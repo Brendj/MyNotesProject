@@ -66,22 +66,25 @@
         logger.error("Error during currentUri building", e);
         throw new ServletException(e);
     }
+    String hidePagesAttr=(String)request.getAttribute("hidePages");
+    if (hidePagesAttr==null) hidePagesAttr="";
     String[] pageNames = {
-            SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_CARDS_PAGE, SHOW_JOURNAL, SHOW_LIBRARY, PAY_BANK_INFO, PREPARE_PAY_PAGE,
-            CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
+            SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_JOURNAL,  SHOW_LIBRARY, PAY_BANK_INFO, PREPARE_PAY_PAGE,
+            SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
     String[] labels = {
-            "Покупки и платежи", "Узнать меню", "Дневник", "Мои карты", "Журнал событий системы доступа", "Данные книговыдачи библиотеки", "Оплата в банке", "Оплата он-лайн",
-            "Личные данные", "Изменить пароль", "Выход"};
+            "Покупки и платежи", "Узнать меню",  "Дневник", "Посещение школы", "Данные книговыдачи библиотеки", "Оплата в банке", "Оплата он-лайн",
+            "Мои карты", "Личные данные", "Изменить пароль", "Выход"};
 %>
 <table width="100%">
     <tr>
-        <%
+        <% 
             for (int i = 0; i != pageNames.length; ++i) {
+                if (pageNames[i]==null || hidePagesAttr.indexOf(pageNames[i])!=-1) continue;
                 if (!(clientAuthToken.isSsoAuth() && (StringUtils.equals(LOGOUT_PAGE, pageNames[i]) || StringUtils
                         .equals(CHANGE_PASSWORD_PAGE, pageNames[i])))) {
                     boolean activePage = null != pageNames[i] && StringUtils.equals(pageNames[i], pageName);
         %>
-        <td <%=activePage ? " class=\"active-tab\"" : ""%>>
+        <td class="tab <%=activePage ? "active-tab" : "inactive-tab"%> ">
             <%if (activePage) {%>
             <div class="active-command-link"><%=StringEscapeUtils.escapeHtml(labels[i])%>
             </div>

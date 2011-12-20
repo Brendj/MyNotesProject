@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class Purchase {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link PurchaseElement }
+     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseElement }
      * 
      * 
      */
@@ -96,7 +95,7 @@ public class Purchase {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getTime() {
@@ -108,7 +107,7 @@ public class Purchase {
      * 
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setTime(XMLGregorianCalendar value) {

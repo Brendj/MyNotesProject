@@ -39,7 +39,8 @@ public class ClientRoomController {
     private static final Long RC_INTERNAL_ERROR = 100L, RC_OK=0L;
 
     interface Processor {
-        public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession, Transaction transaction)
+        public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
+                Transaction transaction)
                 throws Exception;
     }
     class ClientRequest {

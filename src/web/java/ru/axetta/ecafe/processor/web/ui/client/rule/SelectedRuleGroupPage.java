@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.rule;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 

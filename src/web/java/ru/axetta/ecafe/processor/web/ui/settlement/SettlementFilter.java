@@ -5,11 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.POS;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
 
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;

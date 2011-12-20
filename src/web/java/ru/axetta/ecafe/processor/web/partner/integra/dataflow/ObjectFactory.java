@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -30,7 +29,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PurchaseList }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseList }
      * 
      */
     public PurchaseList createPurchaseList() {
@@ -38,7 +37,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Purchase }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.Purchase }
      * 
      */
     public Purchase createPurchase() {
@@ -46,7 +45,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CardList }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.CardList }
      * 
      */
     public CardList createCardList() {
@@ -54,7 +53,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnterEventItem }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventItem }
      * 
      */
     public EnterEventItem createEnterEventItem() {
@@ -62,7 +61,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PurchaseElement }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseElement }
      * 
      */
     public PurchaseElement createPurchaseElement() {
@@ -70,7 +69,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Data }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.Data }
      * 
      */
     public Data createData() {
@@ -78,7 +77,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnterEventList }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventList }
      * 
      */
     public EnterEventList createEnterEventList() {
@@ -86,7 +85,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MenuDateItem }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuDateItem }
      * 
      */
     public MenuDateItem createMenuDateItem() {
@@ -94,7 +93,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MenuItem }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuItem }
      * 
      */
     public MenuItem createMenuItem() {
@@ -102,7 +101,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Payment }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.Payment }
      * 
      */
     public Payment createPayment() {
@@ -110,7 +109,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClientSummary }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummary }
      * 
      */
     public ClientSummary createClientSummary() {
@@ -118,7 +117,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CardItem }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.CardItem }
      * 
      */
     public CardItem createCardItem() {
@@ -126,7 +125,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentList }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentList }
      * 
      */
     public PaymentList createPaymentList() {
@@ -134,7 +133,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MenuList }
+     * Create an instance of {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuList }
      * 
      */
     public MenuList createMenuList() {

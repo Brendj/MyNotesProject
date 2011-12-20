@@ -223,40 +223,40 @@
 <table>
     <tr>
         <td colspan="4">
-            <div class="table-header">Книги
+            <div class="output-text">Книги
             </div>
         </td>
     </tr>
     <tr>
         <td>
-            <div class="column-header">Идентификатор записи</div>
+            <div class="output-text">Идентификатор записи</div>
         </td>
         <td>
-            <div class="column-header">Автор</div>
+            <div class="output-text">Автор</div>
         </td>
          <td>
-            <div class="column-header">Заглавие</div>
+            <div class="output-text">Заглавие</div>
         </td>
          <td>
-            <div class="column-header">Продолжение заглавия</div>
+            <div class="output-text">Продолжение заглавия</div>
         </td>
          <td>
-            <div class="column-header">Дата издания</div>
+            <div class="output-text">Дата издания</div>
         </td>
          <td>
-            <div class="column-header">Издатель</div>
+            <div class="output-text">Издатель</div>
         </td>
         <td>
-            <div class="column-header">Дата выдачи</div>
+            <div class="output-text">Дата выдачи</div>
         </td>
         <td>
-            <div class="column-header">Дата возврата(срок)</div>
+            <div class="output-text">Дата возврата(срок)</div>
         </td>
         <td>
-            <div class="column-header">Дата возврата</div>
+            <div class="output-text">Дата возврата</div>
         </td>
         <td>
-            <div class="column-header">Статус</div>
+            <div class="output-text">Статус</div>
         </td>
     </tr>
     <%

@@ -14,7 +14,7 @@
 <table class="borderless-grid">
     <tr>
         <td>
-            <div class="table-header">Оплата через банк</div>
+            <div class="output-text">Оплата через банк</div>
         </td>
     </tr>
     <tr>
@@ -26,10 +26,10 @@
             <table class="borderless-grid">
                 <tr>
                     <td align="center" colspan="2">
-                        <div class="column-header">Наименование</div>
+                        <div class="output-text">Наименование</div>
                     </td>
                     <td align="center">
-                        <div class="column-header">Размер комиссии</div>
+                        <div class="output-text">Размер комиссии</div>
                     </td>
                 </tr>
                 <tr>

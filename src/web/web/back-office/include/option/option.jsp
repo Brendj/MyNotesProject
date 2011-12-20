@@ -12,6 +12,8 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Использовать схему с оператором" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.optionPage.withOperator}" styleClass="output-text" />
+        <h:outputText escape="true" value="Отпралять СМС-уведомление о событиях входа-выхода" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="Сохранить" action="#{mainPage.saveOption}"
                                reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"

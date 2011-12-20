@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 15:11:09
  * To change this template use File | Settings | File Templates.
  */
-public class Request3Parser implements ru.axetta.ecafe.processor.web.partner.paypoint.Parser.CustomMessageParser {
+public class Request3Parser implements Parser.CustomMessageParser {
 
     public static final String OPERATION_ID_PARAM = Request2Parser.OPERATION_ID_PARAM;
 
@@ -29,10 +29,10 @@ public class Request3Parser implements ru.axetta.ecafe.processor.web.partner.pay
     }
 
     public PayPointRequest parse(
-            ru.axetta.ecafe.processor.web.partner.paypoint.Parser.PartialParseResult partialParseResult)
+            Parser.PartialParseResult partialParseResult)
             throws Exception {
         List<MessageToken> messageTokens = partialParseResult.getMessageTokens();
-        long operationId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long operationId = Parser
                 .parseRequiredLongParam(OPERATION_ID_PARAM, messageTokens, operationIdFormat);
         return new PayPointRequest3(partialParseResult.getRequestId(), operationId);
     }

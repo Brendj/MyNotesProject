@@ -20,7 +20,10 @@ import org.hibernate.criterion.Restrictions;
  */
 public class OptionPage extends BasicWorkspacePage {
 
-    private Option option;
+    private Option withOperatorOption;
+    private Option notifyBySMSAboutEnterEventOption; 
+
+    private Boolean notifyBySMSAboutEnterEvent;
 
     private Boolean withOperator;
 
@@ -32,6 +35,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.withOperator = withOperator;
     }
 
+    public Boolean getNotifyBySMSAboutEnterEvent() {
+        return notifyBySMSAboutEnterEvent;
+    }
+
+    public void setNotifyBySMSAboutEnterEvent(Boolean notifyBySMSAboutEnterEvent) {
+        this.notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEvent;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -39,16 +50,23 @@ public class OptionPage extends BasicWorkspacePage {
     public void fill(Session session) throws Exception {
         Criteria criteria = session.createCriteria(Option.class);
         criteria.add(Restrictions.eq("idOfOption", 2L));
-        option = (Option)criteria.uniqueResult();
-        withOperator = option.getOptionText().equals("1");
+        withOperatorOption = (Option)criteria.uniqueResult();
+        withOperator = withOperatorOption.getOptionText().equals("1");
+        criteria = session.createCriteria(Option.class);
+        criteria.add(Restrictions.eq("idOfOption", 3L));
+        notifyBySMSAboutEnterEventOption = (Option)criteria.uniqueResult();
+        notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
     }
 
     public void save(Session session) {
-        option.setOptionText(withOperator.equals(true) ? "1" : "0");
-        session.merge(option);
+        withOperatorOption.setOptionText(withOperator.equals(true) ? "1" : "0");
+        notifyBySMSAboutEnterEventOption.setOptionText(notifyBySMSAboutEnterEvent.equals(true) ? "1" : "0");
+        session.merge(withOperatorOption);
+        session.merge(notifyBySMSAboutEnterEventOption);
     }
 
     public void cancelOption() {
-        withOperator = option.getOptionText().equals("1");
+        withOperator = withOperatorOption.getOptionText().equals("1");
+        notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
     }
 }

@@ -344,38 +344,38 @@
 </form>
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
-<table>
-<tr>
-    <td colspan="6">
-        <div class="table-header">Покупки, совершенные с <%=StringEscapeUtils.escapeHtml(dateFormat.format(startDate))%>
+<table class="infotable">
+<tr class="header-tr">
+    <td colspan="8">
+        <div class="output-text">Покупки, совершенные с <%=StringEscapeUtils.escapeHtml(dateFormat.format(startDate))%>
             по <%=StringEscapeUtils.escapeHtml(dateFormat.format(endDate))%>
         </div>
     </td>
 </tr>
-<tr>
+<tr class="subheader-tr">
     <td>
-        <div class="column-header">Дата</div>
+        <div class="output-text">Дата</div>
     </td>
     <td>
-        <div class="column-header">Сумма покупки</div>
+        <div class="output-text">Сумма покупки</div>
     </td>
     <td>
-        <div class="column-header">Скидка</div>
+        <div class="output-text">Скидка</div>
     </td>
     <td>
-        <div class="column-header">Дотация</div>
+        <div class="output-text">Дотация</div>
     </td>
     <td>
-        <div class="column-header">Наличными</div>
+        <div class="output-text">Наличными</div>
     </td>
     <td>
-        <div class="column-header">По карте</div>
+        <div class="output-text">По карте</div>
     </td>
     <td>
-        <div class="column-header">Номер карты</div>
+        <div class="output-text">Номер карты</div>
     </td>
     <td>
-        <div class="column-header">Состав</div>
+        <div class="output-text">Состав</div>
     </td>
 </tr>
 <%
@@ -459,7 +459,7 @@
             Long clientPaymentSum = clientPayment.getPaySum();
             String transferInfo = PaymentTextUtils.buildTransferInfo(clientPayment);
         %>
-        <div class="output-text">Пополнение баланса
+        <div class="output-text topup-info">Пополнение баланса
             +<%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(clientPaymentSum))%>
             (<%=StringEscapeUtils.escapeHtml(transferInfo)%>)
             идентификатор платежа <%=clientPayment.getIdOfPayment()%>
@@ -508,8 +508,12 @@
         </div>
     </td>
     <td align="right">
-        <%Long discount = order.getSocDiscount() + order.getTrdDiscount();%>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(discount))%>
+        <%String discountInfo = "";
+          if (order.getSocDiscount()!=0) discountInfo+=CurrencyStringUtils.copecksToRubles(order.getSocDiscount())+" ЛГТ<br/>";
+          if (order.getTrdDiscount()!=0) discountInfo+=CurrencyStringUtils.copecksToRubles(order.getTrdDiscount())+" ТРГ";
+          if (discountInfo.length()==0) discountInfo="-";
+      %>
+        <div class="output-text"><%=discountInfo%>
         </div>
     </td>
     <td align="right">
@@ -544,7 +548,11 @@
             %>
             <tr valign="top">
                 <td>
-                    <div class="output-text"><%=StringEscapeUtils.escapeHtml(currOrderDetail.getMenuDetailName())%>
+                    <% String odStyle="";
+                       if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_9) odStyle="od-complex";
+                       else if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_ITEM_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_ITEM_9) odStyle="od-c-item";
+                    %>
+                    <div class="output-text <%=odStyle%>"><%=StringEscapeUtils.escapeHtml(currOrderDetail.getMenuDetailName())%>
                         (<%=StringEscapeUtils.escapeHtml(currOrderDetail.getQty().toString())%>)
                     </div>
                 </td>

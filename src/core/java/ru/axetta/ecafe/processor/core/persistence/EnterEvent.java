@@ -30,6 +30,13 @@ public class EnterEvent {
     private String docSerialNum;
     private Date issueDocDate;
     private Date visitDateTime;
+    
+    public static final int ENTRY = 0; // вход
+    public static final int EXIT = 1; // выход
+    public static final int PASSAGE_IS_FORBIDDEN = 2; // проход запрещен
+    public static final int TURNSTILE_IS_BROKEN = 3; // взлом турникета
+    public static final int EVENT_WITHOUT_PASSAGE = 4; // событие без прохода
+    public static final int PASSAGE_RUFUSAL = 5; // отказ от прохода
 
     public EnterEvent() {
         // For Hibernate

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.report;
@@ -116,7 +116,7 @@ public class BasicReport {
 
     protected static Transaction createTransaction(Session session) {
         Transaction transaction = session.getTransaction();
-        //transaction.setTimeout(Integer.MAX_VALUE);
+        //transaction.setTimeout(60*60);
         return transaction;
     }
 

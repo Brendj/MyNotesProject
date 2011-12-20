@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.persistence;
@@ -83,12 +83,12 @@ public class BoolType implements UserType {
     }
 
     public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SessionImplementor sessionImplementor)
-            throws org.hibernate.HibernateException, java.sql.SQLException {
+            throws HibernateException, SQLException {
         nullSafeSet(preparedStatement, o, i);
     }
 
     public Object nullSafeGet(ResultSet resultSet, String[] strings, SessionImplementor sessionImplementor, Object o)
-            throws org.hibernate.HibernateException, java.sql.SQLException {
+            throws HibernateException, SQLException {
         return nullSafeGet(resultSet, strings, o);
     }
 

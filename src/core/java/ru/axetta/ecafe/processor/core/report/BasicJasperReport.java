@@ -31,7 +31,7 @@ public class BasicJasperReport extends BasicReport {
     public static class PdfBuilder extends BasicDocumentBuilder {
 
         public PdfBuilder(String basePath, String baseFileName,
-                BasicReport.DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
+                DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
                 DateFormat timeFormat) {
             super(basePath, baseFileName, "pdf", documentBuilderCallback, dateFormat, timeFormat);
         }
@@ -53,7 +53,7 @@ public class BasicJasperReport extends BasicReport {
     public static class XlsBuilder extends BasicDocumentBuilder {
 
         public XlsBuilder(String basePath, String baseFileName,
-                BasicReport.DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
+                DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
                 DateFormat timeFormat) {
             super(basePath, baseFileName, "xls", documentBuilderCallback, dateFormat, timeFormat);
         }
@@ -82,7 +82,7 @@ public class BasicJasperReport extends BasicReport {
     public static class HtmlBuilder extends BasicDocumentBuilder {
 
         public HtmlBuilder(String basePath, String baseFileName,
-                BasicReport.DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
+                DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
                 DateFormat timeFormat) {
             super(basePath, baseFileName, "html", documentBuilderCallback, dateFormat, timeFormat);
         }
@@ -110,7 +110,7 @@ public class BasicJasperReport extends BasicReport {
     public static class CsvBuilder extends BasicDocumentBuilder {
 
         public CsvBuilder(String basePath, String baseFileName,
-                BasicReport.DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
+                DocumentBuilderCallback documentBuilderCallback, DateFormat dateFormat,
                 DateFormat timeFormat) {
             super(basePath, baseFileName, "csv", documentBuilderCallback, dateFormat, timeFormat);
         }

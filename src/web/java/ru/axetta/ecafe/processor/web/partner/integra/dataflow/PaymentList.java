@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class PaymentList {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Payment }
+     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.Payment }
      * 
      * 
      */

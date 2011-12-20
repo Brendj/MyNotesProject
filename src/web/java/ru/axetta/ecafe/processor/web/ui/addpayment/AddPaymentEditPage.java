@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
 import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 

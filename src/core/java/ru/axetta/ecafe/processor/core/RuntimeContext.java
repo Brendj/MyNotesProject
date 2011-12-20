@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core;
@@ -149,7 +149,7 @@ public class RuntimeContext {
      * internal reference counter is used!
      *
      * @return global instance (if exists).
-     * @throws NotInitializedException If global instance was not initialized wet.
+     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.NotInitializedException If global instance was not initialized wet.
      * @thread-safety fully (synchronized lock inside).
      */
     public static RuntimeContext getInstance() throws NotInitializedException {
@@ -167,7 +167,7 @@ public class RuntimeContext {
      * Must be called once during application's lifetime (at startup point).
      *
      * @param contextPath application context path.
-     * @throws AlreadyInitializedException if global instance have already been initialized.
+     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.AlreadyInitializedException if global instance have already been initialized.
      * @throws Exception                   if any exception (error) during runtime context initialization happens.
      * @exception-safety strong guarantee (for global instance).
      * @thread-safety fully (synchronized lock inside).
@@ -191,7 +191,7 @@ public class RuntimeContext {
      *         was really destroyed, nonzero means runtime context is locked
      *         by something else and will be destroyed when
      *         all of its instance copies will be released.
-     * @throws NotInitializedException if global instance was not initialized.
+     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.NotInitializedException if global instance was not initialized.
      * @exception-safety strong guarantee (for global instance).
      * @thread-safety fully (synchronized lock inside).
      */

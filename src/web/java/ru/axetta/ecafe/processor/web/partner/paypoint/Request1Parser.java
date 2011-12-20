@@ -35,14 +35,14 @@ public class Request1Parser implements Parser.CustomMessageParser {
     }
 
     public PayPointRequest parse(
-            ru.axetta.ecafe.processor.web.partner.paypoint.Parser.PartialParseResult partialParseResult)
+            Parser.PartialParseResult partialParseResult)
             throws Exception {
         List<MessageToken> messageTokens = partialParseResult.getMessageTokens();
-        long clientId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long clientId = Parser
                 .parseRequiredLongParam(CLIENT_ID_PARAM, messageTokens, clientIdFormat);
-        long operationId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long operationId = Parser
                 .parseRequiredLongParam(OPERATION_ID_PARAM, messageTokens, operationIdFormat);
-        long terminalId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long terminalId = Parser
                 .parseRequiredLongParam(TERMINAL_ID_PARAM, messageTokens, terminalIdFormat);
         return new PayPointRequest1(partialParseResult.getRequestId(), clientId, operationId, terminalId);
     }

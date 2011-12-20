@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.client.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.POS;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;

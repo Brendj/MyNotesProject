@@ -46,18 +46,18 @@ public class Request2Parser implements Parser.CustomMessageParser {
     }
 
     public PayPointRequest parse(
-            ru.axetta.ecafe.processor.web.partner.paypoint.Parser.PartialParseResult partialParseResult)
+            Parser.PartialParseResult partialParseResult)
             throws Exception {
         List<MessageToken> messageTokens = partialParseResult.getMessageTokens();
-        long clientId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long clientId = Parser
                 .parseRequiredLongParam(CLIENT_ID_PARAM, messageTokens, clientIdFormat);
-        long operationId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long operationId = Parser
                 .parseRequiredLongParam(OPERATION_ID_PARAM, messageTokens, operationIdFormat);
-        long terminalId = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long terminalId = Parser
                 .parseRequiredLongParam(TERMINAL_ID_PARAM, messageTokens, terminalIdFormat);
-        long sum = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long sum = Parser
                 .parseRequiredLongParam(SUM_PARAM, messageTokens, sumFormat);
-        long sumf = ru.axetta.ecafe.processor.web.partner.paypoint.Parser
+        long sumf = Parser
                 .parseRequiredLongParam(SUMF_PARAM, messageTokens, sumFormat);
         Date time = parseTime(messageTokens);
         return new PayPointRequest2(partialParseResult.getRequestId(), clientId, operationId, terminalId, sum, sumf,

@@ -5,16 +5,12 @@
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.POS;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
 import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.Date;
 

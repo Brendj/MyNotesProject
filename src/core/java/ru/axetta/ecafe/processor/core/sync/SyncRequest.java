@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
-     */
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+ */
 
 package ru.axetta.ecafe.processor.core.sync;
 
@@ -1624,9 +1624,9 @@ public class SyncRequest {
                                 .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
                     }
                     Long idOfTempCard = null;
-                    if (enterEventNode.getAttributes().getNamedItem("idOfTempCard") != null) {
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfTempCard") != null) {
                         idOfTempCard = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("idOfTempCard").getTextContent());
+                                enterEventNode.getAttributes().getNamedItem("IdOfTempCard").getTextContent());
                     }
                     TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
                     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");

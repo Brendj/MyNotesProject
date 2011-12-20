@@ -185,15 +185,6 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../servlet-api-2.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/org.springframework.asm-3.0.5.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -276,6 +267,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/org.springframework.web.servlet-3.0.5.RELEASE.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/mail.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

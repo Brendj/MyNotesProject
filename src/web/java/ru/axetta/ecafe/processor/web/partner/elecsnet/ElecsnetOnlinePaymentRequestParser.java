@@ -28,7 +28,7 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long contragentId, HttpServletRequest httpRequest)
             throws Exception {
 
-        OnlinePaymentRequestParser.ParseResult parseResult = parsePostedUrlEncodedParams(httpRequest);
+        ParseResult parseResult = parsePostedUrlEncodedParams(httpRequest);
 
 
         int requestType=parseResult.getReqIntParam("type");

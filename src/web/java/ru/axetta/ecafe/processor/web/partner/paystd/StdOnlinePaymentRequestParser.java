@@ -45,7 +45,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     }
 
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest) throws Exception {
-        OnlinePaymentRequestParser.ParseResult parseResult = parseGetParams(httpRequest);
+        ParseResult parseResult = parseGetParams(httpRequest);
         long clientId=parseResult.getReqLongParam("CLIENTID");
         long opId=parseResult.getReqLongParam("OPID");
         long termId=parseResult.getReqLongParam("TERMID");

@@ -18,8 +18,10 @@ public class ClientSms {
     public static final int TEXT_CONTENTS_MAX_LENGTH = 70;
 
     public static final String UNKNOWN_CONTENTS_TYPE_DESCRIPTION = "Неизвестен";
-    public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, "Баланс меньше нуля"};
+    public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, "Баланс меньше нуля",
+                                                              "Уведомление о проходе"};
     public static final int NEGATIVE_BALANCE_CONTENTS = 1;
+    public static final int ENTER_EVENT_NOTIFY = 2;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;

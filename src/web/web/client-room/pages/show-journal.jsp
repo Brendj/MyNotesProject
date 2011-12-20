@@ -268,29 +268,29 @@
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
 
-<table>
-    <tr>
-        <td colspan="4">
-            <div class="table-header">Посещения с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+<table class="infotable">
+    <tr class="header-tr">
+        <td colspan="5">
+            <div class="output-text">Посещения с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
                 по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
             </div>
         </td>
     </tr>
-    <tr>
+    <tr class="subheader-tr">
         <td>
-            <div class="column-header">Дата и время</div>
+            <div class="output-text">Дата и время</div>
         </td>
         <td>
-            <div class="column-header">День</div>
+            <div class="output-text">День</div>
         </td>
         <td>
-            <div class="column-header">Наименование входа</div>
+            <div class="output-text">Наименование входа</div>
         </td>
         <td>
-            <div class="column-header">Направление</div>
+            <div class="output-text">Направление</div>
         </td>
         <td>
-            <div class="column-header">Временная карта</div>
+            <div class="output-text">Временная карта</div>
         </td>
     </tr>
     <%
@@ -352,7 +352,7 @@
                     </td>
                     <td>
                         <div style="text-align:center">
-                            <input type="checkbox" size="16" maxlength="64" class="input-text" disabled="disabled"
+                            <input type="checkbox" size="16" maxlength="64" class="input-text" style="background:black" disabled="disabled"
                                 <%=enterEvent.getIdOfTempCard() != null ? HTML_CHECKED : ""%> />
                         </div>
                     </td>

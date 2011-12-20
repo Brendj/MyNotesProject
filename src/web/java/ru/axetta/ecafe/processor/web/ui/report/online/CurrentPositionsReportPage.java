@@ -13,12 +13,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

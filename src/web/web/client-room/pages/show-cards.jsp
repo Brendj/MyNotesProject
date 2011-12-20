@@ -37,28 +37,28 @@
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 %>
 
-<table>
-    <tr>
+<table class="infotable">
+    <tr class="header-tr">
         <td colspan="7">
-            <div class="table-header">Карты, соответствующие договору <%=clientAuthToken.getContractId()%>
+            <div class="output-text">Карты, соответствующие договору <%=clientAuthToken.getContractId()%>
             </div>
         </td>
     </tr>
-    <tr>
+    <tr class="subheader-tr">
         <td>
-            <div class="column-header">Номер карты</div>
+            <div class="output-text">Номер карты</div>
         </td>
         <td>
-            <div class="column-header">Статус карты</div>
+            <div class="output-text">Статус карты</div>
         </td>
         <td>
-            <div class="column-header">Состояние</div>
+            <div class="output-text">Состояние</div>
         </td>
         <td>
-            <div class="column-header">Дата окончания срока действия</div>
+            <div class="output-text">Дата окончания срока действия</div>
         </td>
         <td>
-            <div class="column-header">Дата последних изменений</div>
+            <div class="output-text">Дата последних изменений</div>
         </td>
     </tr>
     <%

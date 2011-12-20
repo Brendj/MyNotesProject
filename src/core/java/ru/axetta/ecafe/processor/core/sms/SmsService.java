@@ -96,7 +96,7 @@ public class SmsService {
                 throw new HttpException(String.format("HTTP status is: %d", statusCode));
             }
             String response = httpMethod.getResponseBodyAsString();
-            logger.info("Retrived response from SMS service: %s", response);
+            logger.info(String.format("Retrived response from SMS service: %s", response));
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Retrived response from SMS service: %s", response));
             }

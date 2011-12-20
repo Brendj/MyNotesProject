@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class EnterEventList {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link EnterEventItem }
+     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventItem }
      * 
      * 
      */

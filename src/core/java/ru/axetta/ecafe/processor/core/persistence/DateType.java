@@ -93,12 +93,12 @@ public class DateType implements UserType {
     }
 
     public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SessionImplementor sessionImplementor)
-            throws org.hibernate.HibernateException, java.sql.SQLException {
+            throws HibernateException, SQLException {
         nullSafeSet(preparedStatement, o, i);
     }
 
     public Object nullSafeGet(ResultSet resultSet, String[] strings, SessionImplementor sessionImplementor, Object o)
-            throws org.hibernate.HibernateException, java.sql.SQLException {
+            throws HibernateException, SQLException {
         return nullSafeGet(resultSet, strings, o);
     }
 

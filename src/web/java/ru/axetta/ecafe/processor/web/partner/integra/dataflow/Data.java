@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -72,7 +71,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link ClientSummary }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummary }
      *     
      */
     public ClientSummary getClientSummary() {
@@ -84,7 +83,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link ClientSummary }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummary }
      *     
      */
     public void setClientSummary(ClientSummary value) {
@@ -96,7 +95,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link PurchaseList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseList }
      *     
      */
     public PurchaseList getPurchaseList() {
@@ -108,7 +107,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link PurchaseList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseList }
      *     
      */
     public void setPurchaseList(PurchaseList value) {
@@ -120,7 +119,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link PaymentList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentList }
      *     
      */
     public PaymentList getPaymentList() {
@@ -132,7 +131,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link PaymentList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentList }
      *     
      */
     public void setPaymentList(PaymentList value) {
@@ -144,7 +143,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link MenuList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuList }
      *     
      */
     public MenuList getMenuList() {
@@ -156,7 +155,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link MenuList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuList }
      *     
      */
     public void setMenuList(MenuList value) {
@@ -168,7 +167,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link CardList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.CardList }
      *     
      */
     public CardList getCardList() {
@@ -180,7 +179,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link CardList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.CardList }
      *     
      */
     public void setCardList(CardList value) {
@@ -192,7 +191,7 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link EnterEventList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventList }
      *     
      */
     public EnterEventList getEnterEventList() {
@@ -204,7 +203,7 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link EnterEventList }
+     *     {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventList }
      *     
      */
     public void setEnterEventList(EnterEventList value) {

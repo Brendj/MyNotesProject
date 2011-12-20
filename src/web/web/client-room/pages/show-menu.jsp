@@ -341,26 +341,26 @@
 </form>
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
-<table>
-    <tr>
+<table class="infotable">
+    <tr class="header-tr">
         <td colspan="4">
-            <div class="table-header">Меню с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+            <div class="output-text">Меню с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
                 по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
             </div>
         </td>
     </tr>
-    <tr>
+    <tr class="subheader-tr">
         <td>
-            <div class="column-header">Дата</div>
+            <div class="output-text">Дата</div>
         </td>
         <td>
-            <div class="column-header">Группа</div>
+            <div class="output-text">Группа</div>
         </td>
         <td>
-            <div class="column-header">Наименование</div>
+            <div class="output-text">Наименование</div>
         </td>
         <td>
-            <div class="column-header">Цена</div>
+            <div class="output-text">Цена</div>
         </td>
     </tr>
     <%

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.logic;
@@ -19,12 +19,13 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
-import ru.axetta.ecafe.processor.core.sms.ClientSmsProcessor;
+import ru.axetta.ecafe.processor.core.sms.*;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,7 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,6 +237,15 @@ public class Processor implements SyncProcessor,
                             e);
                     accIncRegistry = new SyncResponse.AccIncRegistry();
                     accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
+                }
+
+                // Process enterEvents
+                try {
+                    if (request.getEnterEvents() != null)
+                        resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
                 }
             }
         } catch (Exception e) {
@@ -1274,7 +1285,9 @@ public class Processor implements SyncProcessor,
                     // if enter event exists (may be last sync result was not transferred to client)
                     if (((ee.getIdOfClient() == null && e.getIdOfClient() == null) ||
                          (ee.getIdOfClient() != null && ee.getIdOfClient().equals(e.getIdOfClient())))
-                        && ee.getEvtDateTime().equals(e.getEvtDateTime())) {
+                        && ee.getEvtDateTime().equals(e.getEvtDateTime())
+                        && ((ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) ||
+                            (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard())))) {
                         SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
                             "Enter event already registered");
                         resEnterEvents.addItem(item);
@@ -1307,6 +1320,24 @@ public class Processor implements SyncProcessor,
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
                             null);
                     resEnterEvents.addItem(item);
+                    // отправить уведомление по смс
+
+                    Criteria criteria = persistenceSession.createCriteria(Option.class);
+                    criteria.add(Restrictions.eq("idOfOption", 3L));
+                    Option notifyBySMSAboutEnterEventOption = (Option)criteria.uniqueResult();
+                    boolean notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
+
+                    logger.info("Preparation to send SMS, notifyBySMSAboutEnterEvent - " + notifyBySMSAboutEnterEvent
+                                + ", today - " + isDateToday(e.getEvtDateTime())
+                                + ", date - " + e.getEvtDateTime()
+                                + ", idOfClient - " + e.getIdOfClient()
+                                + ", direction - " + e.getPassDirection());
+
+                    if (notifyBySMSAboutEnterEvent &&
+                        isDateToday(e.getEvtDateTime()) &&
+                        e.getIdOfClient() != null &&
+                        (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT))
+                        sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
                 }
             }
 
@@ -2406,6 +2437,89 @@ public class Processor implements SyncProcessor,
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private void sendEnterEventSms(Session session, long idOfClient, int passDirection, Date eventDate) throws Exception {
+        RuntimeContext runtimeContext = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            SmsService smsService = runtimeContext.getSmsService();
+            MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
+            ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
+
+            Client client = (Client) session.get(Client.class, idOfClient);
+            if (client == null)
+                throw new Exception ("Client doesn't exist");
+            
+            try {
+                String phoneNumber = client.getMobile();
+                if (StringUtils.isNotEmpty(phoneNumber)) {
+                    phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
+                    if (StringUtils.length(phoneNumber) == 11) {
+                        String sender = buildSender(client);
+                        String text = buildSmsText(client, passDirection, eventDate);
+                        String idOfSms = messageIdGenerator.generate();
+                        SendResponse sendResponse = null;
+                        try {
+                            logger.info(String.format("sending SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                                       idOfSms, sender, phoneNumber, text));
+                            sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
+                            logger.info(String.format("sended SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                                                                   idOfSms, sender, phoneNumber, text));
+                        } catch (Exception e) {
+                            if (logger.isWarnEnabled()) {
+                                logger.warn(String.format(
+                                        "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                        idOfSms, sender, phoneNumber, text), e);
+                            }
+                        }
+                        if (null != sendResponse) {
+                            if (sendResponse.isSuccess()) {
+                                clientSmsProcessor
+                                        .registerClientSms(idOfClient, idOfSms, phoneNumber,
+                                                ClientSms.ENTER_EVENT_NOTIFY, text, new Date());
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(String.format("Failed to send SMS to client: %s", client), e);
+            }
+        } finally {
+            RuntimeContext.release(runtimeContext);
+        }
+    }
+
+    private static String buildSender(Client client) {
+        return StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
+    }
+
+    private static String buildSmsText(Client client, int passDirection, Date eventDate) {
+        String eventName = "";
+        if (passDirection == EnterEvent.ENTRY)
+            eventName = "Вход в школу";
+        if (passDirection == EnterEvent.EXIT)
+            eventName = "Выход из школы";
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(eventDate);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
+        String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
+        return String.format(eventName + " " + time + " (" + clientName + "). Баланс: %s р",
+                CurrencyStringUtils.copecksToRubles(client.getBalance()));
+    }
+    
+    private static boolean isDateToday(Date date) {
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        Calendar dateCalendar = Calendar.getInstance();
+        dateCalendar.setTime(date);
+        if (today.get(Calendar.DATE) == dateCalendar.get(Calendar.DATE) &&
+            today.get(Calendar.MONTH) == dateCalendar.get(Calendar.MONTH) &&
+            today.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR))
+            return true;
+        return false;
     }
 
 }

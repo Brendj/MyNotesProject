@@ -698,6 +698,9 @@ INSERT INTO CF_Options(IdOfOption, OptionText)
 -- Option "with/without operator" (0 - without, 1 - with)
 INSERT INTO CF_Options(IdOfOption, OptionText)
   VALUES(2, 0);
+  -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(3, 0);
 
 CREATE TABLE CF_POS (
   IdOfPos        BIGINT         NOT NULL,

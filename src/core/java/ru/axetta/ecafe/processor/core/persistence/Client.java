@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.persistence;
@@ -41,7 +41,7 @@ public class Client {
     public static final String UNKNOWN_CONTRACT_STATE_NAME = "Статус неизвестен";
     public static final int DISCOUNT_MODE_NONE = 0;
     public static final int INITIAL_DISCOUNT_MODE = DISCOUNT_MODE_NONE;
-    public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Бесплатно по категориям"};
+    public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
 
     private Long idOfClient;
     private long version;

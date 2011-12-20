@@ -105,12 +105,21 @@
     </tr>
     <tr>
         <td>
-            <div class="output-text">Скидка:</div>
+            <div class="output-text">Скидка (льгота):</div>
         </td>
         <td align="right">
-            <%Long discount = order.getSocDiscount() + order.getTrdDiscount() + order.getGrantSum();%>
             <div class="output-text">
-                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(discount))%>
+                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(order.getSocDiscount()))%>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="output-text">Скидка (торговая):</div>
+        </td>
+        <td align="right">
+            <div class="output-text">
+                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(order.getTrdDiscount()))%>
             </div>
         </td>
     </tr>
@@ -164,13 +173,13 @@
     <%}%>
 </table>
 
-<table>
-    <tr>
+<table class="infotable">
+    <tr class="header-tr">
         <td colspan="4">
             <div class="output-text">Состав покупки</div>
         </td>
     </tr>
-    <tr>
+    <tr class="subheader-tr">
         <td>
             <div class="output-text">Наименование</div>
         </td>
@@ -190,22 +199,27 @@
     %>
     <tr>
         <td>
-            <div class="output-text">
+	<%
+	    String odStyle="";
+            if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_9) odStyle="od-complex";
+            else if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_ITEM_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_ITEM_9) odStyle="od-c-item";
+	%>
+            <div class="output-text <%=odStyle%>">
                 <%=StringEscapeUtils.escapeHtml(currOrderDetail.getMenuDetailName())%>
             </div>
         </td>
-        <td align="right">
+        <td align="center">
             <div class="output-text">
                 <%=currOrderDetail.getQty()%>
             </div>
         </td>
-        <td align="right">
+        <td align="center">
             <%Long rPrice = currOrderDetail.getRPrice(); %>
             <div class="output-text">
                 <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(rPrice))%>
             </div>
         </td>
-        <td align="right">
+        <td align="center">
             <%Long detailDiscount = currOrderDetail.getDiscount(); %>
             <div class="output-text">
                 <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(detailDiscount))%>

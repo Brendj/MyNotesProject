@@ -230,7 +230,7 @@
                         action="#{mainPage.showClientSmsListPage}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="categoryGroupMenu" binding="#{mainPage.categoryGroupPage.mainMenuComponent}"
-                         label="Категории скидок"
+                         label="Категории льгот"
                          rendered="#{mainPage.eligibleToViewCategory}">
         <a4j:support event="onclick" action="#{mainPage.showCategoryGroupPage}" reRender="workspaceForm" />
 

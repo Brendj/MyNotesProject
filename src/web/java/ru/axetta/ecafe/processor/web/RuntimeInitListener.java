@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.web; /**
@@ -46,7 +46,10 @@ public class RuntimeInitListener implements ServletContextListener {
     // Public constructor is required by servlet spec
     public RuntimeInitListener() {
     }
-    @PersistenceUnit static SessionFactory sessionFactory;
+
+    @PersistenceUnit
+    static SessionFactory sessionFactory;
+
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         ServletContext servletContext = servletContextEvent.getServletContext();
         // Retrieve application deploy path
@@ -138,74 +141,6 @@ public class RuntimeInitListener implements ServletContextListener {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating application-wide Hibernate session factory.");
         }
-        /*String hibernateResource = "java:/ecafe/processor/hibernate/SessionFactory";
-        SessionFactory sessionFactory;
-        Context context = new InitialContext();
-        try {
-            sessionFactory = (SessionFactory) context.lookup(hibernateResource);
-        } finally {
-            close(context);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Application-wide Hibernate session factory created.");
-        }*/
-
-        /*BasicServiceRegistry serviceRegistry = new ServiceRegistryBuilder().configure().
-                        buildServiceRegistry();
-
-        /*Configuration cfg = new Configuration()
-            .addClass(Person.class)
-            .addClass(Contragent.class)
-            .addClass(Org.class)
-            .addClass(Function.class)
-            .addClass(User.class)
-            .addClass(Client.class)
-            .addClass(Card.class)
-            .addClass(Call.class)
-            .addClass(Notification.class)
-            .addClass(AccountTransaction.class)
-            .addClass(ContragentPayment.class)
-            .addClass(ClientPaymentOrder.class)
-            .addClass(ClientPayment.class)
-            .addClass(Order.class)
-            .addClass(OrderDetail.class)
-            .addClass(SyncHistory.class)
-            .addClass(ClientGroup.class)
-            .addClass(Menu.class)
-            .addClass(MenuDetail.class)
-            .addClass(Registry.class)
-            .addClass(DiaryClass.class)
-            .addClass(DiaryTimesheet.class)
-            .addClass(DiaryValue.class)
-            .addClass(ReportHandleRule.class)
-            .addClass(RuleCondition.class)
-            .addClass(ClientSms.class)
-            .addClass(ContragentClientAccount.class)
-            .addClass(SchedulerJob.class)
-            .addClass(SubscriptionFee.class)
-            .addClass(SochiClient.class)
-            .addClass(SochiClientPayment.class)
-            .addClass(MenuExchange.class)
-            .addClass(MenuExchangeRule.class)
-            .addClass(Assortment.class)
-            .addClass(ComplexInfo.class)
-            .addClass(ComplexInfoDetail.class)
-            .addClass(EnterEvent.class)
-            .addClass(Publication.class)
-            .addClass(Circulation.class)
-            .addClass(Settlement.class)
-            .addClass(POS.class)
-            .addClass(CurrentPosition.class)
-            .addClass(AddPayment.class)
-            .addClass(CategoryDiscount.class)
-            .addClass(DiscountRule.class);*/
-
-        /*SessionFactory sessionFactory = new MetadataSources(serviceRegistry)
-                //.addResource("Person.hbm.xml")
-                //.addAnnotatedClass(Person.class)
-                .buildMetadata()
-                .buildSessionFactory();*/
-
         return sessionFactory;
     }
 

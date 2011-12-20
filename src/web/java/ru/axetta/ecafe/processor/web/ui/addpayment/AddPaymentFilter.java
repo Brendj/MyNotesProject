@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;

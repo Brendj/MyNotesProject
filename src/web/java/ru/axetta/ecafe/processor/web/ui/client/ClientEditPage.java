@@ -16,7 +16,10 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
