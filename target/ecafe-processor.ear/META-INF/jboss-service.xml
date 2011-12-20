@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE server PUBLIC "-//JBoss//DTD MBean Service 5.0//EN"
+        "http://www.jboss.org/j2ee/dtd/jboss-service_5_0.dtd">
+<server>
+
+    <mbean code="org.hibernate.jmx.HibernateService"
+           name="jboss.jca:service=HibernateFactory,name=ecafe/processor/hibernate/SessionFactory">
+        <attribute name="JndiName">java:/ecafe/processor/hibernate/SessionFactory</attribute>
+        <attribute name="Datasource">java:/PostgresDS</attribute>
+        <attribute name="Dialect">org.hibernate.dialect.PostgreSQLDialect</attribute>
+        <attribute name="TransactionStrategy">org.hibernate.transaction.JTATransactionFactory</attribute>
+        <attribute name="TransactionManagerLookupStrategy">org.hibernate.transaction.JBossTransactionManagerLookup
+        </attribute>
+        <attribute name="FlushBeforeCompletionEnabled">true</attribute>
+        <attribute name="AutoCloseSessionEnabled">true</attribute>
+        <attribute name="MaximumFetchDepth">5</attribute>
+        <attribute name="SecondLevelCacheEnabled">true</attribute>
+        <attribute name="CacheProviderClass">org.hibernate.cache.HashtableCacheProvider</attribute>
+        <attribute name="QueryCacheEnabled">true</attribute>
+        <attribute name="ShowSqlEnabled">true</attribute>
+        <attribute name="MapResources">
+            ru/axetta/ecafe/processor/core/persistence/Person.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Contragent.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Org.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Function.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/User.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Client.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Card.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Call.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Notification.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/AccountTransaction.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ContragentPayment.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ClientPaymentOrder.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ClientPayment.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Order.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/OrderDetail.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/SyncHistory.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ClientGroup.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Menu.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/MenuDetail.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Registry.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/DiaryClass.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/DiaryTimesheet.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/DiaryValue.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ReportHandleRule.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/RuleCondition.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ClientSms.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ContragentClientAccount.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/SchedulerJob.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/SubscriptionFee.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/SochiClient.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/SochiClientPayment.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/MenuExchange.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/MenuExchangeRules.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/Assortment.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ComplexInfo.hbm.xml,
+            ru/axetta/ecafe/processor/core/persistence/ComplexInfoDetail.hbm.xml
+        </attribute>
+    </mbean>
+
+    <mbean code="org.jboss.security.auth.login.DynamicLoginConfig"
+           name="jboss.jca:service=DynamicLoginConfig,name=ecafe/processor/LoginConfig">
+        <depends optional-attribute-name="LoginConfigService">jboss.security:service=XMLLoginConfig</depends>
+        <depends optional-attribute-name="SecurityManagerService">jboss.security:service=JaasSecurityManager</depends>
+        <depends>jboss.jca:service=HibernateFactory,name=ecafe/processor/hibernate/SessionFactory</depends>
+        <attribute name="PolicyConfig" serialDataType="jbxb">            
+            <jaas:policy xsi:schemaLocation="urn:jboss:security-config:5.0 resource:security-config_5_0.xsd"
+                         xmlns:jaas="urn:jboss:security-config:5.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <jaas:application-policy name="ecafe">
+                    <jaas:authentication>
+                        <jaas:login-module code="ru.axetta.ecafe.processor.j2ee.login.JBossLoginModule"
+                                           flag="required"/>
+                    </jaas:authentication>
+                </jaas:application-policy>
+            </jaas:policy>
+        </attribute>
+    </mbean>
+
+</server>

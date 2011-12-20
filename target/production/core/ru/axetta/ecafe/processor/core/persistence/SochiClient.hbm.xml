@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SochiClient" table="CF_SochiClients">
+        <id name="contractId" column="ContractId" type="long"/>
+        <property name="createTime" column="CreateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="updateTime" column="UpdateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="true"/>
+        <property name="fullName" column="FullName" type="string" length="255" not-null="true" update="true"/>
+        <property name="address" column="Address" type="string" length="255" not-null="false" update="true"/>
+        <set name="payments" inverse="true" cascade="all">
+            <key column="ContractId"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SochiClientPayment"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+

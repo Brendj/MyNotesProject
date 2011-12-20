@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Dependencies: org.apache.commons.logging,org.hibernate,org.slf4j,javax.servlet.api,javax.faces.api
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
