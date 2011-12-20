@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <context-param>
+        <param-name>org.richfaces.SKIN</param-name>
+        <param-value>darkX</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.richfaces.CONTROL_SKINNING</param-name>
+        <param-value>disable</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.jsp</param-value>
+    </context-param>
+
+    <filter>
+        <filter-name>RichfacesFilter</filter-name>
+        <filter-class>org.ajax4jsf.Filter</filter-class>
+        <init-param>
+            <param-name>createTempFiles</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <listener>
+        <display-name>JavaServer Faces configure listener</display-name>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>ru.axetta.ecafe.processor.web.RuntimeInitListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SyncServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.SyncServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.PaymentServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>PayPointServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.paypoint.PayPointServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>RBKMoneyPaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.rbkmoney.RBKMoneyPaymentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SBRTOnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.sberbank_rt.SBRTOnlinePaymentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ElecsnetOnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.elecsnet.ElecsnetOnlinePaymentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StdPayOnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.faces</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SyncServlet</servlet-name>
+        <url-pattern>/sync</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/pay</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>PayPointServlet</servlet-name>
+        <url-pattern>/payment-point</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+         <servlet-name>SBRTOnlinePaymentServlet</servlet-name>
+         <url-pattern>/payment-sbrt</url-pattern>
+     </servlet-mapping>
+
+    <servlet-mapping>
+         <servlet-name>StdPayOnlinePaymentServlet</servlet-name>
+         <url-pattern>/payment-std</url-pattern>
+     </servlet-mapping>
+
+    <servlet-mapping>
+         <servlet-name>ElecsnetOnlinePaymentServlet</servlet-name>
+         <url-pattern>/payment-elecsnet</url-pattern>
+     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>RBKMoneyPaymentServlet</servlet-name>
+        <url-pattern>/rbkmoney/acceptpay</url-pattern>
+    </servlet-mapping>
+
+    <filter-mapping>
+        <filter-name>RichfacesFilter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict direct access to JSFs</web-resource-name>
+            <url-pattern>/back-office/login.jsp</url-pattern>
+            <url-pattern>/back-office/index.jsp</url-pattern>
+            <url-pattern>/back-office/client_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/client_org_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/pay_complex_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/sale_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/client_load_result_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/client_update_load_result_csv_list.jsp</url-pattern>            
+            <url-pattern>/back-office/card_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/card_load_result_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/ccaccount_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/pos_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/settlement_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/addpayment_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict direct access to include-only JSPs</web-resource-name>
+            <url-pattern>/client-room/pages/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict direct access to include-only JSFs</web-resource-name>
+            <url-pattern>/back-office/include/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport for login page</web-resource-name>
+            <url-pattern>/back-office/login.faces</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict unauthorized access to service functions</web-resource-name>
+            <url-pattern>/back-office/index.faces</url-pattern>
+            <url-pattern>/back-office/client_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/client_org_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/pay_complex_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/sale_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/client_load_result_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/client_update_load_result_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/card_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/card_load_result_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/ccaccount_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/pos_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/settlement_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/addpayment_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>AuthorizedUser</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport safety for synchronization</web-resource-name>
+            <!--<url-pattern>/sync</url-pattern>-->
+            <url-pattern>/pay</url-pattern>
+            <url-pattern>/payment-point</url-pattern>
+            <url-pattern>/payment-sbrt</url-pattern>
+            <url-pattern>/payment-elecsnet</url-pattern>
+            <url-pattern>/payment-std</url-pattern>
+            <url-pattern>/rbkmoney/acceptpay</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport safety for client room</web-resource-name>
+            <url-pattern>/client-room/index.jsp</url-pattern>
+            <url-pattern>/client-room/inlinecabinet.jsp</url-pattern>
+            <url-pattern>/client-room/no-styles-inlinecabinet.jsp</url-pattern>
+            <url-pattern>/client-room/sso.jsp</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/back-office/login.faces</form-login-page>
+            <form-error-page>/back-office/login.faces?error=true</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <role-name>AuthorizedUser</role-name>
+    </security-role>
+
+    <session-config>
+        <session-timeout>15</session-timeout>
+    </session-config>
+
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/sessionexpired.jsp</location>
+    </error-page>
+
+
+    <servlet>
+        <servlet-name>services</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>services</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

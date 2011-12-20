@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SubscriptionFee" table="CF_SubscriptionFee">
+        <composite-id name="compositeIdOfSubscriptionFee"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfSubscriptionFee">
+            <key-property name="subscriptionYear" type="integer" column="SubscriptionYear"/>
+            <key-property name="periodNo" type="integer" column="PeriodNo"/>
+        </composite-id>
+        <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"
+                     column="IdOfTransaction" not-null="true" update="false" fetch="join"/>
+        <property name="createTime" column="CreateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="subscriptionSum" column="SubscriptionSum" type="long" not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

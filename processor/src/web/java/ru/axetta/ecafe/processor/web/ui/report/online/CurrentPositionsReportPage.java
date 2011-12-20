@@ -1,0 +1,412 @@
+/*
+ * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.web.ui.report.online;
+
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
+import ru.axetta.ecafe.processor.core.report.BasicReport;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.classic.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: rumil
+ * Date: 21.11.11
+ * Time: 15:26
+ * To change this template use File | Settings | File Templates.
+ */
+public class CurrentPositionsReportPage extends BasicWorkspacePage {
+
+    public String getPageFilename() {
+        return "report/online/current_positions_report";
+    }
+
+    private List<CurPosition> currentPositionList;
+
+    public List<CurPosition> getCurrentPositionList() {
+        return currentPositionList;
+    }
+
+    public void buildReport(Session session) throws Exception {
+        Criteria currentPositionCriteria = session.createCriteria(CurrentPosition.class);
+        currentPositionCriteria.addOrder(Order.asc("idOfPosition"));
+        currentPositionCriteria.list();
+        List list = currentPositionCriteria.list();
+        currentPositionList = new ArrayList<CurPosition>();
+        for (Object obj : list) {
+            CurrentPosition currentPosition = (CurrentPosition) obj;
+            currentPositionList.add(new CurPosition(currentPosition.getIdOfPosition(),
+                    currentPosition.getIdOfContragentDebtor().getContragentName(),
+                    currentPosition.getIdOfContragentCreditor().getContragentName(), currentPosition.getSumma()));
+        }
+    }
+
+    private class OrderItem {
+        private Long rSum;
+        private Long priviledge;
+        private Contragent supplier;
+
+        private OrderItem(Long rSum, Long priviledge, Contragent supplier) {
+            this.rSum = rSum;
+            this.priviledge = priviledge;
+            this.supplier = supplier;
+        }
+
+        public Long getrSum() {
+            return rSum;
+        }
+
+        public Long getPriviledge() {
+            return priviledge;
+        }
+
+        public Contragent getSupplier() {
+            return supplier;
+        }
+    }
+
+    private class ClientPaymentItem {
+
+        Long paySum;
+        Contragent payAgent;
+        Contragent objectContragent;
+
+        private ClientPaymentItem(Long paySum, Contragent payAgent, Contragent objectContragent) {
+            this.paySum = paySum;
+            this.payAgent = payAgent;
+            this.objectContragent = objectContragent;
+        }
+
+        public Long getPaySum() {
+            return paySum;
+        }
+
+        public Contragent getPayAgent() {
+            return payAgent;
+        }
+
+        public Contragent getObjectContragent() {
+            return objectContragent;
+        }
+    }
+
+    public class SettlementItem {
+        private Long summa;
+        private Integer payerClassId;
+        private Integer receiverClassId;
+        private Contragent contragentPayer;
+        private Contragent contragentReceiver;
+
+        public SettlementItem(Long summa, Integer payerClassId, Integer receiverClassId, Contragent contragentPayer,
+                Contragent contragentReceiver) {
+            this.summa = summa;
+            this.payerClassId = payerClassId;
+            this.receiverClassId = receiverClassId;
+            this.contragentPayer = contragentPayer;
+            this.contragentReceiver = contragentReceiver;
+        }
+
+        public Long getSumma() {
+            return summa;
+        }
+
+        public Integer getPayerClassId() {
+            return payerClassId;
+        }
+
+        public Integer getReceiverClassId() {
+            return receiverClassId;
+        }
+
+        public Contragent getContragentPayer() {
+            return contragentPayer;
+        }
+
+        public Contragent getContragentReceiver() {
+            return contragentReceiver;
+        }
+    }
+
+    public class CurrentPositionData {
+        private List<OrderItem> orderItemList;
+        private List<ClientPaymentItem> clientPaymentItemList;
+        private List<SettlementItem> settlementItemList;
+        private List<AddPayment> addPaymentList;
+        private boolean withOperator;
+        private Contragent operatorContragent;
+        private Contragent clientContragent;
+        private Contragent budgetContragent;
+
+        public CurrentPositionData(List<OrderItem> orderItemList,
+                List<ClientPaymentItem> clientPaymentItemList, List<SettlementItem> settlementItemList,
+                List<AddPayment> addPaymentList, boolean withOperator, Contragent operatorContragent,
+                Contragent clientContragent, Contragent budgetContragent) {
+            this.orderItemList = orderItemList;
+            this.clientPaymentItemList = clientPaymentItemList;
+            this.settlementItemList = settlementItemList;
+            this.addPaymentList = addPaymentList;
+            this.withOperator = withOperator;
+            this.operatorContragent = operatorContragent;
+            this.clientContragent = clientContragent;
+            this.budgetContragent = budgetContragent;
+        }
+
+        public List<OrderItem> getOrderItemList() {
+            return orderItemList;
+        }
+
+        public List<ClientPaymentItem> getClientPaymentItemList() {
+            return clientPaymentItemList;
+        }
+
+        public List<SettlementItem> getSettlementItemList() {
+            return settlementItemList;
+        }
+
+        public List<AddPayment> getAddPaymentList() {
+            return addPaymentList;
+        }
+
+        public boolean isWithOperator() {
+            return withOperator;
+        }
+
+        public Contragent getOperatorContragent() {
+            return operatorContragent;
+        }
+
+        public Contragent getClientContragent() {
+            return clientContragent;
+        }
+
+        public Contragent getBudgetContragent() {
+            return budgetContragent;
+        }
+    }
+
+    public CurrentPositionData prepareCurrentPositionsData(Session session) {
+        Criteria optionCriteria = session.createCriteria(Option.class);
+        optionCriteria.add(Restrictions.eq("idOfOption", 2L));
+        Option option = (Option) optionCriteria.uniqueResult();
+        Boolean withOperator = option.getOptionText().equals("1");
+
+        Criteria criteria = null;
+
+        // Оператор
+        criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", Contragent.OPERATOR));
+        Contragent operatorContragent = (Contragent) criteria.uniqueResult();
+
+        // Клиент
+        criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", Contragent.CLIENT));
+        Contragent clientContragent = (Contragent) criteria.uniqueResult();
+
+        // Бюджет
+        criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", Contragent.BUDGET));
+        Contragent budgetContragent = (Contragent) criteria.uniqueResult();
+
+        // CF_Orders
+        Query query = session.createQuery("select o.contragent.idOfContragent, o.pos.idOfPos, sum(o.RSum), sum(o.sosDiscount), sum(o.grantSum) "
+                                           + "  from Order o"
+                                           + " group by o.contragent.idOfContragent, o.pos.idOfPos ");
+
+        List orderList = query.list();
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+        for (Object object : orderList) {
+            Object[] objects = (Object[])object;
+            Long idOfContragent = (Long) objects[0];
+            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            Long idOfPos = (Long) objects[1];
+            POS pos = null;
+            if (idOfPos != null)
+                pos = (POS) session.load(POS.class, idOfPos);
+            Long rSum = (Long) objects[2];
+            Long sosDiscount = (Long) objects[3];
+            Long grantSum = (Long) objects[4];
+            Long priviledge = sosDiscount + grantSum;
+            Contragent supplier = null;
+            if (pos != null)
+                supplier = pos.getContragent();
+            else
+                supplier = contragent;
+            orderItemList.add(new OrderItem(rSum, priviledge, supplier));
+        }
+
+
+        orderList = null;
+
+        // CF_ClientPayments
+        query = session.createQuery("select cp.contragent.idOfContragent,"
+                                  + "       cp.transaction.client.org.defaultSupplier.idOfContragent, sum(cp.paySum) "
+                                  + "  from ClientPayment cp"
+                                  + " group by cp.contragent.idOfContragent, "
+                                  + "          cp.transaction.client.org.defaultSupplier.idOfContragent");
+        List clientPaymentList = query.list();
+        List<ClientPaymentItem> clientPaymentItemList = new ArrayList<ClientPaymentItem>();
+        for (Object object : clientPaymentList) {
+            Object[] objects = (Object[])object;
+            Long idOfContragent = (Long) objects[0];
+            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            Long paySum = (Long) objects[2];
+            Contragent objectContragent = null;
+            if (withOperator) {
+                objectContragent = operatorContragent;
+            } else {
+                idOfContragent = (Long) objects[1];
+                objectContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            }
+            clientPaymentItemList.add(new ClientPaymentItem(paySum, contragent, objectContragent));
+        }
+        clientPaymentList = null;
+
+        // CF_Settlements
+        query = session.createQuery("select s.idOfContragentPayer.idOfContragent, "
+                                  + "       s.idOfContragentReceiver.idOfContragent, sum(s.summa) "
+                                  + "  from Settlement s"
+                                  + " group by s.idOfContragentPayer.idOfContragent, "
+                                  + "          s.idOfContragentReceiver.idOfContragent");
+        List settlementList = query.list();
+        List<SettlementItem> settlementItemList = new ArrayList<SettlementItem>();
+        for (Object object : settlementList) {
+            Object[] objects = (Object[])object;
+            Long idOfContragent = (Long) objects[0];
+            Contragent contragentPayer = (Contragent) session.load(Contragent.class, idOfContragent);
+            idOfContragent = (Long) objects[1];
+            Contragent contragentReceiver = (Contragent) session.load(Contragent.class, idOfContragent);
+            Long summa = (Long) objects[2];
+            settlementItemList.add(new SettlementItem(summa, contragentPayer.getClassId(),
+                    contragentReceiver.getClassId(), contragentPayer, contragentReceiver));
+        }
+        settlementList = null;
+
+        // CF_ADDPayments
+        query = session.createQuery("select ap.contragentPayer.idOfContragent, "
+                                  + "ap.contragentReceiver.idOfContragent, sum(ap.summa) "
+                                  + "  from AddPayment ap"
+                                  + " group by ap.contragentPayer.idOfContragent, "
+                                  + "          ap.contragentReceiver.idOfContragent");
+        List addPaymentObjectList = query.list();
+        List<AddPayment> addPaymentList = new ArrayList<AddPayment>();
+        for (Object object : addPaymentObjectList) {
+            Object[] objects = (Object[])object;
+            Long idOfContragent = (Long) objects[0];
+            Contragent contragentPayer = (Contragent) session.load(Contragent.class, idOfContragent);
+            idOfContragent = (Long) objects[1];
+            Contragent contragentReceiver = (Contragent) session.load(Contragent.class, idOfContragent);
+            Long summa = (Long) objects[2];
+            AddPayment addPayment = new AddPayment();
+            addPayment.setContragentPayer(contragentPayer);
+            addPayment.setContragentReceiver(contragentReceiver);
+            addPayment.setSumma(summa);
+            addPaymentList.add(addPayment);
+        }
+
+        addPaymentObjectList = null;
+
+        CurrentPositionData currentPositionData = new CurrentPositionData(orderItemList, clientPaymentItemList,
+                settlementItemList, addPaymentList, withOperator, operatorContragent, clientContragent, budgetContragent);
+        return currentPositionData;
+    }
+
+    public List<CurrentPositionsManager.CurrentPositionItem> countCurrentPositions(
+            CurrentPositionData currentPositionData) throws Exception {
+        List<CurrentPositionsManager.CurrentPositionItem> curPositionList = new ArrayList<CurrentPositionsManager.CurrentPositionItem>();
+
+        // CF_Orders
+        for (OrderItem orderItem : currentPositionData.getOrderItemList()) {
+            CurrentPositionsManager.changeOrderPosition(null, orderItem.getrSum(), orderItem.getPriviledge(),
+                    orderItem.getSupplier(), curPositionList,
+                    currentPositionData.isWithOperator(), currentPositionData.getOperatorContragent(),
+                    currentPositionData.getClientContragent(), currentPositionData.getBudgetContragent());
+        }
+
+        // CF_ClientPayments
+        for (ClientPaymentItem clientPaymentItem : currentPositionData.getClientPaymentItemList()) {
+            Contragent payAgent = clientPaymentItem.getPayAgent();
+            Long paySum = clientPaymentItem.getPaySum();
+            Contragent objectContragent = clientPaymentItem.getObjectContragent();
+            CurrentPositionsManager
+                    .changeClientPaymentPosition(null, payAgent, paySum, curPositionList, objectContragent);
+        }
+
+        // CF_Settlements
+        for (SettlementItem settlementItem : currentPositionData.getSettlementItemList()) {
+            CurrentPositionsManager.changeSettlementPosition(null, settlementItem.getSumma(),
+                    settlementItem.getPayerClassId(), settlementItem.getReceiverClassId(),
+                    settlementItem.getContragentPayer(), settlementItem.getContragentReceiver(), curPositionList,
+                    currentPositionData.isWithOperator(), currentPositionData.getClientContragent());
+        }
+
+        // CF_ADDPayments
+        for (AddPayment addPayment : currentPositionData.getAddPaymentList()) {
+            CurrentPositionsManager.changeAddPaymentPosition(null, addPayment, addPayment.getSumma(), curPositionList,
+                    currentPositionData.isWithOperator());
+        }
+
+        return curPositionList;
+    }
+
+    public void fixCurrentPositions(Session session, List<CurrentPositionsManager.CurrentPositionItem> curPositionList) {
+        // Удалить все текущие позиции
+        Criteria currentPositionCriteria = session.createCriteria(CurrentPosition.class);
+        List<CurrentPosition> currentPositionList = currentPositionCriteria.list();
+        for (CurrentPosition currentPosition : currentPositionList) {
+            session.delete(currentPosition);
+        }
+
+        for (CurrentPositionsManager.CurrentPositionItem currentPositionItem : curPositionList) {
+            Contragent contragentDebtor =
+                    (Contragent) session.load(Contragent.class, currentPositionItem.getIdOfContragentDebtor());
+            Contragent contragentCreditor =
+                    (Contragent) session.load(Contragent.class, currentPositionItem.getIdOfContragentCreditor());
+            CurrentPosition currentPosition = new CurrentPosition();
+            currentPosition.setIdOfContragentDebtor(contragentDebtor);
+            currentPosition.setIdOfContragentCreditor(contragentCreditor);
+            currentPosition.setSumma(currentPositionItem.getSumma());
+            session.persist(currentPosition);
+        }
+    }
+
+    public class CurPosition {
+
+        private long idOfPosition;
+        private String contragentDebtorName;
+        private String contragentCreditorName;
+        private String summa;
+
+        public CurPosition(long idOfPosition, String contragentDebtorName, String contragentCreditorName, long summa) {
+            this.idOfPosition = idOfPosition;
+            this.contragentDebtorName = contragentDebtorName;
+            this.contragentCreditorName = contragentCreditorName;
+            this.summa = BasicReport.longToMoney(summa);
+        }
+
+        public long getIdOfPosition() {
+            return idOfPosition;
+        }
+
+        public String getContragentDebtorName() {
+            return contragentDebtorName;
+        }
+
+        public String getContragentCreditorName() {
+            return contragentCreditorName;
+        }
+
+        public String getSumma() {
+            return summa;
+        }
+    }
+}

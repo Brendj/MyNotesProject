@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.OrderDetail" table="CF_OrderDetails">
+        <composite-id name="compositeIdOfOrderDetail"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfOrderDetail">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="idOfOrderDetail" type="long" column="IdOfOrderDetail"/>
+        </composite-id>
+        <property name="idOfOrder" column="IdOfOrder" type="long" not-null="true" update="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="order" class="ru.axetta.ecafe.processor.core.persistence.Order" not-null="true"
+                     insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfOrder"/>
+        </many-to-one>
+        <property name="qty" column="Qty" type="long" not-null="true" update="false"/>
+        <property name="discount" column="Discount" type="long" not-null="true" update="false"/>
+        <property name="socDiscount" column="SocDiscount" type="long" not-null="false" update="false"/>
+        <property name="RPrice" column="rPrice" type="long" not-null="true" update="false"/>
+        <property name="menuDetailName" column="MenuDetailName" type="string" length="256" not-null="true"
+                  update="false"/>
+        <property name="rootMenu" column="RootMenu" type="string" not-null="true" length="32"/>
+        <property name="menuGroup" column="MenuGroup" type="string" not-null="true" length="32"/>
+        <property name="menuType" column="MenuType" type="int" not-null="true" update="false"/>
+        <property name="menuOutput" column="MenuOutput" type="string" length="32" not-null="true"
+                  update="false"/>
+        <property name="menuOrigin" column="MenuOrigin" type="int" not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
