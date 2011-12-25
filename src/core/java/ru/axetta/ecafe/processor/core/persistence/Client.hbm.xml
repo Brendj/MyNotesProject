@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
   -->
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Client" table="CF_Clients" optimistic-lock="version">
         <id name="idOfClient" column="IdOfClient" type="long">
@@ -57,6 +57,11 @@
         <property name="limit" column='"Limit"' type="long" not-null="true"/>
         <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
         <property name="categoriesDiscounts" column="CategoriesDiscounts" type="string" not-null="true"/>
+
+        <!-- Kadirov D (22.12.2011) -->
+        <property name="san" column="San" type="string" length="11" not-null="false"/>
+        <property name="guardsan" column="GuardSan" type="string" length="64" not-null="false"/>
+
         <set name="cardsInternal" inverse="true" cascade="all">
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
@@ -92,6 +97,12 @@
         <set name="transactionsInternal" inverse="true" cascade="all">
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>
+        </set>
+
+        <!-- Kadirov D (21.12.2011) -->
+        <set name="enterEventsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
         </set>
     </class>
 </hibernate-mapping>

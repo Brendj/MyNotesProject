@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.persistence;
@@ -74,6 +74,8 @@ public class Client {
     private Long limit;
     private Long expenditureLimit;
     private String categoriesDiscounts;
+    private String san;
+    private String guardsan;
     private Set<Card> cards = new HashSet<Card>();
     private Set<Call> calls = new HashSet<Call>();
     private Set<Notification> notifications = new HashSet<Notification>();
@@ -84,8 +86,9 @@ public class Client {
     private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Circulation> circulations = new HashSet<Circulation>();
+    private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
 
-    Client() {
+    public Client() {
         // For Hibernate only
     }
 
@@ -113,6 +116,22 @@ public class Client {
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
+    }
+
+    public String getGuardsan() {
+        return guardsan;
+    }
+
+    public void setGuardsan(String guardsan) {
+        this.guardsan = guardsan;
+    }
+
+    public String getSan() {
+        return san;
+    }
+
+    public void setSan(String san) {
+        this.san = san;
     }
 
     public Long getBalance() {
@@ -503,6 +522,20 @@ public class Client {
 
     public Set<AccountTransaction> getTransactions() {
         return Collections.unmodifiableSet(getTransactionsInternal());
+    }
+
+    private Set<EnterEvent> getEnterEventsInternal() {
+        // For Hibernate only
+        return enterEvents;
+    }
+
+    private void setEnterEventsInternal(Set<EnterEvent> enterEvents) {
+        // For Hibernate only
+        this.enterEvents = enterEvents;
+    }
+
+    public Set<EnterEvent> getEnterEvents() {
+        return Collections.unmodifiableSet(getEnterEventsInternal());
     }
 
     public Card findActiveCard(Session session, Card failCard) throws Exception {

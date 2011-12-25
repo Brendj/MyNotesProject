@@ -21,7 +21,6 @@ public class EnterEvent {
     private int passDirection;
     private int eventCode;
     private Long idOfCard;
-    private Long idOfClient;
     private Long idOfTempCard;
     private Date evtDateTime;
     private Long idOfVisitor;
@@ -30,13 +29,17 @@ public class EnterEvent {
     private String docSerialNum;
     private Date issueDocDate;
     private Date visitDateTime;
-    
+    //Kadyrov (21.12.2011)
+    private Client client;
+    private Org org;
+
     public static final int ENTRY = 0; // вход
     public static final int EXIT = 1; // выход
     public static final int PASSAGE_IS_FORBIDDEN = 2; // проход запрещен
     public static final int TURNSTILE_IS_BROKEN = 3; // взлом турникета
     public static final int EVENT_WITHOUT_PASSAGE = 4; // событие без прохода
     public static final int PASSAGE_RUFUSAL = 5; // отказ от прохода
+
 
     public EnterEvent() {
         // For Hibernate
@@ -97,14 +100,6 @@ public class EnterEvent {
 
     public void setIdOfCard(Long idOfCard) {
         this.idOfCard = idOfCard;
-    }
-
-    public Long getIdOfClient() {
-        return idOfClient;
-    }
-
-    public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
     }
 
     public Long getIdOfTempCard() {
@@ -171,6 +166,22 @@ public class EnterEvent {
         this.visitDateTime = visitDateTime;
     }
 
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -198,7 +209,7 @@ public class EnterEvent {
     public String toString() {
         return "EnterEvent{" + "compositeIdOfEnterEvent=" + compositeIdOfEnterEvent + ", enterName='" + enterName + '\''
                 + ", turnstileAddr='" + turnstileAddr + '\'' + ", passDirection=" + passDirection + ", eventCode="
-                + eventCode + ", idOfCard=" + idOfCard + ", idOfClient=" + idOfClient + ", idOfTempCard=" + idOfTempCard
+                + eventCode + ", idOfCard=" + idOfCard  + ", client=" + client + ", idOfTempCard=" + idOfTempCard
                 + ", evtDateTime=" + evtDateTime + ", idOfVisitor=" + idOfVisitor + ", visitorFullName='"
                 + visitorFullName + '\'' + ", docType=" + docType + ", docSerialNum='" + docSerialNum + '\''
                 + ", issueDocDate=" + issueDocDate + ", visitDateTime=" + visitDateTime + '}';

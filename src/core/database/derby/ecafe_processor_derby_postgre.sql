@@ -1,4 +1,4 @@
--- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
+﻿-- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
 -- Version 0.2.1.5
 
 -- Create tables
@@ -9,6 +9,48 @@ CREATE TABLE CF_Persons (
   SecondName    VARCHAR(128)  NOT NULL,
   IDDocument    VARCHAR(128),
   CONSTRAINT CF_Persons_pk PRIMARY KEY (IdOfPerson)
+);
+
+CREATE TABLE CF_Contragents (
+  IdOfContragent          BIGINT            NOT NULL,
+  Version                 BIGINT            NOT NULL,
+  IdOfContactPerson       BIGINT            NOT NULL,
+  ParentId                INTEGER,
+  ContragentName          VARCHAR(128)      NOT NULL,
+  ClassId                 INTEGER           NOT NULL,
+  Flags                   INTEGER           NOT NULL,
+  Title                   VARCHAR(30)       NOT NULL,
+  Address                 VARCHAR(128)      NOT NULL,
+  Phone                   VARCHAR(32),
+  Mobile                  VARCHAR(32),
+  Email                   VARCHAR(128),
+  Fax                     VARCHAR(32),
+  Remarks                 VARCHAR(1024),
+  INN                     VARCHAR(90),
+  Bank                    VARCHAR(90),
+  BIC                     CHAR(15),
+  CorrAccount             VARCHAR(20),
+  Account                 VARCHAR(20),
+  CreatedDate             BIGINT            NOT NULL,
+  LastUpdate              BIGINT            NOT NULL,
+  PublicKey               VARCHAR(1024)     NOT NULL,
+  NeedAccountTranslate    INTEGER           NOT NULL,  
+  CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
+  CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
+  CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)
+);
+
+CREATE TABLE CF_POS (
+  IdOfPos        BIGINT         NOT NULL,
+  IdOfContragent BIGINT         NOT NULL,
+  Name           VARCHAR(128)   NOT NULL,
+  Description    VARCHAR(128),
+  CreatedDate    BIGINT         NOT NULL,
+  State          int,
+  Flags          int,
+  PublicKey      VARCHAR(1024)  NOT NULL,
+  CONSTRAINT CF_POS_pk PRIMARY KEY (IdOfPos),
+  CONSTRAINT CF_POS_IdOfContragentReceiver_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
 CREATE TABLE CF_Orgs (
@@ -78,40 +120,13 @@ CREATE TABLE CF_Clients (
   "Limit"                 BIGINT            NOT NULL,
   ExpenditureLimit        BIGINT            NOT NULL DEFAULT 0,
   CategoriesDiscounts     VARCHAR(60)       NOT NULL DEFAULT '',
+  San                     VARCHAR(11),
+  GuardSan                VARCHAR(64),
   CONSTRAINT CF_Clients_pk PRIMARY KEY (IdOfClient),
   CONSTRAINT CF_Clients_ContractId UNIQUE (ContractId),
   CONSTRAINT CF_Clients_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_Clients_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson),
   CONSTRAINT CF_Clients_IdOfContractPerson_fk FOREIGN KEY (IdOfContractPerson) REFERENCES CF_Persons (IdOfPerson)
-);
-
-CREATE TABLE CF_Contragents (
-  IdOfContragent          BIGINT            NOT NULL,
-  Version                 BIGINT            NOT NULL,
-  IdOfContactPerson       BIGINT            NOT NULL,
-  ParentId                INTEGER,
-  ContragentName          VARCHAR(128)      NOT NULL,
-  ClassId                 INTEGER           NOT NULL,
-  Flags                   INTEGER           NOT NULL,
-  Title                   VARCHAR(30)       NOT NULL,
-  Address                 VARCHAR(128)      NOT NULL,
-  Phone                   VARCHAR(32),
-  Mobile                  VARCHAR(32),
-  Email                   VARCHAR(128),
-  Fax                     VARCHAR(32),
-  Remarks                 VARCHAR(1024),
-  INN                     VARCHAR(90),
-  Bank                    VARCHAR(90),
-  BIC                     CHAR(15),
-  CorrAccount             VARCHAR(20),
-  Account                 VARCHAR(20),
-  CreatedDate             BIGINT            NOT NULL,
-  LastUpdate              BIGINT            NOT NULL,
-  PublicKey               VARCHAR(1024)     NOT NULL,
-  NeedAccountTranslate    INTEGER           NOT NULL,  
-  CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
-  CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
-  CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)
 );
 
 CREATE TABLE CF_ContragentClientAccounts (
@@ -533,7 +548,9 @@ CREATE TABLE CF_Generators (
   IdOfPos                 BIGINT          NOT NULL,
   IdOfSettlement          BIGINT          NOT NULL,
   IdOfPosition            BIGINT          NOT NULL,
-  IdOfAddPayment          BIGINT          NOT NULL
+  IdOfAddPayment          BIGINT          NOT NULL,
+  IdOfCategoryDiscount    BIGINT          NOT NULL,
+  IdOfRule		  BIGINT          NOT NULL
 );
 
 CREATE TABLE CF_SubscriptionFee (
@@ -701,19 +718,6 @@ INSERT INTO CF_Options(IdOfOption, OptionText)
   -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
 INSERT INTO CF_Options(IdOfOption, OptionText)
   VALUES(3, 0);
-
-CREATE TABLE CF_POS (
-  IdOfPos        BIGINT         NOT NULL,
-  IdOfContragent BIGINT         NOT NULL,
-  Name           VARCHAR(128)   NOT NULL,
-  Description    VARCHAR(128),
-  CreatedDate    BIGINT         NOT NULL,
-  State          int,
-  Flags          int,
-  PublicKey      VARCHAR(1024)  NOT NULL,
-  CONSTRAINT CF_POS_pk PRIMARY KEY (IdOfPos),
-  CONSTRAINT CF_POS_IdOfContragentReceiver_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
-);
 
 CREATE TABLE CF_Settlements (
   IdOfSettlement         BIGINT         NOT NULL,

@@ -1281,9 +1281,9 @@ public class Processor implements SyncProcessor,
                 // Check enter event existence
                 EnterEvent ee = DAOUtils
                     .findEnterEvent(persistenceSession, new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
-                if (null != ee) {
+                /*if (null != ee) {
                     // if enter event exists (may be last sync result was not transferred to client)
-                    if (((ee.getIdOfClient() == null && e.getIdOfClient() == null) ||
+                    /*if (((ee.getIdOfClient() == null && e.getIdOfClient() == null) ||
                          (ee.getIdOfClient() != null && ee.getIdOfClient().equals(e.getIdOfClient())))
                         && ee.getEvtDateTime().equals(e.getEvtDateTime())
                         && ((ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) ||
@@ -1338,7 +1338,7 @@ public class Processor implements SyncProcessor,
                         e.getIdOfClient() != null &&
                         (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT))
                         sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
-                }
+                } */
             }
 
             persistenceTransaction.commit();

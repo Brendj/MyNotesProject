@@ -4,7 +4,7 @@
   -->
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Org" table="CF_Orgs" optimistic-lock="version">
         <id name="idOfOrg" column="IdOfOrg" type="long">
@@ -68,6 +68,12 @@
         <set name="diaryValuesInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryValue"/>
+        </set>
+
+        <!-- Kadirov D (21.12.2011) -->
+        <set name="enterEventsInternal" inverse="true" cascade="all">
+            <key column="IdOfOrg"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
         </set>
     </class>
 </hibernate-mapping>
