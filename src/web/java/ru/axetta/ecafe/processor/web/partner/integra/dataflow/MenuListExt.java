@@ -1,3 +1,4 @@
+
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -9,16 +10,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for MenuList complex type.
+ * <p>Java class for MenuListExt complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="MenuList">
+ * &lt;complexType name="MenuListExt">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="M" type="{}MenuDateItem" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="M" type="{}MenuDateItemExt" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MenuList", propOrder = {
+@XmlType(name = "MenuListExt", propOrder = {
     "m"
 })
-public class MenuList {
+public class MenuListExt {
 
     @XmlElement(name = "M")
-    protected List<MenuDateItem> m;
+    protected List<MenuDateItemExt> m;
 
     /**
      * Gets the value of the m property.
@@ -54,13 +55,13 @@ public class MenuList {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuDateItem }
+     * {@link MenuDateItemExt }
      * 
      * 
      */
-    public List<MenuDateItem> getM() {
+    public List<MenuDateItemExt> getM() {
         if (m == null) {
-            m = new ArrayList<MenuDateItem>();
+            m = new ArrayList<MenuDateItemExt>();
         }
         return this.m;
     }

@@ -230,7 +230,7 @@
                         action="#{mainPage.showClientSmsListPage}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="categoryGroupMenu" binding="#{mainPage.categoryGroupPage.mainMenuComponent}"
-                         label="Категории льгот"
+                         label="Категории скидок"
                          rendered="#{mainPage.eligibleToViewCategory}">
         <a4j:support event="onclick" action="#{mainPage.showCategoryGroupPage}" reRender="workspaceForm" />
 
@@ -416,6 +416,11 @@
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
+
+                                               <!-- внесено  изменние -->
+    <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
+                        label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"  reRender="workspaceForm" />
+                                               <!-- внесено  изменние -->
 
     <rich:panelMenuItem id="syncReportMenuItem" binding="#{mainPage.syncReportPage.mainMenuComponent}"
                         label="Отчет по синхронизации" action="#{mainPage.showSyncReportPage}" reRender="workspaceForm" />

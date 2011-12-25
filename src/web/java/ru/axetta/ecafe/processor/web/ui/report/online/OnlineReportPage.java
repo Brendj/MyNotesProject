@@ -62,7 +62,7 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
         return idOfOrgList;
     }
 
-    private String filter = "Не выбрано";
+    protected String filter = "Не выбрано";
 
     public String getFilter() {
         return filter;

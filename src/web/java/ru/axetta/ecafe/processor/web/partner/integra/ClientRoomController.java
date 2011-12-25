@@ -12,8 +12,8 @@ import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +101,22 @@ public class ClientRoomController {
         });
         return new ModelAndView(XML_VIEW_NAME, "object", data);
     }
+    
+    @RequestMapping(method= RequestMethod.GET, value="/{contractId}/summaryext")
+        public ModelAndView getSummaryExt(@PathVariable Long contractId) {
+            Data data=new ClientRequest().process(contractId, new Processor() {
+                public void process(Client client, Data data, ObjectFactory objectFactory, Session session, Transaction transaction) {
+                    ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
+                    clientSummaryExt.setBalance(client.getBalance());
+                    clientSummaryExt.setOverdraftLimit(client.getLimit());
+                    clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
+                    clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
+                    data.setClientSummaryExt(clientSummaryExt);
+                }
+            });
+            return new ModelAndView(XML_VIEW_NAME, "object", data);
+        }
+
     final static int MAX_RECS=50;
     @RequestMapping(method= RequestMethod.GET, value="/{contractId}/purchase/list")
     public ModelAndView getPurchaseList(@PathVariable Long contractId, final @RequestParam("startDate") Date startDate, final @RequestParam("endDate") Date endDate) {
@@ -121,13 +137,13 @@ public class ClientRoomController {
                     Order order = (Order)o;
                     Purchase purchase = objectFactory.createPurchase();
                     purchase.setByCard(order.getSumByCard());
-                    purchase.setDiscount(order.getSocDiscount());
+                    purchase.setDiscount(order.getSocDiscount() + order.getTrdDiscount());
                     purchase.setDonation(order.getGrantSum());
                     purchase.setSum(order.getRSum());
                     purchase.setByCash(order.getSumByCash());
                     purchase.setIdOfCard(order.getCard().getCardPrintedNo());
                     purchase.setTime(toXmlDateTime(order.getCreateTime()));
-                    purchaseList.getP().add(purchase);
+
                     Set<OrderDetail> orderDetailSet=((Order) o).getOrderDetails();
                     for (OrderDetail od : orderDetailSet) {
                         PurchaseElement purchaseElement = objectFactory.createPurchaseElement();
@@ -136,12 +152,59 @@ public class ClientRoomController {
                         purchaseElement.setSum(od.getRPrice());
                         purchase.getE().add(purchaseElement);
                     }
+
+                    purchaseList.getP().add(purchase);
                 }
                 data.setPurchaseList(purchaseList);
             }
         });
         return new ModelAndView(XML_VIEW_NAME, "object", data);
     }
+
+    @RequestMapping(method= RequestMethod.GET, value="/{contractId}/purchase/listext")
+        public ModelAndView getPurchaseListExt(@PathVariable Long contractId, final @RequestParam("startDate") Date startDate, final @RequestParam("endDate") Date endDate) {
+            Data data=new ClientRequest().process(contractId, new Processor() {
+                public void process(Client client, Data data, ObjectFactory objectFactory, Session session, Transaction transaction)
+                        throws Exception {
+                    int nRecs=0;
+                    Date nextToEndDate = DateUtils.addDays(endDate, 1);
+                    Criteria ordersCriteria = session.createCriteria(Order.class);
+                    ordersCriteria.add(Restrictions.eq("client", client));
+                    ordersCriteria.add(Restrictions.ge("createTime", startDate));
+                    ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+                    ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
+                    List ordersList = ordersCriteria.list();
+                    PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
+                    for (Object o : ordersList) {
+                        if (nRecs++>MAX_RECS) break;
+                        Order order = (Order)o;
+                        PurchaseExt purchaseExt = objectFactory.createPurchaseExt();
+                        purchaseExt.setByCard(order.getSumByCard());
+                        purchaseExt.setSocDiscount(order.getSocDiscount());
+                        purchaseExt.setTrdDiscount(order.getTrdDiscount());
+                        purchaseExt.setDonation(order.getGrantSum());
+                        purchaseExt.setSum(order.getRSum());
+                        purchaseExt.setByCash(order.getSumByCash());
+                        purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
+                        purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
+
+                        Set<OrderDetail> orderDetailSet=((Order) o).getOrderDetails();
+                        for (OrderDetail od : orderDetailSet) {
+                            PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
+                            purchaseElementExt.setAmount(od.getQty());
+                            purchaseElementExt.setName(od.getMenuDetailName());
+                            purchaseElementExt.setSum(od.getRPrice());
+                            purchaseExt.getE().add(purchaseElementExt);
+                        }
+
+                        purchaseListExt.getP().add(purchaseExt);
+                    }
+                    data.setPurchaseListExt(purchaseListExt);
+                }
+            });
+            return new ModelAndView(XML_VIEW_NAME, "object", data);
+        }
+
     @RequestMapping(method= RequestMethod.GET, value="/{contractId}/payment/list")
     public ModelAndView getPaymentList(@PathVariable Long contractId, final @RequestParam("startDate") Date startDate, final @RequestParam("endDate") Date endDate) {
         Data data=new ClientRequest().process(contractId, new Processor() {
@@ -217,8 +280,61 @@ public class ClientRoomController {
         return new ModelAndView(XML_VIEW_NAME, "object", data);
     }
 
+    @RequestMapping(method= RequestMethod.GET, value="/{contractId}/menu/listext")
+    public ModelAndView getMenuListExt(@PathVariable Long contractId, final @RequestParam("startDate") Date startDate, final @RequestParam("endDate") Date endDate) {
+        Data data=new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Data data, ObjectFactory objectFactory, Session session, Transaction transaction)
+                throws Exception {
+                Criteria menuCriteria = session.createCriteria(Menu.class);
+                menuCriteria.add(Restrictions.eq("org", client.getOrg()));
+                menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+                menuCriteria.add(Restrictions.ge("menuDate", startDate));
+                menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+
+                List menus = menuCriteria.list();
+                MenuListExt menuListExt = objectFactory.createMenuListExt();
+                int nRecs=0;
+                for (Object currObject : menus) {
+                    if (nRecs++>MAX_RECS) break;
+
+                    Menu menu = (Menu)currObject;
+                    MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+                    menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
+
+                    Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
+                    menuDetailCriteria.add(Restrictions.eq("menu", menu));
+                    HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
+                    HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
+                    List menuDetails = menuDetailCriteria.list();
+
+                    for (Object o : menuDetails) {
+                        MenuDetail menuDetail = (MenuDetail)o;
+                        MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                        menuItemExt.setGroup(menuDetail.getGroupName());
+                        menuItemExt.setName(menuDetail.getMenuDetailName());
+                        menuItemExt.setPrice(menuDetail.getPrice());
+                        menuItemExt.setCalories(menuDetail.getCalories());
+                        menuItemExt.setVitB1(menuDetail.getVitB1());
+                        menuItemExt.setVitC(menuDetail.getVitC());
+                        menuItemExt.setVitA(menuDetail.getVitA());
+                        menuItemExt.setVitE(menuDetail.getVitE());
+                        menuItemExt.setMinCa(menuDetail.getMinCa());
+                        menuItemExt.setMinP(menuDetail.getMinP());
+                        menuItemExt.setMinMg(menuDetail.getMinMg());
+                        menuItemExt.setMinFe(menuDetail.getMinFe());
+                        menuDateItemExt.getE().add(menuItemExt);
+                    }
+
+                    menuListExt.getM().add(menuDateItemExt);
+                }
+                data.setMenuListExt(menuListExt);
+            }
+        });
+        return new ModelAndView(XML_VIEW_NAME, "object", data);
+    }
+    
     @RequestMapping(method= RequestMethod.GET, value="/{contractId}/card/list")
-    public ModelAndView getPaymentList(@PathVariable Long contractId) {
+    public ModelAndView getCardList(@PathVariable Long contractId) {
         Data data=new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session, Transaction transaction)
                 throws Exception {

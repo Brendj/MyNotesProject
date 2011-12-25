@@ -100,6 +100,26 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long expenditureLimit;
     private String clientGroupName;
 
+    // Kadyrov (22.12.2011)
+    private String san;
+    private String guardsan;
+
+    public String getSan() {
+        return san;
+    }
+
+    public void setSan(String san) {
+        this.san = san;
+    }
+
+    public String getGuardsan() {
+        return guardsan;
+    }
+
+    public void setGuardsan(String guardsan) {
+        this.guardsan = guardsan;
+    }
+
     public String getClientGroupName() {
         return clientGroupName;
     }
@@ -243,6 +263,13 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.balance = client.getBalance();
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
+
+        // опекуны
+        // (Kadyrov D) 23.12.2011
+        this.san= client.getSan();
+        this.guardsan=client.getGuardsan();
+
+
         ClientGroup group = client.getClientGroup();
         this.clientGroupName = group==null?"":group.getGroupName();
 

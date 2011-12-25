@@ -1,3 +1,4 @@
+
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -9,16 +10,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for PurchaseList complex type.
+ * <p>Java class for PurchaseListExt complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="PurchaseList">
+ * &lt;complexType name="PurchaseListExt">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="P" type="{}Purchase" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="P" type="{}PurchaseExt" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PurchaseList", propOrder = {
+@XmlType(name = "PurchaseListExt", propOrder = {
     "p"
 })
-public class PurchaseList {
+public class PurchaseListExt {
 
     @XmlElement(name = "P")
-    protected List<Purchase> p;
+    protected List<PurchaseExt> p;
 
     /**
      * Gets the value of the p property.
@@ -54,13 +55,13 @@ public class PurchaseList {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.Purchase }
+     * {@link PurchaseExt }
      * 
      * 
      */
-    public List<Purchase> getP() {
+    public List<PurchaseExt> getP() {
         if (p == null) {
-            p = new ArrayList<Purchase>();
+            p = new ArrayList<PurchaseExt>();
         }
         return this.p;
     }

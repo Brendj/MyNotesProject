@@ -1,3 +1,4 @@
+
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -12,16 +13,16 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for MenuDateItem complex type.
+ * <p>Java class for MenuDateItemExt complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="MenuDateItem">
+ * &lt;complexType name="MenuDateItemExt">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="E" type="{}MenuItem" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="E" type="{}MenuItemExt" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Date" type="{http://www.w3.org/2001/XMLSchema}date" />
  *     &lt;/restriction>
@@ -32,13 +33,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MenuDateItem", propOrder = {
+@XmlType(name = "MenuDateItemExt", propOrder = {
     "e"
 })
-public class MenuDateItem {
+public class MenuDateItemExt {
 
     @XmlElement(name = "E")
-    protected List<MenuItem> e;
+    protected List<MenuItemExt> e;
     @XmlAttribute(name = "Date")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar date;
@@ -61,13 +62,13 @@ public class MenuDateItem {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuItem }
+     * {@link MenuItemExt }
      * 
      * 
      */
-    public List<MenuItem> getE() {
+    public List<MenuItemExt> getE() {
         if (e == null) {
-            e = new ArrayList<MenuItem>();
+            e = new ArrayList<MenuItemExt>();
         }
         return this.e;
     }
@@ -77,7 +78,7 @@ public class MenuDateItem {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getDate() {
@@ -89,7 +90,7 @@ public class MenuDateItem {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setDate(XMLGregorianCalendar value) {

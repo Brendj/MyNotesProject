@@ -34,8 +34,8 @@ import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.user.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -178,10 +178,14 @@ public class MainPage {
     // baybikov (06.10.2011)
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
+
     // baybikov (07.10.2011)
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
     // baybikov (20.10.2011)
     private final ClientReportPage clientReportPage =  new ClientReportPage();
+
+    // kadyrov (20.12.2011)
+    private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
 
     // baybikov (11.11.2011)
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
@@ -4355,6 +4359,57 @@ public class MainPage {
             RuntimeContext.release(runtimeContext);
         }
         return null;
+    }
+
+    // Kadirov (20.12.2011)
+    public EnterEventReportPage getEnterEventReportPage() {
+        return enterEventReportPage;
+    }
+
+    // Kadirov (20.12.2011)
+    public Object showEnterEventReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = enterEventReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set client report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчет по турникетам", null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // Kadirov (20.12.2011)
+    public Object buildEnterEventReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            enterEventReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build client report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+            RuntimeContext.release(runtimeContext);
+        }
+        return null;
+    }
+
+    // Kadirov (21.12.2011)
+    public String showEnterEventCSVList() {
+        return "showEnterEventCSVList";
     }
 
     // baybikov (20.10.2011)

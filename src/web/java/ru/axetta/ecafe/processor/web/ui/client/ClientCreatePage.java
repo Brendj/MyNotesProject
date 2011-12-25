@@ -180,6 +180,27 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Integer contractState = 0;
     private Integer payForSMS = 1;
     private Long limit;
+
+    // Kadyrov (22.12.2011)
+    private String san;
+    private String guardsan;
+
+    public String getSan() {
+        return san;
+    }
+
+    public void setSan(String san) {
+        this.san = san;
+    }
+
+    public String getGuardsan() {
+        return guardsan;
+    }
+
+    public void setGuardsan(String guardsan) {
+        this.guardsan = guardsan;
+    }
+
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientInitContractStateMenu clientInitContractStateMenu = new ClientInitContractStateMenu();
     private boolean autoContractId = true;

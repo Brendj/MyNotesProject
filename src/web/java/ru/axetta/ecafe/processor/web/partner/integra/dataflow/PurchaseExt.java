@@ -1,3 +1,4 @@
+
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import java.util.ArrayList;
@@ -12,20 +13,21 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for Purchase complex type.
+ * <p>Java class for PurchaseExt complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Purchase">
+ * &lt;complexType name="PurchaseExt">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="E" type="{}PurchaseElement" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="E" type="{}PurchaseElementExt" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Time" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *       &lt;attribute name="Sum" type="{http://www.w3.org/2001/XMLSchema}long" />
- *       &lt;attribute name="Discount" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="SocDiscount" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="TrdDiscount" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="Donation" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="ByCash" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="ByCard" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -38,20 +40,22 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Purchase", propOrder = {
+@XmlType(name = "PurchaseExt", propOrder = {
     "e"
 })
-public class Purchase {
+public class PurchaseExt {
 
     @XmlElement(name = "E")
-    protected List<PurchaseElement> e;
+    protected List<PurchaseElementExt> e;
     @XmlAttribute(name = "Time")
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar time;
     @XmlAttribute(name = "Sum")
     protected Long sum;
-    @XmlAttribute(name = "Discount")
-    protected Long discount;
+    @XmlAttribute(name = "SocDiscount")
+    protected Long socDiscount;
+    @XmlAttribute(name = "TrdDiscount")
+    protected Long trdDiscount;
     @XmlAttribute(name = "Donation")
     protected Long donation;
     @XmlAttribute(name = "ByCash")
@@ -79,13 +83,13 @@ public class Purchase {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseElement }
+     * {@link PurchaseElementExt }
      * 
      * 
      */
-    public List<PurchaseElement> getE() {
+    public List<PurchaseElementExt> getE() {
         if (e == null) {
-            e = new ArrayList<PurchaseElement>();
+            e = new ArrayList<PurchaseElementExt>();
         }
         return this.e;
     }
@@ -95,7 +99,7 @@ public class Purchase {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getTime() {
@@ -107,7 +111,7 @@ public class Purchase {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setTime(XMLGregorianCalendar value) {
@@ -139,27 +143,51 @@ public class Purchase {
     }
 
     /**
-     * Gets the value of the discount property.
+     * Gets the value of the socDiscount property.
      * 
      * @return
      *     possible object is
      *     {@link Long }
      *     
      */
-    public Long getDiscount() {
-        return discount;
+    public Long getSocDiscount() {
+        return socDiscount;
     }
 
     /**
-     * Sets the value of the discount property.
+     * Sets the value of the socDiscount property.
      * 
      * @param value
      *     allowed object is
      *     {@link Long }
      *     
      */
-    public void setDiscount(Long value) {
-        this.discount = value;
+    public void setSocDiscount(Long value) {
+        this.socDiscount = value;
+    }
+
+    /**
+     * Gets the value of the trdDiscount property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getTrdDiscount() {
+        return trdDiscount;
+    }
+
+    /**
+     * Sets the value of the trdDiscount property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setTrdDiscount(Long value) {
+        this.trdDiscount = value;
     }
 
     /**

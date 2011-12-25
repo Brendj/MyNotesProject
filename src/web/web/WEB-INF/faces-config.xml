@@ -165,6 +165,16 @@
         </navigation-case>
     </navigation-rule>
 
+    <!--Kadyrov Damir (21.12.2011)-->
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showEnterEventCSVList</from-outcome>
+            <to-view-id>/back-office/enterEvent_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>

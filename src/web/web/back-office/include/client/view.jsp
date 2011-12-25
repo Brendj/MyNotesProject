@@ -99,6 +99,12 @@
             <h:outputText escape="true" value="#{categoryDiscountName}" styleClass="output-text" /><br/>
         </a4j:repeat>
     </h:panelGrid>
+
+    <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.san}" maxlength="11" styleClass="input-text" readonly="true"/>
+    <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.guardsan}" maxlength="64" styleClass="input-text" readonly="true"/>
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"

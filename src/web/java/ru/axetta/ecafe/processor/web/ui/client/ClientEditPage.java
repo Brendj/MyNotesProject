@@ -172,6 +172,28 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balance;
     private Long limit;
     private Long expenditureLimit;
+
+    // Kadyrov (22.12.2011)
+    private String san;
+    private String guardsan;
+    public String getSan() {
+        return san;
+    }
+
+    public void setSan(String san) {
+        this.san = san;
+    }
+
+    public String getGuardsan() {
+        return guardsan;
+    }
+
+    public void setGuardsan(String guardsan) {
+        this.guardsan = guardsan;
+    }
+
+
+
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
     private Integer freePayMaxCount;
@@ -426,6 +448,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setLimit(this.limit);
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
+        client.setSan(this.san);
+        client.setGuardsan(this.guardsan);
         String clientCategories = "";
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
             if (categoryDiscount.getSelected())

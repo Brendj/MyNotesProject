@@ -1,3 +1,4 @@
+
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -9,18 +10,19 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for ClientSummary complex type.
+ * <p>Java class for ClientSummaryExt complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="ClientSummary">
+ * &lt;complexType name="ClientSummaryExt">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="DateOfContract" type="{http://www.w3.org/2001/XMLSchema}date" />
  *       &lt;attribute name="StateOfContract" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Balance" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="OverdraftLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="ExpenditureLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -29,8 +31,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ClientSummary")
-public class ClientSummary {
+@XmlType(name = "ClientSummaryExt")
+public class ClientSummaryExt {
 
     @XmlAttribute(name = "DateOfContract")
     @XmlSchemaType(name = "date")
@@ -41,13 +43,15 @@ public class ClientSummary {
     protected Long balance;
     @XmlAttribute(name = "OverdraftLimit")
     protected Long overdraftLimit;
+    @XmlAttribute(name = "ExpenditureLimit")
+    protected Long expenditureLimit;
 
     /**
      * Gets the value of the dateOfContract property.
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getDateOfContract() {
@@ -59,7 +63,7 @@ public class ClientSummary {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setDateOfContract(XMLGregorianCalendar value) {
@@ -136,6 +140,30 @@ public class ClientSummary {
      */
     public void setOverdraftLimit(Long value) {
         this.overdraftLimit = value;
+    }
+
+    /**
+     * Gets the value of the expenditureLimit property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getExpenditureLimit() {
+        return expenditureLimit;
+    }
+
+    /**
+     * Sets the value of the expenditureLimit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setExpenditureLimit(Long value) {
+        this.expenditureLimit = value;
     }
 
 }

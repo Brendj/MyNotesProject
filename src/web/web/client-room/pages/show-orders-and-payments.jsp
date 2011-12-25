@@ -360,7 +360,10 @@
         <div class="output-text">Сумма покупки</div>
     </td>
     <td>
-        <div class="output-text">Скидка</div>
+        <div class="output-text">Социальная скидка</div>
+    </td>
+    <td>
+        <div class="output-text">Торговая скидка</div>
     </td>
     <td>
         <div class="output-text">Дотация</div>
@@ -425,6 +428,7 @@
             Date minTime = null;
             if (orderIndex != ordersCount) {
                 Order order = (Order) ordersList.get(orderIndex);
+
                 minTime = order.getCreateTime();
             }
             if (clientPaymentIndex != clientPaymentsCount) {
@@ -456,6 +460,7 @@
     </td>
     <td colspan="5">
         <%
+
             Long clientPaymentSum = clientPayment.getPaySum();
             String transferInfo = PaymentTextUtils.buildTransferInfo(clientPayment);
         %>
@@ -508,12 +513,19 @@
         </div>
     </td>
     <td align="right">
-        <%String discountInfo = "";
-          if (order.getSocDiscount()!=0) discountInfo+=CurrencyStringUtils.copecksToRubles(order.getSocDiscount())+" ЛГТ<br/>";
-          if (order.getTrdDiscount()!=0) discountInfo+=CurrencyStringUtils.copecksToRubles(order.getTrdDiscount())+" ТРГ";
-          if (discountInfo.length()==0) discountInfo="-";
+        <%String socDiscountInfo = "";
+          if (order.getSocDiscount()!=0) socDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getSocDiscount());
+          if (socDiscountInfo.length()==0) socDiscountInfo="-";
       %>
-        <div class="output-text"><%=discountInfo%>
+        <div class="output-text"><%=socDiscountInfo%>
+        </div>
+    </td>
+    <td align="right">
+        <%String trdDiscountInfo = "";
+            if (order.getTrdDiscount()!=0) trdDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getTrdDiscount());
+            if (trdDiscountInfo.length()==0) trdDiscountInfo="-";
+        %>
+        <div class="output-text"><%=trdDiscountInfo%>
         </div>
     </td>
     <td align="right">

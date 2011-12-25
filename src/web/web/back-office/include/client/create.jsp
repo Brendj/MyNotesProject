@@ -97,6 +97,12 @@
             <h:outputText escape="true" value="#{categoryDiscount.categoryName}" styleClass="output-text" /><br/>
         </a4j:repeat>
     </h:panelGrid>
+
+    <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientCreatePage.san}" maxlength="11" styleClass="input-text" />
+    <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientCreatePage.guardsan}" maxlength="64" styleClass="input-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
