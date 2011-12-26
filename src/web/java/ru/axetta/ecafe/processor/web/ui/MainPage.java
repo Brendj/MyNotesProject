@@ -4372,7 +4372,7 @@ public class MainPage {
         try {
             currentWorkspacePage = enterEventReportPage;
         } catch (Exception e) {
-            logger.error("Failed to set client report page", e);
+            logger.error(" Failed to set enter event report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчет по турникетам", null));
         }
@@ -4396,7 +4396,7 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to build client report", e);
+            logger.error("Failed to build enter event report", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
         } finally {
