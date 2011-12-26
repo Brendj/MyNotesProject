@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import static org.hibernate.criterion.Restrictions.*;
 
 public class EnterEventReport extends BasicReport {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnterEventReport.class);
     private final List<EnterEventItem> enterEventItems;
 
     public static class Builder {
@@ -74,19 +72,26 @@ public class EnterEventReport extends BasicReport {
                     + " WHERE e.idofclient = c.idofclient AND e.idoforg = o.idoforg AND c.idofperson = p.idofperson"
                      + "  and e.evtdatetime >= :fromCreatedDate and e.evtdatetime <= :toCreatedDate";*/
              /* Для этого необходимо изменить класс EnterEvent со связями */
-            try{
-                Criteria criteria = session.createCriteria(EnterEvent.class);
-                criteria.add((between("evtDateTime", startDate, endDate)));
-                List<EnterEvent> enterEventList = criteria.list();
-                for(EnterEvent enterEvent: enterEventList){
-                      long id=enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent();
-                    enterEvent.getOrg().getOfficialName();
-                    StringBuilder stringBuilder = new StringBuilder();
+            Criteria criteria = session.createCriteria(EnterEvent.class);
+            criteria.createAlias("org","o").add(in("o.idOfOrg",idOfOrgList));
+            criteria.add((between("evtDateTime", startDate, endDate)));
+            List<EnterEvent> enterEventList = criteria.list();
+            for(EnterEvent enterEvent: enterEventList){
+                long id=enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent();
+                enterEvent.getOrg().getOfficialName();
+                StringBuilder stringBuilder = new StringBuilder();
+                String docId = null;
+                if (enterEvent.getClient() != null){
                     stringBuilder.append(enterEvent.getClient().getPerson().getFirstName());
                     stringBuilder.append(" ");
                     stringBuilder.append(enterEvent.getClient().getPerson().getSecondName());
-                    String passdirection, color="black", personFullName=stringBuilder.toString();
-                    switch (enterEvent.getPassDirection()){
+                    docId=enterEvent.getClient().getPerson().getIdDocument();
+                }else{
+                    stringBuilder.append(" ");
+                    docId="";
+                }
+                String passdirection, color="black", personFullName=stringBuilder.toString();
+                switch (enterEvent.getPassDirection()){
                         case 0: passdirection="вход"; color="green"; break;
                         case 1: passdirection="выход"; color="red"; break;
                         case 2: passdirection="проход запрещен"; break;
@@ -94,17 +99,14 @@ public class EnterEventReport extends BasicReport {
                         case 4: passdirection="событие без прохода"; break;
                         case 5: passdirection="отказ от прохода"; break;
                         default: passdirection="Ошибка обратитесь администратору";
-                    }
-
-                    EnterEventItem  enterEventItem = new EnterEventItem(enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
+                }
+                 //if(enterEvent.getOrg().getIdOfOrg())
+                EnterEventItem  enterEventItem = new EnterEventItem(enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
                             enterEvent.getOrg().getIdOfOrg(), enterEvent.getOrg().getOfficialName(),
                             enterEvent.getEnterName(), enterEvent.getTurnstileAddr(), passdirection,
-                            enterEvent.getEventCode(), enterEvent.getClient().getPerson().getIdDocument(),
+                            enterEvent.getEventCode(),docId,
                             personFullName, enterEvent.getEvtDateTime(), color);
-                    enterEventItems.add(enterEventItem);
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
+                enterEventItems.add(enterEventItem);
             }
              /*
             List resultList = null;
