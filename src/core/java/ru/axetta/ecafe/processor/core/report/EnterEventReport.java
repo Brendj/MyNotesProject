@@ -73,7 +73,8 @@ public class EnterEventReport extends BasicReport {
                      + "  and e.evtdatetime >= :fromCreatedDate and e.evtdatetime <= :toCreatedDate";*/
              /* Для этого необходимо изменить класс EnterEvent со связями */
             Criteria criteria = session.createCriteria(EnterEvent.class);
-            criteria.createAlias("org","o").add(in("o.idOfOrg",idOfOrgList));
+            if(idOfOrgList.isEmpty()) criteria.createAlias("org","o").add(in("o.idOfOrg", new Long[] {new Long(0)} ));
+            else criteria.createAlias("org","o").add(in("o.idOfOrg",idOfOrgList));
             criteria.add((between("evtDateTime", startDate, endDate)));
             List<EnterEvent> enterEventList = criteria.list();
             for(EnterEvent enterEvent: enterEventList){
