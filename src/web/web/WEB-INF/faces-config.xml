@@ -170,7 +170,7 @@
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
             <from-outcome>showEnterEventCSVList</from-outcome>
-            <to-view-id>/back-office/enterEvent_csv_list.jsp</to-view-id>
+            <to-view-id>/back-office/enter_event_csv_list.jsp</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>
