@@ -36,108 +36,88 @@
         <h:outputText escape="true" value="Отчет по продажам" styleClass="output-text" />
         <rich:dataTable id="salesReportTable" value="#{mainPage.salesReportPage.salesReport.salesItems}"
                         var="sale" rowKeyVar="row">
-            <rich:column headerClass="center-aligned-column" style="width: 50px; text-align:center">
-                <f:facet name="header">
-                     <h:outputText styleClass="output-text" escape="true" value="№" />
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Организация" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.officialName}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Название" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.menuDetailName}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Выход" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.menuOutput}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Вид производства" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.menuOrigin}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Цена за ед" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.rPrice}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Цена за ед"  />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Скидка на ед" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.discount}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Кол-во" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.qty}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Количество" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Сумма без скидки" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.sumPrice}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Сумма скидки" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.sumPriceDiscount}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Итоговая сумма" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.total}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Время первой продажи" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.firstTimeSale}" converter="timeConverter" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Время последней продажи" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sale.lastTimeSale}" converter="timeConverter" />
-            </rich:column>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText value="#{row + 1}" styleClass="output-text" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.officialName}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.menuDetailName}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.menuOutput}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.menuOrigin}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.rPrice}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.discount}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.qty}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.sumPrice}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.sumPriceDiscount}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.total}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.firstTimeSale}" converter="timeConverter"/>
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sale.lastTimeSale}" converter="timeConverter"/>
+                </rich:column>
         </rich:dataTable>
         <h:commandButton value="Выгрузить в SCV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />
     </h:panelGrid>

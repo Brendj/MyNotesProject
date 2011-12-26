@@ -27,42 +27,39 @@
         <h:outputText escape="true" value="Просмотр текущих позиций" styleClass="output-text" />
         <rich:dataTable id="currentPositionsReportTable" value="#{mainPage.currentPositionsReportPage.currentPositionList}"
                         var="currentPosition" rowKeyVar="row">
-            <rich:column headerClass="center-aligned-column" style="width: 50px; text-align:center">
-                <f:facet name="header">
-                     <h:outputText styleClass="output-text" escape="true" value="№" />
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Идентификатор" />
-                    </h:panelGroup>
-                </f:facet>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Дебитор" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Кредитор" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Сумма" />
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column style="width: 50px; text-align:center">
+                <h:outputText value="#{row + 1}" styleClass="output-text" />
+            </rich:column>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{currentPosition.idOfPosition}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Дебитор" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{currentPosition.contragentDebtorName}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Кредитор" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{currentPosition.contragentCreditorName}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Сумма" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{currentPosition.summa}" />
             </rich:column>
         </rich:dataTable>

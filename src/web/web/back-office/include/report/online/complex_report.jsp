@@ -36,90 +36,76 @@
         <h:outputText styleClass="output-text" escape="true" value="Отчет по комплексам" />
         <rich:dataTable id="complexReportTable" value="#{mainPage.complexReportPage.complexReport.complexItems}"
                         var="complex" rowKeyVar="row">
-            <rich:column headerClass="center-aligned-column" style="width: 50px; text-align:center">
-                <f:facet name="header">
-                     <h:outputText styleClass="output-text" escape="true" value="№" />
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Организация" />
-                    </h:panelGroup>
-                </f:facet>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Название" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Цена за ед" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Скидка за ед" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Количество" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Сумма без скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Сумма скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Итоговая сумма" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Время первой продажи" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Время последней продажи" />
+                    </rich:column>
+                </rich:columnGroup>
+
+            </f:facet>
+            <rich:column style="width: 50px; text-align:center">
+                <h:outputText value="#{row + 1}" styleClass="output-text" />
+            </rich:column>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.officialName}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Название" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.menuDetailName}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Цена за ед" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.rPrice}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Скидка на ед" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.discount}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Кол-во" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.qty}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Сумма без скидки" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.sumPrice}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Сумма скидки" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.sumPriceDiscount}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Итоговая сумма" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.total}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Время первой продажи" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.firstTimeSale}" converter="timeConverter" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Время последней продажи" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{complex.lastTimeSale}" converter="timeConverter" />
             </rich:column>
         </rich:dataTable>

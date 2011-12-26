@@ -36,44 +36,40 @@
         <h:outputText escape="true" value="Отчет по синхронизации" styleClass="output-text" />
         <rich:dataTable id="syncReportTable" value="#{mainPage.syncReportPage.syncReport.syncItems}"
                         var="sync" rowKeyVar="row">
-            <rich:column headerClass="center-aligned-column" style="width: 50px; text-align:center">
-                <f:facet name="header">
-                     <h:outputText styleClass="output-text" escape="true" value="№" />
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-                </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Номер учреждения" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sync.idOfOrg}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Название учреждения" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sync.officialName}" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Время начала синхронизации" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sync.syncStartTime}" converter="timeConverter" />
-            </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Время завершения синхронизации" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{sync.syncEndTime}" converter="timeConverter" />
-            </rich:column>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText value="#{row + 1}" styleClass="output-text" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sync.idOfOrg}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sync.officialName}" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sync.syncStartTime}" converter="timeConverter" />
+                </rich:column>
+                <rich:column style="width: 50px; text-align:center">
+                    <h:outputText styleClass="output-text" value="#{sync.syncEndTime}" converter="timeConverter" />
+                </rich:column>
         </rich:dataTable>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

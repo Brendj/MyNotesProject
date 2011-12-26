@@ -23,42 +23,39 @@
         <h:outputText escape="true" value="Статус синхронизации" styleClass="output-text" />
         <rich:dataTable id="statusSyncReportTable" value="#{mainPage.statusSyncReportPage.statusSyncReport.syncItems}"
                         var="statusSync" rowKeyVar="row">
-            <rich:column headerClass="center-aligned-column" style="width: 50px; text-align:center">
-                <f:facet name="header">
-                     <h:outputText styleClass="output-text" escape="true" value="№" />
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-                </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Номер учреждения" />
-                    </h:panelGroup>
-                </f:facet>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Название учреждения" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Cинхронизация" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Время последней синхронизации" />
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column style="width: 50px; text-align:center">
+                <h:outputText value="#{row + 1}" styleClass="output-text" />
+            </rich:column>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{statusSync.idOfOrg}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:left">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Название учреждения" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{statusSync.officialName}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:center">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Cинхронизация" />
-                    </h:panelGroup>
-                </f:facet>
-                <h:graphicImage value="/images/16x16/#{statusSync.snchrnzd}.png" alt="#{statusSync.snchrnzd}"/>
+            <rich:column style="width: 50px; text-align:center">
+                <h:outputText styleClass="output-text" value="#{statusSync.snchrnzd}" />
             </rich:column>
-            <rich:column headerClass="center-aligned-column" style="text-align:right">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText styleClass="output-text" escape="true" value="Время последней синхронизации" />
-                    </h:panelGroup>
-                </f:facet>
+            <rich:column style="width: 50px; text-align:center">
                 <h:outputText styleClass="output-text" value="#{statusSync.lastSyncTime}" converter="timeConverter" />
             </rich:column>
         </rich:dataTable>
