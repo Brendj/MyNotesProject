@@ -20,7 +20,7 @@ public class EnterEventReportPage extends OnlineReportPage {
     private EnterEventReport enterEventReport;
 
     public String getPageFilename() {
-        return "report/online/enterEvent_report";
+        return "report/online/enter_event_report";
     }
 
     public EnterEventReport getEnterEventReport() {
