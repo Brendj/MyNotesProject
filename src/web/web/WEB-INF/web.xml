@@ -156,6 +156,7 @@
             <url-pattern>/back-office/settlement_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/addpayment_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
         </web-resource-collection>
         <auth-constraint/>
     </security-constraint>
@@ -204,6 +205,7 @@
             <url-pattern>/back-office/settlement_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/addpayment_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>AuthorizedUser</role-name>
