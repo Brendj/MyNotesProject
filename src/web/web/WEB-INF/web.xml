@@ -257,11 +257,16 @@
     </security-role>
 
     <session-config>
-        <session-timeout>15</session-timeout>
+        <session-timeout>1</session-timeout>
     </session-config>
 
     <error-page>
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/sessionexpired.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>403</error-code>
         <location>/sessionexpired.jsp</location>
     </error-page>
 
