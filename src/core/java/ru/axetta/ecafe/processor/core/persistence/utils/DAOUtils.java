@@ -38,15 +38,6 @@ public class DAOUtils {
 
     }
 
-    public static SochiClient findSochiClient(Session persistenceSession, long contractId) throws Exception {
-        return (SochiClient) persistenceSession.get(SochiClient.class, contractId);
-    }
-
-    public static SochiClientPayment findSochiClientPayment(Session persistenceSession, long paymentId)
-            throws Exception {
-        return (SochiClientPayment) persistenceSession.get(SochiClientPayment.class, paymentId);
-    }
-
     public static Contragent findContragent(Session persistenceSession, long idOfContragent) throws Exception {
         return (Contragent) persistenceSession.get(Contragent.class, idOfContragent);
     }
@@ -188,11 +179,6 @@ public class DAOUtils {
     public static DiaryValue findDiaryValue(Session persistenceSession, CompositeIdOfDiaryValue compositeIdOfDiaryValue)
             throws Exception {
         return (DiaryValue) persistenceSession.get(DiaryValue.class, compositeIdOfDiaryValue);
-    }
-
-    public static long getSochiClientNumber(Session persistenceSession) throws Exception {
-        Query query = persistenceSession.createQuery("select count(*) from SochiClient");
-        return (Long) query.uniqueResult();
     }
 
     public static List findClients(Session persistenceSession, Org organization, String firstName, String surname,

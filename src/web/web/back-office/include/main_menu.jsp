@@ -331,17 +331,8 @@
                         rendered="#{mainPage.eligibleToServiceSupport}"/>
 
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
-    <%--reRender="mainMenu, workspaceForm" />--%>
-
-    <rich:panelMenuItem id="loadSochiClientsMenuItem" binding="#{mainPage.sochiClientsLoadPage.mainMenuComponent}"
-                        label="Загрузка списка клиентов по Сочи" action="#{mainPage.showSochiClientsLoadPage}"
-                        reRender="workspaceForm"
-                        rendered="#{mainPage.eligibleToServiceClients}"/>
-
-    <rich:panelMenuItem id="viewSochiClientsMenuItem" binding="#{mainPage.sochiClientsViewPage.mainMenuComponent}"
-                        label="Просмотр клиентов по Сочи" action="#{mainPage.showSochiClientsViewPage}"
-                        reRender="workspaceForm"
-                        rendered="#{mainPage.eligibleToServiceClients}"/>
+    <%--reRender="mainMenu, workspaceForm" />
+    --%>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="reportJobGroupMenu" binding="#{mainPage.reportJobGroupPage.mainMenuComponent}"

@@ -35,7 +35,6 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2101,171 +2100,6 @@ public class Processor implements SyncProcessor,
         return runtimeContext.getPartnerPayPointConfig().getIdOfContragent();
     }
 
-    private static class SochiClientPaymentRequest {
-
-        private final boolean checkRequest;
-        private final long paymentId;
-        private final long contractId;
-        private final long sum;
-        private final long sumf;
-        private final Date paymentTime;
-        private final long terminalId;
-
-        private SochiClientPaymentRequest(boolean checkRequest, long paymentId, long contractId, long sum, long sumf,
-                Date paymentTime, long terminalId) {
-            this.checkRequest = checkRequest;
-            this.paymentId = paymentId;
-            this.contractId = contractId;
-            this.sum = sum;
-            this.sumf = sumf;
-            this.paymentTime = paymentTime;
-            this.terminalId = terminalId;
-        }
-
-        public Date getPaymentTime() {
-            return paymentTime;
-        }
-
-        public long getTerminalId() {
-            return terminalId;
-        }
-
-        public boolean isCheckRequest() {
-            return checkRequest;
-        }
-
-        public long getPaymentId() {
-            return paymentId;
-        }
-
-        public long getContractId() {
-            return contractId;
-        }
-
-        public long getSum() {
-            return sum;
-        }
-
-        public long getSumf() {
-            return sumf;
-        }
-
-        @Override
-        public String toString() {
-            return "SochiClientPaymentRequest{" + "checkRequest=" + checkRequest + ", paymentId=" + paymentId
-                    + ", contractId=" + contractId + ", sum=" + sum + ", sumf=" + sumf + ", paymentTime=" + paymentTime
-                    + ", terminalId=" + terminalId + '}';
-        }
-    }
-
-    private static class SochiClientInfo {
-
-        private final String fullName;
-        private final String address;
-        private final long balance;
-
-        public SochiClientInfo(SochiClient sochiClient) {
-            this.fullName = sochiClient.getFullName();
-            this.address = sochiClient.getAddress();
-            this.balance = 0L;
-        }
-
-        public String getFullName() {
-            return fullName;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public long getBalance() {
-            return balance;
-        }
-
-        @Override
-        public String toString() {
-            return "SochiClientInfo{" + "fullName='" + fullName + '\'' + ", address='" + address + '\'' + ", balance="
-                    + balance + '}';
-        }
-    }
-
-    private static class SochiClientPaymentResponse {
-
-        private final SochiClientInfo client;
-        private final int resultCode;
-        private final String resultDescription;
-        private final Long cardPrintedNo;
-
-        public SochiClientPaymentResponse(SochiClientInfo client, int resultCode, String resultDescription) {
-            this.client = client;
-            this.resultCode = resultCode;
-            this.resultDescription = resultDescription;
-            this.cardPrintedNo = null;
-        }
-
-        public SochiClientInfo getClient() {
-            return client;
-        }
-
-        public int getResultCode() {
-            return resultCode;
-        }
-
-        public String getResultDescription() {
-            return resultDescription;
-        }
-
-        public Long getCardPrintedNo() {
-            return cardPrintedNo;
-        }
-
-        @Override
-        public String toString() {
-            return "SochiClientPaymentResponse{" + "client=" + client + ", resultCode=" + resultCode
-                    + ", resultDescription='" + resultDescription + '\'' + '}';
-        }
-    }
-
-    private SochiClientPaymentResponse processPartnerSochiPaymentRequest(SochiClientPaymentRequest payment)
-            throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            SochiClientPayment sochiClientPayment = DAOUtils
-                    .findSochiClientPayment(persistenceSession, payment.getPaymentId());
-            if (sochiClientPayment != null) {
-                return new SochiClientPaymentResponse(null, PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
-                        String.format("%s. IdOfPayment == %d",
-                                PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(),
-                                payment.getPaymentId()));
-            }
-            SochiClient sochiClient = DAOUtils.findSochiClient(persistenceSession, payment.getContractId());
-            if (sochiClient == null) {
-                return new SochiClientPaymentResponse(null, PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
-                        String.format("%s. ContractId == %s", PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(),
-                                payment.getContractId()));
-            }
-            if (!payment.isCheckRequest()) {
-                sochiClientPayment = new SochiClientPayment(payment.getPaymentId(), sochiClient, payment.getSum(),
-                        payment.getSumf(), payment.getPaymentTime(), payment.getTerminalId());
-                persistenceSession.save(sochiClientPayment);
-            }
-            SochiClientPaymentResponse response = new SochiClientPaymentResponse(new SochiClientInfo(sochiClient),
-                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription());
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return response;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
     private PayPointResponse1 processPartnerPayPointRequest(RuntimeContext runtimeContext, PayPointRequest1 request) {
         final long clientId = request.getClientId();
         try {
@@ -2275,23 +2109,12 @@ public class Processor implements SyncProcessor,
                     ClientPayment.PAY_POINT_PAYMENT_METHOD, null, getPayPointAddIdOfPayment(request), false);
             PaymentResponse.ResPaymentRegistry.Item processResult = processPayPaymentRegistryPayment(
                     getPayPointContragentId(runtimeContext), payment);
-            if (processResult.getResult() == PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) {
-                SochiClientPaymentResponse sochiResponse = processPartnerSochiPaymentRequest(
-                        new SochiClientPaymentRequest(true, request.getOperationId(), request.getClientId(), 0L, 0L,
-                                null, request.getTerminalId()));
-                SochiClientInfo client = sochiResponse.getClient();
-                response = new PayPointResponse1(request.getRequestId(), sochiResponse.getResultCode(),
-                        sochiResponse.getResultDescription(), clientId, request.getOperationId(),
-                        client == null ? null : client.getBalance(), client == null ? null : client.getFullName(),
-                        client == null ? null : client.getAddress(), sochiResponse.getCardPrintedNo());
-            } else {
                 PaymentResponse.ResPaymentRegistry.Item.ClientInfo client = processResult.getClient();
                 PaymentResponse.ResPaymentRegistry.Item.CardInfo card = processResult.getCard();
                 response = new PayPointResponse1(request.getRequestId(), processResult.getResult(),
                         processResult.getError(), clientId, request.getOperationId(), processResult.getBalance(),
                         getPayPointClientNameAbbreviation(client), getPayPointClientAddress(client),
                         card == null ? null : card.getCardPrintedNo());
-            }
             return response;
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
@@ -2330,19 +2153,10 @@ public class Processor implements SyncProcessor,
                     ClientPayment.PAY_POINT_PAYMENT_METHOD, null, getPayPointAddIdOfPayment(request), false);
             PaymentResponse.ResPaymentRegistry.Item processResult = processPayPaymentRegistryPayment(
                     getPayPointContragentId(runtimeContext), payment);
-            if (processResult.getResult() == PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) {
-                SochiClientPaymentResponse sochiResponse = processPartnerSochiPaymentRequest(
-                        new SochiClientPaymentRequest(false, request.getOperationId(), request.getClientId(),
-                                request.getSum(), request.getSumf(), request.getTime(), request.getTerminalId()));
-                response = new PayPointResponse2(request.getRequestId(), sochiResponse.getResultCode(),
-                        sochiResponse.getResultDescription(), request.getOperationId(),
-                        sochiResponse.getCardPrintedNo());
-            } else {
                 PaymentResponse.ResPaymentRegistry.Item.CardInfo card = processResult.getCard();
                 response = new PayPointResponse2(request.getRequestId(), processResult.getResult(),
                         processResult.getError(), request.getOperationId(),
                         card == null ? null : card.getCardPrintedNo());
-            }
             return response;
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
@@ -2377,18 +2191,7 @@ public class Processor implements SyncProcessor,
                                 PaymentProcessResult.OK.getDescription(), request.getOperationId(),
                                 clientPayment.getPaySum());
                     } else {
-                        SochiClientPayment sochiClientPayment = DAOUtils
-                                .findSochiClientPayment(persistenceSession, request.getOperationId());
-                        if (sochiClientPayment == null) {
-                            result = new PayPointResponse3(request.getRequestId(),
-                                    PaymentProcessResult.PAYMENT_NOT_FOUND.getCode(),
-                                    PaymentProcessResult.PAYMENT_NOT_FOUND.getDescription(), request.getOperationId(),
-                                    null);
-                        } else {
-                            result = new PayPointResponse3(request.getRequestId(), PaymentProcessResult.OK.getCode(),
-                                    PaymentProcessResult.OK.getDescription(), request.getOperationId(),
-                                    sochiClientPayment.getPaymentSum());
-                        }
+
                     }
                 }
 
