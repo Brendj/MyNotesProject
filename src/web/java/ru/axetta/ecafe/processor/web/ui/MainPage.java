@@ -141,9 +141,6 @@ public class MainPage {
     private final TestLogPage testLogPage = new TestLogPage();
     private final BuildSignKeysPage buildSignKeysPage = new BuildSignKeysPage();
     private final OrderRemovePage orderRemovePage = new OrderRemovePage();
-    private final SochiClientsLoadPage sochiClientsLoadPage = new SochiClientsLoadPage();
-    private final SochiClientsViewPage sochiClientsViewPage = new SochiClientsViewPage();
-    private Long selectedSochiClientContractId;
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -1954,35 +1951,6 @@ public class MainPage {
         }
     }
 
-    public void sochiClientsLoadFileListener(UploadEvent event) {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
-        InputStream inputStream = null;
-        long dataSize = 0;
-        try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
-            sochiClientsLoadPage.loadClients(inputStream, dataSize);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, String.format(
-                    "Клиенты загружены и зарегистрированы успешно. Всего обработано: %d. Обработано успешно: %d",
-                    sochiClientsLoadPage.getLineResultSize(), sochiClientsLoadPage.getSuccessLineNumber()), null));
-        } catch (Exception e) {
-            logger.error("Failed to load sochi clients from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам",
-                            null));
-        } finally {
-            close(inputStream);
-        }
-    }
-
     private static void close(InputStream inputStream) {
         if (null != inputStream) {
             try {
@@ -3761,14 +3729,6 @@ public class MainPage {
         return orderRemovePage;
     }
 
-    public SochiClientsLoadPage getSochiClientsLoadPage() {
-        return sochiClientsLoadPage;
-    }
-
-    public SochiClientsViewPage getSochiClientsViewPage() {
-        return sochiClientsViewPage;
-    }
-
     public Object showOrderRemovePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -3787,47 +3747,6 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы удаления покупки",
                             null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object showSochiClientsLoadPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        currentWorkspacePage = sochiClientsLoadPage;
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public Long getSelectedSochiClientContractId() {
-        return selectedSochiClientContractId;
-    }
-
-    public void setSelectedSochiClientContractId(Long selectedSochiClientContractId) {
-        this.selectedSochiClientContractId = selectedSochiClientContractId;
-    }
-
-    public Object showSochiClientsViewPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            sochiClientsViewPage.fill(runtimeContext, persistenceSession, selectedSochiClientContractId);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = sochiClientsViewPage;
-        } catch (Exception e) {
-            logger.error("Failed to show sochi clients view page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра информации по клиентам по Сочи", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
