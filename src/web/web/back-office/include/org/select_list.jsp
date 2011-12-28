@@ -45,6 +45,9 @@
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.shortName} (#{item.officialName})"
                                           styleClass="output-text" />
                         </rich:column>
