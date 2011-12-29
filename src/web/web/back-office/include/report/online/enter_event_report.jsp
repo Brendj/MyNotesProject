@@ -82,7 +82,7 @@
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText value="#{row + 1}" styleClass="output-text" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">

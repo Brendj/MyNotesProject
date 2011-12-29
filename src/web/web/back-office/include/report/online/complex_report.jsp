@@ -75,37 +75,37 @@
                 </rich:columnGroup>
 
             </f:facet>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText value="#{row + 1}" styleClass="output-text" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="left-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.officialName}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.menuDetailName}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.rPrice}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.discount}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.qty}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.sumPrice}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.sumPriceDiscount}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.total}" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.firstTimeSale}" converter="timeConverter" />
             </rich:column>
-            <rich:column style="width: 50px; text-align:center">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.lastTimeSale}" converter="timeConverter" />
             </rich:column>
         </rich:dataTable>

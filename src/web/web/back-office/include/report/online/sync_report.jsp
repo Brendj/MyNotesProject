@@ -55,19 +55,19 @@
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
-                <rich:column style="width: 50px; text-align:center">
+                <rich:column styleClass="center-aligned-column">
                     <h:outputText value="#{row + 1}" styleClass="output-text" />
                 </rich:column>
-                <rich:column style="width: 50px; text-align:center">
+                <rich:column styleClass="left-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sync.idOfOrg}" />
                 </rich:column>
-                <rich:column style="width: 50px; text-align:center">
+                <rich:column styleClass="left-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sync.officialName}" />
                 </rich:column>
-                <rich:column style="width: 50px; text-align:center">
+                <rich:column styleClass="center-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sync.syncStartTime}" converter="timeConverter" />
                 </rich:column>
-                <rich:column style="width: 50px; text-align:center">
+                <rich:column styleClass="center-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sync.syncEndTime}" converter="timeConverter" />
                 </rich:column>
         </rich:dataTable>
