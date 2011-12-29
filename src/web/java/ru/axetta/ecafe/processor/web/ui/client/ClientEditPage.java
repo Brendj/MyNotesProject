@@ -449,7 +449,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardsan(this.guardsan);
+        client.setGuardSan(this.guardsan);
         String clientCategories = "";
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
             if (categoryDiscount.getSelected())

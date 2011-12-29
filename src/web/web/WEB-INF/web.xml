@@ -169,13 +169,13 @@
         <auth-constraint/>
     </security-constraint>
 
-    <security-constraint>
+    <!--security-constraint>
         <web-resource-collection>
             <web-resource-name>Restrict direct access to include-only JSFs</web-resource-name>
             <url-pattern>/back-office/include/*</url-pattern>
         </web-resource-collection>
         <auth-constraint/>
-    </security-constraint>
+    </security-constraint-->
 
     <security-constraint>
         <web-resource-collection>
@@ -257,7 +257,7 @@
     </security-role>
 
     <session-config>
-        <session-timeout>1</session-timeout>
+        <session-timeout>15</session-timeout>
     </session-config>
 
     <error-page>

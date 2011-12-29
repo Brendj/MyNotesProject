@@ -20,16 +20,30 @@ import java.util.Date;
 
 @WebService
 public interface ClientRoomController {
+    @WebMethod (operationName = "getSummary")
+    Data getSummary(Long contractId);
+    @WebMethod (operationName = "getSummaryBySan")
+    Data getSummary(String san);
+    @WebMethod (operationName = "getPurchaseList")
+    Data getPurchaseList(Long contractId, Date startDate, Date endDate);
+    @WebMethod (operationName = "getPurchaseListBySan")
+    Data getPurchaseList(String san, Date startDate, Date endDate);
+    @WebMethod (operationName = "getPaymentList")
+    Data getPaymentList(Long contractId, Date startDate, Date endDate);
+    @WebMethod (operationName = "getPaymentListBySan")
+    Data getPaymentList(String san, Date startDate, Date endDate);
+    @WebMethod (operationName = "getMenuList")
+    Data getMenuList(Long contractId, Date startDate, Date endDate);
+    @WebMethod (operationName = "getMenuListBySan")
+    Data getMenuList(String san, Date startDate, Date endDate);
+    @WebMethod (operationName = "getCardList")
+    Data getCardList(Long contractId);
+    @WebMethod (operationName = "getCardListBySan")
+    Data getCardList(String san);
+    @WebMethod (operationName = "getEnterEventList")
+    Data getEnterEventList(Long contractId, Date startDate, Date endDate);
+    @WebMethod (operationName = "getEnterEventListBySan")
+    Data getEnterEventList(String san, Date startDate, Date endDate);
     @WebMethod
-    ClientSummaryExt getSummary(Long contractId);
-    @WebMethod
-    PurchaseListExt getPurchaseList(Long contractId, Date startDate, Date endDate);
-    @WebMethod
-    PaymentList getPaymentList(Long contractId, Date startDate, Date endDate);
-    @WebMethod
-    MenuListExt getMenuList(Long contractId, Date startDate, Date endDate);
-    @WebMethod
-    CardList getCardList(Long contractId);
-    @WebMethod
-    EnterEventList getEnterEventList(Long contractId, Date startDate, Date endDate);
+    Data getClientsByGuardSan(String san);
 }

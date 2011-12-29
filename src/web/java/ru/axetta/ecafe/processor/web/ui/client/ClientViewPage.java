@@ -267,7 +267,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         // опекуны
         // (Kadyrov D) 23.12.2011
         this.san= client.getSan();
-        this.guardsan=client.getGuardsan();
+        this.guardsan=client.getGuardSan();
 
 
         ClientGroup group = client.getClientGroup();
