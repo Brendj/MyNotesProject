@@ -60,7 +60,7 @@ public class Org {
     private Set<DiaryTimesheet> diaryTimesheets = new HashSet<DiaryTimesheet>();
     private Set<DiaryClass> diaryClasses = new HashSet<DiaryClass>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
-    private Set<EnterEvent> enterEvents;
+    //private Set<EnterEvent> enterEvents;
 
     Org() {
         // For Hibernate only
@@ -399,7 +399,7 @@ public class Org {
         return Collections.unmodifiableSet(getDiaryValuesInternal());
     }
 
-    private Set<EnterEvent> getEnterEventsInternal() {
+    /*private Set<EnterEvent> getEnterEventsInternal() {
         // For Hibernate only
         return enterEvents;
     }
@@ -411,7 +411,7 @@ public class Org {
 
     public Set<EnterEvent> getEnterEvents() {
         return Collections.unmodifiableSet(getEnterEventsInternal());
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {

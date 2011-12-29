@@ -75,7 +75,7 @@ public class Client {
     private Long expenditureLimit;
     private String categoriesDiscounts;
     private String san;
-    private String guardsan;
+    private String guardSan;
     private Set<Card> cards = new HashSet<Card>();
     private Set<Call> calls = new HashSet<Call>();
     private Set<Notification> notifications = new HashSet<Notification>();
@@ -118,12 +118,12 @@ public class Client {
         this.categoriesDiscounts = categoriesDiscounts;
     }
 
-    public String getGuardsan() {
-        return guardsan;
+    public String getGuardSan() {
+        return guardSan;
     }
 
-    public void setGuardsan(String guardsan) {
-        this.guardsan = guardsan;
+    public void setGuardSan(String guardSan) {
+        this.guardSan = guardSan;
     }
 
     public String getSan() {

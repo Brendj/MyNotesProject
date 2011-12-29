@@ -9,9 +9,7 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.EnterEvent" table="CF_EnterEvents">
         <composite-id name="compositeIdOfEnterEvent" class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfEnterEvent">
             <key-property name="idOfEnterEvent" type="long" column="idOfEnterEvent"/>
-            <!--
             <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
-            -->
         </composite-id>
         <property name="enterName" column="EnterName" type="string" length="100" not-null="true"/>
         <property name="turnstileAddr" column="TurnstileAddr" type="string" length="20" not-null="true"/>
@@ -19,9 +17,9 @@
         <property name="eventCode" column="EventCode" type="integer" not-null="true"/>
         <property name="idOfCard" column="IdOfCard" type="long" not-null="false"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
-                     update="false" fetch="join"/>
+                     not-null="true" update="false" insert="false"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
-                     update="false" fetch="join"/>
+                     not-null="false" update="false" />
         <property name="idOfTempCard" column="IdOfTempCard" type="long" not-null="false"/>
         <property name="evtDateTime" column="EvtDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>

@@ -35,6 +35,7 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +163,8 @@ public class Processor implements SyncProcessor,
                     resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure());
                 } catch (Exception e) {
                     resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
+                    logger.error(String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg()),
+                                                e);
                 }
 
                 // Process menu from Org
@@ -783,7 +786,7 @@ public class Processor implements SyncProcessor,
                 }
             }
 
-            persistenceSession.flush();
+            //persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return new SyncResponse.ResOrgStructure();
@@ -1280,10 +1283,10 @@ public class Processor implements SyncProcessor,
                 // Check enter event existence
                 EnterEvent ee = DAOUtils
                     .findEnterEvent(persistenceSession, new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
-                /*if (null != ee) {
+                if (null != ee) {
                     // if enter event exists (may be last sync result was not transferred to client)
-                    /*if (((ee.getIdOfClient() == null && e.getIdOfClient() == null) ||
-                         (ee.getIdOfClient() != null && ee.getIdOfClient().equals(e.getIdOfClient())))
+                    if (((ee.getClient() == null && e.getIdOfClient() == null) ||
+                         (ee.getClient() != null && ee.getClient().getIdOfClient().equals(e.getIdOfClient())))
                         && ee.getEvtDateTime().equals(e.getEvtDateTime())
                         && ((ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) ||
                             (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard())))) {
@@ -1298,6 +1301,10 @@ public class Processor implements SyncProcessor,
                     }
                 }
                 else {
+                    // find client by id
+                    Client client = null;
+                    if (e.getIdOfClient() != null)
+                        client = (Client) persistenceSession.get(Client.class, e.getIdOfClient());
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
@@ -1306,7 +1313,7 @@ public class Processor implements SyncProcessor,
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
-                    enterEvent.setIdOfClient(e.getIdOfClient());
+                    enterEvent.setClient(client);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     enterEvent.setEvtDateTime(e.getEvtDateTime());
                     enterEvent.setIdOfVisitor(e.getIdOfVisitor());
@@ -1337,7 +1344,7 @@ public class Processor implements SyncProcessor,
                         e.getIdOfClient() != null &&
                         (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT))
                         sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
-                } */
+                }
             }
 
             persistenceTransaction.commit();
