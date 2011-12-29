@@ -305,7 +305,7 @@
             Client client = (Client) clientCriteria.uniqueResult();
 
             Criteria enterEventCriteria = persistenceSession.createCriteria(EnterEvent.class);
-            enterEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            enterEventCriteria.createAlias("client","c").add(Restrictions.eq("c.idOfClient",client.getIdOfClient()));
             enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
             enterEventCriteria.add(Restrictions.lt("evtDateTime", DateUtils.addDays(endDate, 1)));
 
