@@ -48,6 +48,10 @@
     <h:inputText value="#{mainPage.ruleCreatePage.complex9}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Комплексы" styleClass="output-text" />
     <h:inputText value="#{mainPage.ruleCreatePage.complexes}" maxlength="11" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Приоритет" styleClass="output-text" />
+    <h:inputText value="#{mainPage.ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createRule}"

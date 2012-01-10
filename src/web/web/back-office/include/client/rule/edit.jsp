@@ -49,6 +49,10 @@
     <h:inputText value="#{mainPage.ruleEditPage.complex9}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Комплексы" styleClass="output-text" />
     <h:inputText value="#{mainPage.ruleEditPage.complexes}" maxlength="11" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Приоритет" styleClass="output-text" />
+    <h:inputText value="#{mainPage.ruleEditPage.priority}" maxlength="11" styleClass="input-text" />
+
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateRule}" reRender="mainMenu, workspaceTogglePanel"

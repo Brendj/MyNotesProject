@@ -39,6 +39,18 @@ public class RuleListPage extends BasicWorkspacePage {
         private int complex9;
         private int complexes;
 
+        //
+        public int getPriority() {
+            return priority;
+        }
+
+        public void setPriority(int priority) {
+            this.priority = priority;
+        }
+
+        private int priority;
+        //
+
         public Item(DiscountRule discountRule) {
             this.idOfRule = discountRule.getIdOfRule();
             this.categoryName = discountRule.getCategoryDiscount().getCategoryName();
@@ -54,6 +66,7 @@ public class RuleListPage extends BasicWorkspacePage {
             this.complex8 = discountRule.getComplex8();
             this.complex9 = discountRule.getComplex9();
             this.complexes = discountRule.getComplexes();
+            this.priority = discountRule.getPriority();
         }
 
         public long getIdOfRule() {

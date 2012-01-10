@@ -123,6 +123,16 @@
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.complexes}" />
         </rich:column>
+
+        <rich:column headerClass="center-aligned-column" style="text-align:right">
+            <f:facet name="header">
+                <h:panelGroup>
+                    <h:outputText styleClass="output-text" escape="true" value="Приоритет" />
+                </h:panelGroup>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{item.priority}" />
+        </rich:column>
+
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditRule}"
                      style="text-align:center">
             <f:facet name="header">

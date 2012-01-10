@@ -1053,10 +1053,21 @@ public class SyncResponse {
             private int complex8;
             private int complex9;
             private int complexes;
+            //
+            private int priority;
+            public int getPriority() {
+                return priority;
+            }
+
+            public void setPriority(int priority) {
+                this.priority = priority;
+            }
+            //
+
 
             public DCRI(long idOfRule, long idOfCategoryDiscount, String description, int complex0, int complex1,
                     int complex2, int complex3, int complex4, int complex5, int complex6, int complex7, int complex8,
-                    int complex9, int complexes) {
+                    int complex9, int complexes, int priority) {
                 this.idOfRule = idOfRule;
                 this.idOfCategoryDiscount = idOfCategoryDiscount;
                 this.description = description;
@@ -1071,6 +1082,7 @@ public class SyncResponse {
                 this.complex8 = complex8;
                 this.complex9 = complex9;
                 this.complexes = complexes;
+                this.priority = priority;
             }
 
             public long getIdOfRule() {

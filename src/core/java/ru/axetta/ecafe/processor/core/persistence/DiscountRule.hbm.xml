@@ -29,5 +29,8 @@
         <property name="complex8" column="Complex8" type="integer" not-null="true" />
         <property name="complex9" column="Complex9" type="integer" not-null="true" />
         <property name="complexes" column="Complexes" type="integer" not-null="true" />
+
+        <property name="priority" column='"Priority"' type="integer" not-null="true"/>
+
     </class>
 </hibernate-mapping>

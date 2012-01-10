@@ -20,7 +20,7 @@ import org.hibernate.Session;
  */
 public class RuleCreatePage extends BasicWorkspacePage
     implements CategorySelectPage.CompleteHandler {
-    
+
     public static class CategoryItem {
 
         private final Long idOfCategory;
@@ -58,6 +58,17 @@ public class RuleCreatePage extends BasicWorkspacePage
     private int complex8;
     private int complex9;
     private int complexes;
+
+    //
+    private int priority;
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+    //
 
     public CategoryItem getCategory() {
         return category;
@@ -190,6 +201,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setComplex8(complex8);
         discountRule.setComplex9(complex9);
         discountRule.setComplexes(complexes);
+        discountRule.setPriority(priority);
         session.save(discountRule);
     }
 }

@@ -780,6 +780,7 @@ CREATE TABLE CF_DiscountRules (
   Complex8                  INTEGER       NOT NULL DEFAULT 0,
   Complex9                  INTEGER       NOT NULL DEFAULT 0,
   Complexes                 INTEGER       NOT NULL DEFAULT 0,
+  "Priority"                INTEGER       NOT NULL DEFAULT 0,
   CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule),
   CONSTRAINT CF_DiscountRules_IdOfCategoryDiscount_fk FOREIGN KEY (IdOfCategoryDiscount) REFERENCES CF_CategoryDiscounts (IdOfCategoryDiscount)
 );

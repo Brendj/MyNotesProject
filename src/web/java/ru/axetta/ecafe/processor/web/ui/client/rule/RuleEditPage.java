@@ -58,6 +58,17 @@ public class RuleEditPage extends BasicWorkspacePage implements CategorySelectPa
     private int complex9;
     private int complexes;
 
+    //
+    private int priority;
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+    //
+
     public CategoryItem getCategory() {
         return category;
     }
@@ -190,6 +201,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategorySelectPa
         discountRule.setComplex8(complex8);
         discountRule.setComplex9(complex9);
         discountRule.setComplexes(complexes);
+        discountRule.setPriority(priority);
         persistenceSession.update(discountRule);
         fill(discountRule);
     }
@@ -208,5 +220,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategorySelectPa
         this.complex8 = discountRule.getComplex8();
         this.complex9 = discountRule.getComplex9();
         this.complexes = discountRule.getComplexes();
+        this.priority = discountRule.getPriority();
     }
 }
