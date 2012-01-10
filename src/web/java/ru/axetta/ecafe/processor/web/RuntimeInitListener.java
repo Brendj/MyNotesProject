@@ -18,16 +18,12 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metamodel.MetadataSources;
-import org.hibernate.service.BasicServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceUnit;
 import javax.servlet.ServletContext;
@@ -35,9 +31,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.StringReader;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class RuntimeInitListener implements ServletContextListener {
     // Logger
@@ -97,6 +91,37 @@ public class RuntimeInitListener implements ServletContextListener {
                 createContragent(persistenceSession, "Бюджет", 4);
             if (!clientExists)
                 createContragent(persistenceSession, "Клиент", 5);
+
+            HashMap<Long, String> initCategory = new HashMap<Long, String>();
+                initCategory.put(Long.valueOf(-90),"Начальные классы");
+                initCategory.put(Long.valueOf(-91),"Средние классы");
+                initCategory.put(Long.valueOf(-92),"Старшие классы");
+                initCategory.put(Long.valueOf(-101),"1 класс");
+                initCategory.put(Long.valueOf(-102),"2 класс");
+                initCategory.put(Long.valueOf(-103),"3 класс");
+                initCategory.put(Long.valueOf(-104),"4 класс");
+                initCategory.put(Long.valueOf(-105),"5 класс");
+                initCategory.put(Long.valueOf(-106),"6 класс");
+                initCategory.put(Long.valueOf(-107),"7 класс");
+                initCategory.put(Long.valueOf(-108),"8 класс");
+                initCategory.put(Long.valueOf(-109),"9 класс");
+                initCategory.put(Long.valueOf(-110),"10 класс");
+                initCategory.put(Long.valueOf(-111),"11 класс");
+
+            Criteria categoryDiscountCriteria;
+            Set set=initCategory.entrySet();
+            Iterator i = set.iterator();
+            while(i.hasNext()){
+                Map.Entry me = (Map.Entry)i.next();
+                categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+                categoryDiscountCriteria.add(
+                        Restrictions.eq("idOfCategoryDiscount",me.getKey())
+                );
+                if ( categoryDiscountCriteria.list().size()==0 ) {
+                    createCategoryDiscount(persistenceSession, (Long) me.getKey(), String.valueOf(me.getValue()), "");
+                }
+            }
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
             RuntimeContext.initializeInstance(contextPath, loadConfig(optionText), sessionFactory);
@@ -152,6 +177,14 @@ public class RuntimeInitListener implements ServletContextListener {
                 logger.error("Failed to close JNDI context", e);
             }
         }
+    }
+
+    public void createCategoryDiscount(Session session, Long idOfCategoryDiscount, String categoryName, String description){
+        Date currentTime = new Date();
+        CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, description, currentTime, currentTime);
+
+        session.save(categoryDiscount);
+        logger.info("Category with name \"" + categoryName + "\" created");
     }
 
     public void createContragent(Session session, String contragentName, Integer classId) throws Exception {

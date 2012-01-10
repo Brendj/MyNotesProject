@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
+import javax.management.relation.Relation;
 import java.util.Date;
 
 /**
@@ -74,8 +76,13 @@ public class CategoryCreatePage extends BasicWorkspacePage {
     }
 
     public void createCategory(Session session) throws Exception {
-        CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, description,
-                createdDate, lastUpdate);
-        session.save(categoryDiscount);
+        int size=session.createCriteria(CategoryDiscount.class).add(
+                Restrictions.eq("idOfCategoryDiscount", idOfCategoryDiscount)
+        ).list().size();
+        if (size==0){
+            CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, description,
+                    createdDate, lastUpdate);
+            session.save(categoryDiscount);
+        } else throw new Exception("This category is exists.");
     }
 }

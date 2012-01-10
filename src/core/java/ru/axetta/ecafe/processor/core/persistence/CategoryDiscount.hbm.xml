@@ -8,11 +8,13 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" table="CF_CategoryDiscounts">
         <id name="idOfCategoryDiscount" column="IdOfCategoryDiscount" type="long">
+             <!--
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfCategoryDiscount</param>
-                <param name="max_lo">3</param>
+                <param name="max_lo">10</param>
             </generator>
+              -->
         </id>
         <property name="categoryName" column="CategoryName" type="string" length="100" not-null="true" />
         <property name="description" column="Description" type="string" length="100" not-null="true" />
@@ -20,6 +22,7 @@
                   not-null="false" />
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" />
+
         <set name="discountRulesInternal" inverse="true" cascade="all">
             <key column="IdOfCategoryDiscount"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule"/>
