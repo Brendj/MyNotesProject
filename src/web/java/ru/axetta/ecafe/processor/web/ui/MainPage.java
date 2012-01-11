@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.option.OptionPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
+import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
 import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
@@ -89,6 +90,7 @@ public class MainPage {
     private final OrgCreatePage orgCreatePage = new OrgCreatePage();
     private final OrgBalanceReportPage orgBalanceReportPage = new OrgBalanceReportPage();
     private final OrgOrderReportPage orgOrderReportPage = new OrgOrderReportPage();
+    private final MenuViewPage menuViewPage = new MenuViewPage();
 
     // Contragent manipulation
     private final BasicWorkspacePage contragentGroupPage = new BasicWorkspacePage();
@@ -677,6 +679,34 @@ public class MainPage {
             RuntimeContext.release(runtimeContext);
         }
         updateSelectedMainMenu();
+        return null;
+    }
+
+    public MenuViewPage getMenuViewPage(){
+        return menuViewPage;
+    }
+
+    public Object showMenuViewPage(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try{
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            menuViewPage.buildListMenuView(persistenceSession, selectedIdOfOrg);
+            currentWorkspacePage = menuViewPage;
+        }   catch (Exception e){
+            logger.error("Failed to load menu details from table", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по меню",
+                            null));
+        }   finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+            RuntimeContext.release(runtimeContext);
+        }
         return null;
     }
 
@@ -5550,6 +5580,7 @@ public class MainPage {
             logger.error("Failed to create category", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории", null));
+
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

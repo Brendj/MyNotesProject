@@ -58,6 +58,9 @@
         <rich:panelMenuItem id="editOrgMenuItem" binding="#{mainPage.orgEditPage.mainMenuComponent}"
                             label="Редактирование" action="#{mainPage.showOrgEditPage}" reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="viewOrgMenuDetail" binding="#{mainPage.menuViewPage.mainMenuComponent}"
+                            action="#{mainPage.showMenuViewPage}" label="Просмотр мастер-меню" reRender="workspaceForm" />
+
         <rich:panelMenuItem id="generateOrgBalanceReportMenuItem"
                             binding="#{mainPage.orgBalanceReportPage.mainMenuComponent}" label="Отчет по балансу"
                             action="#{mainPage.showOrgBalanceReportPage}" reRender="workspaceForm" />
