@@ -291,7 +291,7 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>
-              <!--
+
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
@@ -300,5 +300,5 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>
-             -->
+
 </faces-config>
