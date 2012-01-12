@@ -34,6 +34,9 @@
                     <rich:column styleClass="center-aligned-column" rowspan="2">
                         <h:outputText escape="true" value="Menu Source" />
                     </rich:column>
+                    <rich:column styleClass="center-aligned-column" rowspan="2">
+                        <h:outputText escape="true" value="Flag" />
+                    </rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="left-aligned-column">
@@ -48,6 +51,9 @@
             <rich:column styleClass="left-aligned-column">
                 <h:outputText escape="true" value="#{item.menuSource}" styleClass="output-text" />
             </rich:column>
+            <rich:column styleClass="left-aligned-column">
+                <h:outputText escape="true" value="#{item.flag}" styleClass="output-text" />
+            </rich:column>
     <f:facet name="footer">
             <rich:datascroller for="menuListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
@@ -60,5 +66,5 @@
             </rich:datascroller>
     </f:facet>
   </rich:dataTable>
-<h:commandButton value="Выгрузить в SCV" action="#{mainPage.saveMenuToXML}"
+<h:commandButton value="Выгрузить в SCV" action="#{mainPage.showMenuToXML}"
                  styleClass="command-button" />
