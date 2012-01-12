@@ -33,6 +33,8 @@ public class MenuViewPage extends BasicWorkspacePage {
     private int flags;
     private List<Item> items = Collections.emptyList();
 
+
+
     public static class Item {
         private Long idOfMenu;
         private Date menuDate;
