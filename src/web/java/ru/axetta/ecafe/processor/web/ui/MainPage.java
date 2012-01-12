@@ -686,6 +686,12 @@ public class MainPage {
         return menuViewPage;
     }
 
+    public Object saveMenuToXML() {
+        //To change body of created methods use File | Settings | File Templates.
+
+        return null;
+    }
+
     public Object showMenuViewPage(){
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
