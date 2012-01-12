@@ -686,10 +686,9 @@ public class MainPage {
         return menuViewPage;
     }
 
-    public Object saveMenuToXML() {
+    public String showMenuToXML() {
         //To change body of created methods use File | Settings | File Templates.
-
-        return null;
+        return "showMenuToXML";
     }
 
     public Object showMenuViewPage(){

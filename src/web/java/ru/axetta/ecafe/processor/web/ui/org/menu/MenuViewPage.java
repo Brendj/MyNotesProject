@@ -40,12 +40,23 @@ public class MenuViewPage extends BasicWorkspacePage {
         private Date menuDate;
         private Date createTime;
         private Integer menuSource;
+        private Integer flag;
 
-        public Item(Long idOfMenu, Date menuDate, Date createTime, Integer menuSource) {
+        public Item(Long idOfMenu, Date menuDate, Date createTime, Integer menuSource, Integer flag) {
             this.idOfMenu = idOfMenu;
             this.menuDate = menuDate;
             this.createTime = createTime;
             this.menuSource = menuSource;
+            this.flag = flag;
+
+        }
+
+        public Integer getFlag() {
+            return flag;
+        }
+
+        public void setFlag(Integer flag) {
+            this.flag = flag;
         }
 
         public Long getIdOfMenu() {
@@ -98,7 +109,7 @@ public class MenuViewPage extends BasicWorkspacePage {
         List menies = criteria.list();
         for (Object object : menies) {
             Menu menu = (Menu) object;
-            items.add(new Item(menu.getIdOfMenu(), menu.getMenuDate(), menu.getCreateTime(), menu.getMenuSource()));
+            items.add(new Item(menu.getIdOfMenu(), menu.getMenuDate(), menu.getCreateTime(), menu.getMenuSource(), menu.getFlags()));
         }
         this.items=items;
 
