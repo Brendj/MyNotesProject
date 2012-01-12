@@ -746,6 +746,31 @@ public class Processor implements SyncProcessor,
         }
     }
 
+    // 12-01-2012 Kadyrov D.I.
+
+    private SyncResponse.CorrectingNumbersOredrsRegistry processSyncCorrectingNumbersOredrsRegistry (Long idOfOrg) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try{
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            //Реализация запроса
+            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            List<Order> orders = new ArrayList<Order>(organization.getOrders());
+            //Collections.sort(list);
+            //persistenceSession.createCriteria();
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return null;
+            //return new SyncResponse.CorrectingNumbersOredrsRegistry();
+        }  finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     private SyncResponse.ResOrgStructure processSyncOrgStructure(Long idOfOrg, SyncRequest.OrgStructure reqStructure)
             throws Exception {
         Session persistenceSession = null;
