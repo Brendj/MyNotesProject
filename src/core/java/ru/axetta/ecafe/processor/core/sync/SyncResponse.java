@@ -426,6 +426,40 @@ public class SyncResponse {
         }
     }
 
+    // 12-01-2012 Kadyrov D.I. CorrectingNumbersOredrsRegistry
+
+    public static class CorrectingNumbersOredrsRegistry {
+
+        private final int IdOfOrder;
+        private final int IdOfOrderDetails;
+
+        public CorrectingNumbersOredrsRegistry() {
+            this.IdOfOrder = 0;
+            this.IdOfOrderDetails = 0;
+        }
+
+        public CorrectingNumbersOredrsRegistry(int result, int IdOfOrderDetails) {
+            this.IdOfOrder = result;
+            this.IdOfOrderDetails = IdOfOrderDetails;
+        }
+
+
+
+        public Element toElement(Document document) throws Exception {
+            Element element = document.createElement("CorrectingNumbersOredrsRegistry");
+            element.setAttribute("IdOfOrder", Integer.toString(this.IdOfOrder));
+            element.setAttribute("IdOfOrderDetails", Integer.toString(this.IdOfOrderDetails));
+            return element;
+        }
+
+        @Override
+        public String toString() {
+            return "CorrectingNumbersOredrsRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails='" + IdOfOrderDetails + '\'' + '}';
+        }
+    }
+
+    //  CorrectingNumbersOredrsRegistry
+
     public static class ResOrgStructure {
 
         private final int result;
