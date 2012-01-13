@@ -14,9 +14,9 @@
 
 <%-- Панель создания меню --%>
 
+<h:outputText value="exchange page" />
 
-
-<rich:dataTable id="menuListTable" binding="#{mainPage.menuViewPage.pageComponent}" value="#{mainPage.menuViewPage.items}"
+<rich:dataTable id="menuExListTable" binding="#{mainPage.menuDataXMLPage.pageComponent}" value="#{mainPage.menuDataXMLPage.items}"
                 var="item" rows="20" footerClass="data-table-footer"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
@@ -28,34 +28,16 @@
             <rich:column styleClass="center-aligned-column" rowspan="2">
                 <h:outputText escape="true" value="Дата создания" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Дата меню" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Menu Source" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Flag" />
-            </rich:column>
         </rich:columnGroup>
     </f:facet>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText escape="true" value="#{item.idOfMenu}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.menuData}" styleClass="output-text" />
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText value="#{item.createTime}" styleClass="output-text" converter="timeConverter"/>
-    </rich:column>
-    <rich:column styleClass="left-aligned-column">
-        <h:outputText value="#{item.menuDate}" styleClass="output-text" converter="timeConverter"/>
-    </rich:column>
-    <rich:column styleClass="left-aligned-column">
-        <h:outputText escape="true" value="#{item.menuSource}" styleClass="output-text" />
-    </rich:column>
-    <rich:column styleClass="left-aligned-column">
-        <h:outputText escape="true" value="#{item.flag}" styleClass="output-text" />
+        <h:outputText value="#{item.flags}" styleClass="output-text" converter="timeConverter"/>
     </rich:column>
     <f:facet name="footer">
-        <rich:datascroller for="menuListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+        <rich:datascroller for="menuExListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
