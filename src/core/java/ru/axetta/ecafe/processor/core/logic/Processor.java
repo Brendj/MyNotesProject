@@ -35,6 +35,7 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +130,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResEnterEvents resEnterEvents = null;
         SyncResponse.ResLibraryData resLibraryData = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry = null;
         try {
             if (request.getType() == SyncRequest.TYPE_FULL) {
                 // Generate IdOfPacket
@@ -229,6 +231,15 @@ public class Processor implements SyncProcessor,
                     logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
                             request.getIdOfOrg()), e);
                 }
+
+                // Process CorrectingNumbersOredrsRegistry
+                try {
+                    correctingNumbersOredrsRegistry = processSyncCorrectingNumbersOredrsRegistry(request.getIdOfOrg());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process numbers of oredrs, IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
+                }
+
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
                 // запрос на получение пополнений
                 try {
@@ -754,17 +765,14 @@ public class Processor implements SyncProcessor,
         try{
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            //Реализация запроса
-            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
-            List<Order> orders = new ArrayList<Order>(organization.getOrders());
-            //Collections.sort(list);
-            //persistenceSession.createCriteria();
-
+            Criteria orderCriteria = persistenceSession.createCriteria(Order.class);
+            orderCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            orderCriteria.setProjection(Projections.max("compositeIdOfOrder.idOfOrder"));
+            List result=orderCriteria.list();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return null;
-            //return new SyncResponse.CorrectingNumbersOredrsRegistry();
+            return new SyncResponse.CorrectingNumbersOredrsRegistry(idOfOrg,(Long) result.get(0));
+            //return null;
         }  finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
