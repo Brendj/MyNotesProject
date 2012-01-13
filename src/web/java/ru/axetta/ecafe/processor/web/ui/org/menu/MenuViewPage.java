@@ -4,15 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.menu;
 
-import ru.axetta.ecafe.processor.core.persistence.Menu;
-import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 
 import java.io.InputStream;
 import java.util.*;
@@ -29,10 +33,9 @@ import static org.hibernate.criterion.Restrictions.in;
 public class MenuViewPage extends BasicWorkspacePage {
 
     private Long idOfOrg;
-    private Set<MenuDetail> menuDetails = new HashSet<MenuDetail>();
-    private int flags;
     private List<Item> items = Collections.emptyList();
 
+   
 
 
     public static class Item {
@@ -112,27 +115,28 @@ public class MenuViewPage extends BasicWorkspacePage {
             items.add(new Item(menu.getIdOfMenu(), menu.getMenuDate(), menu.getCreateTime(), menu.getMenuSource(), menu.getFlags()));
         }
         this.items=items;
-
     }
 
     public String getPageFilename() {
         return "org/menu/view";
     }
 
-    public Set<MenuDetail> getMenuDetails() {
-        return menuDetails;
+    private Long idOfOrder;
+    private String text;
+
+    public String getText() {
+        return text;
     }
 
-    public void setMenuDetails(Set<MenuDetail> menuDetails) {
-        this.menuDetails = menuDetails;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public int getFlags() {
-        return flags;
+    public Long getIdOfOrder() {
+        return idOfOrder;
     }
 
-    public void setFlags(int flags) {
-        this.flags = flags;
+    public void setIdOfOrder(Long idOfOrder) {
+        this.idOfOrder = idOfOrder;
     }
-
 }

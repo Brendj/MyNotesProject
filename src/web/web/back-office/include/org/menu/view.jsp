@@ -66,5 +66,5 @@
             </rich:datascroller>
     </f:facet>
   </rich:dataTable>
-<h:commandButton value="Выгрузить в SCV" action="#{mainPage.showMenuToXML}"
+<h:commandButton value="Выгрузить в XML" action="#{mainPage.showMenuDataToXML}"
                  styleClass="command-button" />
