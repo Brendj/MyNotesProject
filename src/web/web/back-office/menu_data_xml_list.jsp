@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <%--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  --%>
+
+
+<%--
   Created by IntelliJ IDEA.
   User: damir
   Date: 13.01.12
@@ -13,13 +18,15 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <f:view>
     <menus>
-        sadfdfs
-    <%--
+    <%-- --%>
     <a4j:repeat value="#{mainPage.menuViewPage.items}" var="item">
-
-        <h:outputText escape="false" value="#{item.idofenterevent};#{item.idoforg};#{item.officialname};#{item.entername};#{item.turnstileaddr};#{item.passdirection};#{item.eventCode};#{item.docserialnum};#{item.personFullName};" />
-        <h:outputText escape="false" value="#{item.evtdatetime}" converter="timeConverter" />
-        <h:outputText escape="false" value="#{mainPage.endOfLine}" />
-    </a4j:repeat> --%>
+        <menu>
+            <idOfMenu><h:outputText value="#{item.idOfMenu}"/></idOfMenu>
+            <menuDate><h:outputText value="#{item.menuDate}" converter="timeConverter" /></menuDate>
+            <createTime><h:outputText value="#{item.createTime}" converter="timeConverter" /></createTime>
+            <menuSource><h:outputText value="#{item.menuSource}"/></menuSource>
+            <flag><h:outputText value="#{item.flag}"/></flag>
+        </menu>
+    </a4j:repeat> 
     </menus>
 </f:view>
