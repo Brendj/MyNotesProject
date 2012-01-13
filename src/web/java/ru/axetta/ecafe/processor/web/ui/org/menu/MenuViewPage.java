@@ -35,9 +35,6 @@ public class MenuViewPage extends BasicWorkspacePage {
     private Long idOfOrg;
     private List<Item> items = Collections.emptyList();
 
-   
-
-
     public static class Item {
         private Long idOfMenu;
         private Date menuDate;
@@ -121,22 +118,4 @@ public class MenuViewPage extends BasicWorkspacePage {
         return "org/menu/view";
     }
 
-    private Long idOfOrder;
-    private String text;
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Long getIdOfOrder() {
-        return idOfOrder;
-    }
-
-    public void setIdOfOrder(Long idOfOrder) {
-        this.idOfOrder = idOfOrder;
-    }
 }
