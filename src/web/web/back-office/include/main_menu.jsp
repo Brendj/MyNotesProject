@@ -59,7 +59,7 @@
                             label="Редактирование" action="#{mainPage.showOrgEditPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="viewOrgMenuDetail" binding="#{mainPage.menuViewPage.mainMenuComponent}"
-                            action="#{mainPage.showMenuViewPage}" label="Просмотр мастер" reRender="workspaceForm" />
+                            action="#{mainPage.showMenuViewPage}" label="Просмотр меню" reRender="workspaceForm" />
         <%--
         <rich:panelMenuItem id="viewOrgMenuExchange" binding="#{mainPage.menuDataXMLPage.mainMenuComponent}"
                             action="#{mainPage.showMenuExchange}" label="Просмотр мастер-меню" reRender="workspaceForm" />
