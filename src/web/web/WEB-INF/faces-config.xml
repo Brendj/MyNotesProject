@@ -295,8 +295,8 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
-            <from-outcome>showMenuToXML</from-outcome>
-            <to-view-id>/back-office/menu_xml_list.jsp</to-view-id>
+            <from-outcome>showMenuDataToXML</from-outcome>
+            <to-view-id>/back-office/menu_data_xml_list.jsp</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>
