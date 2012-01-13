@@ -130,7 +130,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResEnterEvents resEnterEvents = null;
         SyncResponse.ResLibraryData resLibraryData = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
-        SyncResponse.CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         try {
             if (request.getType() == SyncRequest.TYPE_FULL) {
                 // Generate IdOfPacket
@@ -232,11 +232,11 @@ public class Processor implements SyncProcessor,
                             request.getIdOfOrg()), e);
                 }
 
-                // Process CorrectingNumbersOredrsRegistry
+                // Process CorrectingNumbersOrdersRegistry
                 try {
-                    correctingNumbersOredrsRegistry = processSyncCorrectingNumbersOredrsRegistry(request.getIdOfOrg());
+                    correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to process numbers of oredrs, IdOfOrg == %s",
+                    logger.error(String.format("Failed to process numbers of Orders, IdOfOrg == %s",
                             request.getIdOfOrg()), e);
                 }
 
@@ -276,7 +276,7 @@ public class Processor implements SyncProcessor,
         SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(), idOfPacket,
                 request.getProtoVersion(), syncEndTime, "", accRegistry, resPaymentRegistry, accIncRegistry,
                 clientRegistry, resOrgStructure, resMenuExchange, resDiary, "", resEnterEvents, resLibraryData,
-                resCategoriesDiscountsAndRules, correctingNumbersOredrsRegistry);
+                resCategoriesDiscountsAndRules, correctingNumbersOrdersRegistry);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -759,7 +759,7 @@ public class Processor implements SyncProcessor,
 
     // 12-01-2012 Kadyrov D.I.
 
-    private SyncResponse.CorrectingNumbersOredrsRegistry processSyncCorrectingNumbersOredrsRegistry (Long idOfOrg) throws Exception{
+    private SyncResponse.CorrectingNumbersOrdersRegistry processSyncCorrectingNumbersOrdersRegistry (Long idOfOrg) throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try{
@@ -775,7 +775,7 @@ public class Processor implements SyncProcessor,
             List orderDetailMax=orderCriteria.list();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return new SyncResponse.CorrectingNumbersOredrsRegistry((Long) orderMax.get(0),(Long) orderDetailMax.get(0));
+            return new SyncResponse.CorrectingNumbersOrdersRegistry((Long) orderMax.get(0),(Long) orderDetailMax.get(0));
             //return null;
         }  finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

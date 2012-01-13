@@ -426,37 +426,36 @@ public class SyncResponse {
         }
     }
 
-    // 12-01-2012 Kadyrov D.I. CorrectingNumbersOredrsRegistry
+    // 12-01-2012 Kadyrov D.I. CorrectingNumbersOrdersRegistry
 
-    public static class CorrectingNumbersOredrsRegistry {
+    public static class CorrectingNumbersOrdersRegistry {
 
         private  Long IdOfOrder;
         private  Long IdOfOrderDetail;
 
-        public CorrectingNumbersOredrsRegistry() {
+        public CorrectingNumbersOrdersRegistry() {
             this.IdOfOrder = 0L;
             this.IdOfOrderDetail = 0L;
         }
 
-        public CorrectingNumbersOredrsRegistry(Long IdOfOrder, Long IdOfOrderDetail) {
+        public CorrectingNumbersOrdersRegistry(Long IdOfOrder, Long IdOfOrderDetail) {
             this.IdOfOrder = IdOfOrder;
             this.IdOfOrderDetail = IdOfOrderDetail;
         }
 
         public Element toElement(Document document) throws Exception {
-            Element element = document.createElement("CorrectingNumbersOredrsRegistry");
+            Element element = document.createElement("CorrectingNumbersOrdersRegistry");
             element.setAttribute("IdOfOrder", Long.toString(this.IdOfOrder));
-            element.setAttribute("IdOfOrderDetail", Long.toString(this.IdOfOrderDetail));
+            element.setAttribute("IdOfOrderDetails", Long.toString(this.IdOfOrderDetail));
             return element;
         }
 
         @Override
         public String toString() {
-            return "CorrectingNumbersOredrsRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetail='" + IdOfOrderDetail + '\'' + '}';
+            return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails='" + IdOfOrderDetail + '\'' + '}';
         }
     }
 
-    //  CorrectingNumbersOredrsRegistry
 
     public static class ResOrgStructure {
 
@@ -1255,17 +1254,17 @@ public class SyncResponse {
     private final ResEnterEvents resEnterEvents;
     private final ResLibraryData resLibraryData;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
-    private final CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry;
+    private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
 
-    public CorrectingNumbersOredrsRegistry getCorrectingNumbersOredrsRegistry() {
-        return correctingNumbersOredrsRegistry;
+    public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
+        return correctingNumbersOrdersRegistry;
     }
 
     public SyncResponse(int type, Long idOfOrg, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData,
-            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry) {
+            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.idOfPacket = idOfPacket;
@@ -1283,7 +1282,7 @@ public class SyncResponse {
         this.resEnterEvents = resEnterEvents;
         this.resLibraryData = resLibraryData;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
-        this.correctingNumbersOredrsRegistry=correctingNumbersOredrsRegistry;
+        this.correctingNumbersOrdersRegistry=correctingNumbersOrdersRegistry;
     }
 
     public Document toDocument() throws Exception {
@@ -1367,9 +1366,9 @@ public class SyncResponse {
         if (resCategoriesDiscountsAndRules != null) {
             ecafeEnvelopeElement.appendChild(resCategoriesDiscountsAndRules.toElement(document));
         }
-        // CorrectingNumbersOredrsRegistry
-        if (correctingNumbersOredrsRegistry != null){
-            ecafeEnvelopeElement.appendChild(correctingNumbersOredrsRegistry.toElement(document));
+        // CorrectingNumbersOrdersRegistry
+        if (correctingNumbersOrdersRegistry != null){
+            ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
