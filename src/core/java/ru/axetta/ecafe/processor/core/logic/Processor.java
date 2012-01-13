@@ -768,10 +768,14 @@ public class Processor implements SyncProcessor,
             Criteria orderCriteria = persistenceSession.createCriteria(Order.class);
             orderCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
             orderCriteria.setProjection(Projections.max("compositeIdOfOrder.idOfOrder"));
-            List result=orderCriteria.list();
+            List orderMax=orderCriteria.list();
+            Criteria orderDetailCriteria = persistenceSession.createCriteria(OrderDetail.class);
+            orderDetailCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            orderDetailCriteria.setProjection(Projections.max("compositeIdOfOrderDetail.idOfOrderDetail"));
+            List orderDetailMax=orderCriteria.list();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return new SyncResponse.CorrectingNumbersOredrsRegistry(idOfOrg,(Long) result.get(0));
+            return new SyncResponse.CorrectingNumbersOredrsRegistry((Long) orderMax.get(0),(Long) orderDetailMax.get(0));
             //return null;
         }  finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

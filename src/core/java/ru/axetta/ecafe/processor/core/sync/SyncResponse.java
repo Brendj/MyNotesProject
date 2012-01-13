@@ -438,7 +438,7 @@ public class SyncResponse {
             this.IdOfOrderDetail = 0L;
         }
 
-        public CorrectingNumbersOredrsRegistry(Long IdOfOrderDetail, Long IdOfOrder) {
+        public CorrectingNumbersOredrsRegistry(Long IdOfOrder, Long IdOfOrderDetail) {
             this.IdOfOrder = IdOfOrder;
             this.IdOfOrderDetail = IdOfOrderDetail;
         }
@@ -1090,10 +1090,6 @@ public class SyncResponse {
             public int getPriority() {
                 return priority;
             }
-
-            public void setPriority(int priority) {
-                this.priority = priority;
-            }
             //
 
 
@@ -1189,6 +1185,7 @@ public class SyncResponse {
                 element.setAttribute("Complex8", Integer.toString(this.complex8));
                 element.setAttribute("Complex9", Integer.toString(this.complex9));
                 element.setAttribute("Complexes", Integer.toString(this.complexes));
+                element.setAttribute("priority", Integer.toString(this.priority));
                 return element;
             }
 
@@ -1198,7 +1195,7 @@ public class SyncResponse {
                         + ", description='" + description + '\'' + ", complex0=" + complex0 + ", complex1=" + complex1
                         + ", complex2=" + complex2 + ", complex3=" + complex3 + ", complex4=" + complex4 + ", complex5="
                         + complex5 + ", complex6=" + complex6 + ", complex7=" + complex7 + ", complex8=" + complex8
-                        + ", complex9=" + complex9 + ", complexes=" + complexes + '}';
+                        + ", complex9=" + complex9 + ", complexes=" + complexes +", priority=" + priority +'}';
             }
         }
 
