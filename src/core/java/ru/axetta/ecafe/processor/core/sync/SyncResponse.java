@@ -1257,6 +1257,10 @@ public class SyncResponse {
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry;
 
+    public CorrectingNumbersOredrsRegistry getCorrectingNumbersOredrsRegistry() {
+        return correctingNumbersOredrsRegistry;
+    }
+
     public SyncResponse(int type, Long idOfOrg, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
@@ -1362,6 +1366,10 @@ public class SyncResponse {
         // ResCategoriesDiscountsAndRules
         if (resCategoriesDiscountsAndRules != null) {
             ecafeEnvelopeElement.appendChild(resCategoriesDiscountsAndRules.toElement(document));
+        }
+        // CorrectingNumbersOredrsRegistry
+        if (correctingNumbersOredrsRegistry != null){
+            ecafeEnvelopeElement.appendChild(correctingNumbersOredrsRegistry.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
