@@ -13,11 +13,11 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания меню --%>
+<h:outputText value="#{mainPage.menuDetailsPage.count}"/>
 
 
-
-<rich:dataTable id="menuListTable" binding="#{mainPage.menuViewPage.pageComponent}" value="#{mainPage.menuViewPage.items}"
-                var="item" rows="20" footerClass="data-table-footer"
+<rich:dataTable id="menuDetailsListTable" binding="#{mainPage.menuDetailsPage.pageComponent}" value="#{mainPage.menuDetailsPage.menuDetailItems}"
+                var="menuDetail" rows="20" footerClass="data-table-footer"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
     <f:facet name="header">
@@ -26,38 +26,36 @@
                 <h:outputText escape="true" value="Идентификатор" />
             </rich:column>
             <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Дата создания" />
+                <h:outputText escape="true" value="Имя" />
             </rich:column>
             <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Дата меню" />
+                <h:outputText escape="true" value="Группа" />
             </rich:column>
             <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Menu Source" />
+                <h:outputText escape="true" value="вывод" />
             </rich:column>
             <rich:column styleClass="center-aligned-column" rowspan="2">
-                <h:outputText escape="true" value="Flag" />
+                <h:outputText escape="true" value="Цена" />
             </rich:column>
         </rich:columnGroup>
     </f:facet>
     <rich:column styleClass="left-aligned-column">
-        <h:commandLink value="#{item.idOfMenu}" action="#{mainPage.showMenuDetailsPage}" styleClass="command-link">
-           <f:setPropertyActionListener value="#{item.idOfMenu}" target="#{mainPage.selectedIdOfMenu}" />
-        </h:commandLink>
+        <h:outputText escape="true" value="#{menuDetail.idOfMenuDetail}" styleClass="output-text" />
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText value="#{item.createTime}" styleClass="output-text" converter="timeConverter"/>
+        <h:outputText value="#{menuDetail.menuDetailName}" styleClass="output-text" />
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText value="#{item.menuDate}" styleClass="output-text" converter="timeConverter"/>
+        <h:outputText escape="true" value="#{menuDetail.groupName}" styleClass="output-text" />
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText escape="true" value="#{item.menuSource}" styleClass="output-text" />
+        <h:outputText value="#{menuDetail.menuDetailOutput}" styleClass="output-text" />
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:outputText escape="true" value="#{item.flag}" styleClass="output-text" />
+        <h:outputText value="#{menuDetail.price}" styleClass="output-text" />
     </rich:column>
     <f:facet name="footer">
-        <rich:datascroller for="menuListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+        <rich:datascroller for="menuDetailsListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -69,5 +67,4 @@
     </f:facet>
 </rich:dataTable>
 
-<h:commandButton value="Выгрузить в XML" action="alert('XML')"
-                 styleClass="command-button" />
+
