@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.option.OptionPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
+import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDataXMLPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
 import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
@@ -91,6 +92,7 @@ public class MainPage {
     private final OrgBalanceReportPage orgBalanceReportPage = new OrgBalanceReportPage();
     private final OrgOrderReportPage orgOrderReportPage = new OrgOrderReportPage();
     private final MenuViewPage menuViewPage = new MenuViewPage();
+    private final MenuDataXMLPage menuDataXMLPage = new MenuDataXMLPage();
 
     // Contragent manipulation
     private final BasicWorkspacePage contragentGroupPage = new BasicWorkspacePage();
@@ -686,11 +688,6 @@ public class MainPage {
         return menuViewPage;
     }
 
-    public String showMenuDataToXML() {
-        //To change body of created methods use File | Settings | File Templates.
-        return "showMenuDataToXML";
-    }
-
     public Object showMenuViewPage(){
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -703,9 +700,9 @@ public class MainPage {
             menuViewPage.buildListMenuView(persistenceSession, selectedIdOfOrg);
             currentWorkspacePage = menuViewPage;
         }   catch (Exception e){
-            logger.error("Failed to load menu details from table", e);
+            logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по меню",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню",
                             null));
         }   finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
