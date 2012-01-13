@@ -16,7 +16,7 @@ import java.util.Set;
  * Time: 10:39:31
  * To change this template use File | Settings | File Templates.
  */
-public class Order {
+public class Order{
 
     public static final long INTERNAL_ID_OF_CASHIER = 0L;
 
@@ -230,4 +230,5 @@ public class Order {
                 + ", createTime=" + createTime + ", sumByCard=" + sumByCard + ", sumByCash=" + sumByCash + ", pos="
                 + pos + ", contragent=" + contragent + '}';
     }
+
 }
