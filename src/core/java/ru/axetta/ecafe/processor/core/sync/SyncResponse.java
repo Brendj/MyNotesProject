@@ -429,29 +429,30 @@ public class SyncResponse {
     // 12-01-2012 Kadyrov D.I. CorrectingNumbersOredrsRegistry
 
     public static class CorrectingNumbersOredrsRegistry {
-        private  Long IdOfOrg;
+
         private  Long IdOfOrder;
+        private  Long IdOfOrderDetail;
 
         public CorrectingNumbersOredrsRegistry() {
             this.IdOfOrder = 0L;
-            this.IdOfOrg = 0L;
+            this.IdOfOrderDetail = 0L;
         }
 
-        public CorrectingNumbersOredrsRegistry(Long IdOfOrg, Long IdOfOrder) {
-            this.IdOfOrg = IdOfOrg;
+        public CorrectingNumbersOredrsRegistry(Long IdOfOrderDetail, Long IdOfOrder) {
             this.IdOfOrder = IdOfOrder;
+            this.IdOfOrderDetail = IdOfOrderDetail;
         }
 
         public Element toElement(Document document) throws Exception {
             Element element = document.createElement("CorrectingNumbersOredrsRegistry");
-            element.setAttribute("IdOfOrg", Long.toString(this.IdOfOrg));
             element.setAttribute("IdOfOrder", Long.toString(this.IdOfOrder));
+            element.setAttribute("IdOfOrderDetail", Long.toString(this.IdOfOrderDetail));
             return element;
         }
 
         @Override
         public String toString() {
-            return "CorrectingNumbersOredrsRegistry{" + "IdOfOrg=" + IdOfOrg + ", IdOfOrder='" + IdOfOrder + '\'' + '}';
+            return "CorrectingNumbersOredrsRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetail='" + IdOfOrderDetail + '\'' + '}';
         }
     }
 
