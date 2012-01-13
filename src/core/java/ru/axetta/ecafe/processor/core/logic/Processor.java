@@ -276,7 +276,7 @@ public class Processor implements SyncProcessor,
         SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(), idOfPacket,
                 request.getProtoVersion(), syncEndTime, "", accRegistry, resPaymentRegistry, accIncRegistry,
                 clientRegistry, resOrgStructure, resMenuExchange, resDiary, "", resEnterEvents, resLibraryData,
-                resCategoriesDiscountsAndRules);
+                resCategoriesDiscountsAndRules, correctingNumbersOredrsRegistry);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }

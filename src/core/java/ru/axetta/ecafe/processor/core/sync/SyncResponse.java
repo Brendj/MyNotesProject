@@ -1185,7 +1185,7 @@ public class SyncResponse {
                 element.setAttribute("Complex8", Integer.toString(this.complex8));
                 element.setAttribute("Complex9", Integer.toString(this.complex9));
                 element.setAttribute("Complexes", Integer.toString(this.complexes));
-                element.setAttribute("priority", Integer.toString(this.priority));
+                element.setAttribute("Priority", Integer.toString(this.priority));
                 return element;
             }
 
@@ -1255,12 +1255,13 @@ public class SyncResponse {
     private final ResEnterEvents resEnterEvents;
     private final ResLibraryData resLibraryData;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
+    private final CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry;
 
     public SyncResponse(int type, Long idOfOrg, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData,
-            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules) {
+            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOredrsRegistry correctingNumbersOredrsRegistry) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.idOfPacket = idOfPacket;
@@ -1278,6 +1279,7 @@ public class SyncResponse {
         this.resEnterEvents = resEnterEvents;
         this.resLibraryData = resLibraryData;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
+        this.correctingNumbersOredrsRegistry=correctingNumbersOredrsRegistry;
     }
 
     public Document toDocument() throws Exception {
