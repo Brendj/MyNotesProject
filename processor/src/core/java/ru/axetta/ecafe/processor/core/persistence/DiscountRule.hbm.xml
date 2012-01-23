@@ -33,7 +33,7 @@
         <property name="priority" column="Priority" type="integer" not-null="true"/>
         <property name="operationOr" column="OperationOr" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
-        <property name="categoryDiscounts" column="CategoryDiscounts" type="string" length="64" not-null="true" />
+        <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
 
     </class>
 </hibernate-mapping>

@@ -121,3 +121,10 @@ CREATE TABLE CF_DiscountRules (
   OperationOr               integer       NOT NULL DEFAULT 0,
   CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule)
 );
+
+ ALTER TABLE CF_EnterEvents ADD COLUMN IdOfVisitor             BIGINT;
+ ALTER TABLE CF_EnterEvents ADD COLUMN VisitorFullName         varchar(110);
+ ALTER TABLE CF_EnterEvents ADD COLUMN DocType                 integer;
+ ALTER TABLE CF_EnterEvents ADD COLUMN DocSerialNum            varchar(45);
+ ALTER TABLE CF_EnterEvents ADD COLUMN IssueDocDate            BIGINT;
+ ALTER TABLE CF_EnterEvents ADD COLUMN VisitDateTime           BIGINT;
