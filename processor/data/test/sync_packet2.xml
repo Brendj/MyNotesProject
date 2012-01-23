@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Data>
+    <Body>
+        <!-- Конверт -->
+        <CafeteriaExchange Date="02.08.2009 20:00:12" IdOfOrg="20" IdOfPacket="2" Version="3">
+            <!-- Реестр платежей -->
+            <PaymentRegistry>
+                <PT IdOfClient="132" CardNo="4" Date="02.08.2009 15:10:35" Discount="0" IdOfOrder="3" IdOfCashier="1"
+                    SumByCard="5000" SumByCash="0" rSum="5000">
+                    <PC Discount="0" IdOfOrderDetails="4" Name="Каша гречневая" Qty="1" rPrice="5000"/>
+                </PT>
+                <PT IdOfClient="132" CardNo="4" Date="02.08.2009 18:00:57" Discount="1000" IdOfOrder="4" IdOfCashier="1"
+                    SumByCard="3500" SumByCash="5050" rSum="8550">
+                    <PC Discount="1000" IdOfOrder="4" IdOfOrderDetails="5" Name="Пюре картофельное" Qty="1"
+                        rPrice="3550"/>
+                    <PC Discount="0" IdOfOrder="4" IdOfOrderDetails="6" Name="Котлета" Qty="2" rPrice="5000"/>
+                </PT>
+            </PaymentRegistry>
+
+            <!-- Запрос реестра клиентов -->
+            <ClientRegistryRequest CurrentVersion="1"/>
+
+            <!-- Меню -->
+            <Menu>
+                <Date Value="11.08.2009">
+                    <ML Calories="1" Carbohydrates="1" Name="1" Output="1" Price="1" Protein="1"/>
+                    <ML Calories="1" Carbohydrates="1" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1" Protein="1" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                </Date>
+                <Date Value="12.08.2009">
+                    <ML Calories="1000" Carbohydrates="1000" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1120" Protein="45854" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                    <ML Calories="1" Carbohydrates="1" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1" Protein="1" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                </Date>
+                <Date Value="13.08.2009">
+                    <ML Calories="1000" Carbohydrates="1000" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1120" Protein="45854" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                    <ML Calories="1" Carbohydrates="1" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1" Protein="1" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                </Date>
+                <Date Value="14.08.2009">
+                    <ML Calories="1000" Carbohydrates="1000" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1120" Protein="45854" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                    <ML Calories="1" Carbohydrates="1" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1" Protein="1" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                </Date>
+                <Date Value="15.08.2009">
+                    <ML Calories="1000" Carbohydrates="1000" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1120" Protein="45854" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                    <ML Calories="1" Carbohydrates="1" Fat="1" MinCa="1" MinFe="1" MinMg="1" MinP="1" Name="1"
+                        Output="1" Price="1" Protein="1" VitA="1" VitB1="1" VitC="1" VitE="1"/>
+                </Date>
+            </Menu>
+
+            <!-- Структура учреждения -->
+            <OrgStructure>
+                <OS IdOfGroup="1" Name="1Б" ClientList="130;133;135;132;134"/>
+                <OS IdOfGroup="2" Name="1А" ClientList="131;128;129;60"/>
+            </OrgStructure>
+
+            <Message>Any admin message</Message>
+
+        </CafeteriaExchange>
+    </Body>
+</Data>

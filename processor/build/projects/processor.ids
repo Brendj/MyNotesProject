@@ -1,0 +1,1135 @@
+<?xml version="1.0" encoding="UTF-8"?><component name="dataSourceStorage">
+  <data-source source="LOCAL" name="ecafe_processor_db" product="Apache Derby" version="10.5.1.1 - (764942)" jdbc-version="4.0" driver-version="10.5.1.1 - (764942)" uuid="d3fa9d06-cbc9-415a-804a-9022fc5352ec">
+    <identifier-quote-string>"</identifier-quote-string>
+    <jdbc-driver>org.apache.derby.jdbc.EmbeddedDriver</jdbc-driver>
+    <jdbc-url>jdbc:derby:D:\users\Marat\documents\work\java\ecafe\processor\data\ecafe_processor_db</jdbc-url>
+    <libraries>
+      <library>
+        <url>jar://$PROJECT_DIR$/../lib/derby.jar!/</url>
+      </library>
+      <library>
+        <url>jar://$PROJECT_DIR$/../lib/derbytools.jar!/</url>
+      </library>
+    </libraries>
+    <table name="CF_CALLS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCALL" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CALLTIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="REASON" sqlType="VARCHAR" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="CALLTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="STATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="CF_CALLS_PK" columns="idofcall" />
+      <foreign-key name="CF_CALLS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <index name="SQL091015143716850" unique="true" columns="IDOFCALL" />
+      <index name="SQL091015143716851" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_CARDS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCARD" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CARDNO" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CARDTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="LASTUPDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="STATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="LOCKREASON" sqlType="VARCHAR" length="64" precision="0" nullable="true" jdbcType="12" />
+      <column name="VALIDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="ISSUEDATE" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="LIFESTATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CARDPRINTEDNO" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="CF_CARDS_PK" columns="idofcard" />
+      <foreign-key name="CF_CARDS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <index name="SQL091015143710460" unique="true" columns="IDOFCARD" />
+      <index name="SQL091015143710461" unique="true" columns="CARDNO" />
+      <index name="SQL091015143710462" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_CLIENTGROUPS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENTGROUP" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="GROUPNAME" sqlType="VARCHAR" length="64" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_CLIENTGROUPS_PK" columns="idoforg,idofclientgroup" />
+      <foreign-key name="CF_CLIENTGROUPS_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143709430" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143709430" unique="true" columns="IDOFCLIENTGROUP" />
+      <index name="SQL091015143709431" unique="false" columns="IDOFORG" />
+    </table>
+    <table name="CF_CLIENTPAYMENTORDERS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCLIENTPAYMENTORDER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATETIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYMENTMETHOD" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="ORDERSTATUS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="IDOFPAYMENT" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="CONTRAGENTSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_CLIENTPAYMENTORDERS_PK" columns="idofclientpaymentorder" />
+      <foreign-key name="CF_CLIENTPAYMENTORDERS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <foreign-key name="CF_CLIENTPAYMENTORDERS_IDOFCONTRAGENT_FK" columns="IDOFCONTRAGENT" ref-table="CF_CONTRAGENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCONTRAGENT" />
+      <index name="SQL091126154357180" unique="true" columns="IDOFCLIENTPAYMENTORDER" />
+      <index name="SQL091126154357181" unique="false" columns="IDOFCONTRAGENT" />
+      <index name="SQL091126154357182" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_CLIENTPAYMENTS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCLIENTPAYMENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="IDOFPAYMENT" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="IDOFCLIENTPAYMENTORDER" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="PAYMENTMETHOD" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="ADDPAYMENTMETHOD" sqlType="VARCHAR" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="ADDIDOFPAYMENT" sqlType="VARCHAR" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="CF_CLIENTPAYMENTS_PK" columns="idofclientpayment" />
+      <foreign-key name="CF_CLIENTPAYMENTS_IDOFCLIENTPAYMENTORDER_FK" columns="IDOFCLIENTPAYMENTORDER" ref-table="CF_CLIENTPAYMENTORDERS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENTPAYMENTORDER" />
+      <foreign-key name="CF_CLIENTPAYMENTS_IDOFCONTRAGENT_FK" columns="IDOFCONTRAGENT" ref-table="CF_CONTRAGENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCONTRAGENT" />
+      <foreign-key name="CF_CLIENTPAYMENTS_IDOFTRANSACTION_FK" columns="IDOFTRANSACTION" ref-table="CF_TRANSACTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFTRANSACTION" />
+      <index name="SQL091015143713820" unique="true" columns="IDOFCLIENTPAYMENT" />
+      <index name="SQL091015143713822" unique="false" columns="IDOFTRANSACTION" />
+      <index name="SQL091015143713824" unique="false" columns="IDOFCONTRAGENT" />
+      <index name="SQL091126154359630" unique="false" columns="IDOFCLIENTPAYMENTORDER" />
+    </table>
+    <table name="CF_CLIENTS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRACTPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENTGROUP" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="CLIENTREGISTRYVERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="FLAGS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="ADDRESS" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="PHONE" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="MOBILE" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="EMAIL" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="NOTIFYVIAEMAIL" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="NOTIFYVIASMS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="IMAGE" sqlType="BLOB" length="2147483647" precision="0" nullable="true" jdbcType="2004" />
+      <column name="REMARKS" sqlType="VARCHAR" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="LASTUPDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONTRACTID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONTRACTDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONTRACTSTATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="PASSWORD" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="PAYFORSMS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="FREEPAYMAXCOUNT" sqlType="INTEGER" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="FREEPAYCOUNT" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="LASTFREEPAYTIME" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="DISCOUNTMODE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="BALANCE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="LIMIT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_CLIENTS_PK" columns="idofclient" />
+      <foreign-key name="CF_CLIENTS_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <foreign-key name="CF_CLIENTS_IDOFCONTRACTPERSON_FK" columns="IDOFCONTRACTPERSON" ref-table="CF_PERSONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFPERSON" />
+      <foreign-key name="CF_CLIENTS_IDOFPERSON_FK" columns="IDOFPERSON" ref-table="CF_PERSONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFPERSON" />
+      <index name="SQL091015143709670" unique="true" columns="IDOFCLIENT" />
+      <index name="SQL091211103343680" unique="true" columns="CONTRACTID" />
+      <index name="SQL091015143709671" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143709672" unique="false" columns="IDOFPERSON" />
+      <index name="SQL091015143709673" unique="false" columns="IDOFCONTRACTPERSON" />
+    </table>
+    <table name="CF_CLIENTSMS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFSMS" sqlType="CHAR" length="32" precision="0" nullable="false" jdbcType="1" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PHONE" sqlType="VARCHAR" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="CONTENTSTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="TEXTCONTENTS" sqlType="VARCHAR" length="70" precision="0" nullable="false" jdbcType="12" />
+      <column name="DELIVERYSTATUS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="SERVICESENDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SENDDATE" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="DELIVERYDATE" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="PRICE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="CF_CLIENTSMS_PK" columns="idofsms" />
+      <foreign-key name="CF_CLIENTSMS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <foreign-key name="CF_CLIENTSMS_IDOFTRANSACTION_FK" columns="IDOFTRANSACTION" ref-table="CF_TRANSACTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFTRANSACTION" />
+      <index name="SQL100319141016170" unique="true" columns="IDOFSMS" />
+      <index name="SQL100319141016180" unique="false" columns="IDOFCLIENT" />
+      <index name="SQL100709115828760" unique="false" columns="IDOFTRANSACTION" />
+    </table>
+    <table name="CF_CONTRAGENTCLIENTACCOUNTS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFACCOUNT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_CONTRAGENTCLIENTACCOUNTS_PK" columns="idofcontragent,idofaccount" />
+      <foreign-key name="CF_CONTRAGENTCLIENTACCOUNTS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <foreign-key name="CF_CONTRAGENTCLIENTACCOUNTS_IDOFCONTRAGENT_FK" columns="IDOFCONTRAGENT" ref-table="CF_CONTRAGENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCONTRAGENT" />
+      <index name="SQL100412112601600" unique="true" columns="IDOFCONTRAGENT" />
+      <index name="SQL100412112601600" unique="true" columns="IDOFACCOUNT" />
+      <index name="SQL100412112601610" unique="false" columns="IDOFCONTRAGENT" />
+      <index name="SQL100412112601611" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_CONTRAGENTPAYMENTS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCONTRAGENTPAYMENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="STATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYMENTDATE" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="CF_CONTRAGENTPAYMENTS_PK" columns="idofcontragentpayment" />
+      <foreign-key name="CF_CONTRAGENTPAYMENTS_IDOFCONTRAGENT_FK" columns="IDOFCONTRAGENT" ref-table="CF_CONTRAGENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCONTRAGENT" />
+      <foreign-key name="CF_CONTRAGENTPAYMENTS_IDOFTRANSACTION_FK" columns="IDOFTRANSACTION" ref-table="CF_TRANSACTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFTRANSACTION" />
+      <index name="SQL091015143713530" unique="true" columns="IDOFCONTRAGENTPAYMENT" />
+      <index name="SQL091015143713531" unique="false" columns="IDOFCONTRAGENT" />
+      <index name="SQL091015143713532" unique="false" columns="IDOFTRANSACTION" />
+    </table>
+    <table name="CF_CONTRAGENTS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTACTPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PARENTID" sqlType="INTEGER" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="CONTRAGENTNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="CLASSID" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="FLAGS" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="TITLE" sqlType="VARCHAR" length="30" precision="0" nullable="false" jdbcType="12" />
+      <column name="ADDRESS" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="PHONE" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="MOBILE" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="EMAIL" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="FAX" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="REMARKS" sqlType="VARCHAR" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="INN" sqlType="VARCHAR" length="90" precision="0" nullable="true" jdbcType="12" />
+      <column name="BANK" sqlType="VARCHAR" length="90" precision="0" nullable="true" jdbcType="12" />
+      <column name="BIC" sqlType="CHAR" length="15" precision="0" nullable="true" jdbcType="1" />
+      <column name="CORRACCOUNT" sqlType="VARCHAR" length="20" precision="0" nullable="true" jdbcType="12" />
+      <column name="ACCOUNT" sqlType="VARCHAR" length="20" precision="0" nullable="true" jdbcType="12" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="LASTUPDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PUBLICKEY" sqlType="VARCHAR" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NEEDACCOUNTTRANSLATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="CF_CONTRAGENTS_PK" columns="idofcontragent" />
+      <foreign-key name="CF_CONTRAGENTS_IDOFCONTACTPERSON_FK" columns="IDOFCONTACTPERSON" ref-table="CF_PERSONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFPERSON" />
+      <index name="SQL091015143710170" unique="true" columns="IDOFCONTRAGENT" />
+      <index name="SQL091211143044620" unique="true" columns="CONTRAGENTNAME" />
+      <index name="SQL091015143710171" unique="false" columns="IDOFCONTACTPERSON" />
+    </table>
+    <table name="CF_DIARYCLASSES" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLASS" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CLASSNAME" sqlType="VARCHAR" length="64" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_DIARYCLASSES_PK" columns="idoforg,idofclass" />
+      <foreign-key name="CF_DIARYCLASSES_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143714450" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143714450" unique="true" columns="IDOFCLASS" />
+      <index name="SQL091015143714451" unique="false" columns="IDOFORG" />
+    </table>
+    <table name="CF_DIARYTIMESHEET" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENTGROUP" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RECDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="C0" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C1" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C2" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C3" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C4" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C5" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C6" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C7" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C8" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="C9" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="CF_DIARYTIMESHEET_PK" columns="idoforg,idofclientgroup,recdate" />
+      <foreign-key name="CF_DIARYTIMESHEET_IDOFORG_IDOFCLIENTGROUP" columns="IDOFORG,IDOFCLIENTGROUP" ref-table="CF_CLIENTGROUPS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLIENTGROUP" />
+      <foreign-key name="CF_DIARYTIMESHEET_C9" columns="IDOFORG,C9" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C8" columns="IDOFORG,C8" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C7" columns="IDOFORG,C7" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C6" columns="IDOFORG,C6" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C5" columns="IDOFORG,C5" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C4" columns="IDOFORG,C4" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C3" columns="IDOFORG,C3" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C2" columns="IDOFORG,C2" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C1" columns="IDOFORG,C1" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_C0" columns="IDOFORG,C0" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYTIMESHEET_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143714670" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143714670" unique="true" columns="IDOFCLIENTGROUP" />
+      <index name="SQL091015143714670" unique="true" columns="RECDATE" />
+      <index name="SQL091015143714671" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714672" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714672" unique="false" columns="IDOFCLIENTGROUP" />
+      <index name="SQL091015143714673" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714673" unique="false" columns="C0" />
+      <index name="SQL091015143714674" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714674" unique="false" columns="C1" />
+      <index name="SQL091015143714675" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714675" unique="false" columns="C2" />
+      <index name="SQL091015143714676" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714676" unique="false" columns="C3" />
+      <index name="SQL091015143714677" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714677" unique="false" columns="C4" />
+      <index name="SQL091015143714678" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714678" unique="false" columns="C5" />
+      <index name="SQL091015143714679" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714679" unique="false" columns="C6" />
+      <index name="SQL091015143714680" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714680" unique="false" columns="C7" />
+      <index name="SQL091015143714681" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714681" unique="false" columns="C8" />
+      <index name="SQL091015143714682" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143714682" unique="false" columns="C9" />
+    </table>
+    <table name="CF_DIARYVALUES" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLASS" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RECDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="VTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="VALUE" sqlType="VARCHAR" length="10" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_DIARYVALUES_PK" columns="idoforg,idofclient,idofclass,recdate,vtype" />
+      <foreign-key name="CF_DIARYVALUES_IDOFCLIENT" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <foreign-key name="CF_DIARYVALUES_IDOFORG_IDOFCLASS_FK" columns="IDOFORG,IDOFCLASS" ref-table="CF_DIARYCLASSES" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFCLASS" />
+      <foreign-key name="CF_DIARYVALUES_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143716250" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143716250" unique="true" columns="IDOFCLIENT" />
+      <index name="SQL091015143716250" unique="true" columns="IDOFCLASS" />
+      <index name="SQL091015143716250" unique="true" columns="RECDATE" />
+      <index name="SQL091015143716250" unique="true" columns="VTYPE" />
+      <index name="SQL091015143716251" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143716252" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143716252" unique="false" columns="IDOFCLASS" />
+      <index name="SQL091015143716253" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_FUNCTIONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFFUNCTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="FUNCTIONNAME" sqlType="VARCHAR" length="10" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_FUNCTIONS_PK" columns="idoffunction" />
+      <index name="SQL091015143711670" unique="true" columns="IDOFFUNCTION" />
+    </table>
+    <table name="CF_GENERATORS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCARD" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFUSER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFFUNCTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFMENU" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFMENUDETAIL" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCONTRAGENTPAYMENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENTPAYMENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCALL" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFNOTIFICATION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFSYNC" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENTPAYMENTORDER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFREPORTHANDLERULE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFRULECONDITION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFSCHEDULERJOB" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+    </table>
+    <table name="CF_MENU" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFMENU" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="MENUDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="MENUSOURCE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="CF_MENU_PK" columns="idofmenu" />
+      <foreign-key name="CF_MENU_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143712210" unique="true" columns="IDOFMENU" />
+      <index name="SQL091015143712211" unique="false" columns="IDOFORG" />
+    </table>
+    <table name="CF_MENUDETAILS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFMENUDETAIL" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFMENU" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="GROUPNAME" sqlType="VARCHAR" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="MENUDETAILOUTPUT" sqlType="VARCHAR" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="PRICE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PROTEIN" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="FAT" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="CARBOHYDRATES" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="CALORIES" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="VITB1" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="VITC" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="VITA" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="VITE" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="MINCA" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="MINP" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="MINMG" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="MINFE" sqlType="DECIMAL" length="5" precision="2" nullable="true" jdbcType="3" />
+      <column name="MENUDETAILNAME" sqlType="VARCHAR" length="256" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_MENUDETAIL_PK" columns="idofmenudetail" />
+      <foreign-key name="CF_MENUDETAIL_IDOFMENU_FK" columns="IDOFMENU" ref-table="CF_MENU" ref-schema="APP" ref-catalog="" ref-columns="IDOFMENU" />
+      <index name="SQL091015143712450" unique="true" columns="IDOFMENUDETAIL" />
+      <index name="SQL091015143712451" unique="false" columns="IDOFMENU" />
+    </table>
+    <table name="CF_NOTIFICATIONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFNOTIFICATION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NOTIFICATIONTIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NOTIFICATIONTYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="NOTIFICATIONTEXT" sqlType="VARCHAR" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_NOTIFICATIONS_PK" columns="idofnotification" />
+      <foreign-key name="CF_NOTIFICATIONS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <index name="SQL091015143717210" unique="true" columns="IDOFNOTIFICATION" />
+      <index name="SQL091015143717211" unique="false" columns="IDOFCLIENT" />
+    </table>
+    <table name="CF_ORDERDETAILS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORDERDETAIL" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORDER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="QTY" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="DISCOUNT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RPRICE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="MENUDETAILNAME" sqlType="VARCHAR" length="256" precision="0" nullable="false" jdbcType="12" />
+      <column name="ROOTMENU" sqlType="VARCHAR" length="32" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CF_ORDERDETAILS_PK" columns="idoforg,idoforderdetail" />
+      <foreign-key name="CF_ORDERDETAILS_IDOFORG_IDOFORDER_FK" columns="IDOFORG,IDOFORDER" ref-table="CF_ORDERS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG,IDOFORDER" />
+      <foreign-key name="CF_ORDERDETAILS_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143713180" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143713180" unique="true" columns="IDOFORDERDETAIL" />
+      <index name="SQL091015143713181" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143713182" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143713182" unique="false" columns="IDOFORDER" />
+    </table>
+    <table name="CF_ORDERS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORDER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCARD" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="IDOFCASHIER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="DISCOUNT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATEDDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SUMBYCARD" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SUMBYCASH" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="GRANTSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_ORDERS_PK" columns="idoforg,idoforder" />
+      <foreign-key name="CF_ORDERS_IDOFCARD_FK" columns="IDOFCARD" ref-table="CF_CARDS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCARD" />
+      <foreign-key name="CF_ORDERS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <foreign-key name="CF_ORDERS_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <foreign-key name="CF_ORDERS_IDOFTRANSACTION_FK" columns="IDOFTRANSACTION" ref-table="CF_TRANSACTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFTRANSACTION" />
+      <index name="SQL091015143712700" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143712700" unique="true" columns="IDOFORDER" />
+      <index name="SQL091015143712701" unique="false" columns="IDOFORG" />
+      <index name="SQL091015143712702" unique="false" columns="IDOFCARD" />
+      <index name="SQL091015143712703" unique="false" columns="IDOFCLIENT" />
+      <index name="SQL091015143712704" unique="false" columns="IDOFTRANSACTION" />
+    </table>
+    <table name="CF_ORGS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SHORTNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="OFFICIALNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="ADDRESS" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="PHONE" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="IDOFOFFICIALPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="OFFICIALPOSITION" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="CONTRACTID" sqlType="VARCHAR" length="50" precision="0" nullable="false" jdbcType="12" />
+      <column name="CONTRACTDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="STATE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="CARDLIMIT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PUBLICKEY" sqlType="VARCHAR" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="IDOFPACKET" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="LASTCLIENTCONTRACTID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SSOPASSWORD" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SMSSENDER" sqlType="VARCHAR" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="PRICEOFSMS" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SUBSCRIPTIONPRICE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_ORGS_PK" columns="idoforg" />
+      <foreign-key name="CF_CLIENTS_IDOFOFFICIALPERSON_FK" columns="IDOFOFFICIALPERSON" ref-table="CF_PERSONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFPERSON" />
+      <index name="SQL091015143709030" unique="true" columns="IDOFORG" />
+      <index name="SQL091015143709031" unique="true" columns="SHORTNAME" />
+      <index name="SQL091015143709032" unique="true" columns="CONTRACTID" />
+      <index name="SQL091015143709033" unique="false" columns="IDOFOFFICIALPERSON" />
+    </table>
+    <table name="CF_PERMISSIONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFUSER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFFUNCTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_PERMISSIONS" columns="idofuser,idoffunction" />
+      <foreign-key name="CF_PERMISSIONS_IDOFFUNCTION_FK" columns="IDOFFUNCTION" ref-table="CF_FUNCTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFFUNCTION" />
+      <foreign-key name="CF_PERMISSIONS_IDOFUSER_FK" columns="IDOFUSER" ref-table="CF_USERS" ref-schema="APP" ref-catalog="" ref-columns="IDOFUSER" />
+      <index name="SQL091015143711810" unique="true" columns="IDOFUSER" />
+      <index name="SQL091015143711810" unique="true" columns="IDOFFUNCTION" />
+      <index name="SQL091015143711811" unique="false" columns="IDOFUSER" />
+      <index name="SQL091015143711812" unique="false" columns="IDOFFUNCTION" />
+    </table>
+    <table name="CF_PERSONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFPERSON" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="FIRSTNAME" sqlType="VARCHAR" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="SURNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="SECONDNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="IDDOCUMENT" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="CF_PERSONS_PK" columns="idofperson" />
+      <index name="SQL091015143708780" unique="true" columns="IDOFPERSON" />
+    </table>
+    <table name="CF_REGISTRY" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFREGISTRY" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CLIENTREGISTRYVERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SMSID" sqlType="CHAR" length="16" precision="0" nullable="false" jdbcType="1" />
+      <primary-key name="CF_CLIENTREGISTRY_PK" columns="idofregistry" />
+      <index name="SQL091015143719250" unique="true" columns="IDOFREGISTRY" />
+    </table>
+    <table name="CF_REPORTHANDLERULES" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFREPORTHANDLERULE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RULENAME" sqlType="VARCHAR" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="DOCUMENTFORMAT" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="SUBJECT" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="ROUTE0" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="ROUTE1" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE2" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE3" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE4" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE5" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE6" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE7" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE8" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="ROUTE9" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="REMARKS" sqlType="VARCHAR" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="ENABLED" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="CF_REPORTHANDLERULES_PK" columns="idofreporthandlerule" />
+      <index name="SQL100115180054880" unique="true" columns="IDOFREPORTHANDLERULE" />
+    </table>
+    <table name="CF_RULECONDITIONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFRULECONDITION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFREPORTHANDLERULE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONDITIONOPERATION" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="CONDITIONARGUMENT" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="CONDITIONCONSTANT" sqlType="VARCHAR" length="128" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="CF_RULECONDITIONS_PK" columns="idofrulecondition" />
+      <foreign-key name="CF_RULECONDITIONS_IDOFREPORTHANDLERULE_FK" columns="IDOFREPORTHANDLERULE" ref-table="CF_REPORTHANDLERULES" ref-schema="APP" ref-catalog="" ref-columns="IDOFREPORTHANDLERULE" />
+      <index name="SQL100115180055210" unique="true" columns="IDOFRULECONDITION" />
+      <index name="SQL100115180055211" unique="false" columns="IDOFREPORTHANDLERULE" />
+    </table>
+    <table name="CF_SCHEDULERJOBS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFSCHEDULERJOB" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="JOBCLASS" sqlType="VARCHAR" length="512" precision="0" nullable="false" jdbcType="12" />
+      <column name="CRONEXPRESSION" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="JOBNAME" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="ENABLED" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="CF_SCHEDULERJOBS_PK" columns="idofschedulerjob" />
+      <index name="SQL100629070500900" unique="true" columns="IDOFSCHEDULERJOB" />
+    </table>
+    <table name="CF_SOCHICLIENTPAYMENTS" schema="APP" catalog="" type="TABLE">
+      <column name="PAYMENTID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONTRACTID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PAYMENTSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATETIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_SOCHICLIENTPAYMENTS_PK" columns="paymentid" />
+      <foreign-key name="CF_SOCHICLIENTPAYMENTS_CONTRACTID_FK" columns="CONTRACTID" ref-table="CF_SOCHICLIENTS" ref-schema="APP" ref-catalog="" ref-columns="CONTRACTID" />
+      <index name="SQL101024001900260" unique="true" columns="PAYMENTID" />
+      <index name="SQL101024001900261" unique="false" columns="CONTRACTID" />
+    </table>
+    <table name="CF_SOCHICLIENTS" schema="APP" catalog="" type="TABLE">
+      <column name="CONTRACTID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATETIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="UPDATETIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="FULLNAME" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="ADDRESS" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="CF_SOCHICLIENTS_PK" columns="contractid" />
+      <index name="SQL101024001900180" unique="true" columns="CONTRACTID" />
+    </table>
+    <table name="CF_SUBSCRIPTIONFEE" schema="APP" catalog="" type="TABLE">
+      <column name="SUBSCRIPTIONYEAR" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="PERIODNO" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SUBSCRIPTIONSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATETIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_SUBSCRIPTIONFEE_PK" columns="subscriptionyear,periodno" />
+      <foreign-key name="CF_SUBSCRIPTIONFEE_IDOFTRANSACTION_FK" columns="IDOFTRANSACTION" ref-table="CF_TRANSACTIONS" ref-schema="APP" ref-catalog="" ref-columns="IDOFTRANSACTION" />
+      <index name="SQL100709115828890" unique="true" columns="SUBSCRIPTIONYEAR" />
+      <index name="SQL100709115828890" unique="true" columns="PERIODNO" />
+      <index name="SQL100709115828891" unique="false" columns="IDOFTRANSACTION" />
+    </table>
+    <table name="CF_SYNCHISTORY" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFSYNC" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFORG" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SYNCSTARTTIME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SYNCENDTIME" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="SYNCRESULT" sqlType="INTEGER" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="IDOFPACKET" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_SYNCHISTORY_PK" columns="idofsync" />
+      <foreign-key name="CF_SYNCHISTORY_IDOFORG_FK" columns="IDOFORG" ref-table="CF_ORGS" ref-schema="APP" ref-catalog="" ref-columns="IDOFORG" />
+      <index name="SQL091015143717500" unique="true" columns="IDOFSYNC" />
+      <index name="SQL091015143717501" unique="false" columns="IDOFORG" />
+    </table>
+    <table name="CF_TRANSACTIONS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFTRANSACTION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="TRANSACTIONSUM" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="SOURCE" sqlType="VARCHAR" length="30" precision="0" nullable="false" jdbcType="12" />
+      <column name="SOURCETYPE" sqlType="INTEGER" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="TRANSACTIONDATE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCLIENT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="IDOFCARD" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="CF_TRANSACTIONS_PK" columns="idoftransaction" />
+      <foreign-key name="CF_TRANSACTIONS_IDOFCARD_FK" columns="IDOFCARD" ref-table="CF_CARDS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCARD" />
+      <foreign-key name="CF_TRANSACTIONS_IDOFCLIENT_FK" columns="IDOFCLIENT" ref-table="CF_CLIENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCLIENT" />
+      <index name="SQL091015143710870" unique="true" columns="IDOFTRANSACTION" />
+      <index name="SQL100709115818360" unique="false" columns="IDOFCLIENT" />
+      <index name="SQL100709115822590" unique="false" columns="IDOFCARD" />
+    </table>
+    <table name="CF_USERS" schema="APP" catalog="" type="TABLE">
+      <column name="IDOFUSER" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="USERNAME" sqlType="VARCHAR" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="PASSWORD" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="LASTCHANGE" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="PHONE" sqlType="VARCHAR" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="IDOFCONTRAGENT" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="VERSION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CF_USERS_PK" columns="idofuser" />
+      <foreign-key name="CF_USERS_IDOFCONTRAGENT_FK" columns="IDOFCONTRAGENT" ref-table="CF_CONTRAGENTS" ref-schema="APP" ref-catalog="" ref-columns="IDOFCONTRAGENT" />
+      <index name="SQL091015143711140" unique="true" columns="IDOFUSER" />
+      <index name="SQL091015143711141" unique="true" columns="USERNAME" />
+      <index name="SQL091015143711142" unique="false" columns="IDOFCONTRAGENT" />
+    </table>
+  </data-source>
+  <data-source source="LOCAL" name="Data Source" product="PostgreSQL" version="8.4.8" jdbc-version="4.0" driver-version="PostgreSQL 9.0 JDBC4 (build 801)" uuid="eef13bb8-dbc2-4fbb-9ba1-67dff913209c">
+    <identifier-quote-string>"</identifier-quote-string>
+    <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+    <jdbc-url>jdbc:postgresql://127.0.0.1:5432/ecafe_processor_db</jdbc-url>
+    <user-name>postgres</user-name>
+    <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+    <libraries>
+      <library>
+        <url>jar://$PROJECT_DIR$/postgresql-9.0-801.jdbc4.jar!/</url>
+      </library>
+      <library>
+        <url>file://$PROJECT_DIR$/postgresql-driver-license.txt</url>
+      </library>
+    </libraries>
+    <table name="cf_assortment" schema="public" catalog="" type="TABLE">
+      <column name="idofast" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="begindate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="shortname" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="fullname" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="groupname" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="menuorigin" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="menuoutput" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="price" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="protein" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="fat" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="carbohydrates" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="calories" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vitb1" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vitc" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vita" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vite" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minca" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minp" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minmg" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minfe" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <primary-key name="cf_assortment_pk" columns="idofast" />
+      <foreign-key name="cf_assortment_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_calls" schema="public" catalog="" type="TABLE">
+      <column name="idofcall" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="calltime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="reason" sqlType="varchar" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="calltype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="state" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_calls_pk" columns="idofcall" />
+      <foreign-key name="cf_calls_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+    </table>
+    <table name="cf_cards" schema="public" catalog="" type="TABLE">
+      <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="cardno" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="cardtype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="lastupdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="state" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="lockreason" sqlType="varchar" length="64" precision="0" nullable="true" jdbcType="12" />
+      <column name="validdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="issuedate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="lifestate" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="cardprintedno" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="cf_cards_pk" columns="idofcard" />
+      <foreign-key name="cf_cards_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <index name="cf_cards_cardno" unique="true" columns="cardno" />
+    </table>
+    <table name="cf_clientgroups" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclientgroup" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="groupname" sqlType="varchar" length="64" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_clientgroups_pk" columns="idoforg,idofclientgroup" />
+      <foreign-key name="cf_clientgroups_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_clientpaymentorders" schema="public" catalog="" type="TABLE">
+      <column name="idofclientpaymentorder" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymentmethod" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="orderstatus" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="paysum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="contragentsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofpayment" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_clientpaymentorders_pk" columns="idofclientpaymentorder" />
+      <foreign-key name="cf_clientpaymentorders_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <foreign-key name="cf_clientpaymentorders_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" />
+    </table>
+    <table name="cf_clientpayments" schema="public" catalog="" type="TABLE">
+      <column name="idofclientpayment" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymentmethod" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="paysum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paytype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idofpayment" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="idofclientpaymentorder" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="addpaymentmethod" sqlType="varchar" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="addidofpayment" sqlType="varchar" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="cf_clientpayments_pk" columns="idofclientpayment" />
+      <foreign-key name="cf_clientpayments_idofclientpaymentorder_fk" columns="idofclientpaymentorder" ref-table="cf_clientpaymentorders" ref-schema="public" ref-catalog="" ref-columns="idofclientpaymentorder" />
+      <foreign-key name="cf_clientpayments_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" />
+      <foreign-key name="cf_clientpayments_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" />
+    </table>
+    <table name="cf_clients" schema="public" catalog="" type="TABLE">
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontractperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclientgroup" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="clientregistryversion" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="flags" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="address" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="phone" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="mobile" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="email" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="notifyviaemail" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="notifyviasms" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="image" sqlType="oid" length="10" precision="0" nullable="true" jdbcType="-5" />
+      <column name="remarks" sqlType="varchar" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="lastupdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="contractid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="contractdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="contractstate" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="password" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="payforsms" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="freepaymaxcount" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="freepaycount" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="lastfreepaytime" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="discountmode" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="balance" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="Limit" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_clients_pk" columns="idofclient" />
+      <foreign-key name="cf_clients_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+      <foreign-key name="cf_clients_idofperson_fk" columns="idofperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" />
+      <foreign-key name="cf_clients_idofcontractperson_fk" columns="idofcontractperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" />
+      <index name="cf_clients_contractid" unique="true" columns="contractid" />
+    </table>
+    <table name="cf_clientsms" schema="public" catalog="" type="TABLE">
+      <column name="idofsms" sqlType="bpchar" length="32" precision="0" nullable="false" jdbcType="1" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="phone" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="contentstype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="textcontents" sqlType="varchar" length="70" precision="0" nullable="false" jdbcType="12" />
+      <column name="deliverystatus" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="servicesenddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="senddate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="deliverydate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="price" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_clientsms_pk" columns="idofsms" />
+      <foreign-key name="cf_clientsms_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <foreign-key name="cf_clientsms_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" />
+    </table>
+    <table name="cf_complexinfo" schema="public" catalog="" type="TABLE">
+      <column name="idofcomplexinfo" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcomplex" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="complexname" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="menudate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="modefree" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="modegrant" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="modeofadd" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_complexinfo_pk" columns="idofcomplexinfo" />
+      <foreign-key name="cf_complexinfo_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_complexinfodetail" schema="public" catalog="" type="TABLE">
+      <column name="idofcomplexinfodetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcomplexinfo" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofmenudetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_complexinfodetail_pk" columns="idofcomplexinfodetail" />
+      <foreign-key name="cf_complexinfodetail_idofmenudetail_fk" columns="idofmenudetail" ref-table="cf_menudetails" ref-schema="public" ref-catalog="" ref-columns="idofmenudetail" cascade-remove="true" />
+    </table>
+    <table name="cf_contragentclientaccounts" schema="public" catalog="" type="TABLE">
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofaccount" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_contragentclientaccounts_pk" columns="idofcontragent,idofaccount" />
+      <foreign-key name="cf_contragentclientaccounts_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <foreign-key name="cf_contragentclientaccounts_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" />
+    </table>
+    <table name="cf_contragentpayments" schema="public" catalog="" type="TABLE">
+      <column name="idofcontragentpayment" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paysum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paytype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="state" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymentdate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="cf_contragentpayments_pk" columns="idofcontragentpayment" />
+      <foreign-key name="cf_contragentpayments_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" />
+      <foreign-key name="cf_contragentpayments_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" />
+    </table>
+    <table name="cf_contragents" schema="public" catalog="" type="TABLE">
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontactperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="parentid" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="contragentname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="classid" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="flags" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="title" sqlType="varchar" length="30" precision="0" nullable="false" jdbcType="12" />
+      <column name="address" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="phone" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="mobile" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="email" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="fax" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="remarks" sqlType="varchar" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="inn" sqlType="varchar" length="90" precision="0" nullable="true" jdbcType="12" />
+      <column name="bank" sqlType="varchar" length="90" precision="0" nullable="true" jdbcType="12" />
+      <column name="bic" sqlType="bpchar" length="15" precision="0" nullable="true" jdbcType="1" />
+      <column name="corraccount" sqlType="varchar" length="20" precision="0" nullable="true" jdbcType="12" />
+      <column name="account" sqlType="varchar" length="20" precision="0" nullable="true" jdbcType="12" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="lastupdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="publickey" sqlType="varchar" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="needaccounttranslate" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_contragents_pk" columns="idofcontragent" />
+      <foreign-key name="cf_contragents_idofcontactperson_fk" columns="idofcontactperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" />
+      <index name="cf_contragents_contragentname" unique="true" columns="contragentname" />
+    </table>
+    <table name="cf_diaryclasses" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclass" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="classname" sqlType="varchar" length="64" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_diaryclasses_pk" columns="idoforg,idofclass" />
+      <foreign-key name="cf_diaryclasses_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_diarytimesheet" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclientgroup" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="recdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="c0" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c1" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c2" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c3" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c4" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c5" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c6" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c7" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c8" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="c9" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="cf_diarytimesheet_pk" columns="idoforg,idofclientgroup,recdate" />
+      <foreign-key name="cf_diarytimesheet_idoforg_idofclientgroup" columns="idoforg,idofclientgroup" ref-table="cf_clientgroups" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclientgroup" />
+      <foreign-key name="cf_diarytimesheet_c1" columns="idoforg,c1" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c2" columns="idoforg,c2" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c3" columns="idoforg,c3" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c4" columns="idoforg,c4" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c5" columns="idoforg,c5" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c6" columns="idoforg,c6" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c7" columns="idoforg,c7" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c8" columns="idoforg,c8" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c9" columns="idoforg,c9" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_c0" columns="idoforg,c0" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diarytimesheet_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_diaryvalues" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclass" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="recdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="vtype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="value" sqlType="varchar" length="10" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_diaryvalues_pk" columns="idoforg,idofclient,idofclass,recdate,vtype" />
+      <foreign-key name="cf_diaryvalues_idofclient" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <foreign-key name="cf_diaryvalues_idoforg_idofclass_fk" columns="idoforg,idofclass" ref-table="cf_diaryclasses" ref-schema="public" ref-catalog="" ref-columns="idoforg,idofclass" />
+      <foreign-key name="cf_diaryvalues_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_enterevents" schema="public" catalog="" type="TABLE">
+      <column name="idofenterevent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="entername" sqlType="varchar" length="100" precision="0" nullable="false" jdbcType="12" />
+      <column name="turnstileaddr" sqlType="varchar" length="20" precision="0" nullable="false" jdbcType="12" />
+      <column name="passdirection" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="eventcode" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idoftempcard" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="evtdatetime" sqlType="timestamp" length="29" precision="6" nullable="false" jdbcType="93" />
+      <primary-key name="cf_enterevents_pk" columns="idofenterevent" />
+    </table>
+    <table name="cf_functions" schema="public" catalog="" type="TABLE">
+      <column name="idoffunction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="functionname" sqlType="varchar" length="10" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_functions_pk" columns="idoffunction" />
+    </table>
+    <table name="cf_generators" schema="public" catalog="" type="TABLE">
+      <column name="idofperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofuser" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoffunction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofmenu" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofmenudetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcontragentpayment" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclientpaymentorder" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclientpayment" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcall" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofnotification" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofsync" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofreporthandlerule" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofrulecondition" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofschedulerjob" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofast" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcomplexinfo" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcomplexinfodetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+    </table>
+    <table name="cf_menu" schema="public" catalog="" type="TABLE">
+      <column name="idofmenu" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menudate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menusource" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="flags" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_menu_pk" columns="idofmenu" />
+      <foreign-key name="cf_menu_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_menudetails" schema="public" catalog="" type="TABLE">
+      <column name="idofmenudetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofmenu" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menupath" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="menudetailname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="groupname" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="menudetailoutput" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="price" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menuorigin" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="availablenow" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="localidofmenu" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="protein" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="fat" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="carbohydrates" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="calories" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vitb1" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vitc" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vita" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="vite" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minca" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minp" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minmg" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <column name="minfe" sqlType="numeric" length="5" precision="2" nullable="true" jdbcType="2" />
+      <primary-key name="cf_menudetail_pk" columns="idofmenudetail" />
+      <foreign-key name="cf_menudetail_idofmenu_fk" columns="idofmenu" ref-table="cf_menu" ref-schema="public" ref-catalog="" ref-columns="idofmenu" />
+    </table>
+    <table name="cf_menuexchange" schema="public" catalog="" type="TABLE">
+      <column name="menudate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menudata" sqlType="varchar" length="32650" precision="0" nullable="false" jdbcType="12" />
+      <column name="flags" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_menuexchange_pk" columns="menudate,idoforg" />
+      <foreign-key name="cf_menuexchange_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" cascade-remove="true" />
+    </table>
+    <table name="cf_menuexchangerules" schema="public" catalog="" type="TABLE">
+      <column name="idofsourceorg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofdestorg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_menuexchangerules_pk" columns="idofsourceorg,idofdestorg" />
+      <foreign-key name="cf_menuexchangerules_idofsourceorg_fk" columns="idofsourceorg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" cascade-remove="true" />
+      <foreign-key name="cf_menuexchangerules_idofdestorg_fk" columns="idofdestorg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" cascade-remove="true" />
+    </table>
+    <table name="cf_notifications" schema="public" catalog="" type="TABLE">
+      <column name="idofnotification" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="notificationtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="notificationtype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="notificationtext" sqlType="varchar" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="cf_notifications_pk" columns="idofnotification" />
+      <foreign-key name="cf_notifications_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+    </table>
+    <table name="cf_orderdetails" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforderdetail" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforder" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="qty" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="discount" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="rprice" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="menudetailname" sqlType="varchar" length="256" precision="0" nullable="false" jdbcType="12" />
+      <column name="rootmenu" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="menugroup" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" />
+      <column name="menutype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="menuoutput" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="menuorigin" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_orderdetails_pk" columns="idoforg,idoforderdetail" />
+      <foreign-key name="cf_orderdetails_idoforg_idoforder_fk" columns="idoforg,idoforder" ref-table="cf_orders" ref-schema="public" ref-catalog="" ref-columns="idoforg,idoforder" />
+      <foreign-key name="cf_orderdetails_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_orders" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforder" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="idofcashier" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="discount" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="grantsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="rsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="sumbycard" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="sumbycash" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_orders_pk" columns="idoforg,idoforder" />
+      <foreign-key name="cf_orders_idofcard_fk" columns="idofcard" ref-table="cf_cards" ref-schema="public" ref-catalog="" ref-columns="idofcard" />
+      <foreign-key name="cf_orders_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+      <foreign-key name="cf_orders_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+      <foreign-key name="cf_orders_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" />
+    </table>
+    <table name="cf_orgs" schema="public" catalog="" type="TABLE">
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="shortname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="officialname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="address" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="phone" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="idofofficialperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="officialposition" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="contractid" sqlType="varchar" length="50" precision="0" nullable="false" jdbcType="12" />
+      <column name="contractdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="state" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="cardlimit" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="publickey" sqlType="varchar" length="1024" precision="0" nullable="false" jdbcType="12" />
+      <column name="idofpacket" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="lastclientcontractid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="ssopassword" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="smssender" sqlType="varchar" length="32" precision="0" nullable="true" jdbcType="12" />
+      <column name="priceofsms" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="subscriptionprice" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_orgs_pk" columns="idoforg" />
+      <foreign-key name="cf_orgs_idofofficialperson_fk" columns="idofofficialperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" />
+      <index name="cf_orgs_contractid" unique="true" columns="contractid" />
+      <index name="cf_orgs_shortname" unique="true" columns="shortname" />
+    </table>
+    <table name="cf_permissions" schema="public" catalog="" type="TABLE">
+      <column name="idofuser" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoffunction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_permissions_pk" columns="idofuser,idoffunction" />
+      <foreign-key name="cf_permissions_idoffunction_fk" columns="idoffunction" ref-table="cf_functions" ref-schema="public" ref-catalog="" ref-columns="idoffunction" />
+      <foreign-key name="cf_permissions_idofuser_fk" columns="idofuser" ref-table="cf_users" ref-schema="public" ref-catalog="" ref-columns="idofuser" />
+    </table>
+    <table name="cf_persons" schema="public" catalog="" type="TABLE">
+      <column name="idofperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="firstname" sqlType="varchar" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="surname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="secondname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="iddocument" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="cf_persons_pk" columns="idofperson" />
+    </table>
+    <table name="cf_registry" schema="public" catalog="" type="TABLE">
+      <column name="idofregistry" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="clientregistryversion" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="smsid" sqlType="bpchar" length="16" precision="0" nullable="false" jdbcType="1" />
+      <primary-key name="cf_clientregistry_pk" columns="idofregistry" />
+    </table>
+    <table name="cf_reporthandlerules" schema="public" catalog="" type="TABLE">
+      <column name="idofreporthandlerule" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="rulename" sqlType="varchar" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="subject" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="documentformat" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="route0" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="route1" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route2" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route3" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route4" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route5" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route6" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route7" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route8" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="route9" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="remarks" sqlType="varchar" length="1024" precision="0" nullable="true" jdbcType="12" />
+      <column name="enabled" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_reporthandlerules_pk" columns="idofreporthandlerule" />
+    </table>
+    <table name="cf_ruleconditions" schema="public" catalog="" type="TABLE">
+      <column name="idofrulecondition" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofreporthandlerule" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="conditionoperation" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="conditionargument" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <column name="conditionconstant" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="cf_ruleconditions_pk" columns="idofrulecondition" />
+      <foreign-key name="cf_ruleconditions_idofreporthandlerule_fk" columns="idofreporthandlerule" ref-table="cf_reporthandlerules" ref-schema="public" ref-catalog="" ref-columns="idofreporthandlerule" />
+    </table>
+    <table name="cf_schedulerjobs" schema="public" catalog="" type="TABLE">
+      <column name="idofschedulerjob" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="jobclass" sqlType="varchar" length="512" precision="0" nullable="false" jdbcType="12" />
+      <column name="cronexpression" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="jobname" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="enabled" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <primary-key name="cf_schedulerjobs_pk" columns="idofschedulerjob" />
+    </table>
+    <table name="cf_sochiclientpayments" schema="public" catalog="" type="TABLE">
+      <column name="paymentid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="contractid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymentsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymentsumf" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="paymenttime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="terminalid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_sochiclientpayments_pk" columns="paymentid" />
+      <foreign-key name="cf_sochiclientpayments_contractid_fk" columns="contractid" ref-table="cf_sochiclients" ref-schema="public" ref-catalog="" ref-columns="contractid" />
+    </table>
+    <table name="cf_sochiclients" schema="public" catalog="" type="TABLE">
+      <column name="contractid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="updatetime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="fullname" sqlType="varchar" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="address" sqlType="varchar" length="255" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="cf_sochiclients_pk" columns="contractid" />
+    </table>
+    <table name="cf_subscriptionfee" schema="public" catalog="" type="TABLE">
+      <column name="subscriptionyear" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="periodno" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="subscriptionsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="createtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_subscriptionfee_pk" columns="subscriptionyear,periodno" />
+      <foreign-key name="cf_subscriptionfee_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" />
+    </table>
+    <table name="cf_synchistory" schema="public" catalog="" type="TABLE">
+      <column name="idofsync" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="syncstarttime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="syncendtime" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="syncresult" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4" />
+      <column name="idofpacket" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_synchistory_pk" columns="idofsync" />
+      <foreign-key name="cf_synchistory_idoforg_fk" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" />
+    </table>
+    <table name="cf_transactions" schema="public" catalog="" type="TABLE">
+      <column name="idoftransaction" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="transactionsum" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="source" sqlType="varchar" length="30" precision="0" nullable="false" jdbcType="12" />
+      <column name="sourcetype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="transactiondate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="cf_transactions_pk" columns="idoftransaction" />
+      <foreign-key name="cf_transactions_idofcard_fk" columns="idofcard" ref-table="cf_cards" ref-schema="public" ref-catalog="" ref-columns="idofcard" />
+      <foreign-key name="cf_transactions_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" />
+    </table>
+    <table name="cf_users" schema="public" catalog="" type="TABLE">
+      <column name="idofuser" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="username" sqlType="varchar" length="64" precision="0" nullable="false" jdbcType="12" />
+      <column name="password" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12" />
+      <column name="lastchange" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="phone" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12" />
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="cf_users_pk" columns="idofuser" />
+      <foreign-key name="cf_users_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" />
+      <index name="cf_users_shortname" unique="true" columns="username" />
+    </table>
+  </data-source>
+</component>
