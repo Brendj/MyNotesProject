@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
-import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -308,6 +305,8 @@ public class SyncResponse {
             private final int contractState;
             private final Integer freePayMaxCount;
             private final String categoriesDiscounts;
+            private final long idOfClientGroup;
+            private final ClientGroup clientGroup;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -323,8 +322,18 @@ public class SyncResponse {
                 this.contractState = client.getContractState();
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
+                this.idOfClientGroup=client.getIdOfClientGroup();
+                this.clientGroup=client.getClientGroup();
             }
 
+            public ClientGroup getClientGroup(){
+                return clientGroup;
+            }
+
+            public long getIdOfClientGroup(){
+                return idOfClientGroup;
+            }
+            
             public long getIdOfClient() {
                 return idOfClient;
             }
@@ -388,6 +397,8 @@ public class SyncResponse {
                     element.setAttribute("FreePayMaxCount", Integer.toString(this.freePayMaxCount));
                 }
                 element.setAttribute("CategoriesDiscounts", this.categoriesDiscounts);
+                element.setAttribute("IdOfClientGroup", Long.toString(this.idOfClientGroup));
+                element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 return element;
             }
 
@@ -398,7 +409,7 @@ public class SyncResponse {
                         + ", idDocument='" + idDocument + '\'' + ", address='" + address + '\'' + ", phone='" + phone
                         + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", contractState="
                         + contractState + ", freePayMaxCount=" + freePayMaxCount + ", categoriesDiscounts='"
-                        + categoriesDiscounts + '\'' + '}';
+                        + categoriesDiscounts + '\''+", "+idOfClientGroup + idOfClientGroup+'}';
             }
         }
 

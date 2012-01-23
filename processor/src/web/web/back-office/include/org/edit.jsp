@@ -19,12 +19,14 @@
     <h:inputText value="#{mainPage.orgEditPage.shortName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="128" styleClass="input-text" />
+
+    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.INN}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.OGRN}" maxlength="32" styleClass="input-text" />
+
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="128" styleClass="input-text" />
-    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.INN}" styleClass="input-text" />
-    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.ORGN}" styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />

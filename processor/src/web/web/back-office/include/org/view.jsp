@@ -16,14 +16,14 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortName}" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.INN}" styleClass="input-text" />
+    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.OGRN}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.address}" styleClass="input-text" />
-    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.INN}"
-                 styleClass="input-text" />
-    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.ORGN}"
-                 styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />

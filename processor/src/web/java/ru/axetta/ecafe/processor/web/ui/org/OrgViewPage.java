@@ -42,8 +42,24 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long subscriptionPrice;
     private String menuExchangeSourceOrgName;
     private String defaultSupplierName;
-    private String ORGN;
     private String INN;
+    private String OGRN;
+
+    public String getINN() {
+        return INN;
+    }
+
+    public void setINN(String INN) {
+        this.INN = INN;
+    }
+
+    public String getOGRN() {
+        return OGRN;
+    }
+
+    public void setOGRN(String OGRN) {
+        this.OGRN = OGRN;
+    }
 
     public String getMenuExchangeSourceOrgName() {
         return menuExchangeSourceOrgName;
@@ -130,22 +146,6 @@ public class OrgViewPage extends BasicWorkspacePage {
         return defaultSupplierName;
     }
 
-    public String getORGN() {
-        return ORGN;
-    }
-
-    public void setORGN(String ORGN) {
-        this.ORGN = ORGN;
-    }
-
-    public String getINN() {
-        return INN;
-    }
-
-    public void setINN(String INN) {
-        this.INN = INN;
-    }
-
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         this.idOfOrg = org.getIdOfOrg();
@@ -169,7 +169,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.subscriptionPrice = org.getSubscriptionPrice();
         this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
         this.INN=org.getINN();
-        this.ORGN=org.getORGN();
+        this.OGRN=org.getOGRN();
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
         if (menuExchangeSourceOrgId == null) {

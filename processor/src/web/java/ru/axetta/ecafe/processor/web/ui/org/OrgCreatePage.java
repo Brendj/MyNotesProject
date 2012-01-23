@@ -44,8 +44,24 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String plainSsoPasswordConfirmation;
     private String smsSender;
     private ContragentItem defaultSupplier = new ContragentItem();
-    private String ORGN;
     private String INN;
+    private String OGRN;
+
+    public String getINN() {
+        return INN;
+    }
+
+    public void setINN(String INN) {
+        this.INN = INN;
+    }
+
+    public String getOGRN() {
+        return OGRN;
+    }
+
+    public void setOGRN(String OGRN) {
+        this.OGRN = OGRN;
+    }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception {
         if (null != idOfContragent) {
@@ -238,22 +254,6 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.state = 0;
     }
 
-    public String getORGN() {
-        return ORGN;
-    }
-
-    public void setORGN(String ORGN) {
-        this.ORGN = ORGN;
-    }
-
-    public String getINN() {
-        return INN;
-    }
-
-    public void setINN(String INN) {
-        this.INN = INN;
-    }
-
     public void createOrg(Session session) throws Exception {
         Person officialPerson = new Person(this.officialPersonFirstName, this.officialPersonSurname,
                 this.officialPersonSecondName);
@@ -264,9 +264,11 @@ public class OrgCreatePage extends BasicWorkspacePage
 
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
-                this.subscriptionPrice, defaultSupplier, INN, ORGN);
+                this.subscriptionPrice, defaultSupplier);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);
+        org.setINN(this.INN);
+        org.setOGRN(this.OGRN);
         if (StringUtils.isNotEmpty(plainSsoPassword)) {
             org.setSsoPassword(plainSsoPassword);
         }

@@ -20,6 +20,10 @@
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.address}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.INN}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.OGRN}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
@@ -58,10 +62,6 @@
     <h:selectOneMenu value="#{mainPage.orgCreatePage.state}" styleClass="input-text">
         <f:selectItems value="#{mainPage.orgCreatePage.orgStateMenu.items}" />
     </h:selectOneMenu>
-    <h:outputText escape="true" value="ИНН" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.INN}" styleClass="input-text" />
-    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.ORGN}" styleClass="input-text" />
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />

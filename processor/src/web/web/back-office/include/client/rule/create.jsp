@@ -26,10 +26,15 @@
 
     <h:outputText escape="true" value="Описание" styleClass="output-text" />
     <h:inputText value="#{mainPage.ruleCreatePage.description}" maxlength="32" styleClass="input-text" />
-    <h:outputText escape="true" value="Операция" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.operationor}" />
+    <h:outputText escape="true" value="Приоритет" styleClass="output-text" />
+    <h:inputText value="#{mainPage.ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
+    <h:outputText escape="true" value="Тип условия" styleClass="output-text" />
+    <h:selectOneListbox value="#{mainPage.ruleCreatePage.operationOr}">
+        <f:selectItem itemLabel="И" itemValue="false"/>
+        <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
+    </h:selectOneListbox>
     <h:outputText escape="true" value="Комплекс 0" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex0}" maxlength="11" styleClass="input-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex0}"/>
     <h:outputText escape="true" value="Комплекс 1" styleClass="output-text" />
     <h:inputText value="#{mainPage.ruleCreatePage.complex1}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Комплекс 2" styleClass="output-text" />
@@ -48,10 +53,6 @@
     <h:inputText value="#{mainPage.ruleCreatePage.complex8}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Комплекс 9" styleClass="output-text" />
     <h:inputText value="#{mainPage.ruleCreatePage.complex9}" maxlength="11" styleClass="input-text" />
-
-    <h:outputText escape="true" value="Приоритет" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
-
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createRule}"

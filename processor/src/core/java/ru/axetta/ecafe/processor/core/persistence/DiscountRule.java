@@ -25,7 +25,7 @@ public class DiscountRule {
     private int complex8;
     private int complex9;
     private int priority;
-    private boolean operationor;
+    private Boolean operationOr;
     private String categoryDiscounts;
 
     public String getCategoryDiscounts() {
@@ -36,12 +36,12 @@ public class DiscountRule {
         this.categoryDiscounts = categoryDiscounts;
     }
 
-    public boolean isOperationor() {
-        return operationor;
+    public Boolean isOperationOr() {
+        return operationOr;
     }
 
-    public void setOperationor(boolean operationor) {
-        this.operationor = operationor;
+    public void setOperationOr(Boolean operationOr) {
+        this.operationOr = operationOr;
     }
 
     public int getPriority() {
@@ -57,7 +57,7 @@ public class DiscountRule {
 
     public DiscountRule(long idOfRule, String description, int complex0, int complex1, int complex2, int complex3,
             int complex4, int complex5, int complex6, int complex7, int complex8, int complex9, int priority,
-            boolean operationor, String categoryDiscounts) {
+            boolean operationOr, String categoryDiscounts) {
         this.idOfRule = idOfRule;
         this.description = description;
         this.complex0 = complex0;
@@ -71,7 +71,7 @@ public class DiscountRule {
         this.complex8 = complex8;
         this.complex9 = complex9;
         this.priority = priority;
-        this.operationor = operationor;
+        this.operationOr = operationOr;
         this.categoryDiscounts = categoryDiscounts;
     }
 

@@ -51,9 +51,25 @@ public class OrgEditPage extends BasicWorkspacePage
     private Long menuExchangeSourceOrg;
     private String menuExchangeSourceOrgName;
     private ContragentItem defaultSupplier = new ContragentItem();
-    private String ORGN;
     private String INN;
-    
+    private String OGRN;
+
+    public String getINN() {
+        return INN;
+    }
+
+    public void setINN(String INN) {
+        this.INN = INN;
+    }
+
+    public String getOGRN() {
+        return OGRN;
+    }
+
+    public void setOGRN(String OGRN) {
+        this.OGRN = OGRN;
+    }
+
     public static class ContragentItem {
 
         private final Long idOfContragent;
@@ -266,22 +282,6 @@ public class OrgEditPage extends BasicWorkspacePage
         return defaultSupplier;
     }
 
-    public String getORGN() {
-        return ORGN;
-    }
-
-    public void setORGN(String ORGN) {
-        this.ORGN = ORGN;
-    }
-
-    public String getINN() {
-        return INN;
-    }
-
-    public void setINN(String INN) {
-        this.INN = INN;
-    }
-
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         fill(org);
@@ -317,7 +317,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setDefaultSupplier(defaultSupplier);
         org.setINN(INN);
-        org.setORGN(ORGN);
+        org.setOGRN(OGRN);
         session.update(org);
         fill(org);
         /////
@@ -346,8 +346,8 @@ public class OrgEditPage extends BasicWorkspacePage
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();
         this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
-        this.ORGN=org.getORGN();
-        this.INN=org.getINN();
+        this.OGRN=org.getOGRN();
+        this.INN=getINN();
     }
 
 

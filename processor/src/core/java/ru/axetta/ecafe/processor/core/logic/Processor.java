@@ -1627,7 +1627,7 @@ public class Processor implements SyncProcessor,
                                 discountRule.getComplex8(),
                                 discountRule.getComplex9(),
                                 discountRule.getPriority(),
-                                discountRule.isOperationor());
+                                discountRule.isOperationOr());
                 resCategoriesDiscountsAndRules.addDCRI(dcri);
             }
 

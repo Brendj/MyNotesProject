@@ -199,8 +199,10 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
+        System.out.println(categoryMap.toString());
         if(null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
+            System.out.println(categoryMap.toString());
             if(categoryMap.isEmpty()){
                 filter = "Не выбрано";
             } else {
@@ -229,6 +231,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void fill(Session session, Long idOfRule) throws Exception {
         DiscountRule discountRule = (DiscountRule) session.load(DiscountRule.class, idOfRule);
+        System.out.println(discountRule.getCategoryDiscounts());
         if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
             String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
             Long[] numbs=new Long[idOfCategoryDiscountsString.length];
@@ -241,9 +244,10 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             StringBuilder sb=new StringBuilder();
             for(CategoryDiscount categoryDiscount: categoryDiscountList){
                 sb.append(categoryDiscount.getCategoryName());
-                sb.append(", ");
+                sb.append("; ");
             }
             String result=sb.toString();
+            System.out.println(result);
             this.setFilter(result);
         }
         fill(discountRule);
@@ -265,7 +269,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         discountRule.setComplex8(complex8?1:0);
         discountRule.setComplex9(complex9?1:0);
         discountRule.setPriority(priority);
-        discountRule.setOperationor(operationor);
+        discountRule.setOperationOr(operationor);
         discountRule.setCategoryDiscounts(categoryDiscounts);
         persistenceSession.update(discountRule);
         fill(discountRule);
@@ -285,7 +289,9 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.complex9 = discountRule.getComplex9()>0;
         this.priority = discountRule.getPriority();
         this.categoryDiscounts = discountRule.getCategoryDiscounts();
-        this.filter= discountRule.getCategoryDiscounts();
-        this.operationor=discountRule.isOperationor();
+       // this.filter= discountRule.getCategoryDiscounts();
+        System.out.println(discountRule.getCategoryDiscounts());
+        System.out.println(this.filter);
+        this.operationor=discountRule.isOperationOr();
     }
 }

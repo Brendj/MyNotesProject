@@ -85,8 +85,8 @@ public class RuleListPage extends BasicWorkspacePage {
             this.complex8 = discountRule.getComplex8();
             this.complex9 = discountRule.getComplex9();
             this.priority = discountRule.getPriority();
-            this.operationor = discountRule.isOperationor();
-            //this.categoryDiscounts = discountRule.getCategoryDiscounts();
+            this.operationor = discountRule.isOperationOr();
+            this.categoryDiscounts = discountRule.getCategoryDiscounts();
             
         }
 
@@ -156,13 +156,14 @@ public class RuleListPage extends BasicWorkspacePage {
     public void fill(Session session) throws Exception {
         List<Item> items = new ArrayList<Item>();
         Criteria ruleCriteria = session.createCriteria(DiscountRule.class);
+        ruleCriteria.addOrder(Order.asc("idOfRule"));
         ruleCriteria.addOrder(Order.desc("priority"));
         ruleCriteria.addOrder(Order.asc("categoryDiscounts"));
         List discountRuleList = ruleCriteria.list();
+
         for (Object object : discountRuleList) {
             DiscountRule discountRule = (DiscountRule) object;
             Item item = new Item(discountRule);
-
             if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
                 String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
                 Long[] numbs=new Long[idOfCategoryDiscountsString.length];

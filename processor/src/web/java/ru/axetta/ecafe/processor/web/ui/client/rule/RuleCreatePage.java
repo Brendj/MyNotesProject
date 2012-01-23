@@ -63,7 +63,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     private int complex7;
     private int complex8;
     private int complex9;
-    private boolean operationor;
+    private Boolean operationOr;
     private String categoryDiscounts;
     private String filter = "Не выбрано";
 
@@ -83,12 +83,12 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.categoryDiscounts = categoryDiscounts;
     }
 
-    public boolean isOperationor() {
-        return operationor;
+    public Boolean getOperationOr() {
+        return operationOr;
     }
 
-    public void setOperationor(boolean operationor) {
-        this.operationor = operationor;
+    public void setOperationOr(Boolean operationOr) {
+        this.operationOr = operationOr;
     }
 
     private int priority;
@@ -226,7 +226,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.complex9 = 0;
         this.priority = 0;
         this.categoryDiscounts = "";
-        this.operationor=false;
+        this.operationOr=false;
         this.filter="";
     }
 
@@ -245,7 +245,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setComplex8(complex8);
         discountRule.setComplex9(complex9);
         discountRule.setPriority(priority);
-        discountRule.setOperationor(operationor);
+        discountRule.setOperationOr(operationOr);
         discountRule.setCategoryDiscounts(categoryDiscounts);
         session.save(discountRule);
     }
