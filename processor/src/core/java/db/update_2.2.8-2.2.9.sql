@@ -1,6 +1,6 @@
 ALTER TABLE CF_Orgs ADD COLUMN OGRN                    character varying(32);
 ALTER TABLE CF_Orgs ADD COLUMN INN                     character varying(32);
-ALTER TABLE CF_Orgs ADD COLUMN  DefaultSupplier         BIGINT            NOT NULL;
+ALTER TABLE CF_Orgs ADD COLUMN  DefaultSupplier         BIGINT            NOT NULL default 1;
 ALTER TABLE CF_Orgs ADD CONSTRAINT CF_Orgs_DefaultSupplier_fk FOREIGN KEY (DefaultSupplier) REFERENCES CF_Contragents (IdOfContragent);
 
 ALTER TABLE CF_Cards ADD COLUMN ExternalId            VARCHAR(32);
@@ -8,33 +8,6 @@ ALTER TABLE CF_Cards ADD COLUMN ExternalId            VARCHAR(32);
 ALTER TABLE CF_Clients ADD COLUMN CategoriesDiscounts     VARCHAR(60)       NOT NULL DEFAULT '';
 ALTER TABLE CF_Clients ADD COLUMN San                     VARCHAR(11);
 ALTER TABLE CF_Clients ADD COLUMN GuardSan                VARCHAR(64);
-
-ALTER TABLE CF_Orders RENAME COLUMN Discount TO SocDiscount;
-ALTER TABLE CF_Orders ADD COLUMN  IdOfPos         BIGINT;
-ALTER TABLE CF_Orders ADD COLUMN   IdOfContragent  BIGINT        NOT NULL,
-ALTER TABLE CF_Orders ADD COLUMN   TrdDiscount     BIGINT        NOT NULL DEFAULT 0;
-ALTER TABLE CF_Orders ADD CONSTRAINT CF_Orders_IdOfPos_fk FOREIGN KEY (IdOfPos) REFERENCES CF_POS (IdOfPos);
-ALTER TABLE CF_Orders ADD CONSTRAINT CF_Orders_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent);
-
-ALTER TABLE CF_OrderDetails ADD COLUMN SocDiscount NOT NULL;
-
-ALTER TABLE CF_Generators ADD COLUMN IdOfPos                 BIGINT          NOT NULL DEFAULT 0;
-ALTER TABLE CF_Generators ADD COLUMN   IdOfSettlement          BIGINT          NOT NULL DEFAULT 0;
-ALTER TABLE CF_Generators ADD COLUMN   IdOfPosition            BIGINT          NOT NULL DEFAULT 0;
-ALTER TABLE CF_Generators ADD COLUMN   IdOfAddPayment          BIGINT          NOT NULL DEFAULT 0;
-ALTER TABLE CF_Generators ADD COLUMN   IdOfCategoryDiscount    BIGINT          NOT NULL DEFAULT 0;
-ALTER TABLE CF_Generators ADD COLUMN   IdOfRule		  BIGINT          NOT NULL DEFAULT 0;
-
-
--- Configuration
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(1, '');
--- Option "with/without operator" (0 - without, 1 - with)
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(2, 0);
-  -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(3, 0);
 
 
 CREATE TABLE CF_POS (
@@ -49,6 +22,38 @@ CREATE TABLE CF_POS (
   CONSTRAINT CF_POS_pk PRIMARY KEY (IdOfPos),
   CONSTRAINT CF_POS_IdOfContragentReceiver_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
+
+ALTER TABLE CF_Orders RENAME COLUMN Discount TO SocDiscount;
+ALTER TABLE CF_Orders ADD COLUMN  IdOfPos         BIGINT;
+ALTER TABLE CF_Orders ADD COLUMN   IdOfContragent  BIGINT        NOT NULL DEFAULT 1;
+ALTER TABLE CF_Orders ADD COLUMN   TrdDiscount     BIGINT        NOT NULL DEFAULT 0;
+ALTER TABLE CF_Orders ADD CONSTRAINT CF_Orders_IdOfPos_fk FOREIGN KEY (IdOfPos) REFERENCES CF_POS (IdOfPos);
+ALTER TABLE CF_Orders ADD CONSTRAINT CF_Orders_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent);
+
+ALTER TABLE CF_OrderDetails ADD COLUMN SocDiscount BIGINT NOT NULL DEFAULT 0;
+
+ALTER TABLE CF_Generators ADD COLUMN   IdOfPos                 BIGINT          NOT NULL DEFAULT 0;
+ALTER TABLE CF_Generators ADD COLUMN   IdOfSettlement          BIGINT          NOT NULL DEFAULT 0;
+ALTER TABLE CF_Generators ADD COLUMN   IdOfPosition            BIGINT          NOT NULL DEFAULT 0;
+ALTER TABLE CF_Generators ADD COLUMN   IdOfAddPayment          BIGINT          NOT NULL DEFAULT 0;
+ALTER TABLE CF_Generators ADD COLUMN   IdOfCategoryDiscount    BIGINT          NOT NULL DEFAULT 0;
+ALTER TABLE CF_Generators ADD COLUMN   IdOfRule		  BIGINT          NOT NULL DEFAULT 0;
+
+CREATE TABLE CF_Options (
+  IdOfOption    BIGINT  NOT NULL,
+  OptionText    text,
+  CONSTRAINT CF_Option_pk PRIMARY KEY (IdOfOption)
+);
+
+-- Configuration
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(1, '');
+-- Option "with/without operator" (0 - without, 1 - with)
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(2, 0);
+  -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(3, 0);
 
 
 CREATE TABLE CF_Settlements (
@@ -112,8 +117,7 @@ CREATE TABLE CF_DiscountRules (
   Complex8                  INTEGER       NOT NULL DEFAULT 0,
   Complex9                  INTEGER       NOT NULL DEFAULT 0,
   Priority                  Integer       NOT NULL DEFAULT 0,
-  CategoryDiscounts         Character     varying(64),
+  CategoriesDiscounts       Character     varying(64),
   OperationOr               integer       NOT NULL DEFAULT 0,
-  CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule),
-  CONSTRAINT CF_DiscountRules_IdOfCategoryDiscount_fk FOREIGN KEY (IdOfCategoryDiscount) REFERENCES CF_CategoryDiscounts (IdOfCategoryDiscount)
+  CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule)
 );
