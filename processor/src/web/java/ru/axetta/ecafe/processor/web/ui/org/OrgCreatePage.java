@@ -264,11 +264,9 @@ public class OrgCreatePage extends BasicWorkspacePage
 
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
-                this.subscriptionPrice, defaultSupplier);
+                this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);
-        org.setINN(this.INN);
-        org.setOGRN(this.OGRN);
         if (StringUtils.isNotEmpty(plainSsoPassword)) {
             org.setSsoPassword(plainSsoPassword);
         }

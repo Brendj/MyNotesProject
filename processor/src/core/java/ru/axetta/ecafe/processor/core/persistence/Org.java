@@ -60,7 +60,7 @@ public class Org {
     private Set<DiaryTimesheet> diaryTimesheets = new HashSet<DiaryTimesheet>();
     private Set<DiaryClass> diaryClasses = new HashSet<DiaryClass>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
-    private String ORGN;
+    private String OGRN;
     private String INN;
 
     public String getINN() {
@@ -71,12 +71,12 @@ public class Org {
         this.INN = INN;
     }
 
-    public String getORGN() {
-        return ORGN;
+    public String getOGRN() {
+        return OGRN;
     }
 
-    public void setORGN(String ORGN) {
-        this.ORGN = ORGN;
+    public void setOGRN(String OGNN) {
+        this.OGRN = OGRN;
     }
     //private Set<EnterEvent> enterEvents;
 
@@ -102,7 +102,7 @@ public class Org {
         this.priceOfSms = priceOfSms;
         this.subscriptionPrice = subscriptionPrice;
         this.defaultSupplier = defaultSupplier;
-        this.ORGN=ORGN;
+        this.OGRN=ORGN;
         this.INN=INN;
     }
 

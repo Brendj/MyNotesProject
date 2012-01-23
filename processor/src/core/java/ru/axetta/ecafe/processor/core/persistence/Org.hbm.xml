@@ -34,7 +34,7 @@
         <property name="smsSender" column="SmsSender" type="string" length="32"/>
         <property name="priceOfSms" column="PriceOfSms" type="long" not-null="true"/>
         <property name="subscriptionPrice" column="SubscriptionPrice" type="long" not-null="true"/>
-        <property name="ORGN" column="OGRN" type="string" length="32"/>
+        <property name="OGRN" column="OGRN" type="string" length="32"/>
         <property name="INN" column="INN" type="string" length="32"/>
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"

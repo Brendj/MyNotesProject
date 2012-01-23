@@ -798,3 +798,6 @@ create table CF_Schema_version_info (
     UpdateTime              BIGINT                   not null,
     constraint "CF_schema_version_info_pk" primary key (SchemaVersionInfoId)
 );
+
+insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
+VALUES(2, 2, 9, 120122, 0);
