@@ -100,8 +100,10 @@
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
                 Client client = (Client) clientCriteria.uniqueResult();
+                logger.info("work");
                 try {
                     if (client.hasPassword(currPassword)) {
+                        logger.info("Work start");
                         client.setAddress(address);
                         client.setPhone(phone);
                         client.setMobile(mobilePhone);
@@ -382,7 +384,7 @@
                 <div class="output-text">Текущий пароль</div>
             </td>
             <td>
-                <input type="password" name="<%=CURR_PASSWORD_PARAM%>" size="16" maxlength="64" class="input-text" />
+                <input type="password" name="<%=CURR_PASSWORD_PARAM%>" size="32" maxlength="64" class="input-text" />
             </td>
         </tr>
         <tr>
