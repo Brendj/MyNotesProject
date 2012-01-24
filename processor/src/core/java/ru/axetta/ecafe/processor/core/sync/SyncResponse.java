@@ -305,7 +305,6 @@ public class SyncResponse {
             private final int contractState;
             private final Integer freePayMaxCount;
             private final String categoriesDiscounts;
-            private final long idOfClientGroup;
             private final ClientGroup clientGroup;
 
             public Item(Client client) {
@@ -322,18 +321,13 @@ public class SyncResponse {
                 this.contractState = client.getContractState();
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
-                this.idOfClientGroup=client.getIdOfClientGroup();
                 this.clientGroup=client.getClientGroup();
             }
 
             public ClientGroup getClientGroup(){
                 return clientGroup;
             }
-
-            public long getIdOfClientGroup(){
-                return idOfClientGroup;
-            }
-            
+           
             public long getIdOfClient() {
                 return idOfClient;
             }
@@ -397,8 +391,8 @@ public class SyncResponse {
                     element.setAttribute("FreePayMaxCount", Integer.toString(this.freePayMaxCount));
                 }
                 element.setAttribute("CategoriesDiscounts", this.categoriesDiscounts);
-                element.setAttribute("IdOfClientGroup", Long.toString(this.idOfClientGroup));
-                element.setAttribute("GroupName", this.clientGroup.getGroupName());
+                if (this.clientGroup != null)
+			element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 return element;
             }
 
