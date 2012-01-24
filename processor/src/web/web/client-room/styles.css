@@ -42,6 +42,13 @@
 .login-panel-body {    
 }
 
+.borderless-form-login {
+    border-style: none;
+    margin: 0 auto;
+    width: 10%;
+    padding: 0 0 0 0;
+}
+
 .borderless-form {
     border-style: none;    
     margin: 0 0 0 0;

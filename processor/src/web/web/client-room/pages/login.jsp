@@ -12,7 +12,7 @@
 .login-page { display:block !important; }
 </style>
 <form method="post" enctype="application/x-www-form-urlencoded"
-  action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formActionUri.toString()))%>" class="borderless-form">
+  action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formActionUri.toString()))%>" class="borderless-form-login">
 <table id="login-form">
     <tr valign="middle" class="login-form-input-tr">
         <td align="center">
@@ -50,7 +50,7 @@
         </td>
     </tr>
 </table>
-</form>            
+</form>
 <%
     }
 %>
