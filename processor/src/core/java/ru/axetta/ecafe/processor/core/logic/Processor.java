@@ -775,7 +775,10 @@ public class Processor implements SyncProcessor,
             List orderDetailMax=orderCriteria.list();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return new SyncResponse.CorrectingNumbersOrdersRegistry((Long) orderMax.get(0),(Long) orderDetailMax.get(0));
+            Long idOfOrderMax = (Long) orderMax.get(0), idOfOrderDetail = (Long) orderDetailMax.get(0);
+            if (idOfOrderMax == null) idOfOrderMax = 0L;
+            if (idOfOrderDetail == null) idOfOrderDetail = 0L;
+            return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail);
             //return null;
         }  finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
