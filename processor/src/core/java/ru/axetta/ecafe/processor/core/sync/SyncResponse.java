@@ -322,6 +322,7 @@ public class SyncResponse {
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
                 this.clientGroup=client.getClientGroup();
+                this.clientGroup.getGroupName(); // lazy load
             }
 
             public ClientGroup getClientGroup(){
@@ -391,8 +392,9 @@ public class SyncResponse {
                     element.setAttribute("FreePayMaxCount", Integer.toString(this.freePayMaxCount));
                 }
                 element.setAttribute("CategoriesDiscounts", this.categoriesDiscounts);
-                if (this.clientGroup != null)
-			element.setAttribute("GroupName", this.clientGroup.getGroupName());
+                if (this.clientGroup != null) {
+			        element.setAttribute("GroupName", this.clientGroup.getGroupName());
+                }
                 return element;
             }
 
@@ -403,7 +405,7 @@ public class SyncResponse {
                         + ", idDocument='" + idDocument + '\'' + ", address='" + address + '\'' + ", phone='" + phone
                         + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", contractState="
                         + contractState + ", freePayMaxCount=" + freePayMaxCount + ", categoriesDiscounts='"
-                        + categoriesDiscounts + '\''+", "+idOfClientGroup + idOfClientGroup+'}';
+                        + categoriesDiscounts + '\''+", clientGroup="+ clientGroup+'}';
             }
         }
 
