@@ -30,13 +30,15 @@ public class SyncRequest {
     }
 
     private static long getLongValue(NamedNodeMap namedNodeMap, String name) throws Exception {
-        return Long.parseLong(namedNodeMap.getNamedItem(name).getTextContent());
+        Node n = namedNodeMap.getNamedItem(name);
+        return Long.parseLong(n.getTextContent());
     }
 
     private static Long getLongValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
         Node node = namedNodeMap.getNamedItem(name);
         if (null == node) {
-            return null;
+            node = namedNodeMap.getNamedItem(name.toUpperCase());
+            if (node==null) return null;
         }
         return Long.parseLong(node.getTextContent());
     }
@@ -206,8 +208,10 @@ public class SyncRequest {
                         else
                             trdDiscount = discount;
                     } else {
-                        socDiscount = getLongValue(namedNodeMap, "SocDiscount");
-                        trdDiscount = getLongValue(namedNodeMap, "TrdDiscount");
+                        socDiscount = getLongValueNullSafe(namedNodeMap, "SocDiscount");
+                        trdDiscount = getLongValueNullSafe(namedNodeMap, "TrdDiscount");
+                        if (socDiscount==null) socDiscount=0L;
+                        if (trdDiscount==null) trdDiscount=0L;
                     }
                     long grant = getLongValue(namedNodeMap, "Grant");
                     Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
