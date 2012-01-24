@@ -13,7 +13,7 @@
 </style>
 <form method="post" enctype="application/x-www-form-urlencoded"
   action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formActionUri.toString()))%>" class="borderless-form-login">
-<table id="login-form">
+<table id="login-form" align="center">
     <tr valign="middle" class="login-form-input-tr">
         <td align="center">
                 <div align="center" class="login-panel-body">

@@ -44,9 +44,10 @@
 
 .borderless-form-login {
     border-style: none;
-    margin: 0 auto;
-    width: 10%;
+  /*  margin: 0 auto;*/
+   /* width: 20%;*/
     padding: 0 0 0 0;
+    /*text-align: center;*/
 }
 
 .borderless-form {
@@ -112,4 +113,8 @@
     font-size: 10pt;
     font-weight: bold;
     color: #003399;
+}
+
+.tab{
+   text-align: center;
 }
