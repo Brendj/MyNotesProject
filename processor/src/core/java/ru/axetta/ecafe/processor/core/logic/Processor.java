@@ -772,7 +772,7 @@ public class Processor implements SyncProcessor,
             Criteria orderDetailCriteria = persistenceSession.createCriteria(OrderDetail.class);
             orderDetailCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
             orderDetailCriteria.setProjection(Projections.max("compositeIdOfOrderDetail.idOfOrderDetail"));
-            List orderDetailMax=orderCriteria.list();
+            List orderDetailMax=orderDetailCriteria.list();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             Long idOfOrderMax = (Long) orderMax.get(0), idOfOrderDetail = (Long) orderDetailMax.get(0);
