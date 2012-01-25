@@ -39,8 +39,7 @@
     font-size: 8pt;
 }
 
-.login-panel-body {
-    margin: 10px;
+.login-panel-body {    
 }
 
 .borderless-form-login {
@@ -48,12 +47,7 @@
   /*  margin: 0 auto;*/
    /* width: 20%;*/
     padding: 0 0 0 0;
-    margin: 10px;
     /*text-align: center;*/
-}
-
-#login-form{
-    margin: 0 auto;
 }
 
 .borderless-form {
@@ -122,5 +116,17 @@
 }
 
 .tab{
-   text-align: center;
+   text-align: center !important;
+}
+
+.borderless-form-login {
+    width: 100%;
+    text-align: center;
+}
+
+#login-form {
+    width: 350px;
+    border-radius: 4px;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
