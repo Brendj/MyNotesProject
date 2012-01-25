@@ -39,7 +39,8 @@
     font-size: 8pt;
 }
 
-.login-panel-body {    
+.login-panel-body {
+    margin: 10px;
 }
 
 .borderless-form-login {
@@ -47,7 +48,12 @@
   /*  margin: 0 auto;*/
    /* width: 20%;*/
     padding: 0 0 0 0;
+    margin: 10px;
     /*text-align: center;*/
+}
+
+#login-form{
+    margin: 0 auto;
 }
 
 .borderless-form {
