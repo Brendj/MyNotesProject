@@ -203,6 +203,9 @@ public class MainPage {
     // baybikov (21.11.2011)
     private final CurrentPositionsReportPage currentPositionsReportPage = new CurrentPositionsReportPage();
 
+    // baybikov (25.01.2012)
+    private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
+
     // POS manipulation (baybikov 22.11.2011)
     private final BasicWorkspacePage posGroupPage = new BasicWorkspacePage();
     private final PosListPage posListPage = new PosListPage();
@@ -6626,5 +6629,59 @@ public class MainPage {
             RuntimeContext.release(runtimeContext);
         }
         return null;
+    }
+
+    /*
+       Все комплексы
+    */
+    // baybikov (25.01.2012)
+    public AllComplexReportPage getAllComplexReportPage() {
+        return allComplexReportPage;
+    }
+
+    // baybikov (25.01.2012)
+    public Object showAllComplexReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = allComplexReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set all complex report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по всем комплексам", null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // baybikov (25.01.2012)
+    public Object buildAllComplexReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            allComplexReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build all complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+            RuntimeContext.release(runtimeContext);
+        }
+        return null;
+    }
+
+    // baybikov (25.01.2012)
+    public String showAllComplexCSVList() {
+        return "showAllComplexCSVList";
     }
 }
