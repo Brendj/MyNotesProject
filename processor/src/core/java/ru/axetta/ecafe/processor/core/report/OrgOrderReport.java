@@ -64,7 +64,8 @@ public class OrgOrderReport extends BasicReport {
         private final PersonItem person;
         private final long totalOrderSumByCard;
         private final long totalOrderSumByCash;
-        private final long totalDiscount;
+        private final long totalSocDiscount;
+        private final long totalTrdDiscount;
         private final long totalGrantSum;
 
         public Long getContractId() {
@@ -75,8 +76,12 @@ public class OrgOrderReport extends BasicReport {
             return person;
         }
 
-        public long getTotalDiscount() {
-            return totalDiscount;
+        public long getTotalSocDiscount() {
+            return totalSocDiscount;
+        }
+
+        public long getTotalTrdDiscount() {
+            return totalTrdDiscount;
         }
 
         public long getTotalGrantSum() {
@@ -91,13 +96,14 @@ public class OrgOrderReport extends BasicReport {
             return totalOrderSumByCash;
         }
 
-        public ClientItem(Client client, long totalOrderSumByCard, long totalOrderSumByCash, long totalDiscount,
+        public ClientItem(Client client, long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount,
                 long totalGrantSum) {
             this.contractId = client.getContractId();
             this.person = new PersonItem(client.getPerson());
             this.totalOrderSumByCard = totalOrderSumByCard;
             this.totalOrderSumByCash = totalOrderSumByCash;
-            this.totalDiscount = totalDiscount;
+            this.totalSocDiscount = totalSocDiscount;
+            this.totalTrdDiscount = totalTrdDiscount;
             this.totalGrantSum = totalGrantSum;
         }
     }
@@ -108,7 +114,7 @@ public class OrgOrderReport extends BasicReport {
         private final String groupName;
         private final long totalOrderSumByCard;
         private final long totalOrderSumByCash;
-        private final long totalDiscount;
+        private final long totalSocDiscount, totalTrdDiscount;
         private final long totalGrantSum;
         private final List<ClientItem> clients;
 
@@ -120,8 +126,12 @@ public class OrgOrderReport extends BasicReport {
             return groupName;
         }
 
-        public long getTotalDiscount() {
-            return totalDiscount;
+        public long getTotalSocDiscount() {
+            return totalSocDiscount;
+        }
+
+        public long getTotalTrdDiscount() {
+            return totalTrdDiscount;
         }
 
         public long getTotalGrantSum() {
@@ -141,7 +151,7 @@ public class OrgOrderReport extends BasicReport {
         }
 
         public ClientGroupItem(ClientGroup clientGroup, long totalOrderSumByCard, long totalOrderSumByCash,
-                long totalDiscount, long totalGrantSum, List<ClientItem> clients) {
+                long totalSocDiscount, long totalTrdDiscount, long totalGrantSum, List<ClientItem> clients) {
             if (null == clientGroup) {
                 this.idOfClientGroup = null;
                 this.groupName = null;
@@ -151,7 +161,8 @@ public class OrgOrderReport extends BasicReport {
             }
             this.totalOrderSumByCard = totalOrderSumByCard;
             this.totalOrderSumByCash = totalOrderSumByCash;
-            this.totalDiscount = totalDiscount;
+            this.totalSocDiscount = totalSocDiscount;
+            this.totalTrdDiscount = totalTrdDiscount;
             this.totalGrantSum = totalGrantSum;
             this.clients = clients;
         }
@@ -161,7 +172,8 @@ public class OrgOrderReport extends BasicReport {
             this.groupName = null;
             this.totalOrderSumByCard = 0;
             this.totalOrderSumByCash = 0;
-            this.totalDiscount = 0;
+            this.totalSocDiscount = 0;
+            this.totalTrdDiscount = 0;
             this.totalGrantSum = 0;
             this.clients = Collections.emptyList();
         }
@@ -174,7 +186,7 @@ public class OrgOrderReport extends BasicReport {
         private final String officialName;
         private final long totalOrderSumByCard;
         private final long totalOrderSumByCash;
-        private final long totalDiscount;
+        private final long totalSocDiscount, totalTrdDiscount;
         private final long totalGrantSum;
         private final List<ClientGroupItem> clientGroups;
 
@@ -198,8 +210,11 @@ public class OrgOrderReport extends BasicReport {
             return totalOrderSumByCash;
         }
 
-        public long getTotalDiscount() {
-            return totalDiscount;
+        public long getTotalSocDiscount() {
+            return totalSocDiscount;
+        }
+        public long getTotalTrdDiscount() {
+            return totalTrdDiscount;
         }
 
         public long getTotalGrantSum() {
@@ -210,14 +225,15 @@ public class OrgOrderReport extends BasicReport {
             return clientGroups;
         }
 
-        public OrgItem(Org org, long totalOrderSumByCard, long totalOrderSumByCash, long totalDiscount,
+        public OrgItem(Org org, long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount,
                 long totalGrantSum, List<ClientGroupItem> clientGroups) {
             this.idOfOrg = org.getIdOfOrg();
             this.shortName = org.getShortName();
             this.officialName = org.getOfficialName();
             this.totalOrderSumByCard = totalOrderSumByCard;
             this.totalOrderSumByCash = totalOrderSumByCash;
-            this.totalDiscount = totalDiscount;
+            this.totalSocDiscount = totalSocDiscount;
+            this.totalTrdDiscount = totalTrdDiscount;
             this.totalGrantSum = totalGrantSum;
             this.clientGroups = clientGroups;
         }
@@ -228,7 +244,8 @@ public class OrgOrderReport extends BasicReport {
             this.officialName = null;
             this.totalOrderSumByCard = 0;
             this.totalOrderSumByCash = 0;
-            this.totalDiscount = 0;
+            this.totalSocDiscount = 0;
+            this.totalTrdDiscount = 0;
             this.totalGrantSum = 0;
             this.clientGroups = Collections.emptyList();
         }
@@ -237,7 +254,7 @@ public class OrgOrderReport extends BasicReport {
         public String toString() {
             return "OrgItem{" + "idOfOrg=" + idOfOrg + ", shortName='" + shortName + '\'' + ", officialName='"
                     + officialName + '\'' + ", totalOrderSumByCard=" + totalOrderSumByCard + ", totalOrderSumByCash="
-                    + totalOrderSumByCash + ", totalDiscount=" + totalDiscount + ", totalGrantSum=" + totalGrantSum
+                    + totalOrderSumByCash + ", totalSocDiscount=" + totalSocDiscount + ", totalTrdDiscount="+totalTrdDiscount+", totalGrantSum=" + totalGrantSum
                     + '}';
         }
     }
@@ -248,15 +265,16 @@ public class OrgOrderReport extends BasicReport {
 
             private final long totalOrderSumByCard;
             private final long totalOrderSumByCash;
-            private final long totalDiscount;
+            private final long totalSocDiscount, totalTrdDiscount;
             private final long totalGrantSum;
             private final List<ClientGroupItem> clientGroupItems;
 
-            private GrouppedClientsData(long totalOrderSumByCard, long totalOrderSumByCash, long totalDiscount,
+            private GrouppedClientsData(long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount,
                     long totalGrantSum, List<ClientGroupItem> clientGroupItems) {
                 this.totalOrderSumByCard = totalOrderSumByCard;
                 this.totalOrderSumByCash = totalOrderSumByCash;
-                this.totalDiscount = totalDiscount;
+                this.totalSocDiscount = totalSocDiscount;
+                this.totalTrdDiscount = totalTrdDiscount;
                 this.totalGrantSum = totalGrantSum;
                 this.clientGroupItems = clientGroupItems;
             }
@@ -269,8 +287,12 @@ public class OrgOrderReport extends BasicReport {
                 return totalOrderSumByCash;
             }
 
-            public long getTotalDiscount() {
-                return totalDiscount;
+            public long getTotalSocDiscount() {
+                return totalSocDiscount;
+            }
+
+            public long getTotalTrdDiscount() {
+                return totalTrdDiscount;
             }
 
             public long getTotalGrantSum() {
@@ -286,13 +308,15 @@ public class OrgOrderReport extends BasicReport {
 
             private final long sumByCard;
             private final long sumByCash;
-            private final long discount;
+            private final long socDiscount;
+            private final long trdDiscount;
             private final long totalGrantSum;
 
-            private TotalSums(long sumByCard, long sumByCash, long discount, long totalGrantSum) {
+            private TotalSums(long sumByCard, long sumByCash, long socDiscount, long trdDiscount, long totalGrantSum) {
                 this.sumByCard = sumByCard;
                 this.sumByCash = sumByCash;
-                this.discount = discount;
+                this.socDiscount = socDiscount;
+                this.trdDiscount = trdDiscount;
                 this.totalGrantSum = totalGrantSum;
             }
 
@@ -304,8 +328,12 @@ public class OrgOrderReport extends BasicReport {
                 return sumByCash;
             }
 
-            public long getDiscount() {
-                return discount;
+            public long getSocDiscount() {
+                return socDiscount;
+            }
+
+            public long getTrdDiscount() {
+                return trdDiscount;
             }
 
             public long getTotalGrantSum() {
@@ -323,7 +351,10 @@ public class OrgOrderReport extends BasicReport {
 
                 TotalSums totalSums = (TotalSums) o;
 
-                if (discount != totalSums.discount) {
+                if (trdDiscount != totalSums.trdDiscount) {
+                    return false;
+                }
+                if (socDiscount != totalSums.socDiscount) {
                     return false;
                 }
                 if (sumByCard != totalSums.sumByCard) {
@@ -343,7 +374,8 @@ public class OrgOrderReport extends BasicReport {
             public int hashCode() {
                 int result = (int) (sumByCard ^ (sumByCard >>> 32));
                 result = 31 * result + (int) (sumByCash ^ (sumByCash >>> 32));
-                result = 31 * result + (int) (discount ^ (discount >>> 32));
+                result = 31 * result + (int) (socDiscount ^ (socDiscount >>> 32));
+                result = 31 * result + (int) (trdDiscount ^ (trdDiscount >>> 32));
                 result = 31 * result + (int) (totalGrantSum ^ (totalGrantSum >>> 32));
                 return result;
             }
@@ -360,7 +392,8 @@ public class OrgOrderReport extends BasicReport {
                             .getTotalOrderSumByCard(),
                             grouppedClientsData.getTotalOrderSumByCash() + unGrouppedClientsData
                                     .getTotalOrderSumByCash(),
-                            grouppedClientsData.getTotalDiscount() + unGrouppedClientsData.getTotalDiscount(),
+                            grouppedClientsData.getTotalSocDiscount() + unGrouppedClientsData.getTotalSocDiscount(),
+                            grouppedClientsData.getTotalTrdDiscount() + unGrouppedClientsData.getTotalTrdDiscount(),
                             grouppedClientsData.getTotalGrantSum() + unGrouppedClientsData.getTotalGrantSum(),
                             clientGroupItems));
         }
@@ -374,7 +407,7 @@ public class OrgOrderReport extends BasicReport {
             List clientGroups = clientGroupsCriteria.list();
             long totalOrderSumByCard = 0;
             long totalOrderSumByCash = 0;
-            long totalDiscount = 0;
+            long totalSocDiscount = 0, totalTrdDiscount = 0;
             long totalGrantSum = 0;
             for (Object currObject : clientGroups) {
                 ClientGroup currClientGroup = (ClientGroup) currObject;
@@ -388,11 +421,12 @@ public class OrgOrderReport extends BasicReport {
                         clientsCriteria.list());
                 totalOrderSumByCard += clientGroupItem.getTotalOrderSumByCard();
                 totalOrderSumByCash += clientGroupItem.getTotalOrderSumByCash();
-                totalDiscount += clientGroupItem.getTotalDiscount();
+                totalSocDiscount += clientGroupItem.getTotalSocDiscount();
+                totalTrdDiscount += clientGroupItem.getTotalTrdDiscount();
                 totalGrantSum += clientGroupItem.getTotalGrantSum();
                 clientGroupItems.add(clientGroupItem);
             }
-            return new GrouppedClientsData(totalOrderSumByCard, totalOrderSumByCash, totalDiscount, totalGrantSum,
+            return new GrouppedClientsData(totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount, totalGrantSum,
                     clientGroupItems);
         }
 
@@ -413,7 +447,7 @@ public class OrgOrderReport extends BasicReport {
             List<ClientItem> clientItems = new LinkedList<ClientItem>();
             long totalOrderSumByCard = 0;
             long totalOrderSumByCash = 0;
-            long totalDiscount = 0;
+            long totalSocDiscount = 0, totalTrdDiscount = 0;
             long totalGrantSum = 0;
             for (Object currObject : clients) {
                 Client currClient = (Client) currObject;
@@ -421,33 +455,34 @@ public class OrgOrderReport extends BasicReport {
                 clientItems.add(clientItem);
                 totalOrderSumByCard += clientItem.getTotalOrderSumByCard();
                 totalOrderSumByCash += clientItem.getTotalOrderSumByCash();
-                totalDiscount += clientItem.getTotalDiscount();
+                totalSocDiscount += clientItem.getTotalSocDiscount();
+                totalTrdDiscount += clientItem.getTotalTrdDiscount();
                 totalGrantSum += clientItem.getTotalGrantSum();
             }
-            return new ClientGroupItem(clientGroup, totalOrderSumByCard, totalOrderSumByCash, totalDiscount,
+            return new ClientGroupItem(clientGroup, totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount,
                     totalGrantSum, clientItems);
         }
 
         private static ClientItem buildClientItem(Session session, Date startTime, Date endTime, Client client)
                 throws Exception {
             TotalSums totalSums = getTotalOrderSums(session, startTime, endTime, client);
-            return new ClientItem(client, totalSums.getSumByCard(), totalSums.getSumByCash(), totalSums.getDiscount(),
+            return new ClientItem(client, totalSums.getSumByCard(), totalSums.getSumByCash(), totalSums.getSocDiscount(), totalSums.getTrdDiscount(),
                     totalSums.getTotalGrantSum());
         }
 
         private static TotalSums getTotalOrderSums(Session session, Date startTime, Date endTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(sumByCard), sum(sumByCash), sum(discount), sum(grantSum) from Order where client = ? and createTime >= ? and createTime < ?");
+                    "select sum(sumByCard), sum(sumByCash), sum(socDiscount), sum(trdDiscount), sum(grantSum) from Order where client = ? and createTime >= ? and createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, startTime);
             query.setParameter(2, endTime);
             Object[] result = (Object[]) query.uniqueResult();
             if (null == result) {
-                return new TotalSums(0, 0, 0, 0);
+                return new TotalSums(0, 0, 0, 0, 0);
             } else {
                 return new TotalSums(defaultValue((Long) result[0]), defaultValue((Long) result[1]),
-                        defaultValue((Long) result[2]), defaultValue((Long) result[3]));
+                        defaultValue((Long) result[2]), defaultValue((Long) result[3]), defaultValue((Long) result[4]));
             }
         }
 

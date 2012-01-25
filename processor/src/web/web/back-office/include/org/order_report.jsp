@@ -18,7 +18,13 @@
         <rich:calendar value="#{mainPage.orgOrderReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgOrderReport}"
-                           reRender="mainMenu, workspaceTogglePanel, orgOrderReportTable" styleClass="command-button" />
+                           reRender="mainMenu, workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
+                           status="orgOrderReportGenerateStatus"/>
+        <a4j:status id="orgOrderReportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Отчет по организации \"#{mainPage.orgOrderReportPage.shortName}\""
@@ -40,6 +46,10 @@
                                       styleClass="output-text" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
+                        <h:outputText escape="true" value="Сумма скидок"
+                                      styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
                         <h:outputText escape="true" value="Сумма дотаций" styleClass="output-text" />
                     </rich:column>
                     <rich:column colspan="4" breakBefore="true" styleClass="left-aligned-column">
@@ -58,7 +68,12 @@
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
-                                      value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalDiscount}"
+                                      value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalSocDiscount}"
+                                      converter="copeckSumConverter" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="right-aligned-column">
+                        <h:outputText escape="true"
+                                      value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalTrdDiscount}"
                                       converter="copeckSumConverter" styleClass="output-text" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
@@ -82,7 +97,11 @@
                               styleClass="output-text" style="font-weight: bold;" />
             </rich:column>
             <rich:column>
-                <h:outputText escape="true" value="#{clientGroup.totalDiscount}" converter="copeckSumConverter"
+                <h:outputText escape="true" value="#{clientGroup.totalSocDiscount}" converter="copeckSumConverter"
+                              styleClass="output-text" style="font-weight: bold;" />
+            </rich:column>
+            <rich:column>
+                <h:outputText escape="true" value="#{clientGroup.totalTrdDiscount}" converter="copeckSumConverter"
                               styleClass="output-text" style="font-weight: bold;" />
             </rich:column>
             <rich:column>
@@ -114,7 +133,11 @@
                                   styleClass="output-text" />
                 </rich:column>
                 <rich:column>
-                    <h:outputText escape="true" value="#{client.totalDiscount}" converter="copeckSumConverter"
+                    <h:outputText escape="true" value="#{client.totalSocDiscount}" converter="copeckSumConverter"
+                                  styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.totalTrdDiscount}" converter="copeckSumConverter"
                                   styleClass="output-text" />
                 </rich:column>
                 <rich:column>

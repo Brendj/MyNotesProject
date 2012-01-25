@@ -370,8 +370,8 @@
                     <tr>
                         <th>
                             <div class="column-header menu-date">
-                                <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "images/a2.png"))%>"
-                                     src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "images/a1.png"))%>"/>
+                                <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
+                                     src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
                                 <%
                                     utcCalendar.setTime(currMenu.getMenuDate());
                                     int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);

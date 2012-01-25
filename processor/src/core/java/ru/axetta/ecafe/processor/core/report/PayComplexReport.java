@@ -42,7 +42,7 @@ public class PayComplexReport extends BasicReport {
                         + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) "
                         + orgCondition
                         //+ "   and (((od.rPrice + od.discount) <> od.discount and o.trdDiscount is null) or"
-                        + "   and (o.trdDiscount is not null and o.socDiscount = 0) "
+                        + "   and (od.socDiscount = 0) "
                         + " group by org.officialName, od.menuDetailName, od.rPrice, od.discount "
                         + " order by org.officialName, od.menuDetailName";
                 List resultList = null;
