@@ -15,10 +15,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web.iml" afterPath="$PROJECT_DIR$/web.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
@@ -129,19 +125,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Processor.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Processor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.44357976">
+            <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="change-password.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/change-password.jsp">
+      <file leaf-file-name="ecafe_processor_derby_postgre.sql" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="135" column="29" selection-start="6192" selection-end="6192" vertical-scroll-proportion="0.0">
+            <state line="652" column="12" selection-start="31015" selection-end="31020" vertical-scroll-proportion="0.33333334">
               <folding />
             </state>
           </provider>
@@ -1626,11 +1622,6 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/login.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="21" selection-start="483" selection-end="493" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-library.jsp">
       <provider selected="true" editor-type-id="text-editor">
         <state line="219" column="42" selection-start="9187" selection-end="9187" vertical-scroll-proportion="0.0" />
@@ -1713,7 +1704,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.44357976">
+        <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="652" column="12" selection-start="31015" selection-end="31020" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>
