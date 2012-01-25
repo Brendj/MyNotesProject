@@ -98,6 +98,7 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.web-3.0.5.RELEASE.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.web.servlet-3.0.5.RELEASE.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.jdbc-3.0.5.RELEASE.jar" />
+            <element id="library" level="project" name="javamelody-monitoring" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -1139,13 +1140,11 @@
       </deployment>
       <server-settings>
         <option name="SERVER" />
-        <option name="BINDING_SET_NAME" value="" />
         <option name="USERNAME" value="" />
         <option name="PASSWORD" value="" />
       </server-settings>
       <log_file path="$PROJECT_DIR$/../../data/logs/processor.log" checked="true" skipped="true" show_all="false" alias="ECafe Log" />
       <log_file path="$USER_HOME$/jboss-5.0.1.GA/server/default/log/server.log" checked="true" skipped="true" show_all="false" alias="JBoss Log" />
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="9999" />
         <option name="TRANSPORT" value="0" />
@@ -1243,6 +1242,27 @@
             </SvnBranchConfiguration>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../../src/payconv">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/pubkey">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/synctest">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../../src/util">
           <value>
             <SvnBranchConfiguration>
@@ -1333,6 +1353,16 @@
     <property name="spaceAfterKeyword" value="false" />
     <property name="splitStringsAtNewline" value="false" />
     <property name="useTabs" value="false" />
+  </component>
+  <component name="libraryTable">
+    <library name="javamelody-monitoring">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/javamelody-1.33.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
   </component>
 </project>
 

@@ -297,6 +297,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="javamelody-monitoring" level="project" />
   </component>
 </module>
 
