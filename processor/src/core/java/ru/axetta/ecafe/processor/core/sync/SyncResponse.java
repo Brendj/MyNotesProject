@@ -328,7 +328,7 @@ public class SyncResponse {
             public ClientGroup getClientGroup(){
                 return clientGroup;
             }
-           
+
             public long getIdOfClient() {
                 return idOfClient;
             }
@@ -392,6 +392,7 @@ public class SyncResponse {
                     element.setAttribute("FreePayMaxCount", Integer.toString(this.freePayMaxCount));
                 }
                 element.setAttribute("CategoriesDiscounts", this.categoriesDiscounts);
+
                 if (this.clientGroup != null) {
 			        element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 }
@@ -406,6 +407,7 @@ public class SyncResponse {
                         + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", contractState="
                         + contractState + ", freePayMaxCount=" + freePayMaxCount + ", categoriesDiscounts='"
                         + categoriesDiscounts + '\''+", clientGroup="+ clientGroup+'}';
+
             }
         }
 
