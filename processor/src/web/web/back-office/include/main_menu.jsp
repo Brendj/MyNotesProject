@@ -473,8 +473,11 @@
 
         <rich:panelMenuItem id="ruleCreateMenuItem" binding="#{mainPage.ruleCreatePage.mainMenuComponent}"
                             label="Регистрация" action="#{mainPage.showRuleCreatePage}" reRender="workspaceForm" />
-
     </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="showJournal" label="Журнал" binding="#{mainPage.journalViewPage.mainMenuComponent}"
+                        action="#{mainPage.showJournalViewPage}" reRender="workspaceForm"/>
+
 </rich:panelMenuGroup>
 </rich:panelMenu>
 </a4j:form> <%-- Главное меню --%>
