@@ -251,6 +251,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showAllComplexCSVList</from-outcome>
+            <to-view-id>/back-office/all_complex_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showSaleCSVList</from-outcome>
             <to-view-id>/back-office/sale_csv_list.jsp</to-view-id>
             <redirect/>
