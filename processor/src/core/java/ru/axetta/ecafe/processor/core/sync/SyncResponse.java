@@ -322,7 +322,7 @@ public class SyncResponse {
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
                 this.clientGroup=client.getClientGroup();
-                this.clientGroup.getGroupName(); // lazy load
+                if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
             public ClientGroup getClientGroup(){
