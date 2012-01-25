@@ -133,7 +133,7 @@
 %>
 <div class="output-text">Данные успешно изменены</div>
 <%} else {%>
-<div class="output-text">Не удалось изменить данные: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
+<div class="error-output-text">Не удалось изменить данные: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
 </div>
 <%
             }

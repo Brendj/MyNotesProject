@@ -14,7 +14,8 @@
 }
 
 .error-output-text {
-    font-size: 8pt;
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
     color: #FF0000;
 }
 
@@ -129,4 +130,16 @@
     border-radius: 4px;
     margin-left: auto !important;
     margin-right: auto !important;
+}
+
+.login-form-button-tr {
+    text-align: center !important;
+}
+.login-form-button-tr td {
+    background-color: #ffeeaa !important;
+    text-align:center !important;
+}
+
+.login-form-input-tr {
+    vertical-align: middle !important;
 }

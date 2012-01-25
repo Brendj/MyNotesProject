@@ -222,7 +222,7 @@
 
 <table>
     <tr>
-        <td colspan="4">
+        <td colspan="10">
             <div class="output-text">Книги
             </div>
         </td>

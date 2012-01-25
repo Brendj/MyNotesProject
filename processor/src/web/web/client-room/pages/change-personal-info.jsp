@@ -152,7 +152,7 @@
     %>
     <div class="output-text">Данные успешно изменены</div>
     <%} else {%>
-    <div class="output-text">Не удалось изменить данные: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
+    <div class="error-output-text">Не удалось изменить данные: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
     </div>
     <%
             }
@@ -388,7 +388,7 @@
             </td>
         </tr>
         <tr>
-            <td><input type="submit" name="<%=PROCESS_PARAM%>" value="Изменить личные данные" class="command-button" />
+            <td colspan="2"><input type="submit" name="<%=PROCESS_PARAM%>" value="Изменить личные данные" class="command-button" />
             </td>
         </tr>
     </table>

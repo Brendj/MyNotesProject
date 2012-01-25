@@ -346,7 +346,7 @@
 <%if (haveDataToProcess && dataToProcessVerified) {%>
 <table class="infotable">
 <tr class="header-tr">
-    <td colspan="8">
+    <td colspan="9">
         <div class="output-text">Покупки, совершенные с <%=StringEscapeUtils.escapeHtml(dateFormat.format(startDate))%>
             по <%=StringEscapeUtils.escapeHtml(dateFormat.format(endDate))%>
         </div>
