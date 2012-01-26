@@ -477,7 +477,11 @@ public class AutoReportGenerator {
         CronTrigger trigger = new CronTrigger(jobName, Scheduler.DEFAULT_GROUP, cronExpression);
         trigger.setTimeZone(this.calendar.getTimeZone());
         trigger.setStartTime(new Date());
-        this.scheduler.scheduleJob(jobDetail, trigger);
+        if (this.scheduler.getTrigger(jobName, Scheduler.DEFAULT_GROUP)!=null) {
+            this.scheduler.deleteJob(jobName, Scheduler.DEFAULT_GROUP);
+        } else {
+            this.scheduler.scheduleJob(jobDetail, trigger);
+        }
     }
 
     private void cancelScheduledJob(String jobName) throws Exception {

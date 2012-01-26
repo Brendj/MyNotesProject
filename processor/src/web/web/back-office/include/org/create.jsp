@@ -14,7 +14,7 @@
 <%-- Панель создания организации --%>
 <h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid"
              columns="2">
-    <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
+    <h:outputText escape="true" value="Краткое наименование" styleClass="output-text required-field" />
     <h:inputText value="#{mainPage.orgCreatePage.shortName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="128" styleClass="input-text" />
@@ -27,7 +27,7 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
-    <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text" />
+    <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text required-field" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.orgCreatePage.defaultSupplier.contragentName}" readonly="true"
                      styleClass="input-text" style="margin-right: 2px;" />
@@ -73,6 +73,14 @@
     <h:outputText escape="true" value="Размер абонентской платы" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.subscriptionPrice}" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.orgCreatePage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+    </h:panelGroup>
     <h:outputText escape="true" value="Пароль для единого входа" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.orgCreatePage.plainSsoPassword}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Подтверждение пароля для единого входа" styleClass="output-text" />

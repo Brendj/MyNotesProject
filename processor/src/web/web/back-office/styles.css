@@ -37,6 +37,10 @@
     font-size: 10pt;
 }
 
+.required-field {
+    font-weight: bold;
+}
+
 .column-header {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 10pt;

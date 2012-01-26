@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
@@ -23,7 +24,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class OrgCreatePage extends BasicWorkspacePage
-    implements ContragentSelectPage.CompleteHandler {
+    implements OrgSelectPage.CompleteHandler, ContragentSelectPage.CompleteHandler {
     private String shortName;
     private String officialName;
     private String address;
@@ -38,6 +39,8 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long cardLimit;
     private Long priceOfSms;
     private Long subscriptionPrice;
+    private Long menuExchangeSourceOrg;
+    private String menuExchangeSourceOrgName;
     private String publicKey;
     private final OrgStateMenu orgStateMenu = new OrgStateMenu();
     private String plainSsoPassword;
@@ -68,6 +71,29 @@ public class OrgCreatePage extends BasicWorkspacePage
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.defaultSupplier = new ContragentItem(contragent);
         }
+    }
+
+    public Long getMenuExchangeSourceOrg() {
+        return menuExchangeSourceOrg;
+    }
+
+    public String getMenuExchangeSourceOrgName() {
+        return menuExchangeSourceOrgName;
+    }
+
+    private void reloadMenuExchangeSourceOrgName(Session session) {
+        if (menuExchangeSourceOrg == null) {
+            menuExchangeSourceOrgName = null;
+        } else {
+            Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
+            menuExchangeSourceOrgName = org.getShortName();
+        }
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.menuExchangeSourceOrg = idOfOrg;
+        reloadMenuExchangeSourceOrgName(session);
     }
 
     public static class ContragentItem {
@@ -259,6 +285,9 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.officialPersonSecondName);
         session.save(officialPerson);
 
+        if (this.defaultSupplier.getIdOfContragent()==null) {
+            throw new Exception("Не указан поставщик по умолчанию");
+        }
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class,
                 this.defaultSupplier.getIdOfContragent());
 
@@ -271,5 +300,7 @@ public class OrgCreatePage extends BasicWorkspacePage
             org.setSsoPassword(plainSsoPassword);
         }
         session.save(org);
+
+        if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());
     }
 }

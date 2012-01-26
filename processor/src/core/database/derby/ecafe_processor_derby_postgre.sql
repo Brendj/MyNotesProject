@@ -78,7 +78,6 @@ CREATE TABLE CF_Orgs (
   INN                     character varying(32),
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
-  CONSTRAINT CF_Orgs_ContractId UNIQUE (ContractId),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),
   CONSTRAINT CF_Orgs_DefaultSupplier_fk FOREIGN KEY (DefaultSupplier) REFERENCES CF_Contragents (IdOfContragent)
 );
@@ -237,6 +236,10 @@ CREATE TABLE CF_MenuDetails (
   CONSTRAINT CF_MenuDetail_pk PRIMARY KEY (IdOfMenuDetail),
   CONSTRAINT CF_MenuDetail_IdOfMenu_fk FOREIGN KEY (IdOfMenu) REFERENCES CF_Menu (IdOfMenu)
 );
+
+-- Indexes
+CREATE index "cf_menudetail_localid_idx" ON CF_MenuDetails (LocalIdOfMenu);
+
 
 
 CREATE TABLE CF_ComplexInfo (
@@ -800,7 +803,7 @@ create table CF_Schema_version_info (
 );
 
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 9, 120122, 0);
+VALUES(2, 2, 10, 120126, 0);
 
 CREATE TABLE cf_transaction_journal
 (
@@ -820,4 +823,4 @@ CREATE TABLE cf_transaction_journal
   servicecode character varying(10),
   transactioncode character varying(10),
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idoftransactionjournal )
-)
+);

@@ -909,7 +909,7 @@ public class MainPage {
             } catch (Exception e) {
                 logger.error("Failed to create org", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации организации", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации организации: "+ e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
