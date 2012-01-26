@@ -7,13 +7,14 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.TransactionJournal" table="cf_transaction_journal" optimistic-lock="version">
-
+        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long">
+                <!--
         <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long">
             <generator class="hilo">
                 <param name="table">hi_value</param>
                 <param name="column">next_value</param>
                 <param name="max_lo">100</param>
-            </generator>
+            </generator>-->
         </id>
         <property name="serviceCode" column="ServiceCode" type="string" length="15"/>
         <property name="transactionCode" column="TransactionCode" type="string" length="15"/>

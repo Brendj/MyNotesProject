@@ -127,6 +127,6 @@ public class TransactionJournal {
 
     @Override
     public String toString(){
-        return this.transactionCode+" "+this.cartTypeName;
+        return this.idOfTransactionJournal+" "+this.transactionCode+" "+this.cartTypeName;
     }
 }
