@@ -801,3 +801,23 @@ create table CF_Schema_version_info (
 
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
 VALUES(2, 2, 9, 120122, 0);
+
+CREATE TABLE cf_transaction_journal
+(
+  idoftransactionjournal bigint NOT NULL,
+  ogrn character varying(32),
+  systemcode character varying(10),
+  sycrodate bigint,
+  carttypename character varying(100),
+  cartidentityname character varying(20),
+  clientsnilssan character varying(15),
+  clienttype character varying(32),
+  entername character varying(100),
+  carttype integer,
+  cardidentitycode integer,
+  contractid bigint,
+  orderrsum bigint,
+  servicecode character varying(10),
+  transactioncode character varying(10),
+  CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idoftransactionjournal )
+)

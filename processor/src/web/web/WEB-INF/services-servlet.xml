@@ -92,4 +92,9 @@
         </property>
     </bean>
 
+    <task:scheduled-tasks scheduler="transactionJournalScheduler">
+        <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="5000"/>
+    </task:scheduled-tasks>
+    <task:scheduler id="transactionJournalScheduler" pool-size="50"/>
+
 </beans>
