@@ -28,6 +28,15 @@ public class TransactionJournal {
     private long orderRSum;
     private String clientType;
     private String cartTypeName;
+    private String OGRN;
+
+    public String getOGRN() {
+        return OGRN;
+    }
+
+    public void setOGRN(String OGRN) {
+        this.OGRN = OGRN;
+    }
 
     public String getCartTypeName() {
         return cartTypeName;

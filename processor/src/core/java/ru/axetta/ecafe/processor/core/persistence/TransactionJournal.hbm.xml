@@ -25,7 +25,7 @@
         <property name="clientSnilsSan" column="ClientSnilsSan" type="string" length="15"/>
         <property name="clientType" column="ClientType" type="string" length="32"/>
         <property name="enterName" column="EnterName" type="string" length="100"/>
-
+        <property name="OGRN" column="ORGN" type="string" length="32"/>
         <!--clienttype
         <version name="version" column="Version" type="long"/>
         <property name="userName" column="UserName" type="string" length="64" unique="true" not-null="true"/>
