@@ -213,7 +213,6 @@ public class JBossLoginModule implements LoginModule {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
     }
 

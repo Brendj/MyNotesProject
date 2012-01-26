@@ -65,7 +65,6 @@ public class FunctionSetConverter implements Converter {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
         int len = stringBuilder.length();
         if (len > MAX_LEN) {

@@ -242,8 +242,6 @@
         }
     } catch (RuntimeContext.NotInitializedException e) {
         throw new UnavailableException(e.getMessage());
-    } finally {
-        RuntimeContext.release(runtimeContext);
     }
 %>
 <a href="javascript:history.go(-1)" class="command-link">Назад</a>

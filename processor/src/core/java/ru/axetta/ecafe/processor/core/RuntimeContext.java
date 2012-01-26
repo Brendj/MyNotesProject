@@ -102,6 +102,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
+    public static final String PARAM_NAME_DB_MAINTANANCE_HOUR=PROCESSOR_PARAM_BASE+".dbmaintanance.hour";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
     private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
     private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
@@ -116,11 +117,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
     // Lock for global instance anchor
     private static final Object INSTANCE_LOCK = new Object();
-    // Global instance anchor
-    private static RuntimeContext instance = null;
 
-    // Reference counter for right destroy order
-    private AtomicLong refCount;
     // Application wide executor service
     private ExecutorService executorService;
     // Application wide job scheduler
@@ -159,95 +156,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
 
-    /**
-     * Retrieve global instance of application's runtime context.
-     * When retrieved runtime context instance is no longer needed,
-     * it must be released by RuntimeContext.release() -
-     * internal reference counter is used!
-     *
-     * @return global instance (if exists).
-     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.NotInitializedException If global instance was not initialized wet.
-     * @thread-safety fully (synchronized lock inside).
-     */
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
-    }
-
-    /**
-     * Create global instance of application's runtime context.
-     * Must be called once during application's lifetime (at startup point).
-     *
-     * @param contextPath application context path.
-     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.AlreadyInitializedException if global instance have already been initialized.
-     * @throws Exception                   if any exception (error) during runtime context initialization happens.
-     * @exception-safety strong guarantee (for global instance).
-     * @thread-safety fully (synchronized lock inside).
-     */
-/*    public static void initializeInstance(String contextPath, Properties properties, SessionFactory sessionFactory)
-            throws AlreadyInitializedException, Exception {
-        synchronized (INSTANCE_LOCK) {
-            if (instance != null) {
-                throw new AlreadyInitializedException();
-            } else {
-                instance = new RuntimeContext(contextPath, properties, sessionFactory).addRef();
-            }
-        }
-    }  */
-
-    /**
-     * Destroy global instance of application's runtime context.
-     * Must be called once during application's lifetime (at shutdown point).
-     *
-     * @return Value of internal reference counter - zero means runtime context
-     *         was really destroyed, nonzero means runtime context is locked
-     *         by something else and will be destroyed when
-     *         all of its instance copies will be released.
-     * @throws ru.axetta.ecafe.processor.core.RuntimeContext.NotInitializedException if global instance was not initialized.
-     * @exception-safety strong guarantee (for global instance).
-     * @thread-safety fully (synchronized lock inside).
-     */
-    public static long destroyInstance() throws NotInitializedException {
-        synchronized (INSTANCE_LOCK) {
-            if (instance == null) {
-                throw new NotInitializedException();
-            } else {
-                long result = instance.release();
-                instance = null;
-                return result;
-            }
-        }
-    }
-
-    /**
-     * Release a copy of runtime context instance.
-     * retrieved by RuntimeContext.getInstance().
-     *
-     * @return Value of internal reference counter - zero means runtime context
-     *         was really destroyed, nonzero means runtime context is locked
-     *         by something else and will be destroyed when
-     *         all of its instance copies will be released.
-     * @thread-safety fully (atomic operations used).
-     */
-    public long release() {
-        long result = refCount.decrementAndGet();
-        if (result == 0) {
-            destroy();
-        }
-        return result;
-    }
-
-    /**
-     * Release a copy of runtime context instance (if not null)
-     * retrieved by RuntimeContext.getInstance().
-     *
-     * @param runtimeContext runtime context instance
-     *                       retrieved earlier by RuntimeContext.getInstance().
-     *                       null value supported.
-     */
-    public static void release(RuntimeContext runtimeContext) {
-        if (runtimeContext != null) {
-            runtimeContext.release();
-        }
     }
 
     public PayPointConfig getPartnerPayPointConfig() {
@@ -395,19 +305,6 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-    /**
-     * Increments internal reference counter used
-     * to the right destroy order.
-     *
-     * @return this instance.
-     * @thread-safety fully (atomic operations used).
-     */
-    private RuntimeContext addRef() {
-        refCount.incrementAndGet();
-        return this;
-    }
-
-
     static SessionFactory sessionFactory;
 
     public static void setSessionFactory(SessionFactory sessionFactory) {
@@ -415,14 +312,16 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
 
+    Properties configProperties;
+
     @PostConstruct
     public void init() throws Exception {
-        logger.info("Creating runtime context: sessionFactory = "+sessionFactory);
         // to run in transaction
         applicationContext.getBean(this.getClass()).initDB();
 
         String basePath="/";
         Properties properties = loadConfig();
+        configProperties = properties;
         Scheduler scheduler = null;
         ExecutorService executorService = null;
         Postman postman = null;
@@ -434,7 +333,6 @@ public class RuntimeContext implements ApplicationContextAware {
         //sessionFactory = ((Session)entityManagerFactory.createEntityManager()).getSessionFactory();
         //logger.info("sf = "+sessionFactory);
         try {
-            this.refCount = new AtomicLong(0);
 
             executorService = createExecutorService(properties);
             this.executorService = executorService;
@@ -990,4 +888,11 @@ public class RuntimeContext implements ApplicationContextAware {
         return "#{" + cls.getSimpleName().substring(0, 1).toLowerCase() + cls.getSimpleName().substring(1) + "}";
     }
 
+    public String getPropertiesValue(String name, String defaultValue) {
+        return configProperties.getProperty(name, defaultValue);
+    }
+
+    public int getPropertiesValue(String name, int defaultValue) {
+        return Integer.parseInt(configProperties.getProperty(name, ""+defaultValue));
+    }
 }

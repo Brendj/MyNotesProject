@@ -92,8 +92,6 @@ public class PayPointServlet extends HttpServlet {
         } catch (RuntimeContext.NotInitializedException e) {
             logger.error("Failed", e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 
@@ -126,19 +124,15 @@ public class PayPointServlet extends HttpServlet {
             logger.debug(String.format("remoteAddress: %s", remoteAddress));
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        try {
-            PayPointConfig payPointConfig = runtimeContext.getPartnerPayPointConfig();
-            List<String> remoteAddressMasks = payPointConfig.getRemoteAddressMasks();
-            for (String mask : remoteAddressMasks) {
-                if (remoteAddress.matches(mask)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(String.format("remoteAddress \"%s\" matches mask \"%s\"", remoteAddress, mask));
-                    }
-                    return true;
+        PayPointConfig payPointConfig = runtimeContext.getPartnerPayPointConfig();
+        List<String> remoteAddressMasks = payPointConfig.getRemoteAddressMasks();
+        for (String mask : remoteAddressMasks) {
+            if (remoteAddress.matches(mask)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("remoteAddress \"%s\" matches mask \"%s\"", remoteAddress, mask));
                 }
+                return true;
             }
-        } finally {
-            runtimeContext.release();
         }
         logger.error(String.format("Authentication failed for: %s", remoteAddress));
         return false;

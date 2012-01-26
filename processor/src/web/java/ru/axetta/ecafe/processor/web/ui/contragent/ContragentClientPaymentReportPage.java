@@ -83,7 +83,6 @@ public class ContragentClientPaymentReportPage extends BasicWorkspacePage {
             this.endDate = localCalendar.getTime();
             this.contragentClientPaymentReport = new ContragentClientPaymentReport(this.startDate, this.endDate);
         } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 

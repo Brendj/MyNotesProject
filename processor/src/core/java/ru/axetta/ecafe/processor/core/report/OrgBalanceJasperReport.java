@@ -538,7 +538,6 @@ public class OrgBalanceJasperReport extends BasicJasperReport {
             } finally {
                 HibernateUtils.rollback(transaction, logger);
                 HibernateUtils.close(session, logger);
-                RuntimeContext.release(runtimeContext);
             }
         }
     }

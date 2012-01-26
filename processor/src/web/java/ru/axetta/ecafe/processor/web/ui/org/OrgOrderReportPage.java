@@ -82,8 +82,6 @@ public class OrgOrderReportPage extends BasicWorkspacePage {
             this.endDate = localCalendar.getTime();
         } catch (RuntimeContext.NotInitializedException e) {
             logger.error("Failed to retrieve runtime context", e);
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
         this.orgOrderReport = new OrgOrderReport(this.startDate, this.endDate);
     }

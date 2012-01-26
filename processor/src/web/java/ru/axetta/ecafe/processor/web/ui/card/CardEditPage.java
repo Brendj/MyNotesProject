@@ -258,17 +258,12 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     }
 
     public void updateCard(Session session, Long idOfCard) throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            if (externalId!=null && externalId.length()==0) externalId=null;
-            runtimeContext.getCardManager()
-                    .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
-                            this.lifeState, this.lockReason, this.issueTime, this.externalId);
-            fill(session, this.idOfCard);
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        if (externalId!=null && externalId.length()==0) externalId=null;
+        runtimeContext.getCardManager()
+                .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
+                        this.lifeState, this.lockReason, this.issueTime, this.externalId);
+        fill(session, this.idOfCard);
     }
 
     public void fill(Card card) throws Exception {

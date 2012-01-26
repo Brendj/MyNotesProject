@@ -525,7 +525,6 @@ public class ClientGroupBalanceReport extends BasicReport {
                 writer.write("</html>");
                 writer.flush();
             } finally {
-                runtimeContext.release();
             }
         }
 

@@ -114,7 +114,6 @@ public class ReportJobListPage extends BasicWorkspacePage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
     }
 

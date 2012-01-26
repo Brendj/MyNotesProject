@@ -74,8 +74,6 @@
             } catch (Exception e) {
                 logger.error("Failed to proceed client credentials check", e);
                 errorMessage = "Внутренняя ошибка";
-            } finally {
-                RuntimeContext.release(runtimeContext);
             }
         }
     }

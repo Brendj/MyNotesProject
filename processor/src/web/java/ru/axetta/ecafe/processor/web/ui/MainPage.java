@@ -341,7 +341,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
         updateSelectedMainMenu();
         return null;
@@ -370,7 +369,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
         return null;
     }
@@ -416,7 +414,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
         }
         updateSelectedMainMenu();
         return null;
@@ -448,7 +445,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -480,7 +477,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -514,7 +511,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -544,7 +541,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -575,7 +572,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -616,7 +613,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -655,7 +652,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -687,7 +684,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -772,7 +769,7 @@ public class MainPage {
         }   finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -822,7 +819,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -855,7 +852,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -885,7 +882,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -916,7 +913,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -948,7 +945,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -975,7 +972,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1006,7 +1003,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1033,7 +1030,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1077,7 +1074,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -1107,7 +1104,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -1133,7 +1130,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1158,7 +1155,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1187,7 +1184,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1263,7 +1260,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1302,7 +1299,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1334,7 +1331,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1366,7 +1363,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1394,7 +1391,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1423,7 +1420,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1454,7 +1451,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1485,7 +1482,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1512,7 +1509,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1559,7 +1556,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -1585,7 +1582,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
     }*/
 
@@ -1613,7 +1610,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1665,7 +1662,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1691,7 +1688,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1717,7 +1714,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -1755,7 +1752,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1787,7 +1784,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1819,7 +1816,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1852,7 +1849,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -1882,7 +1879,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1913,7 +1910,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -1944,7 +1941,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         updateSelectedMainMenu();
@@ -1979,7 +1976,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2005,7 +2002,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2129,7 +2126,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -2155,7 +2152,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2184,7 +2181,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2210,7 +2207,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2240,7 +2237,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2268,7 +2265,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2301,7 +2298,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2327,7 +2324,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2354,7 +2351,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2380,7 +2377,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2409,7 +2406,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2436,7 +2433,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2460,7 +2457,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2485,7 +2482,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2510,7 +2507,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2549,7 +2546,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2574,7 +2571,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2599,7 +2596,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2633,7 +2630,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2665,7 +2662,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2697,7 +2694,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2725,7 +2722,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2755,7 +2752,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2782,7 +2779,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2812,7 +2809,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2842,7 +2839,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2910,7 +2907,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -2935,7 +2932,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2960,7 +2957,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -2997,7 +2994,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3030,7 +3027,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3057,7 +3054,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3086,7 +3083,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3169,7 +3166,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3196,7 +3193,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3235,7 +3232,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3265,7 +3262,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3310,7 +3307,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3342,7 +3339,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3374,7 +3371,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3404,7 +3401,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3433,7 +3430,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3461,7 +3458,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3500,7 +3497,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3530,7 +3527,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3575,7 +3572,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3607,7 +3604,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3639,7 +3636,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3668,7 +3665,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3697,7 +3694,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3725,7 +3722,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3755,7 +3752,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3781,7 +3778,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3810,7 +3807,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3836,7 +3833,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -3866,7 +3863,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3919,7 +3916,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -3977,7 +3974,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4010,7 +4007,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4042,7 +4039,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4067,7 +4064,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         } catch (Exception e) {
             logger.error("Failed to update report job", e);
@@ -4102,7 +4099,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4189,7 +4186,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4238,7 +4235,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4284,7 +4281,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4345,7 +4342,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4391,7 +4388,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4437,7 +4434,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4488,7 +4485,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4540,7 +4537,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4567,7 +4564,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4614,7 +4611,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4641,7 +4638,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4690,7 +4687,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4742,7 +4739,7 @@ public class MainPage {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при расчете текущих позиций", null));
         }
         finally {
-            RuntimeContext.release(runtimeContext);
+            
         }
 
         return null;
@@ -4789,7 +4786,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4821,7 +4818,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4849,7 +4846,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4875,7 +4872,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4916,7 +4913,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -4949,7 +4946,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -4983,7 +4980,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5014,7 +5011,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5061,7 +5058,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5093,7 +5090,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5125,7 +5122,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5151,7 +5148,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5192,7 +5189,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5225,7 +5222,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5258,7 +5255,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5288,7 +5285,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5335,7 +5332,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5367,7 +5364,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5399,7 +5396,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5425,7 +5422,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5466,7 +5463,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5499,7 +5496,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5532,7 +5529,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5562,7 +5559,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5609,7 +5606,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5641,7 +5638,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5670,7 +5667,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5711,7 +5708,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5739,7 +5736,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5773,7 +5770,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5804,7 +5801,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -5838,7 +5835,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -5864,7 +5861,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -5933,7 +5930,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -5959,7 +5956,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6030,7 +6027,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         return null;
@@ -6068,7 +6065,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6114,7 +6111,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -6146,7 +6143,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -6174,7 +6171,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6215,7 +6212,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6243,7 +6240,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -6277,7 +6274,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6308,7 +6305,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         updateSelectedMainMenu();
         return null;
@@ -6474,7 +6471,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                RuntimeContext.release(runtimeContext);
+                
             }
         }
         /////
@@ -6626,7 +6623,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }
@@ -6675,7 +6672,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            RuntimeContext.release(runtimeContext);
+            
         }
         return null;
     }

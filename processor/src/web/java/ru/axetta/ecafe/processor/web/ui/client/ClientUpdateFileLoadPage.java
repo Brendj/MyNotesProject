@@ -92,41 +92,36 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
 
     public void updateClients(InputStream inputStream, long dataSize) throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
-            TimeZone localTimeZone = runtimeContext
-                    .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            dateFormat.setTimeZone(localTimeZone);
+        TimeZone localTimeZone = runtimeContext
+                .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        dateFormat.setTimeZone(localTimeZone);
 
-            long lineCount = dataSize / 20;
-            if (lineCount > MAX_LINE_NUMBER) {
-                lineCount = MAX_LINE_NUMBER;
-            }
-            List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
-            int lineNo = 0;
-            int successLineNumber = 0;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
-            String currLine = reader.readLine();
-            while (null != currLine) {
-                LineResult result = createClient(runtimeContext, dateFormat, currLine, lineNo);
-                if (result.getResultCode() == 0) {
-                    ++successLineNumber;
-                }
-                lineResults.add(result);
-                currLine = reader.readLine();
-                if (lineNo == MAX_LINE_NUMBER) {
-                    break;
-                }
-                ++lineNo;
-            }
-            this.lineResults = lineResults;
-            this.successLineNumber = successLineNumber;
-        } finally {
-            RuntimeContext.release(runtimeContext);
+        long lineCount = dataSize / 20;
+        if (lineCount > MAX_LINE_NUMBER) {
+            lineCount = MAX_LINE_NUMBER;
         }
+        List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
+        int lineNo = 0;
+        int successLineNumber = 0;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+        String currLine = reader.readLine();
+        while (null != currLine) {
+            LineResult result = createClient(runtimeContext, dateFormat, currLine, lineNo);
+            if (result.getResultCode() == 0) {
+                ++successLineNumber;
+            }
+            lineResults.add(result);
+            currLine = reader.readLine();
+            if (lineNo == MAX_LINE_NUMBER) {
+                break;
+            }
+            ++lineNo;
+        }
+        this.lineResults = lineResults;
+        this.successLineNumber = successLineNumber;
     }
 
     private LineResult createClient(RuntimeContext runtimeContext, DateFormat dateFormat, String line, int lineNo) {

@@ -330,7 +330,5 @@
 <%
     } catch (RuntimeContext.NotInitializedException e) {
         throw new UnavailableException(e.getMessage());
-    } finally {
-        RuntimeContext.release(runtimeContext);
     }
 %>

@@ -46,8 +46,6 @@ public class DateConverter implements Converter {
             }
         } catch (RuntimeContext.NotInitializedException e) {
             throw new ConverterException(e);
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 
@@ -65,8 +63,6 @@ public class DateConverter implements Converter {
             return dateFormat.format((Date) object);
         } catch (RuntimeContext.NotInitializedException e) {
             throw new ConverterException(e);
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 }

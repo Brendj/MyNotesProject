@@ -265,22 +265,17 @@ public class CCAccountFileLoadPage extends BasicWorkspacePage {
     }
 
     public void loadCCAccounts(InputStream inputStream) throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            List<LineResult> newLineResults = new LinkedList<LineResult>();
-            long line = 1;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
-            String currLine = reader.readLine();
-            while (null != currLine) {
-                newLineResults.add(new LineResult(line, createCCAccount(runtimeContext, currLine)));
-                currLine = reader.readLine();
-                ++line;
-            }
-            this.lineResults = newLineResults;
-        } finally {
-            RuntimeContext.release(runtimeContext);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        List<LineResult> newLineResults = new LinkedList<LineResult>();
+        long line = 1;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+        String currLine = reader.readLine();
+        while (null != currLine) {
+            newLineResults.add(new LineResult(line, createCCAccount(runtimeContext, currLine)));
+            currLine = reader.readLine();
+            ++line;
         }
+        this.lineResults = newLineResults;
     }
 
     private CreateResult createCCAccount(RuntimeContext runtimeContext, String line) throws Exception {

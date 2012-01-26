@@ -652,7 +652,6 @@ public class OrgBalanceReport extends BasicReport {
                 writer.write("</html>");
                 writer.flush();
             } finally {
-                runtimeContext.release();
             }
         }
 

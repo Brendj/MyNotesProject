@@ -22,23 +22,18 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     protected Calendar localCalendar;
 
     public OnlineReportPage() throws RuntimeContext.NotInitializedException {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            localCalendar = runtimeContext
-                    .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
 
-            localCalendar.setTime(new Date());
-            this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+        localCalendar.setTime(new Date());
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
 
-            localCalendar.setTime(this.startDate);
-            localCalendar.add(Calendar.MONTH, 1);
-            this.endDate = localCalendar.getTime();
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.MONTH, 1);
+        this.endDate = localCalendar.getTime();
 
     }
 

@@ -74,9 +74,6 @@ public class ReportJobViewPage extends BasicWorkspacePage {
         } catch (Exception e) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка: "+e.toString(), ""));
         }
-        finally {
-            runtimeContext.release();
-        }
         return null;
     }
 

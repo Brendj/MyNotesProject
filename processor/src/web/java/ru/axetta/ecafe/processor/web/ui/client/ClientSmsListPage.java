@@ -276,58 +276,53 @@ public class ClientSmsListPage extends BasicWorkspacePage
     }
 
     public void sendNegativeBalanceSms(Session session) throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            SmsService smsService = runtimeContext.getSmsService();
-            MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
-            ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        SmsService smsService = runtimeContext.getSmsService();
+        MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
+        ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
 
-            Criteria clientCriteria = session.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractState", Client.ACTIVE_CONTRACT_STATE));
-            clientCriteria.add(Restrictions.lt("balance", 0L));
-            clientFilter.addRestrictions(session, clientCriteria);
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.eq("contractState", Client.ACTIVE_CONTRACT_STATE));
+        clientCriteria.add(Restrictions.lt("balance", 0L));
+        clientFilter.addRestrictions(session, clientCriteria);
 
-            List clients = clientCriteria.list();
+        List clients = clientCriteria.list();
 
-            for (Object currObject : clients) {
-                Client currClient = (Client) currObject;
-                try {
-                    String phoneNumber = currClient.getMobile();
-                    if (StringUtils.isNotEmpty(phoneNumber)) {
-                        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                        if (StringUtils.length(phoneNumber) == 11) {
-                            Card activeCard = currClient.findActiveCard(session, null);
-                            if (null != activeCard) {
-                                String sender = buildSender(currClient);
-                                String text = buildSmsText(currClient, activeCard);
-                                String idOfSms = messageIdGenerator.generate();
-                                SendResponse sendResponse = null;
-                                try {
-                                    sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
-                                } catch (Exception e) {
-                                    if (logger.isWarnEnabled()) {
-                                        logger.warn(String.format(
-                                                "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                                idOfSms, sender, phoneNumber, text), e);
-                                    }
+        for (Object currObject : clients) {
+            Client currClient = (Client) currObject;
+            try {
+                String phoneNumber = currClient.getMobile();
+                if (StringUtils.isNotEmpty(phoneNumber)) {
+                    phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
+                    if (StringUtils.length(phoneNumber) == 11) {
+                        Card activeCard = currClient.findActiveCard(session, null);
+                        if (null != activeCard) {
+                            String sender = buildSender(currClient);
+                            String text = buildSmsText(currClient, activeCard);
+                            String idOfSms = messageIdGenerator.generate();
+                            SendResponse sendResponse = null;
+                            try {
+                                sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
+                            } catch (Exception e) {
+                                if (logger.isWarnEnabled()) {
+                                    logger.warn(String.format(
+                                            "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                            idOfSms, sender, phoneNumber, text), e);
                                 }
-                                if (null != sendResponse) {
-                                    if (sendResponse.isSuccess()) {
-                                        clientSmsProcessor
-                                                .registerClientSms(currClient.getIdOfClient(), idOfSms, phoneNumber,
-                                                        ClientSms.NEGATIVE_BALANCE_CONTENTS, text, new Date());
-                                    }
+                            }
+                            if (null != sendResponse) {
+                                if (sendResponse.isSuccess()) {
+                                    clientSmsProcessor
+                                            .registerClientSms(currClient.getIdOfClient(), idOfSms, phoneNumber,
+                                                    ClientSms.NEGATIVE_BALANCE_CONTENTS, text, new Date());
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
-                    logger.error(String.format("Failed to send SMS to client: %s", currClient), e);
                 }
+            } catch (Exception e) {
+                logger.error(String.format("Failed to send SMS to client: %s", currClient), e);
             }
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 

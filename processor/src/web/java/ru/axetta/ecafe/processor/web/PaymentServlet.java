@@ -183,8 +183,6 @@ public class PaymentServlet extends HttpServlet {
             logger.info(String.format("End of synchronization with %s", request.getRemoteAddr()));
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 

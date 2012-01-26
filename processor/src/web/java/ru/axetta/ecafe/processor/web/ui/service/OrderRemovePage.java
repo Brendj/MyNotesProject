@@ -48,12 +48,7 @@ public class OrderRemovePage extends BasicWorkspacePage {
 
     public void removeOrder() throws Exception {
         CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(this.idOfOrg, this.idOfOrder);
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            runtimeContext.getOrderCancelProcessor().cancelOrder(compositeIdOfOrder);
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        runtimeContext.getOrderCancelProcessor().cancelOrder(compositeIdOfOrder);
     }
 }

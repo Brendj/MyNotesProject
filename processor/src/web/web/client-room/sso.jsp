@@ -45,7 +45,5 @@
     } catch (Exception e) {
         logger.error("Failed to proceed SSO credentials check", e);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);        
-    } finally {
-        RuntimeContext.release(runtimeContext);
     }
 %>

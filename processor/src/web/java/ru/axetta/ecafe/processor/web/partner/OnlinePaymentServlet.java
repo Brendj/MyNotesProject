@@ -67,8 +67,6 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         } catch (Exception e) {
             getLogger().error("Failed", e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 
@@ -90,13 +88,9 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
             getLogger().debug(String.format("remoteAddress: %s", remoteAddress));
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        try {
-            String remoteAddressMasks = getAuthenticatedRemoteAddressMasks(runtimeContext, httpRequest, requestParser);
-            if (remoteAddress.matches(remoteAddressMasks)) {
-                return true;
-            }
-        } finally {
-            runtimeContext.release();
+        String remoteAddressMasks = getAuthenticatedRemoteAddressMasks(runtimeContext, httpRequest, requestParser);
+        if (remoteAddress.matches(remoteAddressMasks)) {
+            return true;
         }
         getLogger().error(String.format("Authentication failed for: %s", remoteAddress));
         return false;

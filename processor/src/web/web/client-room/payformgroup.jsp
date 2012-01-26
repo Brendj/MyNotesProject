@@ -66,7 +66,6 @@
     } finally {
         HibernateUtils.rollback(persistenceTransaction, logger);
         HibernateUtils.close(persistenceSession, logger);
-        RuntimeContext.release(runtimeContext);
     }
 %>
 <title>Новая школа - <%=docTitle%>%></title>

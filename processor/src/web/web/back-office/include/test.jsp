@@ -75,8 +75,6 @@
 %>
 <%=e.getMessage()%>
 <%
-    } finally {
-        RuntimeContext.release(runtimeContext);
     }
 %>
 </body>

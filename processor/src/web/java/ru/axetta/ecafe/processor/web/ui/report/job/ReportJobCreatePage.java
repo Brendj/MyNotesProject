@@ -72,15 +72,10 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public void createReportJob() throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            SchedulerJob schedulerJob = new SchedulerJob(this.jobName,
-                    AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
-                    this.enabled);
-            runtimeContext.getAutoReportGenerator().addJob(schedulerJob);
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        SchedulerJob schedulerJob = new SchedulerJob(this.jobName,
+                AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
+                this.enabled);
+        runtimeContext.getAutoReportGenerator().addJob(schedulerJob);
     }
 }

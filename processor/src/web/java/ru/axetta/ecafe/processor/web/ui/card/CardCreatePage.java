@@ -275,14 +275,10 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
 
     public void createCard(Session session) throws Exception {
         RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            runtimeContext.getCardManager()
-                    .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, this.state, this.validTime,
-                            this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo);
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        runtimeContext = RuntimeContext.getInstance();
+        runtimeContext.getCardManager()
+                .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, this.state, this.validTime,
+                        this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo);
     }
 
 }

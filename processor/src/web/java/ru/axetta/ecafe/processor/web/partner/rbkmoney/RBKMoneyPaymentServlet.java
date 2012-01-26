@@ -96,8 +96,6 @@ public class RBKMoneyPaymentServlet extends HttpServlet {
         } catch (RuntimeContext.NotInitializedException e) {
             logger.error("Failed", e);
             throw new UnavailableException(e.getMessage());
-        } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 }

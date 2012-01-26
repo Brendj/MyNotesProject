@@ -408,45 +408,40 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     }
 
     public void createClient(Session persistenceSession) throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
-            if (autoContractId) {
-                this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
-            }
-
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-
-            Person person = this.person.buildPerson();
-            persistenceSession.save(person);
-            Person contractPerson = this.contractPerson.buildPerson();
-            persistenceSession.save(contractPerson);
-
-            Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS,
-                    this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
-                    clientRegistryVersion, this.limit, 20000, "");
-
-            client.setAddress(this.address);
-            client.setPhone(this.phone);
-            client.setMobile(this.mobile);
-            client.setEmail(this.email);
-            client.setRemarks(this.remarks);
-
-            // Категории скидок
-            String clientCategories = "";
-            for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
-                if (categoryDiscount.getSelected())
-                    clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
-                }
-            if (!clientCategories.isEmpty())
-                clientCategories = clientCategories.substring(0, clientCategories.length() - 1);
-            client.setCategoriesDiscounts(clientCategories);
-
-            persistenceSession.save(client);
-        } finally {
-            RuntimeContext.release(runtimeContext);
+        RuntimeContext runtimeContext  = RuntimeContext.getInstance();
+        Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
+        if (autoContractId) {
+            this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
         }
+
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
+        Person person = this.person.buildPerson();
+        persistenceSession.save(person);
+        Person contractPerson = this.contractPerson.buildPerson();
+        persistenceSession.save(contractPerson);
+
+        Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS,
+                this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
+                clientRegistryVersion, this.limit, 20000, "");
+
+        client.setAddress(this.address);
+        client.setPhone(this.phone);
+        client.setMobile(this.mobile);
+        client.setEmail(this.email);
+        client.setRemarks(this.remarks);
+
+        // Категории скидок
+        String clientCategories = "";
+        for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
+            if (categoryDiscount.getSelected())
+                clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
+            }
+        if (!clientCategories.isEmpty())
+            clientCategories = clientCategories.substring(0, clientCategories.length() - 1);
+        client.setCategoriesDiscounts(clientCategories);
+
+        persistenceSession.save(client);
     }
 
 }

@@ -82,13 +82,8 @@ public class ContractBuildPage extends BasicWorkspacePage implements OrgSelectPa
     }
 
     public void generateContractNumber() throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
-        } finally {
-            RuntimeContext.release(runtimeContext);
-        }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
     }
 
 }

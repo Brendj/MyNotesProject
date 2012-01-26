@@ -2340,7 +2340,6 @@ public class Processor implements SyncProcessor,
                 logger.error(String.format("Failed to send SMS to client: %s", client), e);
             }
         } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 
