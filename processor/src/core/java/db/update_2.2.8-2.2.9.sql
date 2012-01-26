@@ -55,6 +55,13 @@ INSERT INTO CF_Options(IdOfOption, OptionText)
 INSERT INTO CF_Options(IdOfOption, OptionText)
   VALUES(3, 0);
 
+-- Option "clean database" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(4, 0);
+
+-- Option "date for database cleaning (long)"
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(5, 0);
 
 CREATE TABLE CF_Settlements (
   IdOfSettlement         BIGINT         NOT NULL,

@@ -15,6 +15,13 @@
         <h:outputText escape="true" value="Отпралять СМС-уведомление о событиях входа-выхода" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
         <h:panelGroup>
+            <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.optionPage.cleanMenu}" styleClass="output-text" />
+            <h:outputText escape="true" value="до указанной даты" styleClass="output-text" />
+            <rich:calendar value="#{mainPage.optionPage.menuDateForDeletion}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        </h:panelGroup>
+        <h:panelGroup>
             <a4j:commandButton value="Сохранить" action="#{mainPage.saveOption}"
                                reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
                                styleClass="command-button" />

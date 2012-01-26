@@ -11,6 +11,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.Date;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -21,11 +23,14 @@ import org.hibernate.criterion.Restrictions;
 public class OptionPage extends BasicWorkspacePage {
 
     private Option withOperatorOption;
-    private Option notifyBySMSAboutEnterEventOption; 
+    private Option notifyBySMSAboutEnterEventOption;
+    private Option cleanMenuOption;
+    private Option menuDateForDeletionOption;
 
     private Boolean notifyBySMSAboutEnterEvent;
-
     private Boolean withOperator;
+    private Boolean cleanMenu;
+    private Date menuDateForDeletion;
 
     public Boolean getWithOperator() {
         return withOperator;
@@ -43,6 +48,22 @@ public class OptionPage extends BasicWorkspacePage {
         this.notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEvent;
     }
 
+    public Boolean getCleanMenu() {
+        return cleanMenu;
+    }
+
+    public void setCleanMenu(Boolean cleanMenu) {
+        this.cleanMenu = cleanMenu;
+    }
+
+    public Date getMenuDateForDeletion() {
+        return menuDateForDeletion;
+    }
+
+    public void setMenuDateForDeletion(Date menuDateForDeletion) {
+        this.menuDateForDeletion = menuDateForDeletion;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -56,17 +77,31 @@ public class OptionPage extends BasicWorkspacePage {
         criteria.add(Restrictions.eq("idOfOption", 3L));
         notifyBySMSAboutEnterEventOption = (Option)criteria.uniqueResult();
         notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
+        criteria = session.createCriteria(Option.class);
+        criteria.add(Restrictions.eq("idOfOption", 4L));
+        cleanMenuOption = (Option)criteria.uniqueResult();
+        cleanMenu = cleanMenuOption.getOptionText().equals("1");
+        criteria = session.createCriteria(Option.class);
+        criteria.add(Restrictions.eq("idOfOption", 5L));
+        menuDateForDeletionOption = (Option)criteria.uniqueResult();
+        menuDateForDeletion = new Date(Long.parseLong(menuDateForDeletionOption.getOptionText()));
     }
 
     public void save(Session session) {
         withOperatorOption.setOptionText(withOperator.equals(true) ? "1" : "0");
         notifyBySMSAboutEnterEventOption.setOptionText(notifyBySMSAboutEnterEvent.equals(true) ? "1" : "0");
+        cleanMenuOption.setOptionText(cleanMenu.equals(true) ? "1" : "0");
+        menuDateForDeletionOption.setOptionText(menuDateForDeletion.getTime() + "");        
         session.merge(withOperatorOption);
         session.merge(notifyBySMSAboutEnterEventOption);
+        session.merge(cleanMenuOption);
+        session.merge(menuDateForDeletionOption);
     }
 
     public void cancelOption() {
         withOperator = withOperatorOption.getOptionText().equals("1");
         notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
+        cleanMenu = cleanMenuOption.getOptionText().equals("1");
+        menuDateForDeletion = new Date(Long.parseLong(menuDateForDeletionOption.getOptionText()));
     }
 }
