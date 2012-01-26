@@ -1,5 +1,5 @@
--- ALTER TABLE CF_Orgs ADD COLUMN OGRN                    character varying(32);
--- ALTER TABLE CF_Orgs ADD COLUMN INN                     character varying(32);
+ALTER TABLE CF_Orgs ADD COLUMN OGRN                    character varying(32);
+ALTER TABLE CF_Orgs ADD COLUMN INN                     character varying(32);
 ALTER TABLE CF_Orgs ADD COLUMN  DefaultSupplier         BIGINT            NOT NULL default 1;
 ALTER TABLE CF_Orgs ADD CONSTRAINT CF_Orgs_DefaultSupplier_fk FOREIGN KEY (DefaultSupplier) REFERENCES CF_Contragents (IdOfContragent);
 
@@ -128,23 +128,3 @@ CREATE TABLE CF_DiscountRules (
  ALTER TABLE CF_EnterEvents ADD COLUMN DocSerialNum            varchar(45);
  ALTER TABLE CF_EnterEvents ADD COLUMN IssueDocDate            BIGINT;
  ALTER TABLE CF_EnterEvents ADD COLUMN VisitDateTime           BIGINT;
-
- CREATE TABLE cf_transaction_journal
-(
-  idoftransactionjournal bigint NOT NULL,
-  ogrn character varying(32),
-  systemcode character varying(10),
-  sycrodate bigint,
-  carttypename character varying(100),
-  cartidentityname character varying(20),
-  cartsnils character varying(15),
-  clienttype character varying(32),
-  entername character varying(100),
-  orderrsum character varying(100),
-  servicecode integer,
-  transactioncode integer,
-  carttype integer,
-  cardidentitycode integer,
-  contractid bigint,
-  CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idoftransactionjournal )
-)
