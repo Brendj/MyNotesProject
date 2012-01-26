@@ -2,11 +2,7 @@
     taglib prefix="f" uri="http://java.sun.com/jsf/core" %><%@
     taglib prefix="h" uri="http://java.sun.com/jsf/html" %><%@
     taglib prefix="rich" uri="http://richfaces.org/rich" %><%@
-    taglib prefix="a4j" uri="http://richfaces.org/a4j" %><%--
-  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%
+    taglib prefix="a4j" uri="http://richfaces.org/a4j" %><%
     response.setHeader("Content-disposition", "inline;filename=pay_complexes.csv");
 %><f:view>
     <h:outputText escape="false" value="Организация;Название;Цена за ед;Скидка на ед;Кол-во;Сумма без скидки;Сумма скидки;Итоговая сумма;Время первой продажи;Время последней продажи"/>
