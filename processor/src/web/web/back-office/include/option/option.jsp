@@ -21,6 +21,7 @@
             <rich:calendar value="#{mainPage.optionPage.menuDateForDeletion}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         </h:panelGroup>
+        <h:panelGroup/>
         <h:panelGroup>
             <a4j:commandButton value="Сохранить" action="#{mainPage.saveOption}"
                                reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
