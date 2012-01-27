@@ -6,26 +6,22 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.TransactionJournal" table="cf_transaction_journal" optimistic-lock="version">
-        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long">
-                <!--
-        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long">
-            <generator class="hilo">
-                <param name="table">hi_value</param>
-                <param name="column">next_value</param>
-                <param name="max_lo">100</param>
-            </generator>-->
-        </id>
+    <class name="ru.axetta.ecafe.processor.core.persistence.TransactionJournal" table="cf_transactionjournal">
+        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long"/>
+
+
         <property name="serviceCode" column="ServiceCode" type="string" length="15"/>
         <property name="transactionCode" column="TransactionCode" type="string" length="15"/>
         <property name="cartTypeName" column="CartTypeName" type="string" length="100"/>
-        <property name="cardIdentityCode" column="CardIdentityCode" type="integer"/>
+        <property name="cardIdentityCode" column="CardIdentityCode" type="long"/>
         <property name="contractId" column="ContractId" type="long"/>
         <property name="orderRSum" column="OrderRSum" type="long"/>
         <property name="clientSnilsSan" column="ClientSnilsSan" type="string" length="15"/>
         <property name="clientType" column="ClientType" type="string" length="32"/>
         <property name="enterName" column="EnterName" type="string" length="100"/>
-        <property name="OGRN" column="ORGN" type="string" length="32"/>
+        <property name="OGRN" column="OGRN" type="string" length="32"/>
+        <property name="sycroDate" column="SycroDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
         <!--clienttype
         <version name="version" column="Version" type="long"/>
         <property name="userName" column="UserName" type="string" length="64" unique="true" not-null="true"/>

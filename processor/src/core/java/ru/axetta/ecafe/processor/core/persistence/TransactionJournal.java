@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Date;
+import java.util.Random;
+
 /**
  * Created by IntelliJ IDEA.
  * User: damir
@@ -16,12 +19,12 @@ public class TransactionJournal {
     public static String[] CART_CODE={"MUID"};  //additionalDataCode
     public static String[] ADDITIONAL_DATA_CODE={"ISPP_ACCOUNT_NUMBER","ISPP_CLIENT_TYPE","ISPP_INPUT_GROUP"};
 
-    private static long key=20000;
+    private static long key= 1;
 
     private long idOfTransactionJournal;
     private String serviceCode;
     private String transactionCode;
-    private int cardIdentityCode;
+    private long cardIdentityCode;
     private long contractId;
     private String clientSnilsSan;
     private String enterName;
@@ -29,6 +32,15 @@ public class TransactionJournal {
     private String clientType;
     private String cartTypeName;
     private String OGRN;
+    private Date sycroDate;
+
+    public Date getSycroDate() {
+        return sycroDate;
+    }
+
+    public void setSycroDate(Date sycroDate) {
+        this.sycroDate = sycroDate;
+    }
 
     public String getOGRN() {
         return OGRN;
@@ -104,11 +116,11 @@ public class TransactionJournal {
     }
 
 
-    public int getCardIdentityCode() {
+    public long getCardIdentityCode() {
         return cardIdentityCode;
     }
 
-    public void setCardIdentityCode(int cardIdentityCode) {
+    public void setCardIdentityCode(long cardIdentityCode) {
         this.cardIdentityCode = cardIdentityCode;
     }
 
@@ -121,21 +133,14 @@ public class TransactionJournal {
     }
 
     public TransactionJournal() {
-        key++;
         this.idOfTransactionJournal=key;
-        this.serviceCode = "1";
-        this.transactionCode = "8";
-        this.cardIdentityCode = 1;
-        this.contractId = 12;
-        this.clientSnilsSan = "jjj";
-        this.enterName = "enterName";
-        this.orderRSum = 1212;
-        this.clientType = "clientType";
-        this.cartTypeName = "cartT";
+        key++;
     }
 
     @Override
     public String toString(){
-        return this.idOfTransactionJournal+" "+this.transactionCode+" "+this.cartTypeName;
+        return  this.OGRN+" "+this.transactionCode+" "+this.cartTypeName+
+                " "+this.cardIdentityCode+" "+this.contractId+" "+this.orderRSum+" "+
+                " "+this.clientSnilsSan+" "+this.enterName+" "+this.transactionCode;
     }
 }
