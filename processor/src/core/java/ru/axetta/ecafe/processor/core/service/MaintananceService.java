@@ -41,11 +41,12 @@ public class MaintananceService {
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
+            String report = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                DBCleaner.clean(persistenceSession);
+                report = DBCleaner.clean(persistenceSession, logger);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception e) {
@@ -54,7 +55,7 @@ public class MaintananceService {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
             }
-            logger.info("DB maintanance procedures finished successfully");
+            logger.info("DB maintanance procedures finished successfully. " + report);
         //}
     }
 }
