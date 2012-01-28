@@ -4,17 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.cleaner;
 
-import ru.axetta.ecafe.processor.core.persistence.Menu;
-import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
-import ru.axetta.ecafe.processor.core.persistence.MenuExchange;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,7 +28,7 @@ public class DBCleaner {
     private static Boolean cleanMenu;
     private static Date menuDateForDeletion;
 
-    public static void clean(Session session) throws Exception {
+    public static String clean(Session session, Logger logger) throws Exception {
         Criteria optCriteria = session.createCriteria(Option.class);
         optCriteria.add(Restrictions.eq("idOfOption", 4L));
         cleanMenuOption = (Option) optCriteria.uniqueResult();
@@ -40,23 +38,30 @@ public class DBCleaner {
         menuDateForDeletionOption = (Option)optCriteria.uniqueResult();
         menuDateForDeletion = new Date(Long.parseLong(menuDateForDeletionOption.getOptionText()));
 
+        int menuDeletedCount = 0;
+        int menuDetailDeletedCount = 0;
+        int menuExchangeDeletedCount = 0;
+
         if (cleanMenu) {
-            Criteria menuCriteria = session.createCriteria(Menu.class);
-            menuCriteria.add(Restrictions.lt("menuDate", menuDateForDeletion));
-            List<Menu> menuList = menuCriteria.list();
-            for (Menu menu : menuList) {
-                Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
-                menuDetailCriteria.add(Restrictions.eq("menu", menu));
-                List<MenuDetail> menuDetailList = menuDetailCriteria.list();                    
-                for (MenuDetail menuDetail : menuDetailList)
-                    session.delete(menuDetail);
-                session.delete(menu);
-            }
-            Criteria menuExchangeCriteria = session.createCriteria(MenuExchange.class);
-            menuExchangeCriteria.add(Restrictions.lt("compositeIdOfMenuExchange.menuDate", menuDateForDeletion));
-            List<MenuExchange> menuExchangeList = menuExchangeCriteria.list();
-            for (MenuExchange menuExchange : menuExchangeList)
-                session.delete(menuExchange);
+            logger.info("Cleaning menu details...");
+            SQLQuery query = session.createSQLQuery("delete from CF_MenuDetails md where md.IdOfMenu in (select m.IdOfMenu from CF_Menu m where m.MenuDate < :date)");
+            query.setLong("date", menuDateForDeletion.getTime());
+            menuDetailDeletedCount = query.executeUpdate();
+
+            logger.info("Cleaning menu...");
+            query = session.createSQLQuery("delete from CF_Menu m where m.MenuDate < :date");
+            query.setLong("date", menuDateForDeletion.getTime());
+            menuDeletedCount = query.executeUpdate();
+
+            logger.info("Cleaning menu exchange...");
+            query = session.createSQLQuery("delete from CF_MenuExchange me where me.MenuDate < :date");
+            query.setLong("date", menuDateForDeletion.getTime());
+            menuExchangeDeletedCount = query.executeUpdate();
+
         }
+
+        return ("Menu up data - " + menuDateForDeletion + ", deleted records count: menu - " + menuDeletedCount +
+                ", menu detail - " + menuDetailDeletedCount
+                + ", menu exchange - " + menuExchangeDeletedCount);
     }
 }
