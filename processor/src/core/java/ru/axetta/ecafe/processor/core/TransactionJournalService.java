@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 
-import org.hibernate.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -58,6 +57,9 @@ public class TransactionJournalService {
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             transactClient();
             writeTransactionJournal();
+
+
+
             transactionManager.commit(trx);
         } catch (Throwable e) {
             logger.error("Failed to save journal events to db", e);
@@ -78,7 +80,7 @@ public class TransactionJournalService {
     @Transactional
     public void transactClient() throws Exception{
         try {
-           this.clients = entityManager.createQuery("select c from Client c where c.org.idOfOrg=2").setMaxResults(5).getResultList();
+           this.clients = entityManager.createQuery("select c from Client c where c.org.idOfOrg=2").getResultList();
             logger.info(String.valueOf(this.clients.size()));
         } catch (Exception e) {
             logger.error("Failed to save journal events to db", e);
@@ -86,16 +88,21 @@ public class TransactionJournalService {
         }
     }
 
-    private void createTJClient(){
+    private void createTJClient() throws Exception{
         if(null != this.clients){
             for(Client client: clients){
                 if(null != client.getEnterEvents()){
-                    List<EnterEvent> enterEventList = entityManager.createQuery("select e from EnterEvent e where e.client.idOfClient="+client.getIdOfClient()).getResultList();
-                    logger.info(String.valueOf(enterEventList.size()));
+                    List<EnterEvent> enterEventList =new ArrayList<EnterEvent>(client.getEnterEvents());
                     for (EnterEvent enterEvent: enterEventList){
                         TransactionJournal transactionJournal = new TransactionJournal();
-                        transactionJournal.setClientSnilsSan(client.getSan());
+                        //OGRN
                         transactionJournal.setOGRN(client.getOrg().getOGRN());
+                        //transactionSystemCode
+                        transactionJournal.setTransactionCode("ISPP");
+                        //transactionIdDescription
+                        Date currentTime = new Date();
+                        transactionJournal.setSycroDate(currentTime);
+                        //transactionTypeDescription
                         transactionJournal.setServiceCode("SCHL_ACC");
                         String passdirection;
                         switch (enterEvent.getPassDirection()){
@@ -104,21 +111,58 @@ public class TransactionJournalService {
                             default: passdirection="ERROR";
                         }
                         transactionJournal.setTransactionCode(passdirection);
+                        //holderDescription
+                        List<Card> cardList =new ArrayList<Card>(client.getCards());
+                        if(!cardList.isEmpty()){
+                            Card card=cardList.get(0);
+                            transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+                            transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+                            transactionJournal.setCardIdentityCode(card.getCardNo());
+                        }
+                        //snils
+                        transactionJournal.setClientSnilsSan(client.getSan());
+                        //additionalInfo
+                        //ISPP_ACCOUNT_NUMBER
+                        transactionJournal.setContractId(client.getContractId());
+                        //ISPP_CLIENT_TYPE
+                        transactionJournal.setClientType(client.getClientGroup().getGroupName());
+                        //ISPP_INPUT_GROUP
                         transactionJournal.setEnterName(enterEvent.getEnterName());
-                        Date currentTime = new Date();
-                        transactionJournal.setSycroDate(currentTime);
                         entityManager.persist(transactionJournal);
                     }
-
                 }
                 if(null != client.getOrders()){
-                    TransactionJournal transactionJournal = new TransactionJournal();
-                    transactionJournal.setClientSnilsSan(client.getSan());
-                    transactionJournal.setOGRN(client.getOrg().getOGRN());
-                    transactionJournal.setServiceCode("SCHL_FD");
-                    Date currentTime = new Date();
-                    transactionJournal.setSycroDate(currentTime);
-                    entityManager.persist(transactionJournal);
+                    List<Order> orderList =new ArrayList<Order>(client.getOrders());
+                    for (Order order: orderList){
+                        TransactionJournal transactionJournal = new TransactionJournal();
+                        //OGRN
+                        transactionJournal.setOGRN(client.getOrg().getOGRN());
+                        //transactionSystemCode
+                        transactionJournal.setTransactionCode("ISPP");
+                        //transactionIdDescription
+                        Date currentTime = new Date();
+                        transactionJournal.setSycroDate(currentTime);
+                        //transactionTypeDescription
+                        transactionJournal.setServiceCode("SCHL_FD");
+
+                        //holderDescription
+                        List<Card> cardList =new ArrayList<Card>(client.getCards());
+                        if(!cardList.isEmpty()){
+                            Card card=cardList.get(0);
+                            transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+                            transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+                            transactionJournal.setCardIdentityCode(card.getCardNo());
+                        }
+                        //snils
+                        transactionJournal.setClientSnilsSan(client.getSan());
+                        //accountingDescription
+                        transactionJournal.setOrderRSum(order.getRSum());
+                        transactionJournal.setContractId(client.getContractId());
+
+                        //transactionJournal.getClientType(client.getClientGroup());
+
+                        entityManager.persist(transactionJournal);
+                    }
                 }
             }
         }
