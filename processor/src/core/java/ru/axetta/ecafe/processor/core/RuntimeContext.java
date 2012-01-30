@@ -419,6 +419,8 @@ public class RuntimeContext implements ApplicationContextAware {
             //persistenceTransaction = persistenceSession.beginTransaction();
             // check DB version
             currentSchemaVersionInfo = getAppContext().getBean(DBUpdater.class).checkDbVersion();
+            //
+            loadOptionValues();
             // Check for Operator, Budget, Client type of contragents existence
             boolean operatorExists = false;
             boolean budgetExists = false;
@@ -895,4 +897,46 @@ public class RuntimeContext implements ApplicationContextAware {
     public int getPropertiesValue(String name, int defaultValue) {
         return Integer.parseInt(configProperties.getProperty(name, ""+defaultValue));
     }
+
+    HashMap<Integer, String> optionsValues;
+
+    public void loadOptionValues() {
+        optionsValues = new HashMap<Integer, String>();
+        for (int nOption=2;nOption<=Option.OPTION_MAX;nOption++) {
+            String v = DAOUtils.getOptionValue(em, nOption, Option.getDefaultValue(nOption));
+            optionsValues.put(nOption, v);
+        }
+    }
+
+    public boolean getOptionValueBool(int optionId) {
+        return getOptionValueString(optionId).equals("1");
+    }
+
+    public int getOptionValueInt(int optionId) {
+        return Integer.parseInt(getOptionValueString(optionId));
+    }
+
+    public String getOptionValueString(int optionId) {
+        return optionsValues.get(optionId);
+    }
+
+    public void setOptionValue(int optionId, String value) {
+        optionsValues.put(optionId, value);
+    }
+    public void setOptionValue(int optionId, Boolean value) {
+        setOptionValue(optionId, value?"1":"0");
+    }
+    public void setOptionValue(int optionId, int value) {
+        setOptionValue(optionId, value+"");
+    }
+
+    @Transactional
+    public void saveOptionValues() {
+        for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
+            Option o = new Option((long)e.getKey(), e.getValue());
+            o = em.merge(o);
+            em.persist(o);
+        }
+    }
 }
+

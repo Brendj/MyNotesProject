@@ -11,6 +11,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +24,7 @@ import java.util.concurrent.ExecutorService;
  * Time: 15:41:07
  * To change this template use File | Settings | File Templates.
  */
+
 public class ClientSmsDeliveryStatusUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientSmsDeliveryStatusUpdater.class);
@@ -54,6 +57,9 @@ public class ClientSmsDeliveryStatusUpdater {
         Trigger trigger = TriggerUtils.makeSecondlyTrigger(period);
         trigger.setName(jobClass.getCanonicalName());
         trigger.setStartTime(new Date());
+        if (scheduler.getTrigger(jobClass.getCanonicalName(), Scheduler.DEFAULT_GROUP)!=null) {
+            scheduler.deleteJob(jobClass.getCanonicalName(), Scheduler.DEFAULT_GROUP);
+        }
         scheduler.scheduleJob(jobDetail, trigger);
     }
 

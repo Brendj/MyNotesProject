@@ -398,4 +398,14 @@ public class DAOUtils {
         if (l.size()==0) return null;
         return (CategoryDiscount)l.get(0);
     }
+
+    public static String getOptionValue(EntityManager em, long nOption, String defaultValue) {
+        javax.persistence.Query q = em.createQuery("from Option where idOfOption=:nOption");
+        q.setParameter("nOption", nOption);
+        List l = q.getResultList();
+        String v;
+        if (l.size()==0) v = defaultValue;
+        else v=((Option)l.get(0)).getOptionText();
+        return v;
+    }
 }

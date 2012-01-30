@@ -479,9 +479,8 @@ public class AutoReportGenerator {
         trigger.setStartTime(new Date());
         if (this.scheduler.getTrigger(jobName, Scheduler.DEFAULT_GROUP)!=null) {
             this.scheduler.deleteJob(jobName, Scheduler.DEFAULT_GROUP);
-        } else {
-            this.scheduler.scheduleJob(jobDetail, trigger);
         }
+        this.scheduler.scheduleJob(jobDetail, trigger);
     }
 
     private void cancelScheduledJob(String jobName) throws Exception {

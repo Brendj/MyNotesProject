@@ -12,6 +12,21 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public class Option {
+    public final static int OPTION_WITH_OPERATOR=2,
+            OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3, OPTION_CLEAN_MENU=4,
+            OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_MAX=5;
+
+    public static String getDefaultValue(int nOption) {
+        switch (nOption) {
+            case OPTION_WITH_OPERATOR: return "0";
+            case OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT: return "0";
+            case OPTION_CLEAN_MENU: return "1";
+            case OPTION_MENU_DAYS_FOR_DELETION: return "30";
+        }
+        return null;
+    }
+
+
     private Long idOfOption;
     private String optionText;
 
@@ -67,4 +82,5 @@ public class Option {
     public String toString() {
         return "Option{" + "idOfOption=" + idOfOption + ", optionText='" + optionText + '\'' + '}';
     }
+
 }
