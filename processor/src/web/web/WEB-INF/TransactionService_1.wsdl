@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. --><!-- edited with XMLSpy v2011 rel. 3 (http://www.altova.com) by Ildar Muhhamedjanov (Remarc Systems OÜ) --><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://schemas.msk.ru/uec/TransactionSynchronization/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:uec-trn="http://schemas.msk.ru/uec/transaction/v1" xmlns:uec-id="http://schemas.msk.ru/uec/identification/v1" xmlns:uec-cmn="http://schemas.msk.ru/uec/common/v1" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://schemas.msk.ru/uec/TransactionSynchronization/messages/v1">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://schemas.msk.ru/uec/TransactionSynchronization/schema/v1">
+			<xsd:import namespace="http://schemas.msk.ru/uec/TransactionSynchronization/v1" schemaLocation="TransactionService_6.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="getTransactionsRequest">
+		<wsdl:part name="parameters" element="tns:getTransactionsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getTransactionsResponse">
+		<wsdl:part name="transactionList" element="tns:getTransactionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="storeTransactionsRequest">
+		<wsdl:part name="parameters" element="tns:storeTransactionsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="storeTransactionsResponse">
+		<wsdl:part name="errors" element="tns:storeTransactionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="storeTagsRequest">
+		<wsdl:part name="parameter" element="tns:storeTagsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="storeTagsResponse">
+		<wsdl:part name="parameter" element="tns:storeTagsResponse"/>
+	</wsdl:message>
+</wsdl:definitions>

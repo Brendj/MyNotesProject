@@ -1,0 +1,662 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. --><!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by Alexander (BSS) --><xsd:schema xmlns:tns="http://schemas.msk.ru/uec/TransactionService/v1" xmlns:uec-cmn="http://schemas.msk.ru/uec/common/v1" xmlns:uec-id="http://schemas.msk.ru/uec/identification/v1" xmlns:uec-trn="http://schemas.msk.ru/uec/transaction/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.msk.ru/uec/TransactionService/v1" elementFormDefault="qualified">
+	<xsd:import namespace="http://schemas.msk.ru/uec/transaction/v1" schemaLocation="TransactionService_7.xsd"/>
+	<xsd:import namespace="http://schemas.msk.ru/uec/identification/v1" schemaLocation="TransactionService_4.xsd"/>
+	<xsd:import namespace="http://schemas.msk.ru/uec/common/v1" schemaLocation="TransactionService_3.xsd"/>
+	<xsd:element name="getPersonTransactionsRequest">
+		<xsd:annotation>
+			<xsd:documentation>Получение транзакций</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="holderDescription" type="uec-id:HolderIdDescriptionType">
+					<xsd:annotation>
+						<xsd:documentation>Идентификация держателя карты</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="transactionSourceDescription" type="uec-trn:TransactionSourceDescriptionType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Идентификация источника транзакции</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="transactionIdDescription" type="uec-trn:TransactionIdDescriptionType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Идентификация операции</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="transactionTypeDescription" type="uec-trn:TransactionTypeDescriptionType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Идентификация типа транзакции</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="dateFrom" type="xsd:dateTime">
+					<xsd:annotation>
+						<xsd:documentation>дата начала периода</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="dateTo" type="xsd:dateTime">
+					<xsd:annotation>
+						<xsd:documentation>конец периода</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="block" type="uec-trn:TransactionBlockType">
+					<xsd:annotation>
+						<xsd:documentation>последовательный номер блока</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="getPersonTransactionsResponse" type="uec-trn:TransactionListType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ - список транзакций</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="getSimpleReferenceRequest">
+		<xsd:annotation>
+			<xsd:documentation>Получить простой справочник</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="referenceCode">
+					<xsd:annotation>
+						<xsd:documentation>Код справочника</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="32"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="getSimpleReferenceResponse" type="uec-cmn:SimpleReferenceType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ - простой справочник</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="storeNotificationSubscribersRequest" type="tns:SubscribtionListType">
+		<xsd:annotation>
+			<xsd:documentation>Запрос на сохранение списков рассылки</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="storeNotificationSubscribersResponse" type="uec-trn:ErrorListType">
+		<xsd:annotation>
+			<xsd:documentation>Результат сохранения списков рассылки</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="getBillsRequest" type="tns:getBillsRequestType">
+		<xsd:annotation>
+			<xsd:documentation>Запрос на получение тарификационных расчетов</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="getBillsResponse" type="tns:getBillsResponseType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ на получение тарификационных расчетов</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="getBillsRequestType">
+		<xsd:annotation>
+			<xsd:documentation>Тип запроса по тарификационным расчетов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="dateFrom" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Дата начала периода</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dateTo" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Дата конца периода</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="block" type="uec-trn:TransactionBlockType">
+				<xsd:annotation>
+					<xsd:documentation>Последовательный номер блока</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="service" type="uec-trn:TransactionTypeDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="holderIdDescription" type="uec-id:HolderIdDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация держателя карты</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="serviceProvider" type="tns:ServiceProviderType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="transactionIdDescription" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация транзакции</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="transactionId" type="uec-trn:TransactionIdDescriptionType">
+							<xsd:annotation>
+								<xsd:documentation>Идентификация транзакции</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="system" type="tns:SystemType">
+							<xsd:annotation>
+								<xsd:documentation>Идентификация системы оказания услуг</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="serviceCustomer" type="tns:CustomerDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация заказчика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="getBillsResponseType">
+		<xsd:annotation>
+			<xsd:documentation>Тип для ответа по тарификационным расчетов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="billsList" type="tns:BillListType" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Массив тарификационных расчетов</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BillType">
+		<xsd:annotation>
+			<xsd:documentation>Тип для описания тарификационного расчета</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="transactionDescription" type="uec-trn:TransactionDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Описание транзакции</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="calcDate" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Дата рассчета</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:decimal">
+				<xsd:annotation>
+					<xsd:documentation>Сумма тарификационного расчета</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="customerDescription" type="tns:CustomerDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Описание заказчика услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="serviceProvider" type="tns:ServiceProviderType">
+				<xsd:annotation>
+					<xsd:documentation>Поставщик услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BillListType">
+		<xsd:annotation>
+			<xsd:documentation>Список тарификационных расчетов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="bill" type="tns:BillType" minOccurs="0" maxOccurs="100"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SubscribtionListType">
+		<xsd:annotation>
+			<xsd:documentation>Список рассылок</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="subscription" type="tns:SubscriptionType" minOccurs="0" maxOccurs="100"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SubscriptionType">
+		<xsd:annotation>
+			<xsd:documentation>Сведения о рассылке</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="systemCode">
+				<xsd:annotation>
+					<xsd:documentation>Код системы оказания услуги, реестр</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="host">
+				<xsd:annotation>
+					<xsd:documentation>Название хоста</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="port">
+				<xsd:annotation>
+					<xsd:documentation>Номер порта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:long"/>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="uri">
+				<xsd:annotation>
+					<xsd:documentation>URI сервиса</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="512"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="protocol">
+				<xsd:annotation>
+					<xsd:documentation>Протокол</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="6"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:element name="storeTariffsRequest">
+		<xsd:annotation>
+			<xsd:documentation>Запрос на сохранение тарифов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="systemCode">
+					<xsd:annotation>
+						<xsd:documentation>Код системы оказания услуги, реестр</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="32"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="tariffList" type="tns:TariffListType">
+					<xsd:annotation>
+						<xsd:documentation>Список тарифов</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="storeTariffsResponse" type="uec-trn:ErrorListType">
+		<xsd:annotation>
+			<xsd:documentation>Результат сохранения тарифов</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TariffListType">
+		<xsd:annotation>
+			<xsd:documentation>Список тарифов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="tariff" type="tns:TariffType" maxOccurs="100"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TariffType">
+		<xsd:annotation>
+			<xsd:documentation>Сведения о тарифе</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name">
+				<xsd:annotation>
+					<xsd:documentation>Наименование тарифа</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="code">
+				<xsd:annotation>
+					<xsd:documentation>Код тарифа</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="30"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="modelCalculation">
+				<xsd:annotation>
+					<xsd:documentation>Модель подсчета</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="validFrom" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Дата начала действия тарифа</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="validTo" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата окончания действия тарифа</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="service" type="uec-trn:TransactionTypeDescriptionType">
+				<xsd:annotation>
+					<xsd:documentation>Идентификация услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="tariffByFixedValue" type="tns:TariffByFixedValueType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Тарификация по факту пользования услугой</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="tariffByVolumes" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Тарификация за объёмы</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="tariffByVolumeItem" type="tns:TariffByVolumeType" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Запись тарификации за объем</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="tariffByPeriods" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Периодические выплаты фиксированных сумм</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="tariffByPeriodItem" type="tns:TariffByPeriodType" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="tariffBindings" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Привязки тарифных планов</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="tariffBindingsItem" type="tns:TariffBindingsItemType" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Тарифный план</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TariffByPeriodType">
+		<xsd:annotation>
+			<xsd:documentation>Периодические выплаты фиксированных сумм</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="periodCode">
+				<xsd:annotation>
+					<xsd:documentation>Код периода</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:decimal">
+				<xsd:annotation>
+					<xsd:documentation>Тарифная ставка</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="TariffByFixedValueType">
+		<xsd:annotation>
+			<xsd:documentation>Тариф по факту пользования услугой</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="value" type="xsd:decimal">
+				<xsd:annotation>
+					<xsd:documentation>Тарифная ставка по факту пользования услугой</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="TariffByVolumeType">
+		<xsd:annotation>
+			<xsd:documentation>Тарификация за объём</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="amountFrom" type="xsd:decimal">
+				<xsd:annotation>
+					<xsd:documentation>Начало интервала тарифицируемого объема</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="amountTo" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Конец интервала тарифицируемого объема</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:decimal">
+				<xsd:annotation>
+					<xsd:documentation>Тарифная ставка</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="resourceCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код единицы измерения ресурса</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="timeTarificationInterval" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Временной интервал тарификации</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="startTime" type="xsd:time">
+							<xsd:annotation>
+								<xsd:documentation>Время начала пользования услугой</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="endTime" type="xsd:time">
+							<xsd:annotation>
+								<xsd:documentation>Время завершения пользования услугой</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="ServiceProviderType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация поставщика услуги</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="legalId" type="uec-id:LegalIdDescriptionType">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор поставщика услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="organizationType" type="uec-id:OrganizationType">
+				<xsd:annotation>
+					<xsd:documentation>Тип организации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="ServiceCustomerType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация заказчика услуги</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="legalId" type="uec-id:LegalIdDescriptionType">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор заказчика услуги</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="organizationType" type="uec-id:OrganizationType">
+				<xsd:annotation>
+					<xsd:documentation>Тип организации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="TariffBindingsItemType">
+		<xsd:annotation>
+			<xsd:documentation>Тарифный план</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="serviceProvider" type="tns:ServiceProviderType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Поставщик услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="serviceCustomer" type="tns:CustomerDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Заказчик услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="spType" type="uec-id:OrganizationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Тип поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="scType" type="uec-id:OrganizationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Тип заказчика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="spShare" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Доля участия поставщика услуг во взаиморасчетах</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="scShare" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Доля участия заказчика услуг во взаиморасчетах</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="spWeight" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Весовой коэффициент доли поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="scWeight" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Весовой коэффициент доли заказчика услуг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="snils" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>СНИЛС держателя</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="metaData" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Мета данные</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="metaDataItem" type="tns:TariffBindingsMetaDataItemType" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Запись мета данных</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TariffBindingsMetaDataItemType">
+		<xsd:annotation>
+			<xsd:documentation>Мета данные</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="name">
+				<xsd:annotation>
+					<xsd:documentation>Наименование параметра</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="value">
+				<xsd:annotation>
+					<xsd:documentation>Значение параметра</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1024"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="SystemType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация системы оказания услуг</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="transactionSystemCode">
+				<xsd:annotation>
+					<xsd:documentation>Код системы оказания услуги, реестр</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="transactionSystemName">
+				<xsd:annotation>
+					<xsd:documentation>Наименование  системы оказания услуги</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="CustomerDescriptionType">
+		<xsd:annotation>
+			<xsd:documentation>Описание заказчика услуги</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="organizationCustomer" type="tns:ServiceCustomerType">
+				<xsd:annotation>
+					<xsd:documentation>Организация заказчик</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="personCustomer" type="uec-id:HolderIdDescriptionType">
+				<xsd:annotation>
+					<xsd:documentation>Заказчик держатель карты</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:complexType>
+</xsd:schema>

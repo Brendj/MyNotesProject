@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. -->
+<!-- edited with XMLSpy v2011 rel. 3 (http://www.altova.com) by Ildar Muhhamedjanov (Remarc Systems OÜ) -->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://schemas.msk.ru/uec/TransactionService/v1"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+                  xmlns:uec-id="http://schemas.msk.ru/uec/identification/v1"
+                  xmlns:uec-trn-sync="http://schemas.msk.ru/uec/TransactionSynchronization/messages/v1"
+                  xmlns:uec-cmn="http://schemas.msk.ru/uec/common/v1"
+                  xmlns:uec-trn="http://schemas.msk.ru/uec/transaction/v1"
+                  xmlns:pc="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03"
+                  xmlns:pd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02"
+                  xmlns:ns="http://schemas.msk.ru/uec/TransactionSynchronization/v1"
+                  xmlns:ncc="http://schemas.msk.ru/uec/TransactionService/schema/v1"
+                  targetNamespace="http://schemas.msk.ru/uec/TransactionService/v1">
+	<wsdl:import namespace="http://schemas.msk.ru/uec/TransactionSynchronization/messages/v1"
+                 location="TransactionService_1.wsdl"/>
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://schemas.msk.ru/uec/TransactionService/schema/v1">
+			<xsd:import namespace="http://schemas.msk.ru/uec/TransactionService/v1"
+                        schemaLocation="TransactionService_5.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="requester">
+		<wsdl:part name="requester" element="uec-id:requester"/>
+	</wsdl:message>
+	<wsdl:message name="getPersonTransactionsRequest">
+		<wsdl:part name="parameters" element="tns:getPersonTransactionsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getPersonTransactionsResponse">
+		<wsdl:part name="transactionList" element="tns:getPersonTransactionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="getSimpleReferenceRequest">
+		<wsdl:part name="parameter" element="tns:getSimpleReferenceRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getSimpleReferenceResponse">
+		<wsdl:part name="references" element="tns:getSimpleReferenceResponse"/>
+	</wsdl:message>
+	<wsdl:message name="storeNotificationSubscribersRequest">
+		<wsdl:part name="parameters" element="tns:storeNotificationSubscribersRequest"/>
+	</wsdl:message>
+	<wsdl:message name="storeNotificationSubscribersResponse">
+		<wsdl:part name="errors" element="tns:storeNotificationSubscribersResponse"/>
+	</wsdl:message>
+	<wsdl:message name="storeTariffsRequest">
+		<wsdl:part name="storeTariffsRequest" element="tns:storeTariffsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="storeTariffsResponse">
+		<wsdl:part name="errors" element="tns:storeTariffsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="getBillsRequest">
+		<wsdl:part name="parameters" element="tns:getBillsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getBillsResponse">
+		<wsdl:part name="billsList" element="tns:getBillsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="faultResponse">
+		<wsdl:part name="fault" element="uec-cmn:fault"/>
+	</wsdl:message>
+	<wsdl:portType name="TransactionServicePortType">
+		<wsdl:operation name="getTransactions">
+			<wsdl:documentation>Получение транзакций</wsdl:documentation>
+			<wsdl:input message="uec-trn-sync:getTransactionsRequest"/>
+			<wsdl:output message="uec-trn-sync:getTransactionsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="storeTransactions">
+			<wsdl:documentation>Сброс транзакций</wsdl:documentation>
+			<wsdl:input message="uec-trn-sync:storeTransactionsRequest"/>
+			<wsdl:output message="uec-trn-sync:storeTransactionsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="storeTags">
+			<wsdl:documentation>Изменение тэгов транзакции</wsdl:documentation>
+			<wsdl:input message="uec-trn-sync:storeTagsRequest"/>
+			<wsdl:output message="uec-trn-sync:storeTagsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getPersonTransactions">
+			<wsdl:documentation>Получение транзакций по персоне</wsdl:documentation>
+			<wsdl:input message="tns:getPersonTransactionsRequest"/>
+			<wsdl:output message="tns:getPersonTransactionsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="storeNotificationSubscribers">
+			<wsdl:documentation>Запрос на сохранение списков рассылки</wsdl:documentation>
+			<wsdl:input message="tns:storeNotificationSubscribersRequest"/>
+			<wsdl:output message="tns:storeNotificationSubscribersResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="storeTariffs">
+			<wsdl:documentation>Запрос на сохранение тарифов</wsdl:documentation>
+			<wsdl:input message="tns:storeTariffsRequest"/>
+			<wsdl:output message="tns:storeTariffsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getBills">
+			<wsdl:documentation>Запрос на получение тарификационных расчетов</wsdl:documentation>
+			<wsdl:input message="tns:getBillsRequest"/>
+			<wsdl:output message="tns:getBillsResponse"/>
+			<wsdl:fault name="fault" message="tns:faultResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="TransactionBinding" type="tns:TransactionServicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="getTransactions">
+			<soap:operation soapAction="urn:getTransactions" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="storeTransactions">
+			<soap:operation soapAction="urn:storeTransactions" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="getPersonTransactions">
+			<soap:operation soapAction="urn:getPersonTransactions" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="storeTags">
+			<soap:operation soapAction="urn:storeTags" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="storeNotificationSubscribers">
+			<soap:operation soapAction="urn:storeNotificationSubscribers" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="storeTariffs">
+			<soap:operation soapAction="urn:storeTariffs" style="document"/>
+			<wsdl:input>
+				<soap:header message="tns:requester" part="requester" use="literal"/>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="getBills">
+			<soap:operation soapAction="urn:getBills" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+			<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="TransactionService">
+		<wsdl:port name="TransactionServicePort" binding="tns:TransactionBinding">
+			<soap:address location="http://193.47.154.34:7002/uec-service-war/TransactionService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

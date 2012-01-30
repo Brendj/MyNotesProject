@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. -->
+<!-- edited with XMLSpy v2011 rel. 3 (http://www.altova.com) by Ildar Muhhamedjanov (Remarc Systems OÜ) -->
+<xsd:schema xmlns:tns="http://schemas.msk.ru/uec/TransactionSynchronization/v1"
+            xmlns:uec-cmn="http://schemas.msk.ru/uec/common/v1"
+            xmlns:uec-id="http://schemas.msk.ru/uec/identification/v1"
+            xmlns:uec-trn="http://schemas.msk.ru/uec/transaction/v1"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://schemas.msk.ru/uec/TransactionSynchronization/v1"
+            elementFormDefault="qualified">
+	<xsd:import namespace="http://schemas.msk.ru/uec/transaction/v1" schemaLocation="TransactionService_7.xsd"/>
+	<xsd:import namespace="http://schemas.msk.ru/uec/identification/v1" schemaLocation="TransactionService_4.xsd"/>
+	<xsd:import namespace="http://schemas.msk.ru/uec/common/v1" schemaLocation="TransactionService_3.xsd"/>
+	<xsd:element name="getTransactionsRequest">
+		<xsd:annotation>
+			<xsd:documentation>Получение транзакций</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="transactionTypeDescription" type="uec-trn:TransactionTypeDescriptionType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Идентификация типа транзакции</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="dateFrom" type="xsd:dateTime">
+					<xsd:annotation>
+						<xsd:documentation>дата начала периода</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="dateTo" type="xsd:dateTime">
+					<xsd:annotation>
+						<xsd:documentation>конец периода</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="block" type="uec-trn:TransactionBlockType"/>
+				<xsd:element name="transactionTypes" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Дополнительный фильтр по типам транзакций</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="includeTransactionTypes" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Искать с этими типами транзакций</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="transactionType" type="uec-trn:TransactionTypeDescriptionType" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Тип транзакции</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="excludeTransactionTypes" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Искать без этих типов транзакций</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="transactionType" type="uec-trn:TransactionTypeDescriptionType" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Тип транзакции</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="tags" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Дополнительный фильтр по тэгам транзакции</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="includeTags" type="uec-trn:TagType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Искать с этими тэгами </xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="excludeTags" type="uec-trn:TagType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Искать без этих тэгов</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="getTransactionsResponse" type="uec-trn:TransactionListType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ - список транзакций</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="storeTagsRequest">
+		<xsd:annotation>
+			<xsd:documentation>Добавление информационного тэга к транзакции</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="addTag" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>Тэги для добавления</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="transactionSourceDescription" type="uec-trn:TransactionSourceDescriptionType">
+								<xsd:annotation>
+									<xsd:documentation>Идентификация источника транзакции</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="transactionIdDescription" type="uec-trn:TransactionIdDescriptionType">
+								<xsd:annotation>
+									<xsd:documentation>Идентификация транзакции</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="tags" type="uec-trn:TagType">
+								<xsd:annotation>
+									<xsd:documentation>Список тэгов</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="removeTag" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>Тэги для удаления</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="transactionSourceDescription" type="uec-trn:TransactionSourceDescriptionType">
+								<xsd:annotation>
+									<xsd:documentation>Идентификация источника транзакции</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="transactionIdDescription" type="uec-trn:TransactionIdDescriptionType">
+								<xsd:annotation>
+									<xsd:documentation>Идентификация транзакции</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="tags" type="uec-trn:TagType">
+								<xsd:annotation>
+									<xsd:documentation>Список тэгов</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="storeTagsResponse" type="uec-trn:ErrorListType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ - список ответов, ответ на каждую операцию addTag</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="storeTransactionsRequest" type="uec-trn:TransactionListType">
+		<xsd:annotation>
+			<xsd:documentation>Сброс транзакций - список транзакций, блок размером 100 транзакций</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="storeTransactionsResponse" type="uec-trn:ErrorListType">
+		<xsd:annotation>
+			<xsd:documentation>Ответ - список ответов, ответ на каждую транзакцию</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

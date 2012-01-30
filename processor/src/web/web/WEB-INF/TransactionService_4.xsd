@@ -1,0 +1,1228 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. -->
+<!-- edited with XMLSpy v2011 rel. 3 (http://www.altova.com) by Ildar Muhhamedjanov (Remarc Systems OÜ) -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:uec-id="http://schemas.msk.ru/uec/identification/v1"
+            targetNamespace="http://schemas.msk.ru/uec/identification/v1" elementFormDefault="qualified">
+	<xsd:complexType name="LegalIdDescriptionType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация юридического лица</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="idCodeType">
+				<xsd:annotation>
+					<xsd:documentation>Тип кода идентификатора</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+						<xsd:enumeration value="OGRN">
+							<xsd:annotation>
+								<xsd:documentation>ОГРН юридического лица</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="INN">
+							<xsd:annotation>
+								<xsd:documentation>ИНН юридического лица</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="INTERNAL"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="idCode">
+				<xsd:annotation>
+					<xsd:documentation>Код госрегистрации юридического лица - ОГРН , ОГРНИП или внутренний код</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="legalName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование юридического лица</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="distinguishedName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Уникальное имя в каталоге LDAP </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="512"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="CardIdType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация карты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="cardTypeCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код типа карты (УЭК, СКМ, временная, иное)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+						<xsd:enumeration value="UEC">
+							<xsd:annotation>
+								<xsd:documentation>Универсальная Электронная Карта</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MSC">
+							<xsd:annotation>
+								<xsd:documentation>Московская социальная карта</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="TEMP">
+							<xsd:annotation>
+								<xsd:documentation>Временная</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="OTHER">
+							<xsd:annotation>
+								<xsd:documentation>Другого типа</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardTypeName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование типа карты (УЭК, СКМ, временная, иное)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardIdentityCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код используемого идентификатора УЭК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+						<xsd:enumeration value="PAN">
+							<xsd:annotation>
+								<xsd:documentation>Permanent Account Number</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MUID">
+							<xsd:annotation>
+								<xsd:documentation>MIFARE UID</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="UECN">
+							<xsd:annotation>
+								<xsd:documentation>Номер УЭК</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="ICSN">
+							<xsd:annotation>
+								<xsd:documentation>Номер чипа</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MSCN">
+							<xsd:annotation>
+								<xsd:documentation>Номер СКМ</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="DID">
+							<xsd:annotation>
+								<xsd:documentation>Динамический идентификатор</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardIdentityName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование  используемого идентификатора УЭК </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardId" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор экземпляра УЭК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="HolderIdDescriptionType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация держателя карты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="cardTypeCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код типа карты (УЭК, СКМ, временная, иное)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+						<xsd:enumeration value="UEC">
+							<xsd:annotation>
+								<xsd:documentation>Универсальная Электронная Карта</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MSC">
+							<xsd:annotation>
+								<xsd:documentation>Московская социальная карта</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="TEMP">
+							<xsd:annotation>
+								<xsd:documentation>Временная</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="OTHER">
+							<xsd:annotation>
+								<xsd:documentation>Другого типа</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardTypeName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование типа карты (УЭК, СКМ, временная, иное)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardIdentityCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код используемого идентификатора УЭК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+						<xsd:enumeration value="PAN">
+							<xsd:annotation>
+								<xsd:documentation>Permanent Account Number</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MUID">
+							<xsd:annotation>
+								<xsd:documentation>MIFARE UID</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="UECN">
+							<xsd:annotation>
+								<xsd:documentation>Номер УЭК</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="ICSN">
+							<xsd:annotation>
+								<xsd:documentation>Номер чипа</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="MSCN">
+							<xsd:annotation>
+								<xsd:documentation>Номер СКМ</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="DID">
+							<xsd:annotation>
+								<xsd:documentation>Динамический идентификатор</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="cardIdentityName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование  используемого идентификатора УЭК </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="uecId" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор экземпляра УЭК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="snils" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>СНИЛС держателя </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="14"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:simpleType name="OrganizationType">
+		<xsd:annotation>
+			<xsd:documentation>Тип организации</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="INTERNAL">
+				<xsd:annotation>
+					<xsd:documentation>Внутрення подсистема</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="GOV">
+				<xsd:annotation>
+					<xsd:documentation>Государственная орнанизация</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="FED">
+				<xsd:annotation>
+					<xsd:documentation>Федеральная государственная организация</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="REG">
+				<xsd:annotation>
+					<xsd:documentation>Региональная государственная организация</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="BANK">
+				<xsd:annotation>
+					<xsd:documentation>Банк</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MED">
+				<xsd:annotation>
+					<xsd:documentation>лечебно-профилактическое учреждение </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SCHOOL">
+				<xsd:annotation>
+					<xsd:documentation>учебное учереждение </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="TRANSPORT">
+				<xsd:annotation>
+					<xsd:documentation>траспортное предприятие </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PERSONAL">
+				<xsd:annotation>
+					<xsd:documentation>Личный кабинет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="HolderInfoDescriptionType">
+		<xsd:annotation>
+			<xsd:documentation>Персональная информация</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="personIds">
+				<xsd:annotation>
+					<xsd:documentation>Идентификаторы персоны</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="personId" type="uec-id:HolderIdDescriptionType" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Идентификатор персоны</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="clientCategory" type="uec-id:ClientCategoryType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код категории заявителя по справочнику (Справочник категорий заявителей)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="personInfo" type="uec-id:PersonInfoType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные персоны</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="registrationAddress" type="uec-id:AddressType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Адрес регистрации </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="document" type="uec-id:DocumentType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Информация о ДУЛ </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="residenceAddress" type="uec-id:AddressType" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Адрес фактического пребывания </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="bank" type="uec-id:BankType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные Банка </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="contacts" type="uec-id:ContactsType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Контактная информация </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oms" type="uec-id:OMSType" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Информация ОМС </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="additionalInfo" type="uec-id:AdditionalInfoType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дополнительные сведения </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="authorityPerson" type="uec-id:AuthorityPersonType" nillable="true" minOccurs="0"/>
+			<xsd:element name="universityInfo" type="uec-id:UniversityInfoType" nillable="true" minOccurs="0"/>
+			<xsd:element name="schoolInfo" type="uec-id:SchoolInfoType" nillable="true" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ClientCategoryType">
+		<xsd:annotation>
+			<xsd:documentation>Код категории заявителя по справочнику (Справочник категорий заявителей)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="categoryCode" type="xsd:int"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PersonInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Данные персоны</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="uec-id:NameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ФИО персоны</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="sex" type="xsd:int" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Пол заявителя из справочника</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="citizenship" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код гражданства заявителя по справочнику  (Справочник гражданств)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dateOfBirth" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата рождения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthCityName" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование населённого пункта места рождения из справочника ОКАТО.
+(Справочник населённых пунктов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthCityCode" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код населённого пункта места рождения из справочника ОКАТО.
+(Справочник населённых пунктов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthDistrictName" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование района места рождения из справочника ОКАТО.
+( Справочник районов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthDistrictCode" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код района места рождения из справочника ОКАТО. 
+(Справочник районов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthRegionName" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование региона места рождения из справочника ОКАТО. 
+(Справочник республика/край/область  ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthRegionCode" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код региона места рождения из справочника ОКАТО.
+(Справочник республика/край/область  ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthCountryName" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование страны места рождения из справочника стран.
+(Справочник стран)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="birthCountryCode" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код страны места рождения из справочника стран.
+(Справочник стран)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="photo" type="xsd:base64Binary" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Фотография заявителя</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NameType">
+		<xsd:annotation>
+			<xsd:documentation>Имя персоны</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="lastName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Фамилия</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="firstName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Имя</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="middleName" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Отчество</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AddressType">
+		<xsd:annotation>
+			<xsd:documentation>Описание адреса</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="cityName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Наименование населённого пункта адреса регистрации из справочника ОКАТО. 
+(Справочник населённых пунктов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="cityCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код населённого пункта адреса  регистрации из справочника ОКАТО.
+(Справочник населённых пунктов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="districtName" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование района адреса регистрации из справочника ОКАТО.
+(Справочник районов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="districtCode" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код района адреса регистрации из справочника ОКАТО.
+(Справочник районов ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="regionName" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование региона адреса регистрации из справочника ОКАТО. 
+(Справочник республика/край/область  ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="regionCode" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код региона адреса регистрации из справочника ОКАТО.
+(Справочник республика/край/область  ОКАТО)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="countryName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Наименование страны адреса регистрации из справочника стран.
+(Справочник стран)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="countryCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код страны адреса регистрации из справочника стран.
+(Справочник стран)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="streetName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Наименование улицы адреса регистрации из справочника. 
+Для г. Москвы используется справочник ОМКУМ, для остальных населённых пунктов – КЛАДР или ручной ввод (при отсутствии значения в КЛАДР) 
+(Справочник улиц ОМК – населенного пункта город Москва)
+(Справочник улиц КЛАДР – для населенных пунктов не город Москва)
+</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="streetCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код улицы адреса  регистрации из справочника. Для г. Москвы используется справочник ОМКУМ, для остальных населённых пунктов – КЛАДР или ручной ввод (при отсутствии значения в КЛАДР) 
+(Справочник улиц ОМК – населенного пункта город Москва)
+(Справочник улиц КЛАДР – для населенных пунктов не город Москва)
+</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="index" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Индекс</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="house" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Дом</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="building" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Строение</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="corp" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Корпус</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="flat" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Квартира</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DocumentType">
+		<xsd:annotation>
+			<xsd:documentation>Информация о ДУЛ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>Код ДУЛ из справочника ДУЛ
+(Справочник ДУЛ)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="series" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Серия ДУЛ. Обязателен для паспорта РФ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="number" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Номер ДУЛ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="issueDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Дата выдачи ДУЛ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="issuedBy" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Кем выдан ДУЛ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="unitCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Обязателен для паспорта РФ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PensionFundType">
+		<xsd:annotation>
+			<xsd:documentation>Данные ПФ РФ </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="snils" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>СНИЛС </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="createSnilsFlag" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Флаг подготовки заявления на получение СНИЛС
+true – да
+false - нет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BankType">
+		<xsd:annotation>
+			<xsd:documentation>Данные Банка </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="bankName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код Банка из справочника банков.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="unitCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код отделения Банка, где будет открыт счёт из справочника банков.
+(Справочник Банков)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="password" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Кодовое слово</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ContactsType">
+		<xsd:annotation>
+			<xsd:documentation>Контактная информация </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="phone" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Контактный телефон</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="mobilePhone" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Мобильный телефон</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="mobileNotificationFlag" type="xsd:boolean" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>Флаг использования мобильного телефона для СМС-информирования
+true - да
+false - нет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="email" type="xsd:string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Адрес электронной почты</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="emailNotificationFlag" type="xsd:boolean" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>Флаг использования уведомления по электронной почте
+true – да
+false - нет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="OMSType">
+		<xsd:annotation>
+			<xsd:documentation>Информация ОМС </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="series" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Серия полиса ОМС</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="number" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Номер полиса ОМС</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="createOmsFlag" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Флаг получения полиса ОМС
+true – да
+false - нет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="orgNumber" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код организации страховщика из справочника страховых организаций.
+(Справочник страховых организаций)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="orgName" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Наименование организации страховщика из справочника страховых организаций.
+(Справочник страховых организаций)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AdditionalInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Дополнительные сведения </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="receivingOfficeCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код ПВК из справочника ППЗ\ПВК
+(Справочник ППЗ\ПВК)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="createDSignatureFlag" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Флаг получения сертификата ЭП
+true – да
+false - нет</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="registrationCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код причина подачи заявления из справочника причин.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="officeCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Код ППЗ из справочника из справочника ППЗ\ПВК
+(Справочник ППЗ\ПВК)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="formFillingDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Дата заполнения заявления</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuthorityPersonType">
+		<xsd:sequence>
+			<xsd:element name="lastName" type="xsd:string"/>
+			<xsd:element name="firstName" type="xsd:string"/>
+			<xsd:element name="middleName" type="xsd:string" nillable="true" minOccurs="0"/>
+			<xsd:element name="dateOfBirth" type="xsd:date"/>
+			<xsd:element name="document" type="uec-id:DocumentType"/>
+			<xsd:element name="authorityDocument" type="uec-id:AuthorityDocumentType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuthorityDocumentType">
+		<xsd:sequence>
+			<xsd:element name="documentName" type="xsd:string"/>
+			<xsd:element name="documentInfo" type="uec-id:DocumentType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="UniversityInfoType">
+		<xsd:sequence>
+			<xsd:element name="universityName" type="xsd:string"/>
+			<xsd:element name="faculty" type="xsd:string"/>
+			<xsd:element name="studentTicketNumber" type="xsd:string"/>
+			<xsd:element name="startDate" type="xsd:date"/>
+			<xsd:element name="endDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SchoolInfoType">
+		<xsd:sequence>
+			<xsd:element name="schoolName" type="xsd:string"/>
+			<xsd:element name="type" type="xsd:int"/>
+			<xsd:element name="number" type="xsd:string"/>
+			<xsd:element name="class" type="xsd:string"/>
+			<xsd:element name="endDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="UECPointIdentificationType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация точки обслуживания УЭК</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="organization" type="uec-id:LegalIdDescriptionType">
+				<xsd:annotation>
+					<xsd:documentation>Организация</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="providerCode">
+				<xsd:annotation>
+					<xsd:documentation>Код поставщика услуги (кто должен оказать или оказал услугу)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="person" type="uec-id:HolderIdDescriptionType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Персона</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="requester" type="uec-id:UECPointIdentificationType">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация инициатора запроса</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:simpleType name="CardStatusType">
+		<xsd:annotation>
+			<xsd:documentation>Статус карты (ISO/IEC 7816-4-2005)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="1">
+				<xsd:annotation>
+					<xsd:documentation>В процессе создания (Creation state)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="3">
+				<xsd:annotation>
+					<xsd:documentation>В процессе инициализации (Initialisation state)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="5">
+				<xsd:annotation>
+					<xsd:documentation>Активная (Operational state (activated))</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="4">
+				<xsd:annotation>
+					<xsd:documentation>Неактивная (Operational state (deactivated))</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="12">
+				<xsd:annotation>
+					<xsd:documentation>Уничтожена (Termination state)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="0">
+				<xsd:annotation>
+					<xsd:documentation>Нет информации (No information given)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ApplicationStatusType">
+		<xsd:annotation>
+			<xsd:documentation>Статус приложения карты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="applicationCode">
+				<xsd:annotation>
+					<xsd:documentation>Код приложения карты (RESP, ETP, FIP, BANK, ...)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="applicationStatusCode">
+				<xsd:annotation>
+					<xsd:documentation>Код статуса приложения карты</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="ACTIVE">
+							<xsd:annotation>
+								<xsd:documentation>Приложение активно</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="INACTIVE">
+							<xsd:annotation>
+								<xsd:documentation>Приложение не активировано</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="BLOCK">
+							<xsd:annotation>
+								<xsd:documentation>Приложение заблокировано</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="ValidationSchemeType">
+		<xsd:annotation>
+			<xsd:documentation>Предпочтительная схема валидации карты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="RANDOM_SIGN">
+				<xsd:annotation>
+					<xsd:documentation>Схема валидации карты с использованием случайного числа от ИС УОС</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="OTP">
+				<xsd:annotation>
+					<xsd:documentation>Схема валидации с одноразовым паролем и подписью карты случайного числа от ИС УОС (в случае, если указаны данные для запроса подписи)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="MacRequestType">
+		<xsd:annotation>
+			<xsd:documentation>Описание данных для запроса подписи</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="algType" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор используемого алгоритма (по договоренности сторон)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="key">
+				<xsd:annotation>
+					<xsd:documentation>Код/Номер используемого ключа (7, 8, 9)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="contId">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор области данных, контейнера</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:hexBinary">
+						<xsd:length value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="dataForMacSign" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные для подписи</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MacResponseType">
+		<xsd:annotation>
+			<xsd:documentation>Описание данных подписи</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="keyIndex">
+				<xsd:annotation>
+					<xsd:documentation>Версия используемого ключа</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="macDateTime" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Штамп времени для подписи</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="macSignAddData" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные которые добавила сама карта (апплет РЭСП) при формировании подписи (счетчик карты)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="macSign" type="xsd:hexBinary">
+				<xsd:annotation>
+					<xsd:documentation>Подпись, созданная картой</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="macLabel" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные файла-метки которые читаются с карты</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="64"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ExternalAuthenticateRequestType">
+		<xsd:annotation>
+			<xsd:documentation>Описание данных для запроса внешней аутентификации</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="algType" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор используемого алгоритма (по договоренности сторон)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="key">
+				<xsd:annotation>
+					<xsd:documentation>Код/Номер используемого ключа (7, 8, 9)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="keyIndex">
+				<xsd:annotation>
+					<xsd:documentation>версия ключа, читается с карты</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="99"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="contId">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор области данных, контейнера</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:hexBinary">
+						<xsd:length value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="appId">
+				<xsd:annotation>
+					<xsd:documentation>идентификатор набора сведений в области данных</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="random">
+				<xsd:annotation>
+					<xsd:documentation>Данные для подписи</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:hexBinary">
+						<xsd:maxLength value="16"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MacType">
+		<xsd:annotation>
+			<xsd:documentation>Описание данных подписи</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="algType" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор используемого алгоритма (по договоренности сторон)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="key">
+				<xsd:annotation>
+					<xsd:documentation>Код/Номер используемого ключа (7, 8, 9)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="keyIndex">
+				<xsd:annotation>
+					<xsd:documentation>Версия используемого ключа</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="contId">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор области данных, контейнера</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:hexBinary">
+						<xsd:length value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="macDateTime" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Штамп времени для подписи</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="macSignAddData" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные которые добавила сама карта (апплет РЭСП) при формировании подписи (счетчик карты)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="macSign" type="xsd:hexBinary">
+				<xsd:annotation>
+					<xsd:documentation>Подпись, созданная картой</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="macLabel" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные файла-метки которые читаются с карты</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="64"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuthentificationDataType">
+		<xsd:annotation>
+			<xsd:documentation>Данные для аутентификации карты или держателя карты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="sessionId" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор сессии в системе МСР</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="password" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Введенный пароль</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="32"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="mac" type="uec-id:MacType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Подпись сделанная картой</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
