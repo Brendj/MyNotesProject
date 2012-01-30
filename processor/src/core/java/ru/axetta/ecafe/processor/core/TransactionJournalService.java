@@ -55,7 +55,7 @@ public class TransactionJournalService {
         TransactionStatus trx = null;
         try{
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
-            transactClient();
+            //transactClient();
             writeTransactionJournal();
 
 
@@ -70,7 +70,7 @@ public class TransactionJournalService {
     @Transactional
     public void writeTransactionJournal() throws Exception {
         try {
-            createTJClient();
+            //createTJClient();
         } catch (Exception e) {
             logger.error("Failed to save journal events to db", e);
             throw e;
@@ -81,7 +81,6 @@ public class TransactionJournalService {
     public void transactClient() throws Exception{
         try {
            this.clients = entityManager.createQuery("select c from Client c where c.org.idOfOrg=2").getResultList();
-            logger.info(String.valueOf(this.clients.size()));
         } catch (Exception e) {
             logger.error("Failed to save journal events to db", e);
             throw e;
@@ -167,138 +166,4 @@ public class TransactionJournalService {
             }
         }
     }
-             /*
-    private void CreateTJ(){
-        if(null != org.getClients()){
-            List<Client> clientList=new ArrayList<Client>(org.getClients());
-            for(Client client: clientList){
-                if(null != client.getEnterEvents()){
-                    List<EnterEvent> enterEventList = new ArrayList<EnterEvent>(client.getEnterEvents());
-                    for (EnterEvent enterEvent1: enterEventList){
-                        String passdirection;
-                        switch (enterEvent1.getPassDirection()){
-                            case 0: passdirection="IN"; break;
-                            case 1: passdirection="OUT";  break;
-                            default: passdirection="ERROR";
-                        }
-                        Date currentTime = new Date();
-                        TransactionJournal transactionJournal = new TransactionJournal();
-                        transactionJournal.setOGRN(org.getOGRN());
-                        transactionJournal.setServiceCode("SCHL_ACC");
-                        transactionJournal.setTransactionCode(passdirection);
-                        List<Card> cardList =new ArrayList<Card>(client.getCards());
-                        if(!cardList.isEmpty()){
-                            Card card=cardList.get(0);
-                            transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-                            transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-                            transactionJournal.setCardIdentityCode(card.getCardNo());
-                        }
-                        transactionJournal.setClientSnilsSan(client.getSan());
-                        transactionJournal.setContractId(client.getContractId());
-                        transactionJournal.setSycroDate(currentTime);
-                        logger.info(transactionJournal.toString());
-                        entityManager.persist(transactionJournal);
-                        logger.info(transactionJournal.toString());
-
-
-                     client.getClientGroup();
-                     client.getContractId();
-
-
-                    }
-                }  else{
-                    Date currentTime = new Date();
-                    TransactionJournal transactionJournal = new TransactionJournal();
-                    transactionJournal.setOGRN(org.getOGRN());
-                    transactionJournal.setServiceCode("SCHL_ACC");
-                    transactionJournal.setSycroDate(currentTime);
-                    logger.info(transactionJournal.toString());
-                    entityManager.persist(transactionJournal);
-                    logger.info("null != client.getEnterEvents()");
-                }
-            }
-        } else {
-            Date currentTime = new Date();
-            TransactionJournal transactionJournal = new TransactionJournal();
-            transactionJournal.setOGRN(org.getOGRN());
-            transactionJournal.setServiceCode("SCHL_ACC");
-            transactionJournal.setSycroDate(currentTime);
-            logger.info(transactionJournal.toString());
-            entityManager.persist(transactionJournal);
-            logger.info("null != org.getClients()");
-        }
-        logger.info("End");
-    }
-    
-    private void createTransactionJournal(){
-        Date currentTime = new Date();
-        TransactionJournal transactionJournal = new TransactionJournal();
-        transactionJournal.setServiceCode("SCHL_ACC");
-        String passdirection;
-        switch (enterEvent.getPassDirection()){
-            case 0: passdirection="IN"; break;
-            case 1: passdirection="OUT";  break;
-            default: passdirection="ERROR";
-        }
-        transactionJournal.setTransactionCode(passdirection);
-        if(null != enterEvent.getOrg().getOGRN()){
-            transactionJournal.setOGRN(enterEvent.getOrg().getOGRN());
-        }
-        transactionJournal.setEnterName(enterEvent.getEnterName());
-        if(null != enterEvent.getClient().getCards()){
-            List<Card> cardList =new ArrayList<Card>(enterEvent.getClient().getCards());
-            if(!cardList.isEmpty()){
-                Card card=cardList.get(0);
-                transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-                transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-                transactionJournal.setCardIdentityCode(card.getCardNo());
-            }
-        }
-        transactionJournal.setContractId(enterEvent.getClient().getContractId());
-        transactionJournal.setClientSnilsSan(enterEvent.getClient().getSan());
-        if(null != enterEvent.getClient().getClientGroup().getGroupName()){
-            transactionJournal.setClientType(enterEvent.getClient().getClientGroup().getGroupName());
-        }
-        if(null != enterEvent.getClient().getOrders()){
-            List<Order> orderList =new ArrayList<Order>(enterEvent.getClient().getOrders());
-            logger.info(String.valueOf(orderList.size()));
-            if(!orderList.isEmpty()){
-                Order order=orderList.get(0);
-                transactionJournal.setOrderRSum(order.getRSum());
-            }
-        }
-        transactionJournal.setSycroDate(currentTime);
-        entityManager.persist(transactionJournal);
-    }
-
-    @Transactional
-    public void transactEnterName() throws Exception{
-        try {
-            List<EnterEvent> enterEventList = entityManager.createQuery("select e from EnterEvent e where e.compositeIdOfEnterEvent.idOfOrg="+this.org.getIdOfOrg()).getResultList();
-            for(EnterEvent event: enterEventList){
-                if(!event.getEnterName().equals("")){
-                    this.enterEvent=event;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Failed to save journal events to db", e);
-            throw e;
-        }
-    }
-
-    @Transactional
-    public void transactOrg() throws Exception{
-        try {
-            List orgList = entityManager.createQuery("select o from Org o").getResultList();
-            for(Object obj:  orgList){
-                this.org=(Org) obj;
-                break;
-            }
-        } catch (Exception e) {
-            logger.error("Failed to save journal events to db", e);
-            throw e;
-        }
-    }    */
-
 }

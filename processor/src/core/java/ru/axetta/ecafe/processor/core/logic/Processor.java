@@ -590,6 +590,50 @@ public class Processor implements SyncProcessor,
                         purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
                         purchase.getMenuOutput(), purchase.getType());
                 persistenceSession.save(orderDetail);
+
+                TransactionJournal transactionJournal = new TransactionJournal();
+                //OGRN
+                Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+                orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
+                Org org = (Org) orgCriteria.uniqueResult();
+                transactionJournal.setOGRN(org.getOGRN());
+                //transactionSystemCode
+                transactionJournal.setTransactionCode("ISPP");
+                //transactionIdDescription
+                Date currentTime = new Date();
+                transactionJournal.setSycroDate(currentTime);
+                //transactionTypeDescription
+                transactionJournal.setServiceCode("SCHL_FD");
+                if(purchase.getSocDiscount()>0){
+                    transactionJournal.setTransactionCode("DEBIT");
+                } else{
+                    transactionJournal.setTransactionCode("FD_BEN");
+                }
+                //holderDescription
+                transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+                transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+                transactionJournal.setCardIdentityCode(card.getCardNo());
+                //snils
+                transactionJournal.setClientSnilsSan(client.getSan());
+                //accountingDescription
+                transactionJournal.setOrderRSum(order.getRSum());
+                transactionJournal.setContractId(client.getContractId());
+                //additionalInfo
+                //ISPP_ACCOUNT_NUMBER
+                transactionJournal.setContractId(client.getContractId());
+                //ISPP_CLIENT_TYPE
+                //client.getClientGroup();
+                if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1200000000){
+                    transactionJournal.setClientType("Другое");
+                } else{
+                    if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1100000000){
+                        transactionJournal.setClientType("Сотрудники");
+                    } else {
+                        transactionJournal.setClientType("Ученик");
+                    }
+                }
+                persistenceSession.save(transactionJournal);
+
                 totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
                 totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();
             }
@@ -1363,6 +1407,54 @@ public class Processor implements SyncProcessor,
                     enterEvent.setIssueDocDate(e.getIssueDocDate());
                     enterEvent.setVisitDateTime(e.getVisitDateTime());
                     persistenceSession.save(enterEvent);
+
+
+                    TransactionJournal transactionJournal = new TransactionJournal();
+                    //OGRN
+                    Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+                    orgCriteria.add(Restrictions.eq("idOfOrg",e.getIdOfOrg()));
+                    Org org = (Org) orgCriteria.uniqueResult();
+                    transactionJournal.setOGRN(org.getOGRN());
+                    //transactionSystemCode
+                    transactionJournal.setTransactionCode("ISPP");
+                    //transactionIdDescription
+                    transactionJournal.setSycroDate(e.getEvtDateTime());
+                    //transactionTypeDescription
+                    transactionJournal.setServiceCode("SCHL_ACC");
+                    String passdirection;
+                    switch (e.getPassDirection()){
+                        case 0: passdirection="IN"; break;
+                        case 1: passdirection="OUT";  break;
+                        default: passdirection="ERROR";
+                    }
+                    transactionJournal.setTransactionCode(passdirection);
+                    //holderDescription
+                    Criteria cardCriteria = persistenceSession.createCriteria(Card.class);
+                    cardCriteria.add(Restrictions.eq("idOfCard",e.getIdOfCard()));
+                    Card card =(Card) cardCriteria.uniqueResult();
+
+                    transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+                    transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+                    transactionJournal.setCardIdentityCode(card.getCardNo());
+                    /*
+                    List<Card> cardList =new ArrayList<Card>(client.getCards());
+                    if(!cardList.isEmpty()){
+                        Card card=cardList.get(0);
+                        transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+                        transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+                        transactionJournal.setCardIdentityCode(card.getCardNo());
+                    } */
+                    //snils
+                    transactionJournal.setClientSnilsSan(client.getSan());
+                    //additionalInfo
+                    //ISPP_ACCOUNT_NUMBER
+                    transactionJournal.setContractId(client.getContractId());
+                    //ISPP_CLIENT_TYPE
+                    transactionJournal.setClientType(client.getClientGroup().getGroupName());
+                    //ISPP_INPUT_GROUP
+                    transactionJournal.setEnterName(e.getEnterName());
+                    persistenceSession.save(transactionJournal);
+
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
                             null);
                     resEnterEvents.addItem(item);
@@ -2340,6 +2432,7 @@ public class Processor implements SyncProcessor,
                 logger.error(String.format("Failed to send SMS to client: %s", client), e);
             }
         } finally {
+            RuntimeContext.release(runtimeContext);
         }
     }
 
