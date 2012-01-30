@@ -590,50 +590,6 @@ public class Processor implements SyncProcessor,
                         purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
                         purchase.getMenuOutput(), purchase.getType());
                 persistenceSession.save(orderDetail);
-
-                TransactionJournal transactionJournal = new TransactionJournal();
-                //OGRN
-                Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
-                orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
-                Org org = (Org) orgCriteria.uniqueResult();
-                transactionJournal.setOGRN(org.getOGRN());
-                //transactionSystemCode
-                transactionJournal.setTransactionCode("ISPP");
-                //transactionIdDescription
-                Date currentTime = new Date();
-                transactionJournal.setSycroDate(currentTime);
-                //transactionTypeDescription
-                transactionJournal.setServiceCode("SCHL_FD");
-                if(purchase.getSocDiscount()>0){
-                    transactionJournal.setTransactionCode("DEBIT");
-                } else{
-                    transactionJournal.setTransactionCode("FD_BEN");
-                }
-                //holderDescription
-                transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-                transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-                transactionJournal.setCardIdentityCode(card.getCardNo());
-                //snils
-                transactionJournal.setClientSnilsSan(client.getSan());
-                //accountingDescription
-                transactionJournal.setOrderRSum(order.getRSum());
-                transactionJournal.setContractId(client.getContractId());
-                //additionalInfo
-                //ISPP_ACCOUNT_NUMBER
-                transactionJournal.setContractId(client.getContractId());
-                //ISPP_CLIENT_TYPE
-                //client.getClientGroup();
-                if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1200000000){
-                    transactionJournal.setClientType("Другое");
-                } else{
-                    if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1100000000){
-                        transactionJournal.setClientType("Сотрудники");
-                    } else {
-                        transactionJournal.setClientType("Ученик");
-                    }
-                }
-                persistenceSession.save(transactionJournal);
-
                 totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
                 totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();
             }

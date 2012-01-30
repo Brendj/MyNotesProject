@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,6 +50,49 @@ public class CurrentPositionsManager {
         Long priviledge = order.getSocDiscount() + order.getGrantSum();
         changeOrderPosition(session, rSum, priviledge, supplier, null, null, null, null, null);
         session.save(order);
+
+        TransactionJournal transactionJournal = new TransactionJournal();
+        //OGRN
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
+        Org org = (Org) orgCriteria.uniqueResult();
+        transactionJournal.setOGRN(org.getOGRN());
+        //transactionSystemCode
+        transactionJournal.setTransactionCode("ISPP");
+        //transactionIdDescription
+        Date currentTime = new Date();
+        transactionJournal.setSycroDate(currentTime);
+        //transactionTypeDescription
+        transactionJournal.setServiceCode("SCHL_FD");
+        if(payment.getSocDiscount()>0){
+            transactionJournal.setTransactionCode("DEBIT");
+        } else{
+            transactionJournal.setTransactionCode("FD_BEN");
+        }
+        //holderDescription
+        transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
+        transactionJournal.setCartTypeName("Универсальная Электронная Карта");
+        transactionJournal.setCardIdentityCode(card.getCardNo());
+        //snils
+        transactionJournal.setClientSnilsSan(client.getSan());
+        //accountingDescription
+        transactionJournal.setOrderRSum(order.getRSum());
+        transactionJournal.setContractId(client.getContractId());
+        //additionalInfo
+        //ISPP_ACCOUNT_NUMBER
+        transactionJournal.setContractId(client.getContractId());
+        //ISPP_CLIENT_TYPE
+        //client.getClientGroup();
+        if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1200000000){
+            transactionJournal.setClientType("Другое");
+        } else{
+            if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1100000000){
+                transactionJournal.setClientType("Сотрудники");
+            } else {
+                transactionJournal.setClientType("Ученик");
+            }
+        }
+        session.save(transactionJournal);
     }
 
     public static void createClientPayment(Session session, ClientPayment clientPayment, Client client,
