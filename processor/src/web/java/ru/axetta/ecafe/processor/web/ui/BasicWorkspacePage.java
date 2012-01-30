@@ -4,10 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import org.richfaces.component.html.HtmlPanelMenuGroup;
 import org.richfaces.component.html.HtmlPanelMenuItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,6 +23,7 @@ import javax.faces.component.UIComponent;
  * To change this template use File | Settings | File Templates.
  */
 public class BasicWorkspacePage extends BasicPage {
+    Logger logger = LoggerFactory.getLogger(BasicWorkspacePage.class);
 
     private static final String MENU_PATH_SEPARATOR = " / ";
     private UIComponent mainMenuComponent;
@@ -92,4 +99,33 @@ public class BasicWorkspacePage extends BasicPage {
             menuGroup.setRendered(false);
         }
     }
+
+    public void onShow() throws Exception {
+    }
+
+    public void show() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            this.onShow();
+            MainPage.getSessionInstance().setCurrentWorkspacePage(this);
+        } catch (Exception e) {
+            logger.error("Failed to load page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: "+e,
+                            null));
+        }
+    }
+
+    public void printMessage(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
+    public void logAndPrintMessage(String msg, Exception e) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        logger.error(msg, e);
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+": "+e, null));
+    }
+
 }

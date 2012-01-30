@@ -23,7 +23,6 @@ import ru.axetta.ecafe.processor.web.ui.client.rule.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.option.OptionPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
@@ -198,7 +197,6 @@ public class MainPage {
 
     // baybikov (25.11.2011)
     private final BasicWorkspacePage optionGroupPage = new BasicWorkspacePage();
-    private final OptionPage optionPage = new OptionPage();
 
     // baybikov (21.11.2011)
     private final CurrentPositionsReportPage currentPositionsReportPage = new CurrentPositionsReportPage();
@@ -4556,7 +4554,7 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Конфигурация сохранена успешно", null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Конфигурация сохранена успешно. Для применения необходим перезапуск", null));
         } catch (Exception e) {
             logger.error("Failed to save configurations", e);
             facesContext.addMessage(null,
@@ -4584,64 +4582,11 @@ public class MainPage {
         return null;
     }
 
-    // baybikov (11.11.2011)
-    public OptionPage getOptionPage() {
-        return optionPage;
-    }
-
-    // baybikov (11.11.2011)
-    public Object showOptionPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            optionPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = optionPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill option page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы с настройками",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
+    public void setCurrentWorkspacePage(BasicWorkspacePage page) {
+        this.currentWorkspacePage = page;
         updateSelectedMainMenu();
-        return null;
     }
 
-    public Object saveOption() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            optionPage.save(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Настройки сохранены успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to save options", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при сохранении настроек", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
 
     /*
         CurrentPositions

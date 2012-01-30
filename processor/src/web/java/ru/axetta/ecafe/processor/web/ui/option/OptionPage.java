@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
@@ -20,17 +23,13 @@ import java.util.Date;
  * Time: 13:45
  * To change this template use File | Settings | File Templates.
  */
+@Component
 public class OptionPage extends BasicWorkspacePage {
-
-    private Option withOperatorOption;
-    private Option notifyBySMSAboutEnterEventOption;
-    private Option cleanMenuOption;
-    private Option menuDateForDeletionOption;
 
     private Boolean notifyBySMSAboutEnterEvent;
     private Boolean withOperator;
     private Boolean cleanMenu;
-    private Date menuDateForDeletion;
+    private Integer menuDaysForDeletion;
 
     public Boolean getWithOperator() {
         return withOperator;
@@ -56,52 +55,45 @@ public class OptionPage extends BasicWorkspacePage {
         this.cleanMenu = cleanMenu;
     }
 
-    public Date getMenuDateForDeletion() {
-        return menuDateForDeletion;
+    public Integer getMenuDaysForDeletion() {
+        return menuDaysForDeletion;
     }
 
-    public void setMenuDateForDeletion(Date menuDateForDeletion) {
-        this.menuDateForDeletion = menuDateForDeletion;
+    public void setMenuDaysForDeletion(Integer menuDaysForDeletion) {
+        this.menuDaysForDeletion = menuDaysForDeletion;
     }
 
     public String getPageFilename() {
         return "option/option";
     }
 
-    public void fill(Session session) throws Exception {
-        Criteria criteria = session.createCriteria(Option.class);
-        criteria.add(Restrictions.eq("idOfOption", 2L));
-        withOperatorOption = (Option)criteria.uniqueResult();
-        withOperator = withOperatorOption.getOptionText().equals("1");
-        criteria = session.createCriteria(Option.class);
-        criteria.add(Restrictions.eq("idOfOption", 3L));
-        notifyBySMSAboutEnterEventOption = (Option)criteria.uniqueResult();
-        notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
-        criteria = session.createCriteria(Option.class);
-        criteria.add(Restrictions.eq("idOfOption", 4L));
-        cleanMenuOption = (Option)criteria.uniqueResult();
-        cleanMenu = cleanMenuOption.getOptionText().equals("1");
-        criteria = session.createCriteria(Option.class);
-        criteria.add(Restrictions.eq("idOfOption", 5L));
-        menuDateForDeletionOption = (Option)criteria.uniqueResult();
-        menuDateForDeletion = new Date(Long.parseLong(menuDateForDeletionOption.getOptionText()));
+    @Autowired
+    RuntimeContext runtimeContext;
+
+    @Override
+    public void onShow() throws Exception {
+        withOperator = runtimeContext.getOptionValueBool(Option.OPTION_WITH_OPERATOR);
+        notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
+        cleanMenu = runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU);
+        menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
     }
 
-    public void save(Session session) {
-        withOperatorOption.setOptionText(withOperator.equals(true) ? "1" : "0");
-        notifyBySMSAboutEnterEventOption.setOptionText(notifyBySMSAboutEnterEvent.equals(true) ? "1" : "0");
-        cleanMenuOption.setOptionText(cleanMenu.equals(true) ? "1" : "0");
-        menuDateForDeletionOption.setOptionText(menuDateForDeletion.getTime() + "");        
-        session.merge(withOperatorOption);
-        session.merge(notifyBySMSAboutEnterEventOption);
-        session.merge(cleanMenuOption);
-        session.merge(menuDateForDeletionOption);
+    public Object save() {
+        try {
+            runtimeContext.setOptionValue(Option.OPTION_WITH_OPERATOR, withOperator);
+            runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, notifyBySMSAboutEnterEvent);
+            runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
+            runtimeContext.setOptionValue(Option.OPTION_MENU_DAYS_FOR_DELETION, menuDaysForDeletion);
+            runtimeContext.saveOptionValues();
+            printMessage("Настройки сохранены. Для применения необходим перезапуск");
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при сохранении", e);
+        }
+        return null;
     }
 
-    public void cancelOption() {
-        withOperator = withOperatorOption.getOptionText().equals("1");
-        notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
-        cleanMenu = cleanMenuOption.getOptionText().equals("1");
-        menuDateForDeletion = new Date(Long.parseLong(menuDateForDeletionOption.getOptionText()));
+    public Object cancel() throws Exception {
+        onShow();
+        return null;
     }
 }

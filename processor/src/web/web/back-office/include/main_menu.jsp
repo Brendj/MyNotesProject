@@ -353,8 +353,8 @@
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
                         action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
 
-    <rich:panelMenuItem id="showOptionMenuItem" binding="#{mainPage.optionPage.mainMenuComponent}" label="Настройки"
-                        action="#{mainPage.showOptionPage}" reRender="workspaceForm"/>
+    <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
+                        action="#{optionPage.show}" reRender="workspaceForm"/>
 
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
