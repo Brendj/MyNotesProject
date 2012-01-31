@@ -24,15 +24,61 @@ public class TransactionJournal {
     private long idOfTransactionJournal;
     private String serviceCode;
     private String transactionCode;
-    private long cardIdentityCode;
     private long contractId;
-    private String clientSnilsSan;
+
     private String enterName;
-    private long orderRSum;
     private String clientType;
-    private String cartTypeName;
     private String OGRN;
     private Date sycroDate;
+
+    private String cardIdentityName;
+    private String cardIdentityCode;
+    private String cardTypeName;
+    private String cardTypeCode;
+    private String clientSnilsSan;
+
+    private long orderRSum;
+    private Date accountingDate;
+
+    public  Date getAccountingDate() {
+        return accountingDate;
+    }
+
+    public void setAccountingDate( Date accountingDate) {
+        this.accountingDate = accountingDate;
+    }
+
+    public String getCardTypeCode() {
+        return cardTypeCode;
+    }
+
+    public void setCardTypeCode(String cardTypeCode) {
+        this.cardTypeCode = cardTypeCode;
+    }
+
+    public String getCardTypeName() {
+        return cardTypeName;
+    }
+
+    public void setCardTypeName(String cardTypeName) {
+        this.cardTypeName = cardTypeName;
+    }
+
+    public String getCardIdentityCode() {
+        return cardIdentityCode;
+    }
+
+    public void setCardIdentityCode(String cardIdentityCode) {
+        this.cardIdentityCode = cardIdentityCode;
+    }
+
+    public String getCardIdentityName() {
+        return cardIdentityName;
+    }
+
+    public void setCardIdentityName(String cardIdentityName) {
+        this.cardIdentityName = cardIdentityName;
+    }
 
     public Date getSycroDate() {
         return sycroDate;
@@ -48,14 +94,6 @@ public class TransactionJournal {
 
     public void setOGRN(String OGRN) {
         this.OGRN = OGRN;
-    }
-
-    public String getCartTypeName() {
-        return cartTypeName;
-    }
-
-    public void setCartTypeName(String cartTypeName) {
-        this.cartTypeName = cartTypeName;
     }
 
 
@@ -116,14 +154,6 @@ public class TransactionJournal {
     }
 
 
-    public long getCardIdentityCode() {
-        return cardIdentityCode;
-    }
-
-    public void setCardIdentityCode(long cardIdentityCode) {
-        this.cardIdentityCode = cardIdentityCode;
-    }
-
     public long getIdOfTransactionJournal() {
         return idOfTransactionJournal;
     }
@@ -137,10 +167,4 @@ public class TransactionJournal {
         key++;
     }
 
-    @Override
-    public String toString(){
-        return  this.OGRN+" "+this.transactionCode+" "+this.cartTypeName+
-                " "+this.cardIdentityCode+" "+this.contractId+" "+this.orderRSum+" "+
-                " "+this.clientSnilsSan+" "+this.enterName+" "+this.transactionCode;
-    }
 }

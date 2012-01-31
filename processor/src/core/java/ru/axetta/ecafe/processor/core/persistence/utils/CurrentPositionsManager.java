@@ -70,14 +70,15 @@ public class CurrentPositionsManager {
             transactionJournal.setTransactionCode("FD_BEN");
         }
         //holderDescription
-        transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-        transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-        transactionJournal.setCardIdentityCode(card.getCardNo());
+        transactionJournal.setCardIdentityCode("UEC");
+        transactionJournal.setCardIdentityName("Универсальная Электронная Карта");
+        transactionJournal.setCardTypeCode(Card.TYPE_NAMES[card.getCardType()]);
+        transactionJournal.setCardTypeName(String.valueOf(card.getCardNo()));
         //snils
         transactionJournal.setClientSnilsSan(client.getSan());
         //accountingDescription
         transactionJournal.setOrderRSum(order.getRSum());
-        transactionJournal.setContractId(client.getContractId());
+        transactionJournal.setAccountingDate(order.getCreateTime());
         //additionalInfo
         //ISPP_ACCOUNT_NUMBER
         transactionJournal.setContractId(client.getContractId());

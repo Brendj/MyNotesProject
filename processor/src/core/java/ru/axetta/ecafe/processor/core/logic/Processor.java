@@ -1384,14 +1384,17 @@ public class Processor implements SyncProcessor,
                         default: passdirection="ERROR";
                     }
                     transactionJournal.setTransactionCode(passdirection);
+
                     //holderDescription
                     Criteria cardCriteria = persistenceSession.createCriteria(Card.class);
                     cardCriteria.add(Restrictions.eq("idOfCard",e.getIdOfCard()));
                     Card card =(Card) cardCriteria.uniqueResult();
 
-                    transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-                    transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-                    transactionJournal.setCardIdentityCode(card.getCardNo());
+                    transactionJournal.setCardIdentityCode("UEC");
+                    transactionJournal.setCardIdentityName("Универсальная Электронная Карта");
+                    transactionJournal.setCardTypeCode(Card.TYPE_NAMES[card.getCardType()]);
+                    transactionJournal.setCardTypeName(String.valueOf(card.getCardNo()));
+
                     /*
                     List<Card> cardList =new ArrayList<Card>(client.getCards());
                     if(!cardList.isEmpty()){
