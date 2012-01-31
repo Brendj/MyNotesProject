@@ -30,6 +30,7 @@ import javax.persistence.PersistenceContext;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceRef;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -43,9 +44,11 @@ import java.util.*;
 
 @Component
 @Scope("singleton")
-@WebServiceClient()
 
 public class TransactionJournalService {
+
+    //@WebServiceRef( value = TransactionService.class, type = TransactionServicePortType.class )
+    TransactionService service;
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionJournalService.class);
 
@@ -231,9 +234,10 @@ public class TransactionJournalService {
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             buildTransactionJournal();
             //вызов веб службы
-
+            logger.info(String.valueOf(curTransactionJournalItems.size()));
             if(!curTransactionJournalItems.isEmpty()){
-                TransactionService service = new TransactionService();
+                //TransactionService service = new TransactionService();
+                logger.info("Start");
                 TransactionServicePortType port = service.getTransactionServicePort();
                 TransactionListType transactionListType = new TransactionListType();
                 for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
@@ -326,7 +330,11 @@ public class TransactionJournalService {
                         logger.info(errorType.getErrorCode());
                         logger.info(errorType.getErrorDescription());
                     }
+                } else {
+                    logger.info("No errors");
                 }
+
+                logger.info("End");
             }
             cleanTransactionJournal();
             transactionManager.commit(trx);
@@ -342,8 +350,7 @@ public class TransactionJournalService {
     public void buildTransactionJournal() throws Exception{
        // synchronized (TransactionJournalService.class) {
             List transactionJournalList = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
-            logger.info(String.valueOf(transactionJournalList.size()));
-            logger.info(String.valueOf(transactionJournalList.isEmpty()));
+
             if (!transactionJournalList.isEmpty()){
                 for(Object object: transactionJournalList){
                      TransactionJournal transactionJournal = (TransactionJournal) object;
