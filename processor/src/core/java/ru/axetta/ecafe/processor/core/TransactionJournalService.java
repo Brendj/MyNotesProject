@@ -4,6 +4,15 @@
 
 package ru.axetta.ecafe.processor.core;
 
+import ru.msk.schemas.uec.common.v1.AdditionalDataType;
+import ru.msk.schemas.uec.common.v1.ErrorType;
+import ru.msk.schemas.uec.identification.v1.HolderIdDescriptionType;
+import ru.msk.schemas.uec.identification.v1.LegalIdDescriptionType;
+import ru.msk.schemas.uec.identification.v1.OrganizationType;
+import ru.msk.schemas.uec.transaction.v1.*;
+import ru.msk.schemas.uec.transactionservice.v1.TransactionService;
+import ru.msk.schemas.uec.transactionservice.v1.TransactionServicePortType;
+
 import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.slf4j.Logger;
@@ -18,10 +27,11 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.WebServiceClient;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +43,7 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
+@WebServiceClient()
 
 public class TransactionJournalService {
 
@@ -43,35 +54,80 @@ public class TransactionJournalService {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    private List<TransactionJournalItem> transactionJournalItems= Collections.emptyList();
+    private List<TransactionJournalItem> transactionJournalItems= new LinkedList<TransactionJournalItem>();
     
     public static class TransactionJournalItem{
         private long idOfTransactionJournal;
         private String serviceCode;
         private String transactionCode;
-        private long cardIdentityCode;
         private long contractId;
         private String clientSnilsSan;
         private String enterName;
-        private long orderRSum;
         private String clientType;
-        private String cartTypeName;
         private String OGRN;
         private Date sycroDate;
+
+        private String cardIdentityName;
+        private String cardIdentityCode;
+        private String cardTypeName;
+        private String cardTypeCode;
+
+        private long orderRSum;
+        private Date accountingDate;
+
+        public Date getAccountingDate() {
+            return accountingDate;
+        }
+
+        public void setAccountingDate(Date accountingDate) {
+            this.accountingDate = accountingDate;
+        }
 
         public TransactionJournalItem(TransactionJournal transactionJournal){
             this.idOfTransactionJournal = transactionJournal.getIdOfTransactionJournal();
             this.serviceCode = transactionJournal.getServiceCode();
             this.transactionCode = transactionJournal.getTransactionCode();
-            this.cardIdentityCode = transactionJournal.getCardIdentityCode();
             this.contractId = transactionJournal.getContractId();
             this.clientSnilsSan = transactionJournal.getClientSnilsSan();
             this.enterName = transactionJournal.getEnterName();
             this.orderRSum = transactionJournal.getOrderRSum();
             this.clientType = transactionJournal.getClientType();
-            this.cartTypeName = transactionJournal.getCartTypeName();
             this.OGRN = transactionJournal.getOGRN();
             this.sycroDate = transactionJournal.getSycroDate();
+
+
+        }
+
+        public String getCardIdentityName() {
+            return cardIdentityName;
+        }
+
+        public void setCardIdentityName(String cardIdentityName) {
+            this.cardIdentityName = cardIdentityName;
+        }
+
+        public String getCardIdentityCode() {
+            return cardIdentityCode;
+        }
+
+        public void setCardIdentityCode(String cardIdentityCode) {
+            this.cardIdentityCode = cardIdentityCode;
+        }
+
+        public String getCardTypeName() {
+            return cardTypeName;
+        }
+
+        public void setCardTypeName(String cardTypeName) {
+            this.cardTypeName = cardTypeName;
+        }
+
+        public String getCardTypeCode() {
+            return cardTypeCode;
+        }
+
+        public void setCardTypeCode(String cardTypeCode) {
+            this.cardTypeCode = cardTypeCode;
         }
 
         public long getIdOfTransactionJournal() {
@@ -98,13 +154,6 @@ public class TransactionJournalService {
             this.transactionCode = transactionCode;
         }
 
-        public long getCardIdentityCode() {
-            return cardIdentityCode;
-        }
-
-        public void setCardIdentityCode(long cardIdentityCode) {
-            this.cardIdentityCode = cardIdentityCode;
-        }
 
         public long getContractId() {
             return contractId;
@@ -146,14 +195,6 @@ public class TransactionJournalService {
             this.clientType = clientType;
         }
 
-        public String getCartTypeName() {
-            return cartTypeName;
-        }
-
-        public void setCartTypeName(String cartTypeName) {
-            this.cartTypeName = cartTypeName;
-        }
-
         public String getOGRN() {
             return OGRN;
         }
@@ -173,12 +214,120 @@ public class TransactionJournalService {
     
     public void processTransactionJournalQueue() {
         //To change body of created methods use File | Settings | File Templates.
+
+        final List<TransactionJournalItem> curTransactionJournalItems;
+         /*
+        synchronized (TransactionJournalService.class) {
+            if (transactionJournalItems.size() == 0) {
+                return;
+            }
+            curTransactionJournalItems = transactionJournalItems;
+            transactionJournalItems = new LinkedList<TransactionJournalItem>();
+        }  */
+
+        curTransactionJournalItems = transactionJournalItems;
         TransactionStatus trx = null;
         try{
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             buildTransactionJournal();
             //вызов веб службы
 
+            if(!curTransactionJournalItems.isEmpty()){
+                TransactionService service = new TransactionService();
+                TransactionServicePortType port = service.getTransactionServicePort();
+                TransactionListType transactionListType = new TransactionListType();
+                for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
+
+                    TransactionDescriptionType transactionDescriptionType = new TransactionDescriptionType();
+
+                    //info of organization
+                    TransactionSourceDescriptionType transactionSourceDescriptionType = new TransactionSourceDescriptionType();
+                    transactionSourceDescriptionType.setOrganizationType(OrganizationType.SCHOOL);
+                    transactionSourceDescriptionType.setTransactionSystemCode("ISPP");
+                    LegalIdDescriptionType legalIdDescriptionType = new LegalIdDescriptionType();
+                    legalIdDescriptionType.setIdCode("OGRN");
+                    legalIdDescriptionType.setIdCodeType(transactionJournalItem.getOGRN());
+                    transactionSourceDescriptionType.setTransactionSourceId(legalIdDescriptionType);
+                    transactionDescriptionType.setTransactionSourceDescription(transactionSourceDescriptionType);
+
+                    //info of Transaction
+                    TransactionIdDescriptionType transactionIdDescriptionType = new TransactionIdDescriptionType();
+                    GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                    gregorianCalendar.setTime(transactionJournalItem.getSycroDate());
+                    XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+                    transactionIdDescriptionType.setTransactionDate(xmlGregorianCalendar);
+                    transactionIdDescriptionType.setTransactionId(String.valueOf(transactionJournalItem.getIdOfTransactionJournal()));
+                    transactionDescriptionType.setTransactionIdDescription(transactionIdDescriptionType);
+
+                    // info of transaction Type Description
+                    TransactionTypeDescriptionType transactionTypeDescriptionType = new TransactionTypeDescriptionType();
+                    transactionTypeDescriptionType.setServiceCode(transactionJournalItem.getServiceCode());
+                    transactionTypeDescriptionType.setTransactionCode(transactionJournalItem.getTransactionCode());
+                    transactionDescriptionType.setTransactionTypeDescription(transactionTypeDescriptionType);
+
+                    //info of Carts
+                    HolderIdDescriptionType holderIdDescriptionType = new HolderIdDescriptionType();
+                    holderIdDescriptionType.setCardIdentityCode(transactionJournalItem.getCardIdentityCode());
+                    holderIdDescriptionType.setCardIdentityName(transactionJournalItem.getCardIdentityName());
+                    holderIdDescriptionType.setCardTypeCode(transactionJournalItem.getCardTypeCode());
+                    holderIdDescriptionType.setUecId(transactionJournalItem.getCardTypeName());
+                    holderIdDescriptionType.setSnils(transactionJournalItem.clientSnilsSan);
+                    transactionDescriptionType.setHolderDescription(holderIdDescriptionType);
+
+                    //info of accountingDescription
+                    if(null != transactionJournalItem.getServiceCode() && !transactionJournalItem.getServiceCode().equals("SCHL_FD")){
+                        TransactionDescriptionType.AccountingDescription accountingDescription = new TransactionDescriptionType.AccountingDescription();
+                        AccountingDescriptionItemType accountingDescriptionItemType = new AccountingDescriptionItemType();
+                        AccountingDescriptionItemType.FinancialDescription financialDescription = new AccountingDescriptionItemType.FinancialDescription();
+                        FinancialDescriptionItemType financialDescriptionItemType = new FinancialDescriptionItemType();
+                        financialDescriptionItemType.setFinancialAmount(BigDecimal.valueOf(transactionJournalItem.getOrderRSum()));
+                        financialDescriptionItemType.setFinancialCurrency("RUR");
+                        financialDescriptionItemType.setFinancialCode("DBT");
+                        gregorianCalendar.setTime(transactionJournalItem.getAccountingDate());
+                        xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+                        financialDescriptionItemType.setAccountingDate(xmlGregorianCalendar);
+                        financialDescription.getFinancialDescriptionItem().add(financialDescriptionItemType);
+                        accountingDescriptionItemType.setFinancialDescription(financialDescription);
+                        accountingDescription.getAccountingDescriptionItem().add(accountingDescriptionItemType);
+                        transactionDescriptionType.setAccountingDescription(accountingDescription);
+                    }
+
+
+                    // additional info
+                    AdditionalDataType additionalDataType = new AdditionalDataType();
+                    AdditionalDataType.AdditionalData additionalDataIAN = new AdditionalDataType.AdditionalData();
+                    additionalDataIAN.setAdditionalDataCode("ISPP_ACCOUNT_NUMBER");
+                    additionalDataIAN.setAdditionalDataDescription("Идентификатор лицевого счета");
+                    additionalDataIAN.setAdditionalDataValue(String.valueOf(transactionJournalItem.getContractId()));
+                    additionalDataType.getAdditionalData().add(additionalDataIAN);
+
+                    AdditionalDataType.AdditionalData additionalDataICT = new AdditionalDataType.AdditionalData();
+                    additionalDataICT.setAdditionalDataCode("ISPP_CLIENT_TYPE");
+                    additionalDataICT.setAdditionalDataDescription("Тип клиента");
+                    additionalDataICT.setAdditionalDataValue(transactionJournalItem.getClientType());
+                    additionalDataType.getAdditionalData().add(additionalDataICT);
+
+                    //Enter event info
+                    if(null != transactionJournalItem.getServiceCode() && !transactionJournalItem.getServiceCode().equals("SCHL_ACC")){
+                        AdditionalDataType.AdditionalData additionalDataIIG = new AdditionalDataType.AdditionalData();
+                        additionalDataIIG.setAdditionalDataCode("ISPP_INPUT_GROUP");
+                        additionalDataIIG.setAdditionalDataDescription("Наименование входной группы");
+                        additionalDataIIG.setAdditionalDataValue(transactionJournalItem.getEnterName());
+                        additionalDataType.getAdditionalData().add(additionalDataIIG);
+                    }
+
+                    transactionDescriptionType.setAdditionalInfo(additionalDataType);
+
+                    transactionListType.getTransaction().add(transactionDescriptionType);
+                }
+                ErrorListType quote = port.storeTransactions(transactionListType);
+                if(null != quote){
+                    for(ErrorType errorType: quote.getError()) {
+                        logger.info(errorType.getErrorCode());
+                        logger.info(errorType.getErrorDescription());
+                    }
+                }
+            }
             cleanTransactionJournal();
             transactionManager.commit(trx);
         } catch (Throwable e) {
@@ -187,35 +336,33 @@ public class TransactionJournalService {
         }
     }
 
+
+
     @Transactional
     public void buildTransactionJournal() throws Exception{
-        try {
-           List transactionJournalList = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
-            if (transactionJournalList.isEmpty()){
+       // synchronized (TransactionJournalService.class) {
+            List transactionJournalList = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
+            logger.info(String.valueOf(transactionJournalList.size()));
+            logger.info(String.valueOf(transactionJournalList.isEmpty()));
+            if (!transactionJournalList.isEmpty()){
                 for(Object object: transactionJournalList){
-                    TransactionJournal transactionJournal = (TransactionJournal) object;
-                    TransactionJournalItem transactionJournalItem = new TransactionJournalItem(transactionJournal);
-                    this.transactionJournalItems.add(transactionJournalItem);
+                     TransactionJournal transactionJournal = (TransactionJournal) object;
+                     TransactionJournalItem transactionJournalItem = new TransactionJournalItem(transactionJournal);
+                     this.transactionJournalItems.add(transactionJournalItem);
                 }
             }
-        } catch (Exception e) {
-            logger.error("Failed to save journal events to db", e);
-            throw e;
-        }
+       // }
     }
 
     @Transactional
     public void cleanTransactionJournal() throws Exception{
-        try {
+       // synchronized (TransactionJournalService.class) {
             List<TransactionJournal> transactionJournals = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
             if (!transactionJournals.isEmpty())
             {
                 entityManager.createQuery("Delete from TransactionJournal");
             }
-        } catch (Exception e) {
-            logger.error("Failed to save journal events to db", e);
-            throw e;
-        }
+       // }
     }
 
 }
