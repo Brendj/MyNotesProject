@@ -1,4 +1,4 @@
-п»ї-- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
+-- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
 -- Version 0.2.1.5
 
 -- Create tables
@@ -748,7 +748,7 @@ CREATE TABLE CF_CurrentPositions (
   CONSTRAINT CF_CurrentPositions_IdOfContragentCreditor_fk FOREIGN KEY (IdOfContragentCreditor) REFERENCES CF_Contragents (IdOfContragent)
 );
 
--- РЅР°С‡РёСЃР»РµРЅРЅР°СЏ РїР»Р°С‚Р° Р·Р° РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ
+-- начисленная плата за обслуживание
 CREATE TABLE CF_AddPayments (
    IdOfAddPayment           BIGINT        NOT NULL,
    IdOfContragentPayer      BIGINT        NOT NULL,
