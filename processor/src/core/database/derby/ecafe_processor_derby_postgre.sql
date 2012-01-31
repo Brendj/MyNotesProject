@@ -748,7 +748,7 @@ CREATE TABLE CF_CurrentPositions (
   CONSTRAINT CF_CurrentPositions_IdOfContragentCreditor_fk FOREIGN KEY (IdOfContragentCreditor) REFERENCES CF_Contragents (IdOfContragent)
 );
 
--- начисленная плата за обслуживание
+-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 CREATE TABLE CF_AddPayments (
    IdOfAddPayment           BIGINT        NOT NULL,
    IdOfContragentPayer      BIGINT        NOT NULL,
@@ -809,18 +809,18 @@ CREATE TABLE cf_transaction_journal
 (
   idoftransactionjournal bigint NOT NULL,
   ogrn character varying(32),
-  systemcode character varying(10),
   sycrodate bigint,
-  carttypename character varying(100),
-  cartidentityname character varying(20),
   clientsnilssan character varying(15),
   clienttype character varying(32),
   entername character varying(100),
-  carttype integer,
-  cardidentitycode integer,
   contractid bigint,
   orderrsum bigint,
   servicecode character varying(10),
   transactioncode character varying(10),
+  cardtypecode character varying(10),
+  cardtypename character varying(100),
+  cardidentitycode character varying(10),
+  cardidentityname character varying(32),
+  accountingdate bigint,
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idoftransactionjournal )
 );
