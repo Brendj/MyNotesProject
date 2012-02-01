@@ -14,9 +14,11 @@ import ru.msk.schemas.uec.transactionservice.v1.TransactionService;
 import ru.msk.schemas.uec.transactionservice.v1.TransactionServicePortType;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.transaction.TransactionTest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,9 +31,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.rpc.*;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceRef;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -44,11 +49,11 @@ import java.util.*;
 
 @Component
 @Scope("singleton")
+//@WebServiceRef( value = TransactionService.class, type = TransactionServicePortType.class )
 
 public class TransactionJournalService {
 
-    //@WebServiceRef( value = TransactionService.class, type = TransactionServicePortType.class )
-    TransactionService service;
+    //TransactionService service;
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionJournalService.class);
 
@@ -214,7 +219,22 @@ public class TransactionJournalService {
             this.sycroDate = sycroDate;
         }
     }
-    
+
+    public void processTransactionJournalQueue1() {
+         logger.info("dsdadas");
+        try{
+           testService();
+        }
+        catch (Exception e){
+            logger.info("Error: " + e);
+        }
+    }
+
+    private void testService() throws Exception {
+        TransactionTest transactionTest = new TransactionTest();
+        transactionTest.testWed();
+    }
+
     public void processTransactionJournalQueue() {
         //To change body of created methods use File | Settings | File Templates.
 
@@ -236,7 +256,7 @@ public class TransactionJournalService {
             //вызов веб службы
             logger.info(String.valueOf(curTransactionJournalItems.size()));
             if(!curTransactionJournalItems.isEmpty()){
-                //TransactionService service = new TransactionService();
+                TransactionService service = new TransactionService();
                 logger.info("Start");
                 TransactionServicePortType port = service.getTransactionServicePort();
                 TransactionListType transactionListType = new TransactionListType();
