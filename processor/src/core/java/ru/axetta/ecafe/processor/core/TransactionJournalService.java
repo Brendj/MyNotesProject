@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core;
 
+import com.sun.xml.internal.ws.api.pipe.Engine;
 import ru.msk.schemas.uec.common.v1.AdditionalDataType;
 import ru.msk.schemas.uec.common.v1.ErrorType;
 import ru.msk.schemas.uec.identification.v1.HolderIdDescriptionType;
@@ -16,6 +17,9 @@ import ru.msk.schemas.uec.transactionservice.v1.TransactionServicePortType;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.transaction.TransactionTest;
 
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -32,12 +36,17 @@ import javax.persistence.PersistenceContext;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.rpc.*;
+import javax.xml.rpc.ParameterMode;
+import javax.xml.rpc.ServiceFactory;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceRef;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
+
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,11 +58,9 @@ import java.util.*;
 
 @Component
 @Scope("singleton")
-//@WebServiceRef( value = TransactionService.class, type = TransactionServicePortType.class )
 
 public class TransactionJournalService {
 
-    //TransactionService service;
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionJournalService.class);
 
@@ -91,19 +98,22 @@ public class TransactionJournalService {
             this.accountingDate = accountingDate;
         }
 
-        public TransactionJournalItem(TransactionJournal transactionJournal){
-            this.idOfTransactionJournal = transactionJournal.getIdOfTransactionJournal();
+        public TransactionJournalItem(TransactionJournal transactionJournal) {
+            this.idOfTransactionJournal = transactionJournal.getIdOfTransactionJournal();;
             this.serviceCode = transactionJournal.getServiceCode();
             this.transactionCode = transactionJournal.getTransactionCode();
             this.contractId = transactionJournal.getContractId();
             this.clientSnilsSan = transactionJournal.getClientSnilsSan();
             this.enterName = transactionJournal.getEnterName();
-            this.orderRSum = transactionJournal.getOrderRSum();
             this.clientType = transactionJournal.getClientType();
             this.OGRN = transactionJournal.getOGRN();
             this.sycroDate = transactionJournal.getSycroDate();
-
-
+            this.cardIdentityName =transactionJournal.getCardIdentityName();
+            this.cardIdentityCode =transactionJournal.getCardIdentityCode();
+            this.cardTypeName = transactionJournal.getCardTypeName();
+            this.cardTypeCode = transactionJournal.getCardTypeCode();
+            this.orderRSum = transactionJournal.getOrderRSum();
+            this.accountingDate = transactionJournal.getAccountingDate();
         }
 
         public String getCardIdentityName() {
@@ -218,27 +228,32 @@ public class TransactionJournalService {
         public void setSycroDate(Date sycroDate) {
             this.sycroDate = sycroDate;
         }
+
+        @Override
+        public String toString() {
+            return "TransactionJournalItem{" +
+                    "idOfTransactionJournal=" + idOfTransactionJournal +
+                    ", serviceCode='" + serviceCode + '\'' +
+                    ", transactionCode='" + transactionCode + '\'' +
+                    ", contractId=" + contractId +
+                    ", clientSnilsSan='" + clientSnilsSan + '\'' +
+                    ", enterName='" + enterName + '\'' +
+                    ", clientType='" + clientType + '\'' +
+                    ", OGRN='" + OGRN + '\'' +
+                    ", sycroDate=" + sycroDate +
+                    ", cardIdentityName='" + cardIdentityName + '\'' +
+                    ", cardIdentityCode='" + cardIdentityCode + '\'' +
+                    ", cardTypeName='" + cardTypeName + '\'' +
+                    ", cardTypeCode='" + cardTypeCode + '\'' +
+                    ", orderRSum=" + orderRSum +
+                    ", accountingDate=" + accountingDate +
+                    '}';
+        }
     }
 
-    public void processTransactionJournalQueue1() {
-         logger.info("dsdadas");
-        try{
-           testService();
-        }
-        catch (Exception e){
-            logger.info("Error: " + e);
-        }
-    }
-
-    private void testService() throws Exception {
-        TransactionTest transactionTest = new TransactionTest();
-        transactionTest.testWed();
-    }
 
     public void processTransactionJournalQueue() {
-        //To change body of created methods use File | Settings | File Templates.
-
-        final List<TransactionJournalItem> curTransactionJournalItems;
+        List<TransactionJournalItem> curTransactionJournalItems=Collections.emptyList();
          /*
         synchronized (TransactionJournalService.class) {
             if (transactionJournalItems.size() == 0) {
@@ -247,21 +262,18 @@ public class TransactionJournalService {
             curTransactionJournalItems = transactionJournalItems;
             transactionJournalItems = new LinkedList<TransactionJournalItem>();
         }  */
-
         curTransactionJournalItems = transactionJournalItems;
         TransactionStatus trx = null;
         try{
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             buildTransactionJournal();
             //вызов веб службы
-            logger.info(String.valueOf(curTransactionJournalItems.size()));
             if(!curTransactionJournalItems.isEmpty()){
-                TransactionService service = new TransactionService();
-                logger.info("Start");
-                TransactionServicePortType port = service.getTransactionServicePort();
-                TransactionListType transactionListType = new TransactionListType();
-                for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
 
+                for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
+                    TransactionService service = new TransactionService();
+                    TransactionServicePortType port = service.getTransactionServicePort();
+                    TransactionListType transactionListType = new TransactionListType();
                     TransactionDescriptionType transactionDescriptionType = new TransactionDescriptionType();
 
                     //info of organization
@@ -299,7 +311,8 @@ public class TransactionJournalService {
                     transactionDescriptionType.setHolderDescription(holderIdDescriptionType);
 
                     //info of accountingDescription
-                    if(null != transactionJournalItem.getServiceCode() && !transactionJournalItem.getServiceCode().equals("SCHL_FD")){
+
+                    if(null != transactionJournalItem.getServiceCode() && transactionJournalItem.getServiceCode().equals("SCHL_FD")){
                         TransactionDescriptionType.AccountingDescription accountingDescription = new TransactionDescriptionType.AccountingDescription();
                         AccountingDescriptionItemType accountingDescriptionItemType = new AccountingDescriptionItemType();
                         AccountingDescriptionItemType.FinancialDescription financialDescription = new AccountingDescriptionItemType.FinancialDescription();
@@ -318,6 +331,7 @@ public class TransactionJournalService {
 
 
                     // additional info
+
                     AdditionalDataType additionalDataType = new AdditionalDataType();
                     AdditionalDataType.AdditionalData additionalDataIAN = new AdditionalDataType.AdditionalData();
                     additionalDataIAN.setAdditionalDataCode("ISPP_ACCOUNT_NUMBER");
@@ -332,7 +346,7 @@ public class TransactionJournalService {
                     additionalDataType.getAdditionalData().add(additionalDataICT);
 
                     //Enter event info
-                    if(null != transactionJournalItem.getServiceCode() && !transactionJournalItem.getServiceCode().equals("SCHL_ACC")){
+                    if(null != transactionJournalItem.getServiceCode() && transactionJournalItem.getServiceCode().equals("SCHL_ACC")){
                         AdditionalDataType.AdditionalData additionalDataIIG = new AdditionalDataType.AdditionalData();
                         additionalDataIIG.setAdditionalDataCode("ISPP_INPUT_GROUP");
                         additionalDataIIG.setAdditionalDataDescription("Наименование входной группы");
@@ -343,18 +357,17 @@ public class TransactionJournalService {
                     transactionDescriptionType.setAdditionalInfo(additionalDataType);
 
                     transactionListType.getTransaction().add(transactionDescriptionType);
-                }
-                ErrorListType quote = port.storeTransactions(transactionListType);
-                if(null != quote){
-                    for(ErrorType errorType: quote.getError()) {
-                        logger.info(errorType.getErrorCode());
-                        logger.info(errorType.getErrorDescription());
+                    ErrorListType quote = port.storeTransactions(transactionListType);
+                    if(null != quote){
+                        logger.info("Errors result: ");
+                        for(ErrorType errorType: quote.getError()) {
+                            logger.info(errorType.getErrorCode());
+                            logger.info(errorType.getErrorDescription());
+                        }
+                    } else {
+                        logger.info("No errors");
                     }
-                } else {
-                    logger.info("No errors");
                 }
-
-                logger.info("End");
             }
             cleanTransactionJournal();
             transactionManager.commit(trx);
