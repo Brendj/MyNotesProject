@@ -57,5 +57,4 @@
     </task:scheduled-tasks>
     <task:scheduler id="myScheduler" pool-size="5"/>
 
-
 </beans>
