@@ -51,10 +51,9 @@
 
     <context:component-scan base-package="ru.axetta.ecafe.processor"/>
 
-    <task:scheduled-tasks scheduler="myScheduler">
-        <task:scheduled ref="maintananceService" method="run" fixed-delay="15000" />
-<!--        <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="5000"/>-->
+    <task:scheduled-tasks scheduler="transactionJournalScheduler">
+        <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="5000"/>
     </task:scheduled-tasks>
-    <task:scheduler id="myScheduler" pool-size="5"/>
+    <task:scheduler id="transactionJournalScheduler" pool-size="5"/>
 
 </beans>
