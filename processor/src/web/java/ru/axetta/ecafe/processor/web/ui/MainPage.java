@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.web.ui.client.category.*;
 import ru.axetta.ecafe.processor.web.ui.client.rule.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
+import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
@@ -270,6 +271,8 @@ public class MainPage {
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
     private final RuleListSelectPage ruleListSelectPage = new RuleListSelectPage();
+
+
 
     public String getEndOfLine() {
         return "\r\n";
@@ -4564,6 +4567,18 @@ public class MainPage {
             HibernateUtils.close(persistenceSession, logger);
             
         }
+        return null;
+    }
+
+
+    private final JournalViewPage journalViewPage = new JournalViewPage();
+
+    public JournalViewPage getJournalViewPage(){
+        return journalViewPage;
+    }
+
+    public Object showJournalViewPage(){
+        currentWorkspacePage = journalViewPage;
         return null;
     }
 
