@@ -18,8 +18,10 @@
 
 <h:panelGrid styleClass="borderless-grid" id="journalViewPanel"
              binding="#{mainPage.journalViewPage.pageComponent}">
-    <h:outputText value="journal page"/>
-    <h:outputText value="#{mainPage.journalViewPage.journal.idOfTransactionJournal}"/>
-    <br/>
-    <h:outputText value="#{mainPage.journalViewPage.journal.cartCodeType}"/>
+
+   <h:dataTable id="journalTable" value="#{mainPage.journalViewPage.journal}" var="item">
+       <h:column>
+           <h:outputText value="#{item}" />
+       </h:column>
+   </h:dataTable>
 </h:panelGrid>
