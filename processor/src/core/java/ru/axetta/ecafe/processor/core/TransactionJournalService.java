@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core;
 
-import com.sun.xml.internal.ws.api.pipe.Engine;
+
 import ru.msk.schemas.uec.common.v1.AdditionalDataType;
 import ru.msk.schemas.uec.common.v1.ErrorType;
 import ru.msk.schemas.uec.identification.v1.HolderIdDescriptionType;
@@ -15,10 +15,12 @@ import ru.msk.schemas.uec.transactionservice.v1.TransactionService;
 import ru.msk.schemas.uec.transactionservice.v1.TransactionServicePortType;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.transaction.TransactionTest;
 
+import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.interceptor.InInterceptors;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.OutInterceptors;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +37,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-import javax.xml.rpc.ServiceFactory;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.WebServiceRef;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.*;
-
-
-import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -70,7 +63,7 @@ public class TransactionJournalService {
     private PlatformTransactionManager transactionManager;
 
     private List<TransactionJournalItem> transactionJournalItems= new LinkedList<TransactionJournalItem>();
-    
+
     public static class TransactionJournalItem{
         private long idOfTransactionJournal;
         private String serviceCode;
@@ -268,37 +261,46 @@ public class TransactionJournalService {
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             buildTransactionJournal();
             //вызов веб службы
+
+
             if(!curTransactionJournalItems.isEmpty()){
 
                 for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
+
+
                     TransactionService service = new TransactionService();
                     TransactionServicePortType port = service.getTransactionServicePort();
                     TransactionListType transactionListType = new TransactionListType();
+
                     TransactionDescriptionType transactionDescriptionType = new TransactionDescriptionType();
 
                     //info of organization
                     TransactionSourceDescriptionType transactionSourceDescriptionType = new TransactionSourceDescriptionType();
+
+                    LegalIdDescriptionType legalIdDescriptionType = new LegalIdDescriptionType();
+                    legalIdDescriptionType.setIdCodeType("OGRN");
+                    legalIdDescriptionType.setIdCode(transactionJournalItem.getOGRN());
+                    transactionSourceDescriptionType.setTransactionSourceId(legalIdDescriptionType);
                     transactionSourceDescriptionType.setOrganizationType(OrganizationType.SCHOOL);
                     transactionSourceDescriptionType.setTransactionSystemCode("ISPP");
-                    LegalIdDescriptionType legalIdDescriptionType = new LegalIdDescriptionType();
-                    legalIdDescriptionType.setIdCode("OGRN");
-                    legalIdDescriptionType.setIdCodeType(transactionJournalItem.getOGRN());
-                    transactionSourceDescriptionType.setTransactionSourceId(legalIdDescriptionType);
+
                     transactionDescriptionType.setTransactionSourceDescription(transactionSourceDescriptionType);
 
                     //info of Transaction
                     TransactionIdDescriptionType transactionIdDescriptionType = new TransactionIdDescriptionType();
+                    transactionIdDescriptionType.setTransactionId(String.valueOf(transactionJournalItem.getIdOfTransactionJournal()));
                     GregorianCalendar gregorianCalendar = new GregorianCalendar();
                     gregorianCalendar.setTime(transactionJournalItem.getSycroDate());
                     XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
                     transactionIdDescriptionType.setTransactionDate(xmlGregorianCalendar);
-                    transactionIdDescriptionType.setTransactionId(String.valueOf(transactionJournalItem.getIdOfTransactionJournal()));
+
                     transactionDescriptionType.setTransactionIdDescription(transactionIdDescriptionType);
 
                     // info of transaction Type Description
                     TransactionTypeDescriptionType transactionTypeDescriptionType = new TransactionTypeDescriptionType();
                     transactionTypeDescriptionType.setServiceCode(transactionJournalItem.getServiceCode());
                     transactionTypeDescriptionType.setTransactionCode(transactionJournalItem.getTransactionCode());
+
                     transactionDescriptionType.setTransactionTypeDescription(transactionTypeDescriptionType);
 
                     //info of Carts
@@ -307,7 +309,7 @@ public class TransactionJournalService {
                     holderIdDescriptionType.setCardIdentityName(transactionJournalItem.getCardIdentityName());
                     holderIdDescriptionType.setCardTypeCode(transactionJournalItem.getCardTypeCode());
                     holderIdDescriptionType.setUecId(transactionJournalItem.getCardTypeName());
-                    holderIdDescriptionType.setSnils(transactionJournalItem.clientSnilsSan);
+                    holderIdDescriptionType.setSnils(transactionJournalItem.getClientSnilsSan());
                     transactionDescriptionType.setHolderDescription(holderIdDescriptionType);
 
                     //info of accountingDescription
@@ -317,9 +319,9 @@ public class TransactionJournalService {
                         AccountingDescriptionItemType accountingDescriptionItemType = new AccountingDescriptionItemType();
                         AccountingDescriptionItemType.FinancialDescription financialDescription = new AccountingDescriptionItemType.FinancialDescription();
                         FinancialDescriptionItemType financialDescriptionItemType = new FinancialDescriptionItemType();
+                        financialDescriptionItemType.setFinancialCode("DBT");
                         financialDescriptionItemType.setFinancialAmount(BigDecimal.valueOf(transactionJournalItem.getOrderRSum()));
                         financialDescriptionItemType.setFinancialCurrency("RUR");
-                        financialDescriptionItemType.setFinancialCode("DBT");
                         gregorianCalendar.setTime(transactionJournalItem.getAccountingDate());
                         xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
                         financialDescriptionItemType.setAccountingDate(xmlGregorianCalendar);
@@ -346,6 +348,7 @@ public class TransactionJournalService {
                     additionalDataType.getAdditionalData().add(additionalDataICT);
 
                     //Enter event info
+
                     if(null != transactionJournalItem.getServiceCode() && transactionJournalItem.getServiceCode().equals("SCHL_ACC")){
                         AdditionalDataType.AdditionalData additionalDataIIG = new AdditionalDataType.AdditionalData();
                         additionalDataIIG.setAdditionalDataCode("ISPP_INPUT_GROUP");
@@ -357,17 +360,18 @@ public class TransactionJournalService {
                     transactionDescriptionType.setAdditionalInfo(additionalDataType);
 
                     transactionListType.getTransaction().add(transactionDescriptionType);
+
                     ErrorListType quote = port.storeTransactions(transactionListType);
+
                     if(null != quote){
-                        logger.info("Errors result: ");
+                        logger.info("result: ");
                         for(ErrorType errorType: quote.getError()) {
-                            logger.info(errorType.getErrorCode());
-                            logger.info(errorType.getErrorDescription());
+                            logger.info(errorType.getErrorCode()+" : "+errorType.getErrorDescription());
                         }
-                    } else {
-                        logger.info("No errors");
                     }
                 }
+
+
             }
             cleanTransactionJournal();
             transactionManager.commit(trx);
