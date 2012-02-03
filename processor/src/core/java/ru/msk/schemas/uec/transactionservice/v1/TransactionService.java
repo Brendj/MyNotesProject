@@ -1,8 +1,13 @@
 
 package ru.msk.schemas.uec.transactionservice.v1;
 
+import org.apache.cxf.interceptor.InInterceptors;
+import org.apache.cxf.interceptor.OutInterceptors;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -18,6 +23,8 @@ import javax.xml.ws.WebServiceFeature;
  * 
  */
 @WebServiceClient(name = "TransactionService", targetNamespace = "http://schemas.msk.ru/uec/TransactionService/v1", wsdlLocation = "http://193.47.154.34:7002/uec-service-war/TransactionService?wsdl")
+
+
 public class TransactionService
     extends Service
 {
@@ -67,5 +74,4 @@ public class TransactionService
     public TransactionServicePortType getTransactionServicePort(WebServiceFeature... features) {
         return super.getPort(new QName("http://schemas.msk.ru/uec/TransactionService/v1", "TransactionServicePort"), TransactionServicePortType.class, features);
     }
-
 }
