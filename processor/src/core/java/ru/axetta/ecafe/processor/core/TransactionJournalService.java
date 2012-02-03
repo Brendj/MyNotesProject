@@ -261,16 +261,16 @@ public class TransactionJournalService {
             trx = transactionManager.getTransaction(new DefaultTransactionDefinition());
             buildTransactionJournal();
             //вызов веб службы
-
+            TransactionService service = new TransactionService();
+            TransactionServicePortType port = service.getTransactionServicePort();
+            TransactionListType transactionListType = new TransactionListType();
 
             if(!curTransactionJournalItems.isEmpty()){
 
                 for (TransactionJournalItem transactionJournalItem: curTransactionJournalItems){
 
 
-                    TransactionService service = new TransactionService();
-                    TransactionServicePortType port = service.getTransactionServicePort();
-                    TransactionListType transactionListType = new TransactionListType();
+
 
                     TransactionDescriptionType transactionDescriptionType = new TransactionDescriptionType();
 
@@ -361,16 +361,16 @@ public class TransactionJournalService {
 
                     transactionListType.getTransaction().add(transactionDescriptionType);
 
-                    ErrorListType quote = port.storeTransactions(transactionListType);
 
-                    if(null != quote){
-                        logger.info("result: ");
-                        for(ErrorType errorType: quote.getError()) {
-                            logger.info(errorType.getErrorCode()+" : "+errorType.getErrorDescription());
-                        }
+                }
+                ErrorListType quote = port.storeTransactions(transactionListType);
+
+                if(null != quote){
+                    logger.info("result: ");
+                    for(ErrorType errorType: quote.getError()) {
+                        logger.info(errorType.getErrorCode()+" : "+errorType.getErrorDescription());
                     }
                 }
-
 
             }
             cleanTransactionJournal();
