@@ -62,6 +62,12 @@ public class TransactionJournalService {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    private static List<String> infoOfTransactionJournal = new LinkedList<String>();
+
+    public static List<String> getInfoOfTransactionJournal() {
+        return infoOfTransactionJournal;
+    }
+
     private List<TransactionJournalItem> transactionJournalItems= new LinkedList<TransactionJournalItem>();
 
     public static class TransactionJournalItem{
@@ -247,14 +253,14 @@ public class TransactionJournalService {
 
     public void processTransactionJournalQueue() {
         List<TransactionJournalItem> curTransactionJournalItems=Collections.emptyList();
-         /*
+            /*
         synchronized (TransactionJournalService.class) {
             if (transactionJournalItems.size() == 0) {
                 return;
             }
             curTransactionJournalItems = transactionJournalItems;
             transactionJournalItems = new LinkedList<TransactionJournalItem>();
-        }  */
+        }     */
         curTransactionJournalItems = transactionJournalItems;
         TransactionStatus trx = null;
         try{
@@ -366,14 +372,30 @@ public class TransactionJournalService {
                 ErrorListType quote = port.storeTransactions(transactionListType);
 
                 if(null != quote){
-                    logger.info("result: ");
                     for(ErrorType errorType: quote.getError()) {
                         logger.info(errorType.getErrorCode()+" : "+errorType.getErrorDescription());
+                        Date transactionDate = new Date();
+                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                        StringBuilder sb= new StringBuilder();
+                        gregorianCalendar.setTime(transactionDate);
+                        XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+                        sb.append("[");
+                        sb.append(xmlGregorianCalendar);
+                        sb.append("]");
+                        if(errorType.getErrorCode().equals("0")){
+                            sb.append(" Транзакция прошла успешно: ");
+                            infoOfTransactionJournal.add(sb.toString());
+                            cleanTransactionJournal();
+                        } else {
+                            sb.append(" Ошибка транзакции: ");
+                            sb.append(errorType.getErrorDescription());
+
+                            infoOfTransactionJournal.add(sb.toString());
+                        }
                     }
                 }
 
             }
-            cleanTransactionJournal();
             transactionManager.commit(trx);
         } catch (Throwable e) {
             logger.error("Failed to save journal events to db", e);
@@ -385,7 +407,7 @@ public class TransactionJournalService {
 
     @Transactional
     public void buildTransactionJournal() throws Exception{
-       // synchronized (TransactionJournalService.class) {
+        //synchronized (TransactionJournalService.class) {
             List transactionJournalList = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
 
             if (!transactionJournalList.isEmpty()){
@@ -395,7 +417,7 @@ public class TransactionJournalService {
                      this.transactionJournalItems.add(transactionJournalItem);
                 }
             }
-       // }
+        //}
     }
 
     @Transactional
@@ -404,7 +426,10 @@ public class TransactionJournalService {
             List<TransactionJournal> transactionJournals = entityManager.createQuery("select tj from TransactionJournal tj").getResultList();
             if (!transactionJournals.isEmpty())
             {
-                entityManager.createQuery("Delete from TransactionJournal");
+                for(Object object: transactionJournals){
+                    TransactionJournal transactionJournal = (TransactionJournal) object;
+                    entityManager.remove(transactionJournal);
+                }
             }
        // }
     }
