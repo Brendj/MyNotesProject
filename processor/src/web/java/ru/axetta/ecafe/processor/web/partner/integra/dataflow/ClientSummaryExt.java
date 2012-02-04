@@ -23,6 +23,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="Balance" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="OverdraftLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="ExpenditureLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="FirstName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="Grade" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="OfficialName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -45,6 +48,12 @@ public class ClientSummaryExt {
     protected Long overdraftLimit;
     @XmlAttribute(name = "ExpenditureLimit")
     protected Long expenditureLimit;
+    @XmlAttribute(name = "FirstName")
+    protected String firstName;
+    @XmlAttribute(name = "Grade")
+    protected String grade;
+    @XmlAttribute(name = "OfficialName")
+    protected String officialName;
 
     /**
      * Gets the value of the dateOfContract property.
@@ -164,6 +173,78 @@ public class ClientSummaryExt {
      */
     public void setExpenditureLimit(Long value) {
         this.expenditureLimit = value;
+    }
+
+    /**
+     * Gets the value of the firstName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     * Sets the value of the firstName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setFirstName(String value) {
+        this.firstName = value;
+    }
+
+    /**
+     * Gets the value of the grade property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGrade() {
+        return grade;
+    }
+
+    /**
+     * Sets the value of the grade property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGrade(String value) {
+        this.grade = value;
+    }
+
+    /**
+     * Gets the value of the officialName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getOfficialName() {
+        return officialName;
+    }
+
+    /**
+     * Sets the value of the officialName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setOfficialName(String value) {
+        this.officialName = value;
     }
 
 }

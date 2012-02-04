@@ -11,7 +11,10 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * Time: 11:01
  * To change this template use File | Settings | File Templates.
  */
-public class ClientsData extends Data {
+public class ClientsData {
+    public Long resultCode;
+    public String description;
+
     private ClientList clientList;
 
     public ClientList getClientList() {

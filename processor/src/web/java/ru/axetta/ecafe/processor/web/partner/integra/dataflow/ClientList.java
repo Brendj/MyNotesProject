@@ -18,9 +18,8 @@ public class ClientList {
     private List<ClientItem> clients;
 
     public List<ClientItem> getClients() {
-        if (clients == null) {
+        if (clients == null)
             clients = new ArrayList<ClientItem>();
-        }
         return this.clients;
     }
 }

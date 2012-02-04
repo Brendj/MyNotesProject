@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
+import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
@@ -21,11 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jws.WebService;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServlet;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -43,6 +48,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_NOT_FOUND = 110L;
     private static final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
     private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
 
     interface Processor {
 
@@ -87,11 +94,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             return data;
         }
-        
+
         public Data process(String san, Processor processor) {
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
-            
+
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -101,13 +108,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
                 List<Client> clients = clientCriteria.list();
-                
+
                 if (clients.isEmpty()) {
                     data.setResultCode(RC_CLIENT_NOT_FOUND);
                     data.setDescription("Client not found");
                 } else if (clients.size() > 1) {
                     data.setResultCode(RC_SEVERAL_CLIENTS_WERE_FOUND);
-                    data.setDescription("Several clients were found");                    
+                    data.setDescription("Several clients were found");
                 } else {
                     Client client = (Client) clients.get(0);
                     processor.process(client, data, objectFactory, persistenceSession, persistenceTransaction);
@@ -131,28 +138,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getSummary(Long contractId) {
+    public ClientSummaryResult getSummary(Long contractId) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory);
             }
         });
-        return data;
+
+        ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
+        clientSummaryResult.clientSummary = data.getClientSummaryExt();
+        clientSummaryResult.resultCode = data.getResultCode();
+        clientSummaryResult.description = data.getDescription();
+        return clientSummaryResult;
     }
 
     @Override
-    public Data getSummary(String san) {
+    public ClientSummaryResult getSummary(String san) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory);
             }
         });
-        return data;
+
+        ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
+        clientSummaryResult.clientSummary = data.getClientSummaryExt();
+        clientSummaryResult.resultCode = data.getResultCode();
+        clientSummaryResult.description = data.getDescription();
+        return clientSummaryResult;
     }
 
-    private void processSummary(Client client, Data data, ObjectFactory objectFactory) 
+    private void processSummary(Client client, Data data, ObjectFactory objectFactory)
             throws DatatypeConfigurationException {
         ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
         clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
@@ -160,31 +177,47 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setOverdraftLimit(client.getLimit());
         clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
         clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
+        clientSummaryExt.setFirstName(client.getPerson().getFirstName());
+        if (client.getClientGroup() == null)
+            clientSummaryExt.setGrade(null);
+        else
+            clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
+        clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
         data.setClientSummaryExt(clientSummaryExt);
     }
 
     final static int MAX_RECS = 50;
 
     @Override
-    public Data getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
+    public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPurchaseList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+        PurchaseListResult purchaseListResult = new PurchaseListResult();
+        purchaseListResult.purchaseList = data.getPurchaseListExt();
+        purchaseListResult.resultCode = data.getResultCode();
+        purchaseListResult.description = data.getDescription();
+
+        return purchaseListResult;
     }
-    
+
     @Override
-    public Data getPurchaseList(String san, final Date startDate, final Date endDate) {
+    public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPurchaseList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+
+        PurchaseListResult purchaseListResult = new PurchaseListResult();
+        purchaseListResult.purchaseList = data.getPurchaseListExt();
+        purchaseListResult.resultCode = data.getResultCode();
+        purchaseListResult.description = data.getDescription();
+        return purchaseListResult;
     }
 
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -208,7 +241,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseExt.setDonation(order.getGrantSum());
             purchaseExt.setSum(order.getRSum());
             purchaseExt.setByCash(order.getSumByCash());
-            purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
+            if (order.getCard() == null)
+                purchaseExt.setIdOfCard(null);
+            else
+                purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
             purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
 
             Set<OrderDetail> orderDetailSet=((Order) o).getOrderDetails();
@@ -226,25 +262,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getPaymentList(Long contractId, final Date startDate, final Date endDate) {
+    public PaymentListResult getPaymentList(Long contractId, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPaymentList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+
+        PaymentListResult paymentListResult = new PaymentListResult();
+        paymentListResult.paymentList = data.getPaymentList();
+        paymentListResult.resultCode = data.getResultCode();
+        paymentListResult.description = data.getDescription();
+
+        return paymentListResult;
     }
-    
+
     @Override
-    public Data getPaymentList(String san, final Date startDate, final Date endDate) {
+    public PaymentListResult getPaymentList(String san, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPaymentList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+
+        PaymentListResult paymentListResult = new PaymentListResult();
+        paymentListResult.paymentList = data.getPaymentList();
+        paymentListResult.resultCode = data.getResultCode();
+        paymentListResult.description = data.getDescription();
+
+        return paymentListResult;
     }
 
     private void processPaymentList(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -275,25 +323,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getMenuList(Long contractId, final Date startDate, final Date endDate) {
+    public MenuListResult getMenuList(Long contractId, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processMenuList(client, data, objectFactory, session, startDate, endDate);
             }
         });
-        return data;
+
+        MenuListResult menuListResult = new MenuListResult();
+        menuListResult.menuList = data.getMenuListExt();
+        menuListResult.resultCode = data.getResultCode();
+        menuListResult.description = data.getDescription();
+        return menuListResult;
     }
-    
+
     @Override
-    public Data getMenuList(String san, final Date startDate, final Date endDate) {
+    public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processMenuList(client, data, objectFactory, session, startDate, endDate);
             }
         });
-        return data;
+
+        MenuListResult menuListResult = new MenuListResult();
+        menuListResult.menuList = data.getMenuListExt();
+        menuListResult.resultCode = data.getResultCode();
+        menuListResult.description = data.getDescription();
+        return menuListResult;
     }
 
     private void processMenuList(Client client, Data data, ObjectFactory objectFactory, Session session, Date startDate,
@@ -344,25 +402,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getCardList(Long contractId) {
+    public CardListResult getCardList(Long contractId) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processCardList(client, data, objectFactory);
             }
         });
-        return data;
+        
+        CardListResult cardListResult = new CardListResult();
+        cardListResult.cardList = data.getCardList();
+        cardListResult.resultCode = data.getResultCode();
+        cardListResult.description = data.getDescription();
+        return cardListResult;
     }
-    
+
     @Override
-    public Data getCardList(String san) {
+    public CardListResult getCardList(String san) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processCardList(client, data, objectFactory);
             }
         });
-        return data;
+
+        CardListResult cardListResult = new CardListResult();
+        cardListResult.cardList = data.getCardList();
+        cardListResult.resultCode = data.getResultCode();
+        cardListResult.description = data.getDescription();
+        return cardListResult;
     }
 
     private void processCardList(Client client, Data data, ObjectFactory objectFactory)
@@ -384,25 +452,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+    public EnterEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processEnterEventList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+
+        EnterEventListResult enterEventListResult = new EnterEventListResult();
+        enterEventListResult.enterEventList = data.getEnterEventList();
+        enterEventListResult.resultCode = data.getResultCode();
+        enterEventListResult.description = data.getDescription();
+        return enterEventListResult;
     }
-    
+
     @Override
-    public Data getEnterEventList(String san, final Date startDate, final Date endDate) {
+    public EnterEventListResult getEnterEventList(String san, final Date startDate, final Date endDate) {
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processEnterEventList(client, data, objectFactory, session, endDate, startDate);
             }
         });
-        return data;
+
+        EnterEventListResult enterEventListResult = new EnterEventListResult();
+        enterEventListResult.enterEventList = data.getEnterEventList();
+        enterEventListResult.resultCode = data.getResultCode();
+        enterEventListResult.description = data.getDescription();
+        return enterEventListResult;
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -437,7 +515,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Data getClientsByGuardSan(String guardSan) {
+    public ClientsData getClientsByGuardSan(String guardSan) {
         ClientsData data = new ClientsData();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -448,17 +526,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
 
             Criterion exp1 = Restrictions.or(Restrictions.ilike("guardSan", guardSan, MatchMode.EXACT),
-                Restrictions.ilike("guardSan", guardSan + ";", MatchMode.START));
+                    Restrictions.ilike("guardSan", guardSan + ";", MatchMode.START));
             Criterion exp2 = Restrictions.or(Restrictions.like("guardSan", ";" + guardSan, MatchMode.END),
-                Restrictions.like("guardSan", ";" + guardSan + ";", MatchMode.ANYWHERE));
+                    Restrictions.like("guardSan", ";" + guardSan + ";", MatchMode.ANYWHERE));
             Criterion expression = Restrictions.or(exp1, exp2);
             clientCriteria.add(expression);
 
             List<Client> clients = clientCriteria.list();
 
             if (clients.isEmpty()) {
-                data.setResultCode(RC_CLIENT_NOT_FOUND);
-                data.setDescription("Client not found");
+                data.resultCode = RC_CLIENT_NOT_FOUND;
+                data.description = "Client not found";
             } else {
                 ClientList clientList = new ClientList();
                 for (Client client : clients) {
@@ -468,21 +546,212 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientList.getClients().add(clientItem);
                 }
                 data.setClientList(clientList);
-                data.setResultCode(RC_OK);
-                data.setDescription("OK");
+                data.resultCode = RC_OK;
+                data.description = "OK";
             }
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
-            data.setResultCode(RC_INTERNAL_ERROR);
-            data.setDescription(e.toString());
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.toString();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
         return data;
+    }
+
+    @Override
+    public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
+        AttachGuardSanResult data = new AttachGuardSanResult();
+        EntityManager entityManager = null;
+        EntityTransaction entityTransaction = null;
+        try {
+            entityManager = EntityManagerUtils.createEntityManager();
+            entityTransaction = entityManager.getTransaction();
+            entityTransaction.begin();
+            Query query = entityManager.createNativeQuery(
+                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
+            query.setParameter("san", san);
+            List clientList = query.getResultList();
+            workClientSan(entityManager, guardSan, data, clientList);
+            entityTransaction.commit();
+            entityTransaction = null;
+        } catch (Exception e) {
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.getMessage();
+        } finally {
+            if (entityTransaction != null)
+                entityTransaction.rollback();
+            if (entityManager != null)
+                entityManager.close();
+        }
+        return data;
+    }
+
+    @Override
+    public AttachGuardSanResult attachGuardSan(Long contractId, String guardSan) {
+        AttachGuardSanResult data = new AttachGuardSanResult();
+        EntityManager entityManager = null;
+        EntityTransaction entityTransaction = null;
+        try {
+            entityManager = EntityManagerUtils.createEntityManager();
+            entityTransaction = entityManager.getTransaction();
+            entityTransaction.begin();
+            Query query = entityManager.createNativeQuery(
+                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.contractId = :contractId");
+            query.setParameter("contractId", contractId);
+            List clientList = query.getResultList();
+            workClientSan(entityManager, guardSan, data, clientList);
+            entityTransaction.commit();
+            entityTransaction = null;
+        } catch (Exception e) {
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.getMessage();
+        } finally {
+            if (entityTransaction != null)
+                entityTransaction.rollback();
+            if (entityManager != null)
+                entityManager.close();
+        }
+        return data;
+    }
+
+    @Override
+    public DetachGuardSanResult detachGuardSan(String san, String guardSan) {
+        DetachGuardSanResult data = new DetachGuardSanResult();
+
+        EntityManager entityManager = null;
+        EntityTransaction entityTransaction = null;
+        try {
+            entityManager = EntityManagerUtils.createEntityManager();
+            entityTransaction = entityManager.getTransaction();
+            entityTransaction.begin();
+            Query query = entityManager.createNativeQuery(
+                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
+            query.setParameter("san", san);
+            List clientList = query.getResultList();
+            workClientSan(entityManager, guardSan, data, clientList);
+            entityTransaction.commit();
+            entityTransaction = null;
+        } catch (Exception e) {
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.getMessage();
+        } finally {
+            if (entityTransaction != null)
+                entityTransaction.rollback();
+            if (entityManager != null)
+                entityManager.close();
+        }
+
+        return data;
+    }
+
+    @Override
+    public DetachGuardSanResult detachGuardSan(Long contractId, String guardSan) {
+        DetachGuardSanResult data = new DetachGuardSanResult();
+
+        EntityManager entityManager = null;
+        EntityTransaction entityTransaction = null;
+        try {
+            entityManager = EntityManagerUtils.createEntityManager();
+            entityTransaction = entityManager.getTransaction();
+            entityTransaction.begin();
+            Query query = entityManager.createNativeQuery(
+                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.contractId = :contractId");
+            query.setParameter("contractId", contractId);
+            List clientList = query.getResultList();
+            workClientSan(entityManager, guardSan, data, clientList);
+            entityTransaction.commit();
+            entityTransaction = null;
+        } catch (Exception e) {
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.getMessage();
+        } finally {
+            if (entityTransaction != null)
+                entityTransaction.rollback();
+            if (entityManager != null)
+                entityManager.close();
+        }
+
+        return data;
+    }
+
+    private void workClientSan(EntityManager entityManager, String guardSan, GuardSanResult data, List clientList) {
+        if (clientList.size() == 0) {
+            data.resultCode = RC_CLIENT_NOT_FOUND;
+            data.description = "Client is not found";
+        } else if (clientList.size() > 1) {
+            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+            data.description = "Several clients were found";
+        } else {
+            Object[] clientObject = (Object[]) clientList.get(0);
+            Long idOfClient = ((BigInteger) clientObject[0]).longValue();
+            String clientGuardSan = (String) clientObject[1];
+            if (clientGuardSan == null) {
+                if (data instanceof AttachGuardSanResult) {
+                    Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                    query.setParameter("guardSan", guardSan);
+                    query.setParameter("idOfClient", idOfClient);
+                    query.executeUpdate();
+                    data.resultCode = RC_OK;
+                    data.description = "Ok";
+                } else if (data instanceof DetachGuardSanResult) {
+                    data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
+                    data.description = "Client hasn't this guard SNILS.";
+                }
+            }
+            else {
+                if (data instanceof AttachGuardSanResult) {
+                    if (isGuardSanExists(guardSan, clientGuardSan)) {
+                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
+                        data.description = "Client has this guard SNILS already.";
+                    } else {
+                        String gs = "";
+                        if (clientGuardSan.endsWith(";"))
+                            gs = clientGuardSan + guardSan;
+                        else
+                            gs = clientGuardSan + ";" + guardSan;
+                        Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        query.setParameter("guardSan", gs);
+                        query.setParameter("idOfClient", idOfClient);
+                        query.executeUpdate();
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                } else if (data instanceof DetachGuardSanResult) {
+                    if (!isGuardSanExists(guardSan, clientGuardSan)) {
+                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
+                        data.description = "Client hasn't this guard SNILS.";
+                    } else {
+                        if (clientGuardSan.contains(";" + guardSan + ";"))
+                            clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
+                        else if (clientGuardSan.startsWith(guardSan + ";"))
+                            clientGuardSan = clientGuardSan.substring((guardSan + ";").length());
+                        else if (clientGuardSan.endsWith(";" + guardSan))
+                            clientGuardSan = clientGuardSan.substring(0, clientGuardSan.length() - (";" + guardSan).length());
+                        else
+                            clientGuardSan = clientGuardSan.replace(guardSan, "");
+                        Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        query.setParameter("guardSan", clientGuardSan);
+                        query.setParameter("idOfClient", idOfClient);
+                        query.executeUpdate();
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isGuardSanExists(String guardSan, String clientGuardSans) {
+        String[] guardSans = clientGuardSans.split(";");
+        for (String gs : guardSans)
+            if (gs.equals(guardSan))
+                return true;
+        return false;
     }
 
     XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {

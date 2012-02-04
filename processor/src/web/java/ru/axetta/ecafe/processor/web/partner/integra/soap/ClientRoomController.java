@@ -21,29 +21,37 @@ import java.util.Date;
 @WebService
 public interface ClientRoomController {
     @WebMethod (operationName = "getSummary")
-    Data getSummary(Long contractId);
+    ClientSummaryResult getSummary(Long contractId);
     @WebMethod (operationName = "getSummaryBySan")
-    Data getSummary(String san);
+    ClientSummaryResult getSummary(String san);
     @WebMethod (operationName = "getPurchaseList")
-    Data getPurchaseList(Long contractId, Date startDate, Date endDate);
+    PurchaseListResult getPurchaseList(Long contractId, Date startDate, Date endDate);
     @WebMethod (operationName = "getPurchaseListBySan")
-    Data getPurchaseList(String san, Date startDate, Date endDate);
+    PurchaseListResult getPurchaseList(String san, Date startDate, Date endDate);
     @WebMethod (operationName = "getPaymentList")
-    Data getPaymentList(Long contractId, Date startDate, Date endDate);
+    PaymentListResult getPaymentList(Long contractId, Date startDate, Date endDate);
     @WebMethod (operationName = "getPaymentListBySan")
-    Data getPaymentList(String san, Date startDate, Date endDate);
+    PaymentListResult getPaymentList(String san, Date startDate, Date endDate);
     @WebMethod (operationName = "getMenuList")
-    Data getMenuList(Long contractId, Date startDate, Date endDate);
+    MenuListResult getMenuList(Long contractId, Date startDate, Date endDate);
     @WebMethod (operationName = "getMenuListBySan")
-    Data getMenuList(String san, Date startDate, Date endDate);
+    MenuListResult getMenuList(String san, Date startDate, Date endDate);
     @WebMethod (operationName = "getCardList")
-    Data getCardList(Long contractId);
+    CardListResult getCardList(Long contractId);
     @WebMethod (operationName = "getCardListBySan")
-    Data getCardList(String san);
+    CardListResult getCardList(String san);
     @WebMethod (operationName = "getEnterEventList")
-    Data getEnterEventList(Long contractId, Date startDate, Date endDate);
+    EnterEventListResult getEnterEventList(Long contractId, Date startDate, Date endDate);
     @WebMethod (operationName = "getEnterEventListBySan")
-    Data getEnterEventList(String san, Date startDate, Date endDate);
-    @WebMethod
-    Data getClientsByGuardSan(String san);
+    EnterEventListResult getEnterEventList(String san, Date startDate, Date endDate);
+    @WebMethod (operationName = "getClientsByGuardSan")
+    ClientsData getClientsByGuardSan(String san);
+    @WebMethod (operationName = "attachGuardSanBySan")
+    AttachGuardSanResult attachGuardSan(String san, String guardSan);
+    @WebMethod (operationName = "attachGuardSan")
+    AttachGuardSanResult attachGuardSan(Long contractId, String guardSan);
+    @WebMethod (operationName = "detachGuardSanBySan")
+    DetachGuardSanResult detachGuardSan(String san, String guardSan);
+    @WebMethod (operationName = "detachGuardSan")
+    DetachGuardSanResult detachGuardSan(Long contractId, String guardSan);
 }

@@ -35,6 +35,9 @@
         <xsd:attribute name="Balance" type="xsd:long"/>
         <xsd:attribute name="OverdraftLimit" type="xsd:long"/>
         <xsd:attribute name="ExpenditureLimit" type="xsd:long"/>
+        <xsd:attribute name="FirstName" type="xsd:string"/>
+        <xsd:attribute name="Grade" type="xsd:string"/>
+        <xsd:attribute name="OfficialName" type="xsd:string"/>
     </xsd:complexType>
     
     <xsd:complexType name="PurchaseList">
