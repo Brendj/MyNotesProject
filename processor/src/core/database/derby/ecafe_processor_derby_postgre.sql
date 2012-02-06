@@ -1,4 +1,4 @@
--- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
+﻿-- Copyright (c) 2009 Axetta LLC. All Rights Reserved.
 -- Version 0.2.1.5
 
 -- Create tables
@@ -748,7 +748,7 @@ CREATE TABLE CF_CurrentPositions (
   CONSTRAINT CF_CurrentPositions_IdOfContragentCreditor_fk FOREIGN KEY (IdOfContragentCreditor) REFERENCES CF_Contragents (IdOfContragent)
 );
 
--- ����������� ����� �� ������������
+-- payments between contragents
 CREATE TABLE CF_AddPayments (
    IdOfAddPayment           BIGINT        NOT NULL,
    IdOfContragentPayer      BIGINT        NOT NULL,
@@ -802,25 +802,27 @@ create table CF_Schema_version_info (
     constraint "CF_schema_version_info_pk" primary key (SchemaVersionInfoId)
 );
 
+-- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
 VALUES(2, 2, 10, 120126, 0);
 
-CREATE TABLE cf_transaction_journal
+CREATE TABLE CF_TransactionJournal
 (
-  idoftransactionjournal bigint NOT NULL,
-  ogrn character varying(32),
-  sycrodate bigint,
-  clientsnilssan character varying(15),
-  clienttype character varying(32),
-  entername character varying(100),
-  contractid bigint,
-  orderrsum bigint,
-  servicecode character varying(10),
-  transactioncode character varying(10),
-  cardtypecode character varying(10),
-  cardtypename character varying(100),
-  cardidentitycode character varying(10),
-  cardidentityname character varying(32),
-  accountingdate bigint,
-  CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idoftransactionjournal )
+  idOfTransactionJournal bigserial NOT NULL,
+  transDate bigint NOT NULL,
+  idOfOrg bigint NOT NULL,
+  idOfInternalOperation bigint NOT NULL,
+  OGRN character varying(32),
+  clientSan character varying(15),
+  clientType character varying(32),
+  enterName character varying(100),
+  serviceCode character varying(10),
+  transactionCode character varying(10),
+  cardTypeCode character varying(10),
+  cardIdentityCode character varying(10),
+  cardIdentityName character varying(32),
+  contractId bigint,
+  financialAmount bigint,
+  accountingDate bigint,
+  CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idOfTransactionJournal)
 );
