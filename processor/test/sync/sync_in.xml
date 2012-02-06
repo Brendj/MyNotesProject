@@ -12,9 +12,9 @@
 					<PC Discount="0" IdOfOrder="1" IdOfOrderDetails="7000027" MenuOrigin="0" Name="Комплекс №5" Qty="1" RootMenu="[2012]" SocDiscount="0" T="54" rPrice="250"/>
 					<PC Discount="0" IdOfOrder="1" IdOfOrderDetails="7000028" MenuOrigin="0" Name="Напиток лимонный" O="200" Qty="1" RootMenu="[2012]" SocDiscount="0" T="154" rPrice="0" refIdOfMG="7"/>
 				</PT>
-				<PT CardNo="70054666" Date="17.01.2012 12:59:27" Grant="0" IdOfCashier="22" IdOfClient="12385" IdOfOrder="700022" SocDiscount="250" SumByCard="100" SumByCash="0" TrdDiscount="0" rSum="100">
-					<PC Discount="0" IdOfOrder="1" IdOfOrderDetails="7000037" MenuOrigin="0" Name="Комплекс №5" Qty="1" RootMenu="[2012]" SocDiscount="250" T="54" rPrice="0"/>
-					<PC Discount="0" IdOfOrder="1" IdOfOrderDetails="7000038" MenuOrigin="0" Name="Напиток лимонный" O="200" Qty="1" RootMenu="[2012]" SocDiscount="0" T="154" rPrice="100" refIdOfMG="7"/>
+				<PT CardNo="70054666" Date="17.01.2012 12:59:27" Grant="0" IdOfCashier="22" IdOfClient="12385" IdOfOrder="700025" SocDiscount="250" SumByCard="100" SumByCash="0" TrdDiscount="0" rSum="100">
+					<PC Discount="250" IdOfOrder="1" IdOfOrderDetails="7000041" MenuOrigin="0" Name="Комплекс №5" Qty="1" RootMenu="[2012]" SocDiscount="250" T="54" rPrice="0"/>
+					<PC Discount="0" IdOfOrder="1" IdOfOrderDetails="7000042" MenuOrigin="0" Name="Напиток лимонный" O="200" Qty="1" RootMenu="[2012]" SocDiscount="0" T="154" rPrice="100" refIdOfMG="7"/>
 				</PT>
 			</PaymentRegistry>
 			<Menu>
