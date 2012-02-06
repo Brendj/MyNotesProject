@@ -62,6 +62,24 @@ public class Org {
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
     private String OGRN;
     private String INN;
+    private Set<CategoryOrg> categories = new HashSet<CategoryOrg>();
+
+
+    public Set<CategoryOrg> getCategories() {
+        return getCategoriesInternal();
+    }
+
+    public void setCategories(Set<CategoryOrg> categories) {
+        this.categories = categories;
+    }
+
+    private Set<CategoryOrg> getCategoriesInternal() {
+        return categories;
+    }
+
+    private void setCategoriesInternal(Set<CategoryOrg> categories) {
+        this.categories = categories;
+    }
 
     public String getINN() {
         return INN;

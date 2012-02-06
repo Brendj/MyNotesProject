@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" table="CF_CategoryOrg">
+        <id name="idOfCategoryOrg" column="IdOfCategoryOrg" type="long">
+
+        </id>
+        <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true" />
+
+        <set name="orgsInternal" table="CF_OrgsCategories" inverse="true" cascade="all">
+            <key column="IdOfFunction"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
+        </set>
+
+
+            <!--
+          <generator class="hilo">
+              <param name="table">CF_Generators</param>
+              <param name="column">IdOfCategoryDiscount</param>
+              <param name="max_lo">10</param>
+          </generator>
+
+        </id>
+        <property name="categoryName" column="CategoryName" type="string" length="100" not-null="true" />
+        <property name="description" column="Description" type="string" length="100" not-null="true" />
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="false" />
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" />
+
+        <property name="discountRules" column="DiscountRules" type="string" length="60" not-null="true"/>
+
+      <set name="discountRulesInternal" inverse="true" cascade="all">
+          <key column="IdOfCategoryDiscount"/>
+          <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule"/>
+
+      </set>  -->
+
+    </class>
+</hibernate-mapping>
