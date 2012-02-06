@@ -357,6 +357,12 @@
 
     <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
                         action="#{optionPage.show}" reRender="workspaceForm"/>
+                           <%--
+    <rich:panelMenuItem id="showCategoryOrgsViewMenuItem" binding="#{categoryOrgViewPage.mainMenuComponent}" label="Список категорий организаций"
+                        action="#{categoryOrgViewPage.show}" reRender="workspaceForm"/>
+                               --%>
+    <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}" label="Создание категории для организации"
+                        action="#{categoryOrgCreatePage.show}" reRender="workspaceForm"/>
 
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
