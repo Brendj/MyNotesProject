@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
+import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgCreatePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
@@ -241,6 +242,7 @@ public class MainPage {
     private final CategoryCreatePage categoryCreatePage = new CategoryCreatePage();
     private final SelectedCategoryGroupPage selectedCategoryGroupPage = new SelectedCategoryGroupPage();
     private final CategoryEditPage categoryEditPage = new CategoryEditPage();
+    private final CategoryOrgCreatePage categoryOrgCreatePage = new CategoryOrgCreatePage();
 
     // Rule manipulation (baybikov 06.12.2011)
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
@@ -5572,6 +5574,36 @@ public class MainPage {
         return null;
     }
 
+    public CategoryOrgCreatePage getCategoryOrgCreatePage(){
+        return categoryOrgCreatePage;
+    }
+
+    public Object showCategoryOrgCreatePage(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryOrgCreatePage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = categoryOrgCreatePage;
+        } catch (Exception e) {
+            logger.error("Failed to show category org create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы категорий организаций", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     // baybikov (05.12.2011)
     public CategoryCreatePage getCategoryCreatePage() {
         return categoryCreatePage;
@@ -5601,6 +5633,33 @@ public class MainPage {
             
         }
         updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object createCategoryOrg(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryOrgCreatePage.createCategory(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Категория организаций зарегистрирована успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to create category org", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории организации", null));
+
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
         return null;
     }
 
