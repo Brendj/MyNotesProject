@@ -841,9 +841,7 @@ CREATE TABLE cf_orgscategories
   idofcategoryorg bigint,
   CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idoforgscategories ),
   CONSTRAINT cf_orgscategories_idofcategoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  REFERENCES cf_categoryorg (idofcategoryorg),
   CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
-  REFERENCES cf_orgs (idoforg) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION
+  REFERENCES cf_orgs (idoforg)
 );

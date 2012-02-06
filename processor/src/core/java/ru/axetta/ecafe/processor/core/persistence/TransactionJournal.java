@@ -96,7 +96,7 @@ public class TransactionJournal {
     }
 
     public String getCardTypeName() {
-        if (cardIdentityCode.equals(CARD_TYPE_CODE_UEC)) return "Универсальная Электронная Карта";
+        if (cardTypeCode.equals(CARD_TYPE_CODE_UEC)) return "Универсальная Электронная Карта";
         return "Неизвестно";
     }
 

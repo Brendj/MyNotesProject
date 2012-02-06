@@ -141,7 +141,7 @@ public class TransactionJournalService {
             holderIdDescriptionType.setCardIdentityCode(tj.getCardIdentityCode());
             holderIdDescriptionType.setCardIdentityName(tj.getCardIdentityName());
             holderIdDescriptionType.setCardTypeCode(tj.getCardTypeCode());
-            holderIdDescriptionType.setCardTypeName(tj.getCardIdentityName());
+            holderIdDescriptionType.setCardTypeName(tj.getCardTypeName());
             holderIdDescriptionType.setSnils(tj.getClientSan());
             transactionDescriptionType.setHolderDescription(holderIdDescriptionType);
 
