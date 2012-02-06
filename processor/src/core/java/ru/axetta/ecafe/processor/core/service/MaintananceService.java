@@ -74,8 +74,10 @@ public class MaintananceService {
         menuDeletedCount = query.executeUpdate();
 
         logger.info("Cleaning menu exchange...");
-        query = em.createNativeQuery("delete from CF_MenuExchange me where me.MenuDate < :date");
+        query = em.createNativeQuery("delete from CF_MenuExchange me where me.MenuDate < :date and me.menuDate<>:nullDate");
         query.setParameter("date", timeToClean);
+        // исключаем меню с секцией Settings, у него нулевая дата
+        query.setParameter("nullDate", 0);
         menuExchangeDeletedCount = query.executeUpdate();
 
         return ("Deleted all records before - " + new Date(timeToClean) + ", deleted records count: menu - " + menuDeletedCount +

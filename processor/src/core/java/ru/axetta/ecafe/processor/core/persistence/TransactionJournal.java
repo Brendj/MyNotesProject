@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
-import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,30 +14,70 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 public class TransactionJournal {
+    public static final String CARD_TYPE_CODE_UEC = "UEC";
+    public static final String CARD_TYPE_ID_CODE_MUID = "MUID";
+    public static final String SERVICE_CODE_SCHL_FD = "SCHL_FD";
+    public static final String SERVICE_CODE_SCHL_ACC = "SCHL_ACC";
+    public static final String TRANS_CODE_FD_BEN = "FD_BEN";
+    public static final String TRANS_CODE_DEBIT = "DEBIT";
 
-    public static String[] CART_CODE={"MUID"};  //additionalDataCode
     public static String[] ADDITIONAL_DATA_CODE={"ISPP_ACCOUNT_NUMBER","ISPP_CLIENT_TYPE","ISPP_INPUT_GROUP"};
 
-    private static long key= 1;
+    private long idOfOrg;
+    private long idOfInternalOperation;
 
+    // transactionIdDescription.transactionId
     private long idOfTransactionJournal;
+    // transactionIdDescription.transactionDate
+    private Date transDate;
+
+    // transactionSourceId.idCode
+    private String OGRN;
+
+    // transactionTypeDescription.serviceCode (тип услуги)
     private String serviceCode;
+    // transactionTypeDescription.transactionCode (тип транзакции)
     private String transactionCode;
+
+    // holderDescription.cardTypeCode (тип карты: UEC)
+    private String cardTypeCode;
+    // holderDescription.cardIdentityCode (тип идентификаторы карты: MUID)
+    private String cardIdentityCode;
+    // holderDescription.cardIdentityName (номер чипа в hex для типа MUID)
+    private String cardIdentityName;
+    // holderDescription.snils
+    private String clientSan;
+
+    // additionalInfo.additionalData.additionalDataValue (ISPP_ACCOUNT_NUMBER/Идентификатор лицевого счета)
     private long contractId;
 
-    private String enterName;
+    // additionalInfo.additionalData.additionalDataValue (ISPP_CLIENT_TYPE/Тип клиента - ученик, сотрудник, другое)
     private String clientType;
-    private String OGRN;
-    private Date sycroDate;
 
-    private String cardIdentityName;
-    private String cardIdentityCode;
-    private String cardTypeName;
-    private String cardTypeCode;
-    private String clientSnilsSan;
+    // additionalInfo.additionalData.additionalDataValue (ISPP_INPUT_GROUP/Наименование входной группы)
+    private String enterName;
 
-    private long orderRSum;
+
+    // accountingDescription.accountingDescriptionItem.financialDescription.financialDescriptionItem.financialAmount
+    private long financialAmount;
+    // accountingDescription.accountingDescriptionItem.financialDescription.financialDescriptionItem.accountingDate
     private Date accountingDate;
+
+    public long getIdOfInternalOperation() {
+        return idOfInternalOperation;
+    }
+
+    public void setIdOfInternalOperation(long idOfInternalOperation) {
+        this.idOfInternalOperation = idOfInternalOperation;
+    }
+
+    public long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
 
     public  Date getAccountingDate() {
         return accountingDate;
@@ -57,11 +96,8 @@ public class TransactionJournal {
     }
 
     public String getCardTypeName() {
-        return cardTypeName;
-    }
-
-    public void setCardTypeName(String cardTypeName) {
-        this.cardTypeName = cardTypeName;
+        if (cardIdentityCode.equals(CARD_TYPE_CODE_UEC)) return "Универсальная Электронная Карта";
+        return "Неизвестно";
     }
 
     public String getCardIdentityCode() {
@@ -80,12 +116,12 @@ public class TransactionJournal {
         this.cardIdentityName = cardIdentityName;
     }
 
-    public Date getSycroDate() {
-        return sycroDate;
+    public Date getTransDate() {
+        return transDate;
     }
 
-    public void setSycroDate(Date sycroDate) {
-        this.sycroDate = sycroDate;
+    public void setTransDate(Date transDate) {
+        this.transDate = transDate;
     }
 
     public String getOGRN() {
@@ -121,12 +157,12 @@ public class TransactionJournal {
         this.clientType = clientType;
     }
 
-    public long getOrderRSum() {
-        return orderRSum;
+    public long getFinancialAmount() {
+        return financialAmount;
     }
 
-    public void setOrderRSum(long orderRSum) {
-        this.orderRSum = orderRSum;
+    public void setFinancialAmount(long financialAmount) {
+        this.financialAmount = financialAmount;
     }
 
     public String getEnterName() {
@@ -137,12 +173,12 @@ public class TransactionJournal {
         this.enterName = enterName;
     }
 
-    public String getClientSnilsSan() {
-        return clientSnilsSan;
+    public String getClientSan() {
+        return clientSan;
     }
 
-    public void setClientSnilsSan(String clientSnilsSan) {
-        this.clientSnilsSan = clientSnilsSan;
+    public void setClientSan(String clientSan) {
+        this.clientSan = clientSan;
     }
 
     public long getContractId() {
@@ -162,9 +198,46 @@ public class TransactionJournal {
         this.idOfTransactionJournal = idOfTransactionJournal;
     }
 
-    public TransactionJournal() {
-        this.idOfTransactionJournal=key;
-        key++;
+    protected TransactionJournal() {
+    }
+
+    public TransactionJournal(long idOfOrg, long idOfInternalOperation, Date transDate,
+            String OGRN, String serviceCode, String transactionCode, String cardTypeCode,
+            String cardIdentityCode, String cardIdentityName, String clientSan, long contractId, String clientType,
+            String enterName) {
+        this.idOfOrg = idOfOrg;
+        this.idOfInternalOperation = idOfInternalOperation;
+        this.transDate = transDate;
+        this.OGRN = OGRN;
+        this.serviceCode = serviceCode;
+        this.transactionCode = transactionCode;
+        this.cardTypeCode = cardTypeCode;
+        this.cardIdentityCode = cardIdentityCode;
+        this.cardIdentityName = cardIdentityName;
+        this.clientSan = clientSan;
+        this.contractId = contractId;
+        this.clientType = clientType;
+        this.enterName = enterName;
+    }
+
+    public TransactionJournal(long idOfOrg, long idOfInternalOperation, Date transDate,
+            String OGRN, String serviceCode, String transactionCode, String cardTypeCode,
+            String cardIdentityCode, String cardIdentityName, String clientSan, long contractId, String clientType,
+            long financialAmount, Date accountingDate) {
+        this.idOfOrg = idOfOrg;
+        this.idOfInternalOperation = idOfInternalOperation;
+        this.transDate = transDate;
+        this.OGRN = OGRN;
+        this.serviceCode = serviceCode;
+        this.transactionCode = transactionCode;
+        this.cardTypeCode = cardTypeCode;
+        this.cardIdentityCode = cardIdentityCode;
+        this.cardIdentityName = cardIdentityName;
+        this.clientSan = clientSan;
+        this.contractId = contractId;
+        this.clientType = clientType;
+        this.financialAmount = financialAmount;
+        this.accountingDate = accountingDate;
     }
 
 }

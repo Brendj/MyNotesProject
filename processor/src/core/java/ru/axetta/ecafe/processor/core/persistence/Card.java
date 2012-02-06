@@ -19,7 +19,8 @@ import java.util.Set;
 public class Card {
 
     public static final String UNKNOWN_TYPE_NAME = "Неизвестный";
-    public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine"};
+    public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК"};
+    public static final int TYPE_UEC=4;
 
     public static final String[] STATE_NAMES = {"Активна", "Временно заблокирована", "Окончательно заблокирована"};
     public static final int ACTIVE_STATE = 0;

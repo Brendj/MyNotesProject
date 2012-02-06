@@ -6,28 +6,34 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.TransactionJournal" table="cf_transactionjournal">
-        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long"/>
+    <class name="ru.axetta.ecafe.processor.core.persistence.TransactionJournal" table="CF_TransactionJournal">
+        <id name="idOfTransactionJournal" column="IdOfTransactionJournal" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="transDate" column="transDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <property name="idOfOrg" column="idOfOrg" type="long"/>
+        <property name="idOfInternalOperation" column="idOfInternalOperation" type="long"/>
+
         <property name="OGRN" column="OGRN" type="string" length="32"/>
 
         <property name="serviceCode" column="ServiceCode" type="string" length="15"/>
         <property name="transactionCode" column="TransactionCode" type="string" length="15"/>
 
         <property name="cardTypeCode" column="CardTypeCode" type="string" length="10"/>
-        <property name="cardTypeName" column="CardTypeName" type="string" length="100"/>
         <property name="cardIdentityCode" column="CardIdentityCode" type="string" length="10"/>
         <property name="cardIdentityName" column="CardIdentityName" type="string" length="32"/>
 
-        <property name="orderRSum" column="OrderRSum" type="long"/>
+        <property name="financialAmount" column="FinancialAmount" type="long"/>
         <property name="accountingDate" column="AccountingDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
         <property name="contractId" column="ContractId" type="long"/>
 
-        <property name="clientSnilsSan" column="ClientSnilsSan" type="string" length="15"/>
+        <property name="clientSan" type="string" length="15"/>
         <property name="clientType" column="ClientType" type="string" length="32"/>
         <property name="enterName" column="EnterName" type="string" length="100"/>
 
-        <property name="sycroDate" column="SycroDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
     </class>
 </hibernate-mapping>

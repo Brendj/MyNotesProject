@@ -14,7 +14,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 public class Option {
     public final static int OPTION_WITH_OPERATOR=2,
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3, OPTION_CLEAN_MENU=4,
-            OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_MAX=5;
+            OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_JOURNAL_TRANSACTIONS=6, OPTION_MAX=6;
 
     public static String getDefaultValue(int nOption) {
         switch (nOption) {
@@ -22,6 +22,7 @@ public class Option {
             case OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT: return "0";
             case OPTION_CLEAN_MENU: return "1";
             case OPTION_MENU_DAYS_FOR_DELETION: return "30";
+            case OPTION_JOURNAL_TRANSACTIONS: return "0";
         }
         return null;
     }

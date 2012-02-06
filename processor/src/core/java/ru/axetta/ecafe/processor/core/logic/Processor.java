@@ -1365,66 +1365,16 @@ public class Processor implements SyncProcessor,
                     persistenceSession.save(enterEvent);
 
 
-                    TransactionJournal transactionJournal = new TransactionJournal();
-                    //OGRN
-                    Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
-                    orgCriteria.add(Restrictions.eq("idOfOrg",e.getIdOfOrg()));
-                    Org org = (Org) orgCriteria.uniqueResult();
-                    transactionJournal.setOGRN(org.getOGRN());
-                    //transactionSystemCode
-                    transactionJournal.setTransactionCode("ISPP");
-                    //transactionIdDescription
-                    transactionJournal.setSycroDate(e.getEvtDateTime());
-                    //transactionTypeDescription
-                    transactionJournal.setServiceCode("SCHL_ACC");
-                    String passdirection;
-                    switch (e.getPassDirection()){
-                        case 0: passdirection="IN"; break;
-                        case 1: passdirection="OUT";  break;
-                        default: passdirection="ERROR";
-                    }
-                    transactionJournal.setTransactionCode(passdirection);
-
-                    //holderDescription
-                    Criteria cardCriteria = persistenceSession.createCriteria(Card.class);
-                    cardCriteria.add(Restrictions.eq("idOfCard",e.getIdOfCard()));
-                    Card card =(Card) cardCriteria.uniqueResult();
-
-                    transactionJournal.setCardIdentityCode("UEC");
-                    transactionJournal.setCardIdentityName("Универсальная Электронная Карта");
-                    transactionJournal.setCardTypeCode(Card.TYPE_NAMES[card.getCardType()]);
-                    transactionJournal.setCardTypeName(String.valueOf(card.getCardNo()));
-
-                    /*
-                    List<Card> cardList =new ArrayList<Card>(client.getCards());
-                    if(!cardList.isEmpty()){
-                        Card card=cardList.get(0);
-                        transactionJournal.setCartTypeName(Card.TYPE_NAMES[card.getCardType()]);
-                        transactionJournal.setCartTypeName("Универсальная Электронная Карта");
-                        transactionJournal.setCardIdentityCode(card.getCardNo());
-                    } */
-                    //snils
-                    transactionJournal.setClientSnilsSan(client.getSan());
-                    //additionalInfo
-                    //ISPP_ACCOUNT_NUMBER
-                    transactionJournal.setContractId(client.getContractId());
-                    //ISPP_CLIENT_TYPE
-                    transactionJournal.setClientType(client.getClientGroup().getGroupName());
-                    //ISPP_INPUT_GROUP
-                    transactionJournal.setEnterName(e.getEnterName());
-                    persistenceSession.save(transactionJournal);
-
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
                             null);
                     resEnterEvents.addItem(item);
+
+                    RuntimeContext runtimeContext = RuntimeContext.getInstance();
                     // отправить уведомление по смс
+                    boolean notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(
+                            Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
 
-                    Criteria criteria = persistenceSession.createCriteria(Option.class);
-                    criteria.add(Restrictions.eq("idOfOption", 3L));
-                    Option notifyBySMSAboutEnterEventOption = (Option)criteria.uniqueResult();
-                    boolean notifyBySMSAboutEnterEvent = notifyBySMSAboutEnterEventOption.getOptionText().equals("1");
-
-                    logger.info("Preparation to send SMS, notifyBySMSAboutEnterEvent - " + notifyBySMSAboutEnterEvent
+                    logger.info("Preparing to send SMS, notifyBySMSAboutEnterEvent - " + notifyBySMSAboutEnterEvent
                                 + ", today - " + isDateToday(e.getEvtDateTime())
                                 + ", date - " + e.getEvtDateTime()
                                 + ", idOfClient - " + e.getIdOfClient()
@@ -1435,6 +1385,38 @@ public class Processor implements SyncProcessor,
                         e.getIdOfClient() != null &&
                         (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT))
                         sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
+
+
+                    /// Формирование журнала транзакции
+                    if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) {
+                        Criteria cardCriteria = persistenceSession.createCriteria(Card.class);
+                        cardCriteria.add(Restrictions.eq("idOfCard",e.getIdOfCard()));
+                        Card card = (Card) cardCriteria.uniqueResult();
+                        if (card==null) {
+                            logger.error("Не найдена карта по событию прохода: idOfOrg="+enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()+", idOfEnterEvent="+enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()+", idOfCard="+e.getIdOfCard());
+                        }
+
+                        if (card!=null && card.getCardType()==Card.TYPE_UEC) {
+                            Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+                            orgCriteria.add(Restrictions.eq("idOfOrg",e.getIdOfOrg()));
+                            Org org = (Org) orgCriteria.uniqueResult();
+                            String transCode;
+                            switch (e.getPassDirection()){
+                                case EnterEvent.ENTRY: transCode="IN"; break;
+                                case EnterEvent.EXIT: transCode="OUT";  break;
+                                default: transCode=null;
+                            }
+                            if (transCode!=null) {
+                                TransactionJournal transactionJournal = new TransactionJournal(enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
+                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(), org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_ACC,
+                                        transCode,
+                                        TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Long.toHexString(card.getCardNo()),
+                                        client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), e.getEnterName());
+                                persistenceSession.save(transactionJournal);
+                            }
+                        }
+                    }
+
                 }
             }
 
@@ -2391,7 +2373,6 @@ public class Processor implements SyncProcessor,
                 logger.error(String.format("Failed to send SMS to client: %s", client), e);
             }
         } finally {
-            RuntimeContext.release(runtimeContext);
         }
     }
 

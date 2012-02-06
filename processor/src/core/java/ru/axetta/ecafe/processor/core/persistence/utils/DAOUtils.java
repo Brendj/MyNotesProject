@@ -247,6 +247,7 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static List<MenuExchange> findMenuExchangeDataBetweenDatesIncludingSettings(Session persistenceSession, Long idOfSourceOrg, Date startDate,
             Date endDate) {
+        // Settings record has date = 0
         Query query = persistenceSession.createQuery("from MenuExchange where compositeIdOfMenuExchange.idOfOrg=:idOfSourceOrg AND ((compositeIdOfMenuExchange.menuDate>=:startDate AND compositeIdOfMenuExchange.menuDate<=:endDate) OR (compositeIdOfMenuExchange.menuDate=:nullDate))");
         query.setParameter("idOfSourceOrg", idOfSourceOrg);
         query.setParameter("startDate", startDate);
@@ -407,5 +408,19 @@ public class DAOUtils {
         if (l.size()==0) v = defaultValue;
         else v=((Option)l.get(0)).getOptionText();
         return v;
+    }
+
+    public static int deleteFromTransactionJournal(EntityManager entityManager, long maxIdOfTransactionJournal) {
+        javax.persistence.Query q = entityManager.createQuery("delete from TransactionJournal where idOfTransactionJournal<=:maxId");
+        q.setParameter("maxId", maxIdOfTransactionJournal);
+        return q.executeUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<TransactionJournal> fetchTransactionJournalRecs(EntityManager entityManager,
+            int maxRecordsInBatch) {
+        javax.persistence.Query q = entityManager.createQuery("from TransactionJournal order by idOfTransactionJournal desc");
+        q.setMaxResults(maxRecordsInBatch);
+        return (List<TransactionJournal>)q.getResultList();
     }
 }

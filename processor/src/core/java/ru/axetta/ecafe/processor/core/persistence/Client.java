@@ -616,4 +616,15 @@ public class Client {
         IOUtils.copy(digestInputStream, arrayOutputStream);
         return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
     }
+
+    public String getClientGroupTypeAsString() {
+        long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+        if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER){
+            return "Другое";
+        } else if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+            return "Сотрудники";
+        } else {
+            return "Ученик";
+        }
+    }
 }

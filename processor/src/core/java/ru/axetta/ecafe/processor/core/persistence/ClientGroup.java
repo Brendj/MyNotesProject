@@ -16,6 +16,8 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientGroup {
+    public static final long PREDEFINED_ID_OF_GROUP_OTHER = 1200000000;
+    public static final long PREDEFINED_ID_OF_GROUP_EMPLOYEES = 1100000000;
 
     private CompositeIdOfClientGroup compositeIdOfClientGroup;
     private Org org;

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
@@ -51,48 +52,28 @@ public class CurrentPositionsManager {
         changeOrderPosition(session, rSum, priviledge, supplier, null, null, null, null, null);
         session.save(order);
 
-        TransactionJournal transactionJournal = new TransactionJournal();
-        //OGRN
-        Criteria orgCriteria = session.createCriteria(Org.class);
-        orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
-        Org org = (Org) orgCriteria.uniqueResult();
-        transactionJournal.setOGRN(org.getOGRN());
-        //transactionSystemCode
-        transactionJournal.setTransactionCode("ISPP");
-        //transactionIdDescription
-        Date currentTime = new Date();
-        transactionJournal.setSycroDate(currentTime);
-        //transactionTypeDescription
-        transactionJournal.setServiceCode("SCHL_FD");
-        if(payment.getSocDiscount()>0){
-            transactionJournal.setTransactionCode("DEBIT");
-        } else{
-            transactionJournal.setTransactionCode("FD_BEN");
-        }
-        //holderDescription
-        transactionJournal.setCardIdentityCode("UEC");
-        transactionJournal.setCardIdentityName("Универсальная Электронная Карта");
-        transactionJournal.setCardTypeCode(Card.TYPE_NAMES[card.getCardType()]);
-        transactionJournal.setCardTypeName(String.valueOf(card.getCardNo()));
-        //snils
-        transactionJournal.setClientSnilsSan(client.getSan());
-        //accountingDescription
-        transactionJournal.setOrderRSum(order.getRSum());
-        transactionJournal.setAccountingDate(order.getCreateTime());
-        //additionalInfo
-        //ISPP_ACCOUNT_NUMBER
-        transactionJournal.setContractId(client.getContractId());
-        //ISPP_CLIENT_TYPE
-        //client.getClientGroup();
-        if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1200000000){
-            transactionJournal.setClientType("Другое");
-        } else{
-            if(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=1100000000){
-                transactionJournal.setClientType("Сотрудники");
-            } else {
-                transactionJournal.setClientType("Ученик");
+        /// Формирование журнала транзакции
+        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) {
+            if (card!=null && card.getCardType()==Card.TYPE_UEC) {
+                Criteria orgCriteria = session.createCriteria(Org.class);
+                orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
+                Org org = (Org) orgCriteria.uniqueResult();
+                if(payment.getSocDiscount()>0){
+                    registerTransactionJournal(TransactionJournal.TRANS_CODE_FD_BEN, org, order, card, client, payment.getSocDiscount(), session);
+                }
+                if (payment.getSumByCard()>0) {
+                    registerTransactionJournal(TransactionJournal.TRANS_CODE_DEBIT, org, order, card, client, payment.getSocDiscount(), session);
+                }
             }
         }
+    }
+
+    private static void registerTransactionJournal(String transCode, Org org, Order order, Card card, Client client, Long financialAmount, Session session) {
+        TransactionJournal transactionJournal = new TransactionJournal(order.getCompositeIdOfOrder().getIdOfOrg(),
+                order.getCompositeIdOfOrder().getIdOfOrder(), new Date(), org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_FD,
+                transCode,
+                TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Long.toHexString(card.getCardNo()),
+                client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), financialAmount, order.getCreateTime());
         session.save(transactionJournal);
     }
 

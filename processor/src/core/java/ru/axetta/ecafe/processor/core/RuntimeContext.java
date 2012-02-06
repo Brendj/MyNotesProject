@@ -103,6 +103,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
     public static final String PARAM_NAME_DB_MAINTANANCE_HOUR=PROCESSOR_PARAM_BASE+".dbmaintanance.hour";
+    public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM=PROCESSOR_PARAM_BASE+".clientroom.hiddenPages";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
     private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
     private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
