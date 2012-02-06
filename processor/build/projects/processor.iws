@@ -15,799 +15,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AccountingDescriptionItemType$FinancialDescription.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AccountingDescriptionItemType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AdditionalInfoType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AddressType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ApplicationStatusType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthentificationDataType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthorityDocumentType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthorityPersonType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BankType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BillListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BillType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/CardIdType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ClientCategoryType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ContactsType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/CustomerDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/DeviceDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/DocumentType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ErrorListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ExternalAuthenticateRequestType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/FaultResponse.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/FinancialDescriptionItemType$PaymentInfo.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/FinancialDescriptionItemType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetBillsRequestType$TransactionIdDescription.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetBillsRequestType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetBillsResponseType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetPersonTransactionsRequest.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetSimpleReferenceRequest.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest$Tags.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest$TransactionTypes$ExcludeTransactionTypes.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest$TransactionTypes$IncludeTransactionTypes.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest$TransactionTypes.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/HolderIdDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/HolderInfoDescriptionType$PersonIds.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/HolderInfoDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/LegalIdDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacRequestType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacResponseType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/NameType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OMSType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ObjectFactory.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OrganizationType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OtherStatusesType$OtherStatus.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OtherStatusesType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PaymentAdditionalInfoType$PaymentInstruction.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PaymentAdditionalInfoType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PensionFundType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PersonInfoType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/RelationDescriptionType$PreviousTransaction.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/RelationDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SAMMACDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SchoolInfoType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ServiceCustomerType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ServiceProviderType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTagsRequest$AddTag.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTagsRequest$RemoveTag.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTagsRequest.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTariffsRequest.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SubscribtionListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SubscriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SystemType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TagType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffBindingsItemType$MetaData.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffBindingsItemType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffBindingsMetaDataItemType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByFixedValueType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByPeriodType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByVolumeType$TimeTarificationInterval.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByVolumeType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffType$TariffBindings.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffType$TariffByPeriods.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffType$TariffByVolumes.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionDescriptionType$AccountingDescription.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionDescriptionType$MacDescription.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionIdDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionService.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionServicePortType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionSourceDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionStatusDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionTypeDescriptionType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/UECPointIdentificationType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/UniversityInfoType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ValidationSchemeType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AccountIdentification4Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AccountSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ActiveOrHistoricCurrencyAndAmount.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AddressType2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AmountType3Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Authorisation1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Authorisation1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/BranchAndFinancialInstitutionIdentification4.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/BranchData2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccount16.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccountType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccountType4Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CategoryPurpose1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChargeBearerType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Cheque6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeDelivery1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeDeliveryMethod1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeType2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ClearingSystemIdentification2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ClearingSystemMemberIdentification2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ContactDetails2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditDebitCode.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditTransferTransactionInformation10.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceInformation2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceType1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CustomerCreditTransferInitiationV03.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DateAndPlaceOfBirth.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DatePeriodDetails.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Document.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentAdjustment1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentType3Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentType5Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/EquivalentAmount2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ExchangeRateInformation1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ExchangeRateType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/FinancialIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/FinancialInstitutionIdentification7.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericAccountIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericFinancialIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericOrganisationIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericPersonIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GroupHeader32.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Instruction3Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/InstructionForCreditorAgent1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/LocalInstrument2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/NameAndAddress10.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/NamePrefix1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ObjectFactory.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/OrganisationIdentification4.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/OrganisationIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Party6Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PartyIdentification32.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentInstructionInformation3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentMethod3Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentTypeInformation19.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PersonIdentification5.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PersonIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PostalAddress6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Priority2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Purpose2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentInformation3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentType1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryAuthority2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryReporting3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryReportingType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceAmount1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceInformation5.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceLocation2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceLocationMethod2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ServiceLevel8Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/StructuredRegulatoryReporting3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/StructuredRemittanceInformation7.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxAmount1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxAuthorisation1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxInformation3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxParty1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxParty2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxPeriod1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecord1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecordDetails1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecordPeriod1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/package-info.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AccountIdentification4Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AccountSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ActiveOrHistoricCurrencyAndAmount.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AddressType2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AmendmentInformationDetails6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Authorisation1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Authorisation1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/BranchAndFinancialInstitutionIdentification4.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/BranchData2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccount16.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccountType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccountType4Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CategoryPurpose1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ChargeBearerType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ClearingSystemIdentification2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ClearingSystemMemberIdentification2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ContactDetails2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditDebitCode.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceInformation2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceType1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CustomerDirectDebitInitiationV02.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DateAndPlaceOfBirth.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DatePeriodDetails.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DirectDebitTransaction6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DirectDebitTransactionInformation9.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Document.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentAdjustment1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentType3Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentType5Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/FinancialIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/FinancialInstitutionIdentification7.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Frequency1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericAccountIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericFinancialIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericOrganisationIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericPersonIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GroupHeader39.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/LocalInstrument2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/MandateRelatedInformation6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/NameAndAddress10.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/NamePrefix1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ObjectFactory.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/OrganisationIdentification4.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/OrganisationIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Party6Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PartyIdentification32.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentIdentification1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentInstructionInformation4.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentMethod2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentTypeInformation20.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PersonIdentification5.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PersonIdentificationSchemeName1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PostalAddress6.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Priority2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Purpose2Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentInformation3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentType1Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentType2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryAuthority2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryReporting3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryReportingType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceAmount1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceInformation5.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceLocation2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceLocationMethod2Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/SequenceType1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ServiceLevel8Choice.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/StructuredRegulatoryReporting3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/StructuredRemittanceInformation7.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxAmount1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxAuthorisation1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxInformation3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxParty1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxParty2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxPeriod1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecord1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecordDetails1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecordPeriod1Code.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/package-info.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/package-info.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/AdditionalDataType$AdditionalData.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/AdditionalDataType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ErrorListType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ErrorType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/FaultType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ObjectFactory.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/SimpleReferenceType$Items$Item.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/SimpleReferenceType$Items.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/SimpleReferenceType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/package-info.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AccountingDescriptionItemType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AdditionalInfoType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AddressType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ApplicationStatusType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthentificationDataType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthorityDocumentType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/AuthorityPersonType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BankType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BillListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/BillType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/CardIdType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ClientCategoryType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ContactsType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/CustomerDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/DeviceDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/DocumentType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ErrorListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ExternalAuthenticateRequestType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/FaultResponse.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/FinancialDescriptionItemType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetBillsRequestType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetBillsResponseType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetPersonTransactionsRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetSimpleReferenceRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/GetTransactionsRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/HolderIdDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/HolderInfoDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/LegalIdDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacRequestType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacResponseType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/MacType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/NameType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OMSType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ObjectFactory.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OrganizationType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/OtherStatusesType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PaymentAdditionalInfoType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PensionFundType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/PersonInfoType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/RelationDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SAMMACDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SchoolInfoType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ServiceCustomerType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ServiceProviderType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTagsRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/StoreTariffsRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SubscribtionListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SubscriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/SystemType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TagType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffBindingsItemType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffBindingsMetaDataItemType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByFixedValueType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByPeriodType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffByVolumeType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TariffType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionIdDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionServicePortType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionSourceDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionStatusDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionTypeDescriptionType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/UECPointIdentificationType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/UniversityInfoType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/ValidationSchemeType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AccountIdentification4Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AccountSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ActiveOrHistoricCurrencyAndAmount.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AddressType2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/AmountType3Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Authorisation1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Authorisation1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/BranchAndFinancialInstitutionIdentification4.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/BranchData2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccount16.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccountType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CashAccountType4Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CategoryPurpose1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChargeBearerType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Cheque6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeDelivery1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeDeliveryMethod1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ChequeType2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ClearingSystemIdentification2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ClearingSystemMemberIdentification2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ContactDetails2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditDebitCode.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditTransferTransactionInformation10.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceInformation2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceType1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CreditorReferenceType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/CustomerCreditTransferInitiationV03.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DateAndPlaceOfBirth.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DatePeriodDetails.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Document.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentAdjustment1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentType3Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/DocumentType5Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/EquivalentAmount2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ExchangeRateInformation1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ExchangeRateType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/FinancialIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/FinancialInstitutionIdentification7.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericAccountIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericFinancialIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericOrganisationIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GenericPersonIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/GroupHeader32.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Instruction3Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/InstructionForCreditorAgent1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/LocalInstrument2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/NameAndAddress10.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/NamePrefix1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ObjectFactory.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/OrganisationIdentification4.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/OrganisationIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Party6Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PartyIdentification32.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentInstructionInformation3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentMethod3Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PaymentTypeInformation19.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PersonIdentification5.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PersonIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/PostalAddress6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Priority2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/Purpose2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentInformation3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentType1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ReferredDocumentType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryAuthority2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryReporting3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RegulatoryReportingType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceAmount1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceInformation5.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceLocation2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/RemittanceLocationMethod2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/ServiceLevel8Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/StructuredRegulatoryReporting3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/StructuredRemittanceInformation7.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxAmount1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxAuthorisation1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxInformation3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxParty1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxParty2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxPeriod1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecord1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecordDetails1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/TaxRecordPeriod1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_001_001_03/package-info.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AccountIdentification4Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AccountSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ActiveOrHistoricCurrencyAndAmount.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AddressType2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/AmendmentInformationDetails6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Authorisation1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Authorisation1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/BranchAndFinancialInstitutionIdentification4.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/BranchData2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccount16.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccountType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CashAccountType4Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CategoryPurpose1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ChargeBearerType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ClearingSystemIdentification2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ClearingSystemMemberIdentification2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ContactDetails2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditDebitCode.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceInformation2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceType1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CreditorReferenceType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/CustomerDirectDebitInitiationV02.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DateAndPlaceOfBirth.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DatePeriodDetails.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DirectDebitTransaction6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DirectDebitTransactionInformation9.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Document.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentAdjustment1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentType3Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/DocumentType5Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/FinancialIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/FinancialInstitutionIdentification7.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Frequency1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericAccountIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericFinancialIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericOrganisationIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GenericPersonIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/GroupHeader39.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/LocalInstrument2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/MandateRelatedInformation6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/NameAndAddress10.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/NamePrefix1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ObjectFactory.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/OrganisationIdentification4.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/OrganisationIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Party6Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PartyIdentification32.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentIdentification1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentInstructionInformation4.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentMethod2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PaymentTypeInformation20.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PersonIdentification5.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PersonIdentificationSchemeName1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/PostalAddress6.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Priority2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/Purpose2Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentInformation3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentType1Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ReferredDocumentType2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryAuthority2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryReporting3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RegulatoryReportingType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceAmount1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceInformation5.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceLocation2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/RemittanceLocationMethod2Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/SequenceType1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/ServiceLevel8Choice.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/StructuredRegulatoryReporting3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/StructuredRemittanceInformation7.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxAmount1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxAuthorisation1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxInformation3.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxParty1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxParty2.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxPeriod1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecord1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecordDetails1.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/TaxRecordPeriod1Code.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/iso_008_001_02/package-info.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/package-info.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/AdditionalDataType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ErrorListType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ErrorType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/FaultType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/ObjectFactory.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/SimpleReferenceType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/generated/nfp/x3/package-info.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AccountIdentification4Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AccountSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ActiveOrHistoricCurrencyAndAmount.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AddressType2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AmountType3Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Authorisation1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Authorisation1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\BranchAndFinancialInstitutionIdentification4.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\BranchData2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccount16.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccountType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccountType4Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CategoryPurpose1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChargeBearerType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Cheque6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeDelivery1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeDeliveryMethod1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeType2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ClearingSystemIdentification2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ClearingSystemMemberIdentification2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ContactDetails2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditDebitCode.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditTransferTransactionInformation10.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceInformation2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceType1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CustomerCreditTransferInitiationV03.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DateAndPlaceOfBirth.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DatePeriodDetails.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Document.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentAdjustment1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentType3Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentType5Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\EquivalentAmount2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ExchangeRateInformation1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ExchangeRateType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\FinancialIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\FinancialInstitutionIdentification7.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericAccountIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericFinancialIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericOrganisationIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericPersonIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GroupHeader32.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Instruction3Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\InstructionForCreditorAgent1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\LocalInstrument2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\NameAndAddress10.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\NamePrefix1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\OrganisationIdentification4.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\OrganisationIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Party6Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PartyIdentification32.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentInstructionInformation3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentMethod3Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentTypeInformation19.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PersonIdentification5.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PersonIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PostalAddress6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Priority2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Purpose2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentInformation3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentType1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryAuthority2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryReporting3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryReportingType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceAmount1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceInformation5.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceLocation2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceLocationMethod2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ServiceLevel8Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\StructuredRegulatoryReporting3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\StructuredRemittanceInformation7.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxAmount1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxAuthorisation1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxInformation3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxParty1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxParty2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxPeriod1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecord1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecordDetails1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecordPeriod1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AccountIdentification4Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AccountSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ActiveOrHistoricCurrencyAndAmount.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AddressType2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AmendmentInformationDetails6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Authorisation1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Authorisation1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\BranchAndFinancialInstitutionIdentification4.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\BranchData2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccount16.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccountType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccountType4Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CategoryPurpose1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ChargeBearerType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ClearingSystemIdentification2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ClearingSystemMemberIdentification2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ContactDetails2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditDebitCode.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceInformation2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceType1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CustomerDirectDebitInitiationV02.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DateAndPlaceOfBirth.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DatePeriodDetails.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DirectDebitTransaction6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DirectDebitTransactionInformation9.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Document.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentAdjustment1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentType3Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentType5Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\FinancialIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\FinancialInstitutionIdentification7.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Frequency1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericAccountIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericFinancialIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericOrganisationIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericPersonIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GroupHeader39.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\LocalInstrument2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\MandateRelatedInformation6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\NameAndAddress10.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\NamePrefix1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\OrganisationIdentification4.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\OrganisationIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Party6Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PartyIdentification32.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentIdentification1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentInstructionInformation4.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentMethod2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentTypeInformation20.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PersonIdentification5.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PersonIdentificationSchemeName1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PostalAddress6.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Priority2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Purpose2Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentInformation3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentType1Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentType2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryAuthority2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryReporting3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryReportingType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceAmount1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceInformation5.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceLocation2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceLocationMethod2Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\SequenceType1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ServiceLevel8Choice.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\StructuredRegulatoryReporting3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\StructuredRemittanceInformation7.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxAmount1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxAuthorisation1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxInformation3.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxParty1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxParty2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxPeriod1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecord1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecordDetails1.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecordPeriod1Code.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\AdditionalDataType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ErrorListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ErrorType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\FaultType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\SimpleReferenceType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AdditionalInfoType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AddressType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ApplicationStatusType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthentificationDataType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthorityDocumentType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthorityPersonType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\BankType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\CardIdType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ClientCategoryType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ContactsType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\DocumentType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ExternalAuthenticateRequestType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\HolderIdDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\HolderInfoDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\LegalIdDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacRequestType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacResponseType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\NameType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\OMSType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\OrganizationType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\PensionFundType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\PersonInfoType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\SchoolInfoType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\UECPointIdentificationType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\UniversityInfoType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ValidationSchemeType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\AccountingDescriptionItemType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\DeviceDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\ErrorListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\FinancialDescriptionItemType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\OtherStatusesType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\PaymentAdditionalInfoType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\RelationDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\SAMMACDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TagType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionIdDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionSourceDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionStatusDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionTypeDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\BillListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\BillType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\CustomerDescriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\FaultResponse.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetBillsRequestType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetBillsResponseType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetPersonTransactionsRequest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetSimpleReferenceRequest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ServiceCustomerType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ServiceProviderType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\StoreTariffsRequest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SubscribtionListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SubscriptionType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SystemType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffBindingsItemType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffBindingsMetaDataItemType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByFixedValueType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByPeriodType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByVolumeType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffListType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffType.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TransactionService.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\GetTransactionsRequest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\ObjectFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\StoreTagsRequest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\package-info.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd/pain_001_001" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd/pain_008_001" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/common/v1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/common" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/identification/v1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/identification" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transaction/v1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transaction" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionservice/v1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionservice" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionsynchronization/v1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionsynchronization" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" afterPath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/db/update_2.2.10-2.2.11.sql" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/synctest/java/ru/axetta/ecafe/synctest/ApacheHttp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core.iml" afterPath="$PROJECT_DIR$/core.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/ClientGroup.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/ClientGroup.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/CurrentPositionsManager.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/CurrentPositionsManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Org.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Org.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/MaintananceService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/MaintananceService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/synctest/java/ru/axetta/ecafe/synctest/Main.java" afterPath="$PROJECT_DIR$/../../src/synctest/java/ru/axetta/ecafe/synctest/Main.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentCreatePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentCreatePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentDeletePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentDeletePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/addpayment/AddPaymentEditPage.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/CurrentPositionsReportPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/CurrentPositionsReportPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementCreatePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementCreatePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementDeletePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementDeletePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/settlement/SettlementEditPage.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp" />
+      <change type="MOVED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\axetta\ecafe\processor\core\persistence\utils\CurrentPositionsManager.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/CurrentPositionsManager.java" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -858,20 +90,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" line="160" class="ru.axetta.ecafe.processor.core.RuntimeContext" package="ru.axetta.ecafe.processor.core">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" line="85" class="ru.axetta.ecafe.processor.core.TransactionJournalService" package="ru.axetta.ecafe.processor.core">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" line="38" class="ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage" package="ru.axetta.ecafe.processor.web.ui.journal">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -934,10 +153,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="TransactionJournalService.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="TransactionJournalService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="60" selection-start="2738" selection-end="2738" vertical-scroll-proportion="0.331384">
+            <state line="90" column="62" selection-start="3049" selection-end="3049" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -945,49 +164,29 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="update_2.2.8-2.2.9.sql" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.8-2.2.9.sql">
+      <file leaf-file-name="DAOUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="136" column="0" selection-start="6858" selection-end="6858" vertical-scroll-proportion="0.0">
+            <state line="418" column="48" selection-start="20701" selection-end="20701" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="update_2.2.9-2.2.10.sql" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.9-2.2.10.sql">
+      <file leaf-file-name="update_2.2.10-2.2.11.sql" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.10-2.2.11.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="16" column="23" selection-start="560" selection-end="560" vertical-scroll-proportion="0.5171103">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="show-orders-and-payments.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp">
+      <file leaf-file-name="ecafe_processor_derby_postgre.sql" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="454" column="13" selection-start="19514" selection-end="19514" vertical-scroll-proportion="-2.6153846">
+            <state line="808" column="0" selection-start="38260" selection-end="38927" vertical-scroll-proportion="0.0">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OptionPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="86" column="44" selection-start="2508" selection-end="2508" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DAOService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="72" selection-start="916" selection-end="916" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -995,44 +194,52 @@
       <file leaf-file-name="option.jsp" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="0" selection-start="1109" selection-end="1109" vertical-scroll-proportion="0.0">
+            <state line="11" column="2" selection-start="501" selection-end="501" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1328508617440" expanded="true" signature="2066:2082" placeholder="{...}" />
+                <marker date="1328524647721" expanded="true" signature="2509:2525" placeholder="{...}" />
+                <marker date="1328524647721" expanded="true" signature="2509:2525" placeholder="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="styles.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
+      <file leaf-file-name="TransactionJournal.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="23" selection-start="580" selection-end="580" vertical-scroll-proportion="0.0">
+            <state line="229" column="17" selection-start="6842" selection-end="6846" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="jboss-deployment-structure.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml">
+      <file leaf-file-name="view.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="49" selection-start="592" selection-end="592" vertical-scroll-proportion="0.0">
+            <state line="47" column="38" selection-start="1971" selection-end="1971" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="faces-config.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml">
+      <file leaf-file-name="main_menu.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="15.3">
+            <state line="4" column="27" selection-start="157" selection-end="157" vertical-scroll-proportion="-2.72">
               <folding />
             </state>
           </provider>
-          <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
-            <state />
-          </provider>
-          <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
-            <state />
+        </entry>
+      </file>
+      <file leaf-file-name="list.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/list.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="83" column="24" selection-start="5800" selection-end="5800" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1327300324000" expanded="true" signature="1158:1176" placeholder="{...}" />
+                <marker date="1327300324000" expanded="true" signature="1512:1524" placeholder="{...}" />
+                <marker date="1327300324000" expanded="true" signature="8617:8627" placeholder="{...}" />
+              </folding>
+            </state>
           </provider>
         </entry>
       </file>
@@ -1046,76 +253,6 @@
   <component name="Git.Settings">
     <option name="CHECKOUT_INCLUDE_TAGS" value="false" />
     <option name="UPDATE_CHANGES_POLICY" value="STASH" />
-  </component>
-  <component name="GotoFileConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="AIDL" />
-      <filtered-out-file-type name="ARCHIVE" />
-      <filtered-out-file-type name="ASP" />
-      <filtered-out-file-type name="ActionScript" />
-      <filtered-out-file-type name="AspectJ" />
-      <filtered-out-file-type name="C#" />
-      <filtered-out-file-type name="C++" />
-      <filtered-out-file-type name="CFML" />
-      <filtered-out-file-type name="CLASS" />
-      <filtered-out-file-type name="CSS" />
-      <filtered-out-file-type name="DATASOURCE_STORAGE" />
-      <filtered-out-file-type name="DTD" />
-      <filtered-out-file-type name="Database Table" />
-      <filtered-out-file-type name="EJB" />
-      <filtered-out-file-type name="Eclipse" />
-      <filtered-out-file-type name="Enforced Plain Text" />
-      <filtered-out-file-type name="Erlang files" />
-      <filtered-out-file-type name="FTL" />
-      <filtered-out-file-type name="GSP" />
-      <filtered-out-file-type name="GUI_DESIGNER_FORM" />
-      <filtered-out-file-type name="Groovy" />
-      <filtered-out-file-type name="HAML" />
-      <filtered-out-file-type name="HTML" />
-      <filtered-out-file-type name="Hibernate QL" />
-      <filtered-out-file-type name="IDEA_MODULE" />
-      <filtered-out-file-type name="IDEA_PROJECT" />
-      <filtered-out-file-type name="IDEA_WORKSPACE" />
-      <filtered-out-file-type name="IDL" />
-      <filtered-out-file-type name="Images" />
-      <filtered-out-file-type name="J2EEModule" />
-      <filtered-out-file-type name="JPA QL" />
-      <filtered-out-file-type name="JSON" />
-      <filtered-out-file-type name="JSP" />
-      <filtered-out-file-type name="JSPX" />
-      <filtered-out-file-type name="JavaFX" />
-      <filtered-out-file-type name="JavaScript" />
-      <filtered-out-file-type name="LESS" />
-      <filtered-out-file-type name="MXML" />
-      <filtered-out-file-type name="Manifest" />
-      <filtered-out-file-type name="Native" />
-      <filtered-out-file-type name="PATCH" />
-      <filtered-out-file-type name="PHP" />
-      <filtered-out-file-type name="PLAIN_TEXT" />
-      <filtered-out-file-type name="PeristenceUnit" />
-      <filtered-out-file-type name="Perl" />
-      <filtered-out-file-type name="Properties" />
-      <filtered-out-file-type name="RNG Compact" />
-      <filtered-out-file-type name="RegExp" />
-      <filtered-out-file-type name="ResourceBundle" />
-      <filtered-out-file-type name="SASS" />
-      <filtered-out-file-type name="SCSS" />
-      <filtered-out-file-type name="SQL" />
-      <filtered-out-file-type name="SWF" />
-      <filtered-out-file-type name="Servlet" />
-      <filtered-out-file-type name="Smarty" />
-      <filtered-out-file-type name="SmartyConfig" />
-      <filtered-out-file-type name="Spring Roo script" />
-      <filtered-out-file-type name="TML" />
-      <filtered-out-file-type name="Twig" />
-      <filtered-out-file-type name="UML" />
-      <filtered-out-file-type name="UNKNOWN" />
-      <filtered-out-file-type name="VTL" />
-      <filtered-out-file-type name="XHTML" />
-      <filtered-out-file-type name="XML" />
-      <filtered-out-file-type name="YAML" />
-      <filtered-out-file-type name="htaccess" />
-    </file-type-list>
   </component>
   <component name="HibernateTools">
     <HIBERNATE_HOME value="" />
@@ -1168,22 +305,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" />
+        <option value="$PROJECT_DIR$/../../src/synctest/java/ru/axetta/ecafe/synctest/ApacheHttp.java" />
         <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
-        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/java/generated/nfp/TransactionServicePortType.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Org.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" />
         <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/CurrentPositionsManager.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.10-2.2.11.sql" />
       </list>
     </option>
   </component>
@@ -1535,7 +672,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="client-room" />
+              <option name="myItemId" value="back-office" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1553,11 +690,63 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="client-room" />
+              <option name="myItemId" value="back-office" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="pages" />
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="journal" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1598,6 +787,32 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1624,6 +839,38 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="option" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="synctest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="synctest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="synctest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1661,28 +908,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="ru" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ru" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -1698,10 +923,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ru" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -1726,22 +947,6 @@
               <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ru" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="persistence" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="utils" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -1754,6 +959,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="db" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1781,7 +990,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.11694747" />
     <property name="options.splitter.main.proportions" value="0.3" />
@@ -2436,16 +1645,16 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27710843" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24967742" sideWeight="0.66800535" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2356091" sideWeight="0.0" order="21" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2356091" sideWeight="0.0" order="21" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32854208" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33199465" sideWeight="0.9967914" order="18" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33199465" sideWeight="0.9967914" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32403433" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23408625" sideWeight="0.6679947" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939914" sideWeight="0.80806977" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3303226" sideWeight="0.7643909" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3335484" sideWeight="0.7643909" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.437751" sideWeight="0.49786097" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
@@ -2643,115 +1852,111 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml">
-      <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
-        <state />
-      </provider>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="24" selection-start="2355" selection-end="2355" vertical-scroll-proportion="-10.5">
+        <state line="303" column="0" selection-start="12352" selection-end="12352" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncResponse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="20" selection-start="527" selection-end="527" vertical-scroll-proportion="0.0">
+        <state line="31" column="47" selection-start="736" selection-end="736" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="796" column="19" selection-start="37688" selection-end="37688" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="311" column="17" selection-start="11150" selection-end="11150" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="57" selection-start="825" selection-end="825" vertical-scroll-proportion="0.79735684">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="72" selection-start="916" selection-end="916" vertical-scroll-proportion="0.0">
+        <state line="350" column="23" selection-start="15939" selection-end="15939" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/CurrentPositionsManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="86" column="44" selection-start="2508" selection-end="2508" vertical-scroll-proportion="0.0">
+        <state line="63" column="22" selection-start="2711" selection-end="2711" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml">
+    <entry file="jar://$PROJECT_DIR$/../lib/org.springframework.transaction-3.0.5.RELEASE.jar!/org/springframework/transaction/interceptor/TransactionInterceptor.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="49" selection-start="592" selection-end="592" vertical-scroll-proportion="0.0">
+        <state line="13" column="28" selection-start="820" selection-end="820" vertical-scroll-proportion="0.3319672">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml">
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorReferencesProvider">
-        <state />
-      </provider>
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleGeneralEditorProvider">
-        <state />
-      </provider>
-      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorProvider">
-        <state />
-      </provider>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="20" selection-start="633" selection-end="633" vertical-scroll-proportion="0.7050691">
+        <state line="28" column="28" selection-start="809" selection-end="824" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="15.3">
+        <state line="4" column="27" selection-start="157" selection-end="157" vertical-scroll-proportion="-2.72">
           <folding />
         </state>
       </provider>
-      <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
-        <state />
-      </provider>
-      <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
-        <state />
-      </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/list.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="23" selection-start="580" selection-end="580" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="83" column="24" selection-start="5800" selection-end="5800" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1327300324000" expanded="true" signature="1158:1176" placeholder="{...}" />
+            <marker date="1327300324000" expanded="true" signature="1512:1524" placeholder="{...}" />
+            <marker date="1327300324000" expanded="true" signature="8617:8627" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="1109" selection-end="1109" vertical-scroll-proportion="0.0">
+        <state line="11" column="2" selection-start="501" selection-end="501" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1328508617440" expanded="true" signature="2066:2082" placeholder="{...}" />
+            <marker date="1328524647721" expanded="true" signature="2509:2525" placeholder="{...}" />
+            <marker date="1328524647721" expanded="true" signature="2509:2525" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="454" column="13" selection-start="19514" selection-end="19514" vertical-scroll-proportion="-2.6153846">
+        <state line="47" column="38" selection-start="1971" selection-end="1971" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="229" column="17" selection-start="6842" selection-end="6846" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="90" column="62" selection-start="3049" selection-end="3049" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="418" column="48" selection-start="20701" selection-end="20701" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="808" column="0" selection-start="38260" selection-end="38927" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -2763,19 +1968,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.8-2.2.9.sql">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.10-2.2.11.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="136" column="0" selection-start="6858" selection-end="6858" vertical-scroll-proportion="0.0">
+        <state line="16" column="23" selection-start="560" selection-end="560" vertical-scroll-proportion="0.5171103">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="60" selection-start="2738" selection-end="2738" vertical-scroll-proportion="0.331384">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2839,7 +2035,6 @@
             <option name="proportions">
               <list>
                 <option value="0.21096176" />
-                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
