@@ -48,4 +48,13 @@ public class CategoryOrg {
     public void setIdOfCategoryOrg(long idOfCategoryOrg) {
         this.idOfCategoryOrg = idOfCategoryOrg;
     }
+
+    @Override
+    public String toString() {
+        return "CategoryOrg{" +
+                "idOfCategoryOrg=" + idOfCategoryOrg +
+                ", categoryName='" + categoryName + '\'' +
+                ", orgsInternal=" + orgsInternal +
+                '}';
+    }
 }
