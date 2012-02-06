@@ -826,3 +826,24 @@ CREATE TABLE CF_TransactionJournal
   accountingDate bigint,
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idOfTransactionJournal)
 );
+
+CREATE TABLE cf_categoryorg
+(
+  idofcategoryorg bigint NOT NULL,
+  categoryname character varying(255),
+  CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
+);
+
+CREATE TABLE cf_orgscategories
+(
+  idoforgscategories bigint NOT NULL,
+  idoforg bigint,
+  idofcategoryorg bigint,
+  CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idoforgscategories ),
+  CONSTRAINT cf_orgscategories_idofcategoryorg FOREIGN KEY (idofcategoryorg)
+  REFERENCES cf_categoryorg (idofcategoryorg) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+)
