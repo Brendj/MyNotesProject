@@ -355,6 +355,19 @@
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
                         action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
 
+<<<<<<< .working
+    <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
+                        action="#{optionPage.show}" reRender="workspaceForm"/>
+                           <%--
+    <rich:panelMenuItem id="showCategoryOrgsViewMenuItem" binding="#{categoryOrgViewPage.mainMenuComponent}" label="Список категорий организаций"
+                        action="#{categoryOrgViewPage.show}" reRender="workspaceForm"/>
+
+    <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}" label="Создание категории для организации"
+                        action="#{categoryOrgCreatePage.show}" reRender="workspaceForm"/>
+                               --%>
+    <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{mainPage.categoryOrgCreatePage.mainMenuComponent}" label="Создание категории для организации"
+                        action="#{mainPage.showCategoryOrgCreatePage}" reRender="workspaceForm"/>
+=======
     <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
                         action="#{optionPage.show}" reRender="workspaceForm"/>
                            <%--
@@ -363,6 +376,7 @@
                                --%>
     <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}" label="Создание категории для организации"
                         action="#{categoryOrgCreatePage.show}" reRender="workspaceForm"/>
+>>>>>>> .merge-right.r5317
 
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
