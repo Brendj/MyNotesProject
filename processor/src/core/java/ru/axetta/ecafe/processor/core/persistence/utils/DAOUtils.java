@@ -423,4 +423,14 @@ public class DAOUtils {
         q.setMaxResults(maxRecordsInBatch);
         return (List<TransactionJournal>)q.getResultList();
     }
+
+    public static List<CategoryOrg> fetchCategoryOrg(EntityManager entityManager) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryOrg order by idOfCategoryOrg asc");
+        return (List<CategoryOrg>)q.getResultList();
+    }
+
+    public static void saveFromCategoryOrg(EntityManager entityManager, CategoryOrg categoryOrg) {
+        //To change body of created methods use File | Settings | File Templates.
+        entityManager.persist(categoryOrg);
+    }
 }
