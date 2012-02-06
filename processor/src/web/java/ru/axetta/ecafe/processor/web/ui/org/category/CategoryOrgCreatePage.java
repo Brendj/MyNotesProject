@@ -9,15 +9,15 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.HibernateException;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,45 +26,9 @@ import java.util.Map;
  * Time: 13:11
  * To change this template use File | Settings | File Templates.
  */
-@Component
-@Scope("session")
 
 public class CategoryOrgCreatePage extends BasicWorkspacePage {
-
     private CategoryOrg categoryOrg = new CategoryOrg();
-    private String filter = "Не выбрано";
-    private List<Long> idOfOrgList = new ArrayList<Long>();
-
-
-    public String getFilter() {
-        return filter;
-    }
-
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Override
-    public void onShow() throws Exception {
-
-    }
-
-    @Transactional
-    public Object save() {
-
-        DAOUtils.saveFromCategoryOrg(entityManager, categoryOrg);
-
-        printMessage("Настройки сохранены.");
-        return null;
-    }
-
-    public String getPageFilename() {
-        return "option/orgcategories/create";
-    }
-
-    public Object cancel() throws Exception {
-        onShow();
-        return null;
-    }
 
     public CategoryOrg getCategoryOrg() {
         return categoryOrg;
@@ -72,6 +36,17 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage {
 
     public void setCategoryOrg(CategoryOrg categoryOrg) {
         this.categoryOrg = categoryOrg;
+    }
+
+    private String filter = "Не выбрано";
+    private List<Long> idOfOrgList = new ArrayList<Long>();
+
+    public String getPageFilename() {
+        return "option/orgcategories/create";
+    }
+
+    public String getFilter() {
+        return filter;
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
@@ -89,5 +64,40 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage {
             }
         }
     }
+
+    public void fill(Session session) throws Exception {}
+
+    public void createCategory(Session session) throws Exception {
+           CategoryOrg categoryDiscount = new CategoryOrg();
+           session.save(categoryDiscount);
+    }
+
+      /*
+    private static Logger log= Logger.getLogger("CategoryOrgCreatePage");
+
+    @Override
+    public void onShow() throws Exception {
+
+    }
+
+    public Object save() {
+
+    }
+
+
+
+    public Object cancel() throws Exception {
+
+    }
+
+    public CategoryOrg getCategoryOrg() {
+        return categoryOrg;
+    }
+
+    public void setCategoryOrg(CategoryOrg categoryOrg) {
+        this.categoryOrg = categoryOrg;
+    }
+
+       */
 
 }
