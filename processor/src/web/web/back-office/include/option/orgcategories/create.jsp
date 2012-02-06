@@ -8,9 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:outputText value="Create page" />
-
-<h:panelGrid id="createCategoryOrgPanelGrid" binding="#{categoryOrgCreatePage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="createCategoryOrgPanelGrid" binding="#{categoryOrgCreatePage.pageComponent}" styleClass="borderless-grid" columns="2">
 
     <h:outputText styleClass="output-text" escape="true" value="Организация" />
 
