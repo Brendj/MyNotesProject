@@ -846,4 +846,4 @@ CREATE TABLE cf_orgscategories
   CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
-)
+);
