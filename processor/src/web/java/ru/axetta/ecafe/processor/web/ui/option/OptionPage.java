@@ -30,6 +30,15 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean withOperator;
     private Boolean cleanMenu;
     private Integer menuDaysForDeletion;
+    private Boolean journalTransactions;
+
+    public Boolean getJournalTransactions() {
+        return journalTransactions;
+    }
+
+    public void setJournalTransactions(Boolean journalTransactions) {
+        this.journalTransactions = journalTransactions;
+    }
 
     public Boolean getWithOperator() {
         return withOperator;
@@ -76,6 +85,7 @@ public class OptionPage extends BasicWorkspacePage {
         notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
         cleanMenu = runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU);
         menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
+        journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
     }
 
     public Object save() {
@@ -84,6 +94,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, notifyBySMSAboutEnterEvent);
             runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
             runtimeContext.setOptionValue(Option.OPTION_MENU_DAYS_FOR_DELETION, menuDaysForDeletion);
+            runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {

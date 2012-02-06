@@ -21,7 +21,16 @@
 
    <h:dataTable id="journalTable" value="#{mainPage.journalViewPage.journal}" var="item">
        <h:column>
-           <h:outputText value="#{item}" />
+           <f:facet name="header">
+               <h:outputText escape="true" value="Ид." />
+           </f:facet>
+           <h:outputText value="#{item.idOfTransactionJournal}" />
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText escape="true" value="Дата" />
+           </f:facet>
+           <h:outputText value="#{item.transDate}" converter="timeConverter" />
        </h:column>
    </h:dataTable>
 </h:panelGrid>

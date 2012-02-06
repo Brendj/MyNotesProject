@@ -294,4 +294,14 @@
         <url-pattern>/services/*</url-pattern>
     </servlet-mapping>
 
+    <context-param>
+       <param-name>com.sun.faces.numberOfViewsInSession</param-name>
+       <param-value>2</param-value>
+    </context-param>
+
+    <context-param>
+       <param-name>com.sun.faces.numberOfLogicalViews</param-name>
+       <param-value>2</param-value>
+    </context-param>
+
 </web-app>

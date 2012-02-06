@@ -9,19 +9,30 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <h:panelGrid id="optionPanelGrid" binding="#{optionPage.pageComponent}" styleClass="borderless-grid">
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Использовать схему с оператором" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{optionPage.withOperator}" styleClass="output-text" />
-        <h:outputText escape="true" value="Отпралять СМС-уведомление о событиях входа-выхода" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
-    </h:panelGrid>
-    <h:panelGroup>
-        <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{optionPage.cleanMenu}" styleClass="output-text" />
-        <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
-        <h:inputText value="#{optionPage.menuDaysForDeletion}" styleClass="input-text" size="3"/>
-    </h:panelGroup>
-    <h:panelGroup>
+   <rich:tabPanel>
+        <rich:tab label="Общие">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Использовать схему с оператором" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.withOperator}" styleClass="output-text" />
+                <h:outputText escape="true" value="Отпралять СМС-уведомление о событиях входа-выхода" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
+            </h:panelGrid>
+            <h:panelGroup styleClass="borderless-grid">
+                <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.cleanMenu}" styleClass="output-text" />
+                <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
+                <h:inputText value="#{optionPage.menuDaysForDeletion}" styleClass="input-text" size="3"/>
+            </h:panelGroup>
+        </rich:tab>
+        <rich:tab label="Взаимодействие">
+            <h:panelGroup styleClass="borderless-grid">
+                <h:outputText escape="true" value="Журналировать и отправлять транзакции в ИСНП" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.journalTransactions}" styleClass="output-text" />
+            </h:panelGroup>
+        </rich:tab>
+    </rich:tabPanel>
+
+    <h:panelGroup style="margin-top: 10px">
         <a4j:commandButton value="Сохранить" action="#{optionPage.save}"
                            reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
                            styleClass="command-button" />

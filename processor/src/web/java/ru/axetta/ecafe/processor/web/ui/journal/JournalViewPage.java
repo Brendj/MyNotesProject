@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.journal;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.TransactionJournalService;
+import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
@@ -27,8 +31,15 @@ public class JournalViewPage extends BasicWorkspacePage {
         return "journal/view";
     }
 
-    public List<String> getJournal() {
-        return TransactionJournalService.getInfoOfTransactionJournal();
+    List<TransactionJournal> transactionJournalList;
+
+    @Override
+    public void onShow() throws Exception {
+        transactionJournalList = DAOService.getInstance().fetchTransactionJournal(100);
+    }
+
+    public List<TransactionJournal> getJournal() {
+        return transactionJournalList;
     }
 
 }

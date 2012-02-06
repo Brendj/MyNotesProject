@@ -12,6 +12,7 @@
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.util.Arrays" %>
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 
 
 <%
@@ -68,6 +69,7 @@
     }
     String hidePagesAttr=(String)request.getAttribute("hidePages");
     if (hidePagesAttr==null) hidePagesAttr="";
+    hidePagesAttr+=","+RuntimeContext.getInstance().getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
     String[] pageNames = {
             SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_JOURNAL,  SHOW_LIBRARY, PAY_BANK_INFO, PREPARE_PAY_PAGE,
             SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
