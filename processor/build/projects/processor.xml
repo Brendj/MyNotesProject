@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="processor" >
+
+    <taskdef name="wsimport" classname="com.sun.tools.ws.ant.WsImport">
+        <classpath>
+            <fileset dir="../lib" includes="*.jar"/>
+            <fileset dir="../lib/tools" includes="*.jar"/>
+        </classpath>
+    </taskdef>
+
+    <property name="generatedSrcDest"  location="../../src/core/java"/>
+
+    <target name="gen_nfp" description="">
+        <mkdir dir="${generatedSrcDest}"/>
+        <wsimport
+            keep="true"
+            destdir="${generatedSrcDest}"
+            extension="true"
+            wsdl="http://193.47.154.34:7002/uec-service-war/TransactionService?wsdl">
+            <binding file="tools/nfp.xml"/>
+            <binding file="tools/nfp_jaxb.xml"/>
+        </wsimport>
+
+    </target>
+
+</project>

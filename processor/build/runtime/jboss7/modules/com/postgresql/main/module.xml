@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.0" name="com.postgresql">
   <resources>
-    <resource-root path="postgresql-9.1-901.jdbc4.jar "/>
+    <resource-root path="postgresql-9.1-901.jdbc4.jar"/>
         <!-- Insert resources here -->
   </resources>
 </module>

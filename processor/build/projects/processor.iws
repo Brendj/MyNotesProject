@@ -15,7 +15,293 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AccountIdentification4Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AccountSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ActiveOrHistoricCurrencyAndAmount.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AddressType2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\AmountType3Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Authorisation1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Authorisation1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\BranchAndFinancialInstitutionIdentification4.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\BranchData2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccount16.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccountType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CashAccountType4Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CategoryPurpose1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChargeBearerType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Cheque6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeDelivery1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeDeliveryMethod1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ChequeType2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ClearingSystemIdentification2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ClearingSystemMemberIdentification2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ContactDetails2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditDebitCode.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditTransferTransactionInformation10.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceInformation2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceType1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CreditorReferenceType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\CustomerCreditTransferInitiationV03.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DateAndPlaceOfBirth.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DatePeriodDetails.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Document.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentAdjustment1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentType3Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\DocumentType5Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\EquivalentAmount2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ExchangeRateInformation1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ExchangeRateType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\FinancialIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\FinancialInstitutionIdentification7.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericAccountIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericFinancialIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericOrganisationIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GenericPersonIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\GroupHeader32.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Instruction3Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\InstructionForCreditorAgent1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\LocalInstrument2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\NameAndAddress10.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\NamePrefix1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\OrganisationIdentification4.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\OrganisationIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Party6Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PartyIdentification32.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentInstructionInformation3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentMethod3Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PaymentTypeInformation19.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PersonIdentification5.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PersonIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\PostalAddress6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Priority2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\Purpose2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentInformation3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentType1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ReferredDocumentType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryAuthority2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryReporting3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RegulatoryReportingType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceAmount1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceInformation5.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceLocation2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\RemittanceLocationMethod2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\ServiceLevel8Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\StructuredRegulatoryReporting3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\StructuredRemittanceInformation7.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxAmount1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxAuthorisation1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxInformation3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxParty1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxParty2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxPeriod1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecord1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecordDetails1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\TaxRecordPeriod1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_001_001\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AccountIdentification4Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AccountSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ActiveOrHistoricCurrencyAndAmount.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AddressType2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\AmendmentInformationDetails6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Authorisation1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Authorisation1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\BranchAndFinancialInstitutionIdentification4.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\BranchData2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccount16.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccountType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CashAccountType4Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CategoryPurpose1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ChargeBearerType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ClearingSystemIdentification2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ClearingSystemMemberIdentification2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ContactDetails2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditDebitCode.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceInformation2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceType1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CreditorReferenceType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\CustomerDirectDebitInitiationV02.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DateAndPlaceOfBirth.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DatePeriodDetails.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DirectDebitTransaction6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DirectDebitTransactionInformation9.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Document.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentAdjustment1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentType3Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\DocumentType5Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\FinancialIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\FinancialInstitutionIdentification7.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Frequency1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericAccountIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericFinancialIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericOrganisationIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GenericPersonIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\GroupHeader39.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\LocalInstrument2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\MandateRelatedInformation6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\NameAndAddress10.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\NamePrefix1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\OrganisationIdentification4.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\OrganisationIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Party6Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PartyIdentification32.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentIdentification1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentInstructionInformation4.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentMethod2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PaymentTypeInformation20.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PersonIdentification5.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PersonIdentificationSchemeName1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\PostalAddress6.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Priority2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\Purpose2Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentInformation3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentType1Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ReferredDocumentType2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryAuthority2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryReporting3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RegulatoryReportingType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceAmount1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceInformation5.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceLocation2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\RemittanceLocationMethod2Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\SequenceType1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\ServiceLevel8Choice.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\StructuredRegulatoryReporting3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\StructuredRemittanceInformation7.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxAmount1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxAuthorisation1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxInformation3.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxParty1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxParty2.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxPeriod1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecord1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecordDetails1.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\TaxRecordPeriod1Code.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\iso\std\iso\_20022\tech\xsd\pain_008_001\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\AdditionalDataType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ErrorListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ErrorType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\FaultType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\SimpleReferenceType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\common\v1\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AdditionalInfoType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AddressType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ApplicationStatusType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthentificationDataType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthorityDocumentType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\AuthorityPersonType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\BankType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\CardIdType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ClientCategoryType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ContactsType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\DocumentType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ExternalAuthenticateRequestType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\HolderIdDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\HolderInfoDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\LegalIdDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacRequestType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacResponseType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\MacType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\NameType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\OMSType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\OrganizationType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\PensionFundType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\PersonInfoType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\SchoolInfoType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\UECPointIdentificationType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\UniversityInfoType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\ValidationSchemeType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\identification\v1\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\AccountingDescriptionItemType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\DeviceDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\ErrorListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\FinancialDescriptionItemType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\OtherStatusesType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\PaymentAdditionalInfoType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\RelationDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\SAMMACDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TagType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionIdDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionSourceDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionStatusDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\TransactionTypeDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transaction\v1\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\BillListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\BillType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\CustomerDescriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\FaultResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetBillsRequestType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetBillsResponseType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetPersonTransactionsRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\GetSimpleReferenceRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ServiceCustomerType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\ServiceProviderType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\StoreTariffsRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SubscribtionListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SubscriptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\SystemType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffBindingsItemType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffBindingsMetaDataItemType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByFixedValueType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByPeriodType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffByVolumeType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffListType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TariffType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TransactionService.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\TransactionServicePortType.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionservice\v1\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\GetTransactionsRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\StoreTagsRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Work.dwc\SVN\ecafe-jb7\processor\src\core\java\ru\msk\schemas\uec\transactionsynchronization\v1\package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd/pain_001_001" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd/pain_008_001" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech/xsd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/iso/std/iso/_20022/tech" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/common/v1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/common" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/identification/v1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/identification" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transaction/v1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transaction" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionservice/v1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionservice" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionsynchronization/v1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec/transactionsynchronization" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/core/java/ru/msk/schemas/uec" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" afterPath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/ClientGroup.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/ClientGroup.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/CurrentPositionsManager.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/CurrentPositionsManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/MaintananceService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/MaintananceService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -53,7 +339,33 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/updater/DBUpdater.java" line="51" class="ru.axetta.ecafe.processor.core.updater.DBUpdater" package="ru.axetta.ecafe.processor.core.updater">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" line="398" class="ru.axetta.ecafe.processor.core.RuntimeContext" package="ru.axetta.ecafe.processor.core">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" line="160" class="ru.axetta.ecafe.processor.core.RuntimeContext" package="ru.axetta.ecafe.processor.core">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" line="85" class="ru.axetta.ecafe.processor.core.TransactionJournalService" package="ru.axetta.ecafe.processor.core">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -116,47 +428,71 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="change-personal-info.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/change-personal-info.jsp">
+      <file leaf-file-name="TransactionJournalService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="394" column="33" selection-start="16691" selection-end="16691" vertical-scroll-proportion="-13.730769">
+            <state line="84" column="60" selection-start="2738" selection-end="2738" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="update_2.2.8-2.2.9.sql" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.8-2.2.9.sql">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="136" column="0" selection-start="6858" selection-end="6858" vertical-scroll-proportion="0.8060837">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Processor.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
+      <file leaf-file-name="update_2.2.9-2.2.10.sql" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.9-2.2.10.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ecafe_processor_derby_postgre.sql" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+      <file leaf-file-name="show-orders-and-payments.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="652" column="12" selection-start="31015" selection-end="31020" vertical-scroll-proportion="0.33333334">
+            <state line="454" column="13" selection-start="19514" selection-end="19514" vertical-scroll-proportion="-2.6153846">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="styles.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/styles.css">
+      <file leaf-file-name="OptionPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="22" selection-start="287" selection-end="287" vertical-scroll-proportion="0.0">
+            <state line="86" column="44" selection-start="2508" selection-end="2508" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SyncResponse.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncResponse.java">
+      <file leaf-file-name="DAOService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="448" column="34" selection-start="15858" selection-end="15858" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="31" column="72" selection-start="916" selection-end="916" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="option.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="0" selection-start="1109" selection-end="1109" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1328508617440" expanded="true" signature="2066:2082" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -164,45 +500,33 @@
       <file leaf-file-name="styles.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="54" column="0" selection-start="941" selection-end="941" vertical-scroll-proportion="0.0">
+            <state line="33" column="23" selection-start="580" selection-end="580" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="uec.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp">
+      <file leaf-file-name="jboss-deployment-structure.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="154" column="38" selection-start="3449" selection-end="3449" vertical-scroll-proportion="0.0">
+            <state line="14" column="49" selection-start="592" selection-end="592" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="no-styles-inlinecabinet.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp">
+      <file leaf-file-name="faces-config.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="34" selection-start="593" selection-end="593" vertical-scroll-proportion="0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="15.3">
               <folding />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="inlinecabinet.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/inlinecabinet.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="27" selection-start="187" selection-end="187" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
+          <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
+            <state />
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PayComplexReport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/PayComplexReport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="11" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
+          <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
+            <state />
           </provider>
         </entry>
       </file>
@@ -249,7 +573,6 @@
       <filtered-out-file-type name="IDL" />
       <filtered-out-file-type name="Images" />
       <filtered-out-file-type name="J2EEModule" />
-      <filtered-out-file-type name="JAVA" />
       <filtered-out-file-type name="JPA QL" />
       <filtered-out-file-type name="JSON" />
       <filtered-out-file-type name="JSP" />
@@ -339,22 +662,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncRequest.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/OrgOrderReport.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/org/order_report.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/view.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/login.jsp" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/PayComplexReport.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/FreeComplexReport.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/show-menu.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/show-library.jsp" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/change-password.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/styles.css" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncResponse.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/client-room/pages/change-personal-info.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/journal/JournalViewPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
+        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" />
       </list>
     </option>
   </component>
@@ -651,6 +974,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -670,6 +994,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="WEB-INF" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -722,6 +1064,72 @@
               <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="option" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="j2ee" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -747,6 +1155,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -765,11 +1195,15 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="sync" />
+              <option name="myItemId" value="persistence" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -784,27 +1218,93 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="persistence" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="utils" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="db" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="database" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="derby" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="project.structure.last.edited" value="Artifacts" />
-    <property name="project.structure.proportion" value="0.11694747" />
     <property name="OverrideImplement.combined" value="true" />
+    <property name="project.structure.proportion" value="0.11694747" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="RunManagerConfig.showSettingsBeforeRunnig" value="false" />
-    <property name="MemberChooser.sorted" value="false" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$USER_HOME$/jboss-as-7.0.2.Final/standalone/configuration" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
+    <property name="MemberChooser.sorted" value="false" />
     <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
+    <property name="last_opened_file_path" value="$USER_HOME$/jboss-as-7.0.2.Final/standalone/configuration" />
     <property name="JdbcConsole.OpenEditorOnStart" value="false" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -812,14 +1312,14 @@
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="options.lastSelected" value="project.propCompiler" />
+    <property name="options.lastSelected" value="preferences.externalResources" />
     <property name="project.structure.side.proportion" value="0.21096176" />
     <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="TEMP_MODULE_EXPLODED_DIR_FOR_web/web/web" value="C:\Users\Marat\AppData\Local\Temp\webExplodedDir3886714855693816300tmp" />
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="dynamic.classpath" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -865,6 +1365,14 @@
       <option name="USER_CFG_CLASS" />
       <option name="CONTEXT_PROVIDER" />
       <method />
+    </configuration>
+    <configuration default="true" type="PhpRunConfigurationType" factoryName="PHP">
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="FtpUpload" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
     </configuration>
     <configuration default="true" type="JBossConfiguration" factoryName="Remote">
       <option name="LOCAL" value="false" />
@@ -954,15 +1462,6 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" adl_options="" air_descriptor_path="" air_program_params="" air_publisher_id="" air_root_dir_path="" air_run_mode="AppDescriptor" browser_family="FIREFOX" class_name="" debugger_sdk="Module SDK" html_or_swf_file_path="" launcher_type="OSDefault" main_class_name="" method_name="" module_name="" output_log_level="" package_name="" player_path="FlashPlayer.exe" port="0" run_mode="HtmlOrSwfFile" run_trusted="false" scope="Class" socket_policy_port="0" url_to_launch="http://">
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
-      </method>
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <module name="" />
@@ -1016,25 +1515,12 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" runner="emma" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="" />
-      <envs />
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
+        <option name="FtpUpload" enabled="false" />
         <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -1064,6 +1550,58 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
+    <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
+      <deployment />
+      <server-settings>
+        <option name="DEPLOY_TOMCAT_APPS" value="false" />
+        <option name="BASE_DIRECTORY_NAME" value="" />
+      </server-settings>
+      <predefined_log_file id="TOMCAT_LOCALHOST_LOG_ID" enabled="true" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" adl_options="" air_descriptor_path="" air_program_params="" air_publisher_id="" air_root_dir_path="" air_run_mode="AppDescriptor" browser_family="FIREFOX" class_name="" debugger_sdk="Module SDK" html_or_swf_file_path="" launcher_type="OSDefault" main_class_name="" method_name="" module_name="" output_log_level="" package_name="" player_path="FlashPlayer.exe" port="0" run_mode="HtmlOrSwfFile" run_trusted="false" scope="Class" socket_policy_port="0" url_to_launch="http://">
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" runner="emma" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
     <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
       <JSDebuggerConfigurationSettings>
         <option name="engineId" value="embedded" />
@@ -1079,21 +1617,6 @@
     <configuration default="true" type="GWT.ConfigurationType" factoryName="GWT Configuration">
       <module name="" />
       <option name="VM_PARAMETERS" value="" />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
-      <deployment />
-      <server-settings>
-        <option name="DEPLOY_TOMCAT_APPS" value="false" />
-        <option name="BASE_DIRECTORY_NAME" value="" />
-      </server-settings>
-      <predefined_log_file id="TOMCAT_LOCALHOST_LOG_ID" enabled="true" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
@@ -1418,33 +1941,33 @@
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17612903" sideWeight="0.7657296" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21290323" sideWeight="0.562249" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.11395101" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19612904" sideWeight="0.20883535" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328877" sideWeight="0.23748669" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27710843" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24973261" sideWeight="0.6666667" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27568272" sideWeight="0.0" order="21" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24967742" sideWeight="0.66800535" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2356091" sideWeight="0.0" order="21" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32854208" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23427041" sideWeight="0.9967914" order="18" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33199465" sideWeight="0.9967914" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32403433" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23408625" sideWeight="0.6679947" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939914" sideWeight="0.80806977" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32903227" sideWeight="0.7657296" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.72032744" sideWeight="0.49786097" order="22" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3303226" sideWeight="0.7643909" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.437751" sideWeight="0.49786097" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4515442" sideWeight="0.4983957" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4515442" sideWeight="0.4983957" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.85272145" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="IView" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32934928" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24964029" sideWeight="0.6666667" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24903226" sideWeight="0.7657296" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Cycles" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.53588516" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1584,6 +2107,16 @@
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
+    <buildFile url="file://$PROJECT_DIR$/processor.xml">
+      <antCommandLine value="" />
+      <runInBackground value="true" />
+      <targetFilters>
+        <filter targetName="gen_nfp" isVisible="true" />
+      </targetFilters>
+      <treeView value="true" />
+      <verbose value="true" />
+      <viewClosedWhenNoErrors value="false" />
+    </buildFile>
   </component>
   <component name="atlassian-ide-plugin-workspace">
     <option name="bambooConfiguration">
@@ -1622,96 +2155,138 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-library.jsp">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/services-app.xml">
+      <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="219" column="42" selection-start="9187" selection-end="9187" vertical-scroll-proportion="0.0" />
+        <state line="38" column="24" selection-start="2355" selection-end="2355" vertical-scroll-proportion="-10.5">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/TransactionJournal.hbm.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="708" selection-end="866" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-menu.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="399" column="108" selection-start="17508" selection-end="17508" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/transaction/Journal.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="36" selection-start="689" selection-end="689" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="350" column="31" selection-start="15008" selection-end="15008" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/change-password.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="29" selection-start="6192" selection-end="6192" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/styles.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="22" selection-start="287" selection-end="287" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="941" selection-end="941" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="154" column="38" selection-start="3449" selection-end="3449" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/no-styles-inlinecabinet.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="34" selection-start="593" selection-end="593" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/inlinecabinet.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="27" selection-start="187" selection-end="187" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/PayComplexReport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="11" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/change-personal-info.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="394" column="33" selection-start="16691" selection-end="16691" vertical-scroll-proportion="-13.730769">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="448" column="34" selection-start="15858" selection-end="15858" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="771" column="75" selection-start="41403" selection-end="41403" vertical-scroll-proportion="0.0">
+        <state line="11" column="20" selection-start="527" selection-end="527" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="652" column="12" selection-start="31015" selection-end="31020" vertical-scroll-proportion="0.33333334">
+        <state line="796" column="19" selection-start="37688" selection-end="37688" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="311" column="17" selection-start="11150" selection-end="11150" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="57" selection-start="825" selection-end="825" vertical-scroll-proportion="0.79735684">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="72" selection-start="916" selection-end="916" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="86" column="44" selection-start="2508" selection-end="2508" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="49" selection-start="592" selection-end="592" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml">
+      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorReferencesProvider">
+        <state />
+      </provider>
+      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleGeneralEditorProvider">
+        <state />
+      </provider>
+      <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="20" selection-start="633" selection-end="633" vertical-scroll-proportion="0.7050691">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="15.3">
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
+        <state />
+      </provider>
+      <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="23" selection-start="580" selection-end="580" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="0" selection-start="1109" selection-end="1109" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1328508617440" expanded="true" signature="2066:2082" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/TransactionJournalService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="60" selection-start="2738" selection-end="2738" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/client-room/pages/show-orders-and-payments.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="454" column="13" selection-start="19514" selection-end="19514" vertical-scroll-proportion="-2.6153846">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.9-2.2.10.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.8-2.2.9.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="136" column="0" selection-start="6858" selection-end="6858" vertical-scroll-proportion="0.8060837">
           <folding />
         </state>
       </provider>

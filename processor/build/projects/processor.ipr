@@ -2,6 +2,14 @@
 <project version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/processor.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="ArtifactManager">
     <artifact build-on-make="true" name="payconv:jar">
@@ -81,23 +89,6 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-impl-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/jsf-api.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/jsf-facelets.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/jsf-impl.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/jstl-1.2.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.orm-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.aop-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.asm-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.beans-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.context-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.context.support-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.core-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.expression-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.oxm-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.transaction-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.web-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.web.servlet-3.0.5.RELEASE.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.jdbc-3.0.5.RELEASE.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
