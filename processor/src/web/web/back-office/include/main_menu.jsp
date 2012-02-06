@@ -269,6 +269,8 @@
     <rich:panelMenuItem id="supportEmailMenuItem" binding="#{mainPage.supportEmailPage.mainMenuComponent}"
                         label="Отправка письма" action="#{mainPage.showSupportEmailPage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceSupport}"/>
+    <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций" binding="#{journalViewPage.mainMenuComponent}"
+                        action="#{journalViewPage.show}" reRender="workspaceForm"/>
 
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
     <%--reRender="mainMenu, workspaceForm" />
@@ -478,8 +480,6 @@
                             label="Регистрация" action="#{mainPage.showRuleCreatePage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <rich:panelMenuItem id="showJournal" label="Журнал" binding="#{mainPage.journalViewPage.mainMenuComponent}"
-                        action="#{mainPage.showJournalViewPage}" reRender="workspaceForm"/>
 
 </rich:panelMenuGroup>
 </rich:panelMenu>

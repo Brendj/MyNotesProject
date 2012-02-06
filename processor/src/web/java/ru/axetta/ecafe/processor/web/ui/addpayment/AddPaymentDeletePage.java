@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
+import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.hibernate.Session;

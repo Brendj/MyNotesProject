@@ -2,7 +2,7 @@
  * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.utils;
+package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -62,7 +62,7 @@ public class CurrentPositionsManager {
                     registerTransactionJournal(TransactionJournal.TRANS_CODE_FD_BEN, org, order, card, client, payment.getSocDiscount(), session);
                 }
                 if (payment.getSumByCard()>0) {
-                    registerTransactionJournal(TransactionJournal.TRANS_CODE_DEBIT, org, order, card, client, payment.getSocDiscount(), session);
+                    registerTransactionJournal(TransactionJournal.TRANS_CODE_DEBIT, org, order, card, client, payment.getSumByCard(), session);
                 }
             }
         }

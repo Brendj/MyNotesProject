@@ -25,10 +25,14 @@
             </h:panelGroup>
         </rich:tab>
         <rich:tab label="Взаимодействие">
-            <h:panelGroup styleClass="borderless-grid">
-                <h:outputText escape="true" value="Журналировать и отправлять транзакции в ИСНП" styleClass="output-text" />
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Журналировать транзакции в БД" styleClass="output-text" />
                 <h:selectBooleanCheckbox value="#{optionPage.journalTransactions}" styleClass="output-text" />
-            </h:panelGroup>
+                <h:outputText escape="true" value="Отправлять транзакции в ИС НФП" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.sendJournalTransactionsToNFP}" styleClass="output-text" />
+                <h:outputText escape="true" value="URL-адрес сервиса приема ИС НФП" styleClass="output-text" />
+                <h:inputText value="#{optionPage.nfpServiceAddress}" styleClass="input-text" size="40"/>
+            </h:panelGrid>
         </rich:tab>
     </rich:tabPanel>
 

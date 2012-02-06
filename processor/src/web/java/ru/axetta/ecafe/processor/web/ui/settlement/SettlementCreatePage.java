@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
+import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
-import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 

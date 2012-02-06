@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -343,10 +343,11 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
 
         // CF_Settlements
         for (SettlementItem settlementItem : currentPositionData.getSettlementItemList()) {
-            CurrentPositionsManager.changeSettlementPosition(null, settlementItem.getSumma(),
-                    settlementItem.getPayerClassId(), settlementItem.getReceiverClassId(),
-                    settlementItem.getContragentPayer(), settlementItem.getContragentReceiver(), curPositionList,
-                    currentPositionData.isWithOperator(), currentPositionData.getClientContragent());
+            CurrentPositionsManager
+                    .changeSettlementPosition(null, settlementItem.getSumma(), settlementItem.getPayerClassId(),
+                            settlementItem.getReceiverClassId(), settlementItem.getContragentPayer(),
+                            settlementItem.getContragentReceiver(), curPositionList,
+                            currentPositionData.isWithOperator(), currentPositionData.getClientContragent());
         }
 
         // CF_ADDPayments

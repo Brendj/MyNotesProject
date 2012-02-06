@@ -93,7 +93,7 @@ public class Org {
         return OGRN;
     }
 
-    public void setOGRN(String OGNN) {
+    public void setOGRN(String OGRN) {
         this.OGRN = OGRN;
     }
     //private Set<EnterEvent> enterEvents;

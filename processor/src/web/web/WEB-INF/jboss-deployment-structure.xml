@@ -8,7 +8,7 @@
             <module name="org.apache.cxf"/>
             <module name="javax.servlet.api"/>
             <module name="ecafe"/>
-            <module name="ecafe.spring">
+            <module name="org.springframework.spring">
                 <imports>
                     <include path="**"/>
                 </imports>

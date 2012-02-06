@@ -419,7 +419,7 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static List<TransactionJournal> fetchTransactionJournalRecs(EntityManager entityManager,
             int maxRecordsInBatch) {
-        javax.persistence.Query q = entityManager.createQuery("from TransactionJournal order by idOfTransactionJournal desc");
+        javax.persistence.Query q = entityManager.createQuery("from TransactionJournal order by idOfTransactionJournal asc");
         q.setMaxResults(maxRecordsInBatch);
         return (List<TransactionJournal>)q.getResultList();
     }

@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.*;
@@ -349,6 +348,9 @@ public class Processor implements SyncProcessor,
             SyncResponse.ResPaymentRegistry.Item resAcc;
             try {
                 resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, payment);
+                if (resAcc.getResult()!=0) {
+                    logger.error("Failure in response payment registry: "+resAcc);
+                }
             } catch (Exception e) {
                 logger.error(String.format("Failed to process payment == %s", payment), e);
                 resAcc = new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 100, "Internal error");
@@ -581,7 +583,7 @@ public class Processor implements SyncProcessor,
                 }
                 if (purchase.getDiscount() < 0 || purchase.getRPrice() < 0 || purchase.getQty() < 0) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 250, String.format(
-                            "Negative sum(s) or quatntiy are specified, IdOfOrg == %s, IdOfOrder == %s, IdOfPurchase == %s",
+                            "Negative sum(s) or quantitiy are specified, IdOfOrg == %s, IdOfOrder == %s, IdOfPurchase == %s",
                             idOfOrg, payment.getIdOfOrder(), purchase.getQty()));
                 }
                 OrderDetail orderDetail = new OrderDetail(
@@ -1389,9 +1391,7 @@ public class Processor implements SyncProcessor,
 
                     /// Формирование журнала транзакции
                     if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) {
-                        Criteria cardCriteria = persistenceSession.createCriteria(Card.class);
-                        cardCriteria.add(Restrictions.eq("idOfCard",e.getIdOfCard()));
-                        Card card = (Card) cardCriteria.uniqueResult();
+                        Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
                         if (card==null) {
                             logger.error("Не найдена карта по событию прохода: idOfOrg="+enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()+", idOfEnterEvent="+enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()+", idOfCard="+e.getIdOfCard());
                         }

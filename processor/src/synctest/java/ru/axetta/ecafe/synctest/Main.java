@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.w3c.dom.Document;
@@ -101,6 +102,8 @@ public class Main {
     }
 
     private static void disableSSLCertCheck() {
+        Protocol easyhttps = new Protocol("https", new ApacheHttp.EasySSLProtocolSocketFactory(), 443);
+        Protocol.registerProtocol("https", easyhttps);
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {

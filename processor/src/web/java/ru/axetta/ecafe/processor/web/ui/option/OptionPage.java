@@ -31,6 +31,24 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean cleanMenu;
     private Integer menuDaysForDeletion;
     private Boolean journalTransactions;
+    private Boolean sendJournalTransactionsToNFP;
+    private String nfpServiceAddress;
+
+    public Boolean getSendJournalTransactionsToNFP() {
+        return sendJournalTransactionsToNFP;
+    }
+
+    public void setSendJournalTransactionsToNFP(Boolean sendJournalTransactionsToNFP) {
+        this.sendJournalTransactionsToNFP = sendJournalTransactionsToNFP;
+    }
+
+    public String getNfpServiceAddress() {
+        return nfpServiceAddress;
+    }
+
+    public void setNfpServiceAddress(String nfpServiceAddress) {
+        this.nfpServiceAddress = nfpServiceAddress;
+    }
 
     public Boolean getJournalTransactions() {
         return journalTransactions;
@@ -86,6 +104,8 @@ public class OptionPage extends BasicWorkspacePage {
         cleanMenu = runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU);
         menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
+        sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
+        nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
     }
 
     public Object save() {
@@ -95,6 +115,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
             runtimeContext.setOptionValue(Option.OPTION_MENU_DAYS_FOR_DELETION, menuDaysForDeletion);
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
+            runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
+            runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {

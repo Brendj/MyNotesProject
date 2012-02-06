@@ -5,6 +5,10 @@
 package ru.axetta.ecafe.processor.core;
 
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import generated.nfp.*;
 import generated.nfp.x3.AdditionalDataType;
 import generated.nfp.x3.ErrorType;
@@ -34,6 +38,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -70,7 +75,7 @@ public class TransactionJournalService {
     }
 
     public void processTransactionJournalQueue() {
-        if (!runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) return;
+        if (!runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP)) return;
         for (;;) {
             try {
                 if (!RuntimeContext.getAppContext().getBean(TransactionJournalService.class).processTransactionBatch()) break;
@@ -89,7 +94,14 @@ public class TransactionJournalService {
         TransactionService service = new TransactionService();
         TransactionServicePortType port = service.getTransactionServicePort();
         TransactionListType transactionListType = new TransactionListType();
+        Client client = ClientProxy.getClient(port);
 
+        String nfpUrl = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
+        BindingProvider provider = (BindingProvider)port;
+        provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, nfpUrl);
+
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
         long maxIdOfTransactionJournal=-1;
         for (TransactionJournal tj : tjList){
             if (tj.getIdOfTransactionJournal()>maxIdOfTransactionJournal) maxIdOfTransactionJournal = tj.getIdOfTransactionJournal();
@@ -100,7 +112,7 @@ public class TransactionJournalService {
 
             LegalIdDescriptionType legalIdDescriptionType = new LegalIdDescriptionType();
             legalIdDescriptionType.setIdCodeType("OGRN");
-            legalIdDescriptionType.setIdCode(tj.getOGRN());
+            legalIdDescriptionType.setIdCode(tj.getOGRN()==null?"":tj.getOGRN());
             transactionSourceDescriptionType.setTransactionSourceId(legalIdDescriptionType);
             transactionSourceDescriptionType.setOrganizationType(OrganizationType.SCHOOL);
             transactionSourceDescriptionType.setTransactionSystemCode("ISPP");
@@ -178,7 +190,7 @@ public class TransactionJournalService {
 
             transactionListType.getTransaction().add(transactionDescriptionType);
         }
-        logger.debug("Отправка транзакций: "+transactionListType.getTransaction().size());
+        logger.info("Отправка транзакций: " + transactionListType.getTransaction().size());
 
         ErrorListType quote = port.storeTransactions(transactionListType);
 
@@ -195,7 +207,7 @@ public class TransactionJournalService {
                 sb.append("]");
                 if(errorType.getErrorCode().equals("0")){
                     sb.append("Отправка прошла успешно: ");
-                    logger.debug(sb.toString());
+                    logger.info(sb.toString());
                 } else {
                     sb.append("Ошибка отправки транзакции: ");
                     sb.append(errorType.getErrorDescription());
@@ -205,7 +217,7 @@ public class TransactionJournalService {
             }
         }
         int nRecs = DAOUtils.deleteFromTransactionJournal(entityManager, maxIdOfTransactionJournal);
-        logger.debug("Удалено из журнала транзакций: "+nRecs);
+        logger.info("Удалено из журнала транзакций: " + nRecs);
 
         return true;
     }

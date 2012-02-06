@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -24,8 +25,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 
+@Component
 public class JournalViewPage extends BasicWorkspacePage {
-
 
     public String getPageFilename() {
         return "journal/view";
