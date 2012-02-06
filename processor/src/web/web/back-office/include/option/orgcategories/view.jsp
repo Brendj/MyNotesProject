@@ -11,4 +11,4 @@
 <h:outputText value="Works page" />
 <br/>
 <h:outputText value="List: " />
-<h:outputText value="#{categoryViewPage.categories}" />
+<h:outputText value="#{categoryOrgViewPage.categories}" />

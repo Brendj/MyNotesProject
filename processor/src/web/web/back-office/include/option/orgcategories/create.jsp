@@ -10,17 +10,27 @@
 
 <h:outputText value="Create page" />
 
-<h:panelGrid id="createCategoryOrgPanelGrid" binding="#{categoryOrgCreate.pageComponent}" styleClass="borderless-grid">
-   <h:panelGrid styleClass="borderless-grid" columns="2">
+<h:panelGrid id="createCategoryOrgPanelGrid" binding="#{categoryOrgCreatePage.pageComponent}" styleClass="borderless-grid">
+
+    <h:outputText styleClass="output-text" escape="true" value="Организация" />
+
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+        <h:outputText styleClass="output-text" id="categoryOrgCreatePageFilter" escape="true" value=" {#{categoryOrgCreatePage.filter}}" />
+    </h:panelGroup>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Имя категории" styleClass="output-text" />
-        <h:inputText value="#{categoryOrgCreate.categoryOrg.categoryName}" styleClass="output-text" />
+        <h:inputText value="#{categoryOrgCreatePage.categoryOrg.categoryName}" styleClass="output-text" />
    </h:panelGrid>
 
     <h:panelGroup style="margin-top: 10px">
-        <a4j:commandButton value="Сохранить" action="#{categoryOrgCreate.save}"
+        <a4j:commandButton value="Сохранить" action="#{categoryOrgCreatePage.save}"
                            reRender="mainMenu, workspaceTogglePanel, createCategoryOrgPanelGrid"
                            styleClass="command-button" />
-        <a4j:commandButton value="Отмена" action="#{categoryOrgCreate.cancel}"
+        <a4j:commandButton value="Отмена" action="#{categoryOrgCreatePage.cancel}"
                            reRender="mainMenu, workspaceTogglePanel, createCategoryOrgPanelGrid"
                            styleClass="command-button" />
     </h:panelGroup>
