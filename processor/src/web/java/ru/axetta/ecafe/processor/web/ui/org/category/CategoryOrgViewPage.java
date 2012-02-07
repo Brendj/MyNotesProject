@@ -20,10 +20,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -42,7 +39,7 @@ public class CategoryOrgViewPage extends BasicWorkspacePage {
     private Long selectedIdOfCategoryOrg;
     private CategoryOrg currCategoryOrg;
     private List<Org> orgList;
-    private List<String> names;
+    private List<String> names = Collections.emptyList();
 
     public List<String> getNames() {
         return names;
@@ -61,11 +58,11 @@ public class CategoryOrgViewPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        showAndExpandMenuGroup();
+        //showAndExpandMenuGroup();
         currCategoryOrg = DAOUtils.fetchCategoryOrgById(entityManager, selectedIdOfCategoryOrg);
         if(null != currCategoryOrg.getOrgs()){
             for (Org org:currCategoryOrg.getOrgs()){
-                names.add(org.getShortName());
+                if(null != org.getShortName()) names.add(org.getShortName());
             }
         }   else{
             printMessage("Категория не имеет привязанных организаций.");
