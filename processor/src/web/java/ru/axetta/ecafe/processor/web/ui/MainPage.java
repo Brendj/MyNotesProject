@@ -85,6 +85,9 @@ public class MainPage {
 
     // Org manipulation
     private final BasicWorkspacePage orgGroupPage = new BasicWorkspacePage();
+    //categories orgs
+    private final BasicWorkspacePage categoryOrgGroupPage = new BasicWorkspacePage();
+
     private final OrgListPage orgListPage = new OrgListPage();
     private Long selectedIdOfOrg;
     private final SelectedOrgGroupPage selectedOrgGroupPage = new SelectedOrgGroupPage();
@@ -318,6 +321,17 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
+    //***//
+    public BasicWorkspacePage getCategoryOrgGroupPage() {
+        return categoryOrgGroupPage;
+    }
+
+    public Object showCategoryOrgGroupPage() {
+        currentWorkspacePage = categoryOrgGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     public UserListPage getUserListPage() {
         return userListPage;
@@ -5604,6 +5618,59 @@ public class MainPage {
         return null;
     }
 
+    public Object createCategoryOrg(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryOrgCreatePage.createCategory(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Категория организаций зарегистрирована успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to create category org", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории организации", null));
+
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+          /*
+    public Object saveCategoryOrg(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryCreatePage.createCategory(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = categoryCreatePage;
+        } catch (Exception e) {
+            logger.error("Failed to show category create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы категорий", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }     */
+
     // baybikov (05.12.2011)
     public CategoryCreatePage getCategoryCreatePage() {
         return categoryCreatePage;
@@ -5633,33 +5700,6 @@ public class MainPage {
             
         }
         updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object createCategoryOrg(){
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryOrgCreatePage.createCategory(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Категория организаций зарегистрирована успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to create category org", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории организации", null));
-
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
         return null;
     }
 
