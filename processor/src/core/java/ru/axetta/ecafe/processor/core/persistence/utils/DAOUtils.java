@@ -433,4 +433,16 @@ public class DAOUtils {
         //To change body of created methods use File | Settings | File Templates.
         entityManager.persist(categoryOrg);
     }
+
+    public static List<Org> findOrgs(EntityManager entityManager, List<Long> idOfOrgList) {
+        javax.persistence.Query q = entityManager.createQuery("from Org where idOfOrg in :curId order by idOfOrg asc");
+        q.setParameter("curId", idOfOrgList);
+        return (List<Org>) q.getResultList();
+    }
+
+    public static CategoryOrg fetchCategoryOrgById(EntityManager entityManager, Long selectedIdOfCategoryOrg) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryOrg where idOfCategoryOrg=:curId");
+        q.setParameter("curId", selectedIdOfCategoryOrg);
+        return (CategoryOrg) q.getSingleResult();
+    }
 }
