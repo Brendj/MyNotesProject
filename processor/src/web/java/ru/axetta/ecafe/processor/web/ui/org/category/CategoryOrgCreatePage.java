@@ -5,18 +5,19 @@
 package ru.axetta.ecafe.processor.web.ui.org.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +28,8 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 
-public class CategoryOrgCreatePage extends BasicWorkspacePage {
+public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+    
     private CategoryOrg categoryOrg = new CategoryOrg();
 
     public CategoryOrg getCategoryOrg() {
@@ -68,36 +70,13 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage {
     public void fill(Session session) throws Exception {}
 
     public void createCategory(Session session) throws Exception {
-           CategoryOrg categoryDiscount = new CategoryOrg();
-           session.save(categoryDiscount);
+        Criteria orgsCriteria = session.createCriteria(Org.class);
+        orgsCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
+        for(Object obj:  orgsCriteria.list()){
+            categoryOrg.getOrgs().add((Org) obj);
+        }
+        session.save(this.categoryOrg);
+        this.categoryOrg=new CategoryOrg();
     }
-
-      /*
-    private static Logger log= Logger.getLogger("CategoryOrgCreatePage");
-
-    @Override
-    public void onShow() throws Exception {
-
-    }
-
-    public Object save() {
-
-    }
-
-
-
-    public Object cancel() throws Exception {
-
-    }
-
-    public CategoryOrg getCategoryOrg() {
-        return categoryOrg;
-    }
-
-    public void setCategoryOrg(CategoryOrg categoryOrg) {
-        this.categoryOrg = categoryOrg;
-    }
-
-       */
 
 }
