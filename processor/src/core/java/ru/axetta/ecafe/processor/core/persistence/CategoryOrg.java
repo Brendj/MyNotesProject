@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,10 +19,14 @@ public class CategoryOrg {
 
     private long idOfCategoryOrg;
     private String categoryName;
-    private Set<Org> orgsInternal;
+    private Set<Org> orgsInternal = new HashSet<Org>(0);
 
     public Set<Org> getOrgs() {
-        return Collections.unmodifiableSet(getOrgsInternal());
+        return getOrgsInternal();
+    }
+
+    public void setOrgs(Set<Org> orgsInternal) {
+        this.orgsInternal = orgsInternal;
     }
 
     private Set<Org> getOrgsInternal() {

@@ -14,9 +14,9 @@
                 <param name="max_lo">0</param>
             </generator>
         </id>
-        <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true" />
+        <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true"/>
 
-        <set name="orgsInternal" inverse="true" cascade="all">
+        <set name="orgsInternal" table="CF_OrgsCategories" cascade="all" lazy="false">
             <key column="IdOfCategoryOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
