@@ -18,6 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
@@ -424,25 +425,47 @@ public class DAOUtils {
         return (List<TransactionJournal>)q.getResultList();
     }
 
-    public static List<CategoryOrg> fetchCategoryOrg(EntityManager entityManager) {
+    /**
+     * производит выборку всех значений по таблице CategoryOrg и
+     * выдает все значения в данной таблице с учетом сортировке по идентификатору
+     * @author Kadyrov Damir
+     * @since  2012-02-08
+     * @param entityManager менеджер сущностей
+     * @return null если таблица пуста, List<CategoryOrg>
+     */
+     public static List<CategoryOrg> findCategoryOrg(EntityManager entityManager) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryOrg order by idOfCategoryOrg asc");
         return (List<CategoryOrg>)q.getResultList();
     }
 
-    public static void saveFromCategoryOrg(EntityManager entityManager, CategoryOrg categoryOrg) {
-        //To change body of created methods use File | Settings | File Templates.
-        entityManager.persist(categoryOrg);
-    }
-
+    /**
+     * производит выборку органичиваясь данным множеством идентификаторов по таблице Orgs и
+     * выдает все значения в данной таблице с учетом сортировке по идентификатору
+     * @author Kadyrov Damir
+     * @since  2012-02-08
+     * @param entityManager менеджер сущностей
+     * @param idOfOrgList список идентификаторов организаций
+     * @return null если таблица пуста, List<Org>
+     */
     public static List<Org> findOrgs(EntityManager entityManager, List<Long> idOfOrgList) {
         javax.persistence.Query q = entityManager.createQuery("from Org where idOfOrg in :curId order by idOfOrg asc");
         q.setParameter("curId", idOfOrgList);
         return (List<Org>) q.getResultList();
     }
 
-    public static CategoryOrg fetchCategoryOrgById(EntityManager entityManager, Long selectedIdOfCategoryOrg) {
+    /**
+     * производит выборку по идентификатору в таблице CategoryOrg
+     * @author Kadyrov Damir
+     * @since  2012-02-08
+     * @param entityManager менеджер сущностей
+     * @param selectedIdOfCategoryOrg идентификатор искаемой организации
+     * @return null если таблица пуста, CategoryOrg
+     */
+    public static CategoryOrg findCategoryOrgById(EntityManager entityManager, Long selectedIdOfCategoryOrg) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryOrg where idOfCategoryOrg=:curId");
         q.setParameter("curId", selectedIdOfCategoryOrg);
         return (CategoryOrg) q.getSingleResult();
     }
+
+
 }
