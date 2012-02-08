@@ -34,25 +34,25 @@
         <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
     </h:selectOneListbox>
     <h:outputText escape="true" value="Комплекс 0" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex0}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex0}"/>
     <h:outputText escape="true" value="Комплекс 1" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex1}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex1}"/>
     <h:outputText escape="true" value="Комплекс 2" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex2}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex2}"/>
     <h:outputText escape="true" value="Комплекс 3" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex3}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex3}"/>
     <h:outputText escape="true" value="Комплекс 4" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex4}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex4}"/>
     <h:outputText escape="true" value="Комплекс 5" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex5}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex5}"/>
     <h:outputText escape="true" value="Комплекс 6" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex6}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex6}"/>
     <h:outputText escape="true" value="Комплекс 7" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex7}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex7}"/>
     <h:outputText escape="true" value="Комплекс 8" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex8}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex8}"/>
     <h:outputText escape="true" value="Комплекс 9" styleClass="output-text" />
-    <h:inputText value="#{mainPage.ruleCreatePage.complex9}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex9}"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createRule}"
