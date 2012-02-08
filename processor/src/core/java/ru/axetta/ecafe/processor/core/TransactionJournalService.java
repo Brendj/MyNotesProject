@@ -137,12 +137,24 @@ public class TransactionJournalService {
             transactionDescriptionType.setTransactionTypeDescription(transactionTypeDescriptionType);
 
             //info of Cards
+            /*
+            *   <ns3:holderDescription>
+                 <ns2:cardTypeCode>UEC</ns2:cardTypeCode>
+                 <ns2:cardTypeName>Универсальная Электронная Карта</ns2:cardTypeName>
+                 <ns2:cardIdentityCode>MUID</ns2:cardIdentityCode>
+                 <ns2:cardIdentityName>Mifare UID</ns2:cardIdentityName>
+                 <ns2:uecId>42cf30a</ns2:uecId>
+              </ns3:holderDescription>
+            * */
             HolderIdDescriptionType holderIdDescriptionType = new HolderIdDescriptionType();
-            holderIdDescriptionType.setCardIdentityCode(tj.getCardIdentityCode());
-            holderIdDescriptionType.setCardIdentityName(tj.getCardIdentityName());
             holderIdDescriptionType.setCardTypeCode(tj.getCardTypeCode());
             holderIdDescriptionType.setCardTypeName(tj.getCardTypeName());
-            holderIdDescriptionType.setSnils(tj.getClientSan());
+            holderIdDescriptionType.setCardIdentityCode(tj.getCardIdentityCode());
+            holderIdDescriptionType.setCardIdentityName(tj.getCardIdentityName());
+            /* добавлено поле  UecId */
+            holderIdDescriptionType.setUecId(tj.getUecUd());
+            //holderIdDescriptionType.setSnils(tj.getClientSan());
+
             transactionDescriptionType.setHolderDescription(holderIdDescriptionType);
 
             // additional info

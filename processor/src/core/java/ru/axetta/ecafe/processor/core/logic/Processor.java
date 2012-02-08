@@ -1410,7 +1410,7 @@ public class Processor implements SyncProcessor,
                                 TransactionJournal transactionJournal = new TransactionJournal(enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
                                         enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(), org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_ACC,
                                         transCode,
-                                        TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Long.toHexString(card.getCardNo()),
+                                        TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()] , Long.toHexString(card.getCardNo()),
                                         client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), e.getEnterName());
                                 persistenceSession.save(transactionJournal);
                             }
