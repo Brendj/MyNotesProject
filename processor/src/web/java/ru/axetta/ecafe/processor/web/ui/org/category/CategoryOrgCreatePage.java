@@ -14,6 +14,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,21 +29,25 @@ import java.util.logging.Logger;
  * Time: 13:11
  * To change this template use File | Settings | File Templates.
  */
+@Component
 
 public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
     
-    private CategoryOrg categoryOrg = new CategoryOrg();
+    private CategoryOrg currCategoryOrg = new CategoryOrg();
 
-    public CategoryOrg getCategoryOrg() {
-        return categoryOrg;
+    @PersistenceContext
+    EntityManager entityManager;
+
+    public CategoryOrg getCurrCategoryOrg() {
+        return currCategoryOrg;
     }
 
-    public void setCategoryOrg(CategoryOrg categoryOrg) {
-        this.categoryOrg = categoryOrg;
+    public void setCurrCategoryOrg(CategoryOrg currCategoryOrg) {
+        this.currCategoryOrg = currCategoryOrg;
     }
 
     private String filter = "Не выбрано";
-    private List<Long> idOfOrgList = new ArrayList<Long>();
+    private List<Long> idOfOrgList = Collections.emptyList();
 
     public String getPageFilename() {
         return "option/orgcategories/create";
@@ -67,16 +73,27 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
         }
     }
 
-    public void fill(Session session) throws Exception {}
+    @Override
+    public void onShow() throws Exception {}
 
-    public void createCategory(Session session) throws Exception {
-        Criteria orgsCriteria = session.createCriteria(Org.class);
-        orgsCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
-        for(Object obj:  orgsCriteria.list()){
-            categoryOrg.getOrgs().add((Org) obj);
+    @Transactional
+    public Object save(){
+        if (currCategoryOrg.getCategoryName().equals("")){
+            printMessage("Введите название категории.");
+            return null;
         }
-        session.save(this.categoryOrg);
-        this.categoryOrg=new CategoryOrg();
+        if (idOfOrgList.isEmpty()){
+            printMessage("Выберите организацию для категории.");
+            return null;
+        }
+        List<Org> orgList=DAOUtils.findOrgs(entityManager, idOfOrgList);
+        for(Org org:  orgList){
+            currCategoryOrg.getOrgs().add(org);
+        }
+        entityManager.persist(currCategoryOrg);
+        printMessage("Данные успешно сохранены.");
+        show();
+        return null;
     }
 
 }

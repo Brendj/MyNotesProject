@@ -12,12 +12,11 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.HibernateException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,8 +32,8 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
     private Long selectedIdOfCategoryOrg;
     private CategoryOrg currCategoryOrg;
     private String filter = "Не выбрано";
-    private List<Long> idOfOrgList = new ArrayList<Long>();
-    private List<Org> orgList;
+    private List<Long> idOfOrgList = Collections.emptyList();
+    private List<Org> orgList = Collections.emptyList();
     
     @PersistenceContext
     EntityManager entityManager;
@@ -44,22 +43,37 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
         return "option/orgcategories/edit";
     }
 
+    public String getPageTitle() {
+        return super.getPageTitle() +currCategoryOrg.getCategoryName();
+    }
+
     public String getFilter() {
         return filter;
     }
 
     @Override
     public void onShow() throws Exception {
-        currCategoryOrg = DAOUtils.fetchCategoryOrgById(entityManager, selectedIdOfCategoryOrg);
-        for(Org org:  currCategoryOrg.getOrgs()){
-              idOfOrgList.add(org.getIdOfOrg());
-        }
-        if(!idOfOrgList.isEmpty()){
-
+        //printMessage("Количество организаций категории "+idOfOrgList.size());
+        idOfOrgList = new LinkedList<Long>();
+        orgList = new LinkedList<Org>();
+        if(!currCategoryOrg.getOrgs().isEmpty()){
+            StringBuilder sb=new StringBuilder();
+            for(Org org:  currCategoryOrg.getOrgs()){
+                idOfOrgList.add(org.getIdOfOrg());
+                orgList.add(org);
+                sb.append(org.getShortName());
+                sb.append("; ");
+            }
+            filter=sb.substring(0,sb.length()-2);
         }
     }
 
+    @Transactional
     public Object save() throws Exception {
+        if (currCategoryOrg.getCategoryName().equals("")){
+            printMessage("Введите название категории.");
+            return null;
+        }
         if(orgList == null && idOfOrgList.isEmpty()){
             printMessage("Выберите организацию для категории.");
         } else{
@@ -67,7 +81,7 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
             for(Org org:  orgList){
                 currCategoryOrg.getOrgs().add(org);
             }
-            DAOUtils.saveFromCategoryOrg(entityManager, currCategoryOrg);
+            currCategoryOrg=entityManager.merge(currCategoryOrg);
             printMessage("Данные обновлены.");
         }
         return null;

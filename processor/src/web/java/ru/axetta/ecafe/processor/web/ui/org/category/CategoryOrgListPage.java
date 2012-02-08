@@ -28,7 +28,7 @@ import java.util.List;
 public class CategoryOrgListPage extends BasicWorkspacePage {
 
     private List<CategoryOrg> items = Collections.emptyList();
-
+    
     @PersistenceContext
     EntityManager entityManager;
 
@@ -42,12 +42,7 @@ public class CategoryOrgListPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        fill();
-
-    }
-
-    private void fill() throws Exception {
-        this.items = DAOUtils.fetchCategoryOrg(entityManager);
+        this.items = DAOUtils.findCategoryOrg(entityManager);
     }
 
     public List<CategoryOrg> getItems() {

@@ -38,7 +38,7 @@ public class CategoryOrgViewPage extends BasicWorkspacePage {
 
     private Long selectedIdOfCategoryOrg;
     private CategoryOrg currCategoryOrg;
-    private List<Org> orgList;
+    private List<Org> orgList = Collections.emptyList();
     private List<String> names = Collections.emptyList();
 
     public List<String> getNames() {
@@ -56,17 +56,23 @@ public class CategoryOrgViewPage extends BasicWorkspacePage {
         return "option/orgcategories/view";
     }
 
+    //super.getPageTitle() - пуста так как предыдущая ссылка не является компонентом mainMenu
+   /* public String getPageTitle() {
+        return super.getPageTitle() + currCategoryOrg.getCategoryName();
+    }*/
+
     @Override
     public void onShow() throws Exception {
-        //showAndExpandMenuGroup();
-        currCategoryOrg = DAOUtils.fetchCategoryOrgById(entityManager, selectedIdOfCategoryOrg);
-        if(null != currCategoryOrg.getOrgs()){
-            for (Org org:currCategoryOrg.getOrgs()){
-                if(null != org.getShortName()) names.add(org.getShortName());
+        orgList = new LinkedList<Org>();
+        if(currCategoryOrg.getOrgs().isEmpty()){
+            printMessage("У категории нет орагнизаций.");
+        } else{
+            for(Org org:  currCategoryOrg.getOrgs()){
+                orgList.add(org);
             }
-        }   else{
-            printMessage("Категория не имеет привязанных организаций.");
         }
+
+
     }
 
     public Long getSelectedIdOfCategoryOrg() {
@@ -87,5 +93,9 @@ public class CategoryOrgViewPage extends BasicWorkspacePage {
 
     public void setOrgList(List<Org> orgList) {
         this.orgList = orgList;
+    }
+
+    public void setCurrCategoryOrg(CategoryOrg currCategoryOrg) {
+        this.currCategoryOrg = currCategoryOrg;
     }
 }
