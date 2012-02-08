@@ -14,24 +14,18 @@
     <h:outputText escape="true" value="#{categoryOrgViewPage.currCategoryOrg.categoryName}" styleClass="output-text" />
     <h:outputText escape="true" value="Организаций" styleClass="output-text"/>
 
-    <h:dataTable value="#{categoryOrgViewPage.names}" var="orgShortName">
-        <h:column>
-            <h:outputText value="#{orgShortName}"/>
-        </h:column>
-    </h:dataTable>
-
+    <rich:dataTable value="#{categoryOrgViewPage.orgList}" var="org" rowKeyVar="row">
+        <rich:column>
+            <h:outputText value="#{row+1}) #{org.shortName}" escape="true" styleClass="output-text"/>
+        </rich:column>
+    </rich:dataTable>
 
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
-
-    <h:commandLink action="#{categoryOrgEditPage.show}" styleClass="command-link" value="Редактировать">
-        <f:setPropertyActionListener
-                value="#{categoryOrgViewPage.currCategoryOrg.idOfCategoryOrg}"
-                target="#{categoryOrgEditPage.selectedIdOfCategoryOrg}" />
-    </h:commandLink>
-
-
+    <h:commandButton action="#{categoryOrgEditPage.show}" styleClass="command-button" value="Редактировать">
+        <f:setPropertyActionListener value="#{categoryOrgViewPage.currCategoryOrg}" target="#{categoryOrgEditPage.currCategoryOrg}" />
+    </h:commandButton>
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

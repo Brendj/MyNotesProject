@@ -11,19 +11,17 @@
 <h:panelGrid id="categoryOrgEditTable" binding="#{categoryOrgEditPage.pageComponent}"
              styleClass="borderless-grid" columns="2">
 
-    <h:outputText escape="true" value="Категории" styleClass="output-text" />
+    <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
 
-    <h:panelGroup>
+    <h:panelGrid columns="2">
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
         <h:outputText styleClass="output-text" id="categoryOrgEditFilter" escape="true" value=" {#{categoryOrgEditPage.filter}}" />
-    </h:panelGroup>
+    </h:panelGrid>
 
-    <h:outputText escape="true" value="Имя категории" styleClass="output-text" />
+    <h:outputText escape="true" value="Имя категории" styleClass="output-text required-field" />
     <h:inputText value="#{categoryOrgEditPage.currCategoryOrg.categoryName}" styleClass="output-text"/>
-    <h:outputText escape="true" value="Количество организаций" styleClass="output-text"/>
-    <h:outputText escape="true" value="#{categoryOrgEditPage.currCategoryOrg.orgs}" styleClass="output-text"/>
 
 </h:panelGrid>
 

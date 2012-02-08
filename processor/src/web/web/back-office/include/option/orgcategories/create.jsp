@@ -8,28 +8,28 @@
 <% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditRule())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
-<rich:panel  id="categoryOrgCreatePanel" >
-    <h:panelGrid id="categoryOrgCreateTable" binding="#{mainPage.categoryOrgCreatePage.pageComponent}"
+
+<h:panelGrid id="categoryOrgCreateTable" binding="#{categoryOrgCreatePage.pageComponent}"
                  styleClass="borderless-grid" columns="2">
 
-        <h:outputText escape="true" value="Категории" styleClass="output-text" />
+        <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
 
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.categoryOrgCreatePage.filter}}" />
+            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{categoryOrgCreatePage.filter}}" />
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Описание" styleClass="output-text" />
-        <h:inputText value="#{mainPage.categoryOrgCreatePage.categoryOrg.categoryName}" maxlength="32" styleClass="input-text" />
+        <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
+        <h:inputText value="#{categoryOrgCreatePage.currCategoryOrg.categoryName}" maxlength="32" styleClass="input-text" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createCategoryOrg}"
-                           reRender="categoryOrgCreatePanel" styleClass="command-button" />
+        <a4j:commandButton value="Зарегистрировать правило" action="#{categoryOrgCreatePage.save}"
+                           reRender="categoryOrgCreateTable" styleClass="command-button" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
-    </h:panelGrid>
-</rich:panel>
+</h:panelGrid>
+

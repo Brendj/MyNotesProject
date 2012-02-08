@@ -7,17 +7,28 @@
 
 <% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditRule())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
-<h:panelGrid  id="categoryOrgList" styleClass="borderless-grid">
-    <rich:dataTable id="categoryOrgListTable" binding="#{categoryOrgListPage.pageComponent}"
+
+
+<rich:dataTable id="categoryOrgListTable" binding="#{categoryOrgListPage.pageComponent}"
                     value="#{categoryOrgListPage.items}" var="item" rows="20"
-                    columnClasses="center-aligned-column, center-aligned-column"
+                    columnClasses="center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Названия категорий" />
             </f:facet>
             <h:commandLink value="#{item.categoryName}" action="#{categoryOrgViewPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{item.idOfCategoryOrg}" target="#{categoryOrgViewPage.selectedIdOfCategoryOrg}" />
+                <f:setPropertyActionListener value="#{item}" target="#{categoryOrgViewPage.currCategoryOrg}" />
+            </h:commandLink>
+        </rich:column>
+
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Редактировать" />
+            </f:facet>
+            <h:commandLink action="#{categoryOrgEditPage.show}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}" target="#{categoryOrgEditPage.currCategoryOrg}" />
             </h:commandLink>
         </rich:column>
 
@@ -32,5 +43,5 @@
                 </f:facet>
             </rich:datascroller>
         </f:facet>
-    </rich:dataTable>
-</h:panelGrid>
+</rich:dataTable>
+
