@@ -24,6 +24,7 @@
         <property name="cardTypeCode" column="CardTypeCode" type="string" length="10"/>
         <property name="cardIdentityCode" column="CardIdentityCode" type="string" length="10"/>
         <property name="cardIdentityName" column="CardIdentityName" type="string" length="32"/>
+        <property name="uecUd" column="UecId" type="string" length="10"/>
 
         <property name="financialAmount" column="FinancialAmount" type="long"/>
         <property name="accountingDate" column="AccountingDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

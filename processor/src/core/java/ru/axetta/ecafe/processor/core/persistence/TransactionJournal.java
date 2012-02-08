@@ -43,8 +43,13 @@ public class TransactionJournal {
     private String cardTypeCode;
     // holderDescription.cardIdentityCode (тип идентификаторы карты: MUID)
     private String cardIdentityCode;
-    // holderDescription.cardIdentityName (номер чипа в hex для типа MUID)
+
+    // holderDescription.cardIdentityName (Имя идентификаторы карты: Mifare UID)
     private String cardIdentityName;
+
+    //holderDescription.uecId (номер чипа в hex для типа MUID)
+    private String uecUd;
+
     // holderDescription.snils
     private String clientSan;
 
@@ -114,6 +119,14 @@ public class TransactionJournal {
 
     public void setCardIdentityName(String cardIdentityName) {
         this.cardIdentityName = cardIdentityName;
+    }
+
+    public String getUecUd() {
+        return uecUd;
+    }
+
+    public void setUecUd(String uecUd) {
+        this.uecUd = uecUd;
     }
 
     public Date getTransDate() {
@@ -203,7 +216,7 @@ public class TransactionJournal {
 
     public TransactionJournal(long idOfOrg, long idOfInternalOperation, Date transDate,
             String OGRN, String serviceCode, String transactionCode, String cardTypeCode,
-            String cardIdentityCode, String cardIdentityName, String clientSan, long contractId, String clientType,
+            String cardIdentityCode, String cardIdentityName, String uecUd, String clientSan, long contractId, String clientType,
             String enterName) {
         this.idOfOrg = idOfOrg;
         this.idOfInternalOperation = idOfInternalOperation;
@@ -214,6 +227,7 @@ public class TransactionJournal {
         this.cardTypeCode = cardTypeCode;
         this.cardIdentityCode = cardIdentityCode;
         this.cardIdentityName = cardIdentityName;
+        this.uecUd = uecUd;
         this.clientSan = clientSan;
         this.contractId = contractId;
         this.clientType = clientType;
@@ -222,7 +236,7 @@ public class TransactionJournal {
 
     public TransactionJournal(long idOfOrg, long idOfInternalOperation, Date transDate,
             String OGRN, String serviceCode, String transactionCode, String cardTypeCode,
-            String cardIdentityCode, String cardIdentityName, String clientSan, long contractId, String clientType,
+            String cardIdentityCode, String cardIdentityName, String uecUd, String clientSan, long contractId, String clientType,
             long financialAmount, Date accountingDate) {
         this.idOfOrg = idOfOrg;
         this.idOfInternalOperation = idOfInternalOperation;
@@ -233,6 +247,7 @@ public class TransactionJournal {
         this.cardTypeCode = cardTypeCode;
         this.cardIdentityCode = cardIdentityCode;
         this.cardIdentityName = cardIdentityName;
+        this.uecUd = uecUd;
         this.clientSan = clientSan;
         this.contractId = contractId;
         this.clientType = clientType;
