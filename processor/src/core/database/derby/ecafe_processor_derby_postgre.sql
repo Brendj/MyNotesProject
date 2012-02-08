@@ -821,6 +821,7 @@ CREATE TABLE CF_TransactionJournal
   cardTypeCode character varying(10),
   cardIdentityCode character varying(10),
   cardIdentityName character varying(32),
+  uecid character varying(10),
   contractId bigint,
   financialAmount bigint,
   accountingDate bigint,
@@ -836,7 +837,7 @@ CREATE TABLE cf_categoryorg
 
 CREATE TABLE cf_orgscategories
 (
-  idoforgscategories bigint NOT NULL,
+  idoforgscategories bigserial NOT NULL,
   idoforg bigint,
   idofcategoryorg bigint,
   CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idoforgscategories ),
