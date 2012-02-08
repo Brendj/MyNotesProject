@@ -25,32 +25,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList{
-         /*
-    public static class CategoryItem {
 
-        private final Long idOfCategory;
-        private final String categoryName;
-
-        public CategoryItem(CategoryDiscount category) {
-            this.idOfCategory = category.getIdOfCategoryDiscount();
-            this.categoryName = category.getCategoryName();
-        }
-
-        public CategoryItem() {
-            this.idOfCategory = null;
-            this.categoryName = null;
-        }
-
-        public Long getIdOfCategory() {
-            return idOfCategory;
-        }
-
-        public String getCategoryName() {
-            return categoryName;
-        }
-    }
-       */
-    //private CategoryItem category = new CategoryItem();
     private String description;
     private boolean complex0;
     private boolean complex1;
@@ -103,12 +78,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public void setPriority(int priority) {
         this.priority = priority;
     }
-    //
-              /*
-    public CategoryItem getCategory() {
-        return category;
-    }
-                */
+
     public String getDescription() {
         return description;
     }
@@ -199,10 +169,8 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
-        System.out.println(categoryMap.toString());
         if(null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
-            System.out.println(categoryMap.toString());
             if(categoryMap.isEmpty()){
                 filter = "Не выбрано";
             } else {
@@ -231,7 +199,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void fill(Session session, Long idOfRule) throws Exception {
         DiscountRule discountRule = (DiscountRule) session.load(DiscountRule.class, idOfRule);
-        System.out.println(discountRule.getCategoryDiscounts());
         if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
             String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
             Long[] numbs=new Long[idOfCategoryDiscountsString.length];
@@ -247,7 +214,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 sb.append("; ");
             }
             String result=sb.toString();
-            System.out.println(result);
             this.setFilter(result);
         }
         fill(discountRule);
@@ -290,8 +256,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.priority = discountRule.getPriority();
         this.categoryDiscounts = discountRule.getCategoryDiscounts();
        // this.filter= discountRule.getCategoryDiscounts();
-        System.out.println(discountRule.getCategoryDiscounts());
-        System.out.println(this.filter);
         this.operationor=discountRule.isOperationOr();
     }
 }

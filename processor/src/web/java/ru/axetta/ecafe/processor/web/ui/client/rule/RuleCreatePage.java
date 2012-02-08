@@ -4,11 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.rule;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.category.CategoryListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.client.category.CategorySelectPage;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -53,16 +51,16 @@ public class RuleCreatePage extends BasicWorkspacePage
        */
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private String description;
-    private int complex0;
-    private int complex1;
-    private int complex2;
-    private int complex3;
-    private int complex4;
-    private int complex5;
-    private int complex6;
-    private int complex7;
-    private int complex8;
-    private int complex9;
+    private boolean complex0;
+    private boolean complex1;
+    private boolean complex2;
+    private boolean complex3;
+    private boolean complex4;
+    private boolean complex5;
+    private boolean complex6;
+    private boolean complex7;
+    private boolean complex8;
+    private boolean complex9;
     private Boolean operationOr;
     private String categoryDiscounts;
     private String filter = "Не выбрано";
@@ -108,83 +106,83 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.description = description;
     }
 
-    public int getComplex0() {
+    public boolean isComplex0() {
         return complex0;
     }
 
-    public void setComplex0(int complex0) {
+    public void setComplex0(boolean complex0) {
         this.complex0 = complex0;
     }
 
-    public int getComplex1() {
+    public boolean isComplex1() {
         return complex1;
     }
 
-    public void setComplex1(int complex1) {
+    public void setComplex1(boolean complex1) {
         this.complex1 = complex1;
     }
 
-    public int getComplex2() {
+    public boolean isComplex2() {
         return complex2;
     }
 
-    public void setComplex2(int complex2) {
+    public void setComplex2(boolean complex2) {
         this.complex2 = complex2;
     }
 
-    public int getComplex3() {
+    public boolean isComplex3() {
         return complex3;
     }
 
-    public void setComplex3(int complex3) {
+    public void setComplex3(boolean complex3) {
         this.complex3 = complex3;
     }
 
-    public int getComplex4() {
+    public boolean isComplex4() {
         return complex4;
     }
 
-    public void setComplex4(int complex4) {
+    public void setComplex4(boolean complex4) {
         this.complex4 = complex4;
     }
 
-    public int getComplex5() {
+    public boolean isComplex5() {
         return complex5;
     }
 
-    public void setComplex5(int complex5) {
+    public void setComplex5(boolean complex5) {
         this.complex5 = complex5;
     }
 
-    public int getComplex6() {
+    public boolean isComplex6() {
         return complex6;
     }
 
-    public void setComplex6(int complex6) {
+    public void setComplex6(boolean complex6) {
         this.complex6 = complex6;
     }
 
-    public int getComplex7() {
+    public boolean isComplex7() {
         return complex7;
     }
 
-    public void setComplex7(int complex7) {
+    public void setComplex7(boolean complex7) {
         this.complex7 = complex7;
     }
 
-    public int getComplex8() {
+    public boolean isComplex8() {
         return complex8;
     }
 
-    public void setComplex8(int complex8) {
+    public void setComplex8(boolean complex8) {
         this.complex8 = complex8;
     }
 
-    public int getComplex9() {
+    public boolean isComplex9() {
         return complex9;
     }
 
-    public void setComplex9(int complex9) {
+    public void setComplex9(boolean complex9) {
         this.complex9 = complex9;
     }
 
@@ -214,16 +212,16 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void fill(Session session) throws Exception {
         this.description = "";
-        this.complex0 = 0;
-        this.complex1 = 0;
-        this.complex2 = 0;
-        this.complex3 = 0;
-        this.complex4 = 0;
-        this.complex5 = 0;
-        this.complex6 = 0;
-        this.complex7 = 0;
-        this.complex8 = 0;
-        this.complex9 = 0;
+        this.complex0 = false;
+        this.complex1 = false;
+        this.complex2 = false;
+        this.complex3 = false;
+        this.complex4 = false;
+        this.complex5 = false;
+        this.complex6 = false;
+        this.complex7 = false;
+        this.complex8 = false;
+        this.complex9 = false;
         this.priority = 0;
         this.categoryDiscounts = "";
         this.operationOr=false;
@@ -234,16 +232,16 @@ public class RuleCreatePage extends BasicWorkspacePage
 //        CategoryDiscount category = (CategoryDiscount) session.load(CategoryDiscount.class, this.category.getIdOfCategory());
         DiscountRule discountRule = new DiscountRule();
         discountRule.setDescription(description);
-        discountRule.setComplex0(complex0);
-        discountRule.setComplex1(complex1);
-        discountRule.setComplex2(complex2);
-        discountRule.setComplex3(complex3);
-        discountRule.setComplex4(complex4);
-        discountRule.setComplex5(complex5);
-        discountRule.setComplex6(complex6);
-        discountRule.setComplex7(complex7);
-        discountRule.setComplex8(complex8);
-        discountRule.setComplex9(complex9);
+        discountRule.setComplex0(complex0?1:0);
+        discountRule.setComplex1(complex1?1:0);
+        discountRule.setComplex2(complex2?1:0);
+        discountRule.setComplex3(complex3?1:0);
+        discountRule.setComplex4(complex4?1:0);
+        discountRule.setComplex5(complex5?1:0);
+        discountRule.setComplex6(complex6?1:0);
+        discountRule.setComplex7(complex7?1:0);
+        discountRule.setComplex8(complex8?1:0);
+        discountRule.setComplex9(complex9?1:0);
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationOr);
         discountRule.setCategoryDiscounts(categoryDiscounts);
