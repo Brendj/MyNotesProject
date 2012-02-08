@@ -4,10 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import com.sun.faces.taglib.html_basic.CommandLinkTag;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.richfaces.component.html.HtmlPanelMenuGroup;
 import org.richfaces.component.html.HtmlPanelMenuItem;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +93,7 @@ public class BasicWorkspacePage extends BasicPage {
                 uiComponent.setRendered(true);
             }
         }
+
     }
 
     public void hideMenuGroup() {
@@ -121,6 +125,7 @@ public class BasicWorkspacePage extends BasicPage {
         facesContext.addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
+
     public void logAndPrintMessage(String msg, Exception e) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         logger.error(msg, e);
