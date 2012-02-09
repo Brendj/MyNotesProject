@@ -828,6 +828,7 @@ CREATE TABLE CF_TransactionJournal
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idOfTransactionJournal)
 );
 
+/* Таблица категорий Организаций */
 CREATE TABLE cf_categoryorg
 (
   idofcategoryorg bigint NOT NULL,
@@ -835,6 +836,7 @@ CREATE TABLE cf_categoryorg
   CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
 );
 
+/* Таблица связка между CategoryOrg и Org */
 CREATE TABLE cf_orgscategories
 (
   idoforgscategories bigserial NOT NULL,
@@ -845,4 +847,17 @@ CREATE TABLE cf_orgscategories
   REFERENCES cf_categoryorg (idofcategoryorg),
   CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg)
+);
+
+
+/* Таблица связка между CategoryOrg и CategoryDiscountRule */
+CREATE TABLE cf_catorgcatdiscrule
+(
+  idofcatorgcatdiscrule bigserial NOT NULL,
+  idofcategoryorg bigint,
+  idofcategorydiscount bigint,
+  CONSTRAINT cf_catorgcatdiscrule_categorydiscount FOREIGN KEY (idofcategorydiscount)
+  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE,
+  CONSTRAINT cf_catorgcatdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
+  REFERENCES cf_categoryorg (idofcategoryorg) MATCH SIMPLE
 );
