@@ -13,6 +13,7 @@
                     value="#{categoryOrgListPage.items}" var="item" rows="20"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer">
+
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Названия категорий" />
