@@ -24,12 +24,12 @@
                   not-null="true" />
 
         <property name="discountRules" column="DiscountRules" type="string" length="60" not-null="true"/>
-                         <!--
-        <set name="discountRulesInternal" inverse="true" cascade="all">
-            <key column="IdOfCategoryDiscount"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule"/>
 
-        </set>  -->
+        <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
+        <set name="discountRulesInternal" table="CF_DiscountRulesCategoryDiscount" cascade="all" lazy="false">
+            <key column="idofcategorydiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="idOfRule"/>
+        </set>
 
     </class>
 </hibernate-mapping>

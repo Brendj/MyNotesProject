@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -27,6 +29,23 @@ public class DiscountRule {
     private int priority;
     private Boolean operationOr;
     private String categoryDiscounts;
+    private Set<CategoryDiscount> categoriesDiscountsInternal;
+
+    public Set<CategoryDiscount> getCategoriesDiscounts(){
+        return getCategoriesDiscountsInternal();
+    }
+
+    public void setCategoriesDiscounts(Set<CategoryDiscount> categoriesDiscountsInternal) {
+        this.categoriesDiscountsInternal = categoriesDiscountsInternal;
+    }
+
+    private Set<CategoryDiscount> getCategoriesDiscountsInternal() {
+        return categoriesDiscountsInternal;
+    }
+
+    private void setCategoriesDiscountsInternal(Set<CategoryDiscount> categoriesDiscountsInternal) {
+        this.categoriesDiscountsInternal = categoriesDiscountsInternal;
+    }
 
     public String getCategoryDiscounts() {
         return categoryDiscounts;

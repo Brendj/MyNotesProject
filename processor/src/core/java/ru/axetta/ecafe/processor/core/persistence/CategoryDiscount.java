@@ -22,8 +22,24 @@ public class CategoryDiscount {
     private String description;
     private Date createdDate;
     private Date lastUpdate;
-    //private Set<DiscountRule> discountRules = new HashSet<DiscountRule>();
     private String discountRules;
+    private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
+
+    public Set<DiscountRule> getDiscountsRules() {
+        return getDiscountRulesInternal();
+    }
+
+    public void setDiscountsRules(Set<DiscountRule> discountRulesInternal) {
+        this.discountRulesInternal = discountRulesInternal;
+    }
+
+    private Set<DiscountRule> getDiscountRulesInternal() {
+        return discountRulesInternal;
+    }
+
+    private void setDiscountRulesInternal(Set<DiscountRule> discountRulesInternal) {
+        this.discountRulesInternal = discountRulesInternal;
+    }
 
     public String getDiscountRules() {
         return discountRules;

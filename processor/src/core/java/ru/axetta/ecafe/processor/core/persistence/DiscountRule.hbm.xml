@@ -35,5 +35,11 @@
                   not-null="true"/>
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
 
+        <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
+        <set name="categoriesDiscountsInternal" table="CF_DiscountRulesCategoryDiscount" cascade="all" lazy="false">
+            <key column="idofrule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
+        </set>
+
     </class>
 </hibernate-mapping>
