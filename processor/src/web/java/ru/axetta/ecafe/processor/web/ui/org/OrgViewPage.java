@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -11,7 +12,10 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,6 +48,15 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String defaultSupplierName;
     private String INN;
     private String OGRN;
+    private List<CategoryOrg> categoryOrg;
+
+    public List<CategoryOrg> getCategoryOrg() {
+        return categoryOrg;
+    }
+
+    public void setCategoryOrg(List<CategoryOrg> categoryOrg) {
+        this.categoryOrg = categoryOrg;
+    }
 
     public String getINN() {
         return INN;
@@ -170,6 +183,13 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
         this.INN=org.getINN();
         this.OGRN=org.getOGRN();
+        this.categoryOrg= new LinkedList<CategoryOrg>();
+        if(!org.getCategories().isEmpty()){
+           for (CategoryOrg co: org.getCategories()){
+               this.categoryOrg.add(co);
+           }
+        }
+        
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
         if (menuExchangeSourceOrgId == null) {

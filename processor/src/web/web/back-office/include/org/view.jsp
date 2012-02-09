@@ -35,6 +35,16 @@
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.contractTime}" styleClass="input-text"
                  converter="timeConverter" />
+    <h:outputText escape="true" value="Категории" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText value="Организация не пренадлежит ни к одной категории" escape="true" styleClass="output-text" rendered="#{empty mainPage.orgViewPage.categoryOrg}"/>
+        <rich:dataTable value="#{mainPage.orgViewPage.categoryOrg}" var="category"
+                        rendered="#{not empty mainPage.orgViewPage.categoryOrg}">
+           <rich:column>
+               <h:outputText value="#{category.categoryName}" escape="true" styleClass="output-text" />
+           </rich:column>
+        </rich:dataTable>
+    </h:panelGrid>
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Должность" styleClass="output-text" />
