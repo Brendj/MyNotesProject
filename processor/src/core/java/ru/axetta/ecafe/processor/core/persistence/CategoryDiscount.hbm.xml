@@ -31,5 +31,11 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="idOfRule"/>
         </set>
 
+        <!-- Cвязь многие ко многим между таблицами CategoryOrg и CategoryDiscountRule -->
+        <set name="categoryOrgInternal" table="cf_catorgcatdiscrule" cascade="all" lazy="false">
+            <key column="idofcategorydiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="idOfCategoryDiscount"/>
+        </set>
+
     </class>
 </hibernate-mapping>

@@ -24,6 +24,23 @@ public class CategoryDiscount {
     private Date lastUpdate;
     private String discountRules;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
+    private Set<CategoryOrg> categoryOrgInternal;
+
+    public Set<CategoryOrg> getCategoryOrg() {
+        return getCategoryOrgInternal();
+    }
+
+    public void setCategoryOrg(Set<CategoryOrg> categoryOrg){
+        this.categoryOrgInternal = categoryOrg;
+    }
+
+    private Set<CategoryOrg> getCategoryOrgInternal() {
+        return categoryOrgInternal;
+    }
+
+    private void setCategoryOrgInternal(Set<CategoryOrg> categoryOrgInternal) {
+        this.categoryOrgInternal = categoryOrgInternal;
+    }
 
     public Set<DiscountRule> getDiscountsRules() {
         return getDiscountRulesInternal();

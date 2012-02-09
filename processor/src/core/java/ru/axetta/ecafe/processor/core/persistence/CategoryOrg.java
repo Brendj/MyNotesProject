@@ -20,6 +20,23 @@ public class CategoryOrg {
     private long idOfCategoryOrg;
     private String categoryName;
     private Set<Org> orgsInternal = new HashSet<Org>(0);
+    private Set<CategoryDiscount> categoryDiscountInternal;
+
+    public Set<CategoryDiscount> getCategoryDiscount() {
+         return getCategoryDiscountInternal();
+    }
+
+    public void setCategoryDiscount(Set<CategoryDiscount> categoryDiscount) {
+        this.categoryDiscountInternal = categoryDiscount;
+    }
+
+    private Set<CategoryDiscount> getCategoryDiscountInternal() {
+        return categoryDiscountInternal;
+    }
+
+    private void setCategoryDiscountInternal(Set<CategoryDiscount> categoryDiscountInternal) {
+        this.categoryDiscountInternal = categoryDiscountInternal;
+    }
 
     public Set<Org> getOrgs() {
         return getOrgsInternal();

@@ -16,9 +16,16 @@
         </id>
         <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true"/>
 
+        <!-- Cвязь многие ко многим между таблицами CategoryOrg и Org -->
         <set name="orgsInternal" table="CF_OrgsCategories" cascade="all" lazy="false">
             <key column="IdOfCategoryOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
+        </set>
+
+        <!-- Cвязь многие ко многим между таблицами CategoryOrg и CategoryDiscountRule -->
+        <set name="categoryDiscountInternal" table="cf_catorgcatdiscrule" cascade="all" lazy="false">
+            <key column="idofcategorydiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryOrg"/>
         </set>
 
     </class>
