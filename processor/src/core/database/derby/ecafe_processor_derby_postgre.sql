@@ -857,7 +857,20 @@ CREATE TABLE cf_catorgcatdiscrule
   idofcategoryorg bigint,
   idofcategorydiscount bigint,
   CONSTRAINT cf_catorgcatdiscrule_categorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE,
+  REFERENCES cf_categorydiscounts (idofcategorydiscount),
   CONSTRAINT cf_catorgcatdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg) MATCH SIMPLE
+  REFERENCES cf_categoryorg (idofcategoryorg)
+);
+
+/* Таблица связка между DiscountRules и CategoryDiscountRule */
+CREATE TABLE cf_discountrulescategorydiscount
+(
+  idofdrcd bigserial NOT NULL,
+  idofrule bigint NOT NULL,
+  idofcategorydiscount bigint NOT NULL,
+  CONSTRAINT cf_discountrulescategorydiscount_pk PRIMARY KEY (idofrule , idofcategorydiscount ),
+  CONSTRAINT cf_discountrulescategorydiscount_idofcategorydiscount FOREIGN KEY (idofcategorydiscount)
+  REFERENCES cf_categorydiscounts (idofcategorydiscount),
+  CONSTRAINT cf_discountrulescategorydiscount_idofdiscountrules FOREIGN KEY (idofrule)
+  REFERENCES cf_discountrules (idofrule)
 );
