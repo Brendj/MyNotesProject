@@ -5,17 +5,17 @@
 package ru.axetta.ecafe.processor.web.ui.client.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.rule.RuleListSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.management.relation.Relation;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +24,7 @@ import java.util.Map;
  * Time: 10:07
  * To change this template use File | Settings | File Templates.
  */
-public class CategoryCreatePage extends BasicWorkspacePage {
+public class CategoryCreatePage extends BasicWorkspacePage implements RuleListSelectPage.CompleteHandlerList{
     public String getPageFilename() {
         return "client/category/create";
     }
@@ -37,6 +37,15 @@ public class CategoryCreatePage extends BasicWorkspacePage {
     private String discountRules;
     private String filter = "Не выбрано";
     private List<Long> idOfRuleList = new ArrayList<Long>();
+    private Set<DiscountRule> discountRuleSet;
+
+    public Set<DiscountRule> getDiscountRuleSet() {
+        return discountRuleSet;
+    }
+
+    public void setDiscountRuleSet(Set<DiscountRule> discountRuleSet) {
+        this.discountRuleSet = discountRuleSet;
+    }
 
     public List<Long> getIdOfRuleList() {
         return idOfRuleList;
@@ -123,7 +132,17 @@ public class CategoryCreatePage extends BasicWorkspacePage {
         if (size==0){
             CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules, description,
                     createdDate, lastUpdate);
+            this.discountRuleSet = new HashSet<DiscountRule>();
+            Criteria categoryCrioteria = session.createCriteria(DiscountRule.class);
+            categoryCrioteria.add(Restrictions.in("idOfRule",this.idOfRuleList));
+            for (Object object: categoryCrioteria.list()){
+                this.discountRuleSet.add((DiscountRule) object);
+            }
+            categoryDiscount.setDiscountsRules(this.discountRuleSet);
             session.save(categoryDiscount);
-        } else throw new Exception("This category is exists.");
+        } else {
+            printMessage("Данная категория уже существует.");
+            throw new Exception("This category is exists.");
+        }
     }
 }

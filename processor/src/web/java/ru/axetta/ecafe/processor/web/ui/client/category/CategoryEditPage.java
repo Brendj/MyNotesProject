@@ -5,11 +5,15 @@
 package ru.axetta.ecafe.processor.web.ui.client.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.rule.RuleListSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +22,7 @@ import java.util.Date;
  * Time: 13:56
  * To change this template use File | Settings | File Templates.
  */
-public class CategoryEditPage extends BasicWorkspacePage {
+public class CategoryEditPage extends BasicWorkspacePage implements RuleListSelectPage.CompleteHandlerList {
 
     public String getPageFilename() {
         return "client/category/edit";
@@ -30,6 +34,33 @@ public class CategoryEditPage extends BasicWorkspacePage {
     private String description;
     private Date createdDate;
     private Date lastUpdate;
+    private String filter = "Не выбрано";
+    private List<Long> idOfRuleList = new ArrayList<Long>();
+    private Set<DiscountRule> discountRuleSet;
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public List<Long> getIdOfRuleList() {
+        return idOfRuleList;
+    }
+
+    public void setIdOfRuleList(List<Long> idOfRuleList) {
+        this.idOfRuleList = idOfRuleList;
+    }
+
+    public Set<DiscountRule> getDiscountRuleSet() {
+        return discountRuleSet;
+    }
+
+    public void setDiscountRuleSet(Set<DiscountRule> discountRuleSet) {
+        this.discountRuleSet = discountRuleSet;
+    }
 
     public long getIdOfCategoryDiscount() {
         return idOfCategoryDiscount;
@@ -81,6 +112,7 @@ public class CategoryEditPage extends BasicWorkspacePage {
 
     public void fill(Session session, Long idOfCategoryDiscount) throws Exception {
         CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, idOfCategoryDiscount);
+
         fill(categoryDiscount);
     }
 
@@ -92,6 +124,15 @@ public class CategoryEditPage extends BasicWorkspacePage {
         categoryDiscount.setDescription(description);
         categoryDiscount.setCreatedDate(createdDate);
         categoryDiscount.setLastUpdate(lastUpdate);
+
+        this.discountRuleSet = new HashSet<DiscountRule>();
+        Criteria categoryCrioteria = persistenceSession.createCriteria(DiscountRule.class);
+        categoryCrioteria.add(Restrictions.in("idOfRule", this.idOfRuleList));
+        for (Object object: categoryCrioteria.list()){
+            this.discountRuleSet.add((DiscountRule) object);
+        }
+        categoryDiscount.setDiscountsRules(this.discountRuleSet);
+
         persistenceSession.update(categoryDiscount);
         fill(categoryDiscount);
     }
@@ -103,6 +144,33 @@ public class CategoryEditPage extends BasicWorkspacePage {
         this.description = categoryDiscount.getDescription();
         this.createdDate = categoryDiscount.getCreatedDate();
         this.lastUpdate = categoryDiscount.getLastUpdate();
+        this.discountRuleSet = categoryDiscount.getDiscountsRules();
+        StringBuilder sb=new StringBuilder();
+        for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
+           this.idOfRuleList.add(discountRule.getIdOfRule());
+           sb.append(discountRule.getDescription());
+           sb.append("; ");
+        }
+        this.setFilter(sb.toString());
     }
 
+    @Override
+    public void completeRuleListSelection(Map<Long, String> ruleMap) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+        if(null != ruleMap){
+            idOfRuleList = new ArrayList<Long>();
+            if(ruleMap.isEmpty()){
+                filter = "Не выбрано";
+            } else{
+                filter="";
+                for(Long idOfRule: ruleMap.keySet()){
+                    idOfRuleList.add(idOfRule);
+                    filter=filter.concat(ruleMap.get(idOfRule)+ "; ");
+                }
+                filter = filter.substring(0,filter.length()-2);
+                discountRules=idOfRuleList.toString();
+                discountRules=discountRules.substring(1,discountRules.length()-1);
+            }
+        }
+    }
 }

@@ -15,6 +15,7 @@ import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,9 +41,17 @@ public class RuleListPage extends BasicWorkspacePage {
         private int complex9;
         private boolean operationor;
         private String categoryDiscounts;
-
+        private List<CategoryDiscount> categoryDiscountList;
         //
 
+
+        public List<CategoryDiscount> getCategoryDiscountList() {
+            return categoryDiscountList;
+        }
+
+        public void setCategoryDiscountList(List<CategoryDiscount> categoryDiscountList) {
+            this.categoryDiscountList = categoryDiscountList;
+        }
 
         public String getCategoryDiscounts() {
             return categoryDiscounts;
@@ -87,7 +96,12 @@ public class RuleListPage extends BasicWorkspacePage {
             this.priority = discountRule.getPriority();
             this.operationor = discountRule.isOperationOr();
             this.categoryDiscounts = discountRule.getCategoryDiscounts();
-            
+            this.categoryDiscountList = new LinkedList<CategoryDiscount>();
+            if(!discountRule.getCategoriesDiscounts().isEmpty()){
+                for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
+                    this.categoryDiscountList.add(categoryDiscount);
+                }
+            }
         }
 
         public long getIdOfRule() {
@@ -164,6 +178,7 @@ public class RuleListPage extends BasicWorkspacePage {
         for (Object object : discountRuleList) {
             DiscountRule discountRule = (DiscountRule) object;
             Item item = new Item(discountRule);
+            /*
             if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
                 String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
                 Long[] numbs=new Long[idOfCategoryDiscountsString.length];
@@ -179,8 +194,20 @@ public class RuleListPage extends BasicWorkspacePage {
                     sb.append(", ");
                 }
                 String result=sb.toString();
-                item.setCategoryDiscounts(result.substring(0,result.length()-2));
+                if (result.length()>2) {
+                    item.setCategoryDiscounts(result.substring(0,result.length()-2));
+                }
+            }                                     */
+
+            if (!discountRule.getCategoriesDiscounts().isEmpty()){
+                StringBuilder stringBuilder = new StringBuilder();
+                for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
+                    stringBuilder.append(categoryDiscount.getCategoryName());
+                    stringBuilder.append("; ");
+                }
+                item.setCategoryDiscounts(stringBuilder.toString());
             }
+
             items.add(item);
         }
         this.items = items;

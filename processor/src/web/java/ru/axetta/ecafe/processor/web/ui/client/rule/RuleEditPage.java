@@ -13,9 +13,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,6 +40,15 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private String categoryDiscounts;
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private String filter = "Не выбрано";
+    private Set<CategoryDiscount> categoryDiscountSet;
+
+    public Set<CategoryDiscount> getCategoryDiscountSet() {
+        return categoryDiscountSet;
+    }
+
+    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
+        this.categoryDiscountSet = categoryDiscountSet;
+    }
 
     public String getFilter() {
         return filter;
@@ -179,7 +186,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                     idOfCategoryList.add(idOfCategory);
                     filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
                 }
-                filter = filter.substring(0,filter.length()-2);
+                filter = filter.substring(0,filter.length()-1);
                 categoryDiscounts=idOfCategoryList.toString();
                 categoryDiscounts=categoryDiscounts.substring(1,categoryDiscounts.length()-1);
             }
@@ -207,15 +214,19 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             Criteria catCriteria = session.createCriteria(CategoryDiscount.class);
             catCriteria.add(Restrictions.in("idOfCategoryDiscount", numbs));
-            List<CategoryDiscount> categoryDiscountList = catCriteria.list();
+            //List<CategoryDiscount> categoryDiscountList = ;
+            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             StringBuilder sb=new StringBuilder();
-            for(CategoryDiscount categoryDiscount: categoryDiscountList){
+            for(Object object: catCriteria.list()){
+                CategoryDiscount categoryDiscount = (CategoryDiscount)object;
+                this.categoryDiscountSet.add(categoryDiscount);
                 sb.append(categoryDiscount.getCategoryName());
                 sb.append("; ");
             }
             String result=sb.toString();
             this.setFilter(result);
         }
+
         fill(discountRule);
     }
 
@@ -237,6 +248,13 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationor);
         discountRule.setCategoryDiscounts(categoryDiscounts);
+        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
+        categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
+        for (Object object: categoryCrioteria.list()){
+            this.categoryDiscountSet.add((CategoryDiscount) object);
+        }
+        discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
         persistenceSession.update(discountRule);
         fill(discountRule);
     }

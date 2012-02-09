@@ -14,7 +14,15 @@
 <%-- Панель создания категории --%>
 <h:panelGrid id="categoryCreatePanel" binding="#{mainPage.categoryCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
-       <%--
+
+    <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
+    <h:inputText value="#{mainPage.categoryCreatePage.idOfCategoryDiscount}" maxlength="32" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Наименование" styleClass="output-text" />
+    <h:inputText value="#{mainPage.categoryCreatePage.categoryName}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="Описание" styleClass="output-text" />
+    <h:inputText value="#{mainPage.categoryCreatePage.description}" maxlength="32" styleClass="input-text" />
+
     <h:outputText escape="true" value="Правила" styleClass="output-text" />
     <h:panelGroup>
         <a4j:commandButton value="..." action="#{mainPage.showRuleListSelectPage}" reRender="modalRuleListSelectorPanel"
@@ -23,18 +31,6 @@
         <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{mainPage.categoryCreatePage.filter}}" />
     </h:panelGroup>
 
-           --%>
-    <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
-    <h:inputText value="#{mainPage.categoryCreatePage.idOfCategoryDiscount}" maxlength="32" styleClass="input-text" />
-
-    <h:outputText escape="true" value="Наименование" styleClass="output-text" />
-    <h:inputText value="#{mainPage.categoryCreatePage.categoryName}" maxlength="32" styleClass="input-text" />
-    <h:outputText escape="true" value="Описание" styleClass="output-text" />
-    <h:inputText value="#{mainPage.categoryCreatePage.description}" maxlength="32" styleClass="input-text" />
-        <%--
-    <h:outputText escape="true" value="Номера правил" styleClass="output-text" />
-    <h:inputText value="#{mainPage.categoryCreatePage.discountRules}" maxlength="32" styleClass="input-text" />
-           --%>
     <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
     <rich:calendar value="#{mainPage.categoryCreatePage.createdDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />

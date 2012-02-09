@@ -4,16 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.rule;
 
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.category.CategoryListSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,6 +65,15 @@ public class RuleCreatePage extends BasicWorkspacePage
     private Boolean operationOr;
     private String categoryDiscounts;
     private String filter = "Не выбрано";
+    private Set<CategoryDiscount> categoryDiscountSet;
+
+    public Set<CategoryDiscount> getCategoryDiscountSet() {
+        return categoryDiscountSet;
+    }
+
+    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
+        this.categoryDiscountSet = categoryDiscountSet;
+    }
 
     public List<Long> getIdOfCategoryList() {
         return idOfCategoryList;
@@ -201,6 +211,7 @@ public class RuleCreatePage extends BasicWorkspacePage
                  filter = filter.substring(0,filter.length()-2);
                  categoryDiscounts=idOfCategoryList.toString();
                  categoryDiscounts=categoryDiscounts.substring(1,categoryDiscounts.length()-1);
+
              }
 
          }
@@ -245,6 +256,13 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationOr);
         discountRule.setCategoryDiscounts(categoryDiscounts);
+        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Criteria categoryCrioteria = session.createCriteria(CategoryDiscount.class);
+        categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
+        for (Object object: categoryCrioteria.list()){
+             this.categoryDiscountSet.add((CategoryDiscount) object);
+        }
+        discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
         session.save(discountRule);
     }
 }

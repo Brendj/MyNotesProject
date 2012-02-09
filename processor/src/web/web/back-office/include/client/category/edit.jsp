@@ -19,12 +19,16 @@
     <h:outputText escape="true" value="Наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.categoryEditPage.categoryName}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание" styleClass="output-text" />
-
     <h:inputText value="#{mainPage.categoryEditPage.description}" maxlength="32" styleClass="input-text" />
-    <%--
-    <h:outputText escape="true" value="Номера правил" styleClass="output-text" />
-    <h:inputText value="#{mainPage.categoryEditPage.discountRules}" maxlength="32" styleClass="input-text" />
-     --%>
+
+    <h:outputText escape="true" value="Правила" styleClass="output-text" />
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showRuleListSelectPage}" reRender="modalRuleListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalRuleListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+        <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{mainPage.categoryEditPage.filter}}" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
     <rich:calendar value="#{mainPage.categoryEditPage.createdDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />

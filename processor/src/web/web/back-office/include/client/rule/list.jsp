@@ -13,6 +13,101 @@
     <rich:dataTable id="ruleTable" width="700" var="item" value="#{mainPage.ruleListPage.items}" rows="20"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer">
+           <%--
+    <rich:column rowspan="2"  headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.idOfRule}" />
+    </rich:column>
+    <rich:column rowspan="2"  headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Приоритет" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.priority}" />
+    </rich:column>
+    <rich:column rowspan="2"  headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Описание" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.description}" />
+    </rich:column>
+    <rich:column rowspan="2"  headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Категории" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.categoryDiscounts}" />
+    </rich:column>
+    <rich:column rowspan="2"  headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Тип условия" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
+    </rich:column>
+    <rich:column colspan="4" headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText value="Комплексы" styleClass="output-text" escape="true"/>
+        </f:facet>
+    </rich:column>
+
+    <rich:column headerClass="column-header" breakBefore="true">
+        <f:facet name="header">
+            <h:outputText value="0" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.complex0}" />
+    </rich:column>
+    <rich:column headerClass="column-header" breakBefore="true">
+        <f:facet name="header">
+            <h:outputText value="1" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.complex1}" />
+    </rich:column>
+    <rich:column headerClass="column-header" breakBefore="true">
+        <f:facet name="header">
+            <h:outputText value="2" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.complex2}" />
+    </rich:column>
+    <rich:column headerClass="column-header" breakBefore="true">
+        <f:facet name="header">
+            <h:outputText value="3" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:outputText styleClass="output-text" value="#{item.complex3}" />
+    </rich:column>
+
+    <rich:column breakBefore="false">
+        <f:facet name="header">
+            <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <h:commandLink action="#{mainPage.showRuleEditPage}" styleClass="command-link">
+            <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+            <f:setPropertyActionListener value="#{item.idOfRule}" target="#{mainPage.selectedIdOfRule}" />
+        </h:commandLink>
+    </rich:column>
+    <rich:column style="text-align:center" breakBefore="false">
+        <f:facet name="header">
+            <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
+        </f:facet>
+        <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                         oncomplete="#{rich:component('ruleDeletePanel')}.show();">
+            <h:graphicImage value="/images/16x16/delete.png" />
+            <f:setPropertyActionListener value="#{item.idOfRule}"
+                                         target="#{mainPage.selectedIdOfRule}" />
+        </a4j:commandLink>
+    </rich:column>
+
+    <f:facet name="footer">
+        <rich:datascroller for="ruleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>  --%>
+
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column rowspan="2" headerClass="center-aligned-column" >
@@ -142,5 +237,6 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
+
     <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showRuleCSVList}" styleClass="command-button" /-->
 </h:panelGrid>
