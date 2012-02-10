@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.org.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
@@ -14,11 +13,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -29,14 +24,10 @@ import java.util.logging.Logger;
  * Time: 13:11
  * To change this template use File | Settings | File Templates.
  */
-@Component
 
 public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
-    
-    private CategoryOrg currCategoryOrg = new CategoryOrg();
 
-    @PersistenceContext
-    EntityManager entityManager;
+    private CategoryOrg currCategoryOrg = new CategoryOrg();
 
     public CategoryOrg getCurrCategoryOrg() {
         return currCategoryOrg;
@@ -47,7 +38,7 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
     }
 
     private String filter = "Не выбрано";
-    private List<Long> idOfOrgList = Collections.emptyList();
+    private List<Long> idOfOrgList = new LinkedList<Long>();
 
     public String getPageFilename() {
         return "option/orgcategories/create";
@@ -73,27 +64,20 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
         }
     }
 
-    @Override
-    public void onShow() throws Exception {}
+    public void fill(Session session){}
 
-    @Transactional
-    public Object save(){
-        if (currCategoryOrg.getCategoryName().equals("")){
-            printMessage("Введите название категории.");
-            return null;
+    public void createCategory(Session session){
+        CategoryOrg categoryOrg = new CategoryOrg();
+        categoryOrg.setCategoryName(currCategoryOrg.getCategoryName());
+        Set<Org> orgSet = new HashSet<Org>();
+        Criteria categoryCriteria = session.createCriteria(Org.class);
+        categoryCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
+        for (Object object: categoryCriteria.list()){
+            orgSet.add((Org) object);
         }
-        if (idOfOrgList.isEmpty()){
-            printMessage("Выберите организацию для категории.");
-            return null;
-        }
-        List<Org> orgList=DAOUtils.findOrgs(entityManager, idOfOrgList);
-        for(Org org:  orgList){
-            currCategoryOrg.getOrgs().add(org);
-        }
-        entityManager.persist(currCategoryOrg);
-        printMessage("Данные успешно сохранены.");
-        show();
-        return null;
+        categoryOrg.setOrgs(orgSet);
+        printMessage("Категория зарегистрирована успешно");
+        session.save(categoryOrg);
     }
 
 }

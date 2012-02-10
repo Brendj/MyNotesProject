@@ -361,10 +361,11 @@
 
     <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организациий" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
                          rendered="true" >
+        <%--
         <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}"
-                            label="Регистрация" action="#{categoryOrgCreatePage.show}" reRender="workspaceForm"/>
+            --%>
+        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{mainPage.categoryOrgCreatePage.mainMenuComponent}"
+                            label="Регистрация" action="#{mainPage.showCategoryOrgCreatePage}" reRender="workspaceForm"/>
         <rich:panelMenuItem id="showCategoryOrgsListMenuItem" binding="#{categoryOrgListPage.mainMenuComponent}"
                             label="Список" action="#{categoryOrgListPage.show}" reRender="workspaceForm" />
           <%--

@@ -9,7 +9,7 @@
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 
-<h:panelGrid id="categoryOrgCreateTable" binding="#{categoryOrgCreatePage.pageComponent}"
+<h:panelGrid id="categoryOrgCreateTable" binding="#{mainPage.categoryOrgCreatePage.pageComponent}"
                  styleClass="borderless-grid" columns="2">
 
         <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
@@ -18,14 +18,14 @@
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{categoryOrgCreatePage.filter}}" />
+            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.categoryOrgCreatePage.filter}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
-        <h:inputText value="#{categoryOrgCreatePage.currCategoryOrg.categoryName}" maxlength="32" styleClass="input-text" />
+        <h:inputText value="#{mainPage.categoryOrgCreatePage.currCategoryOrg.categoryName}" maxlength="32" styleClass="input-text" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Зарегистрировать правило" action="#{categoryOrgCreatePage.save}"
+        <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createCategoryOrg}"
                            reRender="categoryOrgCreateTable" styleClass="command-button" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
