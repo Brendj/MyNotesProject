@@ -54,4 +54,6 @@ public interface ClientRoomController {
     DetachGuardSanResult detachGuardSan(String san, String guardSan);
     @WebMethod (operationName = "detachGuardSan")
     DetachGuardSanResult detachGuardSan(Long contractId, String guardSan);
+    PaymentResult balanceRequest(String pid, Long clientId, Long opId, Long termId, int paymentSystem);
+    PaymentResult commitPaymentRequest(String pid, Long clientId, Long sum, String time, Long opId, Long termId, int paymentSystem);
 }

@@ -12,16 +12,8 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientsData {
+    public ClientList clientList;
     public Long resultCode;
     public String description;
 
-    private ClientList clientList;
-
-    public ClientList getClientList() {
-        return clientList;
-    }
-
-    public void setClientList(ClientList clientList) {
-        this.clientList = clientList;
-    }
 }

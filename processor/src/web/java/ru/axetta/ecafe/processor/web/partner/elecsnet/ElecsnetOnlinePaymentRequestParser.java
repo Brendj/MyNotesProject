@@ -10,7 +10,6 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.LinkedList;
@@ -18,9 +17,14 @@ import java.util.LinkedList;
 public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static int TYPE_CHECK=1, TYPE_PAY=2;
 
+    final static String SOAP_PARAM = "soap=";
+
     @Override
     protected String prepareRequestForParsing(String requestBody) throws Exception {
-        if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
+        int pos = requestBody.indexOf(SOAP_PARAM);
+        if (pos == -1) {
+            if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
+        }
         return requestBody;
     }
 

@@ -31,10 +31,15 @@ import java.util.LinkedList;
 public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static String SIGNATURE_PARAM="&SIGNATURE=";
 
+    final static String SOAP_PARAM = "soap=";
+
     @Override
     protected String prepareRequestForParsing(String requestBody) throws Exception {
-        if (linkConfig.checkSignature) {
-            if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
+        int pos = requestBody.indexOf(SOAP_PARAM);
+        if (pos == -1) {
+            if (linkConfig.checkSignature) {
+                if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
+            }
         }
         return requestBody;
     }

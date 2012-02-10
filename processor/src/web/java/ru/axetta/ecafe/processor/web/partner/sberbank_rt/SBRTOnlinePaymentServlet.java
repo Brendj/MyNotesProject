@@ -34,6 +34,8 @@ public class SBRTOnlinePaymentServlet extends OnlinePaymentServlet {
         return runtimeContext.getPartnerSBRTConfig().getIdOfContragent();
     }
 
-
-
+    @Override
+    protected boolean isSoapEnabled(RuntimeContext runtimeContext, HttpServletRequest httpRequest) {
+        return runtimeContext.getPartnerSBRTConfig().isSoapEnabled();
+    }
 }

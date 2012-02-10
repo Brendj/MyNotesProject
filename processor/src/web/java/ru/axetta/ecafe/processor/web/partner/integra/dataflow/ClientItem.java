@@ -4,6 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -11,9 +16,13 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * Time: 10:23
  * To change this template use File | Settings | File Templates.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ClientItem")
 public class ClientItem {
-    private Long contractId;
-    private String san;
+    @XmlAttribute(name = "ContractId")
+    protected Long contractId;
+    @XmlAttribute(name = "San")
+    protected String san;
 
     public Long getContractId() {
         return contractId;

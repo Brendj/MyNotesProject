@@ -364,7 +364,7 @@ public class ClientRoomController {
                     throws Exception {
                 Date nextToEndDate = DateUtils.addDays(endDate, 1);
                 Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
-                enterEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+                enterEventCriteria.add(Restrictions.eq("client", client.getIdOfClient()));
                 enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
                 enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
                 enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));

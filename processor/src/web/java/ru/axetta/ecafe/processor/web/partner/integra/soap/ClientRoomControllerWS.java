@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -30,7 +31,11 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -50,6 +55,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    
+    private static final int ELECSNET_PAYMENT = 0;
+    private static final int STD_PAYMENT = 1;
+    private static final int SBRT_PAYMENT = 2;
 
     interface Processor {
 
@@ -487,7 +496,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date endDate, Date startDate) throws DatatypeConfigurationException {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
-        enterEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        enterEventCriteria.add(Restrictions.eq("client", client));
         enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
         enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
         enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
@@ -538,14 +547,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Client not found";
             } else {
-                ClientList clientList = new ClientList();
                 for (Client client : clients) {
                     ClientItem clientItem = new ClientItem();
                     clientItem.setContractId(client.getContractId());
                     clientItem.setSan(client.getSan());
-                    clientList.getClients().add(clientItem);
+                    data.clientList = new ClientList();
+                    data.clientList.getClients().add(clientItem);
                 }
-                data.setClientList(clientList);
                 data.resultCode = RC_OK;
                 data.description = "OK";
             }
@@ -700,14 +708,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     data.description = "Ok";
                 } else if (data instanceof DetachGuardSanResult) {
                     data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                    data.description = "Client hasn't this guard SNILS.";
+                    data.description = "Client doesn't have this guard SNILS";
                 }
             }
             else {
                 if (data instanceof AttachGuardSanResult) {
                     if (isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
-                        data.description = "Client has this guard SNILS already.";
+                        data.description = "Client has this guard SNILS already";
                     } else {
                         String gs = "";
                         if (clientGuardSan.endsWith(";"))
@@ -724,7 +732,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else if (data instanceof DetachGuardSanResult) {
                     if (!isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description = "Client hasn't this guard SNILS.";
+                        data.description = "Client doesn't have this guard SNILS";
                     } else {
                         if (clientGuardSan.contains(";" + guardSan + ";"))
                             clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
@@ -744,6 +752,60 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
+    }
+
+    public PaymentResult balanceRequest(String pid, Long clientId, Long opId, Long termId, int paymentSystem) {
+        PaymentResult paymentResult = new PaymentResult();
+        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&OPID=" + opId + "&TERMID=" + termId;
+        String response = sendRequestToPaymentSystem(requestParams, paymentSystem);
+        paymentResult.desc = response;
+        return paymentResult;
+    }
+
+    public PaymentResult commitPaymentRequest(String pid, Long clientId, Long sum, String time, Long opId, Long termId, int paymentSystem) {
+        PaymentResult paymentResult = new PaymentResult();
+        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&SUM=" + sum + "&TIME=" + time + "&OPID=" + opId + "&TERMID=" + termId;
+        String response = sendRequestToPaymentSystem(requestParams, paymentSystem);
+        paymentResult.desc = response;
+        return paymentResult;
+    }
+    
+    private String sendRequestToPaymentSystem(String requestParams, int paymentSystem) {
+        String path = null;
+        switch (paymentSystem) {
+            case ELECSNET_PAYMENT : {
+                path = "payment-elecsnet";
+            }
+            break;
+            case STD_PAYMENT: {
+                path = "payment-std";
+            }
+            break;
+            case SBRT_PAYMENT: {
+                path = "payment-sbrt";
+            }
+            break;
+        }
+        String requestUrl = "https://localhost:8443/processor/" + path + "?soap=1" + requestParams;
+        String response = null;
+        try {
+            URL paymentURL = new URL(requestUrl);
+            URLConnection conn = paymentURL.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            /*Properties properties = new Properties();
+            properties.load(in);
+            ntrr.TSMid = properties.getProperty("TSMid");
+            ntrr.resultCode = getPropertyInt(properties, "resultCode");
+            ntrr.resultDesc = properties.getProperty("resultDesc");
+            ntrr.ticket = getPropertyByte(properties, "ticket");
+            ntrr.ticket_mapping = getPropertyByte(properties, "ticket_mapping");*/
+            response = in.toString();
+            in.close();
+        }
+        catch (Exception e) {
+            return e.getMessage();
+        }
+        return response;
     }
 
     private boolean isGuardSanExists(String guardSan, String clientGuardSans) {

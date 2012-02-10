@@ -28,15 +28,24 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         try {
             runtimeContext = RuntimeContext.getInstance();
             OnlinePaymentRequestParser requestParser=createParser();
-            try {
-                if (!authenticate(httpRequest, requestParser)) {
-                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            // disable authentication for soap
+            String soapParameter = httpRequest.getParameter("soap");
+            if (soapParameter == null) {
+                try {
+                    if (!authenticate(httpRequest, requestParser)) {
+                        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
+                } catch (Exception e) {
+                    getLogger().error("Failed to authenticate request", e);
+                    httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
-            } catch (Exception e) {
-                getLogger().error("Failed to authenticate request", e);
-                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+            } else {
+                if (!isSoapEnabled(runtimeContext, httpRequest)) {
+                    httpResponse.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                    return;
+                }
             }
             OnlinePaymentProcessor.PayRequest payRequest=null;
             long contragentId=getDefaultIdOfContragent(runtimeContext);
@@ -70,6 +79,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         }
     }
 
+    protected abstract boolean isSoapEnabled(RuntimeContext runtimeContext, HttpServletRequest httpRequest) throws Exception;
     protected abstract OnlinePaymentRequestParser createParser();
     protected abstract String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext,
             HttpServletRequest httpRequest,
@@ -95,7 +105,5 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         getLogger().error(String.format("Authentication failed for: %s", remoteAddress));
         return false;
     }
-
-
 
 }
