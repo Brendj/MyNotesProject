@@ -35,6 +35,9 @@
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.contractTime}" styleClass="input-text"
                  converter="timeConverter" />
+
+    <%-- Список категорий к которым пренадлежит организация,
+    если организация не пренадлежит к категории выводится соответствующее сообщение --%>
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText value="Организация не пренадлежит ни к одной категории" escape="true" styleClass="output-text" rendered="#{empty mainPage.orgViewPage.categoryOrg}"/>
@@ -45,6 +48,8 @@
            </rich:column>
         </rich:dataTable>
     </h:panelGrid>
+    <%-- Kadyrov D.I. 09.02.2011 --%>
+
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Должность" styleClass="output-text" />
