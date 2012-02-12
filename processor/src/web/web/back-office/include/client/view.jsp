@@ -91,12 +91,22 @@
     <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.discountMode}" converter="clientDiscountModeConverter" readonly="true"
                  styleClass="input-text" />
+
     <h:outputText escape="true" value="Категории скидок" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Нет категорий" styleClass="output-text"
                       rendered="#{mainPage.clientViewPage.categoryDiscountNamesEmpty}" />
         <a4j:repeat value="#{mainPage.clientViewPage.categoryDiscountNames}" var="categoryDiscountName">
             <h:outputText escape="true" value="#{categoryDiscountName}" styleClass="output-text" /><br/>
+        </a4j:repeat>
+    </h:panelGrid>
+
+    <h:outputText  escape="true" value="Категории скидок" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="true" value="Клиен скидок не имеет" styleClass="output-text"
+                      rendered="#{mainPage.clientViewPage.categoryiesDiscounts}" />
+        <a4j:repeat value="#{mainPage.clientViewPage.categoriesDiscounts}" var="categoryDiscount">
+            <h:outputText escape="true" value="#{categoryDiscount.categoryName}" styleClass="output-text" /><br/>
         </a4j:repeat>
     </h:panelGrid>
 

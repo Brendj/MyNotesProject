@@ -88,6 +88,16 @@
     <h:selectOneMenu value="#{mainPage.clientCreatePage.payForSMS}" styleClass="input-text">
         <f:selectItems value="#{mainPage.clientCreatePage.clientPayForSMSMenu.items}" />
     </h:selectOneMenu>
+
+    <h:outputText escape="true" value="Категории" styleClass="output-text" />
+
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientCreatePage.filter}}" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Категории скидок" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Нет категорий" styleClass="output-text"
