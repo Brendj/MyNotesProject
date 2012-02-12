@@ -874,3 +874,17 @@ CREATE TABLE cf_discountrulescategorydiscount
   CONSTRAINT cf_discountrulescategorydiscount_idofdiscountrules FOREIGN KEY (idofrule)
   REFERENCES cf_discountrules (idofrule)
 );
+
+/* Таблица связка между Client и CategoryDiscountRule */
+CREATE TABLE cf_clienscategorydiscount
+(
+  idofclienscategorydiscount bigserial NOT NULL,
+  idofclient bigint,
+  idofcategorydiscount bigint,
+  CONSTRAINT cf_clienscategorydiscount_pk PRIMARY KEY (idofclienscategorydiscount ),
+  CONSTRAINT cf_clienscategorydiscount_categorydiscount FOREIGN KEY (idofcategorydiscount)
+  REFERENCES cf_categorydiscounts (idofcategorydiscount),
+  CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idofclient)
+  REFERENCES cf_clients (idofclient)
+);
+
