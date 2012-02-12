@@ -11,10 +11,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,6 +60,16 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
     }
 
+    private List<CategoryDiscount> categoriesDiscounts = new LinkedList<CategoryDiscount>();
+
+    public List<CategoryDiscount> getCategoriesDiscounts() {
+        return categoriesDiscounts;
+    }
+
+    public void setCategoriesDiscounts(List<CategoryDiscount> categoriesDiscounts) {
+        this.categoriesDiscounts = categoriesDiscounts;
+    }
+
     private List<String> categoryDiscountNames;
 
     public List<String> getCategoryDiscountNames() {
@@ -71,6 +78,10 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public boolean isCategoryDiscountNamesEmpty() {
         return categoryDiscountNames.isEmpty();
+    }
+
+    public boolean isCategoryiesDiscounts(){
+        return categoriesDiscounts.isEmpty() ;
     }
 
     private Long idOfClient;
@@ -294,6 +305,12 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscountNames.add(categoryDiscount.getCategoryName());
+        }
+
+        if(!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                this.categoriesDiscounts.add(categoryDiscount);
+            }
         }
     }
 
