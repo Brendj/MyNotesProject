@@ -24,12 +24,12 @@ public class SBRTOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (sum==null) {
             return new OnlinePaymentProcessor.PayRequest(true,
                     contragentId, paymentMethod, clientId,
-                    ""+opId, ""+termId, 0L);
+                    ""+opId, ""+termId, 0L, false);
         } else {
             String time=parseResult.getReqParam("TIME");
             return new OnlinePaymentProcessor.PayRequest(false,
                     contragentId, paymentMethod, clientId,
-                    ""+opId, termId+"/"+time, parseResult.getReqLongParam("SUM"));
+                    ""+opId, termId+"/"+time, parseResult.getReqLongParam("SUM"), false);
         }
     }
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)

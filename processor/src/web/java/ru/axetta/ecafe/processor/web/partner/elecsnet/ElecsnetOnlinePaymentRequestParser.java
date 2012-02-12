@@ -37,7 +37,7 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
         if (requestType==TYPE_CHECK) {
             return new OnlinePaymentProcessor.PayRequest(true,
                     contragentId, paymentMethod, clientId,
-                    ""+opId, null, 0L);
+                    ""+opId, null, 0L, false);
 
         } else {
             opId=parseResult.getReqParam("auth_code");
@@ -46,7 +46,7 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
             String date=parseResult.getReqParam("date");
             return new OnlinePaymentProcessor.PayRequest(false,
                     contragentId, paymentMethod, clientId,
-                    opId, date+"/"+currency, sum);
+                    opId, date+"/"+currency, sum, false);
         }
     }
 

@@ -61,12 +61,4 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
         return -1;
     }
 
-    @Override
-    protected boolean isSoapEnabled(RuntimeContext runtimeContext, HttpServletRequest httpRequest) throws Exception {
-        String partnerName = httpRequest.getParameter("PID");
-        if (partnerName==null) throw new Exception("Parameter missing: PID");
-        StdPayConfig.LinkConfig linkConfig =  runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
-        if (linkConfig==null) throw new Exception("Invalid PID");
-        return linkConfig.soapEnabled;
-    }
 }
