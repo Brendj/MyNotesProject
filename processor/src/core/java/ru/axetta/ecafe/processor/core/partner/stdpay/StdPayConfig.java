@@ -25,8 +25,7 @@ public class StdPayConfig {
     private static final String PARAM_OUR_PRIVATE_KEY = ".ourPrivKey";
     private static final String PARAM_CHECK_SIGN = ".checkSignature";
     private static final String PARAM_ALLOWED_CLIENT_ORGS = ".allowedClientOrgs";
-    private static final String ENABLE_SOAP = ".enableSoap";
-    
+
     public static class LinkConfig {
         public String name;
         public long idOfContragent;
@@ -48,14 +47,12 @@ public class StdPayConfig {
             String idOfContragentParam = paramBaseName + n + PARAM_ID_OF_CONGRAGENT;
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
-            String soapEnabledParam = paramBaseName + n + ENABLE_SOAP;
-            
+
             LinkConfig linkConfig = new LinkConfig();
             linkConfig.name = getRequiredParam(nameParam, properties);
             linkConfig.idOfContragent = Long.parseLong(getRequiredParam(idOfContragentParam, properties));
             linkConfig.remoteAddressMask = getRequiredParam(remoteAddressParam, properties);
             linkConfig.checkSignature = Boolean.parseBoolean(getRequiredParam(checkSignatureParam, properties));
-            linkConfig.soapEnabled = Boolean.parseBoolean(getRequiredParam(soapEnabledParam, properties));
             if (properties.containsKey(idOfAllowedClientOrgsParam)) {
                 String[] v = properties.getProperty(idOfAllowedClientOrgsParam).replaceAll("\\s", "").split(",");
                 linkConfig.idOfAllowedClientOrgsList = new LinkedList<Long>();

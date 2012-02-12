@@ -56,10 +56,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     
-    private static final int ELECSNET_PAYMENT = 0;
-    private static final int STD_PAYMENT = 1;
-    private static final int SBRT_PAYMENT = 2;
-
     interface Processor {
 
         public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
@@ -754,59 +750,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    public PaymentResult balanceRequest(String pid, Long clientId, Long opId, Long termId, int paymentSystem) {
-        PaymentResult paymentResult = new PaymentResult();
-        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&OPID=" + opId + "&TERMID=" + termId;
-        String response = sendRequestToPaymentSystem(requestParams, paymentSystem);
-        paymentResult.desc = response;
-        return paymentResult;
-    }
-
-    public PaymentResult commitPaymentRequest(String pid, Long clientId, Long sum, String time, Long opId, Long termId, int paymentSystem) {
-        PaymentResult paymentResult = new PaymentResult();
-        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&SUM=" + sum + "&TIME=" + time + "&OPID=" + opId + "&TERMID=" + termId;
-        String response = sendRequestToPaymentSystem(requestParams, paymentSystem);
-        paymentResult.desc = response;
-        return paymentResult;
-    }
-    
-    private String sendRequestToPaymentSystem(String requestParams, int paymentSystem) {
-        String path = null;
-        switch (paymentSystem) {
-            case ELECSNET_PAYMENT : {
-                path = "payment-elecsnet";
-            }
-            break;
-            case STD_PAYMENT: {
-                path = "payment-std";
-            }
-            break;
-            case SBRT_PAYMENT: {
-                path = "payment-sbrt";
-            }
-            break;
-        }
-        String requestUrl = "https://localhost:8443/processor/" + path + "?soap=1" + requestParams;
-        String response = null;
-        try {
-            URL paymentURL = new URL(requestUrl);
-            URLConnection conn = paymentURL.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            /*Properties properties = new Properties();
-            properties.load(in);
-            ntrr.TSMid = properties.getProperty("TSMid");
-            ntrr.resultCode = getPropertyInt(properties, "resultCode");
-            ntrr.resultDesc = properties.getProperty("resultDesc");
-            ntrr.ticket = getPropertyByte(properties, "ticket");
-            ntrr.ticket_mapping = getPropertyByte(properties, "ticket_mapping");*/
-            response = in.toString();
-            in.close();
-        }
-        catch (Exception e) {
-            return e.getMessage();
-        }
-        return response;
-    }
 
     private boolean isGuardSanExists(String guardSan, String clientGuardSans) {
         String[] guardSans = clientGuardSans.split(";");

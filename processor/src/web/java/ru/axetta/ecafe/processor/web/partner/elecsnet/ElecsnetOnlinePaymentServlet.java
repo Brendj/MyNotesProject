@@ -63,9 +63,5 @@ public class ElecsnetOnlinePaymentServlet extends OnlinePaymentServlet {
         return runtimeContext.getPartnerElecsnetConfig().getIdOfContragent();
     }
 
-    @Override
-    protected boolean isSoapEnabled(RuntimeContext runtimeContext, HttpServletRequest httpRequest) {
-        return runtimeContext.getPartnerElecsnetConfig().isSoapEnabled();
-    }
 }
 

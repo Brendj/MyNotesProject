@@ -12,13 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Игорь
- * Date: 18.12.2010
- * Time: 0:25:08
- * To change this template use File | Settings | File Templates.
- */
 abstract public class OnlinePaymentServlet extends HttpServlet {
     protected abstract Logger getLogger();
 
@@ -28,24 +21,16 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         try {
             runtimeContext = RuntimeContext.getInstance();
             OnlinePaymentRequestParser requestParser=createParser();
-            // disable authentication for soap
-            String soapParameter = httpRequest.getParameter("soap");
-            if (soapParameter == null) {
-                try {
-                    if (!authenticate(httpRequest, requestParser)) {
-                        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
-                } catch (Exception e) {
-                    getLogger().error("Failed to authenticate request", e);
-                    httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            //TODO: добавить аутентификиацию по IP для SOAP
+            try {
+                if (!authenticate(httpRequest, requestParser)) {
+                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
-            } else {
-                if (!isSoapEnabled(runtimeContext, httpRequest)) {
-                    httpResponse.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
-                    return;
-                }
+            } catch (Exception e) {
+                getLogger().error("Failed to authenticate request", e);
+                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
             OnlinePaymentProcessor.PayRequest payRequest=null;
             long contragentId=getDefaultIdOfContragent(runtimeContext);
@@ -79,7 +64,6 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         }
     }
 
-    protected abstract boolean isSoapEnabled(RuntimeContext runtimeContext, HttpServletRequest httpRequest) throws Exception;
     protected abstract OnlinePaymentRequestParser createParser();
     protected abstract String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext,
             HttpServletRequest httpRequest,

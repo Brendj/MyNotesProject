@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 
 import org.springframework.context.annotation.Scope;
@@ -29,5 +30,12 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    @Transactional
+    public Long getClientContractIdByCardId(String idOfCard) throws Exception {
+        Client cl = DAOUtils.findClientByCardNo(em, Long.decode(idOfCard));
+        if (cl==null) return null;
+        return cl.getContractId();
     }
 }

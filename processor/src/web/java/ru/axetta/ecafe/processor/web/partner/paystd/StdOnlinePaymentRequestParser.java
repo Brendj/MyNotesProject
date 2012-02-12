@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -21,25 +22,13 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.util.LinkedList;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kolpakov
- * Date: 02.04.11
- * Time: 15:53
- * To change this template use File | Settings | File Templates.
- */
 public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static String SIGNATURE_PARAM="&SIGNATURE=";
 
-    final static String SOAP_PARAM = "soap=";
-
     @Override
     protected String prepareRequestForParsing(String requestBody) throws Exception {
-        int pos = requestBody.indexOf(SOAP_PARAM);
-        if (pos == -1) {
-            if (linkConfig.checkSignature) {
-                if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
-            }
+        if (linkConfig.checkSignature) {
+            if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
         }
         return requestBody;
     }
@@ -51,9 +40,17 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
 
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest) throws Exception {
         ParseResult parseResult = parseGetParams(httpRequest);
-        long clientId=parseResult.getReqLongParam("CLIENTID");
-        long opId=parseResult.getReqLongParam("OPID");
-        long termId=parseResult.getReqLongParam("TERMID");
+        long clientId;
+        if (parseResult.getParam("CARDID")!=null) {
+            String cardId = parseResult.getReqParam("CARDID");
+            Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getClientContractIdByCardId(cardId);
+            if (clId == null) throw new Exception("Card not found: "+cardId);
+            clientId = clId;
+        } else {
+            clientId=parseResult.getReqLongParam("CLIENTID");
+        }
+        String opId=parseResult.getReqParam("OPID");
+        String termId=parseResult.getReqParam("TERMID");
         long contragentId=linkConfig.idOfContragent;
 
         int paymentMethod = ClientPayment.ATM_PAYMENT_METHOD;
@@ -68,12 +65,13 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (sum==null) {
             return new OnlinePaymentProcessor.PayRequest(true,
                     contragentId, paymentMethod, clientId,
-                    ""+opId, ""+termId, 0L);
+                    ""+opId, ""+termId, 0L, false);
         } else {
             String time=parseResult.getReqParam("TIME");
+            boolean isRollback=parseResult.getParam("ROLLBACK")!=null && parseResult.getReqIntParam("ROLLBACK")==1;
             return new OnlinePaymentProcessor.PayRequest(false,
                     contragentId, paymentMethod, clientId,
-                    ""+opId, termId+"/"+time, parseResult.getReqLongParam("SUM"));
+                    ""+opId, termId+"/"+time, parseResult.getReqLongParam("SUM"), isRollback);
         }
     }
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)

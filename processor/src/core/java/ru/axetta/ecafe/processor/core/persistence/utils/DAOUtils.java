@@ -99,6 +99,14 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        q.setParameter("cardNo", cardNo);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Card)l.get(0)).getClient();
+    }
+
     public static User findUser(Session persistenceSession, long idOfUser) throws Exception {
         return (User) persistenceSession.get(User.class, idOfUser);
     }

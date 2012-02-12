@@ -79,9 +79,9 @@ public class OnlinePaymentProcessor {
 
         private final boolean bCheckOnly;
 
-        public PayRequest(boolean bCheckOnly, long contragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum)
+        public PayRequest(boolean bCheckOnly, long contragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
-            if (sum<0) throw new Exception("Payment sum is negative: "+sum);
+            if (!bNegativeSum && sum<0) throw new Exception("Payment sum is negative: "+sum);
             this.bCheckOnly=bCheckOnly;
             this.contragentId = contragentId;
             this.paymentMethod = paymentMethod;

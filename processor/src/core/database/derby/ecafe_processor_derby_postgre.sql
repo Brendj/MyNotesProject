@@ -804,7 +804,7 @@ create table CF_Schema_version_info (
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 10, 120126, 0);
+VALUES(2, 2, 11, 120199, 0);
 
 CREATE TABLE CF_TransactionJournal
 (

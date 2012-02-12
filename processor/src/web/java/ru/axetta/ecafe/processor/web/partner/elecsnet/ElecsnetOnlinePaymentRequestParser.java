@@ -17,14 +17,9 @@ import java.util.LinkedList;
 public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static int TYPE_CHECK=1, TYPE_PAY=2;
 
-    final static String SOAP_PARAM = "soap=";
-
     @Override
     protected String prepareRequestForParsing(String requestBody) throws Exception {
-        int pos = requestBody.indexOf(SOAP_PARAM);
-        if (pos == -1) {
-            if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
-        }
+        if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
         return requestBody;
     }
 
