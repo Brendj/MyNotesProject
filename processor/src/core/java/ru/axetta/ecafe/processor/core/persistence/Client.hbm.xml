@@ -104,6 +104,11 @@
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
         </set>
+
+        <set name="categoriesInternal" table="cf_clienscategorydiscount" cascade="all-delete-orphan" lazy="false">
+            <key column="IdOfClient"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryDiscount"/>
+        </set>
     </class>
 </hibernate-mapping>
 

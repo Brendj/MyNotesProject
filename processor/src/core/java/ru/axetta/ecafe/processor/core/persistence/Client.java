@@ -87,6 +87,19 @@ public class Client {
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
+    private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
+
+    public Set<CategoryDiscount> getCategories(){
+        return getCategoriesInternal();
+    }
+
+    private Set<CategoryDiscount> getCategoriesInternal() {
+        return categoriesInternal;
+    }
+
+    private void setCategoriesInternal(Set<CategoryDiscount> categoriesInternal) {
+        this.categoriesInternal = categoriesInternal;
+    }
 
     public Client() {
         // For Hibernate only
