@@ -467,7 +467,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardSan(this.guardsan);
+        client.setGuardSan(this.guardsan); /*
         String clientCategories = "";
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
             if (categoryDiscount.getSelected())
@@ -475,7 +475,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         if (!clientCategories.isEmpty())
             clientCategories = clientCategories.substring(0, clientCategories.length() - 1);
-        client.setCategoriesDiscounts(clientCategories);
+        client.setCategoriesDiscounts(clientCategories);*/
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
@@ -483,11 +483,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         /* категори скидок */
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        StringBuilder clientCategories = new StringBuilder();
         Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
         categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         for (Object object: categoryCrioteria.list()){
-            this.categoryDiscountSet.add((CategoryDiscount) object);
+            CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+            clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
+            clientCategories.append(",");
+            this.categoryDiscountSet.add(categoryDiscount);
         }
+        client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
         persistenceSession.update(client);
         fill(client);
@@ -531,7 +536,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }  else {
-            categoriesFilter.append("Не выбрано!!");
+            categoriesFilter.append("Не выбрано");
         }
         this.filter=categoriesFilter.toString();
     }

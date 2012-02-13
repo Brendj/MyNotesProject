@@ -442,26 +442,26 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setRemarks(this.remarks);
 
         // Категории скидок
-        String clientCategories = "";
+          /*
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
             if (categoryDiscount.getSelected())
                 clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
-            }
-        if (!clientCategories.isEmpty())
-            clientCategories = clientCategories.substring(0, clientCategories.length() - 1);
-        client.setCategoriesDiscounts(clientCategories);
+            }                            */
 
+        StringBuilder clientCategories = new StringBuilder();
         if(!idOfCategoryList.isEmpty()){
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
             for (Object object: categoryCriteria.list()){
-                this.categoryDiscountSet.add((CategoryDiscount) object);
+                CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
+                clientCategories.append(",");
+                this.categoryDiscountSet.add(categoryDiscount);
             }
             client.setCategories(categoryDiscountSet);
+            client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         }
-
-
 
         persistenceSession.save(client);
     }
@@ -506,11 +506,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     idOfCategoryList.add(idOfCategory);
                     filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
                 }
-                filter = filter.substring(0,filter.length()-2);
-
-               // categoryDiscounts=idOfCategoryList.toString();
-              //  categoryDiscounts=categoryDiscounts.substring(1,categoryDiscounts.length()-1);
-
+                filter = filter.substring(0,filter.length()-1);
             }
 
         }
