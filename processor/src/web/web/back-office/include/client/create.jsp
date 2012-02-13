@@ -98,16 +98,6 @@
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientCreatePage.filter}}" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Категории скидок" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Нет категорий" styleClass="output-text"
-                      rendered="#{mainPage.clientCreatePage.categoriesEmpty}" />
-        <a4j:repeat value="#{mainPage.clientCreatePage.categoryDiscounts}" var="categoryDiscount">
-            <h:selectBooleanCheckbox value="#{categoryDiscount.selected}" styleClass="output-text" />
-            <h:outputText escape="true" value="#{categoryDiscount.categoryName}" styleClass="output-text" /><br/>
-        </a4j:repeat>
-    </h:panelGrid>
-
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.san}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />

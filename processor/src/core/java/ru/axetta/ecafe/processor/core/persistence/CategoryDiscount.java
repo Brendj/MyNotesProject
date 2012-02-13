@@ -25,6 +25,19 @@ public class CategoryDiscount {
     private String discountRules;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<CategoryOrg> categoryOrgInternal = new HashSet<CategoryOrg>();
+    private Set<Client> clientsInternal = new HashSet<Client>();
+
+    public Set<Client> getClients(){
+        return getClientsInternal();
+    }
+
+    private Set<Client> getClientsInternal() {
+        return clientsInternal;
+    }
+
+    private void setClientsInternal(Set<Client> clientsInternal) {
+        this.clientsInternal = clientsInternal;
+    }
 
     public Set<CategoryOrg> getCategoryOrg() {
         return getCategoryOrgInternal();

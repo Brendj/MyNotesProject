@@ -104,15 +104,15 @@
     </h:selectOneMenu>
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Категории скидок" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Нет категорий" styleClass="output-text"
-                      rendered="#{mainPage.clientEditPage.categoriesEmpty}" />
-        <a4j:repeat value="#{mainPage.clientEditPage.categoryDiscounts}" var="categoryDiscount">
-            <h:selectBooleanCheckbox value="#{categoryDiscount.selected}" styleClass="output-text" />
-            <h:outputText escape="true" value="#{categoryDiscount.categoryName}" styleClass="output-text" /><br/>
-        </a4j:repeat>
-    </h:panelGrid>
+
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
+    </h:panelGroup>
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />

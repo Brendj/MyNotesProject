@@ -456,11 +456,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
             for (Object object: categoryCriteria.list()){
-                client.getCategories().add((CategoryDiscount) object);
+                this.categoryDiscountSet.add((CategoryDiscount) object);
             }
+            client.setCategories(categoryDiscountSet);
         }
 
-        //client.getCategories() ;
+
 
         persistenceSession.save(client);
     }

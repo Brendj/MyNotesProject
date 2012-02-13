@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,7 +61,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
     }
 
-    private List<CategoryDiscount> categoriesDiscounts = new LinkedList<CategoryDiscount>();
+    private List<CategoryDiscount> categoriesDiscounts;
 
     public List<CategoryDiscount> getCategoriesDiscounts() {
         return categoriesDiscounts;
@@ -285,6 +286,15 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.clientGroupName = group==null?"":group.getGroupName();
 
         // Категории скидок
+        this.categoriesDiscounts=new LinkedList<CategoryDiscount>();
+        if(!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                String name=categoryDiscount.getCategoryName();
+                this.categoriesDiscounts.add(categoryDiscount);
+            }
+        }
+
+        // Категории скидок старое не используется
         categoryDiscountNames = new ArrayList<String>();
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
         if (clientCategories.isEmpty())
@@ -305,12 +315,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscountNames.add(categoryDiscount.getCategoryName());
-        }
-
-        if(!client.getCategories().isEmpty()){
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
-                this.categoriesDiscounts.add(categoryDiscount);
-            }
         }
     }
 

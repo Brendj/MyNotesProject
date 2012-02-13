@@ -11,15 +11,15 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.category.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +28,7 @@ import java.util.List;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList {
 
 
     public static class OrgItem {
@@ -146,6 +146,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public boolean isCategoriesEmpty() {
         return categoryDiscounts.isEmpty();
+    }
+
+    private List<CategoryDiscount> categoryDiscountList = new LinkedList<CategoryDiscount>();
+
+    public List<CategoryDiscount> getCategoryDiscountList() {
+        return categoryDiscountList;
+    }
+
+    public void setCategoryDiscountList(List<CategoryDiscount> categoryDiscountList) {
+        this.categoryDiscountList = categoryDiscountList;
     }
 
     private static final int CONTRACT_ID_MAX_LENGTH = ContractIdFormat.MAX_LENGTH;
@@ -406,6 +416,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     categoryDiscount.getIdOfCategoryDiscount(),
                     categoryDiscount.getCategoryName()));
         }
+
+        if(!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                String name=categoryDiscount.getCategoryName();
+                this.categoryDiscountList.add(categoryDiscount);
+            }
+        }
+
         fill(client);
     }
 
@@ -462,6 +480,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setPassword(this.plainPassword);
         }
         client.setPayForSMS(this.payForSMS);
+
+        /* категори скидок */
+        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
+        categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
+        for (Object object: categoryCrioteria.list()){
+            this.categoryDiscountSet.add((CategoryDiscount) object);
+        }
+        client.setCategories(categoryDiscountSet);
         persistenceSession.update(client);
         fill(client);
     }
@@ -495,6 +522,64 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();
+        /* filter fill*/
+        StringBuilder categoriesFilter = new StringBuilder();
+        if(!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                categoriesFilter.append(categoryDiscount.getCategoryName());
+                categoriesFilter.append("; ");
+                this.categoryDiscountList.add(categoryDiscount);
+            }
+        }  else {
+            categoriesFilter.append("Не выбрано!!");
+        }
+        this.filter=categoriesFilter.toString();
+    }
+
+    private String filter = "Не выбрано";
+    private List<Long> idOfCategoryList = new ArrayList<Long>();
+    private Set<CategoryDiscount> categoryDiscountSet=new HashSet<CategoryDiscount>();
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public List<Long> getIdOfCategoryList() {
+        return idOfCategoryList;
+    }
+
+    public void setIdOfCategoryList(List<Long> idOfCategoryList) {
+        this.idOfCategoryList = idOfCategoryList;
+    }
+
+    public Set<CategoryDiscount> getCategoryDiscountSet() {
+        return categoryDiscountSet;
+    }
+
+    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
+        this.categoryDiscountSet = categoryDiscountSet;
+    }
+
+    public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
+        //To change body of implemented methods use File | Settings | File Templates.
+        if(null != categoryMap) {
+            idOfCategoryList = new ArrayList<Long>();
+            if(categoryMap.isEmpty()){
+                filter = "Не выбрано";
+            } else {
+                filter="";
+                for(Long idOfCategory: categoryMap.keySet()){
+                    idOfCategoryList.add(idOfCategory);
+                    filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
+                }
+                filter = filter.substring(0,filter.length()-1);
+            }
+
+        }
     }
 
 }
