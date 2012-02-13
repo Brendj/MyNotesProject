@@ -888,3 +888,16 @@ CREATE TABLE cf_clienscategorydiscount
   REFERENCES cf_clients (idofclient)
 );
 
+/* Таблица связка между CategoryOrg и DiscountRule */
+CREATE TABLE cf_catorgdiscrule
+(
+  idofcatorgdiscrule bigserial NOT NULL,
+  idofcategoryorg bigint,
+  idofrule bigint,
+  CONSTRAINT cf_catorgdiscrule_pk PRIMARY KEY (idofcatorgdiscrule),
+  CONSTRAINT cf_catorgdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
+  REFERENCES cf_categoryorg (idofcategoryorg),
+  CONSTRAINT cf_catorgdiscrule_discountrule FOREIGN KEY (idofrule)
+  REFERENCES cf_discountrules (idofrule)
+);
+
