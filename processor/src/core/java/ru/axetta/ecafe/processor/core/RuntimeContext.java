@@ -466,8 +466,8 @@ public class RuntimeContext implements ApplicationContextAware {
                 initCategory.put(-110L,"10 класс");
                 initCategory.put(-111L,"11 класс");
                 /* дополнитеьный категории */
-                initCategory.put(-200L,"Сотрудники");
-                initCategory.put(-201L,"Другие");
+                initCategory.put(-200L,"Сотрудник");
+                initCategory.put(-201L,"Ученик");
             for (Map.Entry me : initCategory.entrySet()) {
                 CategoryDiscount cd = DAOUtils.getCategoryDiscount(em, (Long)me.getKey());
                 if (cd==null) {
