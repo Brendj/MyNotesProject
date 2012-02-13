@@ -387,8 +387,10 @@ public class SyncRequest {
                                 .parse(namedNodeMap.getNamedItem("FPLastTime").getTextContent());
                     }
                     int discountMode = getIntValue(namedNodeMap, "DiscountMode");
+                    /* pridet string with "1, 9, 94, .." key of Category Discount*/
+                    String categoriesDiscounts = getStringValueNullSafe(namedNodeMap, "CategoriesDiscounts");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
-                            discountMode);
+                            discountMode, categoriesDiscounts);
                 }
 
             }
@@ -398,14 +400,16 @@ public class SyncRequest {
             private final int freePayMaxCount;
             private final Date lastFreePayTime;
             private final int discountMode;
+            private final String categoriesDiscounts;
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
-                    int discountMode) {
+                    int discountMode, String categoriesDiscounts) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
                 this.lastFreePayTime = lastFreePayTime;
                 this.discountMode = discountMode;
+                this.categoriesDiscounts = categoriesDiscounts;
             }
 
             public long getIdOfClient() {
@@ -428,11 +432,16 @@ public class SyncRequest {
                 return discountMode;
             }
 
+            public String getCategoriesDiscounts(){
+                return categoriesDiscounts;
+            }
+
             @Override
             public String toString() {
                 return "ClientParamItem{" + "discountMode=" + discountMode + ", lastFreePayTime=" + lastFreePayTime
-                        + ", freePayMaxCount=" + freePayMaxCount + ", freePayCount=" + freePayCount + ", idOfClient="
-                        + idOfClient + '}';
+                        + ", freePayMaxCount=" + freePayMaxCount + ", freePayCount=" + freePayCount +
+                        ", categoriesDiscounts=\""+categoriesDiscounts+"\""+
+                        ", idOfClient="+ idOfClient + '}';
             }
         }
 

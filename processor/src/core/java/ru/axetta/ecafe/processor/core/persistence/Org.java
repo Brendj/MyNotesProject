@@ -62,10 +62,10 @@ public class Org {
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
     private String OGRN;
     private String INN;
-    private Set<CategoryOrg> categoriesInternal;
+    private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
 
     public Set<CategoryOrg> getCategories(){
-        return getCategoriesInternal();
+        return Collections.unmodifiableSet(getCategoriesInternal());
     }
 
     private Set<CategoryOrg> getCategoriesInternal() {

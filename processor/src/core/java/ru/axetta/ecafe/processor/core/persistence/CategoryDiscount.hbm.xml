@@ -28,18 +28,19 @@
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
         <set name="discountRulesInternal" table="CF_DiscountRulesCategoryDiscount" cascade="all" lazy="false">
             <key column="IdOfCategoryDiscount"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="idOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="IdOfRule"/>
         </set>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и CategoryDiscountRule -->
         <set name="categoryOrgInternal" table="cf_catorgcatdiscrule" cascade="all" lazy="false">
             <key column="IdOfCategoryDiscount"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="idOfCategoryDiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>
 
+        <!-- Cвязь многие ко многим между таблицами Client и CategoryDiscountRule -->
         <set name="clientsInternal" table="CF_ClientsCategoryDiscount" cascade="all" lazy="false">
             <key column="IdOfCategoryDiscount"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"/>
         </set>
 
     </class>

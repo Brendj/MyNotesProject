@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -30,6 +31,23 @@ public class DiscountRule {
     private Boolean operationOr;
     private String categoryDiscounts;
     private Set<CategoryDiscount> categoriesDiscountsInternal;
+    private Set<CategoryOrg> categoryOrgsInternal;
+
+    public Set<CategoryOrg> getCategoryOrgs() {
+        return Collections.unmodifiableSet(getCategoryOrgsInternal());
+    }
+
+    public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
+        this.categoryOrgsInternal = categoryOrgs;
+    }
+
+    private Set<CategoryOrg> getCategoryOrgsInternal() {
+        return categoryOrgsInternal;
+    }
+
+    private void setCategoryOrgsInternal(Set<CategoryOrg> categoryOrgsInternal) {
+        this.categoryOrgsInternal = categoryOrgsInternal;
+    }
 
     public Set<CategoryDiscount> getCategoriesDiscounts(){
         return getCategoriesDiscountsInternal();

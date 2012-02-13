@@ -22,10 +22,10 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
-        <!-- Cвязь многие ко многим между таблицами CategoryOrg и CategoryDiscountRule -->
-        <set name="categoryDiscountInternal" table="cf_catorgcatdiscrule" cascade="all" lazy="false">
-            <key column="idofcategorydiscount"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryOrg"/>
+        <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
+        <set name="discountRulesInternal" table="CF_CatOrgDiscRule" cascade="all" lazy="false">
+            <key column="idOfCategoryOrg"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="IdOfRule"/>
         </set>
 
     </class>

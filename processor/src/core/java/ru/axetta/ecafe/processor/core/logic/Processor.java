@@ -225,7 +225,7 @@ public class Processor implements SyncProcessor,
 
                 // Process ResCategoriesDiscountsAndRules
                 try {
-                    resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules();
+                    resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
                             request.getIdOfOrg()), e);
@@ -748,6 +748,27 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
+            
+            /* распарсим строку с категориями */
+            if(clientParamItem.getCategoriesDiscounts()!= null){
+                String categories = clientParamItem.getCategoriesDiscounts();
+                client.setCategoriesDiscounts(categories);
+                if(!categories.equals("")){
+                    String[] catArray = categories.split(",");
+                    List<Long> idOfCategoryDiscount = new ArrayList<Long>();
+                    for (String number: catArray){
+                        idOfCategoryDiscount.add(Long.parseLong(number.trim()));
+                    }
+                    Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+                    categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount",idOfCategoryDiscount));
+                    Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+                    for(Object object: categoryDiscountCriteria.list()){
+                        categoryDiscountSet.add((CategoryDiscount) object);
+                    }
+                    client.setCategories(categoryDiscountSet);
+                }
+            }
+
             persistenceSession.update(client);
 
             persistenceSession.flush();
@@ -1624,7 +1645,7 @@ public class Processor implements SyncProcessor,
         return resLibraryData;
     }
 
-    private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules() {
+    private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules =
@@ -1633,7 +1654,31 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            /* 1) выбирать правила по одному 
+               2) проверять проходит ли оно по фильтру категорий организации
+             *  */
+            
+            Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+            Set<CategoryOrg> categoryOrgSet = org.getCategories();
+            for(Object object: criteriaDiscountRule.list()){
+                DiscountRule discountRule = (DiscountRule) object;
+                Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
+                Set<CategoryOrg> categoryOrgs =new TreeSet<CategoryOrg>(categoryOrgsDR);
+                /* преобразуем множество categoryOrgs с учетом объединения
+                * true если множество не поменялось после объединения
+                * */
+                boolean flag=categoryOrgs.retainAll(categoryOrgSet);
+                /* если после объединения множество не изменилось то есть нет лишких категорий*/
+                if(!flag){
+                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                    resCategoriesDiscountsAndRules.addDCRI(dcri);
+                }
+            }
+
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
+            
             List<CategoryDiscount> categoryDiscounts = criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
                 SyncResponse.ResCategoriesDiscountsAndRules.DCI dci =
@@ -1643,7 +1688,7 @@ public class Processor implements SyncProcessor,
                                 categoryDiscount.getDiscountRules());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }
-
+             /*
             criteria = persistenceSession.createCriteria(DiscountRule.class);
             List<DiscountRule> discountRules = criteria.list();
             for (DiscountRule discountRule : discountRules) {
@@ -1666,7 +1711,7 @@ public class Processor implements SyncProcessor,
                                 discountRule.isOperationOr());
                 resCategoriesDiscountsAndRules.addDCRI(dcri);
             }
-
+               */
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

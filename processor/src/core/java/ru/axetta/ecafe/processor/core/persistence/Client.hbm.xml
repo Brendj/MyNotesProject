@@ -107,7 +107,7 @@
 
         <set name="categoriesInternal" table="CF_ClientsCategoryDiscount" cascade="all" lazy="false">
             <key column="IdOfClient"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryDiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
         </set>
     </class>
 </hibernate-mapping>

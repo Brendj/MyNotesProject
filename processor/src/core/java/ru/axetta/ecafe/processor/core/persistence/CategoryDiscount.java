@@ -28,7 +28,7 @@ public class CategoryDiscount {
     private Set<Client> clientsInternal = new HashSet<Client>();
 
     public Set<Client> getClients(){
-        return getClientsInternal();
+        return Collections.unmodifiableSet(getClientsInternal());
     }
 
     private Set<Client> getClientsInternal() {

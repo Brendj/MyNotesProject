@@ -21,6 +21,23 @@ public class CategoryOrg {
     private String categoryName;
     private Set<Org> orgsInternal = new HashSet<Org>(0);
     private Set<CategoryDiscount> categoryDiscountInternal;
+    private Set<DiscountRule> discountRulesInternal;
+
+    public Set<DiscountRule> getDiscountRules() {
+        return Collections.unmodifiableSet(getDiscountRulesInternal());
+    }
+
+    public void setDiscountRules(Set<DiscountRule> discountRules) {
+        this.discountRulesInternal = discountRules;
+    }
+
+    private Set<DiscountRule> getDiscountRulesInternal() {
+        return discountRulesInternal;
+    }
+
+    private void setDiscountRulesInternal(Set<DiscountRule> discountRulesInternal) {
+        this.discountRulesInternal = discountRulesInternal;
+    }
 
     public Set<CategoryDiscount> getCategoryDiscount() {
          return getCategoryDiscountInternal();

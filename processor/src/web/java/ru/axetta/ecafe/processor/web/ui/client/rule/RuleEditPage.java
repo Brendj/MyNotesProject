@@ -214,7 +214,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             Criteria catCriteria = session.createCriteria(CategoryDiscount.class);
             catCriteria.add(Restrictions.in("idOfCategoryDiscount", numbs));
-            //List<CategoryDiscount> categoryDiscountList = ;
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             StringBuilder sb=new StringBuilder();
             for(Object object: catCriteria.list()){

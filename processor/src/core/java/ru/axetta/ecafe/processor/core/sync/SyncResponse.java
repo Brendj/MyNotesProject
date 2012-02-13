@@ -1074,7 +1074,6 @@ public class SyncResponse {
                 Element element = document.createElement("DCI");
                 element.setAttribute("IdOfCategoryDiscount", Long.toString(this.idOfCategoryDiscount));
                 element.setAttribute("CategoryName", this.categoryName);
-                element.setAttribute("DiscountRules", this.discountRules);
                 return element;
             }
 
@@ -1119,6 +1118,24 @@ public class SyncResponse {
                 return priority;
             }
             //
+
+            public DCRI(DiscountRule discountRule){
+                this.idOfRule = discountRule.getIdOfRule();
+                this.description = discountRule.getDescription();
+                this.categoryDiscounts = discountRule.getCategoryDiscounts();
+                this.complex0 = discountRule.getComplex0();
+                this.complex1 = discountRule.getComplex1();
+                this.complex2 = discountRule.getComplex2();
+                this.complex3 = discountRule.getComplex3();
+                this.complex4 = discountRule.getComplex4();
+                this.complex5 = discountRule.getComplex5();
+                this.complex6 = discountRule.getComplex6();
+                this.complex7 = discountRule.getComplex7();
+                this.complex8 = discountRule.getComplex8();
+                this.complex9 = discountRule.getComplex9();
+                this.priority = discountRule.getPriority();
+                this.operationor = discountRule.isOperationOr();
+            }
 
 
             public DCRI(long idOfRule, String description, String categoryDiscounts, int complex0, int complex1,
