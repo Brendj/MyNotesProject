@@ -1657,24 +1657,52 @@ public class Processor implements SyncProcessor,
             /* 1) выбирать правила по одному 
                2) проверять проходит ли оно по фильтру категорий организации
              *  */
-            
+
+
             Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<CategoryOrg> categoryOrgSet = org.getCategories();
             for(Object object: criteriaDiscountRule.list()){
                 DiscountRule discountRule = (DiscountRule) object;
-                Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
-                Set<CategoryOrg> categoryOrgs =new TreeSet<CategoryOrg>(categoryOrgsDR);
+                //Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
+                //Set<CategoryOrg> categoryOrgs =new TreeSet<CategoryOrg>(categoryOrgsDR);
                 /* преобразуем множество categoryOrgs с учетом объединения
                 * true если множество не поменялось после объединения
                 * */
-                boolean flag=categoryOrgs.retainAll(categoryOrgSet);
+               // boolean flag=categoryOrgs.retainAll(categoryOrgSet);
                 /* если после объединения множество не изменилось то есть нет лишких категорий*/
-                if(!flag){
+
+                if(discountRule.getCategoryOrgs().containsAll(categoryOrgSet)){
                     SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
                             new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
                     resCategoriesDiscountsAndRules.addDCRI(dcri);
                 }
+
+                if(categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                    resCategoriesDiscountsAndRules.addDCRI(dcri);
+                }
+
+                       /*
+                long count=0;
+                for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                    for (CategoryOrg categoryOrg1: categoryOrgSet){
+                        if(categoryOrg.getIdOfCategoryOrg()==categoryOrg1.getIdOfCategoryOrg())
+                            count++;
+                    }
+                }
+                if(categoryOrgSet.size()>=count){
+                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                    resCategoriesDiscountsAndRules.addDCRI(dcri);
+                }          */
+
+               /* if(!flag){
+                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                    resCategoriesDiscountsAndRules.addDCRI(dcri);
+                }*/
             }
 
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
