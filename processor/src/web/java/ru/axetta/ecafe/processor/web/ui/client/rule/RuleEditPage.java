@@ -5,9 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.client.rule;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.category.CategoryListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgListSelectPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -22,7 +24,7 @@ import java.util.*;
  * Time: 13:56
  * To change this template use File | Settings | File Templates.
  */
-public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList{
+public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList{
 
     private String description;
     private boolean complex0;
@@ -194,6 +196,28 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         }
     }
 
+    private String filterOrg = "Не выбрано";
+    private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
+    private Set<CategoryOrg> categoryOrgs;
+
+    public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+        if(null != categoryOrgMap) {
+            idOfCategoryOrgList = new ArrayList<Long>();
+            if(categoryOrgMap.isEmpty()){
+                filterOrg = "Не выбрано";
+            } else {
+                filterOrg="";
+                for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
+                    idOfCategoryOrgList.add(idOfCategoryOrg);
+                    filterOrg=filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
+                }
+                filterOrg = filterOrg.substring(0,filterOrg.length()-1);
+            }
+
+        }
+    }
+
     public void completeCategorySelection(Session session, Long idOfCategory) throws Exception {
         if (null != idOfCategory) {
             CategoryDiscount category = (CategoryDiscount) session.load(CategoryDiscount.class, idOfCategory);
@@ -225,6 +249,17 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             String result=sb.toString();
             this.setFilter(result);
         }
+        StringBuilder categoryOrgFilter = new StringBuilder();
+        if(!discountRule.getCategoryOrgs().isEmpty()){
+            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+                categoryOrgFilter.append(categoryOrg.getCategoryName());
+                categoryOrgFilter.append("; ");
+            }
+            this.filterOrg=categoryOrgFilter.toString();
+        } else{
+            this.filterOrg="Не выбрано";
+        }
 
         fill(discountRule);
     }
@@ -248,12 +283,25 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         discountRule.setOperationOr(operationor);
         discountRule.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
-        Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
-        categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
-        for (Object object: categoryCrioteria.list()){
-            this.categoryDiscountSet.add((CategoryDiscount) object);
+        if(!this.idOfCategoryList.isEmpty()){
+            Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
+            categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
+            for (Object object: categoryCrioteria.list()){
+                this.categoryDiscountSet.add((CategoryDiscount) object);
+            }
+            discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
         }
-        discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
+
+        if(!this.idOfCategoryOrgList.isEmpty()){
+            this.categoryOrgs = new HashSet<CategoryOrg>();
+            Criteria categoryOrgCrioteria = persistenceSession.createCriteria(CategoryOrg.class);
+            categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
+            for (Object object: categoryOrgCrioteria.list()){
+                this.categoryOrgs.add((CategoryOrg) object);
+            }
+
+            discountRule.setCategoryOrgs(this.categoryOrgs);
+        }
         persistenceSession.update(discountRule);
         fill(discountRule);
     }
@@ -274,5 +322,29 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.categoryDiscounts = discountRule.getCategoryDiscounts();
        // this.filter= discountRule.getCategoryDiscounts();
         this.operationor=discountRule.isOperationOr();
+    }
+
+    public String getFilterOrg() {
+        return filterOrg;
+    }
+
+    public void setFilterOrg(String filterOrg) {
+        this.filterOrg = filterOrg;
+    }
+
+    public List<Long> getIdOfCategoryOrgList() {
+        return idOfCategoryOrgList;
+    }
+
+    public void setIdOfCategoryOrgList(List<Long> idOfCategoryOrgList) {
+        this.idOfCategoryOrgList = idOfCategoryOrgList;
+    }
+
+    public Set<CategoryOrg> getCategoryOrgs() {
+        return categoryOrgs;
+    }
+
+    public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
+        this.categoryOrgs = categoryOrgs;
     }
 }

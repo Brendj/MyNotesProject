@@ -18,10 +18,19 @@
 
         <h:outputText escape="true" value="Категории" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
+            <a4j:commandButton id="categoryAjaxButton" value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.ruleEditPage.filter}}" />
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Категории организаций" styleClass="output-text" />
+
+        <h:panelGroup>
+            <a4j:commandButton id="categoryOrgAjaxButton" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+            <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true" value=" {#{mainPage.ruleEditPage.filterOrg}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Описание" styleClass="output-text" />
