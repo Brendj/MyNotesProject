@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgCreatePage;
+import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
@@ -276,7 +277,7 @@ public class MainPage {
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
     private final RuleListSelectPage ruleListSelectPage = new RuleListSelectPage();
-
+    private final CategoryOrgListSelectPage categoryOrgListSelectPage = new CategoryOrgListSelectPage();
 
 
     public String getEndOfLine() {
@@ -5960,6 +5961,97 @@ public class MainPage {
         return null;
     }
 
+
+    public CategoryOrgListSelectPage getCategoryOrgListSelectPage(){
+        return categoryOrgListSelectPage;
+    }
+
+    public Object showCategoryOrgListSelectPage(){
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof CategoryOrgListSelectPage.CompleteHandlerList) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                categoryOrgListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                categoryOrgListSelectPage.pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
+                modalPages.push(categoryListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to complete  category org selection", e);
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+        }
+        return null;
+    }
+
+    public Object updateCategoryOrgListSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryOrgListSelectPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to complete category org selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
+    public Object completeCategoryOrgListSelectionOk() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            categoryOrgListSelectPage.completeCategoryOrgListSelection(true);
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == categoryOrgListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete  category org selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+        }
+        return null;
+    }
+
+    public Object completeCategoryOrgListSelectionCancel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            categoryOrgListSelectPage.completeCategoryOrgListSelection(false);
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == categoryOrgListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete  category org selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+        }
+        return null;
+    }
 
     // Kadyrov (18.01.2012)
     public CategoryListSelectPage getCategoryListSelectPage() {

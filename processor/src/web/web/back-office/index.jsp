@@ -56,6 +56,10 @@
         <c:import url="include/client/rule/select_list.jsp" />
     </f:subview>
 
+    <f:subview id="categoryOrgListSelectSubView">
+        <c:import url="include/option/orgcategories/select_list.jsp" />
+    </f:subview>
+
     <f:subview id="ccAccountDeleteSubView">
         <c:import url="include/contragent/ccaccount/confirm_delete.jsp" />
     </f:subview>
