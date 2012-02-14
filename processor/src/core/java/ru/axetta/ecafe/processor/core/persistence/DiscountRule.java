@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,8 +31,8 @@ public class DiscountRule {
     private int priority;
     private Boolean operationOr;
     private String categoryDiscounts;
-    private Set<CategoryDiscount> categoriesDiscountsInternal;
-    private Set<CategoryOrg> categoryOrgsInternal;
+    private Set<CategoryDiscount> categoriesDiscountsInternal = new HashSet<CategoryDiscount>();
+    private Set<CategoryOrg> categoryOrgsInternal = new HashSet<CategoryOrg>();
 
     public Set<CategoryOrg> getCategoryOrgs() {
         return Collections.unmodifiableSet(getCategoryOrgsInternal());
@@ -50,7 +51,7 @@ public class DiscountRule {
     }
 
     public Set<CategoryDiscount> getCategoriesDiscounts(){
-        return getCategoriesDiscountsInternal();
+        return Collections.unmodifiableSet(getCategoriesDiscountsInternal());
     }
 
     public void setCategoriesDiscounts(Set<CategoryDiscount> categoriesDiscountsInternal) {

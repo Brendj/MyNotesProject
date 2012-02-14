@@ -15,7 +15,7 @@ import java.util.Set;
  * Time: 11:09
  * To change this template use File | Settings | File Templates.
  */
-public class CategoryOrg {
+public class CategoryOrg implements Comparable {
 
     private long idOfCategoryOrg;
     private String categoryName;
@@ -93,7 +93,50 @@ public class CategoryOrg {
         return "CategoryOrg{" +
                 "idOfCategoryOrg=" + idOfCategoryOrg +
                 ", categoryName='" + categoryName + '\'' +
-                ", orgsInternal=" + orgsInternal +
+               // ", orgsInternal=" + orgsInternal +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CategoryOrg that = (CategoryOrg) o;
+
+        if (idOfCategoryOrg != that.idOfCategoryOrg) {
+            return false;
+        }
+        /*
+        if (categoryName != null ? !categoryName.equals(that.categoryName) : that.categoryName != null) {
+            return false;
+        }
+          */
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (idOfCategoryOrg ^ (idOfCategoryOrg >>> 32));
+        result = 31 * result + (categoryName != null ? categoryName.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public int compareTo(Object otherCategoryOrg) {
+        if(!(otherCategoryOrg instanceof CategoryOrg)){
+            throw new ClassCastException("Invalid object");
+        }
+        Long otherIdOfCategoryOrg = ((CategoryOrg) otherCategoryOrg).getIdOfCategoryOrg();
+        if(this.idOfCategoryOrg > otherIdOfCategoryOrg)
+            return 1;
+        else if ( this.idOfCategoryOrg < otherIdOfCategoryOrg )
+            return -1;
+        else
+            return 0;
     }
 }

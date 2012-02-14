@@ -40,7 +40,7 @@ public class CategoryDiscount {
     }
 
     public Set<CategoryOrg> getCategoryOrg() {
-        return getCategoryOrgInternal();
+        return Collections.unmodifiableSet(getCategoryOrgInternal());
     }
 
     public void setCategoryOrg(Set<CategoryOrg> categoryOrg){
@@ -56,7 +56,7 @@ public class CategoryDiscount {
     }
 
     public Set<DiscountRule> getDiscountsRules() {
-        return getDiscountRulesInternal();
+        return Collections.unmodifiableSet(getDiscountRulesInternal());
     }
 
     public void setDiscountsRules(Set<DiscountRule> discountRulesInternal) {
