@@ -281,15 +281,19 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         discountRule.setComplex9(complex9?1:0);
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationor);
-        discountRule.setCategoryDiscounts(categoryDiscounts);
+        //discountRule.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         if(!this.idOfCategoryList.isEmpty()){
             Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
+            StringBuilder stringBuilder = new StringBuilder();
             for (Object object: categoryCrioteria.list()){
                 this.categoryDiscountSet.add((CategoryDiscount) object);
+                stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
+                stringBuilder.append(",");
             }
             discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
+            discountRule.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
         }
 
         if(!this.idOfCategoryOrgList.isEmpty()){
