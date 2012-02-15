@@ -153,6 +153,48 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     public void loadClients(InputStream inputStream, long dataSize) throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            ContractIdGenerator contractIdGenerator = runtimeContext.getClientContractIdGenerator();
+            TimeZone localTimeZone = runtimeContext
+                    .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
+
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            dateFormat.setTimeZone(localTimeZone);
+
+            long lineCount = dataSize / 100;
+            if (lineCount > MAX_LINE_NUMBER) {
+                lineCount = MAX_LINE_NUMBER;
+            }
+            List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
+            int lineNo = 0;
+            int successLineNumber = 0;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+            String currLine = reader.readLine();
+            while (null != currLine) {
+                LineResult result = createClient(runtimeContext, contractIdGenerator, dateFormat, this.org.getIdOfOrg(),
+                        currLine, lineNo, this.checkFullNameUnique);
+                if (result.getResultCode() == 0) {
+                    ++successLineNumber;
+                }
+                lineResults.add(result);
+                currLine = reader.readLine();
+                if (lineNo == MAX_LINE_NUMBER) {
+                    break;
+                }
+                ++lineNo;
+            }
+
+            this.lineResults = lineResults;
+            this.successLineNumber = successLineNumber;
+        } finally {
+            //RuntimeContext.release(runtimeContext);
+        }
+    }
+        /*
+    public void loadClients(InputStream inputStream, long dataSize) throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         ContractIdGenerator contractIdGenerator = runtimeContext.getClientContractIdGenerator();
         TimeZone localTimeZone = runtimeContext
@@ -187,7 +229,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         this.lineResults = lineResults;
         this.successLineNumber = successLineNumber;
     }
-
+               */
     private LineResult createClient(RuntimeContext runtimeContext, ContractIdGenerator contractIdGenerator,
             DateFormat dateFormat, Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) {
         String[] tokens = line.split(";");
@@ -229,14 +271,14 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             person.setIdDocument(tokens[11]);
             persistenceSession.save(person);
 
-            long limit = organization.getCardLimit();
-            if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
+            long limit = organization.getCardLimit();  /*
+            if (tokens.length >= 25 && StringUtils.isNotEmpty(tokens[19])) {
                 limit = CurrencyStringUtils.rublesToCopecks(tokens[19]);
-            }
+            }                                            */
 
-            Client client = new Client(organization, person, contractPerson, 0, Integer.parseInt(tokens[18]) != 0,
-                    Integer.parseInt(tokens[17]) != 0, contractId, dateFormat.parse(tokens[3]),
-                    Integer.parseInt(tokens[2]), tokens[1], Integer.parseInt(tokens[16]), clientRegistryVersion, limit,
+            Client client = new Client(organization, person, contractPerson, 0, Boolean.parseBoolean(tokens[16]),
+                    Boolean.parseBoolean(tokens[15]), contractId, dateFormat.parse(tokens[18]),
+                    Integer.parseInt(tokens[1]), tokens[1], Integer.parseInt(tokens[14]), clientRegistryVersion, limit,
                     20000, "");
             client.setAddress(tokens[12]);
             client.setPhone(tokens[13]);
