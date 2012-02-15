@@ -1411,7 +1411,9 @@ public class Processor implements SyncProcessor,
 
 
                     /// Формирование журнала транзакции
-                    if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) {
+                    if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) &&
+                            (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT)
+                             && e.getIdOfCard()!=null) {
                         Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
                         if (card==null) {
                             logger.error("Не найдена карта по событию прохода: idOfOrg="+enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()+", idOfEnterEvent="+enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()+", idOfCard="+e.getIdOfCard());
