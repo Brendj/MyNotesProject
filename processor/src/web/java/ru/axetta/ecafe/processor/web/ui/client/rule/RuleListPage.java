@@ -95,12 +95,15 @@ public class RuleListPage extends BasicWorkspacePage {
             this.complex9 = discountRule.getComplex9();
             this.priority = discountRule.getPriority();
             this.operationor = discountRule.isOperationOr();
-            this.categoryDiscounts = discountRule.getCategoryDiscounts();
             this.categoryDiscountList = new LinkedList<CategoryDiscount>();
             if(!discountRule.getCategoriesDiscounts().isEmpty()){
+                StringBuilder stringBuilder = new StringBuilder();
                 for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
                     this.categoryDiscountList.add(categoryDiscount);
+                    stringBuilder.append(categoryDiscount.getCategoryName());
+                    stringBuilder.append(",");
                 }
+                this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
             }
         }
 
@@ -171,8 +174,6 @@ public class RuleListPage extends BasicWorkspacePage {
         List<Item> items = new ArrayList<Item>();
         Criteria ruleCriteria = session.createCriteria(DiscountRule.class);
         ruleCriteria.addOrder(Order.asc("idOfRule"));
-        ruleCriteria.addOrder(Order.desc("priority"));
-        ruleCriteria.addOrder(Order.asc("categoryDiscounts"));
         List discountRuleList = ruleCriteria.list();
 
         for (Object object : discountRuleList) {
