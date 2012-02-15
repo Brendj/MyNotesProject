@@ -271,10 +271,10 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             person.setIdDocument(tokens[11]);
             persistenceSession.save(person);
 
-            long limit = organization.getCardLimit();  /*
-            if (tokens.length >= 25 && StringUtils.isNotEmpty(tokens[19])) {
+            long limit = organization.getCardLimit();
+            if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
                 limit = CurrencyStringUtils.rublesToCopecks(tokens[19]);
-            }                                            */
+            }
 
             Client client = new Client(organization, person, contractPerson, 0, Boolean.parseBoolean(tokens[16]),
                     Boolean.parseBoolean(tokens[15]), contractId, dateFormat.parse(tokens[18]),
