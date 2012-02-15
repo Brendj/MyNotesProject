@@ -124,15 +124,17 @@ public class CategoryEditPage extends BasicWorkspacePage implements RuleListSele
         categoryDiscount.setDescription(description);
         categoryDiscount.setCreatedDate(createdDate);
         categoryDiscount.setLastUpdate(lastUpdate);
-
-        this.discountRuleSet = new HashSet<DiscountRule>();
-        Criteria categoryCrioteria = persistenceSession.createCriteria(DiscountRule.class);
-        categoryCrioteria.add(Restrictions.in("idOfRule", this.idOfRuleList));
-        for (Object object: categoryCrioteria.list()){
-            this.discountRuleSet.add((DiscountRule) object);
+        if(!this.idOfRuleList.isEmpty()){
+            this.discountRuleSet = new HashSet<DiscountRule>();
+            Criteria categoryCrioteria = persistenceSession.createCriteria(DiscountRule.class);
+            categoryCrioteria.add(Restrictions.in("idOfRule", this.idOfRuleList));
+            for (Object object: categoryCrioteria.list()){
+                this.discountRuleSet.add((DiscountRule) object);
+            }
+            categoryDiscount.setDiscountsRules(this.discountRuleSet);
+        } else {
+            categoryDiscount.getDiscountsRules().clear();
         }
-        categoryDiscount.setDiscountsRules(this.discountRuleSet);
-
         persistenceSession.update(categoryDiscount);
         fill(categoryDiscount);
     }
@@ -162,15 +164,17 @@ public class CategoryEditPage extends BasicWorkspacePage implements RuleListSele
             if(ruleMap.isEmpty()){
                 filter = "Не выбрано";
             } else{
-                filter="";
+                StringBuilder stringBuilder = new StringBuilder();
                 for(Long idOfRule: ruleMap.keySet()){
                     idOfRuleList.add(idOfRule);
-                    filter=filter.concat(ruleMap.get(idOfRule)+ "; ");
+                    stringBuilder.append(ruleMap.get(idOfRule));
+                    stringBuilder.append(";");
                 }
-                filter = filter.substring(0,filter.length()-2);
-                discountRules=idOfRuleList.toString();
-                discountRules=discountRules.substring(1,discountRules.length()-1);
+                filter = stringBuilder.toString();
+                discountRules=stringBuilder.toString();
             }
+        } else {
+            logAndPrintMessage("Pustole id of rule", new Exception("Pustole id of rule"));
         }
     }
 }

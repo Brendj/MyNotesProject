@@ -14,7 +14,11 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,8 +28,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class CategoryDeletePage extends BasicPage {
+
     public void removeCategory(Session session, Long id) throws Exception {
-        CategoryDiscount categoryDiscount = (CategoryDiscount) session.get(CategoryDiscount.class, id);
+        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
         Criteria clientCriteria = session.createCriteria(Client.class);
         Criterion exp1 = Restrictions.or(
             Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
@@ -52,6 +57,7 @@ public class CategoryDeletePage extends BasicPage {
             client.setCategoriesDiscounts(categoriesDiscounts);
             session.save(client);
         }
+
         session.delete(categoryDiscount);
     }
 }
