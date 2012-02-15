@@ -33,6 +33,7 @@
         <property name="priority" column="Priority" type="integer" not-null="true"/>
         <property name="operationOr" column="OperationOr" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
 
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
@@ -42,7 +43,7 @@
         </set>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
-        <set name="categoryOrgsInternal" table="CF_CatOrgDiscRule" cascade="all" lazy="false">
+        <set name="categoryOrgsInternal" table="CF_CatOrgDiscRule" inverse="true" cascade="all" lazy="false">
             <key column="IdOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>

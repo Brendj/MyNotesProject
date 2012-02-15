@@ -113,27 +113,6 @@ public class DiscountRule {
         this.categoryDiscounts = categoryDiscounts;
     }
 
-    /*
-public DiscountRule(long idOfRule, CategoryDiscount categoryDiscount, String description, int complex0, int complex1,
-      int complex2, int complex3, int complex4, int complex5, int complex6, int complex7, int complex8,
-      int complex9, int priority) {
-  this.idOfRule = idOfRule;
-  this.categoryDiscount = categoryDiscount;
-  this.description = description;
-  this.complex0 = complex0;
-  this.complex1 = complex1;
-  this.complex2 = complex2;
-  this.complex3 = complex3;
-  this.complex4 = complex4;
-  this.complex5 = complex5;
-  this.complex6 = complex6;
-  this.complex7 = complex7;
-  this.complex8 = complex8;
-  this.complex9 = complex9;
-  this.priority = priority;
-
-}
-    */
     public long getIdOfRule() {
         return idOfRule;
     }
@@ -141,15 +120,7 @@ public DiscountRule(long idOfRule, CategoryDiscount categoryDiscount, String des
     public void setIdOfRule(long idOfRule) {
         this.idOfRule = idOfRule;
     }
-                /*
-    public CategoryDiscount getCategoryDiscount() {
-        return categoryDiscount;
-    }
 
-    public void setCategoryDiscount(CategoryDiscount categoryDiscount) {
-        this.categoryDiscount = categoryDiscount;
-    }
-                  */
     public String getDescription() {
         return description;
     }
