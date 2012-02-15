@@ -47,13 +47,6 @@
 
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Контактный телефон" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
-    </rich:column>
-
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
         <h:commandLink action="#{mainPage.showOrgEditPage}" styleClass="command-link">
