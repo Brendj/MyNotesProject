@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.org.category;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -12,9 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,9 +43,73 @@ public class CategoryOrgListPage extends BasicWorkspacePage {
     @Override
     public void onShow() throws Exception {
         this.items = DAOUtils.findCategoryOrg(entityManager);
+        /* для теста */
+        Org org = entityManager.find(Org.class, 2L);
+        /* tnd debug*/
+        Set<CategoryOrg> categoryOrgSet = org.getCategories();
+        List results = entityManager.createQuery("from DiscountRule").getResultList();
+        for(Object object: results){
+            DiscountRule discountRule = (DiscountRule) object;
+            Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
+            Set<CategoryOrg> categoryOrgs =new HashSet<CategoryOrg>(categoryOrgsDR);
+            /* преобразуем множество categoryOrgs с учетом объединения
+           * true если множество не поменялось после объединения
+           * */
+
+                /*
+            long count=0;
+            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                for (CategoryOrg categoryOrg1: categoryOrgSet){
+                    if(categoryOrg.getIdOfCategoryOrg()==categoryOrg1.getIdOfCategoryOrg())
+                        count++;
+                }
+            }
+           // System.out.println("count="+count+" categoryOrgSet.size()="+categoryOrgSet.size());
+           /* if(categoryOrgSet.size()>=count){
+                discountRuleList.add(discountRule);
+            }*/
+
+            if(categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                discountRuleList.add(discountRule);
+                categoryOrgs.addAll(discountRule.getCategoryOrgs());
+                System.out.println(discountRule.getCategoryOrgs().size());
+                if(!discountRule.getCategoryOrgs().isEmpty()) {
+                    System.out.println(discountRule.getCategoryOrgs().toString());
+                }
+            }
+
+            if(discountRule.getCategoryOrgs().containsAll(categoryOrgSet)){
+                discountRuleList.add(discountRule);
+                categoryOrgs.addAll(discountRule.getCategoryOrgs());
+                System.out.println(discountRule.getCategoryOrgs().size());
+                if(!discountRule.getCategoryOrgs().isEmpty()) {
+                    System.out.println(discountRule.getCategoryOrgs().toString());
+                }
+            }
+        }
     }
 
     public List<CategoryOrg> getItems() {
         return items;
+    }
+
+    private List<DiscountRule> discountRuleList = new LinkedList<DiscountRule>();
+
+    public List<DiscountRule> getDiscountRuleList() {
+        return discountRuleList;
+    }
+
+    public void setDiscountRuleList(List<DiscountRule> discountRuleList) {
+        this.discountRuleList = discountRuleList;
+    }
+
+    private List<CategoryOrg> categoryOrgList = new LinkedList<CategoryOrg>();
+
+    public List<CategoryOrg> getCategoryOrgList() {
+        return categoryOrgList;
+    }
+
+    public void setCategoryOrgList(List<CategoryOrg> categoryOrgList) {
+        this.categoryOrgList = categoryOrgList;
     }
 }

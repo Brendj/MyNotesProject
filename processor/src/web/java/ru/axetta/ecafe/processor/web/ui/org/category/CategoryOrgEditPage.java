@@ -77,6 +77,10 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
         if(orgList == null && idOfOrgList.isEmpty()){
             printMessage("Выберите организацию для категории.");
         } else{
+            /* произвести удаление предыдущих */
+            for(Org org:  orgList){
+                currCategoryOrg.getOrgs().remove(org);
+            }
             orgList=DAOUtils.findOrgs(entityManager, idOfOrgList);
             for(Org org:  orgList){
                 currCategoryOrg.getOrgs().add(org);
