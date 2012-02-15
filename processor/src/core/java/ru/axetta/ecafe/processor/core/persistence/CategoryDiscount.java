@@ -24,11 +24,10 @@ public class CategoryDiscount {
     private Date lastUpdate;
     private String discountRules;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
-    private Set<CategoryOrg> categoryOrgInternal = new HashSet<CategoryOrg>();
     private Set<Client> clientsInternal = new HashSet<Client>();
 
     public Set<Client> getClients(){
-        return Collections.unmodifiableSet(getClientsInternal());
+        return getClientsInternal();
     }
 
     private Set<Client> getClientsInternal() {
@@ -39,24 +38,8 @@ public class CategoryDiscount {
         this.clientsInternal = clientsInternal;
     }
 
-    public Set<CategoryOrg> getCategoryOrg() {
-        return Collections.unmodifiableSet(getCategoryOrgInternal());
-    }
-
-    public void setCategoryOrg(Set<CategoryOrg> categoryOrg){
-        this.categoryOrgInternal = categoryOrg;
-    }
-
-    private Set<CategoryOrg> getCategoryOrgInternal() {
-        return categoryOrgInternal;
-    }
-
-    private void setCategoryOrgInternal(Set<CategoryOrg> categoryOrgInternal) {
-        this.categoryOrgInternal = categoryOrgInternal;
-    }
-
     public Set<DiscountRule> getDiscountsRules() {
-        return Collections.unmodifiableSet(getDiscountRulesInternal());
+        return getDiscountRulesInternal();
     }
 
     public void setDiscountsRules(Set<DiscountRule> discountRulesInternal) {
