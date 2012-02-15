@@ -278,7 +278,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
             Client client = new Client(organization, person, contractPerson, 0, Boolean.parseBoolean(tokens[16]),
                     Boolean.parseBoolean(tokens[15]), contractId, dateFormat.parse(tokens[18]),
-                    Integer.parseInt(tokens[1]), tokens[1], Integer.parseInt(tokens[14]), clientRegistryVersion, limit,
+                    Integer.parseInt(tokens[1]), tokens[0], Integer.parseInt(tokens[14]), clientRegistryVersion, limit,
                     20000, "");
             client.setAddress(tokens[12]);
             client.setPhone(tokens[13]);
