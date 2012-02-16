@@ -396,6 +396,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         payForSMS = 1;
 
         // Категории скидок
+        /*
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
         List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
         categoryDiscounts = new ArrayList<CategoryDiscountItem>();
@@ -404,7 +405,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     false,
                     categoryDiscount.getIdOfCategoryDiscount(),
                     categoryDiscount.getCategoryName()));
-        }
+        } */
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
@@ -450,16 +451,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         StringBuilder clientCategories = new StringBuilder();
         if(!idOfCategoryList.isEmpty()){
-            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
             for (Object object: categoryCriteria.list()){
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
-                this.categoryDiscountSet.add(categoryDiscount);
+                client.getCategories().add(categoryDiscount);
             }
-            client.setCategories(categoryDiscountSet);
             client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         }
 
