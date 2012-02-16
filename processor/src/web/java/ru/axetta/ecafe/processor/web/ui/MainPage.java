@@ -39,8 +39,10 @@ import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -5762,10 +5764,18 @@ public class MainPage {
             categoryListPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        } catch (ConstraintViolationException vce){
+            logger.error("Failed to remove category", vce);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории: имеются зарегестрированные Правила скидок или Клиенты привязанные к категории", null));
+        } catch (ObjectDeletedException ode){
+            logger.error("Failed to remove category", ode);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории: имеются зарегестрированные Правила скидок или Клиенты привязанные к категории", null));
         } catch (Exception e) {
             logger.error("Failed to remove category", e);
             facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории", null));
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории ", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
