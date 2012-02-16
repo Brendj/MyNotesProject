@@ -96,5 +96,11 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
+
     <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showCategoryCSVList}" styleClass="command-button" /-->
 </h:panelGrid>
