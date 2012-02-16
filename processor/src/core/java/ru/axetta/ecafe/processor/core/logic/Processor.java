@@ -1656,61 +1656,26 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            /* 1) выбирать правила по одному 
-               2) проверять проходит ли оно по фильтру категорий организации
-             *  */
-
-
             Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<CategoryOrg> categoryOrgSet = org.getCategories();
-            for(Object object: criteriaDiscountRule.list()){
-                DiscountRule discountRule = (DiscountRule) object;
-
-
-
-                /*
-               * проверяем вхождение одного множества в другое
-               * результат categoryOrgSet.containsAll(discountRule.getCategoryOrgs())
-               * вернет true если все категории организации взятые из таблицы организации
-               * пренадлежат категорий организаций приявязанных к Правилам скидок.
-               *
-               * Если все категории организации содержатся в правиле то выводим
-               * */
-
-                /* если после объединения множество не изменилось то есть нет лишких категорий
-
-                if(discountRule.getCategoryOrgs().containsAll(categoryOrgSet)){
-                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
-                    resCategoriesDiscountsAndRules.addDCRI(dcri);
-                }
-                  */
-                if(categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
-                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
-                    resCategoriesDiscountsAndRules.addDCRI(dcri);
-                }
-
-                       /*
-                long count=0;
-                for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
-                    for (CategoryOrg categoryOrg1: categoryOrgSet){
-                        if(categoryOrg.getIdOfCategoryOrg()==categoryOrg1.getIdOfCategoryOrg())
-                            count++;
+            if(!categoryOrgSet.isEmpty()){
+                for(Object object: criteriaDiscountRule.list()){
+                    DiscountRule discountRule = (DiscountRule) object;
+                    /*
+                   * проверяем вхождение одного множества в другое
+                   * результат categoryOrgSet.containsAll(discountRule.getCategoryOrgs())
+                   * вернет true если все категории организации взятые из таблицы организации
+                   * пренадлежат категорий организаций приявязанных к Правилам скидок.
+                   *
+                   * Если все категории организации содержатся в правиле то выводим
+                   * */
+                    if(!discountRule.getCategoryOrgs().isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                                new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                        resCategoriesDiscountsAndRules.addDCRI(dcri);
                     }
                 }
-                if(categoryOrgSet.size()>=count){
-                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
-                    resCategoriesDiscountsAndRules.addDCRI(dcri);
-                }          */
-
-               /* if(!flag){
-                    SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                            new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
-                    resCategoriesDiscountsAndRules.addDCRI(dcri);
-                }*/
             }
 
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
