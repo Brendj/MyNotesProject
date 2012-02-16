@@ -1666,20 +1666,26 @@ public class Processor implements SyncProcessor,
             Set<CategoryOrg> categoryOrgSet = org.getCategories();
             for(Object object: criteriaDiscountRule.list()){
                 DiscountRule discountRule = (DiscountRule) object;
-                //Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
-                //Set<CategoryOrg> categoryOrgs =new TreeSet<CategoryOrg>(categoryOrgsDR);
-                /* преобразуем множество categoryOrgs с учетом объединения
-                * true если множество не поменялось после объединения
-                * */
-               // boolean flag=categoryOrgs.retainAll(categoryOrgSet);
-                /* если после объединения множество не изменилось то есть нет лишких категорий*/
+
+
+
+                /*
+               * проверяем вхождение одного множества в другое
+               * результат categoryOrgSet.containsAll(discountRule.getCategoryOrgs())
+               * вернет true если все категории организации взятые из таблицы организации
+               * пренадлежат категорий организаций приявязанных к Правилам скидок.
+               *
+               * Если все категории организации содержатся в правиле то выводим
+               * */
+
+                /* если после объединения множество не изменилось то есть нет лишких категорий
 
                 if(discountRule.getCategoryOrgs().containsAll(categoryOrgSet)){
                     SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
                             new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
                     resCategoriesDiscountsAndRules.addDCRI(dcri);
                 }
-
+                  */
                 if(categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
                     SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
                             new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
