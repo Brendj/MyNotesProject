@@ -17,13 +17,13 @@
         <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true"/>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и Org -->
-        <set name="orgsInternal" table="CF_OrgsCategories" cascade="all" inverse="true" lazy="false">
+        <set name="orgsInternal" table="CF_OrgsCategories" cascade="all" lazy="false">
             <key column="IdOfCategoryOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
-        <set name="discountRulesInternal" table="CF_CatOrgDiscRule" cascade="all" inverse="true" lazy="false">
+        <set name="discountRulesInternal" table="CF_CatOrgDiscRule" cascade="all" lazy="false">
             <key column="idOfCategoryOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="IdOfRule"/>
         </set>

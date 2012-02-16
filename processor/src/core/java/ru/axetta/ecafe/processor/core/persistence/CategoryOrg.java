@@ -19,9 +19,9 @@ public class CategoryOrg implements Comparable {
 
     private long idOfCategoryOrg;
     private String categoryName;
-    private Set<Org> orgsInternal = new HashSet<Org>(0);
-    private Set<CategoryDiscount> categoryDiscountInternal;
-    private Set<DiscountRule> discountRulesInternal;
+    private Set<Org> orgsInternal = new HashSet<Org>();
+    private Set<CategoryDiscount> categoryDiscountInternal = new HashSet<CategoryDiscount>();
+    private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
 
     public Set<DiscountRule> getDiscountRules() {
         return Collections.unmodifiableSet(getDiscountRulesInternal());
@@ -59,7 +59,7 @@ public class CategoryOrg implements Comparable {
         return getOrgsInternal();
     }
 
-    public void setOrgs(Set<Org> orgsInternal) {
+    private void setOrgs(Set<Org> orgsInternal) {
         this.orgsInternal = orgsInternal;
     }
 
