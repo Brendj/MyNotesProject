@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client.rule;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -41,9 +42,27 @@ public class RuleListPage extends BasicWorkspacePage {
         private int complex9;
         private boolean operationor;
         private String categoryDiscounts;
+        private String CategoryOrgs;
         private List<CategoryDiscount> categoryDiscountList;
+        private List<CategoryOrg> categoryOrgList;
         //
 
+
+        public String getCategoryOrgs() {
+            return CategoryOrgs;
+        }
+
+        public void setCategoryOrgs(String categoryOrgs) {
+            CategoryOrgs = categoryOrgs;
+        }
+
+        public List<CategoryOrg> getCategoryOrgList() {
+            return categoryOrgList;
+        }
+
+        public void setCategoryOrgList(List<CategoryOrg> categoryOrgList) {
+            this.categoryOrgList = categoryOrgList;
+        }
 
         public List<CategoryDiscount> getCategoryDiscountList() {
             return categoryDiscountList;
@@ -105,6 +124,12 @@ public class RuleListPage extends BasicWorkspacePage {
                 }
                 this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
             }
+
+            this.categoryOrgList = new LinkedList<CategoryOrg>();
+            if(!discountRule.getCategoryOrgs().isEmpty()){
+               this.categoryOrgList.addAll(discountRule.getCategoryOrgs());
+            }
+
         }
 
         public long getIdOfRule() {
@@ -206,7 +231,16 @@ public class RuleListPage extends BasicWorkspacePage {
                     stringBuilder.append(categoryDiscount.getCategoryName());
                     stringBuilder.append("; ");
                 }
-                item.setCategoryDiscounts(stringBuilder.toString());
+                item.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
+            }
+
+            if(!discountRule.getCategoryOrgs().isEmpty()){
+                StringBuilder stringBuilder = new StringBuilder();
+                for(CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                    stringBuilder.append(categoryOrg.getCategoryName());
+                    stringBuilder.append(";");
+                }
+                item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length()-1));
             }
 
             items.add(item);

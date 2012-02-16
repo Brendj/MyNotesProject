@@ -120,7 +120,10 @@
                     <h:outputText value="Описание" styleClass="output-text" escape="true"/>
                 </rich:column>
                 <rich:column rowspan="2" headerClass="center-aligned-column">
-                    <h:outputText value="Категории" styleClass="output-text" escape="true"/>
+                    <h:outputText value="Категории скидок" styleClass="output-text" escape="true"/>
+                </rich:column>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Категории организаций" styleClass="output-text" escape="true"/>
                 </rich:column>
                 <rich:column rowspan="2" headerClass="center-aligned-column">
                     <h:outputText value="Тип условия" styleClass="output-text" escape="true"/>
@@ -178,6 +181,9 @@
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.categoryDiscounts}" />
         </rich:column>
+           <rich:column>
+               <h:outputText styleClass="output-text" value="#{item.categoryOrgs}" />
+           </rich:column>
         <rich:column>
             <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
         </rich:column>
@@ -237,6 +243,9 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
     <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showRuleCSVList}" styleClass="command-button" /-->
 </h:panelGrid>
