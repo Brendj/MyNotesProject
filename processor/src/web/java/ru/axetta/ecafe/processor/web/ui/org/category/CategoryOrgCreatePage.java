@@ -64,18 +64,19 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
         }
     }
 
-    public void fill(Session session){}
+    public void fill(Session session){
+        currCategoryOrg.setCategoryName("");
+        this.filter = "Не выбрано";
+    }
 
     public void createCategory(Session session){
         CategoryOrg categoryOrg = new CategoryOrg();
         categoryOrg.setCategoryName(currCategoryOrg.getCategoryName());
-        Set<Org> orgSet = new HashSet<Org>();
         Criteria categoryCriteria = session.createCriteria(Org.class);
         categoryCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
         for (Object object: categoryCriteria.list()){
-            orgSet.add((Org) object);
+            categoryOrg.getOrgs().add((Org) object);
         }
-        categoryOrg.setOrgs(orgSet);
         printMessage("Категория зарегистрирована успешно");
         session.save(categoryOrg);
     }
