@@ -284,14 +284,12 @@ public class RuleCreatePage extends BasicWorkspacePage
         }
         discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
 
-        this.categoryOrgs = new HashSet<CategoryOrg>();
         Criteria categoryOrgCrioteria = session.createCriteria(CategoryOrg.class);
         categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
         for (Object object: categoryOrgCrioteria.list()){
-            this.categoryOrgs.add((CategoryOrg) object);
+            discountRule.getCategoryOrgs().add((CategoryOrg) object);
         }
 
-        discountRule.setCategoryOrgs(this.categoryOrgs);
         session.save(discountRule);
     }
 }
