@@ -230,11 +230,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void fill(Session session, Long idOfRule) throws Exception {
         DiscountRule discountRule = (DiscountRule) session.load(DiscountRule.class, idOfRule);
-        if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
-            String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
+        /*if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
+            String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(",");
             Long[] numbs=new Long[idOfCategoryDiscountsString.length];
             for(int i=0; i<idOfCategoryDiscountsString.length;i++){
-                numbs[i]=Long.parseLong(idOfCategoryDiscountsString[i]);
+                numbs[i]=Long.parseLong(idOfCategoryDiscountsString[i].trim());
             }
             Criteria catCriteria = session.createCriteria(CategoryDiscount.class);
             catCriteria.add(Restrictions.in("idOfCategoryDiscount", numbs));
@@ -248,7 +248,20 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             String result=sb.toString();
             this.setFilter(result);
+        } */
+        StringBuilder categoryFilter = new StringBuilder();
+        if(!discountRule.getCategoriesDiscounts().isEmpty()){
+            for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
+                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                categoryFilter.append(categoryDiscount.getCategoryName());
+                categoryFilter.append(";");
+            }
+            this.filter = categoryFilter.substring(0, categoryFilter.length()-1);
+        } else {
+            this.filter = "Не выбрано";
         }
+
+
         StringBuilder categoryOrgFilter = new StringBuilder();
         if(!discountRule.getCategoryOrgs().isEmpty()){
             for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
@@ -256,7 +269,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 categoryOrgFilter.append(categoryOrg.getCategoryName());
                 categoryOrgFilter.append("; ");
             }
-            this.filterOrg=categoryOrgFilter.toString();
+            this.filterOrg=categoryOrgFilter.substring(0, categoryFilter.length()-1);
         } else{
             this.filterOrg="Не выбрано";
         }
@@ -284,6 +297,9 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         //discountRule.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         if(!this.idOfCategoryList.isEmpty()){
+
+            discountRule.getCategoriesDiscounts().clear();
+
             Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
             StringBuilder stringBuilder = new StringBuilder();
@@ -297,14 +313,15 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         }
 
         if(!this.idOfCategoryOrgList.isEmpty()){
+
+            discountRule.getCategoryOrgs().clear();
+
             this.categoryOrgs = new HashSet<CategoryOrg>();
             Criteria categoryOrgCrioteria = persistenceSession.createCriteria(CategoryOrg.class);
             categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
             for (Object object: categoryOrgCrioteria.list()){
                 this.categoryOrgs.add((CategoryOrg) object);
             }
-
-            discountRule.setCategoryOrgs(this.categoryOrgs);
         }
         persistenceSession.update(discountRule);
         fill(discountRule);
@@ -323,7 +340,14 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.complex8 = discountRule.getComplex8()>0;
         this.complex9 = discountRule.getComplex9()>0;
         this.priority = discountRule.getPriority();
-        this.categoryDiscounts = discountRule.getCategoryDiscounts();
+        if (!discountRule.getCategoriesDiscounts().isEmpty()){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
+                stringBuilder.append(categoryDiscount.getCategoryName());
+                stringBuilder.append("; ");
+            }
+            this.categoryDiscounts=stringBuilder.toString();
+        }
        // this.filter= discountRule.getCategoryDiscounts();
         this.operationor=discountRule.isOperationOr();
     }
