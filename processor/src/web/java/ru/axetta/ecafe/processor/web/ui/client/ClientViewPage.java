@@ -70,7 +70,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     public void setCategoriesDiscounts(List<CategoryDiscount> categoriesDiscounts) {
         this.categoriesDiscounts = categoriesDiscounts;
     }
-
+                    /*
     private List<String> categoryDiscountNames;
 
     public List<String> getCategoryDiscountNames() {
@@ -80,7 +80,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     public boolean isCategoryDiscountNamesEmpty() {
         return categoryDiscountNames.isEmpty();
     }
-
+                      */
     public boolean isCategoryiesDiscounts(){
         return categoriesDiscounts.isEmpty() ;
     }
@@ -295,7 +295,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
 
         // Категории скидок старое не используется
-        categoryDiscountNames = new ArrayList<String>();
+        //categoryDiscountNames = new ArrayList<String>();
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
         if (clientCategories.isEmpty())
             return;
@@ -312,10 +312,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
         categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscountList));
         List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
-
+          /*
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscountNames.add(categoryDiscount.getCategoryName());
-        }
+        }   */
     }
 
 }
