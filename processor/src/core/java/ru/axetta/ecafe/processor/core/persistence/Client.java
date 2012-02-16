@@ -90,7 +90,7 @@ public class Client {
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
 
     public Set<CategoryDiscount> getCategories(){
-        return Collections.unmodifiableSet(getCategoriesInternal());
+        return getCategoriesInternal();
     }
 
     public void setCategories(Set<CategoryDiscount> categories) {

@@ -35,10 +35,10 @@ public class DiscountRule {
     private Set<CategoryOrg> categoryOrgsInternal = new HashSet<CategoryOrg>();
 
     public Set<CategoryOrg> getCategoryOrgs() {
-        return Collections.unmodifiableSet(getCategoryOrgsInternal());
+        return getCategoryOrgsInternal();
     }
 
-    public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
+    private void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
         this.categoryOrgsInternal = categoryOrgs;
     }
 
@@ -51,7 +51,7 @@ public class DiscountRule {
     }
 
     public Set<CategoryDiscount> getCategoriesDiscounts(){
-        return Collections.unmodifiableSet(getCategoriesDiscountsInternal());
+        return getCategoriesDiscountsInternal();
     }
 
     public void setCategoriesDiscounts(Set<CategoryDiscount> categoriesDiscountsInternal) {

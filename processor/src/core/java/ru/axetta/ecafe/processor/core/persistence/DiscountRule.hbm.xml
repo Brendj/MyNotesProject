@@ -43,7 +43,7 @@
         </set>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
-        <set name="categoryOrgsInternal" table="CF_CatOrgDiscRule" inverse="true" cascade="all" lazy="false">
+        <set name="categoryOrgsInternal" table="CF_CatOrgDiscRule" cascade="all" lazy="false">
             <key column="IdOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>
