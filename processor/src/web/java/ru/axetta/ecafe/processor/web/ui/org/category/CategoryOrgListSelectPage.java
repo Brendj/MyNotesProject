@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class CategoryOrgListSelectPage extends BasicPage {
     public interface CompleteHandlerList {
-        void completeCategoryOrgListSelection(Map<Long, String> categoryMap) throws Exception;
+        void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception;
     }
 
     public static class Item {
