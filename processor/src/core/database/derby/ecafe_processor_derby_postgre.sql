@@ -876,7 +876,7 @@ CREATE TABLE cf_discountrulescategorydiscount
 );
 
 /* Таблица связка между Client и CategoryDiscountRule */
-CREATE TABLE cf_clienscategorydiscount
+CREATE TABLE cf_clientscategorydiscount
 (
   idofclienscategorydiscount bigserial NOT NULL,
   idofclient bigint,
