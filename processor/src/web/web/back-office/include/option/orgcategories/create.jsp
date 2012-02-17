@@ -25,7 +25,7 @@
         <h:inputText value="#{mainPage.categoryOrgCreatePage.currCategoryOrg.categoryName}" maxlength="32" styleClass="input-text" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createCategoryOrg}"
+        <a4j:commandButton value="Зарегистрировать категорию" action="#{mainPage.createCategoryOrg}"
                            reRender="categoryOrgCreateTable" styleClass="command-button" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">

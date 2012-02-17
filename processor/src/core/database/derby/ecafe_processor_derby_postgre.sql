@@ -831,7 +831,7 @@ CREATE TABLE CF_TransactionJournal
 /* Таблица категорий Организаций */
 CREATE TABLE cf_categoryorg
 (
-  idofcategoryorg bigint NOT NULL,
+  idofcategoryorg bigserial NOT NULL,
   categoryname character varying(255),
   CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
 );

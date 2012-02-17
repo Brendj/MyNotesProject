@@ -359,30 +359,6 @@
     <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
                         action="#{optionPage.show}" reRender="workspaceForm"/>
 
-    <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организациий" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
-                         rendered="true" >
-        <%--
-        <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
-            --%>
-        <rich:panelMenuItem id="showCategoryOrgsListMenuItem" binding="#{categoryOrgListPage.mainMenuComponent}"
-                            label="Список" action="#{categoryOrgListPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{mainPage.categoryOrgCreatePage.mainMenuComponent}"
-                            label="Регистрация" action="#{mainPage.showCategoryOrgCreatePage}" reRender="workspaceForm"/>
-
-          <%--
-        <rich:panelMenuGroup id="selectedCategoryOrgGroupMenu" label="#{selectedCategoryOrgGroupPage.categoryName}"
-                             binding="#{selectedCategoryOrgGroupPage.mainMenuComponent}" rendered="true">
-            <a4j:support event="onclick" action="#{selectedCategoryOrgGroupPage.show}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="showCategoryOrgsEditMenuItem"
-                                label="Редактирование" reRender="workspaceForm"/>
-            <rich:panelMenuItem id="showCategoryOrgsViewMenuItem"
-                                label="Просмотр" reRender="workspaceForm"/>
-        </rich:panelMenuGroup>
-              --%>
-    </rich:panelMenuGroup>
-
-
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
         <a4j:support event="onclick" action="#{mainPage.showUserGroupPage}" reRender="workspaceForm" />
@@ -458,6 +434,29 @@
                             label="Добавить правило" action="#{mainPage.showReportRuleCreatePage}"
                             reRender="workspaceForm" />
 
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организациий" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
+                         rendered="true" >
+        <%--
+        <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
+            --%>
+        <rich:panelMenuItem id="showCategoryOrgsListMenuItem" binding="#{categoryOrgListPage.mainMenuComponent}"
+                            label="Список" action="#{categoryOrgListPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{mainPage.categoryOrgCreatePage.mainMenuComponent}"
+                            label="Регистрация" action="#{mainPage.showCategoryOrgCreatePage}" reRender="workspaceForm"/>
+
+        <%--
+  <rich:panelMenuGroup id="selectedCategoryOrgGroupMenu" label="#{selectedCategoryOrgGroupPage.categoryName}"
+                       binding="#{selectedCategoryOrgGroupPage.mainMenuComponent}" rendered="true">
+      <a4j:support event="onclick" action="#{selectedCategoryOrgGroupPage.show}" reRender="workspaceForm" />
+
+      <rich:panelMenuItem id="showCategoryOrgsEditMenuItem"
+                          label="Редактирование" reRender="workspaceForm"/>
+      <rich:panelMenuItem id="showCategoryOrgsViewMenuItem"
+                          label="Просмотр" reRender="workspaceForm"/>
+  </rich:panelMenuGroup>
+        --%>
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="categoryGroupMenu" binding="#{mainPage.categoryGroupPage.mainMenuComponent}"

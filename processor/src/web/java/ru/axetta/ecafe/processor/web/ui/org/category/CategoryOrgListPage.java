@@ -45,15 +45,15 @@ public class CategoryOrgListPage extends BasicWorkspacePage {
         this.items = DAOUtils.findCategoryOrg(entityManager);
         /* для теста */
         Org org = entityManager.find(Org.class, 2L);
-        /* tnd debug*/
         Set<CategoryOrg> categoryOrgSet = org.getCategories();
         List results = entityManager.createQuery("from DiscountRule").getResultList();
         for(Object object: results){
             DiscountRule discountRule = (DiscountRule) object;
             System.out.println(discountRule.getCategoryOrgs().toString());
-            System.out.println(categoryOrgSet.toString());
-            System.out.println(categoryOrgSet.containsAll(discountRule.getCategoryOrgs()));
+            System.out.println(org.getCategories().toString());
+            System.out.println(org.getCategories().containsAll(discountRule.getCategoryOrgs()));
         }
+        /* end debug*/
     }
 
     public List<CategoryOrg> getItems() {
