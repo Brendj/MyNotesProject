@@ -24,7 +24,7 @@ public class CategoryOrg implements Comparable {
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
 
     public Set<DiscountRule> getDiscountRules() {
-        return Collections.unmodifiableSet(getDiscountRulesInternal());
+        return getDiscountRulesInternal();
     }
 
     public void setDiscountRules(Set<DiscountRule> discountRules) {
@@ -111,11 +111,7 @@ public class CategoryOrg implements Comparable {
         if (idOfCategoryOrg != that.idOfCategoryOrg) {
             return false;
         }
-        /*
-        if (categoryName != null ? !categoryName.equals(that.categoryName) : that.categoryName != null) {
-            return false;
-        }
-          */
+
         return true;
     }
 
