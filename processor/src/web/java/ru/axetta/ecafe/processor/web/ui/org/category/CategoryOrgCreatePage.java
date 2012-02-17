@@ -70,15 +70,21 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
     }
 
     public void createCategory(Session session){
-        CategoryOrg categoryOrg = new CategoryOrg();
-        categoryOrg.setCategoryName(currCategoryOrg.getCategoryName());
-        Criteria categoryCriteria = session.createCriteria(Org.class);
-        categoryCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
-        for (Object object: categoryCriteria.list()){
-            categoryOrg.getOrgs().add((Org) object);
+        if(!currCategoryOrg.getCategoryName().isEmpty() && !this.idOfOrgList.isEmpty()){
+            CategoryOrg categoryOrg = new CategoryOrg();
+            categoryOrg.setCategoryName(currCategoryOrg.getCategoryName());
+            Criteria categoryCriteria = session.createCriteria(Org.class);
+            categoryCriteria.add(Restrictions.in("idOfOrg",this.idOfOrgList));
+            for (Object object: categoryCriteria.list()){
+                categoryOrg.getOrgs().add((Org) object);
+            }
+            session.save(categoryOrg);
+            printMessage("Категория зарегистрирована успешно");
+        }  else {
+            logAndPrintMessage("Не ввели наименоание или организации которые пренадлежат данной категороии",
+                    new Exception("Category name or org list is empty"));
         }
-        printMessage("Категория зарегистрирована успешно");
-        session.save(categoryOrg);
+
     }
 
 }

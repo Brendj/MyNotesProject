@@ -52,12 +52,12 @@
         <c:import url="include/client/category/select_list.jsp" />
     </f:subview>
 
-    <f:subview id="ruleListSelectSubView">
-        <c:import url="include/client/rule/select_list.jsp" />
-    </f:subview>
-
     <f:subview id="categoryOrgListSelectSubView">
         <c:import url="include/option/orgcategories/select_list.jsp" />
+    </f:subview>
+
+    <f:subview id="ruleListSelectSubView">
+        <c:import url="include/client/rule/select_list.jsp" />
     </f:subview>
 
     <f:subview id="ccAccountDeleteSubView">

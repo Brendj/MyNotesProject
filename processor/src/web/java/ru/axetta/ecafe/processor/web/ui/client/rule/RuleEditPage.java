@@ -206,6 +206,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             idOfCategoryOrgList = new ArrayList<Long>();
             if(categoryOrgMap.isEmpty()){
                 filterOrg = "Не выбрано";
+
             } else {
                 filterOrg="";
                 for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
@@ -218,37 +219,13 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         }
     }
 
-    public void completeCategorySelection(Session session, Long idOfCategory) throws Exception {
-        if (null != idOfCategory) {
-            CategoryDiscount category = (CategoryDiscount) session.load(CategoryDiscount.class, idOfCategory);
-            //this.category = new CategoryItem(category);
-        }
-    }
     public String getPageFilename() {
         return "client/rule/edit";
     }
 
     public void fill(Session session, Long idOfRule) throws Exception {
         DiscountRule discountRule = (DiscountRule) session.load(DiscountRule.class, idOfRule);
-        /*if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
-            String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(",");
-            Long[] numbs=new Long[idOfCategoryDiscountsString.length];
-            for(int i=0; i<idOfCategoryDiscountsString.length;i++){
-                numbs[i]=Long.parseLong(idOfCategoryDiscountsString[i].trim());
-            }
-            Criteria catCriteria = session.createCriteria(CategoryDiscount.class);
-            catCriteria.add(Restrictions.in("idOfCategoryDiscount", numbs));
-            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
-            StringBuilder sb=new StringBuilder();
-            for(Object object: catCriteria.list()){
-                CategoryDiscount categoryDiscount = (CategoryDiscount)object;
-                this.categoryDiscountSet.add(categoryDiscount);
-                sb.append(categoryDiscount.getCategoryName());
-                sb.append("; ");
-            }
-            String result=sb.toString();
-            this.setFilter(result);
-        } */
+
         StringBuilder categoryFilter = new StringBuilder();
         if(!discountRule.getCategoriesDiscounts().isEmpty()){
             for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
@@ -269,7 +246,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 categoryOrgFilter.append(categoryOrg.getCategoryName());
                 categoryOrgFilter.append("; ");
             }
-            this.filterOrg=categoryOrgFilter.substring(0, categoryFilter.length()-1);
+            this.filterOrg=categoryOrgFilter.substring(0, categoryOrgFilter.length()-1);
         } else{
             this.filterOrg="Не выбрано";
         }
@@ -310,18 +287,21 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
             discountRule.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
+        } else {
+            discountRule.getCategoriesDiscounts().clear();
+            discountRule.setCategoryDiscounts("");
         }
 
         if(!this.idOfCategoryOrgList.isEmpty()){
 
             discountRule.getCategoryOrgs().clear();
-
-            this.categoryOrgs = new HashSet<CategoryOrg>();
             Criteria categoryOrgCrioteria = persistenceSession.createCriteria(CategoryOrg.class);
             categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
             for (Object object: categoryOrgCrioteria.list()){
-                this.categoryOrgs.add((CategoryOrg) object);
+                discountRule.getCategoryOrgs().add((CategoryOrg) object);
             }
+        } else {
+            discountRule.getCategoryOrgs().clear();
         }
         persistenceSession.update(discountRule);
         fill(discountRule);
@@ -348,7 +328,13 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             this.categoryDiscounts=stringBuilder.toString();
         }
-       // this.filter= discountRule.getCategoryDiscounts();
+        if(!discountRule.getCategoryOrgs().isEmpty()){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                 stringBuilder.append(categoryOrg.getCategoryName());
+                 stringBuilder.append("; ");
+            }
+        }
         this.operationor=discountRule.isOperationOr();
     }
 

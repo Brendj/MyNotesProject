@@ -5991,7 +5991,7 @@ public class MainPage {
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 categoryOrgListSelectPage.pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
-                modalPages.push(categoryListSelectPage);
+                modalPages.push(categoryOrgListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to complete  category org selection", e);
                 facesContext.addMessage(null,
@@ -6209,15 +6209,8 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (!modalPages.empty()) {
-                System.out.println("!modalPages.empty()");
                 if (modalPages.peek() == categorySelectPage) {
                     modalPages.pop();
-                    System.out.println("modalPages.peek() == categorySelectPage");
-                }
-                if(null!=this.testLogPage.getPageComponent().getId()){
-                    System.out.println(this.testLogPage.getPageComponent().getId());
-                }    else {
-                    System.out.println("Null");
                 }
             }
         } catch (Exception e) {

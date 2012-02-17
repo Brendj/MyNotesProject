@@ -147,13 +147,18 @@ public class CategoryEditPage extends BasicWorkspacePage implements RuleListSele
         this.createdDate = categoryDiscount.getCreatedDate();
         this.lastUpdate = categoryDiscount.getLastUpdate();
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
-        StringBuilder sb=new StringBuilder();
-        for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-           this.idOfRuleList.add(discountRule.getIdOfRule());
-           sb.append(discountRule.getDescription());
-           sb.append("; ");
+        if(categoryDiscount.getDiscountsRules().isEmpty()){
+            this.setFilter("Не выбрано");
+        } else {
+            StringBuilder sb=new StringBuilder();
+            for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
+                this.idOfRuleList.add(discountRule.getIdOfRule());
+                sb.append(discountRule.getDescription());
+                sb.append("; ");
+            }
+            this.setFilter(sb.substring(0, sb.length()-1));
         }
-        this.setFilter(sb.toString());
+
     }
 
     @Override
@@ -173,8 +178,6 @@ public class CategoryEditPage extends BasicWorkspacePage implements RuleListSele
                 filter = stringBuilder.toString();
                 discountRules=stringBuilder.toString();
             }
-        } else {
-            logAndPrintMessage("Pustole id of rule", new Exception("Pustole id of rule"));
         }
     }
 }

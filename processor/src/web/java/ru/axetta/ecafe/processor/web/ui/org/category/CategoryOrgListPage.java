@@ -50,42 +50,9 @@ public class CategoryOrgListPage extends BasicWorkspacePage {
         List results = entityManager.createQuery("from DiscountRule").getResultList();
         for(Object object: results){
             DiscountRule discountRule = (DiscountRule) object;
-            Set<CategoryOrg> categoryOrgsDR = discountRule.getCategoryOrgs();
-            Set<CategoryOrg> categoryOrgs =new HashSet<CategoryOrg>(categoryOrgsDR);
-            /* преобразуем множество categoryOrgs с учетом объединения
-           * true если множество не поменялось после объединения
-           * */
-
-                /*
-            long count=0;
-            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
-                for (CategoryOrg categoryOrg1: categoryOrgSet){
-                    if(categoryOrg.getIdOfCategoryOrg()==categoryOrg1.getIdOfCategoryOrg())
-                        count++;
-                }
-            }
-           // System.out.println("count="+count+" categoryOrgSet.size()="+categoryOrgSet.size());
-           /* if(categoryOrgSet.size()>=count){
-                discountRuleList.add(discountRule);
-            }*/
-
-            if(categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
-                discountRuleList.add(discountRule);
-                categoryOrgs.addAll(discountRule.getCategoryOrgs());
-                System.out.println(discountRule.getCategoryOrgs().size());
-                if(!discountRule.getCategoryOrgs().isEmpty()) {
-                    System.out.println(discountRule.getCategoryOrgs().toString());
-                }
-            }
-
-            if(discountRule.getCategoryOrgs().containsAll(categoryOrgSet)){
-                discountRuleList.add(discountRule);
-                categoryOrgs.addAll(discountRule.getCategoryOrgs());
-                System.out.println(discountRule.getCategoryOrgs().size());
-                if(!discountRule.getCategoryOrgs().isEmpty()) {
-                    System.out.println(discountRule.getCategoryOrgs().toString());
-                }
-            }
+            System.out.println(discountRule.getCategoryOrgs().toString());
+            System.out.println(categoryOrgSet.toString());
+            System.out.println(categoryOrgSet.containsAll(discountRule.getCategoryOrgs()));
         }
     }
 
