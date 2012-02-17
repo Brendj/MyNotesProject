@@ -829,75 +829,62 @@ CREATE TABLE CF_TransactionJournal
 );
 
 /* Таблица категорий Организаций */
-CREATE TABLE cf_categoryorg
+CREATE TABLE CF_CategoryOrg
 (
-  idofcategoryorg bigserial NOT NULL,
-  categoryname character varying(255),
-  CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
+  idOfCategoryOrg bigserial NOT NULL,
+  categoryName character varying(255),
+  CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idOfCategoryOrg )
 );
 
 /* Таблица связка между CategoryOrg и Org */
-CREATE TABLE cf_orgscategories
+CREATE TABLE CF_OrgsCategories
 (
-  idoforgscategories bigserial NOT NULL,
-  idoforg bigint,
-  idofcategoryorg bigint,
-  CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idoforgscategories ),
-  CONSTRAINT cf_orgscategories_idofcategoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg),
-  CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
-  REFERENCES cf_orgs (idoforg)
-);
-
-
-/* Таблица связка между CategoryOrg и CategoryDiscountRule */
-CREATE TABLE cf_catorgcatdiscrule
-(
-  idofcatorgcatdiscrule bigserial NOT NULL,
-  idofcategoryorg bigint,
-  idofcategorydiscount bigint,
-  CONSTRAINT cf_catorgcatdiscrule_categorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount),
-  CONSTRAINT cf_catorgcatdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg)
+  idOfOrgsCategories bigserial NOT NULL,
+  idOfOrg bigint,
+  idOfCategoryOrg bigint,
+  CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idOfOrgsCategories ),
+  CONSTRAINT cf_orgscategories_idofcategoryorg FOREIGN KEY (idOfCategoryOrg)
+  REFERENCES cf_categoryorg (idOfCategoryOrg),
+  CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idOfOrg)
+  REFERENCES cf_orgs (idOfOrg)
 );
 
 /* Таблица связка между DiscountRules и CategoryDiscountRule */
-CREATE TABLE cf_discountrulescategorydiscount
+CREATE TABLE cf_DiscountRulesCategoryDiscount
 (
-  idofdrcd bigserial NOT NULL,
-  idofrule bigint NOT NULL,
-  idofcategorydiscount bigint NOT NULL,
-  CONSTRAINT cf_discountrulescategorydiscount_pk PRIMARY KEY (idofrule , idofcategorydiscount ),
-  CONSTRAINT cf_discountrulescategorydiscount_idofcategorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount),
-  CONSTRAINT cf_discountrulescategorydiscount_idofdiscountrules FOREIGN KEY (idofrule)
-  REFERENCES cf_discountrules (idofrule)
+  idOfDRCD bigserial NOT NULL,
+  idOfRule bigint NOT NULL,
+  idOfCategoryDiscount bigint NOT NULL,
+  CONSTRAINT cf_discountrulescategorydiscount_pk PRIMARY KEY (idOfDRCD),
+  CONSTRAINT cf_discountrulescategorydiscount_idofcategorydiscount FOREIGN KEY (idOfCategoryDiscount)
+  REFERENCES cf_categorydiscounts (idOfCategoryDiscount),
+  CONSTRAINT cf_discountrulescategorydiscount_idofdiscountrules FOREIGN KEY (idOfRule)
+  REFERENCES cf_discountrules (idOfRule)
 );
 
 /* Таблица связка между Client и CategoryDiscountRule */
 CREATE TABLE cf_clientscategorydiscount
 (
-  idofclienscategorydiscount bigserial NOT NULL,
-  idofclient bigint,
-  idofcategorydiscount bigint,
-  CONSTRAINT cf_clienscategorydiscount_pk PRIMARY KEY (idofclienscategorydiscount ),
-  CONSTRAINT cf_clienscategorydiscount_categorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount),
-  CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idofclient)
-  REFERENCES cf_clients (idofclient)
+  idOfCliensCategoryDiscount bigserial NOT NULL,
+  idOfClient bigint,
+  idOfCategoryDiscount bigint,
+  CONSTRAINT cf_clienscategorydiscount_pk PRIMARY KEY (idOfCliensCategoryDiscount ),
+  CONSTRAINT cf_clienscategorydiscount_categorydiscount FOREIGN KEY (idOfCategoryDiscount)
+  REFERENCES cf_categorydiscounts (idOfCategoryDiscount),
+  CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idOfClient)
+  REFERENCES cf_clients (idOfClient)
 );
 
 /* Таблица связка между CategoryOrg и DiscountRule */
-CREATE TABLE cf_catorgdiscrule
+CREATE TABLE CF_CatOrgDiscRule
 (
-  idofcatorgdiscrule bigserial NOT NULL,
-  idofcategoryorg bigint,
-  idofrule bigint,
-  CONSTRAINT cf_catorgdiscrule_pk PRIMARY KEY (idofcatorgdiscrule),
-  CONSTRAINT cf_catorgdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg),
-  CONSTRAINT cf_catorgdiscrule_discountrule FOREIGN KEY (idofrule)
-  REFERENCES cf_discountrules (idofrule)
+  idOfCatOrgDiscRule bigserial NOT NULL,
+  idOfCategoryOrg bigint,
+  idOfRule bigint,
+  CONSTRAINT cf_catorgdiscrule_pk PRIMARY KEY (idOfCatOrgDiscRule),
+  CONSTRAINT cf_catorgdiscrule_categoryorg FOREIGN KEY (idOfCategoryOrg)
+  REFERENCES cf_categoryorg (idOfCategoryOrg),
+  CONSTRAINT cf_catorgdiscrule_discountrule FOREIGN KEY (idOfRule)
+  REFERENCES cf_discountrules (idOfRule)
 );
 
