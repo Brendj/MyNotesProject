@@ -38,7 +38,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     private List<ReportRuleConstants.ParamHint> paramHints = Collections.emptyList();
 
     public String getPageFilename() {
-        return "report/rule/view";
+        return "report/discountrule/view";
     }
 
     public long getIdOfReportHandleRule() {

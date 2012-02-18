@@ -786,7 +786,7 @@ CREATE TABLE CF_DiscountRules (
   Complex8                  INTEGER       NOT NULL DEFAULT 0,
   Complex9                  INTEGER       NOT NULL DEFAULT 0,
   Priority                  Integer       NOT NULL DEFAULT 0,
-  CategoryDiscounts         Character     varying(64),
+  CategoriesDiscounts         Character     varying(64),
   OperationOr               integer       NOT NULL DEFAULT 0,
   CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule),
   CONSTRAINT CF_DiscountRules_IdOfCategoryDiscount_fk FOREIGN KEY (IdOfCategoryDiscount) REFERENCES CF_CategoryDiscounts (IdOfCategoryDiscount)
@@ -801,10 +801,6 @@ create table CF_Schema_version_info (
     UpdateTime              BIGINT                   not null,
     constraint "CF_schema_version_info_pk" primary key (SchemaVersionInfoId)
 );
-
--- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
-insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 11, 120199, 0);
 
 CREATE TABLE CF_TransactionJournal
 (
@@ -888,4 +884,9 @@ CREATE TABLE CF_Clients_CategoryDiscounts
   CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idofclient)
   REFERENCES CF_Clients (idofclient)
 );
+
+
+-- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
+insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
+VALUES(2, 2, 11, 120218, 0);
 

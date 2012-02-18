@@ -83,17 +83,24 @@ public class BasicWorkspacePage extends BasicPage {
         return stringBuilder.toString();
     }
 
-    public void showAndExpandMenuGroup() {
-        UIComponent menuComponent = getMainMenuComponent();
-        if (menuComponent instanceof HtmlPanelMenuGroup) {
+    void showAndExpandMenuGroup(UIComponent menuComponent) {
+        if (menuComponent !=null && (menuComponent instanceof HtmlPanelMenuGroup)) {
             HtmlPanelMenuGroup menuGroup = (HtmlPanelMenuGroup) menuComponent;
-            menuGroup.setRendered(true);
-            menuGroup.setExpanded(true);
-            for (UIComponent uiComponent : menuGroup.getChildren()) {
-                uiComponent.setRendered(true);
+            if (!menuGroup.isRendered()) {
+                menuGroup.setRendered(true);
+                menuGroup.setExpanded(true);
+                for (UIComponent uiComponent : menuGroup.getChildren()) {
+                    uiComponent.setRendered(true);
+                }
             }
         }
-
+    }
+    public void showAndExpandMenuGroup() {
+        showAndExpandMenuGroup(getMainMenuComponent());
+    }
+    public void showAndExpandParentMenuGroup() {
+        UIComponent uiComponent = getMainMenuComponent();
+        if (uiComponent!=null) showAndExpandMenuGroup(uiComponent.getParent());
     }
 
     public void hideMenuGroup() {
@@ -111,7 +118,9 @@ public class BasicWorkspacePage extends BasicPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             this.onShow();
+            showAndExpandParentMenuGroup();
             MainPage.getSessionInstance().setCurrentWorkspacePage(this);
+            MainPage.getSessionInstance().updateSelectedMainMenu();
         } catch (Exception e) {
             logger.error("Failed to load page", e);
             facesContext.addMessage(null,
@@ -124,6 +133,16 @@ public class BasicWorkspacePage extends BasicPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         facesContext.addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
+
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public void logAndPrintMessage(String msg, Exception e) {

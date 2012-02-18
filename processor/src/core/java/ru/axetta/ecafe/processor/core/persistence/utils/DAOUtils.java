@@ -15,6 +15,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -283,7 +283,7 @@ public class DAOUtils {
     }
 
     public static void updateMenuExchangeLink(Session persistenceSession, Long idOfSourceOrg, Long idOfDestOrg) {
-        Query query = persistenceSession.createQuery("delete from MenuExchangeRule rule where rule.idOfDestOrg=?");
+        Query query = persistenceSession.createQuery("delete from MenuExchangeRule discountrule where discountrule.idOfDestOrg=?");
         query.setParameter(0, idOfDestOrg);
         query.executeUpdate();
         ////
@@ -294,7 +294,7 @@ public class DAOUtils {
 
     public static boolean isOrgMenuExchangeSource(Session persistenceSession, Long idOfOrg) {
         Query query = persistenceSession
-                .createQuery("select 1 from MenuExchangeRule rule where rule.idOfSourceOrg = ?");
+                .createQuery("select 1 from MenuExchangeRule discountrule where discountrule.idOfSourceOrg = ?");
         query.setParameter(0, idOfOrg);
         query.setMaxResults(1);
         return !query.list().isEmpty();
@@ -476,4 +476,61 @@ public class DAOUtils {
     }
 
 
+    @SuppressWarnings("unchecked")
+    public static List<CategoryDiscount> getCategoryDiscountList(EntityManager entityManager) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
+        return (List<CategoryDiscount>)q.getResultList();
+    }
+
+    public static CategoryDiscount findCategoryDiscountById(EntityManager entityManager, long idOfCategoryDiscount) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryDiscount where idOfCategoryDiscount=:idOfCategoryDiscount");
+        q.setParameter("idOfCategoryDiscount", idOfCategoryDiscount);
+        return (CategoryDiscount)q.getSingleResult();
+    }
+
+    public static void deleteCategoryDiscount(Session session, long id) {
+        //TODO: разобораться надо ли это с учетом ввода таблицы связи
+        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        Criterion exp1 = Restrictions.or(
+            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
+            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
+                MatchMode.START));
+        Criterion exp2 = Restrictions.or(
+            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(),
+                MatchMode.END),
+            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
+                MatchMode.ANYWHERE));
+        Criterion expression = Restrictions.or(exp1, exp2);
+        clientCriteria.add(expression);
+        List<Client> clients = clientCriteria.list();
+        for (Client client : clients) {
+            String categoriesDiscounts = client.getCategoriesDiscounts();
+            if (categoriesDiscounts.contains("," + id + ","))
+                categoriesDiscounts = categoriesDiscounts.replace("," + id + ",", ",");
+            else if (categoriesDiscounts.startsWith(id + ","))
+                categoriesDiscounts = categoriesDiscounts.substring((id + ",").length());
+            else if (categoriesDiscounts.endsWith("," + id))
+                categoriesDiscounts = categoriesDiscounts.substring(0, categoriesDiscounts.length() - ("," + id).length());
+            else
+                categoriesDiscounts = categoriesDiscounts.replace("" + id, "");
+            client.setCategoriesDiscounts(categoriesDiscounts);
+            session.save(client);
+        }
+
+        session.delete(categoryDiscount);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Org> getOrgsByIdList(EntityManager entityManager, List<Long> idOfOrgList) {
+        if (idOfOrgList.isEmpty()) return new LinkedList<Org>();
+        javax.persistence.Query q = entityManager.createQuery("from Org where idOfOrg in :idOfOrgs");
+        q.setParameter("idOfOrgs", idOfOrgList);
+        return (List<Org>)q.getResultList();
+    }
+
+    public static long getCategoryDiscountMaxId(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("select max(idOfCategoryDiscount) from CategoryDiscount");
+        return (Long)(q.getSingleResult());
+    }
 }

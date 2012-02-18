@@ -105,7 +105,7 @@
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
 
-    <h:outputText escape="true" value="Категории скидок" styleClass="output-text" />
+    <h:outputText escape="true" value="Категории" styleClass="output-text" />
 
     <h:panelGroup>
         <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"

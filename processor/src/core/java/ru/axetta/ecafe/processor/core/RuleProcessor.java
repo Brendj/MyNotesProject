@@ -195,7 +195,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                     if (currRule.applicatable(reportProperties)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug(
-                                    String.format("Report \"%s\" is applicatable for rule \"%s\"", report, currRule));
+                                    String.format("Report \"%s\" is applicatable for discountrule \"%s\"", report, currRule));
                         }
                         ReportDocument reportDocument = readyReportDocuments.get(currRule.getDocumentFormat());
                         if (null == reportDocument) {
@@ -305,7 +305,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         for (Rule currRule : rulesCopy) {
             if (currRule.applicatable(properties)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug(String.format("Event \"%s\" is applicatable for rule \"%s\"", event, currRule));
+                    logger.debug(String.format("Event \"%s\" is applicatable for discountrule \"%s\"", event, currRule));
                 }
                 ReportDocument eventDocument = readyEventDocuments.get(currRule.getDocumentFormat());
                 if (null == eventDocument) {

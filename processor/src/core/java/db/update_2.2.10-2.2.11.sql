@@ -21,48 +21,63 @@ CREATE TABLE CF_TransactionJournal
 );
 
 /* Таблица категорий Организаций */
-CREATE TABLE cf_categoryorg
+CREATE TABLE CF_CategoryOrg
 (
-  idofcategoryorg bigint NOT NULL,
+  idofcategoryorg bigserial NOT NULL,
   categoryname character varying(255),
   CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
 );
 
 /* Таблица связка между CategoryOrg и Org */
-CREATE TABLE cf_orgscategories
+CREATE TABLE CF_CategoryOrg_Orgs
 (
   idoforgscategories bigserial NOT NULL,
   idoforg bigint,
   idofcategoryorg bigint,
   CONSTRAINT cf_orgscategories_pk PRIMARY KEY (idoforgscategories ),
   CONSTRAINT cf_orgscategories_idofcategoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg),
+  REFERENCES CF_CategoryOrg (idofcategoryorg),
   CONSTRAINT cf_orgscategories_idoforg FOREIGN KEY (idoforg)
-  REFERENCES cf_orgs (idoforg)
-);
-
-
-/* Таблица связка между CategoryOrg и CategoryDiscountRule */
-CREATE TABLE cf_catorgcatdiscrule
-(
-  idofcatorgcatdiscrule bigserial NOT NULL,
-  idofcategoryorg bigint,
-  idofcategorydiscount bigint,
-  CONSTRAINT cf_catorgcatdiscrule_categorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount),
-  CONSTRAINT cf_catorgcatdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
-  REFERENCES cf_categoryorg (idofcategoryorg)
+  REFERENCES Cf_Orgs (idoforg)
 );
 
 /* Таблица связка между DiscountRules и CategoryDiscountRule */
-CREATE TABLE cf_discountrulescategorydiscount
+CREATE TABLE CF_DiscountRules_CategoryDiscounts
 (
   idofdrcd bigserial NOT NULL,
   idofrule bigint NOT NULL,
   idofcategorydiscount bigint NOT NULL,
   CONSTRAINT cf_discountrulescategorydiscount_pk PRIMARY KEY (idofrule , idofcategorydiscount ),
   CONSTRAINT cf_discountrulescategorydiscount_idofcategorydiscount FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount),
+  REFERENCES CF_CategoryDiscounts (idofcategorydiscount),
   CONSTRAINT cf_discountrulescategorydiscount_idofdiscountrules FOREIGN KEY (idofrule)
-  REFERENCES cf_discountrules (idofrule)
+  REFERENCES CF_DiscountRules (idofrule)
 );
+
+/* Таблица связка между CategoryOrg и DiscountRule */
+CREATE TABLE CF_DiscountRules_CategoryOrg
+(
+  idofcatorgdiscrule bigserial NOT NULL,
+  idofcategoryorg bigint,
+  idofrule bigint,
+  CONSTRAINT cf_catorgdiscrule_pk PRIMARY KEY (idofcatorgdiscrule),
+  CONSTRAINT cf_catorgdiscrule_categoryorg FOREIGN KEY (idofcategoryorg)
+  REFERENCES CF_CategoryOrg (idofcategoryorg),
+  CONSTRAINT cf_catorgdiscrule_discountrule FOREIGN KEY (idofrule)
+  REFERENCES CF_DiscountRules (idofrule)
+);
+
+
+/* Таблица связка между Client и CategoryDiscountRule */
+CREATE TABLE CF_Clients_CategoryDiscounts
+(
+  idofclienscategorydiscount bigserial NOT NULL,
+  idofclient bigint,
+  idofcategorydiscount bigint,
+  CONSTRAINT cf_clienscategorydiscount_pk PRIMARY KEY (idofclienscategorydiscount ),
+  CONSTRAINT cf_clienscategorydiscount_categorydiscount FOREIGN KEY (idofcategorydiscount)
+  REFERENCES CF_CategoryDiscounts (idofcategorydiscount),
+  CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idofclient)
+  REFERENCES CF_Clients (idofclient)
+);
+

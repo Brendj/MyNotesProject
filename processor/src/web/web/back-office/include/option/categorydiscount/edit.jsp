@@ -1,0 +1,40 @@
+<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%--
+  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+  --%>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
+<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
+<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
+<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditCategory())
+      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+
+<%-- Панель редактирования категории --%>
+
+<h:panelGrid id="categoryEditPanel" binding="#{categoryDiscountEditPage.pageComponent}"
+             styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
+    <h:inputText value="#{categoryDiscountEditPage.categoryName}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="Описание" styleClass="output-text" />
+    <h:inputText value="#{categoryDiscountEditPage.description}" maxlength="32" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Используется в правилах" styleClass="output-text" />
+    <h:panelGroup>
+        <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{categoryDiscountEditPage.filter}}" />
+    </h:panelGroup>
+
+</h:panelGrid>
+<h:panelGrid columns="4" styleClass="borderless-grid">
+    <a4j:commandButton value="Сохранить" action="#{categoryDiscountEditPage.save}" reRender="mainMenu, workspaceTogglePanel"
+                       styleClass="command-button" />
+    <a4j:commandButton value="Восстановить" action="#{categoryDiscountEditPage.reload}"
+                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+</h:panelGrid>
+
+<h:panelGrid styleClass="borderless-grid">
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+</h:panelGrid>

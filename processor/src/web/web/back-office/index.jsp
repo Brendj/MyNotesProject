@@ -45,19 +45,19 @@
     </f:subview>
 
     <f:subview id="categorySelectSubView">
-        <c:import url="include/client/category/select.jsp" />
+        <c:import url="include/option/categorydiscount/select.jsp" />
     </f:subview>
 
     <f:subview id="categoryListSelectSubView">
-        <c:import url="include/client/category/select_list.jsp" />
+        <c:import url="include/option/categorydiscount/select_list.jsp" />
     </f:subview>
 
     <f:subview id="categoryOrgListSelectSubView">
-        <c:import url="include/option/orgcategories/select_list.jsp" />
+        <c:import url="include/option/categoryorg/select_list.jsp" />
     </f:subview>
 
     <f:subview id="ruleListSelectSubView">
-        <c:import url="include/client/rule/select_list.jsp" />
+        <c:import url="include/option/discountrule/select_list.jsp" />
     </f:subview>
 
     <f:subview id="ccAccountDeleteSubView">
@@ -89,11 +89,11 @@
     </f:subview>
 
     <f:subview id="categoryDeleteSubView">
-        <c:import url="include/client/category/confirm_delete.jsp" />
+        <c:import url="include/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="ruleDeleteSubView">
-        <c:import url="include/client/rule/confirm_delete.jsp" />
+        <c:import url="include/option/discountrule/confirm_delete.jsp" />
     </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">

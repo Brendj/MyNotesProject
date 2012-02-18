@@ -38,4 +38,10 @@ public class DAOService {
         if (cl==null) return null;
         return cl.getContractId();
     }
+
+    @Transactional
+    public void deleteEntity(Object entity) {
+        entity = em.merge(entity);
+        if (entity!=null) em.remove(entity);
+    }
 }

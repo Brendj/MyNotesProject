@@ -436,15 +436,24 @@
 
     </rich:panelMenuGroup>
 
-    <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организациий" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
+    <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организаций" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
                          rendered="true" >
         <%--
         <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
             --%>
+
         <rich:panelMenuItem id="showCategoryOrgsListMenuItem" binding="#{categoryOrgListPage.mainMenuComponent}"
                             label="Список" action="#{categoryOrgListPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{mainPage.categoryOrgCreatePage.mainMenuComponent}"
-                            label="Регистрация" action="#{mainPage.showCategoryOrgCreatePage}" reRender="workspaceForm"/>
+
+        <rich:panelMenuGroup id="selectedCategoryOrgsGroupMenu" label="#{categoryOrgEditPage.entityName}"
+                             rendered="false">
+            <rich:panelMenuItem id="editCategoryOrgsMenuItem" binding="#{categoryOrgEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{categoryOrgEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}"
+                            label="Регистрация" action="#{categoryOrgCreatePage.show}" reRender="workspaceForm"/>
 
         <%--
   <rich:panelMenuGroup id="selectedCategoryOrgGroupMenu" label="#{selectedCategoryOrgGroupPage.categoryName}"
@@ -460,30 +469,27 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="categoryGroupMenu" binding="#{mainPage.categoryGroupPage.mainMenuComponent}"
-                         label="Категории скидок"
+                         label="Категории клиентов"
                          rendered="#{mainPage.eligibleToViewCategory}">
         <a4j:support event="onclick" action="#{mainPage.showCategoryGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="categoryListMenuItem" label="Список"
-                            binding="#{mainPage.categoryListPage.mainMenuComponent}"
-                            action="#{mainPage.showCategoryListPage}" reRender="workspaceForm" />
+                            action="#{categoryDiscountListPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuGroup id="selectedCategoryGroupMenu" label="#{mainPage.selectedCategoryGroupPage.name}"
-                             binding="#{mainPage.selectedCategoryGroupPage.mainMenuComponent}" rendered="false">
-            <a4j:support event="onclick" action="#{mainPage.showSelectedCategoryGroupPage}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="editCategoryMenuItem" binding="#{mainPage.categoryEditPage.mainMenuComponent}"
-                                label="Редактирование" action="#{mainPage.showCategoryEditPage}" reRender="workspaceForm" />
+        <rich:panelMenuGroup id="selectedCategoryGroupMenu" label="#{categoryDiscountEditPage.entityName}"
+                            rendered="false">
+            <rich:panelMenuItem id="editCategoryMenuItem" binding="#{categoryDiscountEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{categoryDiscountEditPage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
 
-        <rich:panelMenuItem id="categoryCreateMenuItem" binding="#{mainPage.categoryCreatePage.mainMenuComponent}"
-                            label="Регистрация" action="#{mainPage.showCategoryCreatePage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="categoryCreateMenuItem"
+                            label="Регистрация" action="#{categoryDiscountCreatePage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="ruleGroupMenu" binding="#{mainPage.ruleGroupPage.mainMenuComponent}"
-                         label="Скидки по категориям"
+                         label="Правила соц. скидок"
                          rendered="#{mainPage.eligibleToViewRule}">
         <a4j:support event="onclick" action="#{mainPage.showRuleGroupPage}" reRender="workspaceForm" />
 

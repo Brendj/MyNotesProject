@@ -660,7 +660,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static RuleProcessor createRuleHandler(Properties properties, SessionFactory sessionFactory,
             AutoReportPostman autoReportPostman, EventNotificationPostman eventNotificationPostman) throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating rule processor.");
+            logger.debug("Creating discountrule processor.");
         }
         RuleProcessor ruleProcessor = new RuleProcessor(sessionFactory, autoReportPostman, eventNotificationPostman);
         ruleProcessor.loadAutoReportRules();

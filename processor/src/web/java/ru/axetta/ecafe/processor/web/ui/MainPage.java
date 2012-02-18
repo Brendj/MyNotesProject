@@ -18,15 +18,14 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
-import ru.axetta.ecafe.processor.web.ui.client.category.*;
-import ru.axetta.ecafe.processor.web.ui.client.rule.*;
+import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
+import ru.axetta.ecafe.processor.web.ui.option.discountrule.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
-import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgCreatePage;
-import ru.axetta.ecafe.processor.web.ui.org.category.CategoryOrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
@@ -39,10 +38,8 @@ import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -167,7 +164,7 @@ public class MainPage {
     private final ReportJobEditPage reportJobEditPage = new ReportJobEditPage();
     private final ReportJobCreatePage reportJobCreatePage = new ReportJobCreatePage();
 
-    // Report rule manipulation
+    // Report discountrule manipulation
     private final BasicWorkspacePage reportRuleGroupPage = new BasicWorkspacePage();
     private final ReportRuleListPage reportRuleListPage = new ReportRuleListPage();
     private Long selectedIdOfReportRule;
@@ -242,13 +239,7 @@ public class MainPage {
 
     // Category manipulation (baybikov 05.12.2011)
     private final BasicWorkspacePage categoryGroupPage = new BasicWorkspacePage();
-    private final CategoryListPage categoryListPage = new CategoryListPage();
-    private Long selectedIdOfCategory;
-    private final CategoryDeletePage categoryDeletePage = new CategoryDeletePage();
-    private final CategoryCreatePage categoryCreatePage = new CategoryCreatePage();
-    private final SelectedCategoryGroupPage selectedCategoryGroupPage = new SelectedCategoryGroupPage();
-    private final CategoryEditPage categoryEditPage = new CategoryEditPage();
-    private final CategoryOrgCreatePage categoryOrgCreatePage = new CategoryOrgCreatePage();
+    private final ConfirmDeletePage confirmDeletePage = new ConfirmDeletePage();
 
     // Rule manipulation (baybikov 06.12.2011)
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
@@ -3246,7 +3237,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = reportRuleListPage;
         } catch (Exception e) {
-            logger.error("Failed to fill report rule list page", e);
+            logger.error("Failed to fill report discountrule list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы списка правил обработки отчетов", null));
         } finally {
@@ -3275,7 +3266,7 @@ public class MainPage {
                 selectedReportRuleGroupPage.hideMenuGroup();
             }
         } catch (Exception e) {
-            logger.error("Failed to remove report rule", e);
+            logger.error("Failed to remove report discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки отчетов",
                             null));
@@ -3321,7 +3312,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = selectedReportRuleGroupPage;
         } catch (Exception e) {
-            logger.error("Failed to fill selected report rule group page", e);
+            logger.error("Failed to fill selected report discountrule group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке общей страницы правила обработки отчетов", null));
         } finally {
@@ -3353,7 +3344,7 @@ public class MainPage {
             selectedReportRuleGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = reportRuleViewPage;
         } catch (Exception e) {
-            logger.error("Failed to fill report rule view page", e);
+            logger.error("Failed to fill report discountrule view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы просмотра правила обработки отчетов", null));
         } finally {
@@ -3385,7 +3376,7 @@ public class MainPage {
             selectedReportRuleGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = reportRuleEditPage;
         } catch (Exception e) {
-            logger.error("Failed to fill report rule edit page", e);
+            logger.error("Failed to fill report discountrule edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы редактирования правила обработки отчетов", null));
         } finally {
@@ -3414,7 +3405,7 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило обработки отчетов обновлено успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to update report rule", e);
+            logger.error("Failed to update report discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила обработки отчетов",
                             null));
@@ -3444,7 +3435,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = reportRuleCreatePage;
         } catch (Exception e) {
-            logger.error("Failed to show report rule create page", e);
+            logger.error("Failed to show report discountrule create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы создания правила обработки отчетов", null));
         } finally {
@@ -3472,7 +3463,7 @@ public class MainPage {
             facesContext
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило создано успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to create report rule", e);
+            logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила", null));
         } finally {
@@ -3679,7 +3670,7 @@ public class MainPage {
             facesContext
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило обновлено успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to update report rule", e);
+            logger.error("Failed to update report discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила", null));
         } finally {
@@ -3736,7 +3727,7 @@ public class MainPage {
             facesContext
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило создано успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to create report rule", e);
+            logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила", null));
         } finally {
@@ -5560,325 +5551,11 @@ public class MainPage {
     }
 
     // baybikov (05.12.2011)
-    public CategoryListPage getCategoryListPage() {
-        return categoryListPage;
+    public ConfirmDeletePage getConfirmDeletePage() {
+        return confirmDeletePage;
     }
 
-    // baybikov (05.12.2011)
-    public Object showCategoryListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = categoryListPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill category list page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы категорий", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (05.12.2011)
-    public CategoryCreatePage getCategoryCreatePage() {
-        return categoryCreatePage;
-    }
-
-    // baybikov (05.12.2011)
-    public Object showCategoryCreatePage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryCreatePage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = categoryCreatePage;
-        } catch (Exception e) {
-            logger.error("Failed to show category create page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы категорий", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public CategoryOrgCreatePage getCategoryOrgCreatePage(){
-        return categoryOrgCreatePage;
-    }
-
-    public Object showCategoryOrgCreatePage(){
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryOrgCreatePage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = categoryOrgCreatePage;
-        } catch (Exception e) {
-            logger.error("Failed to show category org create page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "РћС€РёР±РєР° РїСЂРё РїРѕРґРіРѕС‚РѕРІРєРµ СЃС‚СЂР°РЅРёС†С‹ РєР°С‚РµРіРѕСЂРёР№ РѕСЂРіР°РЅРёР·Р°С†РёР№", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object createCategoryOrg(){
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryOrgCreatePage.createCategory(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            /*facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Ошибка при регистрации категории", null));*/
-        } catch (Exception e) {
-            logger.error("Failed to create category org", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории", null));
-
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
-        return null;
-    }
-
-    public Object saveCategoryOrg(){
-       FacesContext facesContext = FacesContext.getCurrentInstance();
-       RuntimeContext runtimeContext = null;
-       Session persistenceSession = null;
-       Transaction persistenceTransaction = null;
-       try {
-           runtimeContext = RuntimeContext.getInstance();
-           persistenceSession = runtimeContext.createPersistenceSession();
-           persistenceTransaction = persistenceSession.beginTransaction();
-           categoryCreatePage.createCategory(persistenceSession);
-           persistenceTransaction.commit();
-           persistenceTransaction = null;
-           currentWorkspacePage = categoryCreatePage;
-       } catch (Exception e) {
-           logger.error("Failed to show category create page", e);
-           facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                   "Ошибка при регистрации категории", null));
-       } finally {
-           HibernateUtils.rollback(persistenceTransaction, logger);
-           HibernateUtils.close(persistenceSession, logger);
-
-       }
-       updateSelectedMainMenu();
-       return null;
-    }
-
-    // baybikov (05.12.2011)
-    public Object createCategory() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryCreatePage.createCategory(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            /* Даное сообщение выводится в классе CategoryCreatePage */
-            /*facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Категория зарегистрирована успешно", null));*/
-        } catch (Exception e) {
-            logger.error("Failed to create category", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации категории", null));
-
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
-
-    // baybikov (05.12.2011)
-    public CategoryDeletePage getCategoryDeletePage() {
-        return categoryDeletePage;
-    }
-
-    // baybikov (05.12.2011)
-    public Long getSelectedIdOfCategory() {
-        return selectedIdOfCategory;
-    }
-
-    // baybikov (05.12.2011)
-    public void setSelectedIdOfCategory(Long selectedIdOfCategory) {
-        this.selectedIdOfCategory = selectedIdOfCategory;
-    }
-
-    // baybikov (05.12.2011)
-    public Object removeCategory() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryDeletePage.removeCategory(persistenceSession, selectedIdOfCategory);
-            categoryListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (ConstraintViolationException vce){
-            logger.error("Failed to remove category", vce);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории: имеются зарегестрированные Правила скидок или Клиенты привязанные к категории", null));
-        } catch (ObjectDeletedException ode){
-            logger.error("Failed to remove category", ode);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории: имеются зарегестрированные Правила скидок или Клиенты привязанные к категории", null));
-        } catch (Exception e) {
-            logger.error("Failed to remove category", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении категории ", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
-
-    // baybikov (05.12.2011)
-    public Object showCategoryEditPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            selectedCategoryGroupPage.fill(persistenceSession, selectedIdOfCategory);
-            categoryEditPage.fill(persistenceSession, selectedIdOfCategory);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            selectedCategoryGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = categoryEditPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill category edit page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования категорий", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (05.12.2011)
-    public CategoryEditPage getCategoryEditPage() {
-        return categoryEditPage;
-    }
-
-    // baybikov (05.12.2011)
-    public Object updateCategory() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            categoryEditPage.updateCategory(persistenceSession, selectedIdOfCategory);
-            selectedCategoryGroupPage.fill(persistenceSession, selectedIdOfCategory);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные категории обновлены успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to update category", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных категории", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
-
-    // baybikov (05.12.2011)
-    public SelectedCategoryGroupPage getSelectedCategoryGroupPage() {
-        return selectedCategoryGroupPage;
-    }
-
-    public Object showSelectedCategoryGroupPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            selectedCategoryGroupPage.fill(persistenceSession, selectedIdOfCategory);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = selectedCategoryGroupPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill selected category group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы категорий",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-      public RuleListSelectPage getRuleListSelectPage() {
+    public RuleListSelectPage getRuleListSelectPage() {
         return ruleListSelectPage;
     }
 
@@ -5900,7 +5577,7 @@ public class MainPage {
                 ruleListSelectPage.pushCompleteHandlerList((RuleListSelectPage.CompleteHandlerList) currentTopMostPage);
                 modalPages.push(ruleListSelectPage);
             } catch (Exception e) {
-                logger.error("Failed to complete  rule selection", e);
+                logger.error("Failed to complete  discountrule selection", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
             } finally {
@@ -5926,7 +5603,7 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Failed to complete  rule selection", e);
+            logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
         } finally {
@@ -5947,7 +5624,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  rule selection", e);
+            logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
         }
@@ -5964,7 +5641,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  rule selection", e);
+            logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
         }
@@ -5993,7 +5670,7 @@ public class MainPage {
                 categoryOrgListSelectPage.pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
                 modalPages.push(categoryOrgListSelectPage);
             } catch (Exception e) {
-                logger.error("Failed to complete  category org selection", e);
+                logger.error("Failed to complete  categorydiscount org selection", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
             } finally {
@@ -6018,7 +5695,7 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Failed to complete category org selection", e);
+            logger.error("Failed to complete categorydiscount org selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
         } finally {
@@ -6039,7 +5716,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  category org selection", e);
+            logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
         }
@@ -6056,7 +5733,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  category org selection", e);
+            logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
         }
@@ -6086,7 +5763,7 @@ public class MainPage {
                 categoryListSelectPage.pushCompleteHandlerList((CategoryListSelectPage.CompleteHandlerList) currentTopMostPage);
                 modalPages.push(categoryListSelectPage);
             } catch (Exception e) {
-                logger.error("Failed to complete  category selection", e);
+                logger.error("Failed to complete  categorydiscount selection", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
             } finally {
@@ -6112,7 +5789,7 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Failed to complete  category selection", e);
+            logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
         } finally {
@@ -6133,7 +5810,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  category selection", e);
+            logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
         }
@@ -6150,7 +5827,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete  category selection", e);
+            logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
         }
@@ -6183,7 +5860,7 @@ public class MainPage {
                     modalPages.push(categorySelectPage);
                 }
             } catch (Exception e) {
-                logger.error("Failed to fill category selection page", e);
+                logger.error("Failed to fill categorydiscount selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при подготовке страницы выбора категории", null));
             } finally {
@@ -6214,7 +5891,7 @@ public class MainPage {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to complete category selection", e);
+            logger.error("Failed to complete categorydiscount selection", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
         } finally {
@@ -6260,7 +5937,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = ruleListPage;
         } catch (Exception e) {
-            logger.error("Failed to fill rule list page", e);
+            logger.error("Failed to fill discountrule list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы правил", null));
         } finally {
@@ -6292,7 +5969,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = ruleCreatePage;
         } catch (Exception e) {
-            logger.error("Failed to show rule create page", e);
+            logger.error("Failed to show discountrule create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы правил", null));
         } finally {
@@ -6320,7 +5997,7 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило зарегистрировано успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to create rule", e);
+            logger.error("Failed to create discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации правила", null));
         } finally {
@@ -6361,7 +6038,7 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Failed to remove rule", e);
+            logger.error("Failed to remove discountrule", e);
             facesContext
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила", null));
         } finally {
@@ -6389,7 +6066,7 @@ public class MainPage {
             selectedRuleGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = ruleEditPage;
         } catch (Exception e) {
-            logger.error("Failed to fill rule edit page", e);
+            logger.error("Failed to fill discountrule edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы редактирования правил", null));
         } finally {
@@ -6423,7 +6100,7 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные правила обновлены успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to update rule", e);
+            logger.error("Failed to update discountrule", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных правила", null));
         } finally {
@@ -6453,7 +6130,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = selectedRuleGroupPage;
         } catch (Exception e) {
-            logger.error("Failed to fill selected rule group page", e);
+            logger.error("Failed to fill selected discountrule group page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы правил",
                             null));
