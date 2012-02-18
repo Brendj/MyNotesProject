@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="org.springframework.spring">
+  <resources>
+	<resource-root path="cglib-nodep-2.2.jar"/>
+	<resource-root path="com.springsource.org.aopalliance-1.0.0.jar"/>
+	<resource-root path="org.springframework.aop-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.context-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.context.support-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.core-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.jdbc-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.orm-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.oxm-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.transaction-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.web-3.0.5.RELEASE.jar"/>
+	<resource-root path="org.springframework.web.servlet-3.0.5.RELEASE.jar"/>
+  </resources>
+    <dependencies>
+            <module name="org.apache.commons.logging"/>
+            <module name="org.slf4j"/>
+            <module name="javax.servlet.api"/>
+            <module name="javax.faces.api" slot="1.2" />
+            <module name="com.sun.jsf-impl" slot="1.2" />
+	<module name="org.jboss.vfs"/>
+	<module name="javax.persistence.api"/>
+	<module name="javax.xml.bind.api"/>
+        <module name="org.apache.cxf"/>
+
+        <module name="javax.api"/>
+        <module name="javax.jms.api"/>
+        <module name="javax.annotation.api"/>
+        <module name="org.apache.commons.logging"/>
+    </dependencies>
+</module>
