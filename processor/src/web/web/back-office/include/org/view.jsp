@@ -40,7 +40,7 @@
     если организация не пренадлежит к категории выводится соответствующее сообщение --%>
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid">
-        <h:outputText value="Организация не пренадлежит ни к одной категории" escape="true" styleClass="output-text" rendered="#{empty mainPage.orgViewPage.categoryOrg}"/>
+        <h:outputText value="Организация не принадлежит ни к одной категории" escape="true" styleClass="output-text" rendered="#{empty mainPage.orgViewPage.categoryOrg}"/>
         <rich:dataTable value="#{mainPage.orgViewPage.categoryOrg}" var="category"
                         rendered="#{not empty mainPage.orgViewPage.categoryOrg}">
            <rich:column>

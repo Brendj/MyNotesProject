@@ -107,7 +107,7 @@
             </f:facet>
         </rich:dataTable>
 
-        <h:commandButton value="Выгрузить в SCV" action="#{mainPage.showClientOrgCSVList}"
+        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientOrgCSVList}"
                          styleClass="command-button" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

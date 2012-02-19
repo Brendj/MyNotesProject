@@ -313,12 +313,14 @@
 
             Map<Integer, String> directionMap = new HashMap<Integer, String>();
 
-            directionMap.put(0, "вход");
-            directionMap.put(1, "выход");
-            directionMap.put(2, "проход запрещен");
-            directionMap.put(3, "взлом турникета");
-            directionMap.put(4, "событие без прохода");
-            directionMap.put(5, "отказ от прохода");
+            directionMap.put(EnterEvent.ENTRY, "вход");
+            directionMap.put(EnterEvent.EXIT, "выход");
+            directionMap.put(EnterEvent.PASSAGE_IS_FORBIDDEN, "проход запрещен");
+            directionMap.put(EnterEvent.TURNSTILE_IS_BROKEN, "взлом турникета");
+            directionMap.put(EnterEvent.EVENT_WITHOUT_PASSAGE, "событие без прохода");
+            directionMap.put(EnterEvent.PASSAGE_RUFUSAL, "отказ от прохода");
+            directionMap.put(EnterEvent.RE_ENTRY, "повторный вход");
+            directionMap.put(EnterEvent.RE_EXIT, "повторный выход");
 
             String[] daysOfWeek = new String[] {"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"};
 

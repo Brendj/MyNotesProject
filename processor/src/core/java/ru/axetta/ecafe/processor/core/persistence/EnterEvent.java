@@ -39,6 +39,8 @@ public class EnterEvent {
     public static final int TURNSTILE_IS_BROKEN = 3; // взлом турникета
     public static final int EVENT_WITHOUT_PASSAGE = 4; // событие без прохода
     public static final int PASSAGE_RUFUSAL = 5; // отказ от прохода
+    public static final int RE_ENTRY = 6; // повторный вход
+    public static final int RE_EXIT = 7; // повторный выход
 
 
     public EnterEvent() {

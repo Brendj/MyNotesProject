@@ -100,7 +100,7 @@
         </f:facet>
     </rich:dataTable>
 
-    <h:commandButton value="Выгрузить в SCV" action="#{mainPage.showClientLoadResultCSVList}"
+    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientLoadResultCSVList}"
                      styleClass="command-button" />
 
 </h:panelGrid>

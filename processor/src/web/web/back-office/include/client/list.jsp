@@ -148,5 +148,5 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-    <h:commandButton value="Выгрузить в SCV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
+    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </h:panelGrid>

@@ -1406,13 +1406,15 @@ public class Processor implements SyncProcessor,
                     if (notifyBySMSAboutEnterEvent &&
                         isDateToday(e.getEvtDateTime()) &&
                         e.getIdOfClient() != null &&
-                        (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT))
+                        (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
+                        e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT))
                         sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
 
 
                     /// Формирование журнала транзакции
                     if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) &&
-                            (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT)
+                            (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
+                            e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)
                              && e.getIdOfCard()!=null) {
                         Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
                         if (card==null) {
@@ -1425,8 +1427,8 @@ public class Processor implements SyncProcessor,
                             Org org = (Org) orgCriteria.uniqueResult();
                             String transCode;
                             switch (e.getPassDirection()){
-                                case EnterEvent.ENTRY: transCode="IN"; break;
-                                case EnterEvent.EXIT: transCode="OUT";  break;
+                                case EnterEvent.ENTRY: case EnterEvent.RE_ENTRY: transCode="IN"; break;
+                                case EnterEvent.EXIT: case EnterEvent.RE_EXIT: transCode="OUT";  break;
                                 default: transCode=null;
                             }
                             if (transCode!=null) {
@@ -2430,8 +2432,12 @@ public class Processor implements SyncProcessor,
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY)
             eventName = "Вход в школу";
-        if (passDirection == EnterEvent.EXIT)
+        else if (passDirection == EnterEvent.EXIT)
             eventName = "Выход из школы";
+        else if (passDirection == EnterEvent.RE_ENTRY)
+            eventName = "Повторный вход в школу";
+        else if (passDirection == EnterEvent.RE_EXIT)
+            eventName = "Повторный выход из школы";
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(eventDate);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);

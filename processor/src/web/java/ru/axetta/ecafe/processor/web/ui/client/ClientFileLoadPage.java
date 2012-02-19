@@ -275,11 +275,14 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
                 limit = CurrencyStringUtils.rublesToCopecks(tokens[19]);
             }
+            String password = tokens[1];
+            if (password.equals("X")) password = ""+contractId;
 
-            Client client = new Client(organization, person, contractPerson, 0, Boolean.parseBoolean(tokens[16]),
-                    Boolean.parseBoolean(tokens[15]), contractId, dateFormat.parse(tokens[18]),
-                    Integer.parseInt(tokens[1]), tokens[0], Integer.parseInt(tokens[14]), clientRegistryVersion, limit,
+            Client client = new Client(organization, person, contractPerson, 0, Integer.parseInt(tokens[18]) != 0,
+                    Integer.parseInt(tokens[17]) != 0, contractId, dateFormat.parse(tokens[3]),
+                    Integer.parseInt(tokens[2]), password, Integer.parseInt(tokens[16]), clientRegistryVersion, limit,
                     20000, "");
+
             client.setAddress(tokens[12]);
             client.setPhone(tokens[13]);
             client.setMobile(tokens[14]);

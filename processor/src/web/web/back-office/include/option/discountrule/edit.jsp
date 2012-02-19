@@ -34,10 +34,10 @@
         </h:panelGroup>
 
         <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
-        <h:inputText value="#{mainPage.ruleEditPage.description}" maxlength="32" styleClass="input-text" />
+        <h:inputText value="#{mainPage.ruleEditPage.description}" maxlength="99" size="40" styleClass="input-text" />
         <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field" />
         <h:inputText value="#{mainPage.ruleEditPage.priority}" maxlength="11" styleClass="input-text" />
-        <h:outputText escape="true" value="Тип условия" styleClass="output-text" />
+        <h:outputText escape="true" value="Объединение комплексов" styleClass="output-text" />
         <h:selectOneListbox value="#{mainPage.ruleEditPage.operationor}">
             <f:selectItem itemLabel="И" itemValue="false"/>
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
