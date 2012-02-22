@@ -10,6 +10,9 @@
         <webroots>
           <root url="file://$MODULE_DIR$/../../src/web/web" relative="/" />
         </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/../../src/web/java" />
+        </sourceRoots>
       </configuration>
       <facet type="jsf" name="JSF">
         <configuration />
@@ -41,6 +44,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../src/web">
       <sourceFolder url="file://$MODULE_DIR$/../../src/web/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../src/web/test" isTestSource="true" />
     </content>
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -298,6 +302,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="javamelody-monitoring" level="project" />
+    <orderEntry type="library" scope="TEST" name="junit" level="project" />
   </component>
 </module>
 

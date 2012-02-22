@@ -23,4 +23,15 @@
 
     </target>
 
+
+    <target name="gen_paymentws" description="">
+        <wsimport
+                package="ru.axetta.soap.test"
+            keep="true"
+            destdir="../../src/web/test"
+            extension="true"
+            wsdl="http://localhost:8080/processor/soap/payment?wsdl">
+        </wsimport>
+
+    </target>
 </project>
