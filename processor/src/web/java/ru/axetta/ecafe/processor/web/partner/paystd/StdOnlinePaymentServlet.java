@@ -21,15 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kolpakov
- * Date: 02.04.11
- * Time: 15:54
- * To change this template use File | Settings | File Templates.
- */
 public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
     private static final Logger logger = LoggerFactory.getLogger(StdOnlinePaymentServlet.class);
+    public static final String ATTR_PAY_RESPONSE = "payResponse";
 
     @Override
     protected Logger getLogger() {
@@ -43,7 +37,7 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
 
     @Override
     protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest, OnlinePaymentRequestParser requestParser)  throws Exception {
-        String partnerName = httpRequest.getParameter("PID");
+        String partnerName = requestParser.getRequestParams().getParam("PID");
         if (partnerName==null) throw new Exception("Parameter missing: PID");
         StdPayConfig.LinkConfig linkConfig =  runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
         if (linkConfig==null) throw new Exception("Invalid PID");

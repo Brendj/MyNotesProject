@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -15,7 +16,11 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 /**
@@ -25,6 +30,7 @@ import java.util.*;
  * Time: 10:07
  * To change this template use File | Settings | File Templates.
  */
+@Component
 public class RuleCreatePage extends BasicWorkspacePage
         implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
 
@@ -240,7 +246,8 @@ public class RuleCreatePage extends BasicWorkspacePage
         return "option/discountrule/create";
     }
 
-    public void fill(Session session) throws Exception {
+    @Override
+    public void onShow() throws Exception {
         this.description = "";
         this.complex0 = false;
         this.complex1 = false;
@@ -259,7 +266,11 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.filterOrg="Не выбрано";
     }
 
-    public void createRule(Session session) throws Exception {
+    @PersistenceContext
+    EntityManager em;
+
+    @Transactional
+    public void createRule() throws Exception {
 //        CategoryDiscount categorydiscount = (CategoryDiscount) session.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
         DiscountRule discountRule = new DiscountRule();
         discountRule.setDescription(description);
@@ -278,21 +289,20 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
-            Criteria categoryCriteria = session.createCriteria(CategoryDiscount.class);
-            categoryCriteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
-            for (Object object: categoryCriteria.list()){
+            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
+            for (Object object: categoryList){
                  this.categoryDiscountSet.add((CategoryDiscount) object);
             }
             discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
         }
         if (!this.idOfCategoryOrgList.isEmpty()) {
-            Criteria categoryOrgCrioteria = session.createCriteria(CategoryOrg.class);
-            categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
-            for (Object object: categoryOrgCrioteria.list()){
+            List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+            for (Object object: categoryOrgList){
                 discountRule.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
 
-        session.save(discountRule);
+        em.persist(discountRule);
+        printMessage("Правило зарегистрировано успешно");
     }
 }

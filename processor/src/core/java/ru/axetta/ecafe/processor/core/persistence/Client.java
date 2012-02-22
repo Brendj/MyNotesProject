@@ -644,4 +644,12 @@ public class Client {
             return "Ученик";
         }
     }
+
+    public static String checkAndConvertMobile(String mobilePhone) {
+        mobilePhone=mobilePhone.replaceAll("[+ -()]", "");
+        if (mobilePhone.startsWith("8")) mobilePhone="7"+mobilePhone.substring(1);
+        if (mobilePhone.length()==10) mobilePhone="7"+mobilePhone;
+        else if (mobilePhone.length()!=11) return null;
+        return mobilePhone;
+    }
 }

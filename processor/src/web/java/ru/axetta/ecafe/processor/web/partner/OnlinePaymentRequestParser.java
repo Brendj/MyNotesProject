@@ -118,6 +118,12 @@ public abstract class OnlinePaymentRequestParser {
     public static final String PARAM_VALUE_DELIMITER = "=";
     public static final String PARAM_DELIMITER = "\r\n";
 
+    ParseResult requestParams;
+
+    public ParseResult getRequestParams() {
+        return requestParams;
+    }
+
     public ParseResult parse(HttpServletRequest httpRequest) throws Exception {
         final String requestText = httpRequest.getParameter(REQUEST_PARAM_NAME);
         if (logger.isDebugEnabled()) {
@@ -127,16 +133,33 @@ public abstract class OnlinePaymentRequestParser {
         return new ParseResult(params);
     }
 
+    public abstract ParseResult parseRequest(HttpServletRequest httpRequest) throws Exception;
+    public void setRequestParams(HttpServletRequest httpRequest) throws Exception {
+        requestParams = parseRequest(httpRequest);
+    }
+    public boolean checkRequestSignature(HttpServletRequest httpRequest) throws Exception {
+        return true;
+    }
+
     public ParseResult parseGetParams(HttpServletRequest httpRequest) throws Exception {
-        prepareRequestForParsing(httpRequest.getQueryString());
+        prepareRequestForParsing(getQueryString(httpRequest));
         Map<String, String> params=new HashMap<String, String>();
-        for (Object param : httpRequest.getParameterMap().keySet()) {
-            params.put(((String)param).toLowerCase(), (String)httpRequest.getParameter((String)param));
-        }
+        params = parseUrlParameterString(getQueryString(httpRequest));
+        //for (Object param : httpRequest.getParameterMap().keySet()) {
+        //    params.put(((String)param).toLowerCase(), (String)httpRequest.getParameter((String)param));
+        //}
         if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Got request text: %s", httpRequest.getQueryString()));
+            logger.debug(String.format("Got request text: %s", getQueryString(httpRequest)));
         }
         return new ParseResult(params);
+    }
+
+    protected String getQueryString(HttpServletRequest httpRequest) {
+        if (httpRequest.getAttribute(OnlinePaymentServlet.ATTR_SOAP_REQUEST)!=null) {
+            return (String)httpRequest.getAttribute(OnlinePaymentServlet.ATTR_SOAP_REQUEST);
+        } else {
+            return httpRequest.getQueryString();
+        }
     }
 
 

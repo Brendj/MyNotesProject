@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
 import java.util.Date;
 
@@ -21,37 +22,52 @@ import java.util.Date;
 @WebService
 public interface ClientRoomController {
     @WebMethod (operationName = "getSummary")
-    ClientSummaryResult getSummary(Long contractId);
+    ClientSummaryResult getSummary(@WebParam(name="contractId") Long contractId);
     @WebMethod (operationName = "getSummaryBySan")
-    ClientSummaryResult getSummary(String san);
+    ClientSummaryResult getSummary(@WebParam(name="san") String san);
     @WebMethod (operationName = "getPurchaseList")
-    PurchaseListResult getPurchaseList(Long contractId, Date startDate, Date endDate);
+    PurchaseListResult getPurchaseList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPurchaseListBySan")
-    PurchaseListResult getPurchaseList(String san, Date startDate, Date endDate);
+    PurchaseListResult getPurchaseList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPaymentList")
-    PaymentListResult getPaymentList(Long contractId, Date startDate, Date endDate);
+    PaymentListResult getPaymentList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPaymentListBySan")
-    PaymentListResult getPaymentList(String san, Date startDate, Date endDate);
+    PaymentListResult getPaymentList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getMenuList")
-    MenuListResult getMenuList(Long contractId, Date startDate, Date endDate);
+    MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getMenuListBySan")
-    MenuListResult getMenuList(String san, Date startDate, Date endDate);
+    MenuListResult getMenuList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getCardList")
-    CardListResult getCardList(Long contractId);
+    CardListResult getCardList(@WebParam(name="contractId") Long contractId);
     @WebMethod (operationName = "getCardListBySan")
-    CardListResult getCardList(String san);
+    CardListResult getCardList(@WebParam(name="san") String san);
     @WebMethod (operationName = "getEnterEventList")
-    EnterEventListResult getEnterEventList(Long contractId, Date startDate, Date endDate);
+    EnterEventListResult getEnterEventList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getEnterEventListBySan")
-    EnterEventListResult getEnterEventList(String san, Date startDate, Date endDate);
+    EnterEventListResult getEnterEventList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getClientsByGuardSan")
-    ClientsData getClientsByGuardSan(String san);
+    ClientsData getClientsByGuardSan(@WebParam(name="san") String san);
     @WebMethod (operationName = "attachGuardSanBySan")
-    AttachGuardSanResult attachGuardSan(String san, String guardSan);
+    AttachGuardSanResult attachGuardSan(@WebParam(name="san") String san, @WebParam(name="guardSan") String guardSan);
     @WebMethod (operationName = "attachGuardSan")
-    AttachGuardSanResult attachGuardSan(Long contractId, String guardSan);
+    AttachGuardSanResult attachGuardSan(@WebParam(name="contractId") Long contractId, @WebParam(name="guardSan") String guardSan);
     @WebMethod (operationName = "detachGuardSanBySan")
-    DetachGuardSanResult detachGuardSan(String san, String guardSan);
+    DetachGuardSanResult detachGuardSan(@WebParam(name="san") String san, @WebParam(name="guardSan") String guardSan);
     @WebMethod (operationName = "detachGuardSan")
-    DetachGuardSanResult detachGuardSan(Long contractId, String guardSan);
+    DetachGuardSanResult detachGuardSan(@WebParam(name="contractId") Long contractId, @WebParam(name="guardSan") String guardSan);
+    @WebMethod
+    Long getContractIdByCardNo(@WebParam(name="cardId") String cardId);
+    @WebMethod
+    public ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name="guardSan") String guardSan);
+    @WebMethod
+    public Result enableNotificationBySMS(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
+    @WebMethod
+    public Result enableNotificationByEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
+    @WebMethod
+    public Result changeMobilePhone(@WebParam(name="contractId") Long contractId, @WebParam(name="mobilePhone") String mobilePhone);
+    @WebMethod
+    public Result changeEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="email") String email);
+    @WebMethod
+    public Result changeExpenditureLimit(@WebParam(name="contractId") Long contractId, @WebParam(name="limit") long limit);
+
 }

@@ -26,11 +26,16 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static String SIGNATURE_PARAM="&SIGNATURE=";
 
     @Override
-    protected String prepareRequestForParsing(String requestBody) throws Exception {
+    public ParseResult parseRequest(HttpServletRequest httpRequest) throws Exception {
+        return parseGetParams(httpRequest);
+    }
+
+    @Override
+    public boolean checkRequestSignature(HttpServletRequest httpRequest) throws Exception {
         if (linkConfig.checkSignature) {
-            if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
+            return checkSignature(getQueryString(httpRequest));
         }
-        return requestBody;
+        return true;
     }
 
     @Override
@@ -39,8 +44,8 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     }
 
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest) throws Exception {
-        ParseResult parseResult = parseGetParams(httpRequest);
         long clientId;
+        ParseResult parseResult = getRequestParams();
         if (parseResult.getParam("CARDID")!=null) {
             String cardId = parseResult.getReqParam("CARDID");
             Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getClientContractIdByCardId(cardId);

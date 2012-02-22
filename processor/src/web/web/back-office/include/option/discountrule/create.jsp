@@ -12,7 +12,7 @@
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель создания правила --%>
-<h:panelGrid id="ruleCreatePanel" binding="#{mainPage.ruleCreatePage.pageComponent}"
+<h:panelGrid id="ruleCreatePanel" binding="#{ruleCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
 
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
@@ -21,7 +21,7 @@
     <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                      oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                      styleClass="command-link" style="width: 25px;" />
-        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.ruleCreatePage.filter}}" />
+        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{ruleCreatePage.filter}}" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Категории организаций" styleClass="output-text" />
@@ -30,41 +30,41 @@
         <a4j:commandButton value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
-        <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true" value=" {#{mainPage.ruleCreatePage.filterOrg}}" />
+        <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true" value=" {#{ruleCreatePage.filterOrg}}" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
-    <h:inputText value="#{mainPage.ruleCreatePage.description}" maxlength="32" styleClass="input-text" />
+    <h:inputText value="#{ruleCreatePage.description}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field" />
-    <h:inputText value="#{mainPage.ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
+    <h:inputText value="#{ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Тип условия" styleClass="output-text" />
-    <h:selectOneListbox value="#{mainPage.ruleCreatePage.operationOr}">
+    <h:selectOneListbox value="#{ruleCreatePage.operationOr}">
         <f:selectItem itemLabel="И" itemValue="false"/>
         <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
     </h:selectOneListbox>
     <h:outputText escape="true" value="Комплекс 0" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex0}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex0}"/>
     <h:outputText escape="true" value="Комплекс 1" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex1}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex1}"/>
     <h:outputText escape="true" value="Комплекс 2" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex2}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex2}"/>
     <h:outputText escape="true" value="Комплекс 3" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex3}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex3}"/>
     <h:outputText escape="true" value="Комплекс 4" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex4}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex4}"/>
     <h:outputText escape="true" value="Комплекс 5" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex5}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex5}"/>
     <h:outputText escape="true" value="Комплекс 6" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex6}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex6}"/>
     <h:outputText escape="true" value="Комплекс 7" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex7}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex7}"/>
     <h:outputText escape="true" value="Комплекс 8" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex8}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex8}"/>
     <h:outputText escape="true" value="Комплекс 9" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.ruleCreatePage.complex9}"/>
+    <h:selectBooleanCheckbox value="#{ruleCreatePage.complex9}"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Зарегистрировать правило" action="#{mainPage.createRule}"
+    <a4j:commandButton value="Зарегистрировать правило" action="#{ruleCreatePage.createRule}"
                        reRender="ruleCreatePanel" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

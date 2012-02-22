@@ -435,6 +435,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public void updateClient(Session persistenceSession, Long idOfClient) throws Exception {
+        String mobile = Client.checkAndConvertMobile(this.mobile);
+        if (mobile==null) throw new Exception("Неверный формат мобильного телефона");
+
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
 
@@ -454,7 +457,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFlags(this.flags);
         client.setAddress(this.address);
         client.setPhone(this.phone);
-        client.setMobile(this.mobile);
+        client.setMobile(mobile);
         client.setEmail(this.email);
         client.setNotifyViaEmail(this.notifyViaEmail);
         client.setNotifyViaSMS(this.notifyViaSMS);
@@ -467,15 +470,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardSan(this.guardsan); /*
-        String clientCategories = "";
-        for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
-            if (categoryDiscount.getSelected())
-                clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
-        }
-        if (!clientCategories.isEmpty())
-            clientCategories = clientCategories.substring(0, clientCategories.length() - 1);
-        client.setCategoriesDiscounts(clientCategories);*/
+        client.setGuardSan(this.guardsan);
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
@@ -484,15 +479,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         /* категори скидок */
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         StringBuilder clientCategories = new StringBuilder();
-        Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
-        categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
-        for (Object object: categoryCrioteria.list()){
-            CategoryDiscount categoryDiscount = (CategoryDiscount) object;
-            clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
-            clientCategories.append(",");
-            this.categoryDiscountSet.add(categoryDiscount);
+        if (this.idOfCategoryList.size()!=0) {
+            Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
+            categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
+            for (Object object: categoryCrioteria.list()){
+                CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
+                clientCategories.append(",");
+                this.categoryDiscountSet.add(categoryDiscount);
+            }
         }
-        client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
+        client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
         persistenceSession.update(client);
         fill(client);

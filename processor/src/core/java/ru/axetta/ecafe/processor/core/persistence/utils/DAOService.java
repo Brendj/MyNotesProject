@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.List;
 
 @Component
@@ -43,5 +44,47 @@ public class DAOService {
     public void deleteEntity(Object entity) {
         entity = em.merge(entity);
         if (entity!=null) em.remove(entity);
+    }
+
+    @Transactional
+    public Long getContractIdByCardNo(long lCardId) throws Exception {
+        Client client = DAOUtils.findClientByCardNo(em, lCardId);
+        if (client!=null) return client.getContractId();
+        return null;
+    }
+
+    @Transactional
+    public boolean enableClientNotificationBySMS(Long contractId, boolean state) {
+        Query q = em.createQuery("update Client set notifyViaSMS=:notifyViaSMS");
+        q.setParameter("notifyViaSMS", state);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean enableClientNotificationByEmail(Long contractId, boolean state) {
+        Query q = em.createQuery("update Client set notifyViaEmail=:notifyViaEmail");
+        q.setParameter("notifyViaEmail", state);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientMobilePhone(Long contractId, String mobile) {
+        Query q = em.createQuery("update Client set mobile=:mobile");
+        q.setParameter("mobile", mobile);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientEmail(Long contractId, String email) {
+        Query q = em.createQuery("update Client set email=:email");
+        q.setParameter("email", email);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientExpenditureLimit(Long contractId, long limit) {
+        Query q = em.createQuery("update Client set expenditureLimit=:expenditureLimit");
+        q.setParameter("expenditureLimit", limit);
+        return q.executeUpdate()!=0;
     }
 }

@@ -37,13 +37,13 @@
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
 
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
-        <set name="categoriesDiscountsInternal" table="CF_DiscountRules_CategoryDiscounts" cascade="all" lazy="false">
+        <set name="categoriesDiscountsInternal" table="CF_DiscountRules_CategoryDiscounts">
             <key column="IdOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
         </set>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
-        <set name="categoryOrgsInternal" table="CF_DiscountRules_CategoryOrg" cascade="all" lazy="false">
+        <set name="categoryOrgsInternal" table="CF_DiscountRules_CategoryOrg">
             <key column="IdOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>

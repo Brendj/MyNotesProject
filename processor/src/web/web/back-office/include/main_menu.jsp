@@ -473,7 +473,7 @@
                          rendered="#{mainPage.eligibleToViewCategory}">
         <a4j:support event="onclick" action="#{mainPage.showCategoryGroupPage}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="categoryListMenuItem" label="Список"
+        <rich:panelMenuItem id="categoryListMenuItem" label="Список"  binding="#{categoryDiscountListPage.mainMenuComponent}"
                             action="#{categoryDiscountListPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="selectedCategoryGroupMenu" label="#{categoryDiscountEditPage.entityName}"
@@ -494,20 +494,20 @@
         <a4j:support event="onclick" action="#{mainPage.showRuleGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="ruleListMenuItem" label="Список"
-                            binding="#{mainPage.ruleListPage.mainMenuComponent}"
-                            action="#{mainPage.showRuleListPage}" reRender="workspaceForm" />
+                            binding="#{ruleListPage.mainMenuComponent}"
+                            action="#{ruleListPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{mainPage.selectedRuleGroupPage.name}"
-                             binding="#{mainPage.selectedRuleGroupPage.mainMenuComponent}" rendered="false">
+        <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{ruleEditPage.entityName}"
+                            rendered="false">
             <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
 
-            <rich:panelMenuItem id="editRuleMenuItem" binding="#{mainPage.ruleEditPage.mainMenuComponent}"
-                                label="Редактирование" action="#{mainPage.showRuleEditPage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="editRuleMenuItem" binding="#{ruleEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{ruleEditPage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
 
-        <rich:panelMenuItem id="ruleCreateMenuItem" binding="#{mainPage.ruleCreatePage.mainMenuComponent}"
-                            label="Регистрация" action="#{mainPage.showRuleCreatePage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="ruleCreateMenuItem" binding="#{ruleCreatePage.mainMenuComponent}"
+                            label="Регистрация" action="#{ruleCreatePage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
 

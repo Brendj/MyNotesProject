@@ -102,20 +102,26 @@
                 Client client = (Client) clientCriteria.uniqueResult();
                 logger.info("work");
                 try {
+                    dataProcessSucceed = false;
                     if (client.hasPassword(currPassword)) {
                         logger.info("Work start");
                         client.setAddress(address);
                         client.setPhone(phone);
-                        client.setMobile(mobilePhone);
-                        client.setEmail(email);
-                        client.setNotifyViaSMS(notifyViaSms);
-                        client.setNotifyViaEmail(notifyViaEmail);
-                        client.setUpdateTime(new Date());
-                        client.setExpenditureLimit(expenditureLimit);
-                        persistenceSession.update(client);
-                        dataProcessSucceed = true;
+                        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+                        if (mobilePhone==null) {
+                            errorMessage = "Неверный формат мобильного телефона, используйте: 7-XXX-XXXXXXX";
+                        }
+                        else {
+                            client.setMobile(mobilePhone);
+                            client.setEmail(email);
+                            client.setNotifyViaSMS(notifyViaSms);
+                            client.setNotifyViaEmail(notifyViaEmail);
+                            client.setUpdateTime(new Date());
+                            client.setExpenditureLimit(expenditureLimit);
+                            persistenceSession.update(client);
+                            dataProcessSucceed = true;
+                        }
                     } else {
-                        dataProcessSucceed = false;
                         errorMessage = "Неверно указан текущий пароль";
                     }
                 } catch (Exception e) {

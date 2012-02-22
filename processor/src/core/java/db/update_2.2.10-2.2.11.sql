@@ -68,8 +68,8 @@ CREATE TABLE CF_DiscountRules_CategoryOrg
 );
 
 
-/* Таблица связка между Client и CategoryDiscountRule */
-CREATE TABLE CF_Clients_CategoryDiscounts
+/* Таблица связка между Client и CategoryCF_Clients_CategoryDiscountsDiscountRule */
+CREATE TABLE
 (
   idofclienscategorydiscount bigserial NOT NULL,
   idofclient bigint,

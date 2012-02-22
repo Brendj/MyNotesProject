@@ -1672,7 +1672,12 @@ public class Processor implements SyncProcessor,
                    *
                    * Если все категории организации содержатся в правиле то выводим
                    * */
-                    if(!discountRule.getCategoryOrgs().isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                    boolean bIncludeRule=false;
+                    if (discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
+                    else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                        bIncludeRule = true;
+                    }
+                    if (bIncludeRule) {
                         SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
                                 new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
                         resCategoriesDiscountsAndRules.addDCRI(dcri);

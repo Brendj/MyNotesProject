@@ -11,8 +11,13 @@ import java.util.LinkedList;
 
 public class SBRTOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
 
+    @Override
+    public ParseResult parseRequest(HttpServletRequest httpRequest) throws Exception {
+        return parseGetParams(httpRequest);
+    }
+
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long sbrtContragentId, HttpServletRequest httpRequest) throws Exception {
-        ParseResult parseResult = parseGetParams(httpRequest);
+        ParseResult parseResult = getRequestParams();
         long clientId=parseResult.getReqLongParam("CLIENTID");
         long opId=parseResult.getReqLongParam("OPID");
         long termId=parseResult.getReqLongParam("TERMID");

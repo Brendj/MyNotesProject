@@ -788,8 +788,7 @@ CREATE TABLE CF_DiscountRules (
   Priority                  Integer       NOT NULL DEFAULT 0,
   CategoriesDiscounts         Character     varying(64),
   OperationOr               integer       NOT NULL DEFAULT 0,
-  CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule),
-  CONSTRAINT CF_DiscountRules_IdOfCategoryDiscount_fk FOREIGN KEY (IdOfCategoryDiscount) REFERENCES CF_CategoryDiscounts (IdOfCategoryDiscount)
+  CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule)
 );
 
 create table CF_Schema_version_info (

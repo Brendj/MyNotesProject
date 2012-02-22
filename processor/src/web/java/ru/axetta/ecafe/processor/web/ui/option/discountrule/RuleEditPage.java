@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -14,7 +16,11 @@ import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelect
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 /**
@@ -24,6 +30,7 @@ import java.util.*;
  * Time: 13:56
  * To change this template use File | Settings | File Templates.
  */
+@Component
 public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList{
 
     private String description;
@@ -223,83 +230,52 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         return "option/discountrule/edit";
     }
 
-    public void fill(Session session, Long idOfRule) throws Exception {
-        DiscountRule discountRule = (DiscountRule) session.load(DiscountRule.class, idOfRule);
-
-        StringBuilder categoryFilter = new StringBuilder();
-        if(!discountRule.getCategoriesDiscounts().isEmpty()){
-            for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
-                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-                categoryFilter.append(categoryDiscount.getCategoryName());
-                categoryFilter.append(";");
-            }
-            this.filter = categoryFilter.substring(0, categoryFilter.length()-1);
-        } else {
-            this.filter = "Не выбрано";
-        }
-
-
-        StringBuilder categoryOrgFilter = new StringBuilder();
-        if(!discountRule.getCategoryOrgs().isEmpty()){
-            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
-                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
-                categoryOrgFilter.append(categoryOrg.getCategoryName());
-                categoryOrgFilter.append("; ");
-            }
-            this.filterOrg=categoryOrgFilter.substring(0, categoryOrgFilter.length()-1);
-        } else{
-            this.filterOrg="Не выбрано";
-        }
-
-        fill(discountRule);
-    }
-
-    public void updateRule(Session persistenceSession, Long idOfRule) throws Exception {
-        DiscountRule discountRule = (DiscountRule) persistenceSession.load(DiscountRule.class, idOfRule);
+    @Transactional
+    public void updateRule() throws Exception {
+        entity = (DiscountRule) em.merge(entity);
         //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
-       // discountRule.setCategoryDiscount(categoryDiscount);
-        discountRule.setDescription(description);
-        discountRule.setComplex0(complex0?1:0);
-        discountRule.setComplex1(complex1?1:0);
-        discountRule.setComplex2(complex2?1:0);
-        discountRule.setComplex3(complex3?1:0);
-        discountRule.setComplex4(complex4?1:0);
-        discountRule.setComplex5(complex5?1:0);
-        discountRule.setComplex6(complex6?1:0);
-        discountRule.setComplex7(complex7?1:0);
-        discountRule.setComplex8(complex8?1:0);
-        discountRule.setComplex9(complex9?1:0);
-        discountRule.setPriority(priority);
-        discountRule.setOperationOr(operationor);
-        //discountRule.setCategoryDiscounts(categoryDiscounts);
+       // entity.setCategoryDiscount(categoryDiscount);
+        entity.setDescription(description);
+        entity.setComplex0(complex0?1:0);
+        entity.setComplex1(complex1?1:0);
+        entity.setComplex2(complex2?1:0);
+        entity.setComplex3(complex3?1:0);
+        entity.setComplex4(complex4?1:0);
+        entity.setComplex5(complex5?1:0);
+        entity.setComplex6(complex6?1:0);
+        entity.setComplex7(complex7?1:0);
+        entity.setComplex8(complex8?1:0);
+        entity.setComplex9(complex9?1:0);
+        entity.setPriority(priority);
+        entity.setOperationOr(operationor);
+        //entity.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
-        discountRule.getCategoriesDiscounts().clear();
+        entity.getCategoriesDiscounts().clear();
         if(!this.idOfCategoryList.isEmpty()){
-            Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
-            categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount",this.idOfCategoryList));
+            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
             StringBuilder stringBuilder = new StringBuilder();
-            for (Object object: categoryCrioteria.list()){
+            for (Object object: categoryList){
                 this.categoryDiscountSet.add((CategoryDiscount) object);
                 stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
                 stringBuilder.append(",");
             }
-            discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
-            discountRule.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
+            entity.setCategoriesDiscounts(this.categoryDiscountSet);
+            entity.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
         } else {
-            discountRule.setCategoryDiscounts("");
+            entity.setCategoryDiscounts("");
         }
 
-        discountRule.getCategoryOrgs().clear();
+        entity.getCategoryOrgs().clear();
         if(!this.idOfCategoryOrgList.isEmpty()){
-            discountRule.getCategoryOrgs().clear();
-            Criteria categoryOrgCrioteria = persistenceSession.createCriteria(CategoryOrg.class);
-            categoryOrgCrioteria.add(Restrictions.in("idOfCategoryOrg", this.idOfCategoryOrgList));
-            for (Object object: categoryOrgCrioteria.list()){
-                discountRule.getCategoryOrgs().add((CategoryOrg) object);
+            entity.getCategoryOrgs().clear();
+            List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+            for (Object object: categoryOrgList){
+                entity.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
-        persistenceSession.update(discountRule);
-        fill(discountRule);
+        em.persist(entity);
+        fill(entity);
+        printMessage("Данные обновлены.");
     }
 
     private void fill(DiscountRule discountRule) throws Exception {
@@ -355,5 +331,57 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
         this.categoryOrgs = categoryOrgs;
+    }
+
+    DiscountRule entity;
+
+    public DiscountRule getEntity() {
+        return entity;
+    }
+
+    public void setEntity(DiscountRule entity) {
+        this.entity = entity;
+    }
+
+    public String getEntityName() {
+        return entity.getDescription();
+    }
+
+    @PersistenceContext
+    EntityManager em;
+
+    @Override
+    public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
+    public void reload() throws Exception {
+        DiscountRule discountRule = em.merge(entity);
+
+        StringBuilder categoryFilter = new StringBuilder();
+        if(!discountRule.getCategoriesDiscounts().isEmpty()){
+            for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
+                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                categoryFilter.append(categoryDiscount.getCategoryName());
+                categoryFilter.append(";");
+            }
+            this.filter = categoryFilter.substring(0, categoryFilter.length()-1);
+        } else {
+            this.filter = "Не выбрано";
+        }
+
+
+        StringBuilder categoryOrgFilter = new StringBuilder();
+        if(!discountRule.getCategoryOrgs().isEmpty()){
+            for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
+                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+                categoryOrgFilter.append(categoryOrg.getCategoryName());
+                categoryOrgFilter.append("; ");
+            }
+            this.filterOrg=categoryOrgFilter.substring(0, categoryOrgFilter.length()-1);
+        } else{
+            this.filterOrg="Не выбрано";
+        }
+
+        fill(discountRule);
     }
 }

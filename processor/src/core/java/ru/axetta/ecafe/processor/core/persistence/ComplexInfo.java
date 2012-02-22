@@ -7,13 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.util.Date;
 import java.util.Set;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kolpakov
- * Date: 23.02.11
- * Time: 16:09
- * To change this template use File | Settings | File Templates.
- */
 public class ComplexInfo {
 
     private Long idOfComplexInfo;

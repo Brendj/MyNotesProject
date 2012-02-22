@@ -18,6 +18,11 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
     final static int TYPE_CHECK=1, TYPE_PAY=2;
 
     @Override
+    public ParseResult parseRequest(HttpServletRequest httpRequest) throws Exception {
+        return parsePostedUrlEncodedParams(httpRequest);
+    }
+
+    @Override
     protected String prepareRequestForParsing(String requestBody) throws Exception {
         if (!checkSignature(requestBody)) throw new Exception("Signature check failed");
         return requestBody;
@@ -27,7 +32,7 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long contragentId, HttpServletRequest httpRequest)
             throws Exception {
 
-        ParseResult parseResult = parsePostedUrlEncodedParams(httpRequest);
+        ParseResult parseResult = getRequestParams();
 
 
         int requestType=parseResult.getReqIntParam("type");

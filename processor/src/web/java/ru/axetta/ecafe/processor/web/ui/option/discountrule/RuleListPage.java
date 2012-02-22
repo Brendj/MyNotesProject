@@ -4,15 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.applet.AppletContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -25,8 +34,17 @@ import java.util.List;
  * Time: 9:56
  * To change this template use File | Settings | File Templates.
  */
-public class RuleListPage extends BasicWorkspacePage {
+@Component
+public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
+
+    @Override
+    public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
+        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
+
     public static class Item {
+        DiscountRule entity;
         private long idOfRule;
         private String description;
         private int complex0;
@@ -46,6 +64,14 @@ public class RuleListPage extends BasicWorkspacePage {
         private List<CategoryOrg> categoryOrgList;
         //
 
+
+        public DiscountRule getEntity() {
+            return entity;
+        }
+
+        public void setEntity(DiscountRule entity) {
+            this.entity = entity;
+        }
 
         public String getCategoryOrgs() {
             return CategoryOrgs;
@@ -194,35 +220,22 @@ public class RuleListPage extends BasicWorkspacePage {
         return "option/discountrule/list";
     }
 
-    public void fill(Session session) throws Exception {
+    @Override
+    public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
+
+    @PersistenceContext
+    EntityManager em;
+
+    @Transactional
+    public void reload() {
         List<Item> items = new ArrayList<Item>();
-        Criteria ruleCriteria = session.createCriteria(DiscountRule.class);
-        ruleCriteria.addOrder(Order.asc("idOfRule"));
-        List discountRuleList = ruleCriteria.list();
+        List discountRuleList = DAOUtils.listDiscountRules(em);
 
         for (Object object : discountRuleList) {
             DiscountRule discountRule = (DiscountRule) object;
             Item item = new Item(discountRule);
-            /*
-            if (null != discountRule.getCategoryDiscounts() && !discountRule.getCategoryDiscounts().equals("")) {
-                String[] idOfCategoryDiscountsString=discountRule.getCategoryDiscounts().split(", ");
-                Long[] numbs=new Long[idOfCategoryDiscountsString.length];
-                for(int i=0; i<idOfCategoryDiscountsString.length;i++){
-                    numbs[i]=Long.parseLong(idOfCategoryDiscountsString[i]);
-                }
-                Criteria catCriteria = session.createCriteria(CategoryDiscount.class);
-                catCriteria.add(Restrictions.in("idOfCategoryDiscount",numbs));
-                List<CategoryDiscount> categoryDiscountList = catCriteria.list();
-                StringBuilder sb=new StringBuilder();
-                for(CategoryDiscount categoryDiscount: categoryDiscountList){
-                    sb.append(categoryDiscount.getCategoryName());
-                    sb.append(", ");
-                }
-                String result=sb.toString();
-                if (result.length()>2) {
-                    item.setCategoryDiscounts(result.substring(0,result.length()-2));
-                }
-            }                                     */
 
             if (!discountRule.getCategoriesDiscounts().isEmpty()){
                 StringBuilder stringBuilder = new StringBuilder();
@@ -232,6 +245,7 @@ public class RuleListPage extends BasicWorkspacePage {
                 }
                 item.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
             }
+            item.setEntity(discountRule);
 
             if(!discountRule.getCategoryOrgs().isEmpty()){
                 StringBuilder stringBuilder = new StringBuilder();
@@ -245,5 +259,6 @@ public class RuleListPage extends BasicWorkspacePage {
             items.add(item);
         }
         this.items = items;
+
     }
 }

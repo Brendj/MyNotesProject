@@ -9,8 +9,8 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Правила --%>
-<h:panelGrid id="ruleListPanel" binding="#{mainPage.ruleListPage.pageComponent}" styleClass="borderless-grid">
-    <rich:dataTable id="ruleTable" width="700" var="item" value="#{mainPage.ruleListPage.items}" rows="20"
+<h:panelGrid id="ruleListPanel" binding="#{ruleListPage.pageComponent}" styleClass="borderless-grid">
+    <rich:dataTable id="ruleTable" width="700" var="item" value="#{ruleListPage.items}" rows="20"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer">
            <%--
@@ -218,17 +218,19 @@
             <h:outputText styleClass="output-text" value="#{item.complex9}" />
         </rich:column>
         <rich:column>
-            <h:commandLink action="#{mainPage.showRuleEditPage}" styleClass="command-link">
+            <h:commandLink action="#{ruleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.idOfRule}" target="#{mainPage.selectedIdOfRule}" />
+                <f:setPropertyActionListener value="#{item.entity}" target="#{ruleEditPage.entity}" />
             </h:commandLink>
         </rich:column>
-        <rich:column style="text-align:center">
+       <rich:column style="text-align:center">
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                             oncomplete="#{rich:component('ruleDeletePanel')}.show();">
-                <h:graphicImage value="/images/16x16/delete.png" />
-                <f:setPropertyActionListener value="#{item.idOfRule}"
-                                             target="#{mainPage.selectedIdOfRule}" />
+                             oncomplete="#{rich:component('confirmDeletePanel')}.show();">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{ruleListPage}"
+                                             target="#{confirmDeletePage.listener}" />
+                <f:setPropertyActionListener value="#{item.entity}"
+                                             target="#{confirmDeletePage.entity}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">

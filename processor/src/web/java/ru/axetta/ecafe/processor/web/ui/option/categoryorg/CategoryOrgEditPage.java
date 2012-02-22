@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -45,16 +46,18 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
         return entity ==null?null: entity.getCategoryName();
     }
 
-    public String getPageTitle() {
-        return super.getPageTitle() + entity.getCategoryName();
-    }
-
     public String getFilter() {
         return filter;
     }
 
     @Override
     public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
+
+    @Transactional
+    public void reload() {
+        entity = entityManager.merge(entity);
         idOfOrgList = new LinkedList<Long>();
         if(!entity.getOrgs().isEmpty()){
             StringBuilder sb=new StringBuilder();
@@ -64,8 +67,6 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
                 sb.append("; ");
             }
             filter=sb.substring(0,sb.length()-2);
-        } else {
-
         }
     }
 

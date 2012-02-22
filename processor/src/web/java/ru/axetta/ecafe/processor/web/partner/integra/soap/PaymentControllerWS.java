@@ -4,12 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
+import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import javax.jws.WebService;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -19,28 +26,17 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
-//TODO: Требуются тесты!!!!!!!
-
-public class PaymentControllerWS implements PaymentController {
+@WebService()
+public class PaymentControllerWS extends HttpServlet implements PaymentController {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentControllerWS.class);
     private static final int STD_PAYMENT = 1;
 
-    public PaymentResult balanceRequest(String pid, Long clientId, Long opId, Long termId, int paymentSystem)
-            throws Exception {
-        PaymentResult paymentResult = new PaymentResult();
-        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&OPID=" + opId + "&TERMID=" + termId;
-        paymentResult.desc = sendRequestToPaymentSystem(requestParams, paymentSystem);
-        return paymentResult;
+    @Override
+    public PaymentResult process(String request) throws Exception {
+        return sendRequestToPaymentSystem(request, STD_PAYMENT);
     }
 
-    public PaymentResult commitPaymentRequest(String pid, Long clientId, Long sum, String time, Long opId, Long termId, int paymentSystem)
-            throws Exception {
-        PaymentResult paymentResult = new PaymentResult();
-        String requestParams = "&PID=" + pid + "&CLIENTID=" + clientId + "&SUM=" + sum + "&TIME=" + time + "&OPID=" + opId + "&TERMID=" + termId;
-        paymentResult.desc = sendRequestToPaymentSystem(requestParams, paymentSystem);
-        return paymentResult;
-    }
-
-    private String sendRequestToPaymentSystem(String requestParams, int paymentSystem) throws Exception {
+    private PaymentResult sendRequestToPaymentSystem(String requestParams, int paymentSystem) throws Exception {
         String path = null;
         switch (paymentSystem) {
             //case ELECSNET_PAYMENT : {
@@ -57,25 +53,30 @@ public class PaymentControllerWS implements PaymentController {
             //break;
             default: throw new Exception("Invalid payment system: "+paymentSystem);
         }
-        ServletContext servletContext = (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
-        HttpServletRequest request = (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
-        HttpServletResponse response = (HttpServletResponse) context.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
-        BufferResponseWrapper bufResponse = new BufferResponseWrapper(response);
-        request.setAttribute("soap", "1");
-        servletContext.getRequestDispatcher("/processor/"+path).include(request, bufResponse);
-        String responseString = null;
+        PaymentResult paymentResult = new PaymentResult();
         try {
-            responseString = bufResponse.getBuffer();
-            //URL paymentURL = new URL(requestUrl);
-            //URLConnection conn = paymentURL.openConnection();
-            //BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            //response = in.toString();
-            //in.close();
+            ServletContext servletContext = (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
+            HttpServletRequest request = (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
+            HttpServletResponse response = (HttpServletResponse) context.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
+            BufferResponseWrapper bufResponse = new BufferResponseWrapper(response);
+            request.setAttribute(StdOnlinePaymentServlet.ATTR_SOAP_REQUEST, requestParams);
+            servletContext.getRequestDispatcher("/"+path).include(request, bufResponse);
+            paymentResult.response = bufResponse.getBuffer();
+            OnlinePaymentProcessor.PayResponse payResponse = (OnlinePaymentProcessor.PayResponse)request.getAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE);
+            if (payResponse==null) throw new Exception("authentication failed");
+            paymentResult.clientId = payResponse.getClientId();
+            paymentResult.opId = payResponse.getPaymentId();
+            paymentResult.res = payResponse.getResultCode();
+            paymentResult.desc = payResponse.getResultDescription();
+            paymentResult.bal = payResponse.getBalance();
+            paymentResult.clientFIO = payResponse.getClientFullName();
         }
         catch (Exception e) {
-            return e.getMessage();
+            paymentResult.res = 100;
+            paymentResult.desc = "Error: "+e;
+            logger.error("Failed to process SOAP payment request", e);
         }
-        return responseString;
+        return paymentResult;
     }
 
     @Resource
@@ -83,7 +84,7 @@ public class PaymentControllerWS implements PaymentController {
 
 
 
-    public class BufferResponseWrapper extends HttpServletResponseWrapper {
+    public static class BufferResponseWrapper extends HttpServletResponseWrapper {
         PrintWriter pw;
         ServletOutputStream sos;
         private StringWriter writerBuffer;
@@ -131,7 +132,7 @@ public class PaymentControllerWS implements PaymentController {
          */
         public void output(String content) throws IOException{
             if (streamBuffer!=null){
-                streamBuffer.write(content.getBytes(originalResponse.getCharacterEncoding()));
+                streamBuffer.write(content.getBytes());
             } else {
                 writerBuffer.write(content);
             }
@@ -140,11 +141,11 @@ public class PaymentControllerWS implements PaymentController {
         public String getBuffer() {
 
                 if (streamBuffer != null) {
-                    try {
-                       return streamBuffer.toString(originalResponse.getCharacterEncoding());
-                    } catch (UnsupportedEncodingException e) {
+                    //try {
+                    //   return streamBuffer.toString(originalResponse.getCharacterEncoding());
+                    //} catch (UnsupportedEncodingException e) {
                        return streamBuffer.toString();
-                    }
+                    //}
                 }
                 else if (writerBuffer != null)
                     return writerBuffer.toString();

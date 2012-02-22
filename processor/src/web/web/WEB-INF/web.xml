@@ -126,7 +126,15 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ClientRoomControllerWS</servlet-name>
-        <url-pattern>/soap/*</url-pattern>
+        <url-pattern>/soap/client</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>PaymentControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PaymentControllerWS</servlet-name>
+        <url-pattern>/soap/payment</url-pattern>
     </servlet-mapping>
 
     <filter-mapping>

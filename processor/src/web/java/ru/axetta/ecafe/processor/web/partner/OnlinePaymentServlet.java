@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.partner;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
 import org.slf4j.Logger;
 
@@ -11,8 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 abstract public class OnlinePaymentServlet extends HttpServlet {
+
+    public static final String ATTR_SOAP_REQUEST = "soap";
+
     protected abstract Logger getLogger();
 
     public void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
@@ -21,9 +26,14 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
         try {
             runtimeContext = RuntimeContext.getInstance();
             OnlinePaymentRequestParser requestParser=createParser();
-            //TODO: добавить аутентификиацию по IP для SOAP
+            requestParser.setRequestParams(httpRequest);
+
             try {
                 if (!authenticate(httpRequest, requestParser)) {
+                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+                if (!requestParser.checkRequestSignature(httpRequest)) {
                     httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
@@ -53,6 +63,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
             getLogger().info(String.format("Request (%s) processed: %s", requestParser.toString(), response.toString()));
             try {
                 requestParser.serializeResponse(response, httpResponse);
+                httpRequest.setAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE, response);
             } catch (Exception e) {
                 getLogger().error("Failed to serialize response", e);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

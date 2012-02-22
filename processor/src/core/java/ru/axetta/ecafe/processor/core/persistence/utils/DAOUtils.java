@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -15,9 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -532,5 +531,31 @@ public class DAOUtils {
     public static long getCategoryDiscountMaxId(EntityManager em) {
         javax.persistence.Query q = em.createQuery("select max(idOfCategoryDiscount) from CategoryDiscount");
         return (Long)(q.getSingleResult());
+    }
+
+    public static List listDiscountRules(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+        return q.getResultList();
+    }
+
+    public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
+        javax.persistence.Query q = em.createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)");
+        q.setParameter("idOfCategoryList", idOfCategoryList);
+        return q.getResultList();
+    }
+
+    public static List getCategoryOrgWithIds(EntityManager em, List<Long> idOfCategoryOrgList) {
+        javax.persistence.Query q = em.createQuery("from CategoryOrg where idOfCategoryOrg in (:idOfCategoryOrgList)");
+        q.setParameter("idOfCategoryOrgList", idOfCategoryOrgList);
+        return q.getResultList();
+    }
+
+    public static EnterEvent getLastEnterEvent(Session session, Client client) {
+        Query q = session.createQuery("from EnterEvent where client=:client order by evtDateTime desc");
+        q.setMaxResults(1);
+        q.setParameter("client", client);
+        List l = q.list();
+        if (l.size()>0) return (EnterEvent)l.get(0);
+        return null;
     }
 }

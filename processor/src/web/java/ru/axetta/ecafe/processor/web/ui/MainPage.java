@@ -243,12 +243,7 @@ public class MainPage {
 
     // Rule manipulation (baybikov 06.12.2011)
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
-    private final RuleListPage ruleListPage = new RuleListPage();
     private Long selectedIdOfRule;
-    private final RuleDeletePage ruleDeletePage = new RuleDeletePage();
-    private final RuleCreatePage ruleCreatePage = new RuleCreatePage();
-    private final SelectedRuleGroupPage selectedRuleGroupPage = new SelectedRuleGroupPage();
-    private final RuleEditPage ruleEditPage = new RuleEditPage();
 
     // Event notification manipulation
     private final BasicWorkspacePage eventNotificationGroupPage = new BasicWorkspacePage();
@@ -1856,7 +1851,7 @@ public class MainPage {
             } catch (Exception e) {
                 logger.error("Failed to update client", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных клиента", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных клиента: "+e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -3243,7 +3238,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3273,7 +3268,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5917,101 +5912,7 @@ public class MainPage {
         return null;
     }
 
-    // baybikov (06.12.2011)
-    public RuleListPage getRuleListPage() {
-        return ruleListPage;
-    }
 
-    // baybikov (06.12.2011)
-    public Object showRuleListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ruleListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = ruleListPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill discountrule list page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы правил", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (06.12.2011)
-    public RuleCreatePage getRuleCreatePage() {
-        return ruleCreatePage;
-    }
-
-    // baybikov (06.12.2011)
-    public Object showRuleCreatePage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ruleCreatePage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = ruleCreatePage;
-        } catch (Exception e) {
-            logger.error("Failed to show discountrule create page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы правил", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (06.12.2011)
-    public Object createRule() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ruleCreatePage.createRule(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило зарегистрировано успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to create discountrule", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации правила", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
-
-    // baybikov (06.12.2011)
-    public RuleDeletePage getRuleDeletePage() {
-        return ruleDeletePage;
-    }
 
     // baybikov (06.12.2011)
     public Long getSelectedIdOfRule() {
@@ -6023,125 +5924,7 @@ public class MainPage {
         this.selectedIdOfRule = selectedIdOfRule;
     }
 
-    // baybikov (06.12.2011)
-    public Object removeRule() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ruleDeletePage.removeRule(persistenceSession, selectedIdOfRule);
-            ruleListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to remove discountrule", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
 
-    // baybikov (06.12.2011)
-    public Object showRuleEditPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            selectedRuleGroupPage.fill(persistenceSession, selectedIdOfRule);
-            ruleEditPage.fill(persistenceSession, selectedIdOfRule);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            selectedRuleGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = ruleEditPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill discountrule edit page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования правил", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (06.12.2011)
-    public RuleEditPage getRuleEditPage() {
-        return ruleEditPage;
-    }
-
-    // baybikov (06.12.2011)
-    public Object updateRule() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ruleEditPage.updateRule(persistenceSession, selectedIdOfRule);
-            selectedRuleGroupPage.fill(persistenceSession, selectedIdOfRule);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные правила обновлены успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to update discountrule", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных правила", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        return null;
-    }
-
-    // baybikov (06.12.2011)
-    public SelectedRuleGroupPage getSelectedRuleGroupPage() {
-        return selectedRuleGroupPage;
-    }
-
-    public Object showSelectedRuleGroupPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            selectedRuleGroupPage.fill(persistenceSession, selectedIdOfRule);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = selectedRuleGroupPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill selected discountrule group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы правил",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
 
     public String showCurrentPositionCSVList() {
         return "showCurrentPositionCSVList";

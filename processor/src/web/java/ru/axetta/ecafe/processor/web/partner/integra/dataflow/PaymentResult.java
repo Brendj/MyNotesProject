@@ -12,8 +12,9 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * To change this template use File | Settings | File Templates.
  */
 public class PaymentResult {
+    public String response;
     public long clientId;
-    public long opId;
+    public String opId;
     public int res;
     public String desc;
     public Long bal;

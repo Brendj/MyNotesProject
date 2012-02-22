@@ -4,9 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
@@ -22,6 +23,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -31,11 +33,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -55,7 +53,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
-    
+    private static final Long RC_INVALID_DATA = 150L;
+    private static final String RC_OK_DESC="OK";
+    private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+
     interface Processor {
 
         public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
@@ -80,11 +84,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Client client = (Client) clientCriteria.uniqueResult();
                 if (client == null) {
                     data.setResultCode(RC_CLIENT_NOT_FOUND);
-                    data.setDescription("Client not found");
+                    data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
                 } else {
                     processor.process(client, data, objectFactory, persistenceSession, persistenceTransaction);
                     data.setResultCode(RC_OK);
-                    data.setDescription("OK");
+                    data.setDescription(RC_OK_DESC);
                 }
                 persistenceSession.flush();
                 persistenceTransaction.commit();
@@ -116,10 +120,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 if (clients.isEmpty()) {
                     data.setResultCode(RC_CLIENT_NOT_FOUND);
-                    data.setDescription("Client not found");
+                    data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
                 } else if (clients.size() > 1) {
                     data.setResultCode(RC_SEVERAL_CLIENTS_WERE_FOUND);
-                    data.setDescription("Several clients were found");
+                    data.setDescription(RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
                 } else {
                     Client client = (Client) clients.get(0);
                     processor.process(client, data, objectFactory, persistenceSession, persistenceTransaction);
@@ -147,7 +151,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processSummary(client, data, objectFactory);
+                processSummary(client, data, objectFactory, session);
             }
         });
 
@@ -163,7 +167,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processSummary(client, data, objectFactory);
+                processSummary(client, data, objectFactory, session);
             }
         });
 
@@ -174,15 +178,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryResult;
     }
 
-    private void processSummary(Client client, Data data, ObjectFactory objectFactory)
+    private void processSummary(Client client, Data data, ObjectFactory objectFactory, Session session)
             throws DatatypeConfigurationException {
         ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
+        clientSummaryExt.setContractId(client.getContractId());
         clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
         clientSummaryExt.setBalance(client.getBalance());
         clientSummaryExt.setOverdraftLimit(client.getLimit());
         clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
         clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
         clientSummaryExt.setFirstName(client.getPerson().getFirstName());
+        clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
+        clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
+        clientSummaryExt.setMobilePhone(client.getMobile());
+        clientSummaryExt.setEmail(client.getEmail());
+        EnterEvent ee = DAOUtils.getLastEnterEvent(session, client);
+        if (ee!=null) {
+            clientSummaryExt.setLastEnterEventCode(ee.getEventCode());
+            clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
+        }
+
         if (client.getClientGroup() == null)
             clientSummaryExt.setGrade(null);
         else
@@ -541,7 +556,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (clients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
-                data.description = "Client not found";
+                data.description = RC_CLIENT_NOT_FOUND_DESC;
             } else {
                 for (Client client : clients) {
                     ClientItem clientItem = new ClientItem();
@@ -683,13 +698,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-    private void workClientSan(EntityManager entityManager, String guardSan, GuardSanResult data, List clientList) {
+    private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
         if (clientList.size() == 0) {
             data.resultCode = RC_CLIENT_NOT_FOUND;
-            data.description = "Client is not found";
+            data.description =RC_CLIENT_NOT_FOUND_DESC;
         } else if (clientList.size() > 1) {
             data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
-            data.description = "Several clients were found";
+            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
         } else {
             Object[] clientObject = (Object[]) clientList.get(0);
             Long idOfClient = ((BigInteger) clientObject[0]).longValue();
@@ -704,14 +719,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     data.description = "Ok";
                 } else if (data instanceof DetachGuardSanResult) {
                     data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                    data.description = "Client doesn't have this guard SNILS";
+                    data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
                 }
             }
             else {
                 if (data instanceof AttachGuardSanResult) {
                     if (isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
-                        data.description = "Client has this guard SNILS already";
+                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
                     } else {
                         String gs = "";
                         if (clientGuardSan.endsWith(";"))
@@ -728,7 +743,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else if (data instanceof DetachGuardSanResult) {
                     if (!isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description = "Client doesn't have this guard SNILS";
+                        data.description =RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
                     } else {
                         if (clientGuardSan.contains(";" + guardSan + ";"))
                             clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
@@ -767,5 +782,101 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         c.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
         xc.setTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
         return xc;
+    }
+
+    @Override
+    public Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId) {
+        long lCardId = Long.parseLong(cardId);
+        try {
+            return DAOService.getInstance().getContractIdByCardNo(lCardId);
+        } catch (Exception e) {
+            logger.error("ClientRoomController failed", e);
+            return null;
+        }
+    }
+
+    @Override
+    public ClientSummaryExt[] getSummaryByGuardSan(String guardSan) {
+        ClientsData cd = getClientsByGuardSan(guardSan);
+        LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
+        if (cd!=null && cd.clientList!=null) {
+            for (ClientItem ci : cd.clientList.getClients()) {
+                ClientSummaryResult cs = getSummary(ci.getContractId());
+                if (cs.clientSummary!=null) {
+                    clientSummaries.add(cs.clientSummary);
+                }
+            }
+        }
+        return clientSummaries.toArray(new ClientSummaryExt[0]);
+    }
+
+    @Override
+    public Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "state") boolean state) {
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        if (!DAOService.getInstance().enableClientNotificationBySMS(contractId, state)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+
+    @Override
+    public Result enableNotificationByEmail(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "state") boolean state) {
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        if (!DAOService.getInstance().enableClientNotificationByEmail(contractId, state)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+
+    @Override
+    public Result changeMobilePhone(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "mobilePhone") String mobilePhone) {
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+        if (mobilePhone==null) {
+            r.resultCode=RC_INVALID_DATA;
+            r.description="Неверный формат телефона";
+            return r;
+        }
+        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+
+    @Override
+    public Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email) {
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        if (!DAOService.getInstance().setClientEmail(contractId, email)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+
+    @Override
+    public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit) {
+        Result r = new Result(RC_OK, RC_OK_DESC);
+        if (limit<0) {
+            r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
+            return r;
+        }
+        if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
+            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+        }
+        return r;
     }
 }

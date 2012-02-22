@@ -11,6 +11,6 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * Time: 16:18
  * To change this template use File | Settings | File Templates.
  */
-public class DetachGuardSanResult extends GuardSanResult {
+public class DetachGuardSanResult extends Result {
 
 }

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -108,7 +109,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        reload();
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
 
     @Transactional

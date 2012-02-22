@@ -72,7 +72,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryValue"/>
         </set>
 
-        <set name="categoriesInternal" table="CF_CategoryOrg_Orgs" cascade="all" lazy="false">
+        <set name="categoriesInternal" table="CF_CategoryOrg_Orgs" cascade="all">
             <key column="IdOfOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>
