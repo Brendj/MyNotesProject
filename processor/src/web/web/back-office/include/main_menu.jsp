@@ -286,13 +286,25 @@
         <a4j:support event="onclick" action="#{mainPage.showComplexGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="allComplexReportMenuItem" binding="#{mainPage.allComplexReportPage.mainMenuComponent}"
-                            label="Все комплексы" action="#{mainPage.showAllComplexReportPage}" reRender="workspaceForm" />
+                            label="Отчет по всем учреждениям" action="#{mainPage.showAllComplexReportPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="freeComplexReportMenuItem" binding="#{mainPage.freeComplexReportPage.mainMenuComponent}"
                         label="Бесплатные комплексы" action="#{mainPage.showFreeComplexReportPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="payComplexReportMenuItem" binding="#{mainPage.payComplexReportPage.mainMenuComponent}"
                         label="Платные комплексы" action="#{mainPage.showPayComplexReportPage}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="discountsGroupMenu" binding="#{mainPage.discountGroupPage.mainMenuComponent}"
+                         label="Отчет по льготам">
+        <a4j:support event="onclick" action="#{mainPage.showDiscountGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="allOrgsReportMenuItem" binding="#{mainPage.allOrgsDiscountsReportPage.mainMenuComponent}"
+                            label="Отчет по всем организациям" action="#{mainPage.showAllOrgsDiscountReportPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="orgDiscountsReportMenuItem" binding="#{mainPage.orgDiscountsReportPage.mainMenuComponent}"
+                        label="Отчет по организации" action="#{mainPage.showOrgDiscountsReportPage}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 

@@ -267,6 +267,100 @@ public class MainPage {
     private final RuleListSelectPage ruleListSelectPage = new RuleListSelectPage();
     private final CategoryOrgListSelectPage categoryOrgListSelectPage = new CategoryOrgListSelectPage();
 
+    // Levadny (11.02.2012)
+    private final BasicWorkspacePage discountGroupPage = new BasicWorkspacePage();
+
+
+    // Levadny (11.02.2012)
+    private final OrgDiscountsReportPage orgDiscountsReportPage = new OrgDiscountsReportPage();
+    private final AllOrgsDiscountsReportPage allOrgsDiscountsReportPage = new AllOrgsDiscountsReportPage();
+
+    public AllOrgsDiscountsReportPage getAllOrgsDiscountsReportPage() {
+        return allOrgsDiscountsReportPage;
+    }
+
+    // Levadny (11.02.2012)
+    public Object showAllOrgsDiscountReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = allOrgsDiscountsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set all orgs discount report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по льготам всех организаций", null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // Levadny (11.02.2012)
+    public OrgDiscountsReportPage getOrgDiscountsReportPage() {
+        return orgDiscountsReportPage;
+    }
+
+    // Levadny (11.02.2012)
+    public Object showOrgDiscountsReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = orgDiscountsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set orgs discounts report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по льготам организации", null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildAllOrgsDiscountsReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            allOrgsDiscountsReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build all orgs discounts report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object buildOrgDiscountsReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            orgDiscountsReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build org discounts report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
 
     public String getEndOfLine() {
         return "\r\n";
@@ -3751,7 +3845,7 @@ public class MainPage {
             persistenceTransaction = null;
             currentWorkspacePage = testLogPage;
         } catch (Exception e) {
-            logger.error("Failed to show log test page", e);
+            logger.error("Failed to show log ru.axetta.ecafe.processor.core.test page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы тестирования лога",
                             null));
@@ -3778,7 +3872,7 @@ public class MainPage {
             persistenceTransaction = null;
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
         } catch (Exception e) {
-            logger.error("Failed to test log", e);
+            logger.error("Failed to ru.axetta.ecafe.processor.core.test log", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при тестировании лога", null));
         } finally {
@@ -4144,6 +4238,18 @@ public class MainPage {
     // baybikov (22.11.2011)
     public Object showComplexGroupPage() {
         currentWorkspacePage = complexGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // Levadny (11.02.2012)
+    public BasicWorkspacePage getDiscountGroupPage() {
+        return discountGroupPage;
+    }
+
+    // Levadny (11.02.2012)
+    public Object showDiscountGroupPage() {
+        currentWorkspacePage = discountGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -5931,7 +6037,7 @@ public class MainPage {
     }
 
     //private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
-    ///* For test only */    
+    ///* For ru.axetta.ecafe.processor.core.test only */
     //private String smsMessageId;
     //private String smsMessageText;
     //private String smsPhoneNumber;
@@ -6296,4 +6402,9 @@ public class MainPage {
     public String showAllComplexCSVList() {
         return "showAllComplexCSVList";
     }
+
+    public String showArgOrgsDiscountsCSVList() {
+        return "showArgOrgsDiscountsCSVList";
+    }
+
 }
