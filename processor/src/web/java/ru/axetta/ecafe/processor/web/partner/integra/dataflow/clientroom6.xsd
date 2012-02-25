@@ -7,7 +7,6 @@
             <xsd:sequence>
                 <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummary" type="ClientSummary"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummaryExt" type="ClientSummaryExt"/>
-                <xsd:element minOccurs="0" maxOccurs="1" name="PurchaseList" type="PurchaseList"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="PurchaseListExt" type="PurchaseListExt"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="PaymentList" type="PaymentList"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="MenuList" type="MenuList"/>
@@ -45,29 +44,6 @@
         <xsd:attribute name="NotifyViaEmail" type="xsd:boolean"/>
         <xsd:attribute name="MobilePhone" type="xsd:string"/>
         <xsd:attribute name="Email" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="PurchaseList">
-        <xsd:sequence>
-            <xsd:element minOccurs="0" maxOccurs="unbounded" name="P" type="Purchase"/>
-        </xsd:sequence>
-    </xsd:complexType>
-    <xsd:complexType name="Purchase">
-        <xsd:sequence>
-            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="PurchaseElement"/>
-        </xsd:sequence>
-        <xsd:attribute name="Time" type="xsd:dateTime"/>
-        <xsd:attribute name="Sum" type="xsd:long"/>
-        <xsd:attribute name="Discount" type="xsd:long"/>
-        <xsd:attribute name="Donation" type="xsd:long"/>
-        <xsd:attribute name="ByCash" type="xsd:long"/>
-        <xsd:attribute name="ByCard" type="xsd:long"/>
-        <xsd:attribute name="IdOfCard" type="xsd:long"/>
-    </xsd:complexType>
-    <xsd:complexType name="PurchaseElement">
-        <xsd:attribute name="Name" type="xsd:string"/>
-        <xsd:attribute name="Sum" type="xsd:long"/>
-        <xsd:attribute name="Amount" type="xsd:long"/>
     </xsd:complexType>
 
     <xsd:complexType name="PurchaseListExt">

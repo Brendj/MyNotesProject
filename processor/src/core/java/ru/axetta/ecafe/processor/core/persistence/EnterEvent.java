@@ -41,6 +41,8 @@ public class EnterEvent {
     public static final int PASSAGE_RUFUSAL = 5; // отказ от прохода
     public static final int RE_ENTRY = 6; // повторный вход
     public static final int RE_EXIT = 7; // повторный выход
+    public static final int DIRECTION_ENTER = 0;
+    public static final int DIRECTION_EXIT = 1;
 
 
     public EnterEvent() {

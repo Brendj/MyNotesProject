@@ -646,6 +646,7 @@ public class Client {
     }
 
     public static String checkAndConvertMobile(String mobilePhone) {
+        if (mobilePhone==null || mobilePhone.length()==0) return mobilePhone;
         mobilePhone=mobilePhone.replaceAll("[+ -()]", "");
         if (mobilePhone.startsWith("8")) mobilePhone="7"+mobilePhone.substring(1);
         if (mobilePhone.length()==10) mobilePhone="7"+mobilePhone;

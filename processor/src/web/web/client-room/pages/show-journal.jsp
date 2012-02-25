@@ -346,8 +346,8 @@
                     </td>
                     <td>
                         <div class="output-text">
-                            <span class=<%=enterEvent.getPassDirection() == 0 ? "green" :
-                                enterEvent.getPassDirection() == 1 ? "red" : "" %>>
+                            <span class=<%=enterEvent.getPassDirection() == EnterEvent.DIRECTION_ENTER ? "green" :
+                                enterEvent.getPassDirection() == EnterEvent.DIRECTION_EXIT ? "red" : "" %>>
                                 <%=directionMap.get(enterEvent.getPassDirection())%>
                             </span>
                         </div>

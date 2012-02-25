@@ -46,7 +46,7 @@
         <xsd:attribute name="MobilePhone" type="xsd:string"/>
         <xsd:attribute name="Email" type="xsd:string"/>
     </xsd:complexType>
-
+    
     <xsd:complexType name="PurchaseList">
         <xsd:sequence>
             <xsd:element minOccurs="0" maxOccurs="unbounded" name="P" type="Purchase"/>
@@ -68,6 +68,7 @@
         <xsd:attribute name="Name" type="xsd:string"/>
         <xsd:attribute name="Sum" type="xsd:long"/>
         <xsd:attribute name="Amount" type="xsd:long"/>
+        <xsd:attribute name="Type" type="xsd:int"/>
     </xsd:complexType>
 
     <xsd:complexType name="PurchaseListExt">
@@ -92,7 +93,6 @@
         <xsd:attribute name="Name" type="xsd:string"/>
         <xsd:attribute name="Sum" type="xsd:long"/>
         <xsd:attribute name="Amount" type="xsd:long"/>
-        <xsd:attribute name="Type" type="xsd:int"/>
     </xsd:complexType>
 
     <xsd:complexType name="PaymentList">

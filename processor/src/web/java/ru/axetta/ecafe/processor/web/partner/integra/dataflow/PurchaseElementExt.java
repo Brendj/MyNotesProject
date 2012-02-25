@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="Name" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Sum" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="Amount" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="Type" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,6 +37,8 @@ public class PurchaseElementExt {
     protected Long sum;
     @XmlAttribute(name = "Amount")
     protected Long amount;
+    @XmlAttribute(name = "Type")
+    protected Integer type;
 
     /**
      * Gets the value of the name property.
@@ -107,6 +110,30 @@ public class PurchaseElementExt {
      */
     public void setAmount(Long value) {
         this.amount = value;
+    }
+
+    /**
+     * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getType() {
+        return type;
+    }
+
+    /**
+     * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setType(Integer value) {
+        this.type = value;
     }
 
 }

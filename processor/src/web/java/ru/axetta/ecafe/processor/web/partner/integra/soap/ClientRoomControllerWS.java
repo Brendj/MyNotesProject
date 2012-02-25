@@ -273,6 +273,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseElementExt.setAmount(od.getQty());
                 purchaseElementExt.setName(od.getMenuDetailName());
                 purchaseElementExt.setSum(od.getRPrice());
+                if (od.isComplex()) purchaseElementExt.setType(1);
+                else if (od.isComplexItem()) purchaseElementExt.setType(2);
+                else purchaseElementExt.setType(0);
                 purchaseExt.getE().add(purchaseElementExt);
             }
 
@@ -554,20 +557,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             List<Client> clients = clientCriteria.list();
 
-            if (clients.isEmpty()) {
-                data.resultCode = RC_CLIENT_NOT_FOUND;
-                data.description = RC_CLIENT_NOT_FOUND_DESC;
-            } else {
-                for (Client client : clients) {
-                    ClientItem clientItem = new ClientItem();
-                    clientItem.setContractId(client.getContractId());
-                    clientItem.setSan(client.getSan());
-                    data.clientList = new ClientList();
-                    data.clientList.getClients().add(clientItem);
-                }
-                data.resultCode = RC_OK;
-                data.description = "OK";
+            data.clientList = new ClientList();
+            for (Client client : clients) {
+                ClientItem clientItem = new ClientItem();
+                clientItem.setContractId(client.getContractId());
+                clientItem.setSan(client.getSan());
+                data.clientList.getClients().add(clientItem);
             }
+            data.resultCode = RC_OK;
+            data.description = "OK";
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;

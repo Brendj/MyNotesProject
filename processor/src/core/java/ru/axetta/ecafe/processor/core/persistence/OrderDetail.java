@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.awt.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -225,4 +227,12 @@ public class OrderDetail {
         else if (menuOrigin==PRODUCT_PURCHASE) return PRODUCTION_NAMES_TYPES[3];
         return "Неизвестное";
     }
+
+    public boolean isComplex() {
+        return menuType>=TYPE_COMPLEX_0 && menuType<=TYPE_COMPLEX_9;
+    }
+    public boolean isComplexItem() {
+        return menuType>=TYPE_COMPLEX_ITEM_0 && menuType<=TYPE_COMPLEX_ITEM_9;
+    }
+
 }
