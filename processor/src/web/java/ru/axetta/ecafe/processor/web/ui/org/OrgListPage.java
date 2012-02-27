@@ -61,6 +61,8 @@ public class OrgListPage extends BasicWorkspacePage {
         }
     }
 
+    private final OrgFilter orgFilter = new OrgFilter();
+
     private List<Item> items = Collections.emptyList();
 
     public String getPageFilename() {
@@ -75,15 +77,23 @@ public class OrgListPage extends BasicWorkspacePage {
         return items;
     }
 
+    public OrgFilter getOrgFilter() {
+        return orgFilter;
+    }
+
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        Criteria criteria = session.createCriteria(Org.class);
-        criteria.addOrder(Order.asc("idOfOrg"));
-        List orgs = criteria.list();
-        for (Object object : orgs) {
-            Org org = (Org) object;
-            items.add(new Item(org));
+
+        /* Добавленна проверка на фильтр
+         * производится выборка только при введении одного из параметров фильтра */
+        if(!orgFilter.isEmpty()){
+            List orgs = orgFilter.retrieveOrgs(session);
+            for (Object object : orgs) {
+                Org org = (Org) object;
+                items.add(new Item(org));
+            }
         }
+
         this.items = items;
     }
 

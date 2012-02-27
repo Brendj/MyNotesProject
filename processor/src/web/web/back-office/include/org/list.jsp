@@ -9,60 +9,96 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель просмотра списка организаций --%>
-<rich:dataTable id="orgListTable" binding="#{mainPage.orgListPage.pageComponent}" value="#{mainPage.orgListPage.items}"
-                var="item" rows="20" footerClass="data-table-footer"
-                columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Идентификатор" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Организация" />
-        </f:facet>
-        <h:commandLink value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
-            <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-        </h:commandLink>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Статус" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.state}" converter="orgStateConverter" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Номер договора" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Контактный телефон" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
-    </rich:column>
+<h:panelGrid id="orgListPanelGrid" binding="#{mainPage.orgListPage.pageComponent}" styleClass="borderless-grid">
 
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Редактировать" />
+    <%-- Панель фильтрации организации:
+     фильтр производится по идентификатору и по имени организации --%>
+
+    <rich:simpleTogglePanel label="Фильтр (#{mainPage.orgListPage.orgFilter.status})" switchType="org"
+                            eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <h:outputText escape="true" value="Идентификатор организации" styleClass="output-text" />
+
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.idOfOrg}" maxlength="5"
+                             styleClass="input-text" />
+
+                <h:outputText escape="true" value="Наименование организации" styleClass="output-text" />
+
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.officialName}" maxlength="64"
+                             styleClass="input-text" />
+
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+            <a4j:commandButton value="Применить" action="#{mainPage.updateOrgListPage}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+
+            <a4j:commandButton value="Очистить" action="#{mainPage.clearOrgListPageFilter}"
+                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
+
+
+    <rich:dataTable id="orgListTable" value="#{mainPage.orgListPage.items}"
+                    var="item" rows="20" footerClass="data-table-footer"
+                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Идентификатор" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Организация" />
+            </f:facet>
+            <h:commandLink value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </h:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.state}" converter="orgStateConverter" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Номер договора" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Контактный телефон" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
+        </rich:column>
+
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Редактировать" />
+            </f:facet>
+            <h:commandLink action="#{mainPage.showOrgEditPage}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </h:commandLink>
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="orgListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
         </f:facet>
-        <h:commandLink action="#{mainPage.showOrgEditPage}" styleClass="command-link">
-            <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-            <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-        </h:commandLink>
-    </rich:column>
-    <f:facet name="footer">
-        <rich:datascroller for="orgListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                           stepControls="auto" boundaryControls="hide">
-            <f:facet name="previous">
-                <h:graphicImage value="/images/16x16/left-arrow.png" />
-            </f:facet>
-            <f:facet name="next">
-                <h:graphicImage value="/images/16x16/right-arrow.png" />
-            </f:facet>
-        </rich:datascroller>
-    </f:facet>
-</rich:dataTable>
+    </rich:dataTable>
+</h:panelGrid>
+
+
