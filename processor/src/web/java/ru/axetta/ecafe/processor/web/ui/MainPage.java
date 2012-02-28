@@ -6457,8 +6457,56 @@ public class MainPage {
         return "showAllComplexCSVList";
     }
 
-    public String showArgOrgsDiscountsCSVList() {
-        return "showArgOrgsDiscountsCSVList";
+    public Object removeClientFromList() {
+        clientListPage.removeClientFromList(selectedIdOfClient);
+        return null;
     }
 
+    public Object setLimit() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientListPage.setLimit(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to set new limit", e);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
+    public Object setOrg() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientListPage.setOrg(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to set new org", e);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
 }

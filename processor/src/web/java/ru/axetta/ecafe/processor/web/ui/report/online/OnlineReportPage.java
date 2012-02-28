@@ -5,21 +5,25 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-public abstract class OnlineReportPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+public abstract class OnlineReportPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, OrgSelectPage.CompleteHandler {
     protected Date startDate;
     protected Date endDate;
     protected List<Long> idOfOrgList = new ArrayList<Long>();
     protected Calendar localCalendar;
+    protected Long idOfOrg;
 
     public OnlineReportPage() throws RuntimeContext.NotInitializedException {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -76,6 +80,16 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
                 }
                 filter = filter.substring(0, filter.length() - 1);
             }
+        }
+    }
+
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.idOfOrg = idOfOrg;
+        if (this.idOfOrg == null) {
+            filter = "Не выбрано";
+        } else {
+            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            filter = org.getShortName();
         }
     }
 

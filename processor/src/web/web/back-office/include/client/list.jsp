@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Панель просмотра списка клиентов --%>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
@@ -136,6 +137,15 @@
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </h:commandLink>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Исключить" />
+            </f:facet>
+            <h:commandLink action="#{mainPage.removeClientFromList}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </h:commandLink>
+        </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="clientListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
@@ -148,5 +158,32 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
+
+    <c:if test="${!ru.axetta.ecafe.processor.web.ui.MainPage.sessionInstance.eligibleToEditClients}" >
+        <rich:tabPanel>
+            <rich:tab label="Изменение лимита овердрафта">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Лимит овердрафта"/>
+                    <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
+            <rich:tab label="Изменение организации">
+                <h:panelGrid styleClass="borderless-grid" columns="3">
+                    <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;" />
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
+                    <rich:spacer/>
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
+        </rich:tabPanel>
+    </c:if>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </h:panelGrid>

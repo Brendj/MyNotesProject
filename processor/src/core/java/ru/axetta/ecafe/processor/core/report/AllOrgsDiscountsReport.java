@@ -28,6 +28,14 @@ public class AllOrgsDiscountsReport extends BasicReport {
     private static List<OrgDiscounts> itemsList;
     private List<String> columnNames;
 
+    public Long getCount() {
+        Long result = 0L;
+        for (OrgDiscounts discounts : itemsList) {
+            result += ((Long)discounts.getValues().get(1)).longValue();
+        }
+        return result;
+    }
+
     public Object[] getColumnNames() {
         return columnNames.toArray();
     }

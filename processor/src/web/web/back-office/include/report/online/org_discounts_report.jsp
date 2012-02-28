@@ -21,16 +21,16 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:panelGroup>
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.orgDiscountsReportPage.filter}}" />
         </h:panelGroup>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgDiscountsReport}"
-                           reRender="mainMenu, workspaceTogglePanel, orgDiscountsReportTable"
+                           reRender="orgDiscountsReportTable"
                            styleClass="commandButton" status="sReportGeneratorStatus" />
         <a4j:status id="sReportGenerateStatus">
             <f:facet name="start">
@@ -77,7 +77,7 @@
                 <%--</rich:column>--%>
 
             <f:facet name="footer">
-                <h:outputText value="Итого по ОУ: #{mainPage.orgDiscountsReportPage.orgDiscountsReport.size}"/>
+                <h:outputText value="Итого по ОУ: #{mainPage.orgDiscountsReportPage.orgDiscountsReport.count}"/>
                 <rich:datascroller for="orgDiscountsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                    stepControls="auto" boundaryControls="hide">
                     <f:facet name="previous">

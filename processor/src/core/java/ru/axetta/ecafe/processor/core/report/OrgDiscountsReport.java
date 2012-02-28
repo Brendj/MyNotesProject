@@ -18,52 +18,41 @@ import java.util.*;
 public class OrgDiscountsReport extends BasicReport {
 
     private final List<ReportItem> itemList;
+    private Long count = null;
 
     public OrgDiscountsReport() {
         super();
         itemList = Collections.emptyList();
     }
 
-    public OrgDiscountsReport(Date generateTime, long generateDuration, List<ReportItem> itemList) {
+    public OrgDiscountsReport(Date generateTime, long generateDuration, List<ReportItem> itemList, Long count) {
         super(generateTime, generateDuration);
         this.itemList = itemList;
+        this.count = count;
     }
 
     public List<ReportItem> getItemList() {
         return itemList;
     }
 
-    public Integer getSize() {
-        Integer count = 0;
-        for (ReportItem ri : itemList) {
-            count += ri.getSize();
-        }
+    public Long getCount() {
         return count;
     }
 
     public static class Builder {
 
-        public OrgDiscountsReport build(Session session, List<Long> idOfOrgList) throws Exception {
+        public OrgDiscountsReport build(Session session, Long idOfOrg) throws Exception {
             Date generateTime = new Date();
             List<ReportItem> reportItems = new ArrayList<ReportItem>();
-
-            if (!idOfOrgList.isEmpty()) {
-
-                //Map<Long, ReportItem> groupMap = new HashMap<Long, ReportItem>();
-
-                String orgCondition = "(";
-                for (Long idOfOrg : idOfOrgList) {
-                    orgCondition = orgCondition.concat("c.org.idOfOrg = " + idOfOrg + " or ");
-                    break; // берем только первую школу
-                }
-                orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ")";
+            Long countResult = null;
+            if (idOfOrg != null) {
 
                 String q = "select c.idOfClient, c.idOfClientGroup, c.clientGroup.groupName, c.person.firstName, c.person.secondName, c.person.surname, cd.categoryName "
                     +  " from Client c, ClientsCategoryDiscount cc, CategoryDiscount cd"
                     + " where c.idOfClient=cc.idOfClient and "
                         + " cc.idOfCategoryDiscount >= 0 and "
                         + " cd.idOfCategoryDiscount=cc.idOfCategoryDiscount and "
-                        + orgCondition
+                        + " c.org.idOfOrg = " + idOfOrg
                     + " order by c.idOfClientGroup, c.person.secondName";
 
                 List clientList = session.createQuery(q).list();
@@ -83,12 +72,6 @@ public class OrgDiscountsReport extends BasicReport {
                     } else
                         reportItem = lastReportItem;
 
-                    //ReportItem reportItem = groupMap.get((Long)client[1]);
-                    //if (reportItem == null) {
-                    //    reportItem = new ReportItem((String)client[2]);
-                    //    groupMap.put((Long)client[1], reportItem);
-                    //}
-
                     String fio = String.format("%s %s %s", (String)client[3], (String)client[4], (String)client[5]);
                     if (!lastClientId.equals((Long)client[0])) {
                         lastSubReportItem = reportItem.addSubItem(fio, (String)client[6]);
@@ -97,10 +80,18 @@ public class OrgDiscountsReport extends BasicReport {
                         lastSubReportItem.addCategory((String)client[6]);
                 }
 
-                //reportItems.addAll(groupMap.values());
+                // поиск общего количества льготников (включая тех, у кого пустая группа)
+                q = "select count(distinct c.idOfClient) as fullCount"
+                    + " from Client c, ClientsCategoryDiscount cc "
+                    + " where c.idOfClient=cc.idOfClient and "
+                        + " cc.idOfCategoryDiscount >= 0 and "
+                        + " c.org.idOfOrg = " + idOfOrg;
+
+                List result = session.createQuery(q).list();
+                countResult = (Long) result.get(0);
             }
 
-            return new OrgDiscountsReport(generateTime,  new Date().getTime() - generateTime.getTime(), reportItems);
+            return new OrgDiscountsReport(generateTime,  new Date().getTime() - generateTime.getTime(), reportItems, countResult);
         }
 
 

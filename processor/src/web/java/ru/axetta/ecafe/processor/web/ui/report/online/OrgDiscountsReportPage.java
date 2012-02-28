@@ -29,6 +29,6 @@ public class OrgDiscountsReportPage extends OnlineReportPage {
 
     public void buildReport(Session session) throws Exception {
         OrgDiscountsReport.Builder builder = new OrgDiscountsReport.Builder();
-        orgDiscountsReport = builder.build(session, idOfOrgList);
+        orgDiscountsReport = builder.build(session, idOfOrg);
     }
 }

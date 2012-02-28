@@ -11,12 +11,11 @@ import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -229,6 +228,15 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
     private List<Item> items = Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
+    private Long limit = 0L;
+
+    public Long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Long limit) {
+        this.limit = limit;
+    }
 
     public String getPageFilename() {
         return "client/list";
@@ -258,6 +266,74 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 Client client = (Client) object;
                 items.add(new Item(client));
             }
+        }
+        this.items = items;
+    }
+
+    public void removeClientFromList(Long clientId) {
+        for (Item item : this.getItems()) {
+            if (item.getIdOfClient().equals(clientId)) {
+                this.getItems().remove(item);
+                //this.clientFilter.getRemovedClients().add(item.getIdOfClient());
+                break;
+            }
+        }
+    }
+
+    /**
+     * Установить овердрафт для выбранного списка клиентов
+     * @param session
+     * @throws Exception
+     */
+    public void setLimit(Session session) throws Exception {
+        if (this.items.isEmpty())
+            return;
+        // создаем множество id клиентов
+        Set<Long> clientId = new HashSet<Long>();
+        for (Item item : this.items) {
+            clientId.add(item.getIdOfClient());
+        }
+        Criteria criteria = session.createCriteria(Client.class);
+        List<Item> items = new LinkedList<Item>();
+        // берем из базы лист клиентов, айди которых входят в множество clientId
+        criteria.add(Restrictions.in("idOfClient", clientId));
+        List clients = criteria.list();
+        for (Object object : clients) {
+            Client client = (Client) object;
+            // устанвливаем овердрафт
+            client.setLimit(limit);
+            session.persist(client);
+            items.add(new Item(client));
+        }
+        this.items = items;
+    }
+
+    public void setOrg(Session session) {
+        if (this.items.isEmpty())
+            return;
+        Org org = null;
+        if (this.getClientFilter().getOrg().getIdOfOrg() != null) {
+            org = (Org) session.load(Org.class, this.getClientFilter().getOrg().getIdOfOrg());
+        }
+        if (org == null)
+            return;;
+
+        // создаем множество id клиентов
+        Set<Long> clientId = new HashSet<Long>();
+        for (Item item : this.items) {
+            clientId.add(item.getIdOfClient());
+        }
+        Criteria criteria = session.createCriteria(Client.class);
+        List<Item> items = new LinkedList<Item>();
+        // берем из базы лист клиентов, айди которых входят в множество clientId
+        criteria.add(Restrictions.in("idOfClient", clientId));
+        List clients = criteria.list();
+        for (Object object : clients) {
+            Client client = (Client) object;
+            // устанвливаем организацию
+            client.setOrg(org);
+            session.persist(client);
+            items.add(new Item(client));
         }
         this.items = items;
     }

@@ -53,6 +53,7 @@
                 </c:if>
 
                 <f:facet name="footer">
+                    <h:outputText value="Итого: #{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.count}" escape="true" styleClass="output-text"/>
                     <rich:datascroller for="orgsDiscountsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                        stepControls="auto" boundaryControls="hide">
                         <f:facet name="previous">
