@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -260,6 +261,7 @@ public class MainPage {
     private final OrgListSelectPage orgListSelectPage = new OrgListSelectPage();
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
+    private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
 
     // baybikov (06.12.2011)
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
@@ -1203,6 +1205,104 @@ public class MainPage {
             currentTopMostPage = modalPages.peek();
         }
         return currentTopMostPage;
+    }
+
+    public ClientGroupSelectPage getClientGroupSelectPage() {
+        return clientGroupSelectPage;
+    }
+
+    public Object showClientGroupSelectPage(){
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ClientGroupSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                if(params.get("idOfOrg") != null){
+                    Long idOfOrg = Long.parseLong(params.get("idOfOrg"));
+                    clientGroupSelectPage.fill(persistenceSession, idOfOrg);
+                } else {
+                    clientGroupSelectPage.fill(persistenceSession, Long.parseLong("0"));
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                clientGroupSelectPage.pushCompleteHandler((ClientGroupSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(clientGroupSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill client group selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора группы клиента", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+        }
+        return null;
+    }
+
+    public Object updateClientGroupSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if(params.get("idOfOrg") != null){
+                Long idOfOrg = Long.parseLong(params.get("idOfOrg"));
+                clientGroupSelectPage.fill(persistenceSession, idOfOrg);
+            } else {
+                clientGroupSelectPage.fill(persistenceSession, Long.parseLong("0"));
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
+    public Object completeClientGroupSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientGroupSelectPage.completeClientGroupSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == clientGroupSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
     }
 
     public Object showOrgSelectPage() {
@@ -5905,6 +6005,7 @@ public class MainPage {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategoryListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
+            Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -5912,7 +6013,11 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                categoryListSelectPage.fill(persistenceSession);
+                if(params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")){
+                    categoryListSelectPage.fill(persistenceSession, false);
+                } else {
+                    categoryListSelectPage.fill(persistenceSession, true);
+                }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 categoryListSelectPage.pushCompleteHandlerList((CategoryListSelectPage.CompleteHandlerList) currentTopMostPage);
@@ -5933,6 +6038,7 @@ public class MainPage {
     // Kadyrov (18.01.2012)
     public Object updateCategoryListSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -5940,7 +6046,11 @@ public class MainPage {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            categoryListSelectPage.fill(persistenceSession);
+            if(params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")){
+                categoryListSelectPage.fill(persistenceSession, false);
+            } else {
+                categoryListSelectPage.fill(persistenceSession, true);
+            }
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

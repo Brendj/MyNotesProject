@@ -70,17 +70,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     public void setCategoriesDiscounts(List<CategoryDiscount> categoriesDiscounts) {
         this.categoriesDiscounts = categoriesDiscounts;
     }
-                    /*
-    private List<String> categoryDiscountNames;
 
-    public List<String> getCategoryDiscountNames() {
-        return categoryDiscountNames;
-    }
-
-    public boolean isCategoryDiscountNamesEmpty() {
-        return categoryDiscountNames.isEmpty();
-    }
-                      */
     public boolean isCategoryiesDiscounts(){
         return categoriesDiscounts.isEmpty() ;
     }

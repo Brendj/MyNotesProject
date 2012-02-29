@@ -44,6 +44,10 @@
         <c:import url="include/client/select.jsp" />
     </f:subview>
 
+    <f:subview id="clientGroupSelectSubView">
+        <c:import url="include/client/select_group.jsp" />
+    </f:subview>
+
     <f:subview id="categorySelectSubView">
         <c:import url="include/option/categorydiscount/select.jsp" />
     </f:subview>

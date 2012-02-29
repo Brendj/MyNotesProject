@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -28,7 +25,8 @@ import java.util.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList {
+public class ClientEditPage extends BasicWorkspacePage
+        implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList, ClientGroupSelectPage.CompleteHandler {
 
 
     public static class OrgItem {
@@ -182,6 +180,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balance;
     private Long limit;
     private Long expenditureLimit;
+    private ClientGroup clientGroup;
+
+    public ClientGroup getClientGroup() {
+        return clientGroup;
+    }
+
+    public void setClientGroup(ClientGroup clientGroup) {
+        this.clientGroup = clientGroup;
+    }
 
     // Kadyrov (22.12.2011)
     private String san;
@@ -427,6 +434,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         fill(client);
     }
 
+    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception{
+        if(null != idOfClientGroup){
+            this.clientGroup = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup));
+        }
+    }
+
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
@@ -491,7 +504,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
+
         persistenceSession.update(client);
+        if(this.clientGroup != null){
+            this.clientGroup.addClient(client);
+            client.setIdOfClientGroup(this.clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            clientGroup.addClient(client);
+            persistenceSession.update(clientGroup);
+        }
         fill(client);
     }
 

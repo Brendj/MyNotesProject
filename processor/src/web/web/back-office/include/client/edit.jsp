@@ -75,6 +75,18 @@
         <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
         <h:inputText value="#{mainPage.clientEditPage.person.idDocument}" maxlength="128" styleClass="input-text" />
     </h:panelGrid>
+
+    <h:outputText escape="true" value="Группа" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.clientEditPage.clientGroup.groupName}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" >
+            <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+        </a4j:commandButton>
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.clientEditPage.balance}" maxlength="20"
                  converter="copeckSumConverter" styleClass="input-text" />
@@ -110,9 +122,13 @@
     <h:panelGroup>
         <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" />
+                           styleClass="command-link" style="width: 25px;" >
+             <f:param name="fullList" value="false" />
+        </a4j:commandButton>
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
     </h:panelGroup>
+
+
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />

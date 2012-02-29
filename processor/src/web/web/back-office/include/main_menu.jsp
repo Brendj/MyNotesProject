@@ -510,9 +510,9 @@
                             action="#{ruleListPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{ruleEditPage.entityName}"
-                            rendered="false">
+                            rendered="false">  <%--
             <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-
+                                                   --%>
             <rich:panelMenuItem id="editRuleMenuItem" binding="#{ruleEditPage.mainMenuComponent}"
                                 label="Редактирование" action="#{ruleEditPage.show}" reRender="workspaceForm" />
 

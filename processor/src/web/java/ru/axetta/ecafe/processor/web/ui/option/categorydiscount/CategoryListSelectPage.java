@@ -98,24 +98,24 @@ public class CategoryListSelectPage extends BasicPage {
         this.filter = filter;
     }
 
-    public void fill(Session session) throws Exception {
+    public void fill(Session session, boolean flag) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        List categoryDiscounts = retrieveCategory(session);
+        List categoryDiscounts = retrieveCategory(session, flag);
         for (Object object : categoryDiscounts) {
             CategoryDiscount categoryDiscount = (CategoryDiscount) object;
             Item item = new Item(categoryDiscount);
-
             items.add(item);
         }
         this.items = items;
     }
 
-    private List retrieveCategory(Session session) throws HibernateException {
+    private List retrieveCategory(Session session, boolean flag) throws HibernateException {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
         criteria.addOrder(Order.asc("idOfCategoryDiscount"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE));
         }
+        if(!flag) criteria.add(Restrictions.ge("idOfCategoryDiscount",Long.parseLong("0")));
         return criteria.list();
     }
 }
