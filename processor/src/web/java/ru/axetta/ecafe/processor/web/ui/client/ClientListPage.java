@@ -85,7 +85,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     public static class Item {
 
         private final Long idOfClient;
-        private final OrgItem org;
+        private OrgItem org;
         private final PersonItem person;
         private final PersonItem contractPerson;
         private final Integer flags;
@@ -103,9 +103,21 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final long cardCount;
         private final String clientGroupName;
         private final Long balance;
-        private final Long limit;
-        private final Long expenditureLimit;
+        private Long limit;
+        private Long expenditureLimit;
         private final Integer discountMode;
+
+        public void setExpenditureLimit(Long expenditureLimit) {
+            this.expenditureLimit = expenditureLimit;
+        }
+
+        public void setOrg(OrgItem org) {
+            this.org = org;
+        }
+
+        public void setLimit(Long limit) {
+            this.limit = limit;
+        }
 
         public Long getBalance() {
             return balance;
@@ -229,6 +241,15 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     private List<Item> items = Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
     private Long limit = 0L;
+    private Long expenditureLimit = 0L;
+
+    public Long getExpenditureLimit() {
+        return expenditureLimit;
+    }
+
+    public void setExpenditureLimit(Long expenditureLimit) {
+        this.expenditureLimit = expenditureLimit;
+    }
 
     public Long getLimit() {
         return limit;
@@ -274,14 +295,13 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.getItems()) {
             if (item.getIdOfClient().equals(clientId)) {
                 this.getItems().remove(item);
-                //this.clientFilter.getRemovedClients().add(item.getIdOfClient());
                 break;
             }
         }
     }
 
     /**
-     * Установить овердрафт для выбранного списка клиентов
+     * Установить лимит овердрафта для выбранного списка клиентов
      * @param session
      * @throws Exception
      */
@@ -289,53 +309,70 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         if (this.items.isEmpty())
             return;
         // создаем множество id клиентов
-        Set<Long> clientId = new HashSet<Long>();
+        List<Long> clientsId = new ArrayList<Long>();
         for (Item item : this.items) {
-            clientId.add(item.getIdOfClient());
+            clientsId.add(item.getIdOfClient());
         }
-        Criteria criteria = session.createCriteria(Client.class);
-        List<Item> items = new LinkedList<Item>();
-        // берем из базы лист клиентов, айди которых входят в множество clientId
-        criteria.add(Restrictions.in("idOfClient", clientId));
-        List clients = criteria.list();
-        for (Object object : clients) {
-            Client client = (Client) object;
-            // устанвливаем овердрафт
-            client.setLimit(limit);
-            session.persist(client);
-            items.add(new Item(client));
+        org.hibernate.Query q = session.createQuery("update Client set limit = :newLimit where idOfClient in :clientsId");
+        q.setLong("newLimit", limit);
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при установлении лимита овердрафта.");
+        for (Item item : this.getItems()) {
+            item.setLimit(limit);
         }
-        this.items = items;
     }
 
-    public void setOrg(Session session) {
+
+    /**
+     * Устанавливаем организацию для выбранного списка клиентов
+     * @param session
+     */
+    public void setOrg(Session session) throws Exception {
         if (this.items.isEmpty())
             return;
         Org org = null;
+        OrgItem orgItem = null;
         if (this.getClientFilter().getOrg().getIdOfOrg() != null) {
             org = (Org) session.load(Org.class, this.getClientFilter().getOrg().getIdOfOrg());
         }
         if (org == null)
-            return;;
-
+            return;
+        else
+            orgItem = new OrgItem(org);
         // создаем множество id клиентов
-        Set<Long> clientId = new HashSet<Long>();
+        Set<Long> clientsId = new HashSet<Long>();
         for (Item item : this.items) {
-            clientId.add(item.getIdOfClient());
+            clientsId.add(item.getIdOfClient());
         }
-        Criteria criteria = session.createCriteria(Client.class);
-        List<Item> items = new LinkedList<Item>();
-        // берем из базы лист клиентов, айди которых входят в множество clientId
-        criteria.add(Restrictions.in("idOfClient", clientId));
-        List clients = criteria.list();
-        for (Object object : clients) {
-            Client client = (Client) object;
-            // устанвливаем организацию
-            client.setOrg(org);
-            session.persist(client);
-            items.add(new Item(client));
+        org.hibernate.Query q = session.createQuery("update Client set org.idOfOrg = :newOrg where idOfClient in :clientsId");
+        q.setLong("newOrg", org.getIdOfOrg());
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при установлении лимита овердрафта.");
+        // устанавливаем лорганизацию в бинах страницы
+        for (Item item : this.getItems()) {
+            item.setOrg(orgItem);
         }
-        this.items = items;
     }
+
+    public void setExpenditureLimit(Session session) throws Exception {
+        if (this.items.isEmpty())
+            return;
+        List<Long> clientsId = new ArrayList<Long>();
+        for (Item item : this.items) {
+            clientsId.add(item.getIdOfClient());
+        }
+        org.hibernate.Query q = session.createQuery("update Client set expenditureLimit = :newExpenditureLimit where idOfClient in :clientsId");
+        q.setLong("newExpenditureLimit", expenditureLimit);
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при установлении лимита дневныъ трат овердрафта.");
+        for (Item item : this.getItems()) {
+            item.setExpenditureLimit(expenditureLimit);
+        }
+    }
+
+
 
 }
