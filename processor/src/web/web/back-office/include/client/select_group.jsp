@@ -52,15 +52,18 @@
                     <rich:dataTable width="100%" align="center" id="modalClientGroupSelectorClientGroupTable"
                                     value="#{mainPage.clientGroupSelectPage.items}" var="item" rows="8"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                    rowKeyVar="row"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
                         <a4j:support event="onRowClick" reRender="modalClientGroupSelectorForm">
                             <f:setPropertyActionListener value="#{item}"
                                                          target="#{mainPage.clientGroupSelectPage.selectedItem}" />
                         </a4j:support>
+
                         <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{item.idOfClientGroup}" styleClass="output-text" />
+                            <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
                         </rich:column>
+
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.groupName}"
                                           styleClass="output-text" />

@@ -180,14 +180,15 @@ public class ClientEditPage extends BasicWorkspacePage
     private Long balance;
     private Long limit;
     private Long expenditureLimit;
-    private ClientGroup clientGroup;
+    private String clientGroupName;
+    private Long idOfClientGroup;
 
-    public ClientGroup getClientGroup() {
-        return clientGroup;
+    public String getClientGroupName() {
+        return clientGroupName;
     }
 
-    public void setClientGroup(ClientGroup clientGroup) {
-        this.clientGroup = clientGroup;
+    public void setClientGroupName(String clientGroupName) {
+        this.clientGroupName = clientGroupName;
     }
 
     // Kadyrov (22.12.2011)
@@ -430,13 +431,14 @@ public class ClientEditPage extends BasicWorkspacePage
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }
-
+        this.clientGroupName =client.getClientGroup() == null? "" : client.getClientGroup().getGroupName();
         fill(client);
     }
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception{
         if(null != idOfClientGroup){
-            this.clientGroup = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup));
+             this.idOfClientGroup = idOfClientGroup;
+             this.clientGroupName = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup)).getGroupName();
         }
     }
 
@@ -505,13 +507,11 @@ public class ClientEditPage extends BasicWorkspacePage
         client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
 
-        persistenceSession.update(client);
-        if(this.clientGroup != null){
-            this.clientGroup.addClient(client);
-            client.setIdOfClientGroup(this.clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            clientGroup.addClient(client);
-            persistenceSession.update(clientGroup);
+        if(this.idOfClientGroup != null){
+            client.setIdOfClientGroup(this.idOfClientGroup);
         }
+
+        persistenceSession.update(client);
         fill(client);
     }
 

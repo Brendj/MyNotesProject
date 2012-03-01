@@ -78,7 +78,7 @@
 
     <h:outputText escape="true" value="Группа" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.clientEditPage.clientGroup.groupName}" readonly="true" styleClass="input-text"
+        <h:inputText value="#{mainPage.clientEditPage.clientGroupName}" readonly="true" styleClass="input-text"
                      style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
