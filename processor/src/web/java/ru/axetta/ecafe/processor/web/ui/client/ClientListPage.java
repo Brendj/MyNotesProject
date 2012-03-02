@@ -236,12 +236,27 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         public String getClientGroupName() {
             return clientGroupName;
         }
+
+
+        public String getIdOfClientString() {
+            return this.getIdOfClient().toString();
+        }
+
     }
 
     private List<Item> items = Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
     private Long limit = 0L;
     private Long expenditureLimit = 0L;
+    private String filterClientId;
+
+    public String getFilterClientId() {
+        return filterClientId;
+    }
+
+    public void setFilterClientId(String filterClientId) {
+        this.filterClientId = filterClientId;
+    }
 
     public Long getExpenditureLimit() {
         return expenditureLimit;
@@ -291,6 +306,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         this.items = items;
     }
 
+    /**
+     * удаление клиента из списка
+     * @param clientId
+     */
     public void removeClientFromList(Long clientId) {
         for (Item item : this.getItems()) {
             if (item.getIdOfClient().equals(clientId)) {
@@ -356,6 +375,11 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
+    /**
+     * Установка лимита дневных трат
+     * @param session
+     * @throws Exception
+     */
     public void setExpenditureLimit(Session session) throws Exception {
         if (this.items.isEmpty())
             return;
@@ -373,6 +397,21 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-
+    /**
+     * Метод для реализации фильтрации клиентов по id
+     * @param current
+     * @return
+     */
+    public boolean filterIds(Object current) {
+        if (filterClientId == null ||  filterClientId.length()==0) {
+            return true;
+        }
+        Item item = (Item)current;
+        if (item.getIdOfClientString().toLowerCase().startsWith(filterClientId.toLowerCase())) {
+            return true;
+        }else {
+            return false;
+        }
+    }
 
 }

@@ -8,6 +8,25 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<script type="text/javascript">
+    function setCaretToEnd (e) {
+        var control = $((e.target ? e.target : e.srcElement).id);
+        if (control.createTextRange) {
+            var range = control.createTextRange();
+            range.collapse(false);
+            range.select();
+        }
+        else if (control.setSelectionRange) {
+            control.focus();
+            var length = control.value.length;
+            control.setSelectionRange(length, length);
+        }
+        control.selectionStart = control.selectionEnd = control.value.length;
+    }
+
+</script>
 
 <%-- Панель просмотра списка клиентов --%>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
@@ -74,9 +93,30 @@
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
+    <a4j:status id="sReportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
+        <rich:column headerClass="column-header" filterMethod="#{mainPage.clientListPage.filterIds}" >
+            <f:facet name="header">
+                <h:panelGrid columns="1">
+                    <h:outputText escape="true" value="Идентификатор" />
+                    <h:inputText value="#{mainPage.clientListPage.filterClientId}" id="input">
+                        <a4j:support event="onkeyup" reRender="clientListTable"
+                            ignoreDupResponses="true" requestDelay="700"
+                            oncomplete="setCaretToEnd(event);"
+                            />
+                    </h:inputText>
+                </h:panelGrid>
+            </f:facet>
+            <h:outputText escape="true" value="#{item.idOfClient}"
+                              styleClass="output-text" />
+        </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
@@ -166,7 +206,7 @@
                 <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
                 <rich:spacer/>
                 <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               reRender="workspaceTogglePanel" styleClass="command-button"/>
             </h:panelGrid>
         </rich:simpleTogglePanel>
         <rich:simpleTogglePanel switchType="client" label="Изменение организации" opened="false">
