@@ -1396,7 +1396,15 @@ public class Processor implements SyncProcessor,
                     // отправить уведомление по смс
                     boolean notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(
                             Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
-
+                    /*
+                    Criteria criteriaClientBySMS = persistenceSession.createCriteria(Client.class);
+                    criteriaClientBySMS.add( Restrictions.and(
+                            Restrictions.eq("idOfClient", e.getIdOfClient())),
+                            Restrictions.eq("notifyViaSMS", )
+                    );
+                    
+                    boolean sendedSMSOfClient = 
+                      */
                     logger.info("Preparing to send SMS, notifyBySMSAboutEnterEvent - " + notifyBySMSAboutEnterEvent
                                 + ", today - " + isDateToday(e.getEvtDateTime())
                                 + ", date - " + e.getEvtDateTime()
@@ -2388,42 +2396,45 @@ public class Processor implements SyncProcessor,
             ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
 
             Client client = (Client) session.get(Client.class, idOfClient);
+
             if (client == null)
                 throw new Exception ("Client doesn't exist");
-            
-            try {
-                String phoneNumber = client.getMobile();
-                if (StringUtils.isNotEmpty(phoneNumber)) {
-                    phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                    if (StringUtils.length(phoneNumber) == 11) {
-                        String sender = buildSender(client);
-                        String text = buildSmsText(client, passDirection, eventDate);
-                        String idOfSms = messageIdGenerator.generate();
-                        SendResponse sendResponse = null;
-                        try {
-                            logger.info(String.format("sending SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                                       idOfSms, sender, phoneNumber, text));
-                            sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
-                            logger.info(String.format("sended SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                                                                   idOfSms, sender, phoneNumber, text));
-                        } catch (Exception e) {
-                            if (logger.isWarnEnabled()) {
-                                logger.warn(String.format(
-                                        "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                        idOfSms, sender, phoneNumber, text), e);
+
+            if(client.isNotifyViaSMS()){
+                try {
+                    String phoneNumber = client.getMobile();
+                    if (StringUtils.isNotEmpty(phoneNumber)) {
+                        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
+                        if (StringUtils.length(phoneNumber) == 11) {
+                            String sender = buildSender(client);
+                            String text = buildSmsText(client, passDirection, eventDate);
+                            String idOfSms = messageIdGenerator.generate();
+                            SendResponse sendResponse = null;
+                            try {
+                                logger.info(String.format("sending SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                        idOfSms, sender, phoneNumber, text));
+                                sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
+                                logger.info(String.format("sended SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                        idOfSms, sender, phoneNumber, text));
+                            } catch (Exception e) {
+                                if (logger.isWarnEnabled()) {
+                                    logger.warn(String.format(
+                                            "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
+                                            idOfSms, sender, phoneNumber, text), e);
+                                }
                             }
-                        }
-                        if (null != sendResponse) {
-                            if (sendResponse.isSuccess()) {
-                                clientSmsProcessor
-                                        .registerClientSms(idOfClient, idOfSms, phoneNumber,
-                                                ClientSms.ENTER_EVENT_NOTIFY, text, new Date());
+                            if (null != sendResponse) {
+                                if (sendResponse.isSuccess()) {
+                                    clientSmsProcessor
+                                            .registerClientSms(idOfClient, idOfSms, phoneNumber,
+                                                    ClientSms.ENTER_EVENT_NOTIFY, text, new Date());
+                                }
                             }
                         }
                     }
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to send SMS to client: %s", client), e);
                 }
-            } catch (Exception e) {
-                logger.error(String.format("Failed to send SMS to client: %s", client), e);
             }
         } finally {
         }
