@@ -133,7 +133,7 @@ public class ReportRuleListPage extends BasicWorkspacePage {
     private List<RuleItem> items = Collections.emptyList();
 
     public String getPageFilename() {
-        return "report/discountrule/list";
+        return "report/rule/list";
     }
 
     public String getPageTitle() {

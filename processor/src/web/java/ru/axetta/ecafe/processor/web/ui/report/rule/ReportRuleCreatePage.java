@@ -36,7 +36,7 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
 
     public String getPageFilename() {
-        return "report/discountrule/create";
+        return "report/rule/create";
     }
 
     public boolean isEnabled() {

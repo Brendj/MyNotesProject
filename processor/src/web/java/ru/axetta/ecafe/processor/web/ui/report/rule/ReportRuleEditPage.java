@@ -62,7 +62,7 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
     private List<ReportParamHint> reportParamHints = Collections.emptyList();
 
     public String getPageFilename() {
-        return "report/discountrule/edit";
+        return "report/rule/edit";
     }
 
     public ReportRuleEditPage() {
