@@ -796,12 +796,21 @@ public class Processor implements SyncProcessor,
             orderDetailCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
             orderDetailCriteria.setProjection(Projections.max("compositeIdOfOrderDetail.idOfOrderDetail"));
             List orderDetailMax=orderDetailCriteria.list();
+
+            Criteria enterEventCriteria = persistenceSession.createCriteria(EnterEvent.class);
+            enterEventCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            enterEventCriteria.setProjection(Projections.max("compositeIdOfEnterEvent.idOfEnterEvent"));
+            List enterEventMax = enterEventCriteria.list();
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            Long idOfOrderMax = (Long) orderMax.get(0), idOfOrderDetail = (Long) orderDetailMax.get(0);
+            Long idOfOrderMax = (Long) orderMax.get(0),
+                 idOfOrderDetail = (Long) orderDetailMax.get(0),
+                 idOfEnterEvent = (Long) enterEventMax.get(0);
             if (idOfOrderMax == null) idOfOrderMax = 0L;
             if (idOfOrderDetail == null) idOfOrderDetail = 0L;
-            return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail);
+            if  (idOfEnterEvent == null) idOfEnterEvent = 0L;
+            return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail, idOfEnterEvent);
             //return null;
         }  finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1685,7 +1694,31 @@ public class Processor implements SyncProcessor,
                     else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
                         bIncludeRule = true;
                     }
+                     /*
+                    if(categoryOrgSet.isEmpty()){
+                        if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
+                    } else {
+                        if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
+                        else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                            bIncludeRule = true;
+                        }
+                    }
+
+                    if(discountRule.getCategoryOrgs().isEmpty()
+                    || (!categoryOrgSet.isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())))
+                       */
                     if (bIncludeRule) {
+                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                                new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                        resCategoriesDiscountsAndRules.addDCRI(dcri);
+                    }
+                }
+            }  /* Организация не пренадлежит ни к одной категории*/
+               else{
+                for(Object object: criteriaDiscountRule.list()){
+                    DiscountRule discountRule = (DiscountRule) object;
+                    /* если правила не установлены категории организаций то отправляем*/
+                    if(discountRule.getCategoryOrgs().isEmpty()){
                         SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
                                 new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
                         resCategoriesDiscountsAndRules.addDCRI(dcri);
