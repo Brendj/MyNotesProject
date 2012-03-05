@@ -441,27 +441,31 @@ public class SyncResponse {
 
         private  Long IdOfOrder;
         private  Long IdOfOrderDetail;
+        private  Long IdOfEnterEvent;
 
         public CorrectingNumbersOrdersRegistry() {
             this.IdOfOrder = 0L;
             this.IdOfOrderDetail = 0L;
+            this.IdOfEnterEvent = 0L;
         }
 
-        public CorrectingNumbersOrdersRegistry(Long IdOfOrder, Long IdOfOrderDetail) {
+        public CorrectingNumbersOrdersRegistry(Long IdOfOrder, Long IdOfOrderDetail, Long IdOfEnterEvent) {
             this.IdOfOrder = IdOfOrder;
             this.IdOfOrderDetail = IdOfOrderDetail;
+            this.IdOfEnterEvent = IdOfEnterEvent;
         }
 
         public Element toElement(Document document) throws Exception {
             Element element = document.createElement("CorrectingNumbersOrdersRegistry");
             element.setAttribute("IdOfOrder", Long.toString(this.IdOfOrder));
             element.setAttribute("IdOfOrderDetails", Long.toString(this.IdOfOrderDetail));
+            element.setAttribute("IdOfEnterEvent", Long.toString(this.IdOfEnterEvent));
             return element;
         }
 
         @Override
         public String toString() {
-            return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails='" + IdOfOrderDetail + '\'' + '}';
+            return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails=" + IdOfOrderDetail +", IdOfEnterEvent='"+IdOfEnterEvent + '}';
         }
     }
 
