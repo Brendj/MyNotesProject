@@ -144,6 +144,16 @@ public class DAOUtils {
         return (ClientGroup) persistenceSession.get(ClientGroup.class, compositeIdOfClientGroup);
     }
 
+    public static ClientGroup findClientGroupByGroupNameAndIdOfOrg(Session persistenceSession,Long idOfOrg, String groupName) throws Exception{
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        return (ClientGroup) clientGroupCriteria.add(
+                Restrictions.and(
+                        Restrictions.eq("groupName", groupName).ignoreCase(),
+                        Restrictions.eq("org.idOfOrg",idOfOrg)
+                )
+        ).list().get(0);
+    }
+
     public static SyncHistory getSyncHistoryReference(Session persistenceSession, long idOfSync) throws Exception {
         return (SyncHistory) persistenceSession.load(SyncHistory.class, idOfSync);
     }
