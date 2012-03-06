@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.hibernate.SQLQuery;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -106,10 +107,21 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
         int lineNo = 0;
         int successLineNumber = 0;
+        /* массив с именами колонок */
+        String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS"};
+        int columnNumber=0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
         String currLine = reader.readLine();
         while (null != currLine) {
-            LineResult result = createClient(runtimeContext, dateFormat, currLine, lineNo);
+            /* в первой строке в файле содержатся имена колонок */
+            if(lineNo==0){
+                ++lineNo;
+                /* заполняем массив */
+                colums = currLine.split(";");
+                currLine = reader.readLine();
+                continue;
+            }
+            LineResult result = createClient(runtimeContext, dateFormat, currLine, lineNo, colums);
             if (result.getResultCode() == 0) {
                 ++successLineNumber;
             }
@@ -124,7 +136,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         this.successLineNumber = successLineNumber;
     }
 
-    private LineResult createClient(RuntimeContext runtimeContext, DateFormat dateFormat, String line, int lineNo) {
+    private LineResult createClient(RuntimeContext runtimeContext, DateFormat dateFormat, String line, int lineNo, String[] colums) {
         String[] tokens = line.split(";");
         if (tokens.length < 2) {
             return new LineResult(lineNo, 1, "Not enough data", null);
@@ -136,18 +148,27 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             long contractId = Long.parseLong(tokens[0]);
-            int contractState = Integer.parseInt(tokens[1]);
 
             Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if (client == null) {
                 return new LineResult(lineNo, 20, "Client not found", null);
             }
+            /* пробегаем по массиву и вставляем соответсвующие значения*/
+            for (int i=0; i<colums.length; i++){
+                if(colums[i].equalsIgnoreCase("ContractState")){
+                    client.setContractState(Integer.parseInt(tokens[i]));
+                }
+                if(colums[i].equalsIgnoreCase("MobilePhone")){
+                    client.setMobile(tokens[i]);
+                }
+                if(colums[i].equalsIgnoreCase("NotifyBySMS")){
+                    client.setNotifyViaSMS(Integer.parseInt(tokens[i])!=0);
+                }
+            }
 
-            client.setContractState(contractState);
             client.setUpdateTime(new Date());
             persistenceSession.update(client);
             Long idOfClient = client.getIdOfClient();
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
