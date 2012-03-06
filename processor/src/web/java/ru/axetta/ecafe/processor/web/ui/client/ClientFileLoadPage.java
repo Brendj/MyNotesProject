@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -16,8 +17,10 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -289,6 +292,15 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             client.setEmail(tokens[15]);
             if (tokens.length >= 21) {
                 client.setRemarks(tokens[20]);
+            }
+
+            /* проверяется есть ли в загрузочном файлу параметр для группы клиента (класс для учиника)*/
+            if (tokens.length >=22){
+                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, tokens[21]);
+                if(clientGroup != null){
+                    /* если существует данная группа в организации добавляем его клиенту*/
+                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                }
             }
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
