@@ -144,6 +144,16 @@ public class DAOUtils {
         return (ClientGroup) persistenceSession.get(ClientGroup.class, compositeIdOfClientGroup);
     }
 
+    /**
+     * производит выборку Группы клиента по номеру организации и имени группы
+     * игнорируя регистр имени группы
+     * @author Kadyrov Damir
+     * @since  2012-03-06
+     * @param persistenceSession ссылка на сессию
+     * @param idOfOrg идентификатор организации
+     * @param groupName имя группы
+     * @return null если таблица пуста, сущность ClientGroup
+     */
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrg(Session persistenceSession,Long idOfOrg, String groupName) throws Exception{
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
         return (ClientGroup) clientGroupCriteria.add(
