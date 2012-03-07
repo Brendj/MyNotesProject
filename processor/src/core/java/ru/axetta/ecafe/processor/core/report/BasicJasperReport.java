@@ -95,6 +95,7 @@ public class BasicJasperReport extends BasicReport {
             htmlExporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
             htmlExporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
             htmlExporter.setParameter(JRHtmlExporterParameter.BETWEEN_PAGES_HTML, null);
+            htmlExporter.setParameter(JRHtmlExporterParameter.CHARACTER_ENCODING, "windows-1251");
             htmlExporter.exportReport();
         }
 

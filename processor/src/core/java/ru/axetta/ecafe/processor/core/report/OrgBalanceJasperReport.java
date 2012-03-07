@@ -263,15 +263,15 @@ public class OrgBalanceJasperReport extends BasicJasperReport {
         private static TotalSums getTotalClientOrderSums(Session session, Date baseTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(clientOrder.sumByCard), sum(clientOrder.sumByCash), sum(clientOrder.discount) from Order clientOrder where clientOrder.client = ? and clientOrder.createTime < ?");
+                    "select sum(clientOrder.sumByCard) as SUM1, sum(clientOrder.sumByCash) as SUM2, "/*sum(clientOrder.discount)*/+" from Order clientOrder where clientOrder.client = ? and clientOrder.createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, baseTime);
             Object[] result = (Object[]) query.uniqueResult();
             if (null == result) {
                 return new TotalSums(0, 0, 0);
             } else {
-                return new TotalSums(defaultValue((Long) result[0]), defaultValue((Long) result[1]),
-                        defaultValue((Long) result[2]));
+                return new TotalSums(defaultValue((Long) result[0]), defaultValue((Long) result[1]), 0L);
+                        //defaultValue((Long) result[2]));
             }
         }
 

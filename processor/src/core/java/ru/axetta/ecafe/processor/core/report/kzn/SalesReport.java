@@ -101,7 +101,7 @@ public class SalesReport extends BasicReportForOrgJob {
             List<MealRow> mealRows = new LinkedList<MealRow>();
 
             //// горячее питание
-            Query complexQuery_0 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice), SUM(od.Qty*od.Discount)" +
+            Query complexQuery_0 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeComplex1 OR od.MenuType=:typeComplex2 OR od.MenuType=:typeComplex4 OR od.MenuType=:typeComplex5 OR od.MenuType=:typeComplex10) AND (od.rPrice>0) AND " +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
@@ -137,7 +137,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("freeComplexSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
 
             //// ГПД
-            Query complexQuery_1 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice), SUM(od.Qty*od.Discount)" +
+            Query complexQuery_1 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeComplex3 OR od.MenuType=:typeComplex4) AND (od.rPrice<>od.Discount) AND " +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
@@ -154,7 +154,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("complexDiscount_1", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
             //// Буфет собственное
-            Query mealsSelfProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice), SUM(od.Qty*od.Discount)" +
+            Query mealsSelfProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin0 OR od.MenuOrigin=:menuOrigin1 OR od.MenuOrigin=:menuOrigin2) AND" +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
@@ -172,7 +172,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("buffetSelfProductionDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
             //// Буфет закупочный
-            Query mealsBoughtQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice), SUM(od.Qty*od.Discount)" +
+            Query mealsBoughtQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin) AND" +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
@@ -188,7 +188,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("buffetBoughtDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
             //// ИТОГО (без бесплатных)
-            Query totalQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice), SUM(od.Qty*od.Discount)" +
+            Query totalQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish OR (od.MenuType>=:complexType0 AND od.MenuType<=:complexType9)) AND (od.rPrice>0) AND" +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
