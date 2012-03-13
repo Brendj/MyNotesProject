@@ -1,8 +1,9 @@
+
 /*
  * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.report.kzn;
+package ru.axetta.ecafe.processor.core.report.msc;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -18,18 +19,17 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.crypto.Data;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
- * User: kolpakov
- * Date: 14.03.11
- * Time: 0:14
+ * User: Frozen
+ * Date: 11.03.12
+ * Time: 13:46
  * To change this template use File | Settings | File Templates.
  */
-public class SalesReport extends BasicReportForOrgJob {
+public class MscSalesReport extends BasicReportForOrgJob {
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
@@ -37,25 +37,25 @@ public class SalesReport extends BasicReportForOrgJob {
     public static class Builder implements BasicReportJob.Builder {
 
         public static class MealRow {
-            private final int menuOrigin;
+            private final String menuGroup;
             private final String name;
             private final long count;
             private final long price, sum;
 
-            public MealRow(int menuOrigin, String name, long count, long price, long sum) {
+            public MealRow(String menuGroup, String name, long count, long price, long sum) {
                 this.name = name;
                 this.count = count;
                 this.price = price;
                 this.sum = sum;
-                this.menuOrigin = menuOrigin;
+                this.menuGroup = menuGroup;
             }
 
-            public int getMenuOrigin() {
-                return menuOrigin;
+            public String getMenuOrigin() {
+                return menuGroup;
             }
 
             public String getOriginName() {
-                return OrderDetail.getMenuOriginAsString(menuOrigin);
+                return menuGroup;
             }
 
             public String getName() {
@@ -87,6 +87,12 @@ public class SalesReport extends BasicReportForOrgJob {
             Map<Object, Object> parameterMap = new HashMap<Object, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
             parameterMap.put("orgName", org.getOfficialName());
+
+            // set date for test
+            //TODO delete
+            //startTime = new Date(1331032005000L);
+            //endTime   = new Date(1331118405000L);
+
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -97,7 +103,7 @@ public class SalesReport extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new SalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new MscSalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
@@ -126,7 +132,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("complexDiscount_0", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
             //// бесплатное питание
-            Query freeComplexQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.Discount)" +
+            Query freeComplexQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.Discount) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
@@ -140,8 +146,26 @@ public class SalesReport extends BasicReportForOrgJob {
             vals=(Object[])freeComplexQuery.uniqueResult();
             parameterMap.put("freeComplexCount", Long.parseLong(vals[0].toString()));
             parameterMap.put("freeComplexSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
+            parameterMap.put("freeComplexDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
-            //// ГПД
+            //Буфет
+            Query mealsSelfProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
+                    " FROM CF_ORDERS o,CF_ORDERDETAILS od "
+                    + "WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
+                    "(od.MenuType=:typeDish) AND "+
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+
+            mealsSelfProductionQuery.setParameter("idOfOrg", org.getIdOfOrg());
+            mealsSelfProductionQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
+            mealsSelfProductionQuery.setParameter("startTime", startTime.getTime());
+            mealsSelfProductionQuery.setParameter("endTime", endTime.getTime());
+            vals=(Object[])mealsSelfProductionQuery.uniqueResult();
+            parameterMap.put("buffetCount", Long.parseLong(vals[0].toString()));
+            parameterMap.put("buffetSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
+            parameterMap.put("buffetDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
+
+            /*
+            //ГПД
             Query complexQuery_1 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeComplex3 OR od.MenuType=:typeComplex4) AND (od.rPrice<>od.Discount) AND " +
@@ -157,7 +181,8 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("complexCount_1", Long.parseLong(vals[0].toString()));
             parameterMap.put("complexSum_1", vals[1]==null?0:Long.parseLong(vals[1].toString()));
             parameterMap.put("complexDiscount_1", vals[2]==null?0:Long.parseLong(vals[2].toString()));
-
+            */
+            /*
             //// Буфет собственное
             Query mealsSelfProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
@@ -175,8 +200,29 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("buffetSelfProductionCount", Long.parseLong(vals[0].toString()));
             parameterMap.put("buffetSelfProductionSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
             parameterMap.put("buffetSelfProductionDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
+            */
+            //// Буфет централизованный PRODUCT_CENTRALIZE
+            /*
+            Query mealsCentralizeProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
+                    " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
+                    "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin1 OR d.MenuOrigin=:menuOrigin2)"+
+                    //+ "(od.MenuOrigin=:menuOrigin0 OR od.MenuOrigin=:menuOrigin1 OR od.MenuOrigin=:menuOrigin2) AND" +
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
 
+            mealsSelfProductionQuery.setParameter("idOfOrg", org.getIdOfOrg());
+            mealsSelfProductionQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
+            //mealsSelfProductionQuery.setParameter("menuOrigin0", OrderDetail.PRODUCT_OWN);
+            mealsSelfProductionQuery.setParameter("menuOrigin1", OrderDetail.PRODUCT_CENTRALIZE);
+            mealsSelfProductionQuery.setParameter("menuOrigin2", OrderDetail.PRODUCT_CENTRALIZE_COOK);
+            mealsSelfProductionQuery.setParameter("startTime", startTime.getTime());
+            mealsSelfProductionQuery.setParameter("endTime", endTime.getTime());
+            vals=(Object[])mealsSelfProductionQuery.uniqueResult();
+            parameterMap.put("buffetCentralizeCount", Long.parseLong(vals[0].toString()));
+            parameterMap.put("buffetCentralizeSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
+            parameterMap.put("buffetCentralizeDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
+            */
             //// Буфет закупочный
+            /*
             Query mealsBoughtQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin) AND" +
@@ -191,6 +237,7 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("buffetBoughtCount", Long.parseLong(vals[0].toString()));
             parameterMap.put("buffetBoughtSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
             parameterMap.put("buffetBoughtDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
+            */
 
             //// ИТОГО (без бесплатных)
             Query totalQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
@@ -209,29 +256,90 @@ public class SalesReport extends BasicReportForOrgJob {
             parameterMap.put("totalSum", vals[1]==null?0:Long.parseLong(vals[1].toString()));
             parameterMap.put("totalDiscount", vals[2]==null?0:Long.parseLong(vals[2].toString()));
 
-            ////
-            Query mealsQuery = session.createSQLQuery("SELECT od.MenuOrigin, od.MenuDetailName, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice)" +
+
+            Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName" +
+                    " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
+                    " (od.MenuType=:typeComplex1 OR od.MenuType=:typeComplex2 OR od.MenuType=:typeComplex4 OR od.MenuType=:typeComplex5 OR od.MenuType=:typeComplex10) AND (od.rPrice>0) AND " +
+                    " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                    + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName");
+
+            complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
+            complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
+            complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
+            complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
+            complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
+            complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
+            complexQuery_1.setParameter("startTime", startTime.getTime());
+            complexQuery_1.setParameter("endTime", endTime.getTime());
+
+            List mealsList = complexQuery_1.list();
+
+            for (Object o : mealsList) {
+                vals=(Object[])o;
+                String menuGroup = "Платное комплексное питание";
+                String menuName = vals[4].toString(); // od.MenuType
+                long count = Long.parseLong(vals[1].toString());
+                long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
+                long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
+                MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
+                mealRows.add(mealRow);
+            }
+
+            //// бесплатное питание
+            Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName " +
+                    " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
+                    " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
+                    " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                    + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName");
+
+            freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
+            freeComplexQuery1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
+            freeComplexQuery1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
+            freeComplexQuery1.setParameter("startTime", startTime.getTime());
+            freeComplexQuery1.setParameter("endTime", endTime.getTime());
+
+            mealsList = freeComplexQuery1.list();
+
+            for (Object o : mealsList) {
+                vals=(Object[])o;
+                String menuGroup = "Бесплатное комплексное питание";
+                String menuName = vals[4].toString(); // od.MenuType
+                long count = Long.parseLong(vals[1].toString());
+                long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
+                long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
+                MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
+                mealRows.add(mealRow);
+            }
+
+
+            // по группам продукции
+            Query mealsQuery = session.createSQLQuery(
+                    "SELECT od.menuGroup, od.MenuDetailName, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice)" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND " +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) GROUP BY od.MenuOrigin, od.MenuDetailName, od.RPrice ORDER BY od.MenuOrigin, od.MenuDetailName");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                    + "GROUP BY od.menuGroup, od.MenuDetailName, od.RPrice ORDER BY od.menuGroup, od.MenuDetailName");
 
             mealsQuery.setParameter("idOfOrg", org.getIdOfOrg());
             mealsQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
             mealsQuery.setParameter("startTime", startTime.getTime());
             mealsQuery.setParameter("endTime", endTime.getTime());
 
-            List mealsList = mealsQuery.list();
+            mealsList = mealsQuery.list();
 
             for (Object o : mealsList) {
                 vals=(Object[])o;
-                int menuOrigin = Integer.parseInt(vals[0].toString());
+                String menuGroup = vals[0].toString();
                 String menuName = (String)vals[1];
                 long count = Long.parseLong(vals[2].toString());
                 long rPrice = vals[3]==null?0:Long.parseLong(vals[3].toString());
                 long sum = vals[4]==null?0:Long.parseLong(vals[4].toString());
-                MealRow mealRow = new MealRow(menuOrigin, menuName, count, rPrice, sum);
+                MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                 mealRows.add(mealRow);
             }
+
+
+
 
             return new JRBeanCollectionDataSource(mealRows);
         }
@@ -239,18 +347,18 @@ public class SalesReport extends BasicReportForOrgJob {
     }
 
 
-    public SalesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime,
+    public MscSalesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime,
             Long idOfOrg) {
         super(generateTime, generateDuration, print, startTime, endTime,
                 idOfOrg);    //To change body of overridden methods use File | Settings | File Templates.
     }
-    private static final Logger logger = LoggerFactory.getLogger(SalesReport.class);
+    private static final Logger logger = LoggerFactory.getLogger(MscSalesReport.class);
 
-    public SalesReport() {}
+    public MscSalesReport() {}
 
     @Override
     public BasicReportForOrgJob createInstance() {
-        return new SalesReport();
+        return new MscSalesReport();
     }
 
     @Override

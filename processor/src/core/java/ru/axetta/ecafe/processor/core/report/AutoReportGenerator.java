@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
+import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -52,6 +53,14 @@ public class AutoReportGenerator {
                 ContragentOrderCategoryReport.BuildJob.class);
         JOB_CLASSNAME_TO_CLASS_MAP.put(BasicReportJob.AutoReportBuildJob.class.getCanonicalName(),
                 BasicReportJob.AutoReportBuildJob.class);
+        JOB_CLASSNAME_TO_CLASS_MAP.put(BasicReportJob.AutoReportBuildJob.class.getCanonicalName(),
+                BasicReportJob.AutoReportBuildJob.class);
+        JOB_CLASSNAME_TO_CLASS_MAP.put(SalesReport.AutoReportBuildJob.class.getCanonicalName(),
+                SalesReport.AutoReportBuildJob.class);
+        JOB_CLASSNAME_TO_CLASS_MAP.put(MscSalesReport.AutoReportBuildJob.class.getCanonicalName(),
+                MscSalesReport.AutoReportBuildJob.class);
+        JOB_CLASSNAME_TO_CLASS_MAP.put(OrgOrderCategoryReport.AutoReportBuildJob.class.getCanonicalName(),
+                OrgOrderCategoryReport.AutoReportBuildJob.class);
     }
 
     private static final String REPORT_JOBS_BASE_CLASS_NAME;
@@ -229,6 +238,36 @@ public class AutoReportGenerator {
             }
         });
 
+        JOB_DETAIL_CREATORS.put(MscSalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                final String REPORT_TEMPLATE_KEY = "MscSalesReport.template";
+
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+
+                String reportTemplate = autoReportGenerator.getReportProperties()
+                        .getProperty(REPORT_TEMPLATE_KEY);
+                if (StringUtils.isEmpty(reportTemplate)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Report property \"%s\" not found. Can\'t schedule MscSalesReport",
+                            REPORT_TEMPLATE_KEY));
+                }
+                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new MscSalesReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(MscSalesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        });
+
     } // static
 
     static {
@@ -244,6 +283,8 @@ public class AutoReportGenerator {
                 OrgOrderCategoryReport.AutoReportBuildJob.class);
         REPORT_TYPE_TO_REPORT_JOB_MAP.put(SalesReport.class.getCanonicalName(),
                 SalesReport.AutoReportBuildJob.class);
+        REPORT_TYPE_TO_REPORT_JOB_MAP.put(MscSalesReport.class.getCanonicalName(),
+                MscSalesReport.AutoReportBuildJob.class);
     }
 
     static {
@@ -260,6 +301,8 @@ public class AutoReportGenerator {
                 OrgOrderCategoryReport.class.getCanonicalName());
         REPORT_JOB_TO_REPORT_TYPE_MAP.put(SalesReport.AutoReportBuildJob.class.getCanonicalName(),
                 SalesReport.class.getCanonicalName());
+        REPORT_JOB_TO_REPORT_TYPE_MAP.put(MscSalesReport.AutoReportBuildJob.class.getCanonicalName(),
+                MscSalesReport.class.getCanonicalName());
     }
 
     private static Class getJobClassForName(String canonicalJobClassName) throws Exception {

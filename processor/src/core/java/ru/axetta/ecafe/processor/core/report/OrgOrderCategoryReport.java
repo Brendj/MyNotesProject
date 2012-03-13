@@ -30,6 +30,10 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class OrgOrderCategoryReport extends BasicReportForOrgJob {
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(OrgOrderCategoryReport.class);
 
     @Override

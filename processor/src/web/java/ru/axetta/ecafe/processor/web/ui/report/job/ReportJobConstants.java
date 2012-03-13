@@ -6,13 +6,11 @@ package ru.axetta.ecafe.processor.web.ui.report.job;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
-import ru.axetta.ecafe.processor.core.report.ClientGroupBalanceReport;
-import ru.axetta.ecafe.processor.core.report.OrgBalanceJasperReport;
-import ru.axetta.ecafe.processor.core.report.OrgBalanceReport;
-import ru.axetta.ecafe.processor.core.report.OrgOrderCategoryReport;
+import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
+import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -109,7 +107,8 @@ public class ReportJobConstants {
             new ReportHint(ContragentOrderReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3})};
+            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3})};
 
     private ReportJobConstants() {
 
