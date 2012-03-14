@@ -119,6 +119,15 @@ public class ClientFilter {
     private PersonItem contractPerson = new PersonItem();
     private final ClientCardOwnMenu clientCardOwnMenu = new ClientCardOwnMenu();
     private int clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
+    private String filterClientId;
+
+    public String getFilterClientId() {
+        return filterClientId;
+    }
+
+    public void setFilterClientId(String filterClientId) {
+        this.filterClientId = filterClientId;
+    }
 
     public int getClientCardOwnCondition() {
         return clientCardOwnCondition;
@@ -223,6 +232,9 @@ public class ClientFilter {
             Criteria contractPersonCriteria = criteria.createCriteria("contractPerson");
             contractPersonCriteria
                     .add(Example.create(examplePerson).excludeZeroes().enableLike(MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (StringUtils.isNotEmpty(this.filterClientId)) {
+            criteria.add(Restrictions.eq("idOfClient", Long.parseLong(this.filterClientId.replaceAll("\\s", ""))));
         }
     }
 }

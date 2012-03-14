@@ -248,15 +248,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     private final ClientFilter clientFilter = new ClientFilter();
     private Long limit = 0L;
     private Long expenditureLimit = 0L;
-    private String filterClientId;
 
-    public String getFilterClientId() {
-        return filterClientId;
-    }
-
-    public void setFilterClientId(String filterClientId) {
-        this.filterClientId = filterClientId;
-    }
 
     public Long getExpenditureLimit() {
         return expenditureLimit;
@@ -396,22 +388,4 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             item.setExpenditureLimit(expenditureLimit);
         }
     }
-
-    /**
-     * Метод для реализации фильтрации клиентов по id
-     * @param current
-     * @return
-     */
-    public boolean filterIds(Object current) {
-        if (filterClientId == null ||  filterClientId.length()==0) {
-            return true;
-        }
-        Item item = (Item)current;
-        if (item.getIdOfClientString().toLowerCase().startsWith(filterClientId.toLowerCase())) {
-            return true;
-        }else {
-            return false;
-        }
-    }
-
 }

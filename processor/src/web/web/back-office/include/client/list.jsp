@@ -8,25 +8,6 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
-<script type="text/javascript">
-    function setCaretToEnd (e) {
-        var control = $((e.target ? e.target : e.srcElement).id);
-        if (control.createTextRange) {
-            var range = control.createTextRange();
-            range.collapse(false);
-            range.select();
-        }
-        else if (control.setSelectionRange) {
-            control.focus();
-            var length = control.value.length;
-            control.setSelectionRange(length, length);
-        }
-        control.selectionStart = control.selectionEnd = control.value.length;
-    }
-
-</script>
 
 <%-- Панель просмотра списка клиентов --%>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
@@ -43,6 +24,8 @@
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
+            <h:outputText escape="true" value="Идентификатор" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientId}"  maxlength="10" styleClass="input-text"/>
             <h:outputText escape="true" value="Договор" styleClass="output-text" />
             <h:panelGrid columns="2" styleClass="borderless-grid">
                 <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
@@ -102,20 +85,15 @@
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
-        <rich:column headerClass="column-header" filterMethod="#{mainPage.clientListPage.filterIds}" >
+        <rich:column headerClass="column-header" >
             <f:facet name="header">
-                <h:panelGrid columns="1">
-                    <h:outputText escape="true" value="Идентификатор" />
-                    <h:inputText value="#{mainPage.clientListPage.filterClientId}" id="input">
-                        <a4j:support event="onkeyup" reRender="clientListTable"
-                            ignoreDupResponses="true" requestDelay="700"
-                            oncomplete="setCaretToEnd(event);"
-                            />
-                    </h:inputText>
-                </h:panelGrid>
+                <h:outputText escape="true" value="Идентификатор" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.idOfClient}"
+            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+                <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
                               styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </h:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -200,38 +178,41 @@
     </rich:dataTable>
 
     <c:if test="${!ru.axetta.ecafe.processor.web.ui.MainPage.sessionInstance.eligibleToEditClients}" >
-        <rich:simpleTogglePanel switchType="client" label="Изменение лимита овердрафта" opened="false">
-            <h:panelGrid columns="2">
-                <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
-                <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                <rich:spacer/>
-                <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
-                               reRender="workspaceTogglePanel" styleClass="command-button"/>
-            </h:panelGrid>
+        <rich:simpleTogglePanel switchType="client" label="Групповые операции" opened="false">
+            <rich:tabPanel>
+                <rich:tab label="Изменение лимита овердрафта">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
+                        <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
+                        <rich:spacer/>
+                        <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
+                                       reRender="workspaceTogglePanel" styleClass="command-button"/>
+                    </h:panelGrid>
+                </rich:tab>
+                <rich:tab label="Изменение организации">
+                    <h:panelGrid styleClass="borderless-grid" columns="3">
+                        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                                   styleClass="command-link" style="width: 25px;" />
+                        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
+                        <rich:spacer/>
+                        <rich:spacer/>
+                        <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
+                                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                    </h:panelGrid>
+                </rich:tab>
+                <rich:tab label="Изменение лимита дневных трат">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Лимит дневных трат" styleClass="output-text"/>
+                        <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
+                        <rich:spacer/>
+                        <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
+                                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                    </h:panelGrid>
+                </rich:tab>
+            </rich:tabPanel>
         </rich:simpleTogglePanel>
-        <rich:simpleTogglePanel switchType="client" label="Изменение организации" opened="false">
-            <h:panelGrid styleClass="borderless-grid" columns="3">
-                <h:outputText escape="true" value="Организация" styleClass="output-text" />
-                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;" />
-                <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
-                <rich:spacer/>
-                <rich:spacer/>
-                <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
-            </h:panelGrid>
-        </rich:simpleTogglePanel>
-        <rich:simpleTogglePanel switchType="client" label="Изменение лимита дневных трат" opened="false">
-            <h:panelGrid columns="2">
-                <h:outputText value="Лимит дневных трат" styleClass="output-text"/>
-                <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                <rich:spacer/>
-                <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
-            </h:panelGrid>
-        </rich:simpleTogglePanel>
-
     </c:if>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </h:panelGrid>
