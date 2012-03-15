@@ -281,7 +281,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             Client client = new Client(organization, person, contractPerson, 0, Integer.parseInt(tokens[18]) != 0,
                     Integer.parseInt(tokens[17]) != 0, contractId, dateFormat.parse(tokens[3]),
                     Integer.parseInt(tokens[2]), password, Integer.parseInt(tokens[16]), clientRegistryVersion, limit,
-                    20000, "");
+                    0, "");
 
             client.setAddress(tokens[12]);
             client.setPhone(tokens[13]);
@@ -296,7 +296,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                 String clientGroupName = tokens[21];
                 ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
                 if (clientGroup == null) {
-                    clientGroup = createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
+                    clientGroup = DAOUtils.createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
                 }
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
@@ -314,14 +314,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-    }
-
-    private ClientGroup createNewClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
-        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,
-                DAOUtils.getIdForTemporaryClientGroup(persistenceSession, idOfOrg));
-        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
-        persistenceSession.save(clientGroup);
-        return clientGroup;
     }
 
     private static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,

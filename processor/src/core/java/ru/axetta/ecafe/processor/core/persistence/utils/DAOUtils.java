@@ -592,4 +592,13 @@ public class DAOUtils {
         }
         return minId-1;
     }
+
+    public static ClientGroup createNewClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
+        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,
+                DAOUtils.getIdForTemporaryClientGroup(persistenceSession, idOfOrg));
+        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
+        persistenceSession.save(clientGroup);
+        return clientGroup;
+    }
+
 }

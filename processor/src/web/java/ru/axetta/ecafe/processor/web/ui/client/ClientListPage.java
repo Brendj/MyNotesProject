@@ -352,23 +352,23 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         if (org == null)
             return;
-        else
-            orgItem = new OrgItem(org);
-        // создаем множество id клиентов
-        Set<Long> clientsId = new HashSet<Long>();
-        for (Item item : this.items) {
-            clientsId.add(item.getIdOfClient());
-        }
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-        org.hibernate.Query q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
-        q.setLong("newOrg", org.getIdOfOrg());
-        q.setLong("clientRegistryVersion", clientRegistryVersion);
-        q.setParameterList("clientsId", clientsId);
-        if (q.executeUpdate() != clientsId.size())
-            throw new Exception("Ошибка при установлении лимита овердрафта.");
-        // устанавливаем лорганизацию в бинах страницы
-        for (Item item : this.getItems()) {
-            item.setOrg(orgItem);
+        for (Item item : this.items) {
+            //clientsId.add(item.getIdOfClient());
+            ClientGroup clientGroup = null;
+            org.hibernate.Query q;
+            if (item.getClientGroupName()!=null) {
+                DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), item.getClientGroupName());
+                if (clientGroup == null) clientGroup = DAOUtils.createNewClientGroup(session, org.getIdOfOrg(), item.getClientGroupName());
+                q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
+            } else {
+                q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion where idOfClient=:idOfClient");
+            }
+            q.setLong("newOrg", org.getIdOfOrg());
+            if (clientGroup!=null) q.setLong("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            q.setLong("idOfClient", item.getIdOfClient());
+            q.setLong("clientRegistryVersion", clientRegistryVersion);
+            q.executeUpdate();
         }
     }
 

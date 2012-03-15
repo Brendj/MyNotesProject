@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -39,29 +40,22 @@ import java.util.concurrent.ExecutorService;
  */
 public class AutoReportGenerator {
 
-    private static final Map<String, Class> JOB_CLASSNAME_TO_CLASS_MAP;
+    static class ReportDef {
+        Class buildJobClass;
+        Class reportClass;
+        JobDetailCreator jobDetailCreator;
 
-    static {
-        JOB_CLASSNAME_TO_CLASS_MAP = new HashMap<String, Class>();
-        JOB_CLASSNAME_TO_CLASS_MAP
-                .put(OrgBalanceReport.BuildJob.class.getCanonicalName(), OrgBalanceReport.BuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(ClientGroupBalanceReport.BuildJob.class.getCanonicalName(),
-                ClientGroupBalanceReport.BuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP
-                .put(ContragentOrderReport.BuildJob.class.getCanonicalName(), ContragentOrderReport.BuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(ContragentOrderCategoryReport.BuildJob.class.getCanonicalName(),
-                ContragentOrderCategoryReport.BuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(BasicReportJob.AutoReportBuildJob.class.getCanonicalName(),
-                BasicReportJob.AutoReportBuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(BasicReportJob.AutoReportBuildJob.class.getCanonicalName(),
-                BasicReportJob.AutoReportBuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(SalesReport.AutoReportBuildJob.class.getCanonicalName(),
-                SalesReport.AutoReportBuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(MscSalesReport.AutoReportBuildJob.class.getCanonicalName(),
-                MscSalesReport.AutoReportBuildJob.class);
-        JOB_CLASSNAME_TO_CLASS_MAP.put(OrgOrderCategoryReport.AutoReportBuildJob.class.getCanonicalName(),
-                OrgOrderCategoryReport.AutoReportBuildJob.class);
+        ReportDef(Class reportClass, Class buildJobClass, JobDetailCreator jobDetailCreator) {
+            this.buildJobClass = buildJobClass;
+            this.jobDetailCreator = jobDetailCreator;
+            this.reportClass = reportClass;
+        }
+
+        String getReportType() {
+            return reportClass.getCanonicalName();
+        }
     }
+    static LinkedList<ReportDef> REPORT_DEFS=new LinkedList<ReportDef>();
 
     private static final String REPORT_JOBS_BASE_CLASS_NAME;
 
@@ -85,14 +79,8 @@ public class AutoReportGenerator {
         public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception;
     }
 
-    private static final Map<Class, JobDetailCreator> JOB_DETAIL_CREATORS;
-    private static final Map<String, Class> REPORT_TYPE_TO_REPORT_JOB_MAP;
-    private static final Map<String, String> REPORT_JOB_TO_REPORT_TYPE_MAP;
-
     static {
-        JOB_DETAIL_CREATORS = new HashMap<Class, JobDetailCreator>();
-
-        JOB_DETAIL_CREATORS.put(OrgBalanceReport.BuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(OrgBalanceReport.class, OrgBalanceReport.BuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 Class jobClass = OrgBalanceReport.BuildJob.class;
                 OrgBalanceReport.BuildJob.ExecuteEnvironment executeEnvironment = new OrgBalanceReport.BuildJob.ExecuteEnvironment(
@@ -104,24 +92,26 @@ public class AutoReportGenerator {
                 jobDetail.getJobDataMap().put(OrgBalanceReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
-        JOB_DETAIL_CREATORS.put(ClientGroupBalanceReport.BuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                Class jobClass = ClientGroupBalanceReport.BuildJob.class;
-                ClientGroupBalanceReport.BuildJob.ExecuteEnvironment executeEnvironment = new ClientGroupBalanceReport.BuildJob.ExecuteEnvironment(
-                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
-                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
-                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
-                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
-                jobDetail.getJobDataMap()
-                        .put(ClientGroupBalanceReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
-                return jobDetail;
-            }
-        });
+        REPORT_DEFS.add(new ReportDef(ClientGroupBalanceReport.class, ClientGroupBalanceReport.BuildJob.class,
+                new JobDetailCreator() {
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName)
+                            throws Exception {
+                        Class jobClass = ClientGroupBalanceReport.BuildJob.class;
+                        ClientGroupBalanceReport.BuildJob.ExecuteEnvironment executeEnvironment = new ClientGroupBalanceReport.BuildJob.ExecuteEnvironment(
+                                autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                                autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                                (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                                (DateFormat) autoReportGenerator.getTimeFormat().clone());
+                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        jobDetail.getJobDataMap()
+                                .put(ClientGroupBalanceReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        return jobDetail;
+                    }
+                }));
 
-        JOB_DETAIL_CREATORS.put(ContragentOrderReport.BuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(ContragentOrderReport.class, ContragentOrderReport.BuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 final String CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY = "ContragentOrderReport.template";
 
@@ -147,9 +137,9 @@ public class AutoReportGenerator {
                 jobDetail.getJobDataMap().put(ContragentOrderReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
-        JOB_DETAIL_CREATORS.put(ContragentOrderCategoryReport.BuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(ContragentOrderCategoryReport.class, ContragentOrderCategoryReport.BuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 final String CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY = "ContragentOrderCategoryReport.template";
 
@@ -176,9 +166,9 @@ public class AutoReportGenerator {
                         .put(ContragentOrderCategoryReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
-        JOB_DETAIL_CREATORS.put(OrgOrderCategoryReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(OrgOrderCategoryReport.class, OrgOrderCategoryReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 final String REPORT_TEMPLATE_KEY = "OrgOrderCategoryReport.template";
 
@@ -206,9 +196,9 @@ public class AutoReportGenerator {
                         .put(OrgOrderCategoryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
-        JOB_DETAIL_CREATORS.put(SalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(SalesReport.class, SalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 final String REPORT_TEMPLATE_KEY = "SalesReport.template";
 
@@ -236,9 +226,9 @@ public class AutoReportGenerator {
                         .put(SalesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
-        JOB_DETAIL_CREATORS.put(MscSalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(MscSalesReport.class, MscSalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 final String REPORT_TEMPLATE_KEY = "MscSalesReport.template";
 
@@ -266,55 +256,30 @@ public class AutoReportGenerator {
                         .put(MscSalesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
-        });
+        }));
 
     } // static
 
-    static {
-        REPORT_TYPE_TO_REPORT_JOB_MAP = new HashMap<String, Class>();
-        REPORT_TYPE_TO_REPORT_JOB_MAP.put(OrgBalanceReport.class.getCanonicalName(), OrgBalanceReport.BuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP
-                .put(ClientGroupBalanceReport.class.getCanonicalName(), ClientGroupBalanceReport.BuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP
-                .put(ContragentOrderReport.class.getCanonicalName(), ContragentOrderReport.BuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP.put(ContragentOrderCategoryReport.class.getCanonicalName(),
-                ContragentOrderCategoryReport.BuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP.put(OrgOrderCategoryReport.class.getCanonicalName(),
-                OrgOrderCategoryReport.AutoReportBuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP.put(SalesReport.class.getCanonicalName(),
-                SalesReport.AutoReportBuildJob.class);
-        REPORT_TYPE_TO_REPORT_JOB_MAP.put(MscSalesReport.class.getCanonicalName(),
-                MscSalesReport.AutoReportBuildJob.class);
-    }
-
-    static {
-        REPORT_JOB_TO_REPORT_TYPE_MAP = new HashMap<String, String>();
-        REPORT_JOB_TO_REPORT_TYPE_MAP
-                .put(OrgBalanceReport.BuildJob.class.getCanonicalName(), OrgBalanceReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(ClientGroupBalanceReport.BuildJob.class.getCanonicalName(),
-                ClientGroupBalanceReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(ContragentOrderReport.BuildJob.class.getCanonicalName(),
-                ContragentOrderReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(ContragentOrderCategoryReport.BuildJob.class.getCanonicalName(),
-                ContragentOrderCategoryReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(OrgOrderCategoryReport.AutoReportBuildJob.class.getCanonicalName(),
-                OrgOrderCategoryReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(SalesReport.AutoReportBuildJob.class.getCanonicalName(),
-                SalesReport.class.getCanonicalName());
-        REPORT_JOB_TO_REPORT_TYPE_MAP.put(MscSalesReport.AutoReportBuildJob.class.getCanonicalName(),
-                MscSalesReport.class.getCanonicalName());
-    }
 
     private static Class getJobClassForName(String canonicalJobClassName) throws Exception {
-        return JOB_CLASSNAME_TO_CLASS_MAP.get(canonicalJobClassName);
+        for (ReportDef r : REPORT_DEFS) {
+            if (r.buildJobClass.getCanonicalName().equals(canonicalJobClassName)) return r.buildJobClass;
+        }
+        return null;
     }
 
     public static Class getReportJobClass(String reportType) {
-        return REPORT_TYPE_TO_REPORT_JOB_MAP.get(reportType);
+        for (ReportDef r : REPORT_DEFS) {
+            if (r.getReportType().equals(reportType)) return r.buildJobClass;
+        }
+        return null;
     }
 
     public static String getReportType(String reportJobClass) {
-        return REPORT_JOB_TO_REPORT_TYPE_MAP.get(reportJobClass);
+        for (ReportDef r : REPORT_DEFS) {
+            if (r.buildJobClass.getCanonicalName().equals(reportJobClass)) return r.reportClass.getCanonicalName();
+        }
+        return null;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(AutoReportGenerator.class);
@@ -396,7 +361,12 @@ public class AutoReportGenerator {
             List rules = jobsCriteria.list();
             for (Object object : rules) {
                 SchedulerJob schedulerJob = (SchedulerJob) object;
-                scheduleNewJob(schedulerJob);
+                try {
+                    scheduleNewJob(schedulerJob);
+                } catch (Exception e) {
+                    logger.error("Failed to schedule job: "+schedulerJob.getJobClass()+". Removing it");
+                    persistenceSession.delete(schedulerJob);
+                }
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -491,11 +461,19 @@ public class AutoReportGenerator {
     }
 
     private JobDetail createJobDetail(Class jobClass, String jobName) throws Exception {
-        JobDetailCreator jobDetailCreator = JOB_DETAIL_CREATORS.get(jobClass);
+        JobDetailCreator jobDetailCreator = getReportJobDetailCreator(jobClass);
         if (jobClass == null) {
             throw new IllegalArgumentException(String.format("Unknown report job class: %s", jobClass));
         }
         return jobDetailCreator.createJobDetail(this, jobName);
+    }
+
+    private JobDetailCreator getReportJobDetailCreator(Class jobClass) {
+        String jobClassName = jobClass.getCanonicalName();
+        for (ReportDef r : REPORT_DEFS) {
+            if (r.buildJobClass.getCanonicalName().equals(jobClassName)) return r.jobDetailCreator;
+        }
+        return null;
     }
 
     private String getJobName(SchedulerJob schedulerJob) {
