@@ -68,6 +68,11 @@ public class OnlinePaymentProcessor {
         return card.getCardPrintedNo();
     }
 
+    public static PayResponse generateErrorResponse(Processor.PaymentProcessResult result) {
+        return new OnlinePaymentProcessor.PayResponse(true, result.getCode(),
+            result.getDescription(), null, null, null, null, null, null, null);
+    }
+
     public static class PayRequest {
         private final long contragentId;
         private final int paymentMethod;
@@ -131,16 +136,16 @@ public class OnlinePaymentProcessor {
         }
     }
 
-    public class PayResponse {
+    public static class PayResponse {
         private final boolean bCheckOnly;
-        private final long clientId;
+        private final Long clientId;
         private final String paymentId, clientFirstName, clientSurname, clientSecondName;
         private final Long balance;
         private final Long cardPrintedNo;
         private final int resultCode;
         private final String resultDescription;
 
-        public PayResponse(boolean bCheckOnly, int resultCode, String resultDescription, long clientId, String paymentId,
+        public PayResponse(boolean bCheckOnly, int resultCode, String resultDescription, Long clientId, String paymentId,
                 Long balance, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo) {
             this.bCheckOnly = bCheckOnly;
             this.resultCode=resultCode;
@@ -161,7 +166,7 @@ public class OnlinePaymentProcessor {
             return resultDescription;
         }
 
-        public long getClientId() {
+        public Long getClientId() {
             return clientId;
         }
 

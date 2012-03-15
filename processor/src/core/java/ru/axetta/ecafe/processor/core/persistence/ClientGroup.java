@@ -18,6 +18,7 @@ import java.util.Set;
 public class ClientGroup {
     public static final long PREDEFINED_ID_OF_GROUP_OTHER = 1200000000;
     public static final long PREDEFINED_ID_OF_GROUP_EMPLOYEES = 1100000000;
+    public static final long TEMPORARY_GROUP_MAX_ID = -100000;
 
     private CompositeIdOfClientGroup compositeIdOfClientGroup;
     private Org org;
@@ -120,5 +121,9 @@ public class ClientGroup {
     public String toString() {
         return "ClientGroup{" + "compositeIdOfClientGroup=" + compositeIdOfClientGroup + ", org=" + org
                 + ", groupName='" + groupName + '\'' + '}';
+    }
+
+    public boolean isTemporaryGroup() {
+        return (compositeIdOfClientGroup.getIdOfClientGroup()<=TEMPORARY_GROUP_MAX_ID);
     }
 }

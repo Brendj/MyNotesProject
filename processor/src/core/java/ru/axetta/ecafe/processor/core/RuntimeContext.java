@@ -384,20 +384,17 @@ public class RuntimeContext implements ApplicationContextAware {
             this.autoReportGenerator = createAutoReportGenerator(basePath, properties, executorService, scheduler,
                     sessionFactory, ruleProcessor);
 
-
             this.clientSmsDeliveryStatusUpdater = createClientSmsDeliveryStatusUpdater(properties, executorService,
                     scheduler, sessionFactory, smsService);
 
-            this.payformUrl = buildPayformUrl(properties);
+             this.payformUrl = buildPayformUrl(properties);
             this.payformGroupUrl = buildPayformGroupUrl(properties);
             this.messageIdGenerator = createMessageIdGenerator(properties, sessionFactory);
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
 
             // Start background activities
             this.autoReportGenerator.start();
-            if(this.getOptionValueBool(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT)){
-                this.clientSmsDeliveryStatusUpdater.start();
-            }
+            this.clientSmsDeliveryStatusUpdater.start();
         } catch (Exception e) {
             destroy(executorService, scheduler);
             throw e;
@@ -701,6 +698,7 @@ public class RuntimeContext implements ApplicationContextAware {
         AutoReportGenerator generator = new AutoReportGenerator(basePath, executorService, scheduler, sessionFactory,
                 autoReportProcessor, calendar, properties.getProperty(AUTO_REPORT_PARAM_BASE + ".path"), dateFormat,
                 timeFormat, reportProperties);
+
         if (logger.isDebugEnabled()) {
             logger.debug("Auto report generator created.");
         }

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.payment;
 
+import sun.management.counter.LongCounter;
+
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
@@ -118,6 +120,7 @@ public class PaymentResponse {
 
             private final PaymentRequest.PaymentRegistry.Payment payment;
             private final Long idOfClient;
+            private final Long contractId;
             private final Long idOfCard;
             private final Long balance;
             private final int result;
@@ -125,10 +128,11 @@ public class PaymentResponse {
             private final ClientInfo client;
             private final CardInfo card;
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long idOfCard, Long balance,
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
                     int result, String error) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
+                this.contractId = contractId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
@@ -137,10 +141,11 @@ public class PaymentResponse {
                 this.card = null;
             }
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long idOfCard, Long balance,
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
                     int result, String error, Client client) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
+                this.contractId = contractId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
@@ -149,10 +154,11 @@ public class PaymentResponse {
                 this.card = null;
             }
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long idOfCard, Long balance,
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
                     int result, String error, Client client, Card card) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
+                this.contractId = contractId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
@@ -175,6 +181,10 @@ public class PaymentResponse {
 
             public Long getIdOfClient() {
                 return idOfClient;
+            }
+
+            public Long getContractId() {
+                return contractId;
             }
 
             public Long getIdOfCard() {

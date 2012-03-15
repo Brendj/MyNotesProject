@@ -156,12 +156,14 @@ public class DAOUtils {
      */
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrg(Session persistenceSession,Long idOfOrg, String groupName) throws Exception{
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        return (ClientGroup) clientGroupCriteria.add(
+        List l = clientGroupCriteria.add(
                 Restrictions.and(
                         Restrictions.eq("groupName", groupName).ignoreCase(),
                         Restrictions.eq("org.idOfOrg",idOfOrg)
                 )
-        ).list().get(0);
+        ).list();
+        if (l.size()>0) return (ClientGroup)l.get(0);
+        return null;
     }
 
     public static SyncHistory getSyncHistoryReference(Session persistenceSession, long idOfSync) throws Exception {
@@ -577,5 +579,17 @@ public class DAOUtils {
         List l = q.list();
         if (l.size()>0) return (EnterEvent)l.get(0);
         return null;
+    }
+
+    public static long getIdForTemporaryClientGroup(Session session, Long idOfOrg) {
+        Query q = session.createQuery("select min(compositeIdOfClientGroup.idOfClientGroup) from ClientGroup where compositeIdOfClientGroup.idOfOrg=:idOfOrg");
+        q.setParameter("idOfOrg", idOfOrg);
+        List l = q.list();
+        long minId=ClientGroup.TEMPORARY_GROUP_MAX_ID;
+        if (l.size()>0 && l.get(0)!=null) {
+            long id = (Long)l.get(0);
+            if (id<minId) minId = id;
+        }
+        return minId-1;
     }
 }

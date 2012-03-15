@@ -303,6 +303,7 @@ public class SyncResponse {
             private final String mobile;
             private final String email;
             private final int contractState;
+            private final long contractId;
             private final Integer freePayMaxCount;
             private final String categoriesDiscounts;
             private final ClientGroup clientGroup;
@@ -319,6 +320,7 @@ public class SyncResponse {
                 this.mobile = client.getMobile();
                 this.email = client.getEmail();
                 this.contractState = client.getContractState();
+                this.contractId = client.getContractId();
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
                 this.clientGroup=client.getClientGroup();
@@ -376,6 +378,7 @@ public class SyncResponse {
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
+                element.setAttribute("ContractId", Long.toString(this.contractId));
                 element.setAttribute("Version", Long.toString(this.version));
                 element.setAttribute("FirstName", this.firstName);
                 element.setAttribute("Surname", this.surname);
@@ -1281,6 +1284,7 @@ public class SyncResponse {
 
     private final int type;
     private final Long idOfOrg;
+    private final String orgName;
     private final Long idOfPacket;
     private final Long protoVersion;
     private final Date time;
@@ -1302,13 +1306,14 @@ public class SyncResponse {
         return correctingNumbersOrdersRegistry;
     }
 
-    public SyncResponse(int type, Long idOfOrg, Long idOfPacket, Long protoVersion, Date time, String options,
+    public SyncResponse(int type, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry) {
         this.type = type;
         this.idOfOrg = idOfOrg;
+        this.orgName = orgName;
         this.idOfPacket = idOfPacket;
         this.protoVersion = protoVersion;
         this.time = time;
@@ -1346,6 +1351,7 @@ public class SyncResponse {
 
         Element ecafeEnvelopeElement = document.createElement("CafeteriaExchange");
         ecafeEnvelopeElement.setAttribute("IdOfOrg", this.idOfOrg.toString());
+        ecafeEnvelopeElement.setAttribute("Org", this.orgName);
         if (this.idOfPacket != null) {
             ecafeEnvelopeElement.setAttribute("IdOfPacket", this.idOfPacket.toString());
         }
@@ -1421,6 +1427,10 @@ public class SyncResponse {
 
     public Long getIdOfOrg() {
         return idOfOrg;
+    }
+
+    public String getOrgName() {
+        return orgName;
     }
 
     public Long getIdOfPacket() {

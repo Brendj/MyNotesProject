@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -2267,7 +2268,7 @@ public class SyncRequest {
             return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
         }
 
-        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, long idOfOrg, String idOfSync)
+        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync)
                 throws Exception {
             long version = getLongValue(namedNodeMap, "Version");
             if (3L != version && 4L != version && 5L != version) {
@@ -2359,18 +2360,18 @@ public class SyncRequest {
             Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
             EnterEvents enterEvents = null;
             if (enterEventsNode != null) {
-                enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext, idOfOrg);
+                enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext, org.getIdOfOrg());
             }
 
             // 15.09.2011 LibraryData
             Node libraryDataNode = findFirstChildElement(envelopeNode, "LibraryData");
             LibraryData libraryData = null;
             if (libraryDataNode != null) {
-                libraryData = libraryDataBuilder.build(libraryDataNode, idOfOrg);
+                libraryData = libraryDataBuilder.build(libraryDataNode, org.getIdOfOrg());
             }
 
 
-            return new SyncRequest(version, type, idOfOrg, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, libraryData);
         }
@@ -2414,6 +2415,7 @@ public class SyncRequest {
 
     private final long protoVersion;
     private final long idOfOrg;
+    private final Org org;
     private final Date syncTime;
     private final Long idOfPacket;
     private final MenuGroups menuGroups;
@@ -2429,14 +2431,15 @@ public class SyncRequest {
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
 
-    public SyncRequest(long protoVersion, int type, long idOfOrg, Date syncTime, Long idOfPacket,
+    public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
             EnterEvents enterEvents, LibraryData libraryData) {
         this.protoVersion = protoVersion;
         this.type = type;
-        this.idOfOrg = idOfOrg;
+        this.idOfOrg = org.getIdOfOrg();
+        this.org = org;
         this.syncTime = syncTime;
         this.idOfPacket = idOfPacket;
         this.paymentRegistry = paymentRegistry;
@@ -2458,6 +2461,10 @@ public class SyncRequest {
 
     public long getIdOfOrg() {
         return idOfOrg;
+    }
+
+    public Org getOrg() {
+        return org;
     }
 
     public Date getSyncTime() {

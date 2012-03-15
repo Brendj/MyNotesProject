@@ -272,7 +272,7 @@ public class Processor implements SyncProcessor,
         }
 
         // Build and return response
-        SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(), idOfPacket,
+        SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(), request.getOrg().getShortName(), idOfPacket,
                 request.getProtoVersion(), syncEndTime, "", accRegistry, resPaymentRegistry, accIncRegistry,
                 clientRegistry, resOrgStructure, resMenuExchange, resDiary, "", resEnterEvents, resLibraryData,
                 resCategoriesDiscountsAndRules, correctingNumbersOrdersRegistry);
@@ -371,7 +371,7 @@ public class Processor implements SyncProcessor,
                 resAcc = processPayPaymentRegistryPayment(idOfContragent, payment);
             } catch (Exception e) {
                 logger.error(String.format("Failed to process payment == %s", payment), e);
-                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null,
+                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
                         PaymentProcessResult.UNKNOWN_ERROR.getCode(),
                         PaymentProcessResult.UNKNOWN_ERROR.getDescription());
             }
@@ -650,14 +650,14 @@ public class Processor implements SyncProcessor,
 
             Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
             if (null == contragent) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
                         PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s",
                                 PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId()));
             }
             if (DAOUtils.existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
                         PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
                         String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                                 PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
@@ -666,7 +666,7 @@ public class Processor implements SyncProcessor,
             Client client = findPaymentClient(persistenceSession, contragent, payment.getContractId(),
                     payment.getClientId());
             if (null == client) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
                         PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
                                 PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
@@ -706,7 +706,7 @@ public class Processor implements SyncProcessor,
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, paymentCard == null ? null : paymentCard.getIdOfCard(), client.getBalance(),
+                    idOfClient, client.getContractId(), paymentCard == null ? null : paymentCard.getIdOfCard(), client.getBalance(),
                     PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, paymentCard);
 
             persistenceTransaction.commit();
@@ -830,8 +830,12 @@ public class Processor implements SyncProcessor,
             // Ищем "лишние" группы
             List<ClientGroup> superfluousClientGroups = new LinkedList<ClientGroup>();
             for (ClientGroup clientGroup : organization.getClientGroups()) {
-                if (!find(clientGroup, reqStructure)) {
-                    superfluousClientGroups.add(clientGroup);
+                if (clientGroup.isTemporaryGroup()) {
+                    // добавляем временную группу в список для удаления если она уже есть в постоянных
+                    if (findClientGroupByName(clientGroup.getGroupName(), reqStructure))
+                        superfluousClientGroups.add(clientGroup);
+                } else {
+                    if (!findClientGroupById(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), reqStructure)) superfluousClientGroups.add(clientGroup);
                 }
             }
             // Удаляем "лишние" группы
@@ -868,11 +872,19 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private static boolean find(ClientGroup clientGroup, SyncRequest.OrgStructure reqStructure) throws Exception {
+    private static boolean findClientGroupById(long idOfClientGroup, SyncRequest.OrgStructure reqStructure) throws Exception {
         Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
         while (reqGroups.hasMoreElements()) {
-            if (clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()
-                    .equals(reqGroups.nextElement().getIdOfGroup())) {
+            if (idOfClientGroup==reqGroups.nextElement().getIdOfGroup()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean findClientGroupByName(String groupName, SyncRequest.OrgStructure reqStructure) throws Exception {
+        Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
+        while (reqGroups.hasMoreElements()) {
+            if (groupName.equals(reqGroups.nextElement().getName())) {
                 return true;
             }
         }
@@ -2430,7 +2442,7 @@ public class Processor implements SyncProcessor,
 
             Client client = (Client) session.get(Client.class, idOfClient);
 
-            if (client == null)
+if (client == null)
                 throw new Exception ("Client doesn't exist");
 
             if(client.isNotifyViaSMS()){
