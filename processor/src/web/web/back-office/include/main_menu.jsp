@@ -286,7 +286,7 @@
         <a4j:support event="onclick" action="#{mainPage.showComplexGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="allComplexReportMenuItem" binding="#{mainPage.allComplexReportPage.mainMenuComponent}"
-                            label="Отчет по всем учреждениям" action="#{mainPage.showAllComplexReportPage}" reRender="workspaceForm" />
+                            label="Все комплексы" action="#{mainPage.showAllComplexReportPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="freeComplexReportMenuItem" binding="#{mainPage.freeComplexReportPage.mainMenuComponent}"
                         label="Бесплатные комплексы" action="#{mainPage.showFreeComplexReportPage}" reRender="workspaceForm" />

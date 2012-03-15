@@ -102,9 +102,11 @@ public class SyncServlet extends HttpServlet {
             }
 
             // Verify XML signature
+            Org org;
             PublicKey publicKey;
             try {
-                publicKey = extractPublicKey(runtimeContext, idOfOrg);
+                org = findOrg(runtimeContext, idOfOrg);
+                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
@@ -125,7 +127,7 @@ public class SyncServlet extends HttpServlet {
             SyncRequest syncRequest;
             try {
                 SyncRequest.Builder syncRequestBuilder = new SyncRequest.Builder();
-                syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, idOfOrg, idOfSync);
+                syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync);
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -207,7 +209,7 @@ public class SyncServlet extends HttpServlet {
         if (outputStream instanceof GZIPOutputStream) ((GZIPOutputStream)outputStream).finish();
     }
 
-    private static PublicKey extractPublicKey(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
+    private Org findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
         PublicKey publicKey;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -221,15 +223,13 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
                 throw new NullPointerException(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
             }
-            // Extract PK for org with given IdOfOrg
-            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            return org;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return publicKey;
     }
 
 }

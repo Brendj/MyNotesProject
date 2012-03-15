@@ -37,6 +37,8 @@ public interface ClientRoomController {
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getMenuListBySan")
     MenuListResult getMenuList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+    @WebMethod (operationName = "getMenuListByOrg")
+    MenuListResult getMenuListByOrg(@WebParam(name="orgId") Long orgId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getCardList")
     CardListResult getCardList(@WebParam(name="contractId") Long contractId);
     @WebMethod (operationName = "getCardListBySan")

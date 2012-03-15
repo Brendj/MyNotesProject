@@ -2268,6 +2268,11 @@ public class MainPage {
         InputStream inputStream = null;
         long dataSize = 0;
         try {
+            if (clientFileLoadPage.getOrg()==null || clientFileLoadPage.getOrg().getIdOfOrg()==null) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не указана организация", null));
+                return;
+            }
             if (item.isTempFile()) {
                 File file = item.getFile();
                 dataSize = file.length();
@@ -2283,7 +2288,7 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to load clients from file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам: "+e,
                             null));
         } finally {
             close(inputStream);

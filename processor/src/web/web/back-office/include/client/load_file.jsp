@@ -56,6 +56,13 @@
         <a4j:support event="onclear" reRender="clientFileLoaderPanel" />
     </rich:fileUpload>
 
+    <a4j:outputPanel>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages" />
+        </h:panelGrid>
+    </a4j:outputPanel>
+
     <rich:dataTable id="clientLoadResultTable" value="#{mainPage.clientFileLoadPage.lineResults}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"
                     footerClass="data-table-footer">

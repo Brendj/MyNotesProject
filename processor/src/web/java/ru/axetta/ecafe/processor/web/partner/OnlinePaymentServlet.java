@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.partner;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
 import org.slf4j.Logger;
@@ -43,24 +44,29 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                 return;
             }
             OnlinePaymentProcessor.PayRequest payRequest=null;
+            OnlinePaymentProcessor.PayResponse response=null;
             long contragentId=getDefaultIdOfContragent(runtimeContext);
             try {
                 payRequest = requestParser.parsePayRequest(contragentId, httpRequest);
+            } catch (OnlinePaymentRequestParser.CardNotFoundException e) {
+                response = OnlinePaymentProcessor.generateErrorResponse(Processor.PaymentProcessResult.CARD_NOT_FOUND);
+                getLogger().error("Card not found for request", e);
             } catch (Exception e) {
                 getLogger().error("Failed to parse request", e);
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            getLogger().info(String.format("New request: %s", payRequest.toString()));
-            OnlinePaymentProcessor.PayResponse response;
-            try {
-                response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
-            } catch (Exception e) {
-                getLogger().error("Failed to process request", e);
-                httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+            if (response==null) {
+                getLogger().info(String.format("New request: %s", payRequest.toString()));
+                try {
+                    response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
+                } catch (Exception e) {
+                    getLogger().error("Failed to process request", e);
+                    httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
             }
-            getLogger().info(String.format("Request (%s) processed: %s", requestParser.toString(), response.toString()));
+            getLogger().info(String.format("Request (%s) processed: %s", requestParser==null?"null":requestParser.toString(), response.toString()));
             try {
                 requestParser.serializeResponse(response, httpResponse);
                 httpRequest.setAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE, response);

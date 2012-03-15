@@ -147,6 +147,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             long contractId = Long.parseLong(tokens[0]);
 
             Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
@@ -154,7 +155,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
                 return new LineResult(lineNo, 20, "Client not found", null);
             }
             /* пробегаем по массиву и вставляем соответсвующие значения*/
-            for (int i=0; i<colums.length; i++){
+            for (int i=1; i<colums.length; i++){
                 if(colums[i].equalsIgnoreCase("ContractState")){
                     client.setContractState(Integer.parseInt(tokens[i]));
                 }
@@ -167,6 +168,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             }
 
             client.setUpdateTime(new Date());
+            client.setClientRegistryVersion(clientRegistryVersion);
             persistenceSession.update(client);
             Long idOfClient = client.getIdOfClient();
             persistenceTransaction.commit();

@@ -25,6 +25,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="OverdraftLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="ExpenditureLimit" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="FirstName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="LastName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="MiddleName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Grade" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="OfficialName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="LastEnterEventCode" type="{http://www.w3.org/2001/XMLSchema}int" />
@@ -59,6 +61,10 @@ public class ClientSummaryExt {
     protected Long expenditureLimit;
     @XmlAttribute(name = "FirstName")
     protected String firstName;
+    @XmlAttribute(name = "LastName")
+    protected String lastName;
+    @XmlAttribute(name = "MiddleName")
+    protected String middleName;
     @XmlAttribute(name = "Grade")
     protected String grade;
     @XmlAttribute(name = "OfficialName")
@@ -243,6 +249,54 @@ public class ClientSummaryExt {
      */
     public void setFirstName(String value) {
         this.firstName = value;
+    }
+
+    /**
+     * Gets the value of the lastName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     * Sets the value of the lastName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setLastName(String value) {
+        this.lastName = value;
+    }
+
+    /**
+     * Gets the value of the middleName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    /**
+     * Sets the value of the middleName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setMiddleName(String value) {
+        this.middleName = value;
     }
 
     /**

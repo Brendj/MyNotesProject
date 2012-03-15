@@ -49,7 +49,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (parseResult.getParam("CARDID")!=null) {
             String cardId = parseResult.getReqParam("CARDID");
             Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getClientContractIdByCardId(cardId);
-            if (clId == null) throw new Exception("Card not found: "+cardId);
+            if (clId == null) throw new CardNotFoundException("Card not found: "+cardId);
             clientId = clId;
         } else {
             clientId=parseResult.getReqLongParam("CLIENTID");

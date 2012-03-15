@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -294,13 +291,14 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                 client.setRemarks(tokens[20]);
             }
 
-            /* проверяется есть ли в загрузочном файлу параметр для группы клиента (класс для учиника)*/
+            /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (tokens.length >=22){
-                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, tokens[21]);
-                if(clientGroup != null){
-                    /* если существует данная группа в организации добавляем его клиенту*/
-                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                String clientGroupName = tokens[21];
+                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
+                if (clientGroup == null) {
+                    clientGroup = createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
                 }
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
@@ -310,12 +308,20 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
-            logger.debug("Failed to create client", e);
+            logger.info("Failed to create client", e);
             return new LineResult(lineNo, 3, e.getMessage(), null);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private ClientGroup createNewClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
+        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,
+                DAOUtils.getIdForTemporaryClientGroup(persistenceSession, idOfOrg));
+        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
+        persistenceSession.save(clientGroup);
+        return clientGroup;
     }
 
     private static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,

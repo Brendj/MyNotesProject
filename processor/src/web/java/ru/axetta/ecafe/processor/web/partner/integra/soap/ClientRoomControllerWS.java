@@ -54,16 +54,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
+
     private static final String RC_OK_DESC="OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
     private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
     private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
 
-    interface Processor {
+    static class Processor {
 
         public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
-                Transaction transaction) throws Exception;
+                Transaction transaction) throws Exception {}
+        public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
+                Transaction transaction) throws Exception {}
     }
 
     class ClientRequest {
@@ -144,6 +147,48 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             return data;
         }
+
+    }
+
+    class OrgRequest {
+        public Data process(long orgId, Processor processor) {
+            ObjectFactory objectFactory = new ObjectFactory();
+            Data data = objectFactory.createData();
+
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                Criteria criteria = persistenceSession.createCriteria(Org.class);
+                criteria.add(Restrictions.eq("idOfOrg", orgId));
+                List<Org> orgs = criteria.list();
+
+                if (orgs.isEmpty()) {
+                    data.setResultCode(RC_INVALID_DATA);
+                    data.setDescription("Организация не найдена");
+                } else {
+                    Org org = (Org) orgs.get(0);
+                    processor.process(org, data, objectFactory, persistenceSession, persistenceTransaction);
+                    data.setIdOfContract(null);
+                    data.setResultCode(RC_OK);
+                    data.setDescription("OK");
+                }
+                persistenceSession.flush();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Failed to process client room controller request", e);
+                data.setResultCode(RC_INTERNAL_ERROR);
+                data.setDescription(e.toString());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+            return data;
+        }
+
     }
 
     @Override
@@ -188,6 +233,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
         clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
         clientSummaryExt.setFirstName(client.getPerson().getFirstName());
+        clientSummaryExt.setLastName(client.getPerson().getSurname());
+        clientSummaryExt.setMiddleName(client.getPerson().getSecondName());
         clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
         clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
         clientSummaryExt.setMobilePhone(client.getMobile());
@@ -350,7 +397,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processMenuList(client, data, objectFactory, session, startDate, endDate);
+                processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
             }
         });
 
@@ -366,7 +413,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(san, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processMenuList(client, data, objectFactory, session, startDate, endDate);
+                processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
             }
         });
 
@@ -377,10 +424,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuListResult;
     }
 
-    private void processMenuList(Client client, Data data, ObjectFactory objectFactory, Session session, Date startDate,
+    @Override
+    public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId,
+            final Date startDate, final Date endDate) {
+        Data data = new OrgRequest().process(orgId, new Processor() {
+            public void process(Org org, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                processMenuList(org, data, objectFactory, session, startDate, endDate);
+            }
+        });
+
+        MenuListResult menuListResult = new MenuListResult();
+        menuListResult.menuList = data.getMenuListExt();
+        menuListResult.resultCode = data.getResultCode();
+        menuListResult.description = data.getDescription();
+        return menuListResult;
+    }
+
+
+    private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
         Criteria menuCriteria = session.createCriteria(Menu.class);
-        menuCriteria.add(Restrictions.eq("org", client.getOrg()));
+        menuCriteria.add(Restrictions.eq("org", org));
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuCriteria.add(Restrictions.ge("menuDate", startDate));
         menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));

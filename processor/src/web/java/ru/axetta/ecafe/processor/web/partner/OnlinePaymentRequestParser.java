@@ -19,6 +19,12 @@ import java.security.PrivateKey;
 import java.util.*;
 
 public abstract class OnlinePaymentRequestParser {
+    public static class CardNotFoundException extends Exception {
+
+        public CardNotFoundException(String message) {
+            super(message);    //To change body of overridden methods use File | Settings | File Templates.
+        }
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(OnlinePaymentRequestParser.class);
 

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -324,8 +325,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.items) {
             clientsId.add(item.getIdOfClient());
         }
-        org.hibernate.Query q = session.createQuery("update Client set limit = :newLimit where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        org.hibernate.Query q = session.createQuery("update Client set limit = :newLimit, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
         q.setLong("newLimit", limit);
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
         q.setParameterList("clientsId", clientsId);
         if (q.executeUpdate() != clientsId.size())
             throw new Exception("Ошибка при установлении лимита овердрафта.");
@@ -356,8 +359,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.items) {
             clientsId.add(item.getIdOfClient());
         }
-        org.hibernate.Query q = session.createQuery("update Client set org.idOfOrg = :newOrg where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        org.hibernate.Query q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
         q.setLong("newOrg", org.getIdOfOrg());
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
         q.setParameterList("clientsId", clientsId);
         if (q.executeUpdate() != clientsId.size())
             throw new Exception("Ошибка при установлении лимита овердрафта.");
@@ -379,11 +384,13 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.items) {
             clientsId.add(item.getIdOfClient());
         }
-        org.hibernate.Query q = session.createQuery("update Client set expenditureLimit = :newExpenditureLimit where idOfClient in :clientsId");
+        org.hibernate.Query q = session.createQuery("update Client set expenditureLimit = :newExpenditureLimit, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
         q.setLong("newExpenditureLimit", expenditureLimit);
         q.setParameterList("clientsId", clientsId);
         if (q.executeUpdate() != clientsId.size())
-            throw new Exception("Ошибка при установлении лимита дневныъ трат овердрафта.");
+            throw new Exception("Ошибка при установлении лимита дневных трат овердрафта.");
         for (Item item : this.getItems()) {
             item.setExpenditureLimit(expenditureLimit);
         }
