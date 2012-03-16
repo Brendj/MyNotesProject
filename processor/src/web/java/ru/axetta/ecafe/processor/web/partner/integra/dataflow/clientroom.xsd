@@ -5,6 +5,7 @@
     <xsd:element name="Data">
         <xsd:complexType>
             <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="1" name="OrgSummary" type="OrgSummary"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummary" type="ClientSummary"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummaryExt" type="ClientSummaryExt"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="PurchaseList" type="PurchaseList"/>
@@ -14,6 +15,7 @@
                 <xsd:element minOccurs="0" maxOccurs="1" name="MenuListExt" type="MenuListExt"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="CardList" type="CardList"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="EnterEventList" type="EnterEventList"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="ClientGroupList" type="ClientGroupList"/>
             </xsd:sequence>
             <xsd:attribute name="IdOfContract" type="xsd:long"/>
             <xsd:attribute name="ResultCode" type="xsd:long"/>
@@ -167,5 +169,19 @@
         <xsd:attribute name="EnterName" type="xsd:string"/>
         <xsd:attribute name="Direction" type="xsd:int"/>
         <xsd:attribute name="TemporaryCard" type="xsd:int"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="OrgSummary">
+        <xsd:attribute name="groupCount" type="xsd:long"/>
+        <xsd:attribute name="ResultCode" type="xsd:long"/>
+        <xsd:attribute name="Description" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:complexType name="ClientGroupList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="ClientGroupItem"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ClientGroupItem">
+        <xsd:attribute name="GroupName" type="xsd:string"/>
     </xsd:complexType>
 </xsd:schema>

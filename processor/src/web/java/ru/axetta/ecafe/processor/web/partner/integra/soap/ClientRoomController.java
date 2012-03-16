@@ -21,6 +21,13 @@ import java.util.Date;
 
 @WebService
 public interface ClientRoomController {
+
+    @WebMethod (operationName = "getGroupListByOrg")
+    ClientGroupListResult getGroupListByOrg(@WebParam(name="idOfOrg") Long idOfOrg);
+
+    @WebMethod (operationName = "getStudentListByIdOfClientGroup")
+    ClassStudentListResult getStudentListByIdOfClientGroup(@WebParam(name="idOfClientGroup") Long idOfClientGroup);
+
     @WebMethod (operationName = "getSummary")
     ClientSummaryResult getSummary(@WebParam(name="contractId") Long contractId);
     @WebMethod (operationName = "getSummaryBySan")

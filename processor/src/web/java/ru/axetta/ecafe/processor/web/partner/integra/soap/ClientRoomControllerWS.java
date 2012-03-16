@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -17,9 +18,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
 
-    private static final String RC_OK_DESC="OK";
+private static final String RC_OK_DESC="OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
     private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
@@ -67,6 +66,92 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Transaction transaction) throws Exception {}
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
                 Transaction transaction) throws Exception {}
+    }
+
+    @Override
+    public ClassStudentListResult getStudentListByIdOfClientGroup(Long idOfClientGroup){
+        ClassStudentListResult classStudentListResult = new ClassStudentListResult();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+            List objects =clientCriteria.list();
+            ObjectFactory objectFactory = new ObjectFactory();
+            Data data = objectFactory.createData();
+            ClassStudentList classStudentList = new ClassStudentList();
+            if(!objects.isEmpty()){
+                for (Object object :objects){
+                    Client client = (Client) object;
+                    ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
+                    clientSummaryExt.setContractId(client.getContractId());
+                    clientSummaryExt.setFirstName(client.getPerson().getFirstName());
+                    clientSummaryExt.setLastName(client.getPerson().getSurname());
+                    clientSummaryExt.setMiddleName(client.getPerson().getSecondName());
+                    /* нет необходимости их отправлять */
+                    //clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
+                    //clientSummaryExt.setBalance(client.getBalance());
+                    //clientSummaryExt.setOverdraftLimit(client.getLimit());
+                    //clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
+                    //clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
+                    //clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
+                    //clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
+                    //clientSummaryExt.setMobilePhone(client.getMobile());
+                    //clientSummaryExt.setEmail(client.getEmail());
+
+                    classStudentList.getC().add(clientSummaryExt);
+                }
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            classStudentListResult.classStudentList = classStudentList;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return classStudentListResult;
+    }
+
+    @Override
+    public ClientGroupListResult getGroupListByOrg(Long idOfOrg){
+        ClientGroupListResult clientGroupListResult = new ClientGroupListResult();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+            clientGroupCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+
+            List objects =clientGroupCriteria.list();
+            ClientGroupList clientGroupList = new ClientGroupList();
+            if(!objects.isEmpty()){
+                for (Object object :objects){
+                    ClientGroup clientGroup = (ClientGroup) object;
+                    ClientGroupItem clientGroupItem = new ClientGroupItem();
+                    clientGroupItem.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    clientGroupItem.setGroupName(clientGroup.getGroupName());
+                    clientGroupList.getG().add(clientGroupItem);
+                }
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            clientGroupListResult.clientGroupList = clientGroupList;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientGroupListResult;
     }
 
     class ClientRequest {
@@ -148,7 +233,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return data;
         }
 
-    }
+}
 
     class OrgRequest {
         public Data process(long orgId, Processor processor) {
