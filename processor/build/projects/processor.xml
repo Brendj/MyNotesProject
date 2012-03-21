@@ -34,4 +34,18 @@
         </wsimport>
 
     </target>
+
+
+    <target name="gen_teralectws" description="">
+        <wsimport
+                package="generated.ru.teralect"
+            keep="true"
+            destdir="${generatedSrcDest}"
+            extension="true"
+            wsdl="http://sms.teralect.ru:13700/">
+            <binding file="tools/simple_jaxb.xml"/>
+        </wsimport>
+
+    </target>
+
 </project>
