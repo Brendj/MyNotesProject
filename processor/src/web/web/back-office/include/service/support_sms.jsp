@@ -9,12 +9,24 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:panel id="supportSmsPanel" headerClass="workspace-panel-header">
-    <f:facet name="header">
-        <h:outputText escape="true" value="Сервис > Отправка SMS" />
-    </f:facet>
     <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="" />
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Кому" styleClass="output-text" />
+            <h:inputText value="#{supportSMSPage.address}" size="11" maxlength="11" styleClass="input-text" />
+            <h:outputText escape="true" value="Текст" styleClass="output-text" />
+            <h:inputTextarea rows="10" cols="40" value="#{supportSMSPage.text}" styleClass="input-text" />
+            <h:outputText escape="true" value="Статус" styleClass="output-text" rendered="#{supportSMSPage.sent}"/>
+            <h:inputText readonly="true" size="40" value="#{supportSMSPage.deliveryStatus}" styleClass="input-text" rendered="#{supportSMSPage.sent}"/>
+            <a4j:commandButton action="#{supportSMSPage.updateStatus}"
+                reRender="supportSmsPanel" value="Обновить статус"
+                rendered="#{supportSMSPage.sent}"
+                />
+            <a4j:commandButton action="#{supportSMSPage.send}"
+                reRender="supportSmsPanel" value="Отправить"
+                rendered="#{not supportSMSPage.sent}" />
+
+        </h:panelGrid>
     </h:panelGrid>
 </rich:panel>

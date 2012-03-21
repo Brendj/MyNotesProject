@@ -269,6 +269,9 @@
     <rich:panelMenuItem id="supportEmailMenuItem" binding="#{mainPage.supportEmailPage.mainMenuComponent}"
                         label="Отправка письма" action="#{mainPage.showSupportEmailPage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceSupport}"/>
+    <rich:panelMenuItem id="supportSMSMenuItem" binding="#{supportSMSPage.mainMenuComponent}"
+                        label="Отправка SMS" action="#{supportSMSPage.show}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToServiceSupport}"/>
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций" binding="#{journalViewPage.mainMenuComponent}"
                         action="#{journalViewPage.show}" reRender="workspaceForm"/>
 
