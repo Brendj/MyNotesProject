@@ -33,10 +33,10 @@ public class ClientSmsDeliveryStatusUpdater {
     private final Scheduler scheduler;
     private final int period;
     private final SessionFactory sessionFactory;
-    private final SmsService smsService;
+    private final ISmsService smsService;
 
     public ClientSmsDeliveryStatusUpdater(ExecutorService executorService, Scheduler scheduler, int period,
-            SessionFactory sessionFactory, SmsService smsService) {
+            SessionFactory sessionFactory, ISmsService smsService) {
         this.executorService = executorService;
         this.scheduler = scheduler;
         this.period = period;

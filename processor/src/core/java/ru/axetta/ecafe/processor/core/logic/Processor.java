@@ -2436,13 +2436,12 @@ public class Processor implements SyncProcessor,
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            SmsService smsService = runtimeContext.getSmsService();
-            MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
+            ISmsService smsService = runtimeContext.getSmsService();
             ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
 
             Client client = (Client) session.get(Client.class, idOfClient);
 
-if (client == null)
+            if (client == null)
                 throw new Exception ("Client doesn't exist");
 
             if(client.isNotifyViaSMS()){
@@ -2453,25 +2452,24 @@ if (client == null)
                         if (StringUtils.length(phoneNumber) == 11) {
                             String sender = buildSender(client);
                             String text = buildSmsText(client, passDirection, eventDate);
-                            String idOfSms = messageIdGenerator.generate();
                             SendResponse sendResponse = null;
                             try {
-                                logger.info(String.format("sending SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                        idOfSms, sender, phoneNumber, text));
-                                sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
-                                logger.info(String.format("sended SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                        idOfSms, sender, phoneNumber, text));
+                                logger.info(String.format("sending SMS, sender: %s, phoneNumber: %s, text: %s",
+                                        sender, phoneNumber, text));
+                                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
+                                logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
+                                        sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
                             } catch (Exception e) {
                                 if (logger.isWarnEnabled()) {
                                     logger.warn(String.format(
-                                            "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                            idOfSms, sender, phoneNumber, text), e);
+                                            "Failed to send SMS, sender: %s, phoneNumber: %s, text: %s",
+                                            sender, phoneNumber, text), e);
                                 }
                             }
                             if (null != sendResponse) {
                                 if (sendResponse.isSuccess()) {
                                     clientSmsProcessor
-                                            .registerClientSms(idOfClient, idOfSms, phoneNumber,
+                                            .registerClientSms(idOfClient, sendResponse.getMessageId(), phoneNumber,
                                                     ClientSms.ENTER_EVENT_NOTIFY, text, new Date());
                                 }
                             }

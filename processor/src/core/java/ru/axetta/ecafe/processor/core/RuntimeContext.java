@@ -30,7 +30,9 @@ import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsProcessor;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
-import ru.axetta.ecafe.processor.core.sms.SmsService;
+import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
+import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.support.SupportEmailSender;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
@@ -72,14 +74,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-/**
- * Created by IntelliJ IDEA.
- * User: Developer
- * Date: 25.05.2009
- * Time: 10:48:56
- * To change this template use File | Settings | File Templates.
- */
 
 @Component
 @Scope("singleton")
@@ -141,7 +135,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private AutoReportGenerator autoReportGenerator;
     private String payformUrl;
     private String payformGroupUrl;
-    private SmsService smsService;
+    private ISmsService smsService;
     private SupportEmailSender supportEmailSender;
     private ClientSmsDeliveryStatusUpdater clientSmsDeliveryStatusUpdater;
     private MessageIdGenerator messageIdGenerator;
@@ -201,7 +195,7 @@ public class RuntimeContext implements ApplicationContextAware {
         return clientSmsProcessor;
     }
 
-    public SmsService getSmsService() {
+    public ISmsService getSmsService() {
         return smsService;
     }
 
@@ -330,7 +324,7 @@ public class RuntimeContext implements ApplicationContextAware {
         RuleProcessor ruleProcessor = null;
         EventNotificator eventNotificator = null;
         Processor processor = null;
-        SmsService smsService = null;
+        ISmsService smsService = null;
         //sessionFactory = ((Session)entityManagerFactory.createEntityManager()).getSessionFactory();
         //logger.info("sf = "+sessionFactory);
         try {
@@ -706,7 +700,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private static ClientSmsDeliveryStatusUpdater createClientSmsDeliveryStatusUpdater(Properties properties,
-            ExecutorService executorService, Scheduler scheduler, SessionFactory sessionFactory, SmsService smsService)
+            ExecutorService executorService, Scheduler scheduler, SessionFactory sessionFactory, ISmsService smsService)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating SMS delivery status updater.");
@@ -773,17 +767,27 @@ public class RuntimeContext implements ApplicationContextAware {
         return properties.getProperty(AUTO_REPORT_PARAM_BASE + ".payformgroup.url");
     }
 
-    private static SmsService createSmsService(Properties properties) throws Exception {
+    private static ISmsService createSmsService(Properties properties) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating SMS service.");
         }
+        String serviceType = properties
+                .getProperty(SMS_SERVICE_PARAM_BASE + ".type", "atompark");
         String serviceUrl = properties
                 .getProperty(SMS_SERVICE_PARAM_BASE + ".url", "http://atompark.com/members/sms/xml.php");
         String userName = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".user", "kolpakov.igor@gmail.com");
         String password = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".password", "nkjngnnwdv");
         String sender = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".sender", "Novshkola");
         String timeZone = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".timeZone", "GMT-1");
-        SmsService smsService = new SmsService(new SmsService.Config(serviceUrl, userName, password, sender, timeZone));
+        ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone);
+        ISmsService smsService = null;
+        if (serviceType.equalsIgnoreCase("atompark")) {
+            smsService = new AtomparkSmsServiceImpl(config);
+        } else if (serviceType.equalsIgnoreCase("teralect")) {
+            smsService = new TeralectSmsServiceImpl(config);
+        } else {
+            throw new Exception("Invalid SMS service type: "+serviceType);
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("SMS service created.");
         }

@@ -36,10 +36,10 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
 
         private final ExecutorService executorService;
         private final SessionFactory sessionFactory;
-        private final SmsService smsService;
+        private final ISmsService smsService;
 
         public ExecuteEnvironment(ExecutorService executorService, SessionFactory sessionFactory,
-                SmsService smsService) {
+                ISmsService smsService) {
             this.executorService = executorService;
             this.sessionFactory = sessionFactory;
             this.smsService = smsService;
@@ -53,7 +53,7 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
             return sessionFactory;
         }
 
-        public SmsService getSmsService() {
+        public ISmsService getSmsService() {
             return smsService;
         }
     }
@@ -79,7 +79,7 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
         };
     }
 
-    public static void run(SessionFactory sessionFactory, SmsService smsService) {
+    public static void run(SessionFactory sessionFactory, ISmsService smsService) {
         if (logger.isDebugEnabled()) {
             logger.debug("SMS delivery status update started.");
         }
@@ -105,7 +105,7 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
         }
     }
 
-    private static void updateSmsDeliveryStatus(Session persistenceSession, SmsService smsService) throws Exception {
+    private static void updateSmsDeliveryStatus(Session persistenceSession, ISmsService smsService) throws Exception {
         Date currentTime = new Date();
         Criteria clientSmsCriteria = persistenceSession.createCriteria(ClientSms.class);
         clientSmsCriteria.add(Restrictions.or(Restrictions.eq("deliveryStatus", ClientSms.SENT_TO_SERVICE),
@@ -145,6 +145,7 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
                     if (null != sendDate && null == clientSms.getSendTime()) {
                         clientSms.setSendTime(sendDate);
                     }
+                case DeliveryResponse.EXPIRED:
                 case DeliveryResponse.NOT_ALLOWED:
                 case DeliveryResponse.INVALID_DESTINATION_ADDRESS:
                 case DeliveryResponse.INVALID_SOURCE_ADDRESS:

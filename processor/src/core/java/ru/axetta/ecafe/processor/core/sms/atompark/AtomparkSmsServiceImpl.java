@@ -1,16 +1,20 @@
 /*
- * Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sms;
+package ru.axetta.ecafe.processor.core.sms.atompark;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
+import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
+import ru.axetta.ecafe.processor.core.sms.SendResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
@@ -28,58 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Developer
- * Date: 24.02.2010
- * Time: 15:41:07
- * To change this template use File | Settings | File Templates.
- */
-public class SmsService {
+public class AtomparkSmsServiceImpl extends ISmsService {
 
-    public static class Config {
-
-        private final String serviceUrl;
-        private final String userName;
-        private final String password;
-        private final String defaultSender;
-        private final String serviceTimeZone;
-
-        public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone)
-                throws Exception {
-            this.serviceUrl = serviceUrl;
-            this.userName = userName;
-            this.password = password;
-            this.defaultSender = StringUtils.substring(defaultSender, 0, 11);
-            this.serviceTimeZone = serviceTimeZone;
-        }
-
-        public String getServiceUrl() {
-            return serviceUrl;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getDefaultSender() {
-            return defaultSender;
-        }
-
-        public String getServiceTimeZone() {
-            return serviceTimeZone;
-        }
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
-    private final Config config;
-
-    public SmsService(Config config) {
-        this.config = config;
+    public AtomparkSmsServiceImpl(Config config) {
+        super(config);
     }
 
     private String sendServiceRequest(String request) throws Exception {
@@ -116,14 +72,17 @@ public class SmsService {
      * @return
      * @throws Exception
      */
-    public SendResponse sendTextMessage(String messageId, String sender, String phoneNumber, String text)
+    public SendResponse sendTextMessage(String sender, String phoneNumber, String text)
             throws Exception {
         if (StringUtils.isEmpty(sender)) {
             sender = config.getDefaultSender();
         }
+        MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();
+        String messageId = messageIdGenerator.generate();
+
         String serviceRequest = buildSendXml(messageId, sender, phoneNumber, text);
         String serviceResponse = sendServiceRequest(serviceRequest);
-        return new SendResponse(extractStatusCodeFromSendResponse(serviceResponse));
+        return new SendResponse(extractStatusCodeFromSendResponse(serviceResponse), null, messageId);
     }
 
     /**

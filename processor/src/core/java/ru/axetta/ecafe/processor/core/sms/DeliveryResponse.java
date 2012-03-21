@@ -23,14 +23,15 @@ public class DeliveryResponse {
     public static final int INVALID_DESTINATION_ADDRESS = 5;
     public static final int INVALID_SOURCE_ADDRESS = 6;
     public static final int NOT_ENOUGH_CREDITS = 7;
+    public static final int EXPIRED = 8;
     public static final String[] STATUS_TEXT = {
             "", "SENT", "NOT_DELIVERED", "DELIVERED", "NOT_ALLOWED", "INVALID_DESTINATION_ADDRESS",
-            "INVALID_SOURCE_ADDRESS", "NOT_ENOUGH_CREDITS", "NOT DELIVERED"};
+            "INVALID_SOURCE_ADDRESS", "NOT_ENOUGH_CREDITS", "NOT DELIVERED", "EXPIRED"};
     public static final int[] STATUS_CODE = {
             0, 1, 2, 3, 4, 5, 6, 7, 2};
     private static final String[] STATUS_MESSAGES = {
             "Статус неизвестен", "Отослано", "Не доставлено", "Доставлено", "Оператор не обслуживается",
-            "Неверный адрес для доставки", "Неправильное имя «От кого»", "Недостаточно кредитов"};
+            "Неверный адрес для доставки", "Неправильное имя «От кого»", "Недостаточно кредитов", "Истекло время ожидания"};
 
     private final int statusCode;
     private final Date sentDate;
