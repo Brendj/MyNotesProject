@@ -277,7 +277,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
 
     public void sendNegativeBalanceSms(Session session) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        SmsService smsService = runtimeContext.getSmsService();
+        ISmsService smsService = runtimeContext.getSmsService();
         MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
         ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
 
