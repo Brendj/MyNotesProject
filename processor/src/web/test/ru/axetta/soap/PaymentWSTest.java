@@ -4,26 +4,23 @@
 
 package ru.axetta.soap;
 
+import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import junit.framework.TestCase;
 
+import java.io.FileInputStream;
 import java.lang.Exception;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
+import java.security.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 
 import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -43,6 +40,7 @@ public class PaymentWSTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
             new X509TrustManager() {
@@ -70,31 +68,47 @@ public class PaymentWSTest extends TestCase {
     }
 
     String PRIV_KEY="MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBALEyuOL4fdt8B+tmSNzpsaQrecstv4qlS+mYQ2ScT/SciRWMi9Yw3yBOons5ztc/4ialxq1Fv10KEzlAOu7wrxc7joAGfhtRlf1XTE0YwQlE+0sBB14Qhran1Bxy49bUMdxVuCQgLLd44BPztDb0YenY8hNGMvjyY93gDp0DBuDxAgMBAAECgYEAgE2Gu6lLkAnNvi+woGyB2Ko2JNy6LQyk274JRic8aZSSWc0LT4rRdJYbZfgkgYzbFjrAkaPH/PkXlEOiqHIThB1sf1pPatHIcP46ozStV/IgxCqiTkKpp0ATLScW++CUvRhq+Bz8AARi0j6wly5OGFZ+3BDppu0vYVDJQMhWfrECQQDamO8czIRhDjlaFMQ++rBpEneDVQ6wbWYh22X6/qhOAJGvgPm42q07vVQw099ilpP3KtL8PE2JQPAIvulYyfstAkEAz4Rn3AC/OhkU2S0ao2yr0sLtDgr+9eLkZCTNp1/OVOb4Ee7v4YSKcyek5zHx1xFMHTkCLJ4HPfcrRroxPKFHVQJAFl7+YZEgnxoojmp/pv5a3XXxWzRyO2YGxMJCToyPRuRSBIcLh3qBrhJzMkgMnXdRj0MHsp6tRLWrmwmGsfqBxQJBAIK7UE7aLZ5lRKwY7So9gPWzFXJ+XOb8/JNWWDT0d2EnbOqnU3oIbMxlEk8QOOIbpI7YZlVDbR6Ngzb4f6JJnE0CQQCzfdWdzgDG2AK1ECWhPU8HsXxG3foUPE9vp7Yy5vXwOxykv1S0j4lmKoK1qjneBZSxF7dJ4iMDaKpmpwCeEJXy";
+    //String PUB_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxMrji+H3bfAfrZkjc6bGkK3nLLb+KpUvpmENknE/0nIkVjIvWMN8gTqJ7Oc7XP+ImpcatRb9dChM5QDru8K8XO46ABn4bUZX9V0xNGMEJRPtLAQdeEIa2p9QccuPW1DHcVbgkICy3eOAT87Q29GHp2PITRjL48mPd4A6dAwbg8QIDAQAB";
     String PUB_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxMrji+H3bfAfrZkjc6bGkK3nLLb+KpUvpmENknE/0nIkVjIvWMN8gTqJ7Oc7XP+ImpcatRb9dChM5QDru8K8XO46ABn4bUZX9V0xNGMEJRPtLAQdeEIa2p9QccuPW1DHcVbgkICy3eOAT87Q29GHp2PITRjL48mPd4A6dAwbg8QIDAQAB";
 
-    public void testEcafeSoap() {
+    public class TestHostnameVerifier implements HostnameVerifier {
+        public boolean verify(String arg0, SSLSession arg1) {
+            return true;
+        }
+    }
+
+    public void testEcafeSoap() throws Exception {
+        KeyStore ks = KeyStore.getInstance("PKCS12");
+        ks.load(new FileInputStream("C:\\Work\\Projects\\Москва-образование\\Сертификаты\\test\\testpay.pfx"), "1".toCharArray());
+        //PrivateKey privateKey = DigitalSignatureUtils.convertToPrivateKey(PRIV_KEY);
+        PrivateKey privateKey = (PrivateKey)ks.getKey("b5bfceff-c935-4203-93bc-f9499be1c63c", "1".toCharArray());
+
         System.out.println("Start");
         try {
             PublicKey publicKey = DigitalSignatureUtils.convertToPublicKey(PUB_KEY);
-            PrivateKey privateKey = DigitalSignatureUtils.convertToPrivateKey(PRIV_KEY);
+            //PrivateKey privateKey = DigitalSignatureUtils.convertToPrivateKey(PRIV_KEY);
             PaymentControllerWSService service = new PaymentControllerWSService();
             PaymentController port
                     = service.getPaymentControllerWSPort();
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8111/processor/soap/payment");
+            ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new TestHostnameVerifier());
+
             String pid ="sber_msk";
-            String clientId = "200485";
-            String opId = ""+System.currentTimeMillis(), termId="0";
+            String clientId = "00200485";
+            //String opId = ""+System.currentTimeMillis(), termId="0";
+            String opId = "44445555", termId="1";
             String sum="1000", time="20120221000000";
             String balanceRequest = "PID=" + pid + "&CLIENTID=" + clientId + "&OPID=" + opId + "&TERMID=" + termId;
             balanceRequest = sign(privateKey, balanceRequest);
-            verify(publicKey, balanceRequest);
+            if (!verify(publicKey, balanceRequest)) throw new Exception("Signature check failed");
             String commitPaymentRequest = "PID=" + pid + "&CLIENTID=" + clientId + "&SUM=" + sum + "&TIME=" + time + "&OPID=" + opId + "&TERMID=" + termId;
             commitPaymentRequest = sign(privateKey, commitPaymentRequest);
-            System.out.println("- Balance request");
+            System.out.println("- Balance request: "+balanceRequest);
             PaymentResult r = port.process(balanceRequest);
             printResult(r);
-            System.out.println("- Commit payment");
-            r = port.process(commitPaymentRequest);
-            printResult(r);
+            //System.out.println("- Commit payment: "+commitPaymentRequest);
+            //r = port.process(commitPaymentRequest);
+            //printResult(r);
 
             // GetSummary by contract id
 
@@ -120,7 +134,7 @@ public class PaymentWSTest extends TestCase {
     private String sign(PrivateKey pk, String rq) throws Exception {
         Signature sign=Signature.getInstance("SHA1withRSA");
         sign.initSign(pk);
-        sign.update((rq+"1").getBytes());
+        sign.update((rq).getBytes());
         return rq+"&SIGNATURE="+ConversionUtils.byteArray2Hex(sign.sign());
 
     }

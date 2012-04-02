@@ -14,7 +14,7 @@
     <%-- Панель фильтрации организации:
      фильтр производится по идентификатору и по имени организации --%>
 
-    <rich:simpleTogglePanel label="Фильтр (#{mainPage.orgListPage.orgFilter.status})" switchType="org"
+    <rich:simpleTogglePanel label="Фильтр (#{mainPage.orgListPage.orgFilter.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">

@@ -79,6 +79,10 @@
         <servlet-name>StdPayOnlinePaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Way4OnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.way4.Way4PaymentServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
@@ -120,6 +124,11 @@
         <url-pattern>/rbkmoney/acceptpay</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+         <servlet-name>Way4OnlinePaymentServlet</servlet-name>
+         <url-pattern>/payment-way4</url-pattern>
+     </servlet-mapping>
+
     <servlet>
         <servlet-name>ClientRoomControllerWS</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS</servlet-class>
@@ -135,6 +144,14 @@
     <servlet-mapping>
         <servlet-name>PaymentControllerWS</servlet-name>
         <url-pattern>/soap/payment</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FrontControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.internal.FrontController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FrontControllerWS</servlet-name>
+        <url-pattern>/soap/front</url-pattern>
     </servlet-mapping>
 
     <filter-mapping>
@@ -235,6 +252,7 @@
             <url-pattern>/payment-elecsnet</url-pattern>
             <url-pattern>/payment-std</url-pattern>
             <url-pattern>/rbkmoney/acceptpay</url-pattern>
+            <url-pattern>/payment-way4</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>

@@ -83,7 +83,7 @@
     </a4j:status>
 
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" >
             <f:facet name="header">
