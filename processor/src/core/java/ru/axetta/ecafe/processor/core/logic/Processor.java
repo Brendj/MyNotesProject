@@ -2114,6 +2114,25 @@ public class Processor implements SyncProcessor,
         }
     }
 
+    public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
+        Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
+        if (client==null) throw new Exception("Клиент не найден: "+idOfClient);
+        Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+        if (c!=null) {
+            throw new Exception("Карта уже зарегистрирована на клиента: "+c.getClient().getIdOfClient());
+        }
+        if (state == Card.ACTIVE_STATE) {
+            lockActiveCards(persistenceSession, client.getCards());
+        }
+
+        Card card = new Card(client, cardNo, cardType, state, validTime, lifeState, cardPrintedNo);
+        card.setIssueTime(issueTime);
+        card.setLockReason(lockReason);
+        persistenceSession.save(card);
+        return card.getIdOfCard();
+    }
+
     public Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
         Session persistenceSession = null;
@@ -2122,16 +2141,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
-            if (state == Card.ACTIVE_STATE) {
-                lockActiveCards(persistenceSession, client.getCards());
-            }
-
-            Card card = new Card(client, cardNo, cardType, state, validTime, lifeState, cardPrintedNo);
-            card.setIssueTime(issueTime);
-            card.setLockReason(lockReason);
-            persistenceSession.save(card);
-            Long idOfCard = card.getIdOfCard();
+            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime, cardPrintedNo);
 
             persistenceSession.flush();
             persistenceTransaction.commit();

@@ -25,6 +25,9 @@ public class StdPayConfig {
     private static final String PARAM_OUR_PRIVATE_KEY = ".ourPrivKey";
     private static final String PARAM_CHECK_SIGN = ".checkSignature";
     private static final String PARAM_ALLOWED_CLIENT_ORGS = ".allowedClientOrgs";
+    private static final String PARAM_AUTH_TYPE = ".authType";
+
+    private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2;
 
     public static class LinkConfig {
         public String name;
@@ -32,8 +35,8 @@ public class StdPayConfig {
         public LinkedList<Long> idOfAllowedClientOrgsList;
         public String remoteAddressMask;
         public PublicKey partnerPublicKey;
+        public int authType;
         public boolean checkSignature;
-        public boolean soapEnabled;
     }
     LinkedList<LinkConfig> linkConfigs = new LinkedList<LinkConfig>();
 
@@ -47,12 +50,22 @@ public class StdPayConfig {
             String idOfContragentParam = paramBaseName + n + PARAM_ID_OF_CONGRAGENT;
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
+            String authTypeParam = paramBaseName + n + PARAM_AUTH_TYPE;
 
             LinkConfig linkConfig = new LinkConfig();
             linkConfig.name = getRequiredParam(nameParam, properties);
             linkConfig.idOfContragent = Long.parseLong(getRequiredParam(idOfContragentParam, properties));
             linkConfig.remoteAddressMask = getRequiredParam(remoteAddressParam, properties);
-            linkConfig.checkSignature = Boolean.parseBoolean(getRequiredParam(checkSignatureParam, properties));
+            if (properties.containsKey(checkSignatureParam)) {
+                linkConfig.checkSignature = Boolean.parseBoolean(getRequiredParam(checkSignatureParam, properties));
+            }
+            if (properties.containsKey(authTypeParam)) {
+                String authType = properties.getProperty(authTypeParam);
+                if (0==authType.compareToIgnoreCase("none")) linkConfig.authType = AUTH_TYPE_NONE;
+                else if (0==authType.compareToIgnoreCase("signature")) { linkConfig.authType = AUTH_TYPE_SIGNATURE; linkConfig.checkSignature = true; }
+                else if (0==authType.compareToIgnoreCase("sslcert")) linkConfig.authType = AUTH_TYPE_CLIENT_CERT;
+                else throw new Exception("Invalid authType: "+authType);
+            }
             if (properties.containsKey(idOfAllowedClientOrgsParam)) {
                 String[] v = properties.getProperty(idOfAllowedClientOrgsParam).replaceAll("\\s", "").split(",");
                 linkConfig.idOfAllowedClientOrgsList = new LinkedList<Long>();
@@ -68,6 +81,13 @@ public class StdPayConfig {
     public LinkConfig getLinkConfig(String name) {
         for (LinkConfig lc : linkConfigs) {
             if (lc.name.equals(name)) return lc;
+        }
+        return null;
+    }
+
+    public LinkConfig getLinkConfigByCertDN(String dn) {
+        for (LinkConfig lc : linkConfigs) {
+            if (lc.authType==AUTH_TYPE_CLIENT_CERT && lc.name.equals(dn)) return lc;
         }
         return null;
     }

@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -40,5 +43,10 @@ public class CalendarUtils {
         c.setTime(date);
         truncateToDayOfMonth(c);
         return c.getTime();
+    }
+
+    static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    public static Date parseDate(String validTime) throws ParseException {
+        return dateFormat.parse(validTime);
     }
 }

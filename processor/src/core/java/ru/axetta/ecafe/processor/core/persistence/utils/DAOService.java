@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 
 import org.springframework.context.annotation.Scope;
@@ -86,5 +87,14 @@ public class DAOService {
         Query q = em.createQuery("update Client set expenditureLimit=:expenditureLimit");
         q.setParameter("expenditureLimit", limit);
         return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public Org getOrg(Long idOfOrg) {
+        Query q = em.createQuery("from Org where idOfOrg = :idOfOrg");
+        q.setParameter("idOfOrg", idOfOrg);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return (Org)l.get(0);
     }
 }

@@ -20,7 +20,7 @@ CREATE TABLE CF_TransactionJournal
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idOfTransactionJournal)
 );
 
-/* Таблица категорий Организаций */
+-- Таблица категорий Организаций
 CREATE TABLE CF_CategoryOrg
 (
   idofcategoryorg bigserial NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE CF_CategoryOrg
   CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
 );
 
-/* Таблица связка между CategoryOrg и Org */
+-- Таблица связка между CategoryOrg и Org
 CREATE TABLE CF_CategoryOrg_Orgs
 (
   idoforgscategories bigserial NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE CF_CategoryOrg_Orgs
   REFERENCES Cf_Orgs (idoforg)
 );
 
-/* Таблица связка между DiscountRules и CategoryDiscountRule */
+-- Таблица связка между DiscountRules и CategoryDiscountRule
 CREATE TABLE CF_DiscountRules_CategoryDiscounts
 (
   idofdrcd bigserial NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE CF_DiscountRules_CategoryDiscounts
   REFERENCES CF_DiscountRules (idofrule)
 );
 
-/* Таблица связка между CategoryOrg и DiscountRule */
+-- Таблица связка между CategoryOrg и DiscountRule
 CREATE TABLE CF_DiscountRules_CategoryOrg
 (
   idofcatorgdiscrule bigserial NOT NULL,
@@ -68,8 +68,8 @@ CREATE TABLE CF_DiscountRules_CategoryOrg
 );
 
 
-/* Таблица связка между Client и CategoryCF_Clients_CategoryDiscountsDiscountRule */
-CREATE TABLE
+-- Таблица связка между Client и CategoryCF_Clients_CategoryDiscountsDiscountRule
+CREATE TABLE CF_Clients_CategoryDiscounts
 (
   idofclienscategorydiscount bigserial NOT NULL,
   idofclient bigint,

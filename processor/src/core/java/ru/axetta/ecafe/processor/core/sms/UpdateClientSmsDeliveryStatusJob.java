@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob {
 
-    private static final long DELIVERY_STATUS_TIMEOUT = 10L * 24L * 60L * 60L * 1000L; // 10 days 
+    private static final long DELIVERY_STATUS_TIMEOUT = 2L * 24L * 60L * 60L * 1000L; // 2 days
 
     public static class ExecuteEnvironment {
 

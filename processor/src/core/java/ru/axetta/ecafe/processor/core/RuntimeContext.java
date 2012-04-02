@@ -37,11 +37,13 @@ import ru.axetta.ecafe.processor.core.support.SupportEmailSender;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.updater.DBUpdater;
+import ru.axetta.ecafe.processor.core.utils.CxfContextCapture;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.BusFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
@@ -54,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -107,6 +110,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String SUPPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".support";
     private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";
     private static final String CLIENT_SMS_PARAM_BASE = PROCESSOR_PARAM_BASE + ".client.sms";
+    private static final String WS_CRYPTO_BASE=PROCESSOR_PARAM_BASE+".ws.crypto";
 
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
@@ -389,6 +393,9 @@ public class RuntimeContext implements ApplicationContextAware {
             // Start background activities
             this.autoReportGenerator.start();
             this.clientSmsDeliveryStatusUpdater.start();
+
+            //
+            initWSCrypto();
         } catch (Exception e) {
             destroy(executorService, scheduler);
             throw e;
@@ -396,6 +403,19 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isInfoEnabled()) {
             logger.info("Runtime context created.");
         }
+    }
+
+    private void initWSCrypto() {
+        java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance().getBean("wsCryptoProperties");
+        String params[]={"keystore.type", "keystore.password", "file", "truststore.type", "truststore.password", "truststore.file"};
+        for (String s : params) signatureProps.setProperty("org.apache.ws.security.crypto.merlin."+s, configProperties.getProperty(WS_CRYPTO_BASE+"."+s, ""));
+        /*<prop key="org.apache.ws.security.crypto.merlin.keystore.type">JKS</prop>
+        <prop key="org.apache.ws.security.crypto.merlin.keystore.password">123456</prop>
+        <prop key="org.apache.ws.security.crypto.merlin.file">/temp/certs/alice.jks</prop>
+        <prop key="org.apache.ws.security.crypto.merlin.truststore.type">PKCS12</prop>
+        <prop key="org.apache.ws.security.crypto.merlin.truststore.password">BCGG00</prop>
+        <prop key="org.apache.ws.security.crypto.merlin.truststore.file">/temp/certs/ispp_agent_istk.pfx</prop>
+        */
     }
 
     SchemaVersionInfo currentSchemaVersionInfo;

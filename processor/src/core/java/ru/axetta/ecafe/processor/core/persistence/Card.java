@@ -33,6 +33,13 @@ public class Card {
     public static final int ISSUED_LIFE_STATE = 1;
     public static final String UNKNOWN_LIFE_STATE_NAME = "Неизвестно";
 
+    public static int parseCardType(String type) throws Exception {
+        for (int n=0;n<TYPE_NAMES.length;++n) {
+            if (TYPE_NAMES[n].equalsIgnoreCase(type)) return n;
+        }
+        throw new Exception("Неизвестный тип карты: "+type);
+    }
+
     private Long idOfCard;
     private long version;
     private Client client;

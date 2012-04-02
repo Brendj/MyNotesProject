@@ -150,6 +150,12 @@ public class Client {
     public void setSan(String san) {
         this.san = san;
     }
+    public void setSanWithConvert(String san) {
+        if (san!=null) {
+            san = san.replaceAll("[\\s-]", "");
+        }
+        this.san = san;
+    }
 
     public Long getBalance() {
         return balance;

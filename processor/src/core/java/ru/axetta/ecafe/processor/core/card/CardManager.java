@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.card;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import java.util.Date;
 
 /**
@@ -14,6 +17,9 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public interface CardManager {
+
+    Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
 
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
