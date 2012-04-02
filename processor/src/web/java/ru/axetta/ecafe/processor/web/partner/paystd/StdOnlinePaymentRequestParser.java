@@ -123,7 +123,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     String getSignature(String data) throws Exception {
         Signature sign=Signature.getInstance("SHA1withRSA");
         sign.initSign(getOurDefaultPrivateKey());
-        sign.update(data.getBytes("windows-1251"));
+        sign.update(data.getBytes(getRequestEncoding()));
         return ConversionUtils.byteArray2Hex(sign.sign());
     }
 

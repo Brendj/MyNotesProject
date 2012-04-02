@@ -6,32 +6,26 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -156,12 +150,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            ContractIdGenerator contractIdGenerator = runtimeContext.getClientContractIdGenerator();
-            TimeZone localTimeZone = runtimeContext
-                    .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
-
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            dateFormat.setTimeZone(localTimeZone);
 
             long lineCount = dataSize / 100;
             if (lineCount > MAX_LINE_NUMBER) {
@@ -170,15 +158,20 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
             int lineNo = 0;
             int successLineNumber = 0;
+            ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
             String currLine = reader.readLine();
             while (null != currLine) {
-                LineResult result = createClient(runtimeContext, contractIdGenerator, dateFormat, this.org.getIdOfOrg(),
-                        currLine, lineNo, this.checkFullNameUnique);
-                if (result.getResultCode() == 0) {
-                    ++successLineNumber;
+                if (lineNo==0 && currLine.startsWith("!")) {
+                    parseLineConfig(fieldConfig, currLine);
+                } else {
+                    LineResult result = createClient(fieldConfig, this.org.getIdOfOrg(),
+                            currLine, lineNo, this.checkFullNameUnique);
+                    if (result.getResultCode() == 0) {
+                        ++successLineNumber;
+                    }
+                    lineResults.add(result);
                 }
-                lineResults.add(result);
                 currLine = reader.readLine();
                 if (lineNo == MAX_LINE_NUMBER) {
                     break;
@@ -192,136 +185,34 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             //RuntimeContext.release(runtimeContext);
         }
     }
-        /*
-    public void loadClients(InputStream inputStream, long dataSize) throws Exception {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        ContractIdGenerator contractIdGenerator = runtimeContext.getClientContractIdGenerator();
-        TimeZone localTimeZone = runtimeContext
-                .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
 
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        dateFormat.setTimeZone(localTimeZone);
-
-        long lineCount = dataSize / 100;
-        if (lineCount > MAX_LINE_NUMBER) {
-            lineCount = MAX_LINE_NUMBER;
+    private void parseLineConfig(FieldProcessor.Config fc, String currLine) throws Exception {
+        String attrs[] = currLine.substring(1).split(";");
+        for (int n=0;n<attrs.length;++n) {
+            fc.registerField(attrs[n]);
         }
-        List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
-        int lineNo = 0;
-        int successLineNumber = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
-        String currLine = reader.readLine();
-        while (null != currLine) {
-            LineResult result = createClient(runtimeContext, contractIdGenerator, dateFormat, this.org.getIdOfOrg(),
-                    currLine, lineNo, this.checkFullNameUnique);
-            if (result.getResultCode() == 0) {
-                ++successLineNumber;
-            }
-            lineResults.add(result);
-            currLine = reader.readLine();
-            if (lineNo == MAX_LINE_NUMBER) {
-                break;
-            }
-            ++lineNo;
-        }
-
-        this.lineResults = lineResults;
-        this.successLineNumber = successLineNumber;
+        fc.checkRequiredFields();
     }
-               */
-    private LineResult createClient(RuntimeContext runtimeContext, ContractIdGenerator contractIdGenerator,
-            DateFormat dateFormat, Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) {
+
+    private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig,
+            Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) {
         String[] tokens = line.split(";");
-        if (tokens.length < 19) {
-            return new LineResult(lineNo, 1, "Not enough data", null);
-        }
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
-            if (null == organization) {
-                return new LineResult(lineNo, 2, String.format("Org ot found: idOfOrg == %s", idOfOrg), null);
-            }
-
-            String firstName = tokens[9];
-            String surname = tokens[8];
-            String secondName = tokens[10];
-
-            if (checkFullNameUnique && existClient(persistenceSession, organization, firstName, surname, secondName)) {
-                return new LineResult(lineNo, 10, "Duplicate client (full name of person)", null);
-            }
-
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-            String contractIdText = tokens[0];
-            long contractId;
-            if (StringUtils.equals(contractIdText, "AUTO")) {
-                contractId = contractIdGenerator.generate(organization.getIdOfOrg());
-            } else {
-                contractId = Long.parseLong(contractIdText);
-            }
-
-            Person contractPerson = new Person(tokens[5], tokens[4], tokens[6]);
-            contractPerson.setIdDocument(tokens[7]);
-            persistenceSession.save(contractPerson);
-            Person person = new Person(firstName, surname, secondName);
-            person.setIdDocument(tokens[11]);
-            persistenceSession.save(person);
-
-            long limit = organization.getCardLimit();
-            if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
-                limit = CurrencyStringUtils.rublesToCopecks(tokens[19]);
-            }
-            String password = tokens[1];
-            if (password.equals("X")) password = ""+contractId;
-
-            Client client = new Client(organization, person, contractPerson, 0, Integer.parseInt(tokens[18]) != 0,
-                    Integer.parseInt(tokens[17]) != 0, contractId, dateFormat.parse(tokens[3]),
-                    Integer.parseInt(tokens[2]), password, Integer.parseInt(tokens[16]), clientRegistryVersion, limit,
-                    0, "");
-
-            client.setAddress(tokens[12]);
-            client.setPhone(tokens[13]);
-            client.setMobile(tokens[14]);
-            client.setEmail(tokens[15]);
-            if (tokens.length >= 21) {
-                client.setRemarks(tokens[20]);
-            }
-
-            /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
-            if (tokens.length >=22){
-                String clientGroupName = tokens[21];
-                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
-                if (clientGroup == null) {
-                    clientGroup = DAOUtils.createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
-                }
-                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            }
-            persistenceSession.save(client);
-            Long idOfClient = client.getIdOfClient();
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
+            fieldConfig.setValues(tokens);
+        } catch (Exception e) {
+            return new LineResult(lineNo, 1, e.getMessage(), null);
+        }
+        //if (tokens.length < 19) {
+        //    return new LineResult(lineNo, 1, "Not enough data", null);
+        //}
+        try {
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
-            logger.info("Failed to create client", e);
-            return new LineResult(lineNo, 3, e.getMessage(), null);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            return new LineResult(lineNo, -1, "Ошибка: "+e.getMessage(), -1L);
         }
+
     }
 
-    private static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
-            String secondName) throws Exception {
-        if (StringUtils.isEmpty(secondName)) {
-            return DAOUtils.existClient(persistenceSession, organization, firstName, surname);
-        }
-        return DAOUtils.existClient(persistenceSession, organization, firstName, surname, secondName);
-    }
 
 }

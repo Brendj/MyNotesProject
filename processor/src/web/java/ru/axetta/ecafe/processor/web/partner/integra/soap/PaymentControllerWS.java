@@ -61,7 +61,7 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             BufferResponseWrapper bufResponse = new BufferResponseWrapper(response);
             request.setAttribute(StdOnlinePaymentServlet.ATTR_SOAP_REQUEST, requestParams);
             servletContext.getRequestDispatcher("/"+path).include(request, bufResponse);
-            paymentResult.response = bufResponse.getBuffer();
+            paymentResult.response = bufResponse.getBuffer("UTF-8");
             OnlinePaymentProcessor.PayResponse payResponse = (OnlinePaymentProcessor.PayResponse)request.getAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE);
             if (payResponse==null) throw new Exception("authentication failed");
             paymentResult.clientId = payResponse.getClientId();
@@ -138,13 +138,13 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             }
         }
 
-        public String getBuffer() {
+        public String getBuffer(String encoding) throws UnsupportedEncodingException {
 
                 if (streamBuffer != null) {
                     //try {
                     //   return streamBuffer.toString(originalResponse.getCharacterEncoding());
                     //} catch (UnsupportedEncodingException e) {
-                       return streamBuffer.toString();
+                       return new String(streamBuffer.toByteArray(), encoding);
                     //}
                 }
                 else if (writerBuffer != null)

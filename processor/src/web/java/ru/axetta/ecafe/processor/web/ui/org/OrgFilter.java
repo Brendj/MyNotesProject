@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.org;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -27,7 +26,7 @@ public class OrgFilter {
     /* полное имя организации*/
     private String officialName;
     /* идентификатор организации */
-    private Long IdOfOrg;
+    private Long idOfOrg;
 
 
     /**
@@ -37,7 +36,7 @@ public class OrgFilter {
      * @return true если хотябы одно поле будет не пустым
      */
     public boolean isEmpty() {
-        return officialName==null || IdOfOrg == null;
+        return officialName==null && idOfOrg == null;
     }
 
     /**
@@ -50,12 +49,12 @@ public class OrgFilter {
     public List retrieveOrgs(Session session) {
         Criteria criteria = session.createCriteria(Org.class);
         /*criteria.add(Restrictions.or(
-                Restrictions.eq("idOfOrg",IdOfOrg),
+                Restrictions.eq("idOfOrg",idOfOrg),
                 Restrictions.like("officialName",officialName, MatchMode.ANYWHERE).ignoreCase()
         ));*/
-        if(IdOfOrg.compareTo(Long.parseLong("0"))>0){
-            criteria.add(Restrictions.eq("idOfOrg",IdOfOrg));
-        } else {
+        if(idOfOrg!=null && idOfOrg.compareTo(Long.parseLong("0"))>0){
+            criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        } else if (officialName!=null) {
             criteria.add(Restrictions.like("officialName",officialName, MatchMode.ANYWHERE).ignoreCase());
         }
 
@@ -84,7 +83,7 @@ public class OrgFilter {
      */
     public void clear() {
         this.officialName=null;
-        this.IdOfOrg=null;
+        this.idOfOrg =null;
     }
 
     public String getOfficialName() {
@@ -96,11 +95,12 @@ public class OrgFilter {
     }
 
     public Long getIdOfOrg() {
-        return IdOfOrg;
+        return idOfOrg;
     }
 
     public void setIdOfOrg(Long idOfOrg) {
-        IdOfOrg = idOfOrg;
+        if (idOfOrg==null || idOfOrg==0) this.idOfOrg=null;
+        else this.idOfOrg = idOfOrg;
     }
 
 }

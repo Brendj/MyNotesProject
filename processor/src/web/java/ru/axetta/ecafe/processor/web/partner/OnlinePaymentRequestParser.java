@@ -27,6 +27,7 @@ public abstract class OnlinePaymentRequestParser {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(OnlinePaymentRequestParser.class);
+    String requestEncoding=CHARSET_NAME;
 
     public abstract OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest) throws Exception;
     public abstract void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)
@@ -47,7 +48,7 @@ public abstract class OnlinePaymentRequestParser {
 
     protected void printToStream(String s, HttpServletResponse httpResponse) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(byteStream, true, CHARSET_NAME);
+        PrintStream printStream = new PrintStream(byteStream, true, getRequestEncoding());
         try {
             printStream.print(s);
         } catch (Exception e) {
@@ -55,7 +56,7 @@ public abstract class OnlinePaymentRequestParser {
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         printStream.close();
-        httpResponse.setCharacterEncoding(CHARSET_NAME);
+        httpResponse.setCharacterEncoding(getRequestEncoding());
         httpResponse.setContentLength(byteStream.size());
         byteStream.writeTo(httpResponse.getOutputStream());
     }
@@ -162,12 +163,17 @@ public abstract class OnlinePaymentRequestParser {
 
     protected String getQueryString(HttpServletRequest httpRequest) {
         if (httpRequest.getAttribute(OnlinePaymentServlet.ATTR_SOAP_REQUEST)!=null) {
+            requestEncoding = "UTF-8";
             return (String)httpRequest.getAttribute(OnlinePaymentServlet.ATTR_SOAP_REQUEST);
         } else {
+            requestEncoding = "windows-1251";
             return httpRequest.getQueryString();
         }
     }
 
+    public String getRequestEncoding() {
+        return requestEncoding;
+    }
 
     private Map<String, String> parseRequest(String text) throws Exception {
         Map<String, String> params=new HashMap<String, String>();
@@ -219,7 +225,7 @@ public abstract class OnlinePaymentRequestParser {
         for (;;) {
             int c=inputStream.read(bytes);
             if (c==-1) break;
-            b.append(new String(bytes, 0, c, CHARSET_NAME));
+            b.append(new String(bytes, 0, c, getRequestEncoding()));
         }
         return b.toString();
     }
