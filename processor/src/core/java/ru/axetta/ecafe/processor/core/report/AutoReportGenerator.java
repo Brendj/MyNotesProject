@@ -258,6 +258,96 @@ public class AutoReportGenerator {
             }
         }));
 
+        REPORT_DEFS.add(new ReportDef(RegisterReport.class, RegisterReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                final String REPORT_TEMPLATE_KEY = "RegisterReport.template";
+
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+
+                String reportTemplate = autoReportGenerator.getReportProperties()
+                        .getProperty(REPORT_TEMPLATE_KEY);
+                if (StringUtils.isEmpty(reportTemplate)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Report property \"%s\" not found. Can\'t schedule RegisterReport",
+                            REPORT_TEMPLATE_KEY));
+                }
+                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new RegisterReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(RegisterReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(ClientsReport.class, ClientsReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                final String REPORT_TEMPLATE_KEY = "ClientsReport.template";
+
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+
+                String reportTemplate = autoReportGenerator.getReportProperties()
+                        .getProperty(REPORT_TEMPLATE_KEY);
+                if (StringUtils.isEmpty(reportTemplate)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Report property \"%s\" not found. Can\'t schedule ClientsReport",
+                            REPORT_TEMPLATE_KEY));
+                }
+                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new ClientsReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(ClientsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(OrgOrderByDaysReport.class, OrgOrderByDaysReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                final String REPORT_TEMPLATE_KEY = "OrgOrderByDaysReport.template";
+
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+
+                String reportTemplate = autoReportGenerator.getReportProperties()
+                        .getProperty(REPORT_TEMPLATE_KEY);
+                if (StringUtils.isEmpty(reportTemplate)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Report property \"%s\" not found. Can\'t schedule OrgOrderByDaysReport",
+                            REPORT_TEMPLATE_KEY));
+                }
+                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new OrgOrderByDaysReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(OrgOrderByDaysReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
     } // static
 
 

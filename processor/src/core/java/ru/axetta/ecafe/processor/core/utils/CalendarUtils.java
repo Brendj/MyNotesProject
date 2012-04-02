@@ -49,4 +49,20 @@ public class CalendarUtils {
     public static Date parseDate(String validTime) throws ParseException {
         return dateFormat.parse(validTime);
     }
+
+    public static long getTimeFirstDayOfMonth(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        truncateToMonth(calendar);
+        return calendar.getTimeInMillis();
+    }
+
+    public static long getTimeLastDayOfMonth(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.add(Calendar.MONTH, 1);
+        truncateToMonth(calendar);
+        calendar.add(Calendar.MILLISECOND, -1);
+        return calendar.getTimeInMillis();
+    }
 }

@@ -335,6 +335,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.getItems()) {
             item.setLimit(limit);
         }
+        printMessage("Данные обновлены.");
     }
 
 
@@ -370,6 +371,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             q.setLong("clientRegistryVersion", clientRegistryVersion);
             q.executeUpdate();
         }
+        printMessage("Данные обновлены.");
     }
 
     /**
@@ -394,5 +396,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         for (Item item : this.getItems()) {
             item.setExpenditureLimit(expenditureLimit);
         }
+        printMessage("Данные обновлены.");
     }
 }

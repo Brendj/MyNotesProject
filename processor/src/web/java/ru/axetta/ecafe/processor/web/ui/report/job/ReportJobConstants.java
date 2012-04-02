@@ -108,7 +108,10 @@ public class ReportJobConstants {
             new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3})};
+            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3})};
 
     private ReportJobConstants() {
 
