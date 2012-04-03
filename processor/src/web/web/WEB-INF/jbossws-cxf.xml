@@ -41,7 +41,19 @@
   <bean id="signRequest" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
     <constructor-arg>
       <map>
-        <entry key="action" value="Timestamp Signature"/>
+        <entry key="action" value="Signature"/>
+        <entry key="wss4j.processor.map">
+        <map key-type="javax.xml.namespace.QName">
+            <entry value="null">
+              <key>
+                <bean class="javax.xml.namespace.QName">
+                  <constructor-arg value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                  <constructor-arg value="Timestamp"/>
+                </bean>
+              </key>
+            </entry>
+          </map>
+        </entry>
           <!--<entry key="signaturePropFile" value="bob.properties"/>
         <entry key="decryptionPropFile" value="bob.properties"/>-->
               <entry key="signaturePropRefId" value="signatureProperties"/>
@@ -72,12 +84,11 @@ the signature crypto configuration.  See SignaturePropRefId. -->
         </constructor-arg>
     </bean>
 
-
     <jaxws:endpoint
             id="FrontController"
             address='http://localhost:8080/processor/soap/front'
             implementor='ru.axetta.ecafe.processor.web.internal.FrontController'>
-        <jaxws:inInterceptors>
+<!--        <jaxws:inInterceptors>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
             <ref bean="signRequest"/>
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
@@ -86,7 +97,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
             <ref bean="signResponse"/>
             <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-        </jaxws:outInterceptors>
+        </jaxws:outInterceptors>-->
     </jaxws:endpoint>
     <jaxws:endpoint
             id="PaymentControllerWS"

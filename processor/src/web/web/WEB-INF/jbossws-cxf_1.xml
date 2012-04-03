@@ -120,7 +120,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
         </wsp:All>
       </wsp:ExactlyOne>
     </wsp:Policy>
-
+<!--
     <jaxws:endpoint
             id="FrontController"
             address='http://localhost:8080/processor/FrontController'
@@ -144,6 +144,6 @@ the signature crypto configuration.  See SignaturePropRefId. -->
                 <wsp:PolicyReference URI="#MutualCertificate10SignEncrypt_IPingService_policy"/>
             </p:policies>
         </jaxws:features>
-    </jaxws:endpoint>
+    </jaxws:endpoint>-->
 
 </beans>
