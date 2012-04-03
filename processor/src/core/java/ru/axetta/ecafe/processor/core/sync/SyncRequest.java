@@ -390,13 +390,25 @@ public class SyncRequest {
                     int discountMode = getIntValue(namedNodeMap, "DiscountMode");
                     /* pridet string with "1, 9, 94, .." key of Category Discount*/
                     String categoriesDiscounts = getStringValueNullSafe(namedNodeMap, "CategoriesDiscounts");
+                    ///
+                    String name = getStringValueNullSafe(namedNodeMap, "Name");
+                    String surname = getStringValueNullSafe(namedNodeMap, "Surname");
+                    String secondName = getStringValueNullSafe(namedNodeMap, "Secondname");
+                    String address = getStringValueNullSafe(namedNodeMap, "Address");
+                    String phone = getStringValueNullSafe(namedNodeMap, "Phone");
+                    String mobilePhone = getStringValueNullSafe(namedNodeMap, "Mobile");
+                    String email = getStringValueNullSafe(namedNodeMap, "Email");
+                    String fax = getStringValueNullSafe(namedNodeMap, "Fax");
+                    String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
-                            discountMode, categoriesDiscounts);
+                            discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
+                            mobilePhone, fax, email, remarks);
                 }
 
             }
 
             private final long idOfClient;
+            private final String name, surname, secondName, address, phone, mobilePhone, fax, email, remarks;
             private final int freePayCount;
             private final int freePayMaxCount;
             private final Date lastFreePayTime;
@@ -404,13 +416,23 @@ public class SyncRequest {
             private final String categoriesDiscounts;
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
-                    int discountMode, String categoriesDiscounts) {
+                    int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
+                    String address, String phone, String mobilePhone, String fax, String email, String remarks) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
                 this.lastFreePayTime = lastFreePayTime;
                 this.discountMode = discountMode;
                 this.categoriesDiscounts = categoriesDiscounts;
+                this.name = name;
+                this.surname = surname;
+                this.secondName = secondName;
+                this.address = address;
+                this.phone = phone;
+                this.mobilePhone = mobilePhone;
+                this.fax = fax;
+                this.email = email;
+                this.remarks = remarks;
             }
 
             public long getIdOfClient() {
@@ -437,12 +459,51 @@ public class SyncRequest {
                 return categoriesDiscounts;
             }
 
+            public String getName() {
+                return name;
+            }
+
+            public String getSurname() {
+                return surname;
+            }
+
+            public String getSecondName() {
+                return secondName;
+            }
+
+            public String getAddress() {
+                return address;
+            }
+
+            public String getPhone() {
+                return phone;
+            }
+
+            public String getMobilePhone() {
+                return mobilePhone;
+            }
+
+            public String getFax() {
+                return fax;
+            }
+
+            public String getEmail() {
+                return email;
+            }
+
+            public String getRemarks() {
+                return remarks;
+            }
+
             @Override
             public String toString() {
-                return "ClientParamItem{" + "discountMode=" + discountMode + ", lastFreePayTime=" + lastFreePayTime
-                        + ", freePayMaxCount=" + freePayMaxCount + ", freePayCount=" + freePayCount +
-                        ", categoriesDiscounts=\""+categoriesDiscounts+"\""+
-                        ", idOfClient="+ idOfClient + '}';
+                return "ClientParamItem{" + "idOfClient=" + idOfClient + ", name='" + name + '\'' + ", surname='"
+                        + surname + '\'' + ", secondName='" + secondName + '\'' + ", address='" + address + '\''
+                        + ", phone='" + phone + '\'' + ", mobilePhone='" + mobilePhone + '\'' + ", fax='" + fax + '\''
+                        + ", email='" + email + '\'' + ", remarks='" + remarks + '\'' + ", freePayCount=" + freePayCount
+                        + ", freePayMaxCount=" + freePayMaxCount + ", lastFreePayTime=" + lastFreePayTime
+                        + ", discountMode=" + discountMode + ", categoriesDiscounts='" + categoriesDiscounts + '\''
+                        + '}';
             }
         }
 

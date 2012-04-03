@@ -748,7 +748,15 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
-            
+            if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
+            if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
+            if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
+            if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
+            if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
+            if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
+            if (clientParamItem.getSurname()!=null) client.getPerson().setSurname(clientParamItem.getSurname());
+            if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
+
             /* распарсим строку с категориями */
             if(clientParamItem.getCategoriesDiscounts()!= null){
                 String categories = clientParamItem.getCategoriesDiscounts();
