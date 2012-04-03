@@ -21,7 +21,9 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -111,7 +113,10 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerClients")
     public List<RegisterClientResult> registerClients(@WebParam(name = "orgId")Long orgId,
-            @WebParam(name = "clientDescList") List<ClientDesc> clientDescList, @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness) {
+            @WebParam(name = "clientDescList") List<ClientDesc> clientDescList, @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
             try {
@@ -148,8 +153,12 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
-        X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        if (cert==null) throw new FrontControllerException("В запросе отсутствует сертификат");
+        MessageContext msgContext = wsContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+        X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+
+        //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
         Org org = DAOService.getInstance().getOrg(orgId);
         if (org==null) throw new FrontControllerException("Неизвестная организация: "+orgId);
         PublicKey publicKey = null;
@@ -158,6 +167,6 @@ public class FrontController extends HttpServlet {
         } catch (Exception e) {
             throw new FrontControllerException("Внутренняя ошибка", e);
         }
-        if (!publicKey.equals(cert.getPublicKey())) throw new FrontControllerException("Ключ сертификата невалиден: "+orgId);
+        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException("Ключ сертификата невалиден: "+orgId);
     }
 }
