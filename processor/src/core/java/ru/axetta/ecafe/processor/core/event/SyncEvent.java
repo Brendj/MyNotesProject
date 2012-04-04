@@ -133,7 +133,7 @@ public class SyncEvent extends BasicEvent {
 
                     Properties properties = new Properties();
                     ReportPropertiesUtils.addProperties(properties, syncEvent, timeFormat);
-                    ReportPropertiesUtils.addProperties(properties, org, "org.");
+                    ReportPropertiesUtils.addProperties(session, properties, org, "org.");
 
                     transaction.commit();
                     transaction = null;

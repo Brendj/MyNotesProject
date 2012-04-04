@@ -85,7 +85,8 @@ public class ReportRuleConstants {
             new ParamHint("idOfOrg", "Идентификатор организации"),
             new ParamHint("shortName", "Краткое название организации"),
             new ParamHint("officialName", "Официальное название организации"),
-            new ParamHint("groupName", "Название класса"), new ParamHint("idOfClient", "Идентификатор клиента"),
+            new ParamHint("groupName", "Название класса"),
+            new ParamHint("idOfClient", "Идентификатор клиента"),
             new ParamHint("email", "Адрес электронной почты клиента"),
             new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),
             new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),
@@ -98,20 +99,22 @@ public class ReportRuleConstants {
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
             new ParamHint("idOfContragent", "Идентификатор контрагента"),
-            new ParamHint("contragentName", "Название контрагента")};
+            new ParamHint("contragentName", "Название контрагента"),
+            new ParamHint("category", "название категории организации"),
+            new ParamHint("idOfMenuSourceOrg", "идентификатор организации - источника меню")};
 
     public static final ReportHint[] REPORT_HINTS = {
-            new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5}),
-            new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 6}),
-            new ReportHint(OrgBalanceJasperReport.class.getCanonicalName(), new int[]{3, 4, 5}),
-            new ReportHint(ContragentOrderReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3})
+            new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
+            new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 6, 22, 23}),
+            new ReportHint(OrgBalanceJasperReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
+            new ReportHint(ContragentOrderReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23})
     };
 
     private ReportRuleConstants() {

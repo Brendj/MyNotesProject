@@ -58,7 +58,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                         }
                         Properties properties = new Properties();
                         ReportPropertiesUtils.addProperties(properties, getMyClass());
-                        ReportPropertiesUtils.addProperties(properties, org, null);
+                        ReportPropertiesUtils.addProperties(session, properties, org, null);
                         BasicReportForOrgJob report = createInstance();
                         report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
                                 org.getIdOfOrg(), autoReportBuildTask.templateFileName,

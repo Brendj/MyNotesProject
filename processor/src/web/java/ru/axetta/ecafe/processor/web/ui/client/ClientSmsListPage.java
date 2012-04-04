@@ -302,7 +302,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
                             String idOfSms = messageIdGenerator.generate();
                             SendResponse sendResponse = null;
                             try {
-                                sendResponse = smsService.sendTextMessage(idOfSms, sender, phoneNumber, text);
+                                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
                             } catch (Exception e) {
                                 if (logger.isWarnEnabled()) {
                                     logger.warn(String.format(

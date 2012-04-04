@@ -34,6 +34,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(RuleProcessor.class);
 
+    public static final String DELIMETER = ",";
+
     private static interface BasicBoolExpression {
 
         boolean applicatable(Properties properties);
@@ -69,7 +71,13 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
 
         public boolean evaluate(Properties properties) {
-            return StringUtils.equals(properties.getProperty(this.comparatorArgument), this.comparatorValue);
+            String values[] = this.comparatorValue.split(DELIMETER);
+            String property[] = properties.getProperty(this.comparatorArgument).split(DELIMETER);
+            for (String value : values)
+                for (String prop : property)
+                    if (StringUtils.equals(prop, value))
+                        return true;
+            return false;
         }
 
         @Override

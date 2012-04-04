@@ -4,10 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 
 import java.text.DateFormat;
 import java.util.Properties;
@@ -21,6 +24,8 @@ import java.util.Properties;
  */
 public class ReportPropertiesUtils {
 
+    //private static String DELIMETER = ",";
+
     private ReportPropertiesUtils() {
 
     }
@@ -29,11 +34,21 @@ public class ReportPropertiesUtils {
         properties.setProperty("class", reportClass.getCanonicalName());
     }
 
-    public static void addProperties(Properties properties, Org org, String prefix) throws Exception {
+    public static void addProperties(Session session, Properties properties, Org org, String prefix) throws Exception {
         String realPrefix = StringUtils.defaultString(prefix);
         properties.setProperty(realPrefix.concat("idOfOrg"), org.getIdOfOrg().toString());
         properties.setProperty(realPrefix.concat("shortName"), org.getShortName());
         properties.setProperty(realPrefix.concat("officialName"), org.getOfficialName());
+        //idOfMenuSourceOrg
+        Long idOfMenuSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, org.getIdOfOrg());
+        if (idOfMenuSourceOrg != null)
+            properties.setProperty(realPrefix.concat("idOfMenuSourceOrg"), idOfMenuSourceOrg.toString());
+        //category
+        StringBuilder categories = new StringBuilder();
+        for (CategoryOrg categoryOrg : org.getCategories()) {
+            categories.append(categoryOrg.getCategoryName()).append(RuleProcessor.DELIMETER);
+        }
+        properties.setProperty(realPrefix.concat("category"), categories.toString());
     }
 
     public static void addProperties(Properties properties, ClientGroup clientGroup, String prefix) throws Exception {

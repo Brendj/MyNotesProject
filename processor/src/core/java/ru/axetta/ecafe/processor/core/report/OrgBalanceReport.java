@@ -715,7 +715,7 @@ public class OrgBalanceReport extends BasicReport {
                     }
                     Properties properties = new Properties();
                     ReportPropertiesUtils.addProperties(properties, OrgBalanceReport.class);
-                    ReportPropertiesUtils.addProperties(properties, currOrg, null);
+                    ReportPropertiesUtils.addProperties(session, properties, currOrg, null);
                     OrgBalanceReport report = new OrgBalanceReport(baseTime, currOrg.getIdOfOrg(), sessionFactory);
                     //OrgBalanceReport report = builder.build(session, baseTime, currOrg);
                     autoReports.add(new AutoReport(report, properties));
