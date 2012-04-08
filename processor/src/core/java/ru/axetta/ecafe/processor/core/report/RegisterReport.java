@@ -35,24 +35,15 @@ public class RegisterReport extends BasicReportForOrgJob {
     public static class Builder implements BasicReportJob.Builder {
 
         public static class RegisterReportItem {
-            private long class14count1 = 0;
-            private long class14count2 = 0;
-            private long class14count3 = 0;
-            private long class14price1 = 0;
-            private long class14price2 = 0;
-            private long class14price3 = 0;
-            private long class14sum1 = 0;
-            private long class14sum2 = 0;
-            private long class14sum3 = 0;
-            private long class511count1 = 0;
-            private long class511count2 = 0;
-            private long class511count3 = 0;
-            private long class511price1 = 0;
-            private long class511price2 = 0;
-            private long class511price3 = 0;
-            private long class511sum1 = 0;
-            private long class511sum2 = 0;
-            private long class511sum3 = 0;
+
+            public static final int CLASSES_1_4 = 0, CLASSES_5_11 = 1;
+
+            List<Object> breakfastCount = new ArrayList<Object>(2); // завтрак
+            List<Object> breakfastCost = new ArrayList<Object>(2);
+            List<Object> lunchCount = new ArrayList<Object>(2); // обед
+            List<Object> lunchCost = new ArrayList<Object>(2);
+            List<Object> afternoonSnackCount = new ArrayList<Object>(2); // полдник
+            List<Object> afternoonSnackCost = new ArrayList<Object>(2);
 
             private Date date;
 
@@ -64,77 +55,52 @@ public class RegisterReport extends BasicReportForOrgJob {
                 this.date = new Date(date);
             }
 
-            public long getClass14count1() {
-                return class14count1;
+            public List<Object> getBreakfastCount() {
+                return breakfastCount;
             }
 
-
-            public long getClass14count2() {
-                return class14count2;
+            public void setBreakfastCount(List<Object> breakfastCount) {
+                this.breakfastCount = breakfastCount;
             }
 
-            public long getClass14count3() {
-                return class14count3;
+            public List<Object> getBreakfastCost() {
+                return breakfastCost;
             }
 
-            public long getClass14price1() {
-                return class14price1;
+            public void setBreakfastCost(List<Object> breakfastCost) {
+                this.breakfastCost = breakfastCost;
             }
 
-            public long getClass14price2() {
-                return class14price2;
+            public List<Object> getLunchCount() {
+                return lunchCount;
             }
 
-            public long getClass14price3() {
-                return class14price3;
+            public void setLunchCount(List<Object> lunchCount) {
+                this.lunchCount = lunchCount;
             }
 
-            public long getClass14sum1() {
-                return class14sum1;
+            public List<Object> getLunchCost() {
+                return lunchCost;
             }
 
-            public long getClass14sum2() {
-                return class14sum2;
+            public void setLunchCost(List<Object> lunchCost) {
+                this.lunchCost = lunchCost;
             }
 
-            public long getClass14sum3() {
-                return class14sum3;
+            public List<Object> getAfternoonSnackCount() {
+                return afternoonSnackCount;
             }
 
-            public long getClass511count1() {
-                return class511count1;
+            public void setAfternoonSnackCount(List<Object> afternoonSnackCount) {
+                this.afternoonSnackCount = afternoonSnackCount;
             }
 
-            public long getClass511count2() {
-                return class511count2;
+            public List<Object> getAfternoonSnackCost() {
+                return afternoonSnackCost;
             }
 
-            public long getClass511count3() {
-                return class511count3;
-            }
-
-            public long getClass511price1() {
-                return class511price1;
-            }
-
-            public long getClass511price2() {
-                return class511price2;
-            }
-
-            public long getClass511price3() {
-                return class511price3;
-            }
-
-            public long getClass511sum1() {
-                return class511sum1;
-            }
-
-            public long getClass511sum2() {
-                return class511sum2;
-            }
-
-            public long getClass511sum3() {
-                return class511sum3;
+            public void setAfternoonSnackCost(List<Object> afternoonSnackCost) {
+                this.afternoonSnackCost = afternoonSnackCost;
             }
 
             public String getDate() {
@@ -146,78 +112,6 @@ public class RegisterReport extends BasicReportForOrgJob {
 
             public void setDate(Date date) {
                 this.date = date;
-            }
-
-            public void addClass14count1(long class14count1) {
-                this.class14count1 += class14count1;
-            }
-
-            public void addClass14count2(long class14count2) {
-                this.class14count2 += class14count2;
-            }
-
-            public void addClass14count3(long class14count3) {
-                this.class14count3 += class14count3;
-            }
-
-            public void addClass14price1(long class14price1) {
-                this.class14price1 += class14price1;
-            }
-
-            public void addClass14price2(long class14price2) {
-                this.class14price2 += class14price2;
-            }
-
-            public void addClass14price3(long class14price3) {
-                this.class14price3 += class14price3;
-            }
-
-            public void addClass14sum1(long class14sum1) {
-                this.class14sum1 += class14sum1;
-            }
-
-            public void addClass14sum2(long class14sum2) {
-                this.class14sum2 += class14sum2;
-            }
-
-            public void addClass14sum3(long class14sum3) {
-                this.class14sum3 += class14sum3;
-            }
-
-            public void addClass511count1(long class511count1) {
-                this.class511count1 += class511count1;
-            }
-
-            public void addClass511count2(long class511count2) {
-                this.class511count2 += class511count2;
-            }
-
-            public void addClass511count3(long class511count3) {
-                this.class511count3 += class511count3;
-            }
-
-            public void addClass511price1(long class511price1) {
-                this.class511price1 += class511price1;
-            }
-
-            public void addClass511price2(long class511price2) {
-                this.class511price2 += class511price2;
-            }
-
-            public void addClass511price3(long class511price3) {
-                this.class511price3 += class511price3;
-            }
-
-            public void addClass511sum1(long class511sum1) {
-                this.class511sum1 += class511sum1;
-            }
-
-            public void addClass511sum2(long class511sum2) {
-                this.class511sum2 += class511sum2;
-            }
-
-            public void addClass511sum3(long class511sum3) {
-                this.class511sum3 += class511sum3;
             }
         }
 
@@ -249,13 +143,13 @@ public class RegisterReport extends BasicReportForOrgJob {
                 " FROM CF_ORDERS o, CF_ORDERDETAILS od, CF_CLIENTS c, CF_CLIENTGROUPS cg " +
                 " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
                 " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
+                //" (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
                 " (od.menuDetailName = 'Обед' OR od.menuDetailName = 'Завтрак' OR od.menuDetailName = 'Полдник')" +
                 " group by o.CreatedDate, od.menuDetailName, cg.groupname "+
                 " order by o.CreatedDate, od.menuDetailName;");
 
-            query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
-            query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
+            //query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
+            //query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
             query.setParameter("idOfOrg", org.getIdOfOrg());
             query.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
             query.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
@@ -275,63 +169,30 @@ public class RegisterReport extends BasicReportForOrgJob {
                 RegisterReportItem resultRow = mapItems.get(day);
                 if (resultRow == null) {
                     resultRow = new RegisterReportItem(Long.parseLong(vals[1].toString()));
+                    for (int classNum = 0; classNum < 2; classNum++) {
+                        resultRow.getAfternoonSnackCost().add(classNum, 0F);
+                        resultRow.getAfternoonSnackCount().add(classNum, 0);
+                        resultRow.getBreakfastCost().add(classNum, 0F);
+                        resultRow.getBreakfastCount().add(classNum, 0);
+                        resultRow.getLunchCost().add(classNum, 0F);
+                        resultRow.getLunchCount().add(classNum, 0);
+                    }
                     mapItems.put(day, resultRow);
                     resultRows.add(resultRow);
                 }
 
-                if (grName.charAt(0) >= '1' && grName.charAt(0) <= '4') {
-                    if (detailName.equals("Завтрак")) {
-                        resultRow.addClass14count1(count);
-                        resultRow.addClass14price1(price);
-                        resultRow.addClass14sum1(sum);
-                    } else if (detailName.equals("Обед")) {
-                        resultRow.addClass14count2(count);
-                        resultRow.addClass14price2(price);
-                        resultRow.addClass14sum2(sum);
-                    } else if (detailName.equals("Полдник")) {
-                        resultRow.addClass14count3(count);
-                        resultRow.addClass14price3(price);
-                        resultRow.addClass14sum3(sum);
-                    }
-                } else {
-                    if (detailName.equals("Завтрак")) {
-                        resultRow.addClass511count1(count);
-                        resultRow.addClass511price1(price);
-                        resultRow.addClass511sum1(sum);
-                    } else if (detailName.equals("Обед")) {
-                        resultRow.addClass511count2(count);
-                        resultRow.addClass511price2(price);
-                        resultRow.addClass511sum2(sum);
-                    } else if (detailName.equals("Полдник")) {
-                        resultRow.addClass511count3(count);
-                        resultRow.addClass511price3(price);
-                        resultRow.addClass511sum3(sum);
-                    }
+                int classNum = (grName.charAt(0) >= '1' && grName.charAt(0) <= '4')? 0 : 1;
+                if (detailName.equals("Завтрак")) {
+                    resultRow.getBreakfastCost().add(classNum, Float.valueOf(String.valueOf(price/100.0)));
+                    resultRow.getBreakfastCount().add(classNum, count);
+                } else if (detailName.equals("Обед")) {
+                    resultRow.getLunchCost().add(classNum, Float.valueOf(String.valueOf(price/100.0)));
+                    resultRow.getLunchCount().add(classNum, count);
+                } else if (detailName.equals("Полдник")) {
+                    resultRow.getAfternoonSnackCost().add(classNum, Float.valueOf(String.valueOf(price/100.0)));
+                    resultRow.getAfternoonSnackCount().add(classNum, count);
                 }
             }
-            // ИТОГО
-            RegisterReportItem resultRow = new RegisterReportItem();
-            for (RegisterReportItem tmp : resultRows) {
-                resultRow.addClass14count1(tmp.getClass14count1());
-                resultRow.addClass14price1(tmp.getClass14price1());
-                resultRow.addClass14sum1(tmp.getClass14sum1());
-                resultRow.addClass14count2(tmp.getClass14count2());
-                resultRow.addClass14price2(tmp.getClass14price2());
-                resultRow.addClass14sum2(tmp.getClass14sum2());
-                resultRow.addClass14count3(tmp.getClass14count3());
-                resultRow.addClass14price3(tmp.getClass14price3());
-                resultRow.addClass14sum3(tmp.getClass14sum3());
-                resultRow.addClass511count1(tmp.getClass511count1());
-                resultRow.addClass511price1(tmp.getClass511price1());
-                resultRow.addClass511sum1(tmp.getClass511sum1());
-                resultRow.addClass511count2(tmp.getClass511count2());
-                resultRow.addClass511price2(tmp.getClass511price2());
-                resultRow.addClass511sum2(tmp.getClass511sum2());
-                resultRow.addClass511count3(tmp.getClass511count3());
-                resultRow.addClass511price3(tmp.getClass511price3());
-                resultRow.addClass511sum3(tmp.getClass511sum3());
-            }
-            resultRows.add(resultRow);
             return new JRBeanCollectionDataSource(resultRows);
         }
 
