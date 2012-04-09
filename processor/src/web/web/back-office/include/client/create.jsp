@@ -107,6 +107,10 @@
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Заметки" styleClass="output-text" />
+    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.remarks}" styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
                        reRender="clientCreatePanel" styleClass="command-button" />
 </h:panelGrid>

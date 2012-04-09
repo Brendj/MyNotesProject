@@ -136,6 +136,10 @@
     <h:inputText value="#{mainPage.clientEditPage.guardsan}" maxlength="64" styleClass="input-text" />
 
 </h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Заметки" styleClass="output-text" />
+    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.remarks}" styleClass="input-text" />
+</h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel"
                        styleClass="command-button" />

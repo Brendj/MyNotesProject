@@ -190,8 +190,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Integer contractState = 0;
     private Integer payForSMS = 1;
     private Long limit;
-
-    // Kadyrov (22.12.2011)
     private String san;
     private String guardsan;
 

@@ -108,6 +108,11 @@
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Заметки" styleClass="output-text" />
+    <h:inputTextarea readonly="true" rows="5" cols="64" value="#{mainPage.clientViewPage.remarks}"
+                     styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
