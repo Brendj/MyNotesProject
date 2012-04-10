@@ -166,7 +166,8 @@ CREATE TABLE CF_Transactions (
   TransactionSum          BIGINT            NOT NULL,
   Source                  VARCHAR(30)       NOT NULL,
   SourceType              INTEGER           NOT NULL,
-  TransactionDate         BIGINT            NOT NULL,          
+  TransactionDate         BIGINT            NOT NULL,
+  BalanceBefore           BIGINT,
   CONSTRAINT CF_Transactions_pk PRIMARY KEY (IdOfTransaction),
   CONSTRAINT CF_Transactions_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient),
   CONSTRAINT CF_Transactions_IdOfCard_fk FOREIGN KEY (IdOfCard) REFERENCES CF_Cards (IdOfCard)
@@ -302,10 +303,11 @@ CREATE TABLE CF_Orders (
   SocDiscount     BIGINT        NOT NULL DEFAULT 0,
   TrdDiscount     BIGINT        NOT NULL DEFAULT 0,
   GrantSum        BIGINT        NOT NULL,
-  rSum            BIGINT        NOT NULL,
+  sumByCard            BIGINT        NOT NULL,
   CreatedDate     BIGINT        NOT NULL,
   SumByCard       BIGINT        NOT NULL,
   SumByCash       BIGINT        NOT NULL,
+  State           INT           NOT NULL DEFAULT 0,
   CONSTRAINT CF_Orders_pk PRIMARY KEY (IdOfOrg, IdOfOrder),
   CONSTRAINT CF_Orders_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_Orders_IdOfCard_fk FOREIGN KEY (IdOfCard) REFERENCES CF_Cards (IdOfCard),
@@ -329,6 +331,8 @@ CREATE TABLE CF_OrderDetails (
   MenuType        INT           NOT NULL,
   MenuOutput      VARCHAR(32)   NOT NULL,
   MenuOrigin      INT           NOT NULL,
+  State           INT           NOT NULL DEFAULT 0,
+  ItemCode VARCHAR(32),
   CONSTRAINT CF_OrderDetails_pk PRIMARY KEY (IdOfOrg, IdOfOrderDetail),
   CONSTRAINT CF_OrderDetails_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_OrderDetails_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder) REFERENCES CF_Orders (IdOfOrg, IdOfOrder)
@@ -887,5 +891,5 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 11, 120218, 0);
+VALUES(2, 2, 12, 120407, 0);
 
