@@ -19,6 +19,7 @@
         <many-to-one name="card" class="ru.axetta.ecafe.processor.core.persistence.Card" column="IdOfCard"
                      not-null="false" update="false"/>
         <property name="transactionSum" column="TransactionSum" type="long" not-null="true" update="false"/>
+        <property name="balanceBeforeTransaction" column="BalanceBefore" type="long" update="false"/>
         <property name="source" column="Source" type="string" length="30" not-null="true" update="false"/>
         <property name="sourceType" column="SourceType" type="integer" not-null="true" update="false"/>
         <property name="transactionTime" column="TransactionDate"

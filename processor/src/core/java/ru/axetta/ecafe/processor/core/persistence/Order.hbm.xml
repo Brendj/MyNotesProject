@@ -29,6 +29,7 @@
                   not-null="true" update="false"/>
         <property name="sumByCard" column="SumByCard" type="long" not-null="true" update="false"/>
         <property name="sumByCash" column="SumByCash" type="long" not-null="true" update="false"/>
+        <property name="state" column="State" type="int" not-null="true" update="true"/>
         <many-to-one name="pos" class="ru.axetta.ecafe.processor.core.persistence.POS"
                      column="IdOfPos"
                      not-null="false"/>

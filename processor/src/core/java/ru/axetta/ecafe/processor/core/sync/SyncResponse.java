@@ -808,6 +808,7 @@ public class SyncResponse {
             private final long idOfEnterEvent;
             private final int resEvent;
             private final String error;
+            public static final int RC_OK = 0, RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES=2, RC_CLIENT_NOT_FOUND=3;
 
             public Item(long idOfEnterEvent, int resEvent, String error) {
                 this.idOfEnterEvent = idOfEnterEvent;

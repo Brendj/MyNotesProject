@@ -17,6 +17,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class Order{
+    public static final int STATE_COMMITED=0, STATE_CANCELED=1;
 
     public static final long INTERNAL_ID_OF_CASHIER = 0L;
 
@@ -36,6 +37,7 @@ public class Order{
     private Set<OrderDetail> orderDetails = new HashSet<OrderDetail>();
     private POS pos;
     private Contragent contragent;
+    private int state;
 
     Order() {
         // For Hibernate only
@@ -191,6 +193,14 @@ public class Order{
         this.contragent = contragent;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     private Set<OrderDetail> getOrderDetailsInternal() {
         // For Hibernate only
         return orderDetails;
@@ -231,4 +241,9 @@ public class Order{
                 + pos + ", contragent=" + contragent + '}';
     }
 
+    public String getStateAsString() {
+        if (state==STATE_COMMITED) return "Проведен";
+        else if (state==STATE_CANCELED) return "Отменен";
+        return "Неизвестно";
+    }
 }

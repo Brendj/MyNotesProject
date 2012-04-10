@@ -139,14 +139,14 @@ public class RegisterReport extends BasicReportForOrgJob {
             HashMap<Integer, RegisterReportItem> mapItems = new HashMap<Integer, RegisterReportItem>(31);
             List<RegisterReportItem> resultRows = new LinkedList<RegisterReportItem>();
             Calendar c = Calendar.getInstance();
-            Query query = session.createSQLQuery("SELECT count(*), o.CreatedDate, sum(od.socDiscount) AS SUM1, sum(od.Qty*od.socDiscount) AS SUM2, od.menuDetailName, cg.groupname "+
+            Query query = session.createSQLQuery("SELECT count(*), o.CreatedDate/(1000*60*60*24) xdt, sum(od.socDiscount) AS SUM1, sum(od.Qty*od.socDiscount) AS SUM2, od.menuDetailName, cg.groupname "+
                 " FROM CF_ORDERS o, CF_ORDERDETAILS od, CF_CLIENTS c, CF_CLIENTGROUPS cg " +
                 " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
                 " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
                 " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
                 " (od.menuDetailName = 'Обед' OR od.menuDetailName = 'Завтрак' OR od.menuDetailName = 'Полдник')" +
-                " group by o.CreatedDate, od.menuDetailName, cg.groupname "+
-                " order by o.CreatedDate, od.menuDetailName;");
+                " group by xdt, od.menuDetailName, cg.groupname "+
+                " order by xdt, od.menuDetailName;");
 
             query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
             query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
@@ -159,7 +159,8 @@ public class RegisterReport extends BasicReportForOrgJob {
             for (Object o : resultList) {
                 Object vals[]=(Object[])o;
                 int count = Integer.parseInt(vals[0].toString());
-                c.setTimeInMillis(Long.parseLong(vals[1].toString()));
+                long timeMs=Long.parseLong(vals[1].toString())*1000*60*60*24;
+                c.setTimeInMillis(timeMs);
                 int day = c.get(Calendar.DAY_OF_MONTH);
                 long price = Long.parseLong(vals[2].toString());
                 long sum = Long.parseLong(vals[3].toString());
@@ -168,7 +169,7 @@ public class RegisterReport extends BasicReportForOrgJob {
 
                 RegisterReportItem resultRow = mapItems.get(day);
                 if (resultRow == null) {
-                    resultRow = new RegisterReportItem(Long.parseLong(vals[1].toString()));
+                    resultRow = new RegisterReportItem(timeMs);
                     for (int classNum = 0; classNum < 2; classNum++) {
                         resultRow.getAfternoonSnackCost().add(classNum, 0F);
                         resultRow.getAfternoonSnackCount().add(classNum, 0);

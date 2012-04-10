@@ -430,10 +430,17 @@ public class DAOUtils {
         return (CategoryDiscount)l.get(0);
     }
 
+    public static boolean getOptionValueBool(Session session, long nOption, boolean defaultValue) {
+        String v =getOptionValue(session, nOption, defaultValue?"1":"0");
+        return v.equals("1") || v.compareToIgnoreCase("true")==0;
+    }
     public static String getOptionValue(EntityManager em, long nOption, String defaultValue) {
-        javax.persistence.Query q = em.createQuery("from Option where idOfOption=:nOption");
+        return getOptionValue((Session)em.getDelegate(),  nOption, defaultValue);
+    }
+    public static String getOptionValue(Session session, long nOption, String defaultValue) {
+        Query q = session.createQuery("from Option where idOfOption=:nOption");
         q.setParameter("nOption", nOption);
-        List l = q.getResultList();
+        List l = q.list();
         String v;
         if (l.size()==0) v = defaultValue;
         else v=((Option)l.get(0)).getOptionText();
@@ -601,4 +608,10 @@ public class DAOUtils {
         return clientGroup;
     }
 
+    public static Contragent findContragentByClass(Session session, int classId) {
+        // Оператор
+        Criteria criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", classId));
+        return (Contragent) criteria.uniqueResult();
+    }
 }

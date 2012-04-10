@@ -4,215 +4,89 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.Date;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: rumil
- * Date: 21.11.11
- * Time: 10:01
- * To change this template use File | Settings | File Templates.
- */
 public class CurrentPositionsManager {
+    Session session;
+    Boolean isOperatorScheme;
+    Contragent operatorCt, budgetCt, clientCt;
+    List<CurrentPositionItem> currentPositionList;
 
-    public static void createOrder(Session session, SyncRequest.PaymentRegistry.Payment payment, Long idOfOrg,
-            Client client, Card card, AccountTransaction orderTransaction) throws Exception {
-        POS pos = null;
-        Contragent supplier = null;
-        if (payment.getIdOfPOS() != null) {
-            pos = (POS) session.get(POS.class, payment.getIdOfPOS());
-            if (pos == null) {
-                throw new Exception("POS with id " + payment.getIdOfPOS() + " not found");
-            } else {
-                supplier = pos.getContragent();
-            }
-        } else {
-            // Использовать поставщика по умолчанию из организации
-            Org org = (Org) session.get(Org.class, idOfOrg);
-            supplier = org.getDefaultSupplier();
-        }
-
-        Order order = new Order(new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()), payment.getIdOfCashier(),
-                payment.getSocDiscount(), payment.getTrdDiscount(), payment.getGrant(), payment.getRSum(),
-                payment.getTime(), payment.getSumByCard(), payment.getSumByCash(), client, card, orderTransaction, pos,
-                supplier);
-
-        Long rSum = order.getRSum();
-        Long priviledge = order.getSocDiscount() + order.getGrantSum();
-        changeOrderPosition(session, rSum, priviledge, supplier, null, null, null, null, null);
-        session.save(order);
-
-        /// Формирование журнала транзакции
-        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS)) {
-            if (card!=null && card.getCardType()==Card.TYPE_UEC) {
-                Criteria orgCriteria = session.createCriteria(Org.class);
-                orgCriteria.add(Restrictions.eq("idOfOrg",idOfOrg));
-                Org org = (Org) orgCriteria.uniqueResult();
-                if(payment.getSocDiscount()>0){
-                    registerTransactionJournal(TransactionJournal.TRANS_CODE_FD_BEN, org, order, card, client, payment.getSocDiscount(), session);
-                }
-                if (payment.getSumByCard()>0) {
-                    registerTransactionJournal(TransactionJournal.TRANS_CODE_DEBIT, org, order, card, client, payment.getSumByCard(), session);
-                }
-            }
-        }
+    public CurrentPositionsManager(Session session) {
+        this.session = session;
+    }
+    boolean isOperatorScheme() {
+        if (isOperatorScheme==null) isOperatorScheme = DAOUtils.getOptionValueBool(session, Option.OPTION_WITH_OPERATOR, false);
+        return isOperatorScheme;
+    }
+    Contragent getOperatorContragent() {
+        if (session!=null) return DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
+        return operatorCt;
+    }
+    Contragent getBudgetContragent() {
+        if (session!=null) return DAOUtils.findContragentByClass(session, Contragent.BUDGET);
+        return budgetCt;
+    }
+    Contragent getClientContragent() {
+        if (session!=null) return DAOUtils.findContragentByClass(session, Contragent.CLIENT);
+        return clientCt;
     }
 
-    private static void registerTransactionJournal(String transCode, Org org, Order order, Card card, Client client, Long financialAmount, Session session) {
-        TransactionJournal transactionJournal = new TransactionJournal(order.getCompositeIdOfOrder().getIdOfOrg(),
-                order.getCompositeIdOfOrder().getIdOfOrder(), new Date(), org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_FD,
-                transCode,
-                TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()], Long.toHexString(card.getCardNo()),
-                client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), financialAmount, order.getCreateTime());
-        session.save(transactionJournal);
-    }
-
-    public static void createClientPayment(Session session, ClientPayment clientPayment, Client client,
-            List<CurrentPositionItem> currentPositionList) throws Exception {
-        Long paySum = clientPayment.getPaySum();
-        Contragent payAgent = clientPayment.getContragent();
-
-        Criteria optionCriteria = session.createCriteria(Option.class);
-        optionCriteria.add(Restrictions.eq("idOfOption", 2L));
-        Option option = (Option) optionCriteria.uniqueResult();
-        boolean withOperator = option.getOptionText().equals("1");
-
-        Criteria criteria = null;
-        Contragent objectContragent = null;
-
-        if (withOperator) {
-            // Оператор
-            criteria = session.createCriteria(Contragent.class);
-            criteria.add(Restrictions.eq("classId", Contragent.OPERATOR));
-            objectContragent = (Contragent) criteria.uniqueResult();
-        }
-        else
-            objectContragent = client.getOrg().getDefaultSupplier();
-
-        changeClientPaymentPosition(session, payAgent, paySum, currentPositionList, objectContragent);
-        session.save(clientPayment);
-    }
-
-    public static void createSettlement(Session session, Settlement settlement) throws Exception {
-        changeSettlementPosition(session, settlement.getSumma(),
-                settlement.getIdOfContragentPayer().getClassId(),
-                settlement.getIdOfContragentReceiver().getClassId(),
-                settlement.getIdOfContragentPayer(),
-                settlement.getIdOfContragentReceiver(), null, null, null);
-        session.save(settlement);
-    }
-
-    public static void editSettlement(Session session, Settlement settlement, Long preSumma) throws Exception {
-        changeSettlementPosition(session, preSumma,
-                settlement.getIdOfContragentPayer().getClassId(),
-                settlement.getIdOfContragentReceiver().getClassId(),
-                settlement.getIdOfContragentPayer(),
-                settlement.getIdOfContragentReceiver(), null, null, null);
-        session.update(settlement);
-    }
-
-    public static void deleteSettlement(Session session, Settlement settlement) throws Exception {
-        changeSettlementPosition(session, -settlement.getSumma(),
-                settlement.getIdOfContragentPayer().getClassId(),
-                settlement.getIdOfContragentReceiver().getClassId(),
-                settlement.getIdOfContragentPayer(),
-                settlement.getIdOfContragentReceiver(), null, null, null);
-        session.delete(settlement);
+    public CurrentPositionsManager(boolean operatorScheme, Contragent operatorContragent, Contragent budgetContragent,
+            Contragent clientContragent, List<CurrentPositionItem> currentPositionList) {
+        isOperatorScheme = operatorScheme;
+        this.operatorCt = operatorContragent;
+        this.budgetCt = budgetContragent;
+        this.clientCt = clientContragent;
+        this.currentPositionList = currentPositionList;
     }
 
     // пополнение лицевого счета
-    public static void changeClientPaymentPosition(Session session, Contragent payAgent, Long paySum,
-            List<CurrentPositionItem> currentPositionList, Contragent objectContragent)
+    public void changeClientPaymentPosition(Contragent payAgent, Long paySum, Contragent objectContragent)
             throws Exception {
-
         // увеличиваем позицию Платежный агент – ТСП/Оператор
-        changeCurrentPosition(session, paySum, payAgent, objectContragent, currentPositionList);
+        changeCurrentPosition(paySum, payAgent, objectContragent);
     }
 
     // Регистрация заказа с точки продажи
-    public static void changeOrderPosition(Session session, Long rSum, Long priviledge, Contragent supplier,
-            List<CurrentPositionItem> currentPositionList, Boolean withOperator,
-            Contragent operatorContragent, Contragent clientContragent, Contragent budgetContragent) throws Exception {
-        if (currentPositionList == null) {
-            Criteria optionCriteria = session.createCriteria(Option.class);
-            optionCriteria.add(Restrictions.eq("idOfOption", 2L));
-            Option option = (Option) optionCriteria.uniqueResult();
-            withOperator = option.getOptionText().equals("1");
-
-            Criteria criteria = null;
-
-            if (withOperator) {
-                criteria = session.createCriteria(Contragent.class);
-                criteria.add(Restrictions.eq("classId", Contragent.OPERATOR));
-                operatorContragent = (Contragent) criteria.uniqueResult();
-            }
-
-            // Клиент
-            criteria = session.createCriteria(Contragent.class);
-            criteria.add(Restrictions.eq("classId", Contragent.CLIENT));
-            clientContragent = (Contragent) criteria.uniqueResult();
-
-            // Бюджет
-            criteria = session.createCriteria(Contragent.class);
-            criteria.add(Restrictions.eq("classId", Contragent.BUDGET));
-            budgetContragent = (Contragent) criteria.uniqueResult();
-        }
-
+    public void changeOrderPosition(Long sumByCard, Long budgetSum, Contragent supplier) throws Exception {
         // увеличиваем позицию Оператор – ТСП
-        if (withOperator)
-            changeCurrentPosition(session, rSum, operatorContragent, supplier, currentPositionList);
+        if (isOperatorScheme())
+            changeCurrentPosition(sumByCard, getOperatorContragent(), supplier);
 
-        Contragent objectContragent = null;
-        if (withOperator)
-            objectContragent = operatorContragent;
-        else
-            objectContragent = supplier;
+        Contragent objectContragent;
+        if (isOperatorScheme()) objectContragent = getOperatorContragent();
+        else objectContragent = supplier;
 
         // уменьшаем позицию ТСП/Оператор – Клиенты
-        changeCurrentPosition(session, -rSum, objectContragent, clientContragent, currentPositionList);
+        changeCurrentPosition(-sumByCard, objectContragent, getClientContragent());
 
         // увеличиваем позицию Бюджет – ТСП/Оператор на размер льготы
-        changeCurrentPosition(session, priviledge, budgetContragent, objectContragent, currentPositionList);
+        changeCurrentPosition(budgetSum, getBudgetContragent(), objectContragent);
     }
 
     // Регистрация выплаты
-    public static void changeSettlementPosition(Session session, Long summa,
-            Integer payerClassId, Integer receiverClassId, Contragent contragentPayer, Contragent contragentReceiver,
-            List<CurrentPositionItem> currentPositionList, Boolean withOperator, Contragent clientContragent) throws Exception {
-        if (currentPositionList == null) {
-            Criteria optionCriteria = session.createCriteria(Option.class);
-            optionCriteria.add(Restrictions.eq("idOfOption", 2L));
-            Option option = (Option) optionCriteria.uniqueResult();
-            withOperator = option.getOptionText().equals("1");
-
-            Criteria criteria = null;
-
-            criteria = session.createCriteria(Contragent.class);
-            criteria.add(Restrictions.eq("classId", Contragent.CLIENT));
-            clientContragent = (Contragent) criteria.uniqueResult();
-        }
+    public void changeSettlementPosition(Long sum,
+            Integer payerClassId, Integer receiverClassId, Contragent contragentPayer, Contragent contragentReceiver) throws Exception {
+        boolean withOperator = isOperatorScheme();
 
         // Регистрация выплаты от платежного агента
         if (payerClassId.equals(Contragent.PAY_AGENT)) {
             if ((withOperator && receiverClassId.equals(Contragent.OPERATOR)) ||
                 (!withOperator && receiverClassId.equals(Contragent.TSP))) {
                 // уменьшаем позицию Платежный агент – ТСП/Оператор
-                changeCurrentPosition(session, -summa, contragentPayer,
-                    contragentReceiver, currentPositionList);
+                changeCurrentPosition(-sum, contragentPayer, contragentReceiver);
 
                 // увеличиваем позицию ТСП/Оператор – Клиенты
-                changeCurrentPosition(session, summa, contragentReceiver, clientContragent,
-                        currentPositionList);
+                changeCurrentPosition(sum, contragentReceiver, getClientContragent());
             }
         }
 
@@ -220,8 +94,7 @@ public class CurrentPositionsManager {
         else if (payerClassId.equals(Contragent.OPERATOR)) {
             if (withOperator) {
                 // уменьшаем позицию Оператор – ТСП
-                changeCurrentPosition(session, -summa, contragentPayer,
-                        contragentReceiver, currentPositionList);
+                changeCurrentPosition(-sum, contragentPayer, contragentReceiver);
             }
         }
 
@@ -229,49 +102,23 @@ public class CurrentPositionsManager {
         else if (payerClassId.equals(Contragent.TSP)) {
             if (withOperator) {
                 // уменьшаем позицию ТСП – Оператор
-                changeCurrentPosition(session, -summa, contragentPayer,
-                        contragentReceiver, currentPositionList);
+                changeCurrentPosition(-sum, contragentPayer, contragentReceiver);
             }
         }
 
         // Регистрация выплаты компенсации ТСП из бюджета
         else if (payerClassId.equals(Contragent.BUDGET)) {
             // уменьшаем позицию Бюджет – ТСП
-            changeCurrentPosition(session, -summa, contragentPayer,
-                    contragentReceiver, currentPositionList);
+            changeCurrentPosition(-sum, contragentPayer, contragentReceiver);
         }
     }
 
-    public static class CurrentPositionItem {
-        Long idOfContragentDebtor;
-        Long idOfContragentCreditor;
-        Long summa;
-
-        public CurrentPositionItem(Long idOfContragentDebtor, Long idOfContragentCreditor, Long summa) {
-            this.idOfContragentDebtor = idOfContragentDebtor;
-            this.idOfContragentCreditor = idOfContragentCreditor;
-            this.summa = summa;
-        }
-
-        public Long getIdOfContragentDebtor() {
-            return idOfContragentDebtor;
-        }
-
-        public Long getIdOfContragentCreditor() {
-            return idOfContragentCreditor;
-        }
-
-        public Long getSumma() {
-            return summa;
-        }
-
-        public void setSumma(Long summa) {
-            this.summa = summa;
-        }
+    // Регистрация начисления выплаты
+    public void changeAddPaymentPosition(AddPayment addPayment, Long sum) throws Exception {
+        changeCurrentPosition(sum, addPayment.getContragentPayer(), addPayment.getContragentReceiver());
     }
 
-    private static void changeCurrentPosition(Session session, Long summa, Contragent debtor, Contragent creditor,
-            List<CurrentPositionItem> currentPositionList) {
+    public void changeCurrentPosition(Long sum, Contragent debtor, Contragent creditor) {
         if (currentPositionList != null) {
             CurrentPositionItem currentPosition = null;
             for (CurrentPositionItem currentPositionItem : currentPositionList) {
@@ -281,15 +128,15 @@ public class CurrentPositionsManager {
                     currentPositionItem.getIdOfContragentCreditor().equals(debtor.getIdOfContragent()))) {
                     currentPosition = currentPositionItem;
                     if (currentPositionItem.getIdOfContragentDebtor().equals(debtor.getIdOfContragent()))
-                        currentPositionItem.setSumma(currentPositionItem.getSumma() + summa);
+                        currentPositionItem.setSum(currentPositionItem.getSum() + sum);
                     else
-                        currentPositionItem.setSumma(currentPositionItem.getSumma() - summa);
+                        currentPositionItem.setSum(currentPositionItem.getSum() - sum);
                     break;
                 }
             }
             if (currentPosition == null) {
                 currentPosition = new CurrentPositionItem(debtor.getIdOfContragent(),
-                        creditor.getIdOfContragent(), summa);
+                        creditor.getIdOfContragent(), sum);
                 currentPositionList.add(currentPosition);
             }
         } else {
@@ -304,48 +151,47 @@ public class CurrentPositionsManager {
             currentPosition = (CurrentPosition) criteria.uniqueResult();
             if (currentPosition != null) {
                 if (currentPosition.getIdOfContragentDebtor().equals(debtor))
-                    currentPosition.setSumma(currentPosition.getSumma() + summa);
+                    currentPosition.setSumma(currentPosition.getSumma() + sum);
                 else
-                    currentPosition.setSumma(currentPosition.getSumma() - summa);
+                    currentPosition.setSumma(currentPosition.getSumma() - sum);
                 session.save(currentPosition);
             } else {
                 currentPosition = new CurrentPosition();
                 currentPosition.setIdOfContragentDebtor(debtor);
                 currentPosition.setIdOfContragentCreditor(creditor);
-                currentPosition.setSumma(summa);
+                currentPosition.setSumma(sum);
                 session.persist(currentPosition);
             }
         }
     }
 
-    public static void createAddPayment(Session session, AddPayment addPayment) throws Exception {
-        changeAddPaymentPosition(session, addPayment, addPayment.getSumma(), null, null);
-        session.save(addPayment);
-    }
 
-    public static void updateAddPayment(Session session, AddPayment addPayment, Long preSumma) throws Exception {
-        changeAddPaymentPosition(session, addPayment, preSumma, null, null);
-        session.update(addPayment);
-    }
+    public static class CurrentPositionItem {
+        Long idOfContragentDebtor;
+        Long idOfContragentCreditor;
+        Long sum;
 
-    public static void deleteAddPayment(Session session, AddPayment addPayment) throws Exception {
-        changeAddPaymentPosition(session, addPayment, -addPayment.getSumma(), null, null);
-        session.delete(addPayment);
-    }
-
-    // Регистрация начисления выплаты
-    public static void changeAddPaymentPosition(Session session, AddPayment addPayment, Long summa,
-            List<CurrentPositionItem> currentPositionList, Boolean withOperator) throws Exception {
-        if (currentPositionList == null) {
-            Criteria optionCriteria = session.createCriteria(Option.class);
-            optionCriteria.add(Restrictions.eq("idOfOption", 2L));
-            Option option = (Option) optionCriteria.uniqueResult();
-            withOperator = option.getOptionText().equals("1");
+        public CurrentPositionItem(Long idOfContragentDebtor, Long idOfContragentCreditor, Long summa) {
+            this.idOfContragentDebtor = idOfContragentDebtor;
+            this.idOfContragentCreditor = idOfContragentCreditor;
+            this.sum = summa;
         }
 
-        if (withOperator) {
-            changeCurrentPosition(session, summa, addPayment.getContragentPayer(),
-                    addPayment.getContragentReceiver(), currentPositionList);
+        public Long getIdOfContragentDebtor() {
+            return idOfContragentDebtor;
+        }
+
+        public Long getIdOfContragentCreditor() {
+            return idOfContragentCreditor;
+        }
+
+        public Long getSum() {
+            return sum;
+        }
+
+        public void setSum(Long sum) {
+            this.sum = sum;
         }
     }
+
 }

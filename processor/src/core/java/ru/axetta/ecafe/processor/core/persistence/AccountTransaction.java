@@ -21,11 +21,23 @@ public class AccountTransaction {
     public static final int PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE = 3;
     public static final int CLIENT_ORDER_TRANSACTION_SOURCE_TYPE = 8;
     public static final int INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE = 10;
+    public static final int SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE = 20;
+    public static final int CANCEL_TRANSACTION_SOURCE_TYPE = 30;
+
+    public static String sourceTypeToString(int sourceType) {
+        if (sourceType==PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE) return "Платежная система";
+        else if (sourceType==CLIENT_ORDER_TRANSACTION_SOURCE_TYPE) return "Покупка";
+        else if (sourceType==INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE) return "Операция";
+        else if (sourceType==SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE) return "Плата";
+        else if (sourceType==CANCEL_TRANSACTION_SOURCE_TYPE) return "Отмена";
+        return "Неизвестно";
+    }
 
     private Long idOfTransaction;
     private Client client;
     private Card card;
     private Long transactionSum;
+    private Long balanceBeforeTransaction;
     private String source;
     private Integer sourceType;
     private Date transactionTime;
@@ -42,6 +54,7 @@ public class AccountTransaction {
     public AccountTransaction(Client client, Card card, long transactionSum, String source, int sourceType,
             Date transactionTime) throws Exception {
         this.client = client;
+        this.balanceBeforeTransaction = client.getBalance();
         this.card = card;
         this.transactionSum = transactionSum;
         this.source = source;
@@ -85,6 +98,14 @@ public class AccountTransaction {
         this.transactionSum = transactionSum;
     }
 
+    public Long getBalanceBeforeTransaction() {
+        return balanceBeforeTransaction;
+    }
+
+    public void setBalanceBeforeTransaction(Long balanceBeforeTransaction) {
+        this.balanceBeforeTransaction = balanceBeforeTransaction;
+    }
+
     public String getSource() {
         return source;
     }
@@ -101,6 +122,10 @@ public class AccountTransaction {
     private void setSourceType(Integer sourceType) {
         // For Hibernate only
         this.sourceType = sourceType;
+    }
+
+    public String getSourceTypeAsString() {
+        return sourceTypeToString(sourceType);
     }
 
     public Date getTransactionTime() {

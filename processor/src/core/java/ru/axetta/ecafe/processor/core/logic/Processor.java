@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.PaymentProcessEvent;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
-import ru.axetta.ecafe.processor.core.partner.paypoint.*;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
@@ -18,7 +17,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
-import ru.axetta.ecafe.processor.core.sms.*;
+import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
@@ -51,11 +50,9 @@ import java.util.*;
 public class Processor implements SyncProcessor,
         PaymentProcessor,
         ClientPaymentOrderProcessor,
-        ClientSmsProcessor,
         CardManager,
         OrderCancelProcessor,
-        SubscriptionFeeManager,
-        PayPointProcessor {
+        SubscriptionFeeManager {
 
     public Client getClientInfo(long idOfContract) throws Exception {
         Session persistenceSession = null;
@@ -536,42 +533,18 @@ public class Processor implements SyncProcessor,
                         String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
             }
-            // By default we have no transaction
-            AccountTransaction orderTransaction = null;
-            // If "card part" of payment is specified...
-            if (0 != payment.getSumByCard()) {
+            if (0 != payment.getSumByCard() && card==null) {
                 // Check if card is specified
-                if (null == card) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 240, String.format(
-                            "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                            idOfOrg, payment.getIdOfOrder(), idOfClient));
-                }
-
-                // Check card balance and overdraft limit to be enough for payment registration
-                //if (card.getBalance() + card.getLimit() < payment.getSumByCard()) {
-                //    registerLimitOverflow(session, syncHistory, organization, card);
-                //    transaction.commit(); transaction = null;
-                //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 260, String.format(
-                //            "There is not enough sum at the card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s",
-                //            idOfOrg, payment.getIdOfOrder(), payment.getCardNo()));
-                //}
-
-                // Update client balance...
-                DAOUtils.changeClientBalance(persistenceSession, client.getIdOfClient(), -payment.getSumByCard());
-                //client.addBalance(-payment.getSumByCard());
-                //client.setUpdateTime(new Date());
-                //persistenceSession.update(client);
-
-                // ... and register transaction
-                orderTransaction = new AccountTransaction(client, card, -payment.getSumByCard(), "",
-                        AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
-                persistenceSession.save(orderTransaction);
+                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 240, String.format(
+                        "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
+                        idOfOrg, payment.getIdOfOrder(), idOfClient));
             }
             // Create order
-            CurrentPositionsManager.createOrder(persistenceSession, payment, idOfOrg, client, card, orderTransaction);
+            RuntimeContext.getFinancialOpsManager().createOrderCharge(persistenceSession, payment, idOfOrg, client,
+                    card);
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
-            // Register order datails (purchase)
+            // Register order details (purchase)
             Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
             while (purchases.hasMoreElements()) {
                 SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
@@ -673,7 +646,7 @@ public class Processor implements SyncProcessor,
                                 payment.getContractId(), payment.getClientId()));
             }
             Long idOfClient = client.getIdOfClient();
-            Card paymentCard = client.findActiveCard(persistenceSession, null);
+            //Card paymentCard = client.findActiveCard(persistenceSession, null);
             /*if (null == paymentCard) {
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, idOfClient, null, client.getBalance(),
                         PaymentProcessResult.CARD_NOT_FOUND.getCode(),
@@ -688,26 +661,16 @@ public class Processor implements SyncProcessor,
                     logger.info("Processing payment with balance reset: " + client + "; current balance="
                             + client.getBalance() + "; set balance=" + paymentSum);
                 }
-                client.addBalance(paymentSum);
-                client.setUpdateTime(new Date());
-                persistenceSession.update(client);
-
-                AccountTransaction cardAccountTransaction = new AccountTransaction(client, paymentCard, paymentSum,
-                        payment.getIdOfPayment(), AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
-                        new Date());
-                persistenceSession.save(cardAccountTransaction);
-
-                ClientPayment clientPayment = new ClientPayment(cardAccountTransaction, payment.getPaymentMethod(),
-                        paymentSum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, payment.getPayTime(),
-                        payment.getIdOfPayment(), contragent, payment.getAddPaymentMethod(),
+                RuntimeContext.getFinancialOpsManager().createClientPayment(persistenceSession, client,
+                        payment.getPaymentMethod(), paymentSum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT,
+                        payment.getPayTime(), payment.getIdOfPayment(), contragent, payment.getAddPaymentMethod(),
                         payment.getAddIdOfPayment());
-                CurrentPositionsManager.createClientPayment(persistenceSession, clientPayment, client, null);
 
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, client.getContractId(), paymentCard == null ? null : paymentCard.getIdOfCard(), client.getBalance(),
-                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, paymentCard);
+                    idOfClient, client.getContractId(), null, client.getBalance(),
+                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, null);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1382,11 +1345,13 @@ public class Processor implements SyncProcessor,
                         && ee.getEvtDateTime().equals(e.getEvtDateTime())
                         && ((ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) ||
                             (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard())))) {
-                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
+                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
+                                SyncResponse.ResEnterEvents.Item.RC_OK,
                             "Enter event already registered");
                         resEnterEvents.addItem(item);
                     } else {
-                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 2,
+                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
+                                SyncResponse.ResEnterEvents.Item.RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES,
                             "Enter event already registered but attributes differ, idOfOrg == " + e.getIdOfOrg() +
                                     ", idOfEnterEvent == " + e.getIdOfEnterEvent());
                         resEnterEvents.addItem(item);
@@ -1395,8 +1360,15 @@ public class Processor implements SyncProcessor,
                 else {
                     // find client by id
                     Client client = null;
-                    if (e.getIdOfClient() != null)
+                    if (e.getIdOfClient() != null) {
                         client = (Client) persistenceSession.get(Client.class, e.getIdOfClient());
+                        if (client==null) {
+                            SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
+                                "Client not found: "+e.getIdOfClient());
+                            resEnterEvents.addItem(item);
+                            continue;
+                        }
+                    }
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
@@ -1445,7 +1417,7 @@ public class Processor implements SyncProcessor,
                         e.getIdOfClient() != null &&
                         (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                         e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT))
-                        sendEnterEventSms(persistenceSession, e.getIdOfClient(), e.getPassDirection(), e.getEvtDateTime());
+                        sendEnterEventSms(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
 
 
                     /// Формирование журнала транзакции
@@ -1981,26 +1953,15 @@ public class Processor implements SyncProcessor,
                 if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
                     Client client = clientPaymentOrder.getClient();
                     // Ищем подходящую карту
-                    Card paymentCard = client.findActiveCard(persistenceSession, null);
+                    /*Card paymentCard = client.findActiveCard(persistenceSession, null);
                     if (null == paymentCard) {
                         // Нет карты, подходящей для зачисления платежа
                         throw new IllegalArgumentException(String.format(
                                 "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
-                    }
-                    // Изменяем баланс клиента
-                    client.addBalance(clientPaymentOrder.getPaySum());
-                    client.setUpdateTime(new Date());
-                    persistenceSession.update(client);
-                    // Вводим транзакцию по изменению баланса клиента
-                    AccountTransaction cardAccountTransaction = new AccountTransaction(client, paymentCard,
-                            clientPaymentOrder.getPaySum(), idOfPayment,
-                            AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-                    persistenceSession.save(cardAccountTransaction);
-                    // Регистрируем платеж клиента
-                    ClientPayment clientPayment = new ClientPayment(cardAccountTransaction, clientPaymentOrder,
-                            new Date());
-                    CurrentPositionsManager.createClientPayment(persistenceSession, clientPayment, client, null);
+                    }  */
+                    RuntimeContext.getFinancialOpsManager().createClientPaymentWithOrder(persistenceSession,
+                            clientPaymentOrder, client);
                 }
             }
 
@@ -2070,46 +2031,6 @@ public class Processor implements SyncProcessor,
             persistenceSession.save(diaryValue);
         } else {
             //todo register error here
-        }
-    }
-
-    public void registerClientSms(Long idOfClient, String idOfSms, String phone, Integer contentsType,
-            String textContents, Date serviceSendTime) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
-            long priceOfSms = client.getOrg().getPriceOfSms();
-            Card card = client.findActiveCard(persistenceSession, null);
-            Date currTime = new Date();
-
-            AccountTransaction accountTransaction = null;
-            if (priceOfSms != 0) {
-                // Register transaction
-                accountTransaction = new AccountTransaction(client, card, -priceOfSms, "",
-                        AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, currTime);
-                persistenceSession.save(accountTransaction);
-            }
-
-            ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsType, textContents,
-                    serviceSendTime, priceOfSms);
-            persistenceSession.save(clientSms);
-
-            if (priceOfSms != 0) {
-                client.addBalance(-priceOfSms);
-                client.setUpdateTime(currTime);
-                persistenceSession.update(client);
-            }
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
     }
 
@@ -2212,11 +2133,7 @@ public class Processor implements SyncProcessor,
                 // Update client balance
                 Client client = order.getClient();
                 if (null != client && 0 != order.getSumByCard()) {
-                    client.addBalance(order.getSumByCard());
-                    client.setUpdateTime(new Date());
-                    persistenceSession.update(client);
-                    AccountTransaction orderAccountTransaction = order.getTransaction();
-                    persistenceSession.delete(orderAccountTransaction);
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                 }
             }
 
@@ -2240,17 +2157,8 @@ public class Processor implements SyncProcessor,
             Org organization = client.getOrg();
             long subscriptionPrice = organization.getSubscriptionPrice();
             if (subscriptionPrice != 0L) {
-                Date currentTime = new Date();
-                AccountTransaction accountTransaction = new AccountTransaction(client,
-                        client.findActiveCard(persistenceSession, null), -subscriptionPrice, "",
-                        AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, currentTime);
-                persistenceSession.save(accountTransaction);
-                SubscriptionFee subscriptionFee = new SubscriptionFee(idOfSubscriptionFee, accountTransaction,
-                        subscriptionPrice, currentTime);
-                persistenceSession.save(subscriptionFee);
-                client.addBalance(-subscriptionPrice);
-                client.setUpdateTime(currentTime);
-                persistenceSession.update(client);
+                RuntimeContext.getFinancialOpsManager().createSubscriptionFeeCharge(persistenceSession,
+                        idOfSubscriptionFee, client, subscriptionPrice);
             }
 
             persistenceSession.flush();
@@ -2259,161 +2167,6 @@ public class Processor implements SyncProcessor,
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
-    public PayPointResponse processPartnerPayPointRequest(RuntimeContext runtimeContext, PayPointRequest request)
-            throws InvalidRequestException {
-        switch (request.getRequestId()) {
-            case PayPointRequest1.ID:
-                return processPartnerPayPointRequest(runtimeContext, (PayPointRequest1) request);
-            case PayPointRequest2.ID:
-                return processPartnerPayPointRequest(runtimeContext, (PayPointRequest2) request);
-            case PayPointRequest3.ID:
-                return processPartnerPayPointRequest(runtimeContext, (PayPointRequest3) request);
-            default:
-                throw new InvalidRequestException(request);
-        }
-    }
-
-    private static String getPayPointIdOfPayment(long operationId) throws Exception {
-        return new PayPointIdOfPaymentFormat().format(operationId);
-    }
-
-    private static String getPayPointAddIdOfPayment(long terminalId) throws Exception {
-        return new PayPointTerminalIdFormat().format(terminalId);
-    }
-
-    private static String getPayPointIdOfPayment(PayPointRequest1 request) throws Exception {
-        return getPayPointIdOfPayment(request.getOperationId());
-    }
-
-    private static String getPayPointIdOfPayment(PayPointRequest2 request) throws Exception {
-        return getPayPointIdOfPayment(request.getOperationId());
-    }
-
-    private static String getPayPointAddIdOfPayment(PayPointRequest1 request) throws Exception {
-        return getPayPointAddIdOfPayment(request.getOperationId());
-    }
-
-    private static String getPayPointAddIdOfPayment(PayPointRequest2 request) throws Exception {
-        return getPayPointAddIdOfPayment(request.getOperationId());
-    }
-
-    private static String getPayPointIdOfPayment(PayPointRequest3 request) throws Exception {
-        return getPayPointIdOfPayment(request.getOperationId());
-    }
-
-    private static Long getPayPointContragentId(RuntimeContext runtimeContext) throws Exception {
-        return runtimeContext.getPartnerPayPointConfig().getIdOfContragent();
-    }
-
-    private PayPointResponse1 processPartnerPayPointRequest(RuntimeContext runtimeContext, PayPointRequest1 request) {
-        final long clientId = request.getClientId();
-        try {
-            PayPointResponse1 response = null;
-            PaymentRequest.PaymentRegistry.Payment payment = new PaymentRequest.PaymentRegistry.Payment(true,
-                    getPayPointIdOfPayment(request), clientId, null, new Date(), 0L,
-                    ClientPayment.PAY_POINT_PAYMENT_METHOD, null, getPayPointAddIdOfPayment(request), false);
-            PaymentResponse.ResPaymentRegistry.Item processResult = processPayPaymentRegistryPayment(
-                    getPayPointContragentId(runtimeContext), payment);
-                PaymentResponse.ResPaymentRegistry.Item.ClientInfo client = processResult.getClient();
-                PaymentResponse.ResPaymentRegistry.Item.CardInfo card = processResult.getCard();
-                response = new PayPointResponse1(request.getRequestId(), processResult.getResult(),
-                        processResult.getError(), clientId, request.getOperationId(), processResult.getBalance(),
-                        getPayPointClientNameAbbreviation(client), getPayPointClientAddress(client),
-                        card == null ? null : card.getCardPrintedNo());
-            return response;
-        } catch (Exception e) {
-            logger.error(String.format("Failed to process request: %s", request), e);
-            return new PayPointResponse1(request.getRequestId(), PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                    PaymentProcessResult.UNKNOWN_ERROR.getDescription(), clientId, request.getOperationId(), null, null,
-                    null, null);
-        }
-    }
-
-    private static String getPayPointClientNameAbbreviation(PaymentResponse.ResPaymentRegistry.Item.ClientInfo client)
-            throws Exception {
-        if (null == client) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder(322);
-        PaymentResponse.ResPaymentRegistry.Item.ClientInfo.PersonInfo person = client.getPerson();
-        stringBuilder.append(person.getSurname()).append(' ').append(person.getFirstName()).append(' ')
-                .append(person.getSecondName());
-        return stringBuilder.toString();
-    }
-
-    private static String getPayPointClientAddress(PaymentResponse.ResPaymentRegistry.Item.ClientInfo client)
-            throws Exception {
-        if (null == client) {
-            return null;
-        }
-        return StringUtils.defaultString(client.getAddress());
-    }
-
-    private PayPointResponse2 processPartnerPayPointRequest(RuntimeContext runtimeContext, PayPointRequest2 request) {
-        final long clientId = request.getClientId();
-        try {
-            PayPointResponse2 response = null;
-            PaymentRequest.PaymentRegistry.Payment payment = new PaymentRequest.PaymentRegistry.Payment(
-                    getPayPointIdOfPayment(request), clientId, null, request.getTime(), request.getSum(),
-                    ClientPayment.PAY_POINT_PAYMENT_METHOD, null, getPayPointAddIdOfPayment(request), false);
-            PaymentResponse.ResPaymentRegistry.Item processResult = processPayPaymentRegistryPayment(
-                    getPayPointContragentId(runtimeContext), payment);
-                PaymentResponse.ResPaymentRegistry.Item.CardInfo card = processResult.getCard();
-                response = new PayPointResponse2(request.getRequestId(), processResult.getResult(),
-                        processResult.getError(), request.getOperationId(),
-                        card == null ? null : card.getCardPrintedNo());
-            return response;
-        } catch (Exception e) {
-            logger.error(String.format("Failed to process request: %s", request), e);
-            return new PayPointResponse2(request.getRequestId(), PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                    PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getOperationId(), null);
-        }
-    }
-
-    private PayPointResponse3 processPartnerPayPointRequest(RuntimeContext runtimeContext, PayPointRequest3 request) {
-        try {
-            Long idOfContragent = getPayPointContragentId(runtimeContext);
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                persistenceSession = persistenceSessionFactory.openSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-
-                PayPointResponse3 result = null;
-                Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
-                if (null == contragent) {
-                    result = new PayPointResponse3(request.getRequestId(),
-                            PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
-                            String.format("%s. IdOfContrganet = %s",
-                                    PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent),
-                            request.getOperationId(), null);
-                } else {
-                    List payments = DAOUtils
-                            .findClientPayments(persistenceSession, contragent, getPayPointIdOfPayment(request));
-                    if (!payments.isEmpty()) {
-                        ClientPayment clientPayment = (ClientPayment) payments.iterator().next();
-                        result = new PayPointResponse3(request.getRequestId(), PaymentProcessResult.OK.getCode(),
-                                PaymentProcessResult.OK.getDescription(), request.getOperationId(),
-                                clientPayment.getPaySum());
-                    } else {
-
-                    }
-                }
-
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                return result;
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-        } catch (Exception e) {
-            logger.error(String.format("Failed to process request: %s", request), e);
-            return new PayPointResponse3(request.getRequestId(), PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                    PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getOperationId(), null);
         }
     }
 
@@ -2450,62 +2203,7 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private void sendEnterEventSms(Session session, long idOfClient, int passDirection, Date eventDate) throws Exception {
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            ISmsService smsService = runtimeContext.getSmsService();
-            ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
-
-            Client client = (Client) session.get(Client.class, idOfClient);
-
-            if (client == null)
-                throw new Exception ("Client doesn't exist");
-
-            if(client.isNotifyViaSMS()){
-                try {
-                    String phoneNumber = client.getMobile();
-                    if (StringUtils.isNotEmpty(phoneNumber)) {
-                        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                        if (StringUtils.length(phoneNumber) == 11) {
-                            String sender = buildSender(client);
-                            String text = buildSmsText(client, passDirection, eventDate);
-                            SendResponse sendResponse = null;
-                            try {
-                                logger.info(String.format("sending SMS, sender: %s, phoneNumber: %s, text: %s",
-                                        sender, phoneNumber, text));
-                                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
-                                logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                                        sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
-                            } catch (Exception e) {
-                                if (logger.isWarnEnabled()) {
-                                    logger.warn(String.format(
-                                            "Failed to send SMS, sender: %s, phoneNumber: %s, text: %s",
-                                            sender, phoneNumber, text), e);
-                                }
-                            }
-                            if (null != sendResponse) {
-                                if (sendResponse.isSuccess()) {
-                                    clientSmsProcessor
-                                            .registerClientSms(idOfClient, sendResponse.getMessageId(), phoneNumber,
-                                                    ClientSms.ENTER_EVENT_NOTIFY, text, new Date());
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error(String.format("Failed to send SMS to client: %s", client), e);
-                }
-            }
-        } finally {
-        }
-    }
-
-    private static String buildSender(Client client) {
-        return StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
-    }
-
-    private static String buildSmsText(Client client, int passDirection, Date eventDate) {
+    private void sendEnterEventSms(Session session, Client client, int passDirection, Date eventDate) throws Exception {
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY)
             eventName = "Вход в школу";
@@ -2521,10 +2219,13 @@ public class Processor implements SyncProcessor,
         int minute = calendar.get(Calendar.MINUTE);
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
-        return String.format(eventName + " " + time + " (" + clientName + "). Баланс: %s р",
+        String smsText = String.format(eventName + " " + time + " (" + clientName + "). Баланс: %s р",
                 CurrencyStringUtils.copecksToRubles(client.getBalance()));
+
+        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
+        smsService.sendSMSAsync(client.getIdOfClient(), ClientSms.TYPE_ENTER_EVENT_NOTIFY, smsText);
     }
-    
+
     private static boolean isDateToday(Date date) {
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());

@@ -161,7 +161,8 @@ public class Client {
         return balance;
     }
 
-    public void addBalance(Long sum) {
+    // Обновление баланса только через ClientAccountManager!
+    public void addBalanceNotForSave(Long sum) {
         setBalance(getBalance() + sum);
     }
 

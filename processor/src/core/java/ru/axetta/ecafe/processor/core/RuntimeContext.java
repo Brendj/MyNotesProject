@@ -10,11 +10,10 @@ import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
+import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
-import ru.axetta.ecafe.processor.core.partner.paypoint.PayPointConfig;
-import ru.axetta.ecafe.processor.core.partner.paypoint.PayPointProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -28,7 +27,6 @@ import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
-import ru.axetta.ecafe.processor.core.sms.ClientSmsProcessor;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
@@ -65,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.*;
+import javax.print.attribute.standard.Finishings;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.StringReader;
@@ -81,6 +80,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
+
+    public static FinancialOpsManager getFinancialOpsManager() {
+        return getAppContext().getBean(FinancialOpsManager.class);
+    }
 
     public static class NotInitializedException extends RuntimeException {
 
@@ -107,6 +110,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String EVENT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".event";
     private static final String AUTO_REPORT_MAIL_PARAM_BASE = AUTO_REPORT_PARAM_BASE + ".mail";
     private static final String SMS_SERVICE_PARAM_BASE = PROCESSOR_PARAM_BASE + ".sms.service";
+    private static final String SMS_SERVICE_PARAM_CHECK_DELIVERY = SMS_SERVICE_PARAM_BASE+".checkDelivery";
     private static final String SUPPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".support";
     private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";
     private static final String CLIENT_SMS_PARAM_BASE = PROCESSOR_PARAM_BASE + ".client.sms";
@@ -143,14 +147,11 @@ public class RuntimeContext implements ApplicationContextAware {
     private SupportEmailSender supportEmailSender;
     private ClientSmsDeliveryStatusUpdater clientSmsDeliveryStatusUpdater;
     private MessageIdGenerator messageIdGenerator;
-    private ClientSmsProcessor clientSmsProcessor;
     private ContractIdGenerator clientContractIdGenerator;
     private CardManager cardManager;
     private OrderCancelProcessor orderCancelProcessor;
-    private PayPointProcessor payPointProcessor;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
-    private PayPointConfig partnerPayPointConfig;
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
@@ -159,20 +160,12 @@ public class RuntimeContext implements ApplicationContextAware {
         return getAppContext().getBean(RuntimeContext.class);
     }
 
-    public PayPointConfig getPartnerPayPointConfig() {
-        return partnerPayPointConfig;
-    }
-
     public SBRTConfig getPartnerSBRTConfig() {
         return partnerSbrtConfig;
     }
 
     public ElecsnetConfig getPartnerElecsnetConfig() {
         return partnerElecsnetConfig;
-    }
-
-    public PayPointProcessor getPayPointProcessor() {
-        return payPointProcessor;
     }
 
     public AutoReportGenerator getAutoReportGenerator() {
@@ -193,10 +186,6 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public MessageIdGenerator getMessageIdGenerator() {
         return messageIdGenerator;
-    }
-
-    public ClientSmsProcessor getClientSmsProcessor() {
-        return clientSmsProcessor;
     }
 
     public ISmsService getSmsService() {
@@ -352,7 +341,6 @@ public class RuntimeContext implements ApplicationContextAware {
             this.smsService = smsService;
 
             this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE);
-            this.partnerPayPointConfig = new PayPointConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerStdPayConfig = new StdPayConfig(properties, PROCESSOR_PARAM_BASE);
@@ -371,9 +359,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.syncProcessor = processor;
             this.paymentProcessor = processor;
             this.clientPaymentOrderProcessor = processor;
-            this.clientSmsProcessor = processor;
             this.orderCancelProcessor = processor;
-            this.payPointProcessor = processor;
 
             this.onlinePaymentProcessor= new OnlinePaymentProcessor(processor);
 
@@ -392,7 +378,12 @@ public class RuntimeContext implements ApplicationContextAware {
 
             // Start background activities
             this.autoReportGenerator.start();
-            this.clientSmsDeliveryStatusUpdater.start();
+
+            //
+            String checkSMSDelivery=properties.getProperty(SMS_SERVICE_PARAM_CHECK_DELIVERY);
+            if (checkSMSDelivery!=null && (checkSMSDelivery.equals("1") || 0==checkSMSDelivery.compareToIgnoreCase("true"))) {
+                this.clientSmsDeliveryStatusUpdater.start();
+            }
 
             //
             initWSCrypto();

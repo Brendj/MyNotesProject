@@ -14,6 +14,8 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class OrderDetail {
+    public static final int STATE_COMMITED=0, STATE_CANCELED=1;
+
     public static final int TYPE_DISH_ITEM = 0;
     public static final int TYPE_COMPLEX_0 = 50;
     public static final int TYPE_COMPLEX_1 = 51;
@@ -50,6 +52,7 @@ public class OrderDetail {
     private String menuOutput;
     private int menuOrigin;
     private String menuGroup;
+    private int state;
 
     public String getMenuGroup() {
         return menuGroup;
@@ -190,6 +193,14 @@ public class OrderDetail {
 
     public void setRootMenu(String rootMenu) {
         this.rootMenu = rootMenu;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     @Override
