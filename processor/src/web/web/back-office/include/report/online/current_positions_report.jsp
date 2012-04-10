@@ -10,7 +10,7 @@
 
 <h:panelGrid id="currentPositionsReportPanelGrid" binding="#{mainPage.currentPositionsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildCurrentPositionsReport}"
+        <a4j:commandButton value="Обновить" action="#{mainPage.buildCurrentPositionsReport}"
                            reRender="mainMenu, workspaceTogglePanel, currentPositionsReportTable"
                            styleClass="command-button" status="currentPositionsReportGenerateStatus" />
         <a4j:status id="currentPositionsReportGenerateStatus">
@@ -18,15 +18,11 @@
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
             </f:facet>
         </a4j:status>
-        <a4j:commandButton value="Рассчитать текущие позиции" action="#{mainPage.countCurrentPositions}"
-                           reRender="mainMenu, workspaceTogglePanel, currentPositionsReportTable"
-                           styleClass="command-button" status="currentPositionsReportGenerateStatus"
-                           rendered="#{mainPage.eligibleToCountCurrentPositions}" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Просмотр текущих позиций" styleClass="output-text" />
         <rich:dataTable id="currentPositionsReportTable" value="#{mainPage.currentPositionsReportPage.currentPositionList}"
-                        var="currentPosition" rowKeyVar="row" rows="15" footerClass="data-table-footer"
+                        var="currentPosition" rowKeyVar="row" rows="50" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
             <f:facet name="header">
@@ -76,6 +72,10 @@
             </f:facet>
         </rich:dataTable>
         <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showCurrentPositionCSVList}" styleClass="command-button" />
+        <a4j:commandButton value="Выполнить перерасчет текущих позиций (длительная операция)" action="#{mainPage.countCurrentPositions}"
+                           reRender="mainMenu, workspaceTogglePanel, currentPositionsReportTable"
+                           styleClass="command-button" status="currentPositionsReportGenerateStatus"
+                           rendered="#{mainPage.eligibleToCountCurrentPositions}" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
