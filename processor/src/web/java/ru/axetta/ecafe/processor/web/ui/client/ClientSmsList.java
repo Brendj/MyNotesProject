@@ -41,6 +41,7 @@ public class ClientSmsList {
         private final Date sendTime;
         private final Date deliveryTime;
         private final Long price;
+        private final Long idOfTransaction;
 
         public Item(ClientSms clientSms) {
             this.idOfSms = clientSms.getIdOfSms();
@@ -54,6 +55,7 @@ public class ClientSmsList {
             this.deliveryTime = clientSms.getDeliveryTime();
             this.price = clientSms.getPrice();
             AccountTransaction accountTransaction = clientSms.getTransaction();
+            this.idOfTransaction = accountTransaction==null?null:accountTransaction.getIdOfTransaction();
             Card card = null == accountTransaction ? null : accountTransaction.getCard();
             if (null == card) {
                 this.idOfCard = null;
@@ -110,6 +112,10 @@ public class ClientSmsList {
 
         public Long getPrice() {
             return price;
+        }
+
+        public Long getIdOfTransaction() {
+            return idOfTransaction;
         }
     }
 

@@ -91,10 +91,12 @@ public class ClientOrderList {
         private final Long grantSum;
         private final Long rSum;
         private final Date createTime;
+        private final Long idOfTransaction;
         private final Date transactionTime;
         private final Long sumByCard;
         private final Long sumByCash;
         private final List<Detail> details;
+        private final String state;
 
         public Item(Order order) {
             this.org = new OrgItem(order.getOrg());
@@ -114,9 +116,11 @@ public class ClientOrderList {
             this.createTime = order.getCreateTime();
             //this.transactionTime = order.getTransaction().getTransactionTime();
             AccountTransaction accountTransaction = order.getTransaction();
+            this.idOfTransaction = null == accountTransaction ? null : accountTransaction.getIdOfTransaction();
             this.transactionTime = null == accountTransaction ? null : accountTransaction.getTransactionTime();
             this.sumByCard = order.getSumByCard();
             this.sumByCash = order.getSumByCash();
+            this.state = order.getStateAsString();
             this.details = new LinkedList<Detail>();
             for (OrderDetail currOrderDetail : order.getOrderDetails()) {
                 this.details.add(new Detail(currOrderDetail));
@@ -159,6 +163,10 @@ public class ClientOrderList {
             return createTime;
         }
 
+        public Long getIdOfTransaction() {
+            return idOfTransaction;
+        }
+
         public Date getTransactionTime() {
             return transactionTime;
         }
@@ -173,6 +181,10 @@ public class ClientOrderList {
 
         public List<Detail> getDetails() {
             return details;
+        }
+
+        public String getState() {
+            return state;
         }
     }
 

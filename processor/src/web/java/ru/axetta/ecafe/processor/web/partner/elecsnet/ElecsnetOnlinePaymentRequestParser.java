@@ -10,6 +10,7 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.LinkedList;
@@ -105,6 +106,15 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
     }
 
     final static String ELECSNET_PUB_KEY="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5vSZ1JC8KcCw3gmKdmx4RZ/aYU6iN8dLmwsDCEJKUXXeo/Tf1ocfrthzu5CdrMFib3ztG6wTpmP8JiKI6ohR+XAhhavTNuxgqDkUdymWC1ow1TBXFl166rEI+aditzVC76d3Pjv7HTW2YxBXY7xEPEiUqFs06OzdNytBVGXHTGzA7zAO8mF3OCbvH3mrZsfZDvDymWj0zHVTODYHgCaYTmuOlsqSmd97ckXcOA7JKPBNo+tAvZkrwKkSoW1/xMJlnfGDY47FBDL9Rw/ldZVjBiBOmn0vXwXWDkYJ6c6hpVwRqPKkcXUikqz67NUyPdwYwGC0OQSFc0jM3Q3Uq3XXiwIDAQAB";
+    final static String OUR_PRIV_KEY_TO_ELECSNET="MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzqZ3II63JmM/GQ0Hb9RLw4QohtrCFSi9J85/iI/BCkWudd5W/3lA0mJ0Vs/iLIoVqjon1qfKechPxDCBWgJkuApqOPr627A0j27xRSH5DiV8lcuH7Y1U30YHIarzdGCfD5xNdQvJsUXtncSbWbthpOi5JhoxF6rSprrpJpzeO6SHR2FmGvCLe+eBcxODnsSnklKqhQqtbk0LAFhnYsOYYH7ZRKlOGAmqFEZxMG+BV7P6aTed+3Tu2DwaTOuZoP1tBZNMPwM9k2ERVXIi4Ze8l1yeON1sHAHJlaLeMwgWiBWY4wFv2Z0yk+gSharD1MPDV1qVB7tl7omjt4ELpuROJAgMBAAECggEAdBZC1xEGt94/UpIeuetOw8oE6+fJgzZ9+8CpLEugcMLZ0DN21TTmijWaOm3BSNWTc1iKl+up0utPK090jbAmSe5wwzyTqko361WOBs9alnTqv53NmsuCQsDipQci5ZE4EIL8piQd1BOKMzqPp7qTptprEiMX/A09ku5NfE3JvlKbwo1cItx3+DtL1yvryfSMYQ1nN9RVfRLZkTVp8Agmny+8nmcXz38b9EKrnnXtjLq+prVdbtuEnlHEmFtyxNWaN/IVeIxZG+vPnAN7+r7BgYIKRGXUPsZ4aILAX2krSpOljOojtwTe2GdKPP2XUvmnMe1a7K29isK44PucAMR5qQKBgQDcQ6wpdba7IReEysdXU5yrFl7irtajd0HjyIn/gJD2zA0moz0C1m4d62JNA8bVtUeHWhT9cVAwnRoVepdOKeLIDXKEA34ES4n6aknnNeVdSTDxd66wx4mOHfz8wGJ6rbiJa1yDLH8DDzod2tVR2Dx8NNZ3saeqP5fDw4nxWJmwEwKBgQDQz50cwYtOfeREgpmjB8y75zDuU/lN/5GR0iHXZoMpG4y3a9cN+hoTcEH5AeGlbEdtQUlFuX1N4FhSvcm49bSQ5XNk+hbkutir7Yt3k8aP8zB73J41AtxTs9hAgqI+bsZsYMR8QBFil+B1U0xN8+aGn2bAdJLohitK7tjesHJ5cwKBgHR4HCr4IZ2li+gdyXZ1sdwNwjKfPMPHJcIqoj3GX+EAWNvbaUF83VFYy+vpWVRbvOznRz4UktCB4e8FmcgtAcvCwJDpv9LJlrYhSd7Gcvf24bhtDqRPfn71gHaty+UOwwt3B74c4zRc8uAifLYAX0tWLSmxePTfF4LefKxvqySdAoGARhX5SQaZaG4O6QPg53ydtlAB92yOGCT4yjX6j97jlS+fCo2SsClLCU07h4WfJDP0wXIRUurQaQws+RCknYUy5xNsqO7cMkeYpBRmJGugUP6yPlCtdWORajLKGdT++e+agBP2vzGN5EbP2vFrghqkPHlSNrSp/ovSCiOi/RPCSIsCgYEAqn6jy7Mi1w2Xuj6rTUyIC5x+Nf4JLoVwMfXqhodAvgdcFKxO99uK6XRTs/bmsJ8o6TN0mwRIvGxlR5ATSIywGbYnMMJJHMJq+6uANKSk1bJrwnstj8VrXvoYoHxg6I4G7VkVBvoDL3PvMtFTQGeATZxZ8ETgxk2K4o7Fh3zZ/P4=";
+    static PrivateKey ourElecsnetPrivateKey;
+
+    public PrivateKey getOurElecsnetDefaultPrivateKey() throws Exception {
+        if (ourElecsnetPrivateKey==null) {
+            ourElecsnetPrivateKey=DigitalSignatureUtils.convertToPrivateKey(OUR_PRIV_KEY_TO_ELECSNET);
+        }
+        return ourElecsnetPrivateKey;
+    }
 
     final static String SIGNATURE_PARAM="&signature=";
     PublicKey partnerPublicKey;
@@ -122,7 +132,7 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
 
     String getSignature(String data) throws Exception {
         Signature sign=Signature.getInstance("MD5withRSA");
-        sign.initSign(getOurDefaultPrivateKey());
+        sign.initSign(getOurElecsnetDefaultPrivateKey());
         sign.update(data.getBytes("windows-1251"));
         return ConversionUtils.byteArray2Hex(sign.sign());
     }

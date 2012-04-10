@@ -33,6 +33,7 @@ public class ClientPaymentList {
         private final Date createTime;
         private final Date transactionTime;
         private final String idOfPayment;
+        private final Long idOfTransaction;
         private final Long idOfContragent;
         private final String contragentName;
         private final String paymentMethod;
@@ -43,6 +44,7 @@ public class ClientPaymentList {
             this.paySum = clientPayment.getPaySum();
             this.createTime = clientPayment.getCreateTime();
             AccountTransaction accountTransaction = clientPayment.getTransaction();
+            this.idOfTransaction = accountTransaction.getIdOfTransaction();
             this.transactionTime = accountTransaction.getTransactionTime();
             this.idOfPayment = clientPayment.getIdOfPayment();
             Contragent contragent = clientPayment.getContragent();
@@ -76,6 +78,10 @@ public class ClientPaymentList {
 
         public Long getPaySum() {
             return paySum;
+        }
+
+        public Long getIdOfTransaction() {
+            return idOfTransaction;
         }
 
         public Date getCreateTime() {

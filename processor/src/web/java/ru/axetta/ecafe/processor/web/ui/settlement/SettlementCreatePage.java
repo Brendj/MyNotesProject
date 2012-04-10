@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
@@ -144,7 +145,7 @@ public class SettlementCreatePage extends BasicWorkspacePage
         settlement.setPaymentDate(paymentDate);
         settlement.setPaymentDoc(paymentDoc);
         settlement.setSumma(summaLong);
-        CurrentPositionsManager.createSettlement(session, settlement);
+        RuntimeContext.getFinancialOpsManager().createSettlement(session, settlement);
     }
 
     public class WrongContragentsException extends Exception {}

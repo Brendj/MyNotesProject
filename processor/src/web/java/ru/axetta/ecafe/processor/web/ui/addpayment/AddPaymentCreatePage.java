@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
@@ -126,7 +127,7 @@ public class AddPaymentCreatePage extends BasicWorkspacePage
         addPayment.setComment(comment);
         addPayment.setToDate(toDate);
         addPayment.setFromDate(fromDate);
-        CurrentPositionsManager.createAddPayment(session, addPayment);
+        RuntimeContext.getFinancialOpsManager().createAddPayment(session, addPayment);
     }
 
     public class WrongContragentsException extends Exception {}

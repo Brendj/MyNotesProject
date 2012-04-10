@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
@@ -85,7 +86,7 @@ public class AddPaymentEditPage extends BasicWorkspacePage {
         addPayment.setComment(comment);
         addPayment.setFromDate(fromDate);
         addPayment.setToDate(toDate);
-        CurrentPositionsManager.updateAddPayment(persistenceSession, addPayment, summaLong - preSumma);
+        RuntimeContext.getFinancialOpsManager().updateAddPayment(persistenceSession, addPayment, summaLong - preSumma);
         fill(addPayment);
     }
 

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.addpayment;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.AddPayment;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
@@ -20,6 +21,6 @@ import org.hibernate.Session;
 public class AddPaymentDeletePage extends BasicPage {
     public void removeAddPayment(Session session, Long id) throws Exception {
         AddPayment addPayment = (AddPayment) session.get(AddPayment.class, id);
-        CurrentPositionsManager.deleteAddPayment(session, addPayment);
+        RuntimeContext.getFinancialOpsManager().deleteAddPayment(session, addPayment);
     }
 }

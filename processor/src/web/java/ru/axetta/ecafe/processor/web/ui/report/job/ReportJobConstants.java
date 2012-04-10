@@ -101,8 +101,8 @@ public class ReportJobConstants {
             new ParamHint("address", "Адрес клиента"),
             new ParamHint("idOfContragent", "Идентификатор контрагента"),
             new ParamHint("contragentName", "Название контрагента"),
-            new ParamHint("category", "название категории организации"),
-            new ParamHint("idOfMenuSourceOrg", "идентификатор организации - источника меню")};
+            new ParamHint("category", "Категория организации"),
+            new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню")};
 
     public static final ReportHint[] REPORT_HINTS = {
             new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),

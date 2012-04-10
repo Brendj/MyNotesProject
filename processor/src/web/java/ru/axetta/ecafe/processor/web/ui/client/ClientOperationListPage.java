@@ -4,13 +4,20 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.persistence.SubscriptionFee;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,6 +34,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private final ClientPaymentList clientPaymentList = new ClientPaymentList();
     private final ClientOrderList clientOrderList = new ClientOrderList();
     private final ClientSmsList clientSmsList = new ClientSmsList();
+    private List<AccountTransaction> accountTransactionList = new LinkedList<AccountTransaction>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -74,12 +82,26 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return clientSmsList;
     }
 
+    public List<AccountTransaction> getAccountTransactionList() {
+        return accountTransactionList;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
         this.clientPaymentList.fill(session, client, this.startTime, this.endTime);
         this.clientOrderList.fill(session, client, this.startTime, this.endTime);
         this.clientSmsList.fill(session, client, this.startTime, this.endTime);
+        /////
+        Criteria criteria = session.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.ge("transactionTime", startTime));
+        criteria.add(Restrictions.le("transactionTime", endTime));
+        criteria.add(Restrictions.eq("client", client));
+        this.accountTransactionList = new LinkedList<AccountTransaction>();
+        for (Object o : criteria.list()) {
+            accountTransactionList.add((AccountTransaction)o);
+        }
+
     }
 
 }

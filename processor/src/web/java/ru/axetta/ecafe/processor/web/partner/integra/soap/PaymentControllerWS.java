@@ -5,8 +5,10 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import javax.xml.ws.handler.MessageContext;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Signature;
 
 @WebService()
 public class PaymentControllerWS extends HttpServlet implements PaymentController {
@@ -62,6 +65,7 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             request.setAttribute(StdOnlinePaymentServlet.ATTR_SOAP_REQUEST, requestParams);
             servletContext.getRequestDispatcher("/"+path).include(request, bufResponse);
             paymentResult.response = bufResponse.getBuffer("UTF-8");
+            //checkSignature(paymentResult.response);
             OnlinePaymentProcessor.PayResponse payResponse = (OnlinePaymentProcessor.PayResponse)request.getAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE);
             if (payResponse==null) throw new Exception("authentication failed");
             paymentResult.clientId = payResponse.getClientId();
@@ -78,6 +82,21 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
         }
         return paymentResult;
     }
+
+    /* // test signature procedure
+    private boolean checkSignature(String data) throws Exception {
+        String SIGNATURE_PARAM="&SIGNATURE=";
+        int pos=data.indexOf(SIGNATURE_PARAM);
+        if (pos==-1) throw new Exception("Signature missing");
+        String payload=data.substring(0, pos), signData=data.substring(pos+SIGNATURE_PARAM.length());
+        Signature sign=Signature.getInstance("SHA1withRSA");
+        sign.initVerify(DigitalSignatureUtils.convertToPublicKey("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDsuUGFoSW/giuxNEyZ4SITd/jJzlR3piPtR01BW4ih30ddX1IOaxDu90k84VB20NUgqzz1BIUbemiQ0HVUY/j+g2UFcVWpwQgJZkonay6JmkiNqbADesocu1Jx6EP/felYRL4XufnEPIJA3CD+Gzl9m89ukvj/WVGLw1owv0IUPwIDAQAB"));
+        //byte[] signBytes=Base64.decodeBase64(signData.getBytes("UTF-8"));
+        byte[] signBytes= ConversionUtils.hex2ByteArray(signData);
+        sign.update(payload.getBytes("UTF-8"));
+        return sign.verify(signBytes);
+    }
+    */
 
     @Resource
     private WebServiceContext context;

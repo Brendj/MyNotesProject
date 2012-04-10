@@ -52,22 +52,22 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
     }
 
     private class OrderItem {
-        private Long rSum;
-        private Long priviledge;
+        private Long sumByCard;
+        private Long budgetSum;
         private Contragent supplier;
 
-        private OrderItem(Long rSum, Long priviledge, Contragent supplier) {
-            this.rSum = rSum;
-            this.priviledge = priviledge;
+        private OrderItem(Long sumByCard, Long budgetSum, Contragent supplier) {
+            this.sumByCard = sumByCard;
+            this.budgetSum = budgetSum;
             this.supplier = supplier;
         }
 
-        public Long getrSum() {
-            return rSum;
+        public Long getSumByCard() {
+            return sumByCard;
         }
 
-        public Long getPriviledge() {
-            return priviledge;
+        public Long getBudgetSum() {
+            return budgetSum;
         }
 
         public Contragent getSupplier() {
@@ -142,6 +142,7 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
         private List<ClientPaymentItem> clientPaymentItemList;
         private List<SettlementItem> settlementItemList;
         private List<AddPayment> addPaymentList;
+        private Long internalServicesFromOperatorToClientSum;
         private boolean withOperator;
         private Contragent operatorContragent;
         private Contragent clientContragent;
@@ -149,12 +150,14 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
 
         public CurrentPositionData(List<OrderItem> orderItemList,
                 List<ClientPaymentItem> clientPaymentItemList, List<SettlementItem> settlementItemList,
-                List<AddPayment> addPaymentList, boolean withOperator, Contragent operatorContragent,
+                List<AddPayment> addPaymentList, Long internalServicesFromOperatorToClientSum,
+                boolean withOperator, Contragent operatorContragent,
                 Contragent clientContragent, Contragent budgetContragent) {
             this.orderItemList = orderItemList;
             this.clientPaymentItemList = clientPaymentItemList;
             this.settlementItemList = settlementItemList;
             this.addPaymentList = addPaymentList;
+            this.internalServicesFromOperatorToClientSum = internalServicesFromOperatorToClientSum;
             this.withOperator = withOperator;
             this.operatorContragent = operatorContragent;
             this.clientContragent = clientContragent;
@@ -218,8 +221,8 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
         Contragent budgetContragent = (Contragent) criteria.uniqueResult();
 
         // CF_Orders
-        Query query = session.createQuery("select o.contragent.idOfContragent, o.pos.idOfPos, sum(o.RSum), sum(o.sosDiscount), sum(o.grantSum) "
-                                           + "  from Order o"
+        Query query = session.createQuery("select o.contragent.idOfContragent, o.pos.idOfPos, sum(o.sumByCard), sum(o.socDiscount), sum(o.grantSum) "
+                                           + "  from Order o where state="+ ru.axetta.ecafe.processor.core.persistence.Order.STATE_COMMITED
                                            + " group by o.contragent.idOfContragent, o.pos.idOfPos ");
 
         List orderList = query.list();
@@ -232,16 +235,16 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
             POS pos = null;
             if (idOfPos != null)
                 pos = (POS) session.load(POS.class, idOfPos);
-            Long rSum = (Long) objects[2];
+            Long sumByCard = (Long) objects[2];
             Long sosDiscount = (Long) objects[3];
             Long grantSum = (Long) objects[4];
-            Long priviledge = sosDiscount + grantSum;
+            Long budgetSum = sosDiscount + grantSum;
             Contragent supplier = null;
             if (pos != null)
                 supplier = pos.getContragent();
             else
                 supplier = contragent;
-            orderItemList.add(new OrderItem(rSum, priviledge, supplier));
+            orderItemList.add(new OrderItem(sumByCard, budgetSum, supplier));
         }
 
 
@@ -315,21 +318,21 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
 
         addPaymentObjectList = null;
 
+        /// CF_ClientSms
+        query = session.createQuery("select sum(price) from ClientSms");
+        Long smsPayments = (Long)query.list().get(0);
+
         CurrentPositionData currentPositionData = new CurrentPositionData(orderItemList, clientPaymentItemList,
-                settlementItemList, addPaymentList, withOperator, operatorContragent, clientContragent, budgetContragent);
+                settlementItemList, addPaymentList, smsPayments, withOperator, operatorContragent,
+                clientContragent, budgetContragent);
         return currentPositionData;
     }
 
-    public List<CurrentPositionsManager.CurrentPositionItem> countCurrentPositions(
-            CurrentPositionData currentPositionData) throws Exception {
-        List<CurrentPositionsManager.CurrentPositionItem> curPositionList = new ArrayList<CurrentPositionsManager.CurrentPositionItem>();
-
+    public void countCurrentPositions(
+            CurrentPositionsManager currentPositionsManager, CurrentPositionData currentPositionData) throws Exception {
         // CF_Orders
         for (OrderItem orderItem : currentPositionData.getOrderItemList()) {
-            CurrentPositionsManager.changeOrderPosition(null, orderItem.getrSum(), orderItem.getPriviledge(),
-                    orderItem.getSupplier(), curPositionList,
-                    currentPositionData.isWithOperator(), currentPositionData.getOperatorContragent(),
-                    currentPositionData.getClientContragent(), currentPositionData.getBudgetContragent());
+            currentPositionsManager.changeOrderPosition(orderItem.getSumByCard(), orderItem.getBudgetSum(), orderItem.getSupplier());
         }
 
         // CF_ClientPayments
@@ -337,26 +340,25 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
             Contragent payAgent = clientPaymentItem.getPayAgent();
             Long paySum = clientPaymentItem.getPaySum();
             Contragent objectContragent = clientPaymentItem.getObjectContragent();
-            CurrentPositionsManager
-                    .changeClientPaymentPosition(null, payAgent, paySum, curPositionList, objectContragent);
+            currentPositionsManager.changeClientPaymentPosition(payAgent, paySum, objectContragent);
         }
 
         // CF_Settlements
         for (SettlementItem settlementItem : currentPositionData.getSettlementItemList()) {
-            CurrentPositionsManager
-                    .changeSettlementPosition(null, settlementItem.getSumma(), settlementItem.getPayerClassId(),
+            currentPositionsManager
+                    .changeSettlementPosition(settlementItem.getSumma(), settlementItem.getPayerClassId(),
                             settlementItem.getReceiverClassId(), settlementItem.getContragentPayer(),
-                            settlementItem.getContragentReceiver(), curPositionList,
-                            currentPositionData.isWithOperator(), currentPositionData.getClientContragent());
+                            settlementItem.getContragentReceiver());
         }
 
         // CF_ADDPayments
         for (AddPayment addPayment : currentPositionData.getAddPaymentList()) {
-            CurrentPositionsManager.changeAddPaymentPosition(null, addPayment, addPayment.getSumma(), curPositionList,
-                    currentPositionData.isWithOperator());
+            currentPositionsManager.changeAddPaymentPosition(addPayment, addPayment.getSumma());
         }
 
-        return curPositionList;
+        // internal services
+        currentPositionsManager.changeCurrentPosition(-currentPositionData.internalServicesFromOperatorToClientSum,
+                currentPositionData.getOperatorContragent(), currentPositionData.getClientContragent());
     }
 
     public void fixCurrentPositions(Session session, List<CurrentPositionsManager.CurrentPositionItem> curPositionList) {
@@ -375,7 +377,7 @@ public class CurrentPositionsReportPage extends BasicWorkspacePage {
             CurrentPosition currentPosition = new CurrentPosition();
             currentPosition.setIdOfContragentDebtor(contragentDebtor);
             currentPosition.setIdOfContragentCreditor(contragentCreditor);
-            currentPosition.setSumma(currentPositionItem.getSumma());
+            currentPosition.setSumma(currentPositionItem.getSum());
             session.persist(currentPosition);
         }
     }

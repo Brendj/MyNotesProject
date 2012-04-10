@@ -7,13 +7,12 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.sms.*;
+import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -276,10 +275,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
     }
 
     public void sendNegativeBalanceSms(Session session) throws Exception {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        ISmsService smsService = runtimeContext.getSmsService();
-        MessageIdGenerator messageIdGenerator = runtimeContext.getMessageIdGenerator();
-        ClientSmsProcessor clientSmsProcessor = runtimeContext.getClientSmsProcessor();
+        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
 
         Criteria clientCriteria = session.createCriteria(Client.class);
         clientCriteria.add(Restrictions.eq("contractState", Client.ACTIVE_CONTRACT_STATE));
@@ -290,49 +286,15 @@ public class ClientSmsListPage extends BasicWorkspacePage
 
         for (Object currObject : clients) {
             Client currClient = (Client) currObject;
+            String text = String.format("Просьба пополнить счет карты. Баланс: %s р",
+                    CurrencyStringUtils.copecksToRubles(currClient.getBalance()));
             try {
-                String phoneNumber = currClient.getMobile();
-                if (StringUtils.isNotEmpty(phoneNumber)) {
-                    phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                    if (StringUtils.length(phoneNumber) == 11) {
-                        Card activeCard = currClient.findActiveCard(session, null);
-                        if (null != activeCard) {
-                            String sender = buildSender(currClient);
-                            String text = buildSmsText(currClient, activeCard);
-                            String idOfSms = messageIdGenerator.generate();
-                            SendResponse sendResponse = null;
-                            try {
-                                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
-                            } catch (Exception e) {
-                                if (logger.isWarnEnabled()) {
-                                    logger.warn(String.format(
-                                            "Failed to send SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s",
-                                            idOfSms, sender, phoneNumber, text), e);
-                                }
-                            }
-                            if (null != sendResponse) {
-                                if (sendResponse.isSuccess()) {
-                                    clientSmsProcessor
-                                            .registerClientSms(currClient.getIdOfClient(), idOfSms, phoneNumber,
-                                                    ClientSms.NEGATIVE_BALANCE_CONTENTS, text, new Date());
-                                }
-                            }
-                        }
-                    }
-                }
+                smsService.sendSMS(currClient.getIdOfClient(), ClientSms.TYPE_NEGATIVE_BALANCE, text);
             } catch (Exception e) {
                 logger.error(String.format("Failed to send SMS to client: %s", currClient), e);
             }
         }
     }
 
-    private static String buildSender(Client client) {
-        return StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
-    }
-
-    private static String buildSmsText(Client client, Card card) {
-        return String.format("Просим пополнить счет карты питания. Баланс: %s р",
-                CurrencyStringUtils.copecksToRubles(client.getBalance()));
-    }
 
 }

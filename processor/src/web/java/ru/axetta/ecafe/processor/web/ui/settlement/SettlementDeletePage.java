@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
@@ -20,6 +21,6 @@ import org.hibernate.Session;
 public class SettlementDeletePage extends BasicPage {
     public void removeSettlement(Session session, Long id) throws Exception {
         Settlement settlement = (Settlement) session.get(Settlement.class, id);
-        CurrentPositionsManager.deleteSettlement(session, settlement);
+        RuntimeContext.getFinancialOpsManager().deleteSettlement(session, settlement);
     }
 }

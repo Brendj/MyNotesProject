@@ -55,6 +55,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -4136,7 +4137,7 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to remove order", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении покупки", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении покупки: "+e.getMessage(), null));
         }
         return null;
     }
@@ -4885,6 +4886,7 @@ public class MainPage {
     public Object showCurrentPositionsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
+            buildCurrentPositionsReport();
             currentWorkspacePage = currentPositionsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set current positions report page", e);
@@ -4908,8 +4910,6 @@ public class MainPage {
             currentPositionsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to build current positions report", e);
             facesContext.addMessage(null,
@@ -4944,18 +4944,24 @@ public class MainPage {
                 HibernateUtils.close(persistenceSession, logger);
 
             }
+            List<CurrentPositionsManager.CurrentPositionItem> curPositionList = new ArrayList<CurrentPositionsManager.CurrentPositionItem>();
+            CurrentPositionsManager currentPositionsManager = new CurrentPositionsManager(currentPositionData.isWithOperator(),
+                    currentPositionData.getOperatorContragent(), currentPositionData.getBudgetContragent(),
+                    currentPositionData.getClientContragent(), curPositionList);
 
             // Рассчитать текущие позиции
-            List<CurrentPositionsManager.CurrentPositionItem> currentPositionList =
-                    currentPositionsReportPage.countCurrentPositions(currentPositionData);
+            currentPositionsReportPage.countCurrentPositions(currentPositionsManager, currentPositionData);
 
             // Зафиксировать текущие позиции в бд
             try {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                currentPositionsReportPage.fixCurrentPositions(persistenceSession, currentPositionList);
+                currentPositionsReportPage.fixCurrentPositions(persistenceSession, curPositionList);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
+
+                buildCurrentPositionsReport();
+
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Расчет текущих позиций завершен успешно", null));
             } finally {

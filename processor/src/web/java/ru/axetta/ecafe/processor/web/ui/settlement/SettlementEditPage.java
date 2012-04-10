@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.settlement;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Settlement;
@@ -116,7 +117,7 @@ public class SettlementEditPage extends BasicWorkspacePage
         settlement.setPaymentDoc(paymentDoc);
         Long preSumma = settlement.getSumma();
         settlement.setSumma(summaLong);
-        CurrentPositionsManager.editSettlement(persistenceSession, settlement, summaLong - preSumma);
+        RuntimeContext.getFinancialOpsManager().editSettlement(persistenceSession, settlement, summaLong - preSumma);
         fill(settlement);
     }
 
