@@ -143,13 +143,13 @@ public class RegisterReport extends BasicReportForOrgJob {
                 " FROM CF_ORDERS o, CF_ORDERDETAILS od, CF_CLIENTS c, CF_CLIENTGROUPS cg " +
                 " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
                 " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                //" (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
+                " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
                 " (od.menuDetailName = 'Обед' OR od.menuDetailName = 'Завтрак' OR od.menuDetailName = 'Полдник')" +
                 " group by o.CreatedDate, od.menuDetailName, cg.groupname "+
                 " order by o.CreatedDate, od.menuDetailName;");
 
-            //query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
-            //query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
+            query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
+            query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
             query.setParameter("idOfOrg", org.getIdOfOrg());
             query.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
             query.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
