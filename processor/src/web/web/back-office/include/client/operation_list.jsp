@@ -22,18 +22,79 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
+<h:outputText value="Операции по счету:"/>
+<rich:dataTable id="clientAccountTransTable" value="#{mainPage.clientOperationListPage.accountTransactionList}" var="item"
+                rows="8"
+                columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
+                footerClass="data-table-footer">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Идентификатор" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Карта" />
+        </f:facet>
+        <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+            <h:outputText escape="true" value="#{(item.card==null)?(null):item.card.cardNo}" converter="cardNoConverter" />
+            <f:setPropertyActionListener value="#{item.card.cardNo}" target="#{mainPage.selectedIdOfCard}" />
+        </h:commandLink>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время транзакции" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transactionTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Входящий баланс" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.balanceBeforeTransaction}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Сумма" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transactionSum}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ссылка" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.source}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Тип" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.sourceTypeAsString}" styleClass="output-text" />
+    </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="clientPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
+<h:outputText value="Зачисления:"/>
 <rich:dataTable id="clientPaymentsTable" value="#{mainPage.clientOperationListPage.clientPaymentList.items}" var="item"
                 rows="8"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
                 footerClass="data-table-footer">
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Карта" />
+            <h:outputText escape="true" value="Ид. транзакции" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
-            <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter" />
-            <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-        </h:commandLink>
+        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -92,17 +153,15 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+<h:outputText value="Сообщения:"/>
 <rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"
                 footerClass="data-table-footer">
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Карта" />
+            <h:outputText escape="true" value="Ид. транзакции" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
-            <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter" />
-            <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-        </h:commandLink>
+        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -167,10 +226,17 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+<h:outputText value="Покупки:"/>
 <rich:dataTable id="clientOrdersTable" value="#{mainPage.clientOperationListPage.clientOrderList.items}" var="item"
                 rows="8"
                 columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column"
                 footerClass="data-table-footer">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид. транзакции" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Организация" />
@@ -182,7 +248,7 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="IdOfOrder" />
+            <h:outputText escape="true" value="Ид. заказа" />
         </f:facet>
         <h:outputText escape="true" value="#{item.idOfOrder}" styleClass="output-text" />
     </rich:column>
@@ -240,6 +306,12 @@
                 <h:outputText escape="true" value="#{detail.rootMenu}" styleClass="output-text" />
             </rich:column>
         </rich:dataTable>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.state}" styleClass="output-text" />
+        </rich:column>
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientOrdersTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
