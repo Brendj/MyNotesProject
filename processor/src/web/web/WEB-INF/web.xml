@@ -59,11 +59,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>PayPointServlet</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.partner.paypoint.PayPointServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>RBKMoneyPaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.rbkmoney.RBKMoneyPaymentServlet</servlet-class>
     </servlet>
@@ -97,11 +92,6 @@
     <servlet-mapping>
         <servlet-name>PaymentServlet</servlet-name>
         <url-pattern>/pay</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>PayPointServlet</servlet-name>
-        <url-pattern>/payment-point</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
