@@ -66,13 +66,21 @@ public class EnterEventReport extends BasicReport {
                     }
                     String passdirection, color="black", personFullName=stringBuilder.toString();
                     switch (enterEvent.getPassDirection()){
-                        case 0: passdirection="вход"; color="green"; break;
-                        case 1: passdirection="выход"; color="red"; break;
-                        case 2: passdirection="проход запрещен"; break;
-                        case 3: passdirection="взлом турникета"; break;
-                        case 4: passdirection="событие без прохода"; break;
-                        case 5: passdirection="отказ от прохода"; break;
+                        case EnterEvent.ENTRY: passdirection="вход"; color="green"; break;
+                        case EnterEvent.EXIT: passdirection="выход"; color="red"; break;
+                        case EnterEvent.PASSAGE_IS_FORBIDDEN: passdirection="проход запрещен"; break;
+                        case EnterEvent.TURNSTILE_IS_BROKEN: passdirection="взлом турникета"; break;
+                        case EnterEvent.EVENT_WITHOUT_PASSAGE: passdirection="событие без прохода"; break;
+                        case EnterEvent.PASSAGE_RUFUSAL: passdirection="отказ от прохода"; break;
+                        case EnterEvent.RE_ENTRY: passdirection="повторный вход"; color="green"; break;
+                        case EnterEvent.RE_EXIT: passdirection="повторный выход"; color="red"; break;
+                        case EnterEvent.DETECTED_INSIDE: passdirection="обнаружен на подносе карты внутри здания"; break;
                         default: passdirection="Ошибка обратитесь администратору";
+                        /*
+                        TwicePassEnter = 6,     //повторный вход
+                        TwicePassExit = 7,       //повторный выход
+                        DetectedInside=100 // обнаружен на подносе карты внутри здания
+                        * */
                     }
                     EnterEventItem  enterEventItem = new EnterEventItem(enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
                             enterEvent.getOrg().getIdOfOrg(), enterEvent.getOrg().getOfficialName(),
