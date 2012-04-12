@@ -52,9 +52,13 @@ public class EnterEventReport extends BasicReport {
                     StringBuilder stringBuilder = new StringBuilder();
                     String docId = null;
                     if (enterEvent.getClient() != null){
-                        stringBuilder.append(enterEvent.getClient().getPerson().getFirstName());
+                        /* Фамилия клиента */
+                        stringBuilder.append(enterEvent.getClient().getPerson().getSurname());
                         stringBuilder.append(" ");
-                        stringBuilder.append(enterEvent.getClient().getPerson().getSecondName());
+                        /* Имя клиента */
+                        stringBuilder.append(enterEvent.getClient().getPerson().getFirstName());
+                        /* Отчество клиента*/
+                        // stringBuilder.append(enterEvent.getClient().getPerson().getSecondName());
                         docId=String.valueOf(enterEvent.getClient().getContractId());
                     }else{
                         stringBuilder.append(" ");
