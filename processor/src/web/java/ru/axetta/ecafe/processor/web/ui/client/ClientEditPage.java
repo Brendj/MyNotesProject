@@ -520,7 +520,11 @@ public class ClientEditPage extends BasicWorkspacePage
         if (!client.getOrders().isEmpty()) throw new Exception("Имеются зарегистрированные заказы");
         if (!client.getClientPaymentOrders().isEmpty()) throw new Exception("Имеются зарегистрированные пополнения счета");
         if (!client.getCards().isEmpty()) throw new Exception("Имеются зарегистрированные карты");
-        if (!client.getCategories().isEmpty()) throw new Exception("Имеются зарегистрированные категории скидок");
+        if (!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                client.getCategories().remove(categoryDiscount);
+            }
+        }
         persistenceSession.delete(client);
     }
 
