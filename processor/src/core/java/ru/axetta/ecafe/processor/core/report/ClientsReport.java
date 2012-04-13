@@ -105,12 +105,12 @@ public class ClientsReport extends BasicReportForOrgJob {
             HashMap<Integer, ClientsReportItem> mapItems = new HashMap<Integer, ClientsReportItem>(31);
             List<ClientsReportItem> resultRows = new LinkedList<ClientsReportItem>();
             Calendar c = Calendar.getInstance();
-            Query query = session.createSQLQuery("SELECT o.CreatedDate, sum(o.rsum) AS SUM1, p.firstname, p.surname, p.secondname "
-                    + "FROM CF_ORDERS o, CF_CLIENTS c, CF_PERSONS p "
-                    + "WHERE (o.idOfOrg=:idOfOrg) AND (o.idofclient=c.idofclient) AND (p.idofperson=c.idofperson) AND "
-                    + "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
-                    + " group by o.CreatedDate, p.firstname, p.surname, p.secondname "
-                    + " order by p.surname, p.firstname, p.secondname, o.CreatedDate;");
+            Query query = session.createSQLQuery("SELECT o.CreatedDate, sum(od.rPrice) AS SUM1, p.firstname, p.surname, p.secondname "
+                    + "FROM CF_ORDERS o, CF_CLIENTS c, CF_PERSONS p, CF_ORDERDETAILS od "
+                    + "WHERE (o.idOfOrg=:idOfOrg) AND (o.idofclient=c.idofclient) AND (p.idofperson=c.idofperson) AND od.idOfOrder=o.idOfOrder "
+                    + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND (od.rPrice > 0) "
+                    + "group by o.CreatedDate, p.firstname, p.surname, p.secondname "
+                    + "order by p.surname, p.firstname, p.secondname, o.CreatedDate;");
 
             query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
             query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
