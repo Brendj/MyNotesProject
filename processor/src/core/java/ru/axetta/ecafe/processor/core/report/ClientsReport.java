@@ -37,12 +37,12 @@ public class ClientsReport extends BasicReportForOrgJob {
         public static class ClientsReportItem {
             private Integer id = null;
             private String fio = null;
-            private List<Float> row;
+            private List<Long> row;
 
             public ClientsReportItem() {
-                row = new ArrayList<Float>();
+                row = new ArrayList<Long>();
                 for (float f = 0; f < 32; f++)
-                    row.add(0F);
+                    row.add(0L);
             }
 
             public Integer getId() {
@@ -61,15 +61,15 @@ public class ClientsReport extends BasicReportForOrgJob {
                 this.fio = fio;
             }
 
-            public List<Float> getRow() {
+            public List<Long> getRow() {
                 return row;
             }
 
-            public void setRow(List<Float> row) {
+            public void setRow(List<Long> row) {
                 this.row = row;
             }
 
-            public void add(int ind, float val) {
+            public void add(int ind, Long val) {
                 this.row.set(ind, this.row.get(ind) + val);
                 this.row.set(31, this.row.get(31) + val);
             }
@@ -145,7 +145,7 @@ public class ClientsReport extends BasicReportForOrgJob {
                 }
                 c.setTimeInMillis(time);
                 int day = c.get(Calendar.DAY_OF_MONTH);
-                tmp.add(day, sum.floatValue()/100);
+                tmp.add(day, sum);
             }
             // ИТОГО
             ClientsReportItem sum = new ClientsReportItem();

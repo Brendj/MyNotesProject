@@ -37,14 +37,14 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             private Integer id = null; // порядковый номер строки в отчете
             private String orderName = null; // наименование блюда
             private List<Integer> countRow; // лист количесва блюд
-            private List<Float> sumRow; // лист стоимости
+            private List<Long> sumRow; // лист стоимости
 
             public ReportItem() {
                 countRow = new ArrayList<Integer>();
-                sumRow = new ArrayList<Float>();
+                sumRow = new ArrayList<Long>();
                 for (float f = 0; f < 32; f++) {
                     countRow.add(0);
-                    sumRow.add(0F);
+                    sumRow.add(0L);
                 }
             }
 
@@ -68,11 +68,11 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
                 return countRow;
             }
 
-            public List<Float> getSumRow() {
+            public List<Long> getSumRow() {
                 return sumRow;
             }
 
-            public void setSumRow(List<Float> sumRow) {
+            public void setSumRow(List<Long> sumRow) {
                 this.sumRow = sumRow;
             }
 
@@ -80,7 +80,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
                 this.countRow = countRow;
             }
 
-            public void addSum(int ind, float val) {
+            public void addSum(int ind, Long val) {
                 this.sumRow.set(ind, this.sumRow.get(ind) + val);
                 this.sumRow.set(31, this.sumRow.get(31) + val);
             }
@@ -158,7 +158,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
                 c.setTimeInMillis(time);
                 int day = c.get(Calendar.DAY_OF_MONTH);
                 tmp.addCount(day, count);
-                tmp.addSum(day, sum.floatValue() / 100);
+                tmp.addSum(day, sum);
             }
             // ИТОГО
             ReportItem sum = new ReportItem();
