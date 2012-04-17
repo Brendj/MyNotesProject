@@ -32,6 +32,9 @@
     final String PAY_BANK_INFO = "paybank";
     final String SHOW_JOURNAL = "show-journal";
     final String SHOW_LIBRARY = "show-library";
+    final String RECOVER_PARAM = "recover";
+    final String PASSWORD_PARAM = "password";
+    Boolean recoverPassword = Boolean.FALSE;
 
     if (StringUtils.isEmpty(request.getCharacterEncoding())) {
         try {
@@ -43,9 +46,19 @@
     }
 
     if (null == ClientAuthToken.loadFrom(session)) {
-%>
-<jsp:include page="pages/login.jsp" />
-<%
+        /*  */
+        String pageName = request.getParameter(PAGE_PARAM);
+
+        if (StringUtils.equals(PASSWORD_PARAM, pageName)) {
+        %>
+            <jsp:include page="pages/password.jsp" />
+        <%
+        } else {
+        %>
+            <jsp:include page="pages/login.jsp" />
+        <%
+        }
+
     }
     ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
     if (null != clientAuthToken) {
