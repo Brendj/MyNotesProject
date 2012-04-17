@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
+import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
@@ -136,6 +137,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private PrivateKey syncPrivateKey;
     private PrivateKey paymentPrivateKey;
     private ClientAuthenticator clientAuthenticator;
+
+    private ClientPasswordRecover clientPasswordRecover;
+
     private AutoReportPostman autoReportPostman;
     private EventNotificationPostman eventNotificationPostman;
     private RuleProcessor autoReportProcessor;
@@ -246,6 +250,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public ClientAuthenticator getClientAuthenticator() {
         return clientAuthenticator;
+    }
+
+    public ClientPasswordRecover getClientPasswordRecover(){
+        return clientPasswordRecover;
     }
 
     public SupportEmailSender getSupportEmailSender() {
@@ -364,6 +372,8 @@ public class RuntimeContext implements ApplicationContextAware {
             this.onlinePaymentProcessor= new OnlinePaymentProcessor(processor);
 
             this.clientAuthenticator = createClientAuthenticator(sessionFactory);
+
+            this.clientPasswordRecover = createClientPasswordRecover(sessionFactory);
 
             this.autoReportGenerator = createAutoReportGenerator(basePath, properties, executorService, scheduler,
                     sessionFactory, ruleProcessor);
@@ -611,6 +621,17 @@ public class RuntimeContext implements ApplicationContextAware {
         }
         authenticator.initUserFunctions();
         return authenticator;
+    }
+
+    private static ClientPasswordRecover createClientPasswordRecover(SessionFactory sessionFactory) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating client authenticator.");
+        }
+        ClientPasswordRecover passwordRecover = new ClientPasswordRecover(sessionFactory);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Client authenticator created.");
+        }
+        return passwordRecover;
     }
 
     private static PrivateKey loadSyncPrivateKeyData(Properties properties) throws Exception {
