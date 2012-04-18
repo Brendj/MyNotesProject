@@ -56,16 +56,18 @@
                  date = System.currentTimeMillis();
                  ecp=Integer.toHexString(System.identityHashCode(date))+"_"+Long.toHexString(System.identityHashCode(contractId));
                  URI url = new URI(request.getRequestURL().toString());
-                 url =   UriUtils.putParam(url, DATE_PARAM, String.valueOf(date));
-                 url =  UriUtils.putParam(url, CONTRACT_ID_PARAM, request.getParameter(CONTRACT_ID_PARAM));
-                 String strURL = StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(url, ECP_PARAM, ecp).toString()));
+                 url = UriUtils.putParam(url, "page", "recover");
+                 url = UriUtils.putParam(url, DATE_PARAM, String.valueOf(date));
+                 url = UriUtils.putParam(url, CONTRACT_ID_PARAM, request.getParameter(CONTRACT_ID_PARAM));
+                 //String strURL = StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(url, ECP_PARAM, ecp).toString()));
+                 String strURL = UriUtils.putParam(url, ECP_PARAM, ecp).toString();
                  /* send URL to E-mail */
                  StringBuilder emailText = new StringBuilder();
                  /* Email text */
                  emailText.append("Для востановления пароля перейдите по ссылке.");
                  emailText.append(strURL);
                  ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-                 int succeeded = 0;//clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,emailText.toString());
+                 int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,emailText.toString());
 
                  if(succeeded == ClientPasswordRecover.CONTRACT_SEND_RECOVER_PASSWORD){
                      sendEmailSucceed = true;
@@ -133,7 +135,5 @@
     </table>
 </form>
 <%
-    } else {
-
     }
 %>
