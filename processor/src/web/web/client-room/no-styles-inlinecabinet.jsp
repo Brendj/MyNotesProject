@@ -48,15 +48,17 @@
     if (null == ClientAuthToken.loadFrom(session)) {
         /*  */
         String pageName = request.getParameter(PAGE_PARAM);
-
-        if (StringUtils.equals(PASSWORD_PARAM, pageName)) {
-        %>
-            <jsp:include page="pages/password.jsp" />
-        <%
+        if(pageName == null || pageName.equalsIgnoreCase("")){
+        %><jsp:include page="pages/login.jsp" /><%
         } else {
-        %>
-            <jsp:include page="pages/login.jsp" />
-        <%
+            if (StringUtils.equals(PASSWORD_PARAM, pageName)) {
+                %>
+                <jsp:include page="pages/password.jsp" />
+                <%
+            }
+            if (StringUtils.equals(RECOVER_PARAM, pageName)) {
+                %><jsp:include page="pages/recover.jsp" /><%
+            }
         }
 
     }
