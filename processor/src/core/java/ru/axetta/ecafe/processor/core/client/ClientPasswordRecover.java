@@ -8,7 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.util.UriUtils;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,6 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +47,12 @@ public class ClientPasswordRecover {
     public final static int CONTRACT_SEND_RECOVER_PASSWORD=0;
     public final static int NOT_FOUND_CONTRACT_BY_ID=1;
     public final static int CONTRACT_HAS_NOT_EMAIL=2;
+    private final static String PASS= "aa009189990e4a13ccc05be914c69df3d2a90e9d4bbb743826bc4a641a1f3208";
+
+    final String CONTRACT_ID_PARAM = "contractId";
+    final String DATE_PARAM = "date";
+    final String PASS_PARAM = "p";
+
     /* Время существования ссылки */
     private final static long LIFETIME_OF_URL = 1000*60*60*24;
 
@@ -47,7 +65,55 @@ public class ClientPasswordRecover {
     public ClientPasswordRecover(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-
+    public int sendPasswordRecoverURLFromEmail(Long contractId,HttpServletRequest request) throws Exception{
+        int succeeded = -1;
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            transaction = session.beginTransaction();
+            Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
+            clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
+            Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
+            succeeded = (null != currClient?0:-1);
+            if (null != currClient) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            String.format("Client with contractId: %s is exist", contractId));
+                }
+                String clientEmail = currClient.getEmail();
+                if(clientEmail == null || clientEmail.isEmpty() || clientEmail.equalsIgnoreCase("")){
+                    succeeded = CONTRACT_HAS_NOT_EMAIL;
+                } else {
+                    session.update(currClient);
+                    URI url = new URI(request.getRequestURL().toString());
+                    url = UriUtils.putParam(url, "page", "recover");
+                    String sDate = String.valueOf(System.currentTimeMillis());
+                    url = UriUtils.putParam(url, DATE_PARAM,sDate );
+                    String sContractId =String.valueOf(currClient.getContractId());
+                    url = UriUtils.putParam(url, CONTRACT_ID_PARAM, sContractId);
+                    String hash = encryptURL(PASS + sDate + sContractId);
+                    String strURL = UriUtils.putParam(url, PASS_PARAM, hash).toString();
+                    /* send URL to E-mail */
+                    StringBuilder emailText = new StringBuilder();
+                    /* Email text */
+                    emailText.append("Для востановления пароля перейдите по ссылке.");
+                    emailText.append(strURL);
+                    runtimeContext.getSupportEmailSender().postSupportEmail(clientEmail, "Востановление пароля", emailText.toString(), files);
+                    succeeded = CONTRACT_SEND_RECOVER_PASSWORD;
+                    logger.info("Send recover password URL send from '"+clientEmail+"'");
+                }
+            } else {
+                succeeded = NOT_FOUND_CONTRACT_BY_ID;
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return succeeded;
+    }
     public int sendPasswordRecoverURLFromEmail(Long contractId,String emailText) throws Exception{
         int succeeded = -1;
         Transaction transaction = null;
@@ -88,7 +154,7 @@ public class ClientPasswordRecover {
         boolean succeeded = false;
         String sContractId = request.getParameter("contractId");
         String sDate = request.getParameter("date");
-        String ecp = request.getParameter("ecp");
+        String pass = request.getParameter("p");
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
         try{
@@ -104,11 +170,11 @@ public class ClientPasswordRecover {
                 Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
                 clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
                 Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
-                succeeded = null != currClient;
+                succeeded = (null != currClient && StringUtils.equals(pass, encryptURL(PASS+sDate+sContractId)));
             }
         } catch (Exception e){
             succeeded = false;
-        }finally {
+        } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
@@ -138,5 +204,14 @@ public class ClientPasswordRecover {
             HibernateUtils.close(session, logger);
         }
         return succeeded;
+    }
+
+    private static String encryptURL(String url) throws NoSuchAlgorithmException, IOException {
+        MessageDigest hash = MessageDigest.getInstance("SHA1");
+        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(url.getBytes());
+        DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(digestInputStream, arrayOutputStream);
+        return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
     }
 }

@@ -28,7 +28,7 @@
     final String CONTRACT_ID_PARAM = "contractId";
     final String HAVE_RECOVER_DATA_PARAM = "password";
     final String DATE_PARAM = "date";
-    final String ECP_PARAM = "ecp";
+    final String PASS_PARAM = "p";
 
     Boolean haveRecoverPasswordData = StringUtils.isNotEmpty(request.getParameter(HAVE_RECOVER_DATA_PARAM));
     Boolean sendEmailSucceed = false;
@@ -60,15 +60,15 @@
                  url = UriUtils.putParam(url, DATE_PARAM, String.valueOf(date));
                  url = UriUtils.putParam(url, CONTRACT_ID_PARAM, request.getParameter(CONTRACT_ID_PARAM));
                  //String strURL = StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(url, ECP_PARAM, ecp).toString()));
-                 String strURL = UriUtils.putParam(url, ECP_PARAM, ecp).toString();
+                 String strURL = UriUtils.putParam(url, PASS_PARAM, ecp).toString();
                  /* send URL to E-mail */
                  StringBuilder emailText = new StringBuilder();
                  /* Email text */
                  emailText.append("Для востановления пароля перейдите по ссылке.");
                  emailText.append(strURL);
                  ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-                 int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,emailText.toString());
-
+                 //int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,emailText.toString());
+                 int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,request);
                  if(succeeded == ClientPasswordRecover.CONTRACT_SEND_RECOVER_PASSWORD){
                      sendEmailSucceed = true;
                      errorMessage="";
