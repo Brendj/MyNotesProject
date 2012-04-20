@@ -14,10 +14,10 @@
 <%-- Панель создания категории --%>
 <h:panelGrid id="categoryCreatePanel" binding="#{categoryDiscountCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
-
+    <%--
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text required-field" />
     <h:inputText value="#{categoryDiscountCreatePage.idOfCategoryDiscount}" maxlength="32" styleClass="input-text" />
-
+        --%>
     <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
     <h:inputText value="#{categoryDiscountCreatePage.categoryName}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание" styleClass="output-text" />

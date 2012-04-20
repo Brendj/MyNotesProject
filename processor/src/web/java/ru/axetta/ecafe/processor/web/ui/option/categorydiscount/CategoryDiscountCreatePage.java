@@ -78,10 +78,19 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
 
     @Transactional
     public void createCategory() {
+        idOfCategoryDiscount = DAOUtils.getCategoryDiscountMaxId(em)+1;
+        if (idOfCategoryDiscount<1) idOfCategoryDiscount=1;
         if (idOfCategoryDiscount<0) {
             printError("Идентификатор должен быть больше 0");
             return;
         }
+        /*List<Long> ids = new LinkedList<Long>();
+        ids.add(idOfCategoryDiscount);
+        int count = DAOUtils.getCategoryDiscountListWithIds(entityManager,ids).size();
+        if(count>0){
+            printError("Идентификатор "+idOfCategoryDiscount+" зарегстрирован");
+            return;
+        } */
         try {
             Date createdDate = new Date();
             CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, "", description,
@@ -89,6 +98,8 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
 
             entityManager.persist(categoryDiscount);
             printMessage("Категория успешно создана");
+            categoryName = "";
+            description = "";
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при создании категории", e);
         }
