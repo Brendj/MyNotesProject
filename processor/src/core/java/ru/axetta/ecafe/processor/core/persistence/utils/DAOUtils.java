@@ -446,6 +446,9 @@ public class DAOUtils {
         else v=((Option)l.get(0)).getOptionText();
         return v;
     }
+    public static void setOptionValue(Session session, long nOption, String value) {
+        session.saveOrUpdate(new Option(nOption, value));
+    }
 
     public static int deleteFromTransactionJournal(EntityManager entityManager, long maxIdOfTransactionJournal) {
         javax.persistence.Query q = entityManager.createQuery("delete from TransactionJournal where idOfTransactionJournal<=:maxId");

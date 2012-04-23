@@ -68,7 +68,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
             if (response.getResultCode()==Processor.PaymentProcessResult.OK.getCode()) {
                 infoSection=String.format("<AccountInfo><RRN>%s</RRN><Account>%d</Account><Currency>RUR</Currency><Phone>%d</Phone><Info2>%s</Info2></AccountInfo>",
                         rrn, response.getClientId(), response.getClientId(), "PARAM3="+ Base64.encodeBytes(response.getClientFullName().getBytes("UTF-8"))+";PARAM4="+
-                                Base64.encodeBytes(CurrencyStringUtils.copecksToRubles(response.getBalance()).getBytes("UTF-8")));
+                                Base64.encodeBytes(CurrencyStringUtils.copecksToRubles(response.getBalance()).getBytes("UTF-8"))+";");
             }
         } else {
             if (response.getResultCode()==Processor.PaymentProcessResult.OK.getCode()) {
@@ -77,13 +77,13 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
                         response.getClientId(), parseResult.getParam("AMOUNT"));
             }
         }
-        String rsp = String.format("<XML><mBilling version=\"1.0\"><STAN>%s</STAN><Response>%s</Response>%s</mBilling></XML>", stan, rspCode, infoSection);
+        String rsp = String.format("<XML><mBilling Version=\"1.0\"><STAN>%s</STAN><Response>%s</Response>%s</mBilling></XML>", stan, rspCode, infoSection);
         printToStream(rsp, httpResponse);
     }
 
     @Override
     public ParseResult parseRequest(HttpServletRequest httpRequest) throws Exception {
-        return parseGetParams(httpRequest);
+        return parsePostedUrlEncodedParams(httpRequest);
     }
 
     private String translateResultCode(int resultCode) {

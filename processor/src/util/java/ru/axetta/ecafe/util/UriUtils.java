@@ -25,6 +25,15 @@ public final class UriUtils {
         // Not instantiable
     }
 
+    public static URI getURIWithNoParams(URI uri) throws Exception {
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+        int port = uri.getPort();
+        String path = uri.getPath();
+        String fragment = uri.getFragment();
+        return new URI(scheme, null, host, port, path, null, fragment);
+    }
+
     public static URI putParam(URI uri, String paramName, String paramValue) throws Exception {
         String scheme = uri.getScheme();
         String host = uri.getHost();

@@ -30,9 +30,11 @@ public class Way4PaymentServlet extends OnlinePaymentServlet {
 
     @Override
     protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest, OnlinePaymentRequestParser requestParser)  throws Exception {
-        X509Certificate[] certificates = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
-        if (certificates.length==0) throw new Exception("Client certificate missing in request");
         StdPayConfig.LinkConfig linkConfig = null;
+
+        X509Certificate[] certificates = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
+        if (certificates==null || certificates.length==0) throw new Exception("Client certificate missing in request");
+
         String DNs="";
         for (int n=0;n<certificates.length;++n) {
             String dn = certificates[0].getSubjectDN().getName();

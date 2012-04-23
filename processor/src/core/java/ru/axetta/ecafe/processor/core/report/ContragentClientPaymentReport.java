@@ -83,10 +83,10 @@ public class ContragentClientPaymentReport extends BasicReport {
 
     public static class CardItem {
 
-        private final Long idOfCard;
-        private final Long cardNo;
-        private final Integer state;
-        private final Integer lifeState;
+        private Long idOfCard;
+        private Long cardNo;
+        private Integer state;
+        private Integer lifeState;
 
         public Long getIdOfCard() {
             return idOfCard;
@@ -105,10 +105,12 @@ public class ContragentClientPaymentReport extends BasicReport {
         }
 
         public CardItem(Card card) {
-            this.idOfCard = card.getIdOfCard();
-            this.cardNo = card.getCardNo();
-            this.state = card.getState();
-            this.lifeState = card.getLifeState();
+            if (card!=null) {
+                this.idOfCard = card.getIdOfCard();
+                this.cardNo = card.getCardNo();
+                this.state = card.getState();
+                this.lifeState = card.getLifeState();
+            }
         }
     }
 

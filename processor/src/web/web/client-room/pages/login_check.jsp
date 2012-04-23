@@ -62,7 +62,7 @@
                 ClientAuthenticator clientAuthenticator = runtimeContext.getClientAuthenticator();                
                 loginSucceed = clientAuthenticator.checkClientCredentials(contractId, password);
                 if (!loginSucceed) {
-                    errorMessage = "Неверный номер контракта и/или пароль";
+                    errorMessage = "Неверный номер договора и/или пароль";
                 } else {
                     ClientAuthToken clientAuthToken = new ClientAuthToken(contractId, false);
                     clientAuthToken.storeTo(session);

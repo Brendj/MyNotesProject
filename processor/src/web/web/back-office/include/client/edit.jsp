@@ -110,10 +110,6 @@
     <h:inputText value="#{mainPage.clientEditPage.email}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaEmail}" styleClass="output-text" />
-    <h:outputText escape="true" value="Тип SMS-уведомлений (не работает!)" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientEditPage.payForSMS}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.clientEditPage.clientPayForSMSMenu.items}" />
-    </h:selectOneMenu>
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
 

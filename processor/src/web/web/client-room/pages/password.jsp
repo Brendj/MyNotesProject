@@ -29,10 +29,11 @@
     final String HAVE_RECOVER_DATA_PARAM = "password";
     final String DATE_PARAM = "date";
     final String PASS_PARAM = "p";
+    String mainPage = ServletUtils.getHostRelativeResourceUri(request, "client-room/index.jsp");
 
     Boolean haveRecoverPasswordData = StringUtils.isNotEmpty(request.getParameter(HAVE_RECOVER_DATA_PARAM));
     Boolean sendEmailSucceed = false;
-    String errorMessage = null;
+    String errorMessage = null, infoMessage = null;
     URI formActionUri;
     Long contractId;
     Long date;
@@ -50,38 +51,21 @@
              String sContractId = request.getParameter(CONTRACT_ID_PARAM);
              sContractId = sContractId.replaceAll("[^0-9]", "");
              if(sContractId.equalsIgnoreCase("")){
-                 errorMessage = "Номер контракта состоит из цифр.";
+                 errorMessage = "Неверный номер договора.";
              } else {
                  contractId = Long.parseLong(sContractId);
-                 date = System.currentTimeMillis();
-                 ecp=Integer.toHexString(System.identityHashCode(date))+"_"+Long.toHexString(System.identityHashCode(contractId));
-                 URI url = new URI(request.getRequestURL().toString());
-                 url = UriUtils.putParam(url, "page", "recover");
-                 url = UriUtils.putParam(url, DATE_PARAM, String.valueOf(date));
-                 url = UriUtils.putParam(url, CONTRACT_ID_PARAM, request.getParameter(CONTRACT_ID_PARAM));
-                 //String strURL = StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(url, ECP_PARAM, ecp).toString()));
-                 String strURL = UriUtils.putParam(url, PASS_PARAM, ecp).toString();
-                 /* send URL to E-mail */
-                 StringBuilder emailText = new StringBuilder();
-                 /* Email text */
-                 emailText.append("Для востановления пароля перейдите по ссылке.");
-                 emailText.append(strURL);
                  ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-                 //int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,emailText.toString());
                  int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,request);
-                 if(succeeded == ClientPasswordRecover.CONTRACT_SEND_RECOVER_PASSWORD){
+                 if (succeeded == ClientPasswordRecover.CONTRACT_SEND_RECOVER_PASSWORD){
                      sendEmailSucceed = true;
-                     errorMessage="";
-                     %>
-                     <meta http-equiv="refresh" content="0; url=https://localhost:8443/processor/client-room/index.jsp">
-                     <%
+                     infoMessage = "Для восстановления пароля перейдите по ссылке, отправленной на Ваш адрес электронной почты.";
                  } else {
                      sendEmailSucceed = false;
                      switch (succeeded){
                          case ClientPasswordRecover.NOT_FOUND_CONTRACT_BY_ID:
-                             errorMessage = "Контракт с номером "+String.valueOf(contractId)+" не зарегистрирован.";break;
+                             errorMessage = "Договор с номером "+String.valueOf(contractId)+" не зарегистрирован."; break;
                          case ClientPasswordRecover.CONTRACT_HAS_NOT_EMAIL:
-                             errorMessage = "Контракт при регитрации не указал свой контактный E-Mail.";break;
+                             errorMessage = "Для данного договора не указан контактный адрес e-mail. Для восстановления пароля обратитесь в службу поддержки."; break;
                          default:
                              errorMessage ="";
                      }
@@ -89,11 +73,19 @@
              }
          } catch (Exception e) {
              logger.error("Failed to parse client password recover", e);
-             response.sendRedirect("https://localhost:8443/processor/client-room/index.jsp");
+             response.sendRedirect(mainPage);
              return;
          }
     }
-    if(!(haveRecoverPasswordData && sendEmailSucceed)){
+    if (infoMessage!=null) {%>
+    <table class="borderless-form-login" align="center">
+        <tr valign="middle" class="login-form-input-tr">
+            <td align="center">
+                <div class="output-text"><%=infoMessage%></div>
+            </td>
+        </tr>
+    </table>
+<%  } else {
 %>
 <style>
     .login-page { display:block !important; }

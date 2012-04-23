@@ -78,9 +78,6 @@
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.notifyViaEmail}" disabled="true" readonly="true"
                              styleClass="output-text" />
-    <h:outputText escape="true" value="Тип SMS-уведомлений (не работает!)" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.payForSMS}" readonly="true" converter="clientPayForSMSConverter"
-                 styleClass="input-text" />
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.freePayMaxCount}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Текущее количество покупок без предъявления карты" styleClass="output-text" />

@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.UriUtils;
 
@@ -26,10 +28,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,17 +48,17 @@ import java.util.List;
  */
 public class ClientPasswordRecover {
 
-    public final static int CONTRACT_SEND_RECOVER_PASSWORD=0;
-    public final static int NOT_FOUND_CONTRACT_BY_ID=1;
-    public final static int CONTRACT_HAS_NOT_EMAIL=2;
-    private final static String PASS= "aa009189990e4a13ccc05be914c69df3d2a90e9d4bbb743826bc4a641a1f3208";
+    public final static int CONTRACT_SEND_RECOVER_PASSWORD = 0;
+    public final static int NOT_FOUND_CONTRACT_BY_ID = 1;
+    public final static int CONTRACT_HAS_NOT_EMAIL = 2;
+    private static String PASS = null;
 
     final String CONTRACT_ID_PARAM = "contractId";
     final String DATE_PARAM = "date";
     final String PASS_PARAM = "p";
 
     /* Время существования ссылки */
-    private final static long LIFETIME_OF_URL = 1000*60*60*24;
+    private final static long LIFETIME_OF_URL = 1000 * 60 * 60 * 24;
 
     private static final Logger logger = LoggerFactory.getLogger(ClientPasswordRecover.class);
 
@@ -65,7 +69,21 @@ public class ClientPasswordRecover {
     public ClientPasswordRecover(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    public int sendPasswordRecoverURLFromEmail(Long contractId,HttpServletRequest request) throws Exception{
+
+    synchronized String getPasswordSeed(Session session) {
+        if (PASS==null) {
+            PASS = DAOUtils.getOptionValue(session, Option.OPTION_PASSWORD_RESTORE_SEED, null);
+            if (PASS==null) {
+                StringBuilder sb = new StringBuilder();
+                SecureRandom random = new SecureRandom();
+                PASS = new BigInteger(130, random).toString(32);
+                DAOUtils.setOptionValue(session, Option.OPTION_PASSWORD_RESTORE_SEED, PASS);
+            }
+        }
+        return PASS;
+    }
+
+    public int sendPasswordRecoverURLFromEmail(Long contractId, HttpServletRequest request) throws Exception {
         int succeeded = -1;
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
@@ -75,33 +93,32 @@ public class ClientPasswordRecover {
             Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
             clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
             Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
-            succeeded = (null != currClient?0:-1);
+            succeeded = (null != currClient ? 0 : -1);
             if (null != currClient) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug(
-                            String.format("Client with contractId: %s is exist", contractId));
+                    logger.debug(String.format("Client with contractId: %s is exist", contractId));
                 }
                 String clientEmail = currClient.getEmail();
-                if(clientEmail == null || clientEmail.isEmpty() || clientEmail.equalsIgnoreCase("")){
+                if (clientEmail == null || clientEmail.isEmpty() || clientEmail.equalsIgnoreCase("")) {
                     succeeded = CONTRACT_HAS_NOT_EMAIL;
                 } else {
-                    session.update(currClient);
                     URI url = new URI(request.getRequestURL().toString());
                     url = UriUtils.putParam(url, "page", "recover");
                     String sDate = String.valueOf(System.currentTimeMillis());
-                    url = UriUtils.putParam(url, DATE_PARAM,sDate );
-                    String sContractId =String.valueOf(currClient.getContractId());
+                    url = UriUtils.putParam(url, DATE_PARAM, sDate);
+                    String sContractId = String.valueOf(currClient.getContractId());
                     url = UriUtils.putParam(url, CONTRACT_ID_PARAM, sContractId);
-                    String hash = encryptURL(PASS + sDate + sContractId);
+                    String hash = encryptURL(getPasswordSeed(session) + sDate + sContractId);
                     String strURL = UriUtils.putParam(url, PASS_PARAM, hash).toString();
                     /* send URL to E-mail */
                     StringBuilder emailText = new StringBuilder();
                     /* Email text */
-                    emailText.append("Для востановления пароля перейдите по ссылке.");
+                    emailText.append("Если Вы не запрашивали восстановление пароля, пожалуйста, удалите данное письмо. Для восстановления пароля перейдите по ссылке ");
                     emailText.append(strURL);
-                    runtimeContext.getSupportEmailSender().postSupportEmail(clientEmail, "Востановление пароля", emailText.toString(), files);
+                    runtimeContext.getSupportEmailSender()
+                            .postSupportEmail(clientEmail, "Восстановление пароля", emailText.toString(), files);
                     succeeded = CONTRACT_SEND_RECOVER_PASSWORD;
-                    logger.info("Send recover password URL send from '"+clientEmail+"'");
+                    logger.info("Sent recover password URL to '" + clientEmail + "'");
                 }
             } else {
                 succeeded = NOT_FOUND_CONTRACT_BY_ID;
@@ -114,50 +131,16 @@ public class ClientPasswordRecover {
         }
         return succeeded;
     }
-    public int sendPasswordRecoverURLFromEmail(Long contractId,String emailText) throws Exception{
-        int succeeded = -1;
-        Transaction transaction = null;
-        Session session = sessionFactory.openSession();
-        try {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            transaction = session.beginTransaction();
-            Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
-            clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
-            Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
-            succeeded = (null != currClient?0:-1);
-            if (null != currClient) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
-                            String.format("Client with contractId: %s is exist", contractId));
-                }
-                String clientEmail = currClient.getEmail();
-                if(clientEmail == null || clientEmail.isEmpty() || clientEmail.equalsIgnoreCase("")){
-                    succeeded = CONTRACT_HAS_NOT_EMAIL;
-                } else {
-                    runtimeContext.getSupportEmailSender().postSupportEmail(clientEmail, "Востановление пароля", emailText, files);
-                    succeeded = CONTRACT_SEND_RECOVER_PASSWORD;
-                    logger.info("Send recover password URL send from '"+clientEmail+"'");
-                }
-            } else {
-                succeeded = NOT_FOUND_CONTRACT_BY_ID;
-            }
-            transaction.commit();
-            transaction = null;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-       return succeeded;
-    }
 
-    public boolean checkContractURI(HttpServletRequest request) throws Exception{
+
+    public boolean checkPasswordRestoreRequest(HttpServletRequest request) throws Exception {
         boolean succeeded = false;
         String sContractId = request.getParameter("contractId");
         String sDate = request.getParameter("date");
         String pass = request.getParameter("p");
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
-        try{
+        try {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             transaction = session.beginTransaction();
             sContractId = sContractId.replaceAll("[^0-9]", "");
@@ -166,13 +149,15 @@ public class ClientPasswordRecover {
             Long currDate = System.currentTimeMillis();
             Long urlDate = Long.parseLong(sDate);
             /* Проверка жизни ссылки */
-            if(currDate-urlDate<=LIFETIME_OF_URL){
+            if (currDate - urlDate <= LIFETIME_OF_URL) {
                 Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
                 clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
                 Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
-                succeeded = (null != currClient && StringUtils.equals(pass, encryptURL(PASS+sDate+sContractId)));
+                String checkPass = encryptURL(getPasswordSeed(session) + sDate + sContractId);
+                int l = checkPass.length()-2; // убираем последние два т.к. могут быть = - они могут неправильно декодироваться
+                succeeded = (null != currClient && pass.length()>=l && StringUtils.equals(pass.substring(0, l), checkPass.substring(0, l)));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             succeeded = false;
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -181,8 +166,8 @@ public class ClientPasswordRecover {
         return succeeded;
     }
 
-    public boolean changePassword(Long contractId, String newPassword) throws Exception{
-        boolean succeeded= false;
+    public boolean changePassword(Long contractId, String newPassword) throws Exception {
+        boolean succeeded = false;
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -198,7 +183,9 @@ public class ClientPasswordRecover {
             succeeded = true;
             session.flush();
             transaction.commit();
-            runtimeContext.getSupportEmailSender().postSupportEmail(client.getEmail(), "Востановление пароля", "Пароль изменет: "+newPassword, files);
+            //runtimeContext.getSupportEmailSender()
+            //        .postSupportEmail(client.getEmail(), "Воcстановление пароля", "Пароль изменен: " + newPassword,
+            //                files);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

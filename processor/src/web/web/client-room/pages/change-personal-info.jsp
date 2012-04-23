@@ -165,6 +165,13 @@
         }
     %>
     <table>
+        <% if (client.getEmail()==null || client.getEmail().isEmpty()) {%>
+            <tr>
+                <td colspan="2">
+                    <div class="error-output-text">Пожалуйста, сохраните свой адрес электронной почты для возможности восстановления пароля</div>
+                </td>
+            </tr>
+        <%}%>
         <tr>
             <td>
                 <div class="output-text">Номер договора</div>
@@ -284,6 +291,15 @@
         </tr>
         <tr>
             <td>
+                <div class="output-text">Уведомлять посредством SMS</div>
+            </td>
+            <td>
+                <input type="checkbox" name="<%=NOTIFY_VIA_SMS_PARAM%>" size="16" maxlength="64" class="input-text"
+                <%=client.isNotifyViaSMS() ? HTML_CHECKED : ""%> />
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <div class="output-text">Адрес электронной почты</div>
             </td>
             <td>
@@ -291,16 +307,7 @@
                        value="<%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(client.getEmail()))%>" />
             </td>
         </tr>
-        <!-- 01.12.2011 Убрал уведомления по просьбе А. Калугиной -->
-        <!--tr>
-            <td>
-                <div class="output-text">Уведомлять посредством SMS</div>
-            </td>
-            <td>
-                <input type="checkbox" name="<=NOTIFY_VIA_SMS_PARAM%>" size="16" maxlength="64" class="input-text" <=
-                client.isNotifyViaSMS() ? HTML_CHECKED : ""%> />
-            </td>
-        </tr>
+        <!--
         <tr>
             <td>
                 <div class="output-text">Уведомлять по электронной почте</div>
@@ -310,7 +317,7 @@
                        class="input-text" <=
                 client.isNotifyViaEmail() ? HTML_CHECKED : ""%> />
             </td>
-        </tr-->
+        </tr>-->
         <%
             Integer freePayMaxCount = client.getFreePayMaxCount();
             if (null != freePayMaxCount) {

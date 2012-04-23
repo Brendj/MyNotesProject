@@ -15,7 +15,9 @@ public class Option {
     public final static int OPTION_WITH_OPERATOR=2,
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3, OPTION_CLEAN_MENU=4,
             OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_JOURNAL_TRANSACTIONS=6, OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP=7,
-            OPTION_NFP_SERVICE_ADDRESS=8, OPTION_MAX=8;
+            OPTION_NFP_SERVICE_ADDRESS=8,
+            OPTION_PASSWORD_RESTORE_SEED =9,
+            OPTION_MAX=9;
 
     public static String getDefaultValue(int nOption) {
         switch (nOption) {

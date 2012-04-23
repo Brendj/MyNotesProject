@@ -47,7 +47,10 @@
     <tr valign="middle" class="login-form-button-tr">
         <td align="center">
             <input type="submit" name="<%=HAVE_LOGIN_DATA_PARAM%>" value="Войти" class="command-button" />
-            &nbsp;&nbsp;&nbsp;
+        </td>
+    </tr>
+    <tr style="margin-top:4px">
+        <td align="right">
             <a class="command-link"
                href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(formActionUri, "page", "password").toString()))%>">
                 <%=StringEscapeUtils.escapeHtml("Забыли пароль?")%>

@@ -19,10 +19,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -151,8 +148,12 @@ public class Way4PaymentTest extends TestCase {
     }
 
     private String sendRequest(String request) throws Exception {
-        URL yahoo = new URL("https://localhost:8443/processor/payment-way4?"+request);
+        URL yahoo = new URL("https://localhost:8443/processor/payment-way4");
         URLConnection yc = yahoo.openConnection();
+        yc.setDoOutput(true);
+        OutputStream out = yc.getOutputStream();
+        out.write(request.getBytes());
+        out.close();
         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(
                                 yc.getInputStream()));
