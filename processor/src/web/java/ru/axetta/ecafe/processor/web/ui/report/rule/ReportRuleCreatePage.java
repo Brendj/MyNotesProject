@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl;
+
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -34,6 +36,20 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
     private String shortName;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
+    private String reportTemplateFileName;
+    private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
+
+    public ReportTemplateFileNameMenu getReportTemplateFileNameMenu() {
+        return reportTemplateFileNameMenu;
+    }
+
+    public void setReportTemplateFileName(String reportTemplateFileName) {
+        this.reportTemplateFileName = reportTemplateFileName;
+    }
+
+    public String getReportTemplateFileName() {
+        return reportTemplateFileName;
+    }
 
     public String getPageFilename() {
         return "report/rule/create";
@@ -148,6 +164,8 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
                                 conditionItem.getConditionArgument(), conditionItem.getConditionConstant()));
             }
         }
+        reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
+
         session.save(reportHandleRule);
     }
 

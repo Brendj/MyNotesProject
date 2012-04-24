@@ -27,6 +27,9 @@ public class RuleCondition {
     public static final int EQUAL_OPERTAION = 1;
     public static final int[] BINARY_OPERTAIONS = {EQUAL_OPERTAION};
     public static final String[] OPERATION_TEXT = {"всегда", "="};
+    public static final String[] ENTEREVENT_TYPE_TEXT = {"все", "учащиеся", "все_без_учащихся"};
+    public static final int ENTEREVENT_TYPE_ALL = 0, ENTEREVENT_TYPE_STUDS = 1, ENTEREVENT_TYPE_WITHOUTSTUDS = 2;
+
     private Long idOfRuleCondition;
     private ReportHandleRule reportHandleRule;
     private Integer conditionOperation;

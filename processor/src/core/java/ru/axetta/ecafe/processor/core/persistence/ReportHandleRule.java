@@ -29,9 +29,9 @@ public class ReportHandleRule {
     public static final int XLS_FORMAT = 1;
     public static final int CSV_FORMAT = 2;
     public static final int PDF_FORMAT = 3;
-
     private Long IdOfReportHandleRule;
     private String ruleName;
+    private String templateFileName; // имя файла шаблона отчета
     private Integer documentFormat;
     private String subject;
     private String route0;
@@ -208,6 +208,14 @@ public class ReportHandleRule {
 
     public void removeRuleCondition(RuleCondition ruleCondition) {
         getRuleConditionsInternal().remove(ruleCondition);
+    }
+
+    public String getTemplateFileName() {
+        return templateFileName;
+    }
+
+    public void setTemplateFileName(String templateFileName) {
+        this.templateFileName = templateFileName;
     }
 
     public String findType(Session session) throws Exception {

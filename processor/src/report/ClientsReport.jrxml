@@ -8,7 +8,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.464100000000005"/>
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -317,165 +317,165 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{fio}==null?"Итого":$F{fio}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="122" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(0)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(0).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="206" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(4)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(4).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="773" y="0" width="29" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(31)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(31).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="185" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(3)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(3).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="248" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(6)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(6).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="143" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(1)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(1).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="164" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(2)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(2).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="227" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(5)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(5).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="269" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(7)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(7).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="374" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(12)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(12).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="332" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(10)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(10).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="395" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(13)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(13).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="353" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(11)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(11).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="311" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(9)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(9).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="290" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(8)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(8).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="416" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(14)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(14).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="521" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(19)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(19).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="647" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(25)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(25).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="479" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(17)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(17).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="605" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(23)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(23).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="584" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(22)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(22).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="542" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(20)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(20).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="500" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(18)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(18).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="458" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(16)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(16).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="626" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(24)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(24).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="563" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(21)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(21).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="668" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(26)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(26).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="437" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(15)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(15).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="689" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(27)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(27).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="731" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(29)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(29).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="752" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(30)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(30).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="710" y="0" width="21" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{row}.get(28)]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{row}.get(28).toString())/100]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

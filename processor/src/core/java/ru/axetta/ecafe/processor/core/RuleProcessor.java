@@ -12,8 +12,10 @@ import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.RuleExpressionUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.ws.security.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -35,6 +37,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     private static final Logger logger = LoggerFactory.getLogger(RuleProcessor.class);
 
     public static final String DELIMETER = ",";
+
+    private static Rule currRule;
+    private static Properties reportProperties;
 
     private static interface BasicBoolExpression {
 
@@ -67,17 +72,28 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
 
         public boolean applicatable(Properties properties) {
+            if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
+                properties.put(this.comparatorArgument, "");
+                return true;
+            }
             return StringUtils.isNotEmpty(properties.getProperty(this.comparatorArgument));
         }
 
         public boolean evaluate(Properties properties) {
+            boolean result = false;
             String values[] = this.comparatorValue.split(DELIMETER);
             String property[] = properties.getProperty(this.comparatorArgument).split(DELIMETER);
-            for (String value : values)
-                for (String prop : property)
+            for (String value : values) {
+                for (String prop : property) {
+                    if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
+                        properties.put(this.comparatorArgument, String.format("%s%s%s", properties.get(this.comparatorArgument), value, DELIMETER));
+                        result = true;//return true;//continue;
+                    }
                     if (StringUtils.equals(prop, value))
                         return true;
-            return false;
+                }
+            }
+            return result;
         }
 
         @Override
@@ -87,12 +103,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
     }
 
-    private static class Rule {
+    public static class Rule {
 
         private final int documentFormat;
         private final String subject;
         private final List<String> routeAdresses;
         private final List<BasicBoolExpression> boolExpressions;
+        private final String templateFileName;
+        //private final Set<RuleCondition> ruleConditions;
 
         private Rule(ReportHandleRule reportHandleRule) throws Exception {
             this.documentFormat = reportHandleRule.getDocumentFormat();
@@ -112,6 +130,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             for (RuleCondition currRuleCondition : reportHandleRule.getRuleConditions()) {
                 this.boolExpressions.add(createExpression(currRuleCondition));
             }
+            this.templateFileName = reportHandleRule.getTemplateFileName();
+            //this.ruleConditions = reportHandleRule.getRuleConditions();
         }
 
         private static BasicBoolExpression createExpression(RuleCondition ruleCondition) throws Exception {
@@ -155,6 +175,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             return "Rule{" + "documentFormat=" + documentFormat + ", routeAdresses=" + routeAdresses
                     + ", boolExpressions=" + boolExpressions + '}';
         }
+
+        public String getTemplateFileName() {
+            return templateFileName;
+        }
     }
 
     private final SessionFactory sessionFactory;
@@ -196,7 +220,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             }
 
             for (AutoReport report : reports) {
-                Properties reportProperties = report.getProperties();
+                reportProperties = report.getProperties();
                 BasicReport basicReport = report.getBasicReport();
                 Map<Integer, ReportDocument> readyReportDocuments = new HashMap<Integer, ReportDocument>();
                 for (Rule currRule : rulesCopy) {
@@ -204,6 +228,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         if (logger.isDebugEnabled()) {
                             logger.debug(
                                     String.format("Report \"%s\" is applicatable for discountrule \"%s\"", report, currRule));
+                        }
+                        if (basicReport instanceof BasicReportJob && currRule.getTemplateFileName()!=null && !currRule.getTemplateFileName().isEmpty()) {
+                                ((BasicReportJob)basicReport).templateFilename = currRule.getTemplateFileName();
                         }
                         ReportDocument reportDocument = readyReportDocuments.get(currRule.getDocumentFormat());
                         if (null == reportDocument) {
@@ -311,6 +338,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
         Map<Integer, ReportDocument> readyEventDocuments = new HashMap<Integer, ReportDocument>();
         for (Rule currRule : rulesCopy) {
+            RuleProcessor.currRule = currRule;
             if (currRule.applicatable(properties)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(String.format("Event \"%s\" is applicatable for discountrule \"%s\"", event, currRule));
@@ -376,5 +404,13 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         synchronized (this.eventNotificationsLock) {
             this.eventNotifications = newRules;
         }
+    }
+
+    public static Rule getCurrRule() {
+        return currRule;
+    }
+
+    public static Properties getReportProperties() {
+        return reportProperties;
     }
 }

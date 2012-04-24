@@ -60,6 +60,20 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
     private List<ReportParamHint> reportParamHints = Collections.emptyList();
+    private String reportTemplateFileName;
+    private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
+
+    public ReportTemplateFileNameMenu getReportTemplateFileNameMenu() {
+        return reportTemplateFileNameMenu;
+    }
+
+    public void setReportTemplateFileName(String reportTemplateFileName) {
+        this.reportTemplateFileName = reportTemplateFileName;
+    }
+
+    public String getReportTemplateFileName() {
+        return reportTemplateFileName;
+    }
 
     public String getPageFilename() {
         return "report/rule/edit";
@@ -174,6 +188,8 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
         reportHandleRule.setSubject(this.subject);
         reportHandleRule.setEnabled(this.enabled);
 
+        reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
+
         String[] addressList = this.routeAddresses.split(DELIMETER);
         reportHandleRule.setRoute0(StringUtils.trim(getString(addressList, 0)));
         reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
@@ -237,6 +253,7 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
         if (null == this.reportType) {
             this.reportType = ReportRuleConstants.UNKNOWN_REPORT_TYPE;
         }
+        this.reportTemplateFileName = reportHandleRule.getTemplateFileName();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
 

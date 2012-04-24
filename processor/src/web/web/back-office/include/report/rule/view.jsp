@@ -24,6 +24,9 @@
         <h:outputText escape="true" value="Тип отчета" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.reportType}" style="width: 600px;"
                      styleClass="input-text" />
+        <h:outputText escape="true" value="Шаблон отчета" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.reportTemplateFileName}" style="width: 600px;"
+                     styleClass="input-text" />
         <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.documentFormat}"
                      converter="reportFormatConverter" style="width: 600px;" styleClass="input-text" />

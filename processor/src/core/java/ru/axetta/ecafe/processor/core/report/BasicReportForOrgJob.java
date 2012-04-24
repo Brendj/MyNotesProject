@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JasperPrint;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -121,6 +122,10 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
 
     protected void prepare() {
         if (!hasPrint() && idOfOrg != null && templateFilename != null && sessionFactory != null) {
+            // templateFilename может содержать только имя файла отчета или относительный путь к нему
+            // добавляем путь к файлам отчетов, если это необходимо
+            templateFilename = AutoReportGenerator.restoreFilename(
+                    RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath(), templateFilename);
             Builder builder = createBuilder(templateFilename);
             Session session = null;
             org.hibernate.Transaction transaction = null;
@@ -136,7 +141,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                 transaction.commit();
                 transaction = null;
             } catch (Exception e) {
-                getLogger().error(String.format("Failed at report lazy-build \"%s\"", OrgOrderCategoryReport.class),
+                getLogger().error(String.format("Failed at report lazy-build \"%s\"", BasicReportForOrgJob.class),
                         e);
             } finally {
                 HibernateUtils.rollback(transaction, getLogger());

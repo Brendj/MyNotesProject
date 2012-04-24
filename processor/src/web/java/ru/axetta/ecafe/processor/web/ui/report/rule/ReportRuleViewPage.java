@@ -36,6 +36,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     private List<RuleConditionItem> ruleConditionItems = Collections.emptyList();
     private String shortName;
     private List<ReportRuleConstants.ParamHint> paramHints = Collections.emptyList();
+    private String reportTemplateFileName;
 
     public String getPageFilename() {
         return "report/rule/view";
@@ -91,6 +92,9 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         if (null == this.reportType) {
             this.reportType = ReportRuleConstants.UNKNOWN_REPORT_TYPE;
         }
+        this.reportTemplateFileName = reportHandleRule.getTemplateFileName();
+        if (null == this.reportTemplateFileName)
+            this.reportTemplateFileName = ReportRuleConstants.DEFAULT_REPORT_TEMPLATE;
         this.enabled = reportHandleRule.isEnabled();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
@@ -124,5 +128,13 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         if (StringUtils.isNotEmpty(newAddress)) {
             addresses.add(newAddress);
         }
+    }
+
+    public void setReportTemplateFileName(String reportTemplateFileName) {
+        this.reportTemplateFileName = reportTemplateFileName;
+    }
+
+    public String getReportTemplateFileName() {
+        return reportTemplateFileName;
     }
 }

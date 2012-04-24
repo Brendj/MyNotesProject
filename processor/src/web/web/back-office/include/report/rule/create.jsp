@@ -22,6 +22,10 @@
     <h:selectOneMenu value="#{mainPage.reportRuleCreatePage.reportType}" styleClass="input-text">
         <f:selectItems value="#{mainPage.reportRuleCreatePage.reportTypeMenu.items}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Шаблон отчета" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.reportRuleCreatePage.reportTemplateFileName}" styleClass="input-text">
+        <f:selectItems value="#{mainPage.reportRuleCreatePage.reportTemplateFileNameMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.reportRuleCreatePage.documentFormat}" styleClass="input-text">
         <f:selectItems value="#{mainPage.reportRuleCreatePage.reportFormatMenu.items}" />

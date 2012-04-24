@@ -25,6 +25,7 @@ public class ReportRuleConstants {
 
     public static final String ELIDE_FILL = "...";
     public static final String UNKNOWN_REPORT_TYPE = "Неизвестный";
+    public static final String DEFAULT_REPORT_TEMPLATE = "По умолчанию";
 
     static public String createShortName(ReportHandleRule reportHandleRule, int maxLen) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
@@ -101,7 +102,8 @@ public class ReportRuleConstants {
             new ParamHint("idOfContragent", "Идентификатор контрагента"),
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
-            new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню")};
+            new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
+            new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся")};
 
     public static final ReportHint[] REPORT_HINTS = {
             new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
@@ -114,7 +116,9 @@ public class ReportRuleConstants {
             new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23})
+            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23}),
+            new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
+            new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24})
     };
 
     private ReportRuleConstants() {

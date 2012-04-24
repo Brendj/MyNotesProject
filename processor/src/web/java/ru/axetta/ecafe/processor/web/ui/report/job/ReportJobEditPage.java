@@ -33,6 +33,16 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
+    //private String reportTemplate;
+    //
+    //
+    //public String getReportTemplate() {
+    //    return reportTemplate;
+    //}
+    //
+    //public void setReportTemplate(String reportTemplate) {
+    //    this.reportTemplate = reportTemplate;
+    //}
 
     public String getJobName() {
         return jobName;

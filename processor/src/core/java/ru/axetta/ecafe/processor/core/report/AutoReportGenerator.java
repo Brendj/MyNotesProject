@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
-import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -320,18 +319,21 @@ public class AutoReportGenerator {
 
         REPORT_DEFS.add(new ReportDef(OrgOrderByDaysReport.class, OrgOrderByDaysReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                final String REPORT_TEMPLATE_KEY = "OrgOrderByDaysReport.template";
+                //final String REPORT_TEMPLATE_KEY = "OrgOrderByDaysReport.template";
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule OrgOrderByDaysReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule OrgOrderByDaysReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + OrgOrderByDaysReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new OrgOrderByDaysReport(),
@@ -347,6 +349,48 @@ public class AutoReportGenerator {
                 return jobDetail;
             }
         }));
+
+        REPORT_DEFS.add(new ReportDef(AutoEnterEventReport.class, AutoEnterEventReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + AutoEnterEventReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new AutoEnterEventReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(AutoEnterEventReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(AutoEnterEventByDaysReport.class, AutoEnterEventByDaysReport.AutoReportBuildJob.class, new JobDetailCreator() {
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                        Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                        // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                        String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
+
+                        BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                                new AutoEnterEventByDaysReport(),
+                                autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                                autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                                reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                                (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                                (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        jobDetail.getJobDataMap()
+                                .put(AutoEnterEventByDaysReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        return jobDetail;
+                    }
+                }));
 
     } // static
 
@@ -609,12 +653,17 @@ public class AutoReportGenerator {
         this.scheduler.triggerJob(jobName, Scheduler.DEFAULT_GROUP);
     }
 
-    private static String restoreFilename(String defaultPath, String filename) {
+    public static String restoreFilename(String defaultPath, String filename) {
         File file = new File(filename);
         if (!file.isAbsolute()) {
             return FilenameUtils.concat(defaultPath, filename);
         }
         return filename;
+    }
+
+    public String getReportsTemplateFilePath() {
+        //TODO заменить "path" на константу
+        return this.getReportProperties().getProperty("path");
     }
 
 }
