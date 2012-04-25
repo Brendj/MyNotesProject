@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -108,7 +109,13 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         int lineNo = 0;
         int successLineNumber = 0;
         /* массив с именами колонок */
-        String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS"};
+        /*
+        private String firstName;
+    private String surname;
+    private String secondName;
+        * */
+        String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS",
+        // "PersonFirstName","PersonSurName","PersonSecondName"};
         int columnNumber=0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
         String currLine = reader.readLine();
@@ -157,16 +164,25 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             /* пробегаем по массиву и вставляем соответсвующие значения*/
             for (int i=1; i<colums.length; i++){
                 if(colums[i].equalsIgnoreCase("ContractState")){
-                    client.setContractState(Integer.parseInt(tokens[i]));
+                    client.setContractState(Integer.parseInt(tokens[i].trim()));
                 }
                 if(colums[i].equalsIgnoreCase("MobilePhone")){
-                    client.setMobile(tokens[i]);
+                    client.setMobile(tokens[i].trim());
                 }
                 if(colums[i].equalsIgnoreCase("NotifyBySMS")){
-                    client.setNotifyViaSMS(Integer.parseInt(tokens[i])!=0);
+                    client.setNotifyViaSMS(Integer.parseInt(tokens[i].trim())!=0);
+                }
+                if(colums[i].equalsIgnoreCase("PersonFirstName")){
+                    client.getPerson().setFirstName(tokens[i].trim());
+                }
+                if(colums[i].equalsIgnoreCase("PersonSurName")){
+                    client.getPerson().setSurname(tokens[i].trim());
+                }
+                if(colums[i].equalsIgnoreCase("PersonSecondName")){
+                    client.getPerson().setSecondName(tokens[i].trim());
                 }
             }
-
+            // "PersonFirstName","PersonSurName","PersonSecondName"};
             client.setUpdateTime(new Date());
             client.setClientRegistryVersion(clientRegistryVersion);
             persistenceSession.update(client);
