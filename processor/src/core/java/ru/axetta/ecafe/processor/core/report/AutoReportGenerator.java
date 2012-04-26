@@ -116,14 +116,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = ContragentOrderReport.BuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(
-                            String.format("Report property \"%s\" not found. Can\'t schedule ContragentOrderReport",
-                                    CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(
+                //            String.format("Report property \"%s\" not found. Can\'t schedule ContragentOrderReport",
+                //                    CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ContragentOrderReport.class.getSimpleName() + ".jasper";
 
                 ContragentOrderReport.BuildJob.ExecuteEnvironment executeEnvironment = new ContragentOrderReport.BuildJob.ExecuteEnvironment(
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -144,14 +146,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = ContragentOrderCategoryReport.BuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule ContragentOrderCategoryReport",
-                            CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule ContragentOrderCategoryReport",
+                //            CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ContragentOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 ContragentOrderCategoryReport.BuildJob.ExecuteEnvironment executeEnvironment = new ContragentOrderCategoryReport.BuildJob.ExecuteEnvironment(
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -173,14 +177,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule OrgOrderCategoryReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule OrgOrderCategoryReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + OrgOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new OrgOrderCategoryReport(),
@@ -203,14 +209,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule SalesReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule SalesReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + SalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new SalesReport(),
@@ -233,14 +241,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule MscSalesReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule MscSalesReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + MscSalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new MscSalesReport(),
@@ -263,14 +273,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule RegisterReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule RegisterReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + RegisterReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new RegisterReport(),
@@ -293,14 +305,16 @@ public class AutoReportGenerator {
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
 
-                String reportTemplate = autoReportGenerator.getReportProperties()
-                        .getProperty(REPORT_TEMPLATE_KEY);
-                if (StringUtils.isEmpty(reportTemplate)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Report property \"%s\" not found. Can\'t schedule ClientsReport",
-                            REPORT_TEMPLATE_KEY));
-                }
-                reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                //String reportTemplate = autoReportGenerator.getReportProperties()
+                //        .getProperty(REPORT_TEMPLATE_KEY);
+                //if (StringUtils.isEmpty(reportTemplate)) {
+                //    throw new IllegalArgumentException(String.format(
+                //            "Report property \"%s\" not found. Can\'t schedule ClientsReport",
+                //            REPORT_TEMPLATE_KEY));
+                //}
+                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new ClientsReport(),
