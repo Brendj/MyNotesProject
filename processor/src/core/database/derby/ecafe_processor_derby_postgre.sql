@@ -492,6 +492,7 @@ CREATE TABLE CF_ReportHandleRules (
   Route9                  VARCHAR(128),
   Remarks                 VARCHAR(1024),
   Enabled                 INTEGER         NOT NULL,
+  TemplateFileName 		  character varying(64)
   CONSTRAINT CF_ReportHandleRules_pk PRIMARY KEY (IdOfReportHandleRule)
 );
 
@@ -891,5 +892,5 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 12, 120407, 0);
+VALUES(2, 2, 13, 120407, 0);
 
