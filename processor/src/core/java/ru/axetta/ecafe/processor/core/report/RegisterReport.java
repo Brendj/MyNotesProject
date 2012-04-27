@@ -40,7 +40,7 @@ public class RegisterReport extends BasicReportForOrgJob {
                  public void sum(int ind, Object number) {
                      if (get(ind) instanceof Long) {
                          Long num = Long.valueOf(String.valueOf(get(ind)));
-                         this.add(ind, num + Float.valueOf(String.valueOf(number)));
+                         this.add(ind, num + Long.valueOf(String.valueOf(number)));
                      } else if (get(ind) instanceof Integer) {
                          Integer num = Integer.valueOf(String.valueOf(get(ind)));
                          this.add(ind, num + Integer.valueOf(String.valueOf(number)));
@@ -52,10 +52,13 @@ public class RegisterReport extends BasicReportForOrgJob {
 
             SumArrayList<Long> breakfastCount = new SumArrayList<Long>(); // завтрак
             SumArrayList<Long> breakfastCost = new SumArrayList<Long>();
+            SumArrayList<Long> breakfastSum = new SumArrayList<Long>();
             SumArrayList<Long> lunchCount = new SumArrayList<Long>(); // обед
             SumArrayList<Long> lunchCost = new SumArrayList<Long>();
+            SumArrayList<Long> lunchSum = new SumArrayList<Long>();
             SumArrayList<Long> afternoonSnackCount = new SumArrayList<Long>(); // полдник
             SumArrayList<Long> afternoonSnackCost = new SumArrayList<Long>();
+            SumArrayList<Long> afternoonSnackSum = new SumArrayList<Long>();
 
             private Date date;
 
@@ -66,6 +69,30 @@ public class RegisterReport extends BasicReportForOrgJob {
             public RegisterReportItem(Long date) {
                 if (date!=null)
                     this.date = new Date(date);
+            }
+
+            public SumArrayList<Long> getBreakfastSum() {
+                return breakfastSum;
+            }
+
+            public void setBreakfastSum(SumArrayList<Long> breakfastSum) {
+                this.breakfastSum = breakfastSum;
+            }
+
+            public SumArrayList<Long> getLunchSum() {
+                return lunchSum;
+            }
+
+            public void setLunchSum(SumArrayList<Long> lunchSum) {
+                this.lunchSum = lunchSum;
+            }
+
+            public SumArrayList<Long> getAfternoonSnackSum() {
+                return afternoonSnackSum;
+            }
+
+            public void setAfternoonSnackSum(SumArrayList<Long> afternoonSnackSum) {
+                this.afternoonSnackSum = afternoonSnackSum;
             }
 
             public SumArrayList<Long> getBreakfastCount() {
@@ -171,7 +198,7 @@ public class RegisterReport extends BasicReportForOrgJob {
 
             for (Object o : resultList) {
                 Object vals[]=(Object[])o;
-                int count = Integer.parseInt(vals[0].toString());
+                long count = Long.parseLong(vals[0].toString());
                 long timeMs=Long.parseLong(vals[1].toString())*1000*60*60*24;
                 c.setTimeInMillis(timeMs);
                 int day = c.get(Calendar.DAY_OF_MONTH);
@@ -186,10 +213,13 @@ public class RegisterReport extends BasicReportForOrgJob {
                     for (int classNum = 0; classNum < 2; classNum++) {
                         resultRow.getAfternoonSnackCost().add(classNum, 0L);
                         resultRow.getAfternoonSnackCount().add(classNum, 0L);
+                        resultRow.getAfternoonSnackSum().add(classNum, 0L);
                         resultRow.getBreakfastCost().add(classNum, 0L);
                         resultRow.getBreakfastCount().add(classNum, 0L);
+                        resultRow.getBreakfastSum().add(classNum, 0L);
                         resultRow.getLunchCost().add(classNum, 0L);
                         resultRow.getLunchCount().add(classNum, 0L);
+                        resultRow.getLunchSum().add(classNum, 0L);
                     }
                     mapItems.put(day, resultRow);
                     resultRows.add(resultRow);
@@ -199,31 +229,41 @@ public class RegisterReport extends BasicReportForOrgJob {
                 if (detailName.equals("Завтрак")) {
                     resultRow.getBreakfastCost().sum(classNum, price);
                     resultRow.getBreakfastCount().sum(classNum, count);
+                    resultRow.getBreakfastSum().sum(classNum, sum);
                 } else if (detailName.equals("Обед")) {
                     resultRow.getLunchCost().sum(classNum, price);
                     resultRow.getLunchCount().sum(classNum, count);
+                    resultRow.getLunchCount().sum(classNum, count);
+                    resultRow.getLunchSum().sum(classNum, sum);
                 } else if (detailName.equals("Полдник")) {
                     resultRow.getAfternoonSnackCost().sum(classNum, price);
                     resultRow.getAfternoonSnackCount().sum(classNum, count);
+                    resultRow.getAfternoonSnackSum().sum(classNum, sum);
                 }
             }
             RegisterReportItem resultRow = new RegisterReportItem(null);
             for (int classNum = 0; classNum < 2; classNum++) {
                 resultRow.getAfternoonSnackCost().add(classNum, 0L);
                 resultRow.getAfternoonSnackCount().add(classNum, 0L);
+                resultRow.getAfternoonSnackSum().add(classNum, 0L);
                 resultRow.getBreakfastCost().add(classNum, 0L);
                 resultRow.getBreakfastCount().add(classNum, 0L);
+                resultRow.getBreakfastSum().add(classNum, 0L);
                 resultRow.getLunchCost().add(classNum, 0L);
                 resultRow.getLunchCount().add(classNum, 0L);
+                resultRow.getLunchSum().add(classNum, 0L);
             }
             for (RegisterReportItem row : resultRows) {
                 for (int classNum = 0; classNum < 2; classNum++) {
                     resultRow.getBreakfastCost().sum(classNum, row.getBreakfastCost().get(classNum));
                     resultRow.getBreakfastCount().sum(classNum, row.getBreakfastCount().get(classNum));
+                    resultRow.getBreakfastSum().sum(classNum, row.getBreakfastSum().get(classNum));
                     resultRow.getLunchCost().sum(classNum, row.getLunchCost().get(classNum));
                     resultRow.getLunchCount().sum(classNum, row.getLunchCount().get(classNum));
+                    resultRow.getLunchSum().sum(classNum, row.getLunchSum().get(classNum));
                     resultRow.getAfternoonSnackCost().sum(classNum, row.getAfternoonSnackCost().get(classNum));
                     resultRow.getAfternoonSnackCount().sum(classNum, row.getAfternoonSnackCount().get(classNum));
+                    resultRow.getAfternoonSnackSum().sum(classNum, row.getAfternoonSnackSum().get(classNum));
                 }
             }
             resultRows.add(resultRow);
