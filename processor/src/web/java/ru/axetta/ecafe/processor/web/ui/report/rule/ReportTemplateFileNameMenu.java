@@ -6,6 +6,9 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.faces.model.SelectItem;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -21,17 +24,22 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ReportTemplateFileNameMenu {
+    private static final Logger logger = LoggerFactory.getLogger(ReportTemplateFileNameMenu.class);
 
     private SelectItem[] items = readAllItems();
 
     private static SelectItem[] readAllItems() {
-        List<String> templateFilesNameList = new ArrayList<String>();
+        List<File> templateFilesNameList = new ArrayList<File>();
         String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        getTemplateFilesname(reportPath, templateFilesNameList);
+        if (reportPath!=null) {
+            getTemplateFilesname(reportPath, templateFilesNameList);
+        } else {
+            logger.error("Report templates path is not specified");
+        }
         SelectItem[] items = new SelectItem[templateFilesNameList.size()];
         int i = 0;
-        for (String file : templateFilesNameList) {
-            items[i++] = new SelectItem(file.substring(reportPath.length()));
+        for (File file : templateFilesNameList) {
+            items[i++] = new SelectItem(file.getName());
         }
         return items;
     }
@@ -41,16 +49,18 @@ public class ReportTemplateFileNameMenu {
      * @param dirName - имя директории для поиска
      * @param templateFilesNameList - список имен файлов шаблонов отчетов
      */
-    static void getTemplateFilesname(String dirName, List<String> templateFilesNameList) {
+    static void getTemplateFilesname(String dirName, List<File> templateFilesNameList) {
         File dir = new File(dirName);
         File[] files = dir.listFiles();
-		for (File file : files) {
-			if (file.isDirectory())
-				getTemplateFilesname(file.getAbsolutePath(), templateFilesNameList);
-			else if (file.getName().endsWith(".jasper")) {
-				templateFilesNameList.add(file.getAbsolutePath());
+        if (files!=null) {
+            for (File file : files) {
+                if (file.isDirectory())
+                    getTemplateFilesname(file.getAbsolutePath(), templateFilesNameList);
+                else if (file.getName().endsWith(".jasper")) {
+                    templateFilesNameList.add(file);
+                }
             }
-		}
+        }
 
     }
 

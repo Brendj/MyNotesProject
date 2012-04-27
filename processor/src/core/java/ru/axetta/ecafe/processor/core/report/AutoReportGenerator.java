@@ -125,7 +125,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ContragentOrderReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentOrderReport.class.getSimpleName() + ".jasper";
 
                 ContragentOrderReport.BuildJob.ExecuteEnvironment executeEnvironment = new ContragentOrderReport.BuildJob.ExecuteEnvironment(
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -155,7 +155,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ContragentOrderCategoryReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 ContragentOrderCategoryReport.BuildJob.ExecuteEnvironment executeEnvironment = new ContragentOrderCategoryReport.BuildJob.ExecuteEnvironment(
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -186,7 +186,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + OrgOrderCategoryReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new OrgOrderCategoryReport(),
@@ -218,7 +218,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + SalesReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + SalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new SalesReport(),
@@ -250,7 +250,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + MscSalesReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MscSalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new MscSalesReport(),
@@ -282,8 +282,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + RegisterReport.class.getSimpleName() + ".jasper";
-
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + RegisterReport.class.getSimpleName() + ".jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new RegisterReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -314,7 +313,7 @@ public class AutoReportGenerator {
                 //}
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + ClientsReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new ClientsReport(),
@@ -347,7 +346,7 @@ public class AutoReportGenerator {
                 //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
 
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + OrgOrderByDaysReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderByDaysReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new OrgOrderByDaysReport(),
@@ -368,7 +367,7 @@ public class AutoReportGenerator {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + AutoEnterEventReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         new AutoEnterEventReport(),
@@ -389,7 +388,7 @@ public class AutoReportGenerator {
                     public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                         Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                         // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                        String reportTemplate = autoReportGenerator.getReportProperties().getProperty("path") + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
+                        String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
 
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                                 new AutoEnterEventByDaysReport(),
@@ -512,7 +511,7 @@ public class AutoReportGenerator {
                 try {
                     scheduleNewJob(schedulerJob);
                 } catch (Exception e) {
-                    logger.error("Failed to schedule job: "+schedulerJob.getJobClass()+". Removing it");
+                    logger.error("Failed to schedule job: "+schedulerJob.getJobClass()+". Removing it", e);
                     persistenceSession.delete(schedulerJob);
                 }
             }
@@ -677,7 +676,10 @@ public class AutoReportGenerator {
 
     public String getReportsTemplateFilePath() {
         //TODO заменить "path" на константу
-        return this.getReportProperties().getProperty("path");
+        String path = this.getReportProperties().getProperty("path");
+        if (path==null) return null;
+        if (!path.endsWith("/") && !path.endsWith("\\")) path+='/';
+        return path;
     }
 
 }

@@ -54,62 +54,166 @@ public class ClientManager {
     }
 
     static FieldProcessor.Def[] fieldInfo={
-            new FieldProcessor.Def(0, false, "Номер договора", "AUTO", FieldId.CONTRACT_ID),
-            new FieldProcessor.Def(1, false, "Пароль", "X", FieldId.PASSWORD),
-            new FieldProcessor.Def(2, false, "Статус", "1", FieldId.CONTRACT_STATE),
-            new FieldProcessor.Def(3, false, "Дата заключения", "#CURRENT_DATE", FieldId.CONTRACT_DATE),
-            new FieldProcessor.Def(4, false, "Договор-фамилия", "", FieldId.CONTRACT_SURNAME),
-            new FieldProcessor.Def(5, false, "Договор-имя", "", FieldId.CONTRACT_NAME),
-            new FieldProcessor.Def(6, false, "Договор-отчество", "", FieldId.CONTRACT_SECONDNAME),
-            new FieldProcessor.Def(7, false, "Договор-документ", null, FieldId.CONTRACT_DOC),
-            new FieldProcessor.Def(8, true,  "Фамилия", null, FieldId.SURNAME),
-            new FieldProcessor.Def(9, true,  "Имя", null, FieldId.NAME),
-            new FieldProcessor.Def(10, true, "Отчество", null, FieldId.SECONDNAME),
-            new FieldProcessor.Def(11, false, "Документ", "", FieldId.DOC),
-            new FieldProcessor.Def(12, false, "Адрес", "", FieldId.ADDRESS),
-            new FieldProcessor.Def(13, false, "Телефон", null, FieldId.PHONE),
-            new FieldProcessor.Def(14, false, "Мобильный", null, FieldId.MOBILE_PHONE),
-            new FieldProcessor.Def(15, false, "E-mail", null, FieldId.EMAIL),
-            new FieldProcessor.Def(16, false, "Платный SMS", "0", FieldId.PAY_FOR_SMS),
-            new FieldProcessor.Def(17, false, "Уведомление по SMS", "0", FieldId.NOTIFY_BY_SMS),
-            new FieldProcessor.Def(18, false, "Уведомление по e-mail", "0", FieldId.NOTIFY_BY_EMAIL),
-            new FieldProcessor.Def(19, false, "Овердрафт", "0", FieldId.OVERDRAFT),
-            new FieldProcessor.Def(20, false, "Комментарии", null, FieldId.COMMENTS),
-            new FieldProcessor.Def(21, false, "Группа", null, FieldId.GROUP),
-            new FieldProcessor.Def(22, false, "СНИЛС", null, FieldId.SAN),
-            new FieldProcessor.Def(23, false, "Дневной лимит", "0", FieldId.EXPENDITURE_LIMIT),
-            new FieldProcessor.Def(24, false, "Карта-ид", null, FieldId.CARD_ID),
-            new FieldProcessor.Def(25, false, "Карта-номер", null, FieldId.CARD_PRINTED_NUM),
-            new FieldProcessor.Def(26, false, "Карта-тип", null, FieldId.CARD_TYPE),
-            new FieldProcessor.Def(27, false, "Карта-выдана", "#CURRENT_DATE", FieldId.CARD_ISSUED),
-            new FieldProcessor.Def(28, false, "Карта-срок", "#5", FieldId.CARD_EXPIRY)
+            new FieldProcessor.Def(0, false, true, "Номер договора", "AUTO", FieldId.CONTRACT_ID, true),
+            new FieldProcessor.Def(1, false, false, "Пароль", "X", FieldId.PASSWORD, true),
+            new FieldProcessor.Def(2, false, false, "Статус", "1", FieldId.CONTRACT_STATE, true),
+            new FieldProcessor.Def(3, false, false, "Дата заключения", "#CURRENT_DATE", FieldId.CONTRACT_DATE, true),
+            new FieldProcessor.Def(4, false, false, "Договор-фамилия", "", FieldId.CONTRACT_SURNAME, true),
+            new FieldProcessor.Def(5, false, false, "Договор-имя", "", FieldId.CONTRACT_NAME, true),
+            new FieldProcessor.Def(6, false, false, "Договор-отчество", "", FieldId.CONTRACT_SECONDNAME, true),
+            new FieldProcessor.Def(7, false, false, "Договор-документ", null, FieldId.CONTRACT_DOC, true),
+            new FieldProcessor.Def(8, true,  false, "Фамилия", null, FieldId.SURNAME, true),
+            new FieldProcessor.Def(9, true,  false, "Имя", null, FieldId.NAME, true),
+            new FieldProcessor.Def(10, true, false, "Отчество", null, FieldId.SECONDNAME, true),
+            new FieldProcessor.Def(11, false, false, "Документ", "", FieldId.DOC, true),
+            new FieldProcessor.Def(12, false, false, "Адрес", "", FieldId.ADDRESS, true),
+            new FieldProcessor.Def(13, false, false, "Телефон", null, FieldId.PHONE, true),
+            new FieldProcessor.Def(14, false, false, "Мобильный", null, FieldId.MOBILE_PHONE, true),
+            new FieldProcessor.Def(15, false, false, "E-mail", null, FieldId.EMAIL, true),
+            new FieldProcessor.Def(16, false, false, "Платный SMS", "0", FieldId.PAY_FOR_SMS, true),
+            new FieldProcessor.Def(17, false, false, "Уведомление по SMS", "0", FieldId.NOTIFY_BY_SMS, true),
+            new FieldProcessor.Def(18, false, false, "Уведомление по e-mail", "0", FieldId.NOTIFY_BY_EMAIL, true),
+            new FieldProcessor.Def(19, false, false, "Овердрафт", "0", FieldId.OVERDRAFT, true),
+            new FieldProcessor.Def(20, false, false, "Комментарии", null, FieldId.COMMENTS, true),
+            new FieldProcessor.Def(21, false, false, "Группа", null, FieldId.GROUP, true),
+            new FieldProcessor.Def(22, false, false, "СНИЛС", null, FieldId.SAN, true),
+            new FieldProcessor.Def(23, false, false, "Дневной лимит", "0", FieldId.EXPENDITURE_LIMIT, true),
+            new FieldProcessor.Def(24, false, false, "Карта-ид", null, FieldId.CARD_ID, false),
+            new FieldProcessor.Def(25, false, false, "Карта-номер", null, FieldId.CARD_PRINTED_NUM, false),
+            new FieldProcessor.Def(26, false, false, "Карта-тип", null, FieldId.CARD_TYPE, false),
+            new FieldProcessor.Def(27, false, false, "Карта-выдана", "#CURRENT_DATE", FieldId.CARD_ISSUED, false),
+            new FieldProcessor.Def(28, false, false, "Карта-срок", "#5", FieldId.CARD_EXPIRY, false),
+            new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
     public static class ClientFieldConfig extends FieldProcessor.Config {
 
         public ClientFieldConfig() {
-            super(fieldInfo);
+            super(fieldInfo, true);
         }
 
         @Override
         public void checkRequiredFields() throws Exception {
             if (nFields>0) {
                 for (FieldProcessor.Def fd : currentConfig) {
-                    if (fd.required && fd.realPos==-1) throw new Exception("В списке полей отсутствует обязательное поле: "+fd.fieldName);
+                    if (fd.requiredForInsert && fd.realPos==-1) throw new Exception("В списке полей отсутствует обязательное поле: "+fd.fieldName);
                 }
                 if (getField(FieldId.CARD_ID).realPos!=-1) {
                     if (getField(FieldId.CARD_TYPE).realPos==-1) throw new Exception("В списке полей отсутствует обязательное поле: "+getField(FieldId.CARD_TYPE).fieldName);
                 }
             }
         }
+    }
 
-        public void setValue(Object id, Object value) throws Exception {
-            if (value instanceof Date) getField(id).currentValue = dateFormat.format((Date)value);
-            else getField(id).currentValue = value.toString();
+    public static class ClientFieldConfigForUpdate extends FieldProcessor.Config {
+
+        public ClientFieldConfigForUpdate() {
+            super(fieldInfo, false);
+        }
+
+        @Override
+        public void checkRequiredFields() throws Exception {
+            if (nFields>0) {
+                for (FieldProcessor.Def fd : currentConfig) {
+                    if (!fd.isUpdatable() && fd.realPos!=-1) throw new Exception("Поле нельзя обновить: "+fd.fieldName);
+                    if (fd.requiredForUpdate && fd.realPos==-1) throw new Exception("В списке полей отсутствует обязательное поле: "+fd.fieldName);
+                }
+            }
         }
     }
 
+    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig)
+            throws Exception {
+        fieldConfig.checkRequiredFields();
 
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME); //tokens[9];
+            String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME); //tokens[8];
+            String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME); //tokens[10];
+            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
+
+            //Date contractDate = fieldConfig.getValueDate(ClientManager.FieldId.CONTRACT_DATE);//dateFormat.parse(tokens[3]);
+            //int payForSms = fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS);
+
+            long contractId = Long.parseLong(contractIdText);
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client==null) {
+                throw new Exception("Клиент не найден: "+contractId);
+            }
+
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
+            Person person = client.getPerson();
+            if(firstName!=null) person.setFirstName(firstName);
+            if(secondName!=null) person.setSecondName(secondName);
+            if(surname!=null) person.setSurname(surname);
+            if(fieldConfig.getValue(ClientManager.FieldId.DOC)!=null) person.setIdDocument(fieldConfig.getValue(ClientManager.FieldId.DOC));//tokens[11]);
+            persistenceSession.save(person);
+            client.setPerson(person);
+
+            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_EMAIL)!=null)
+                client.setNotifyViaEmail(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_EMAIL));
+            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_SMS)!=null)
+                client.setNotifyViaSMS(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS));
+            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null)
+                client.setContractState(fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE));
+            if(fieldConfig.getValue(FieldId.PAY_FOR_SMS)!=null)
+                client.setPayForSMS(fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS));
+            long expenditureLimit = 0;
+            if (fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT)!=null) {
+                expenditureLimit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
+                client.setExpenditureLimit(expenditureLimit);
+            }
+            if(fieldConfig.getValue(FieldId.ADDRESS)!=null)
+                client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS));
+            if(fieldConfig.getValue(FieldId.PHONE)!=null)
+                client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));
+            String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
+            if (mobilePhone!=null) {
+                mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+                if (mobilePhone==null) throw new Exception("Неправильный формат мобильного телефона");
+                client.setMobile(mobilePhone);//tokens[14]);
+            }
+            if(fieldConfig.getValue(FieldId.EMAIL)!=null)
+                client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
+            if(fieldConfig.getValue(FieldId.COMMENTS)!=null)
+                client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
+            if(fieldConfig.getValue(FieldId.SAN)!=null)
+                client.setSanWithConvert(fieldConfig.getValue(ClientManager.FieldId.SAN));
+            if (fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT)!=null) {
+                long limit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));//tokens[19]);
+                client.setLimit(limit);
+            }
+            /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
+            if (fieldConfig.getValue(ClientManager.FieldId.GROUP)!=null) {
+                String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
+                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(),
+                        clientGroupName);
+                if (clientGroup == null) {
+                    clientGroup = DAOUtils.createNewClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
+                }
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            }
+            client.setClientRegistryVersion(clientRegistryVersion);
+
+            long idOfClient = client.getIdOfClient();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return idOfClient;
+        } catch (Exception e) {
+            logger.info("Ошибка при обновлении данных клиента", e);
+            throw new Exception(e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
 
     public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique)
             throws Exception {

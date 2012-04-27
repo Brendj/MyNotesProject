@@ -5,13 +5,15 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
-import org.hibernate.SQLQuery;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -69,6 +71,37 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         }
     }
 
+    public static class OrgItem {
+
+        private final Long idOfOrg;
+        private final String shortName;
+        private final String officialName;
+
+        public OrgItem() {
+            this.idOfOrg = null;
+            this.shortName = null;
+            this.officialName = null;
+        }
+
+        public OrgItem(Org org) {
+            this.idOfOrg = org.getIdOfOrg();
+            this.shortName = org.getShortName();
+            this.officialName = org.getOfficialName();
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getOfficialName() {
+            return officialName;
+        }
+    }
+
     private List<LineResult> lineResults = Collections.emptyList();
     private int successLineNumber;
 
@@ -95,54 +128,78 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
     public void updateClients(InputStream inputStream, long dataSize) throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        try{
+            TimeZone localTimeZone = runtimeContext
+                    .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            dateFormat.setTimeZone(localTimeZone);
 
-        TimeZone localTimeZone = runtimeContext
-                .getDefaultLocalTimeZone((HttpSession) facesContext.getExternalContext().getSession(false));
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        dateFormat.setTimeZone(localTimeZone);
+            long lineCount = dataSize / 20;
+            if (lineCount > MAX_LINE_NUMBER) {
+                lineCount = MAX_LINE_NUMBER;
+            }
+            List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
+            int lineNo = 0;
+            int successLineNumber = 0;
+            /* массив с именами колонок */
+            String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS",
+            // "PersonFirstName","PersonSurName","PersonSecondName"};
 
-        long lineCount = dataSize / 20;
-        if (lineCount > MAX_LINE_NUMBER) {
-            lineCount = MAX_LINE_NUMBER;
-        }
-        List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
-        int lineNo = 0;
-        int successLineNumber = 0;
-        /* массив с именами колонок */
-        /*
-        private String firstName;
-    private String surname;
-    private String secondName;
-        * */
-        String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS",
-        // "PersonFirstName","PersonSurName","PersonSecondName"};
-        int columnNumber=0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
-        String currLine = reader.readLine();
-        while (null != currLine) {
-            /* в первой строке в файле содержатся имена колонок */
-            if(lineNo==0){
-                ++lineNo;
-                /* заполняем массив */
-                colums = currLine.split(";");
+            ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+            String currLine = reader.readLine();
+            while (null != currLine) {
+                if (lineNo==0) {
+                    if (!currLine.startsWith("!")) currLine="!"+currLine;
+                    parseLineConfig(fieldConfig, currLine);
+                } else {
+                    LineResult result = updateClient(fieldConfig, currLine, lineNo);
+                    //result = updateClient(runtimeContext, dateFormat, currLine, lineNo, colums);
+                    if (result.getResultCode() == 0) {
+                        ++successLineNumber;
+                    }
+                    lineResults.add(result);
+                }
                 currLine = reader.readLine();
-                continue;
+                if (lineNo == MAX_LINE_NUMBER) {
+                    break;
+                }
+                ++lineNo;
             }
-            LineResult result = createClient(runtimeContext, dateFormat, currLine, lineNo, colums);
-            if (result.getResultCode() == 0) {
-                ++successLineNumber;
-            }
-            lineResults.add(result);
-            currLine = reader.readLine();
-            if (lineNo == MAX_LINE_NUMBER) {
-                break;
-            }
-            ++lineNo;
+            this.lineResults = lineResults;
+            this.successLineNumber = successLineNumber;
+        } finally {
+
         }
-        this.lineResults = lineResults;
-        this.successLineNumber = successLineNumber;
     }
 
+    private void parseLineConfig(FieldProcessor.Config fc, String currLine) throws Exception {
+        String attrs[] = currLine.substring(1).split(";");
+        for (int n=0;n<attrs.length;++n) {
+            fc.registerField(attrs[n]);
+        }
+        fc.checkRequiredFields();
+    }
+
+    private LineResult updateClient(ClientManager.ClientFieldConfigForUpdate fieldConfig, String line,
+            int lineNo) {
+        String[] tokens = line.split(";");
+        try {
+            fieldConfig.setValues(tokens);
+        } catch (Exception e) {
+            return new LineResult(lineNo, 1, e.getMessage(), null);
+        }
+        try {
+            long idOfClient = ClientManager.modifyClient(fieldConfig);
+            return new LineResult(lineNo, 0, "Ok", idOfClient);
+        } catch (Exception e) {
+            return new LineResult(lineNo, -1, "Ошибка: "+e.getMessage(), -1L);
+        }
+
+    }
+
+    /*
     private LineResult createClient(RuntimeContext runtimeContext, DateFormat dateFormat, String line, int lineNo, String[] colums) {
         String[] tokens = line.split(";");
         if (tokens.length < 2) {
@@ -161,7 +218,6 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             if (client == null) {
                 return new LineResult(lineNo, 20, "Client not found", null);
             }
-            /* пробегаем по массиву и вставляем соответсвующие значения*/
             for (int i=1; i<colums.length; i++){
                 if(colums[i].equalsIgnoreCase("ContractState")){
                     client.setContractState(Integer.parseInt(tokens[i].trim()));
@@ -199,5 +255,6 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+    */
 
 }

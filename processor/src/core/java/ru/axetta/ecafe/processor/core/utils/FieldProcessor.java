@@ -11,23 +11,31 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FieldProcessor {
+    final static int UPDATABLE=0, NON_UPDATABLE=1;
     public static class Def {
         public Object fieldId;
         public int defaultPos;
-        public boolean required;
+        public boolean requiredForInsert;
+        public boolean requiredForUpdate;
         public String fieldName;
         public String defValue;
         public int realPos=-1;
         public String currentValue;
+        public boolean updatable;
 
-        public Def(int defaultPos, boolean required, String fieldName, String defValue, Object fieldId) {
+        public Def(int defaultPos, boolean requiredForInsert, boolean requiredForUpdate, String fieldName, String defValue, Object fieldId, boolean updatable) {
             this.defaultPos = defaultPos;
-            this.required = required;
+            this.requiredForInsert = requiredForInsert;
+            this.requiredForUpdate = requiredForUpdate;
             this.fieldName = fieldName;
             this.defValue = defValue;
             this.fieldId = fieldId;
+            this.updatable = updatable;
         }
         boolean isIncluded() { return realPos!=-1; }
+        public boolean isUpdatable() {
+            return updatable;
+        }
 
         public String getValue() {
             if (currentValue==null) return defValue;
@@ -36,7 +44,7 @@ public class FieldProcessor {
 
         @Override
         protected Object clone() {
-            return new Def(defaultPos, required, fieldName, defValue, fieldId);
+            return new Def(defaultPos, requiredForInsert, requiredForUpdate, fieldName, defValue, fieldId, updatable);
         }
     }
 
@@ -44,9 +52,12 @@ public class FieldProcessor {
         protected DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         protected Def[] currentConfig;
-        public Config(Def[] fieldInfo) {
+        public Config(Def[] fieldInfo, boolean useDefaultValues) {
             currentConfig = new Def[fieldInfo.length];
-            for (int n=0;n<fieldInfo.length;++n) currentConfig[n]=(Def)fieldInfo[n].clone();
+            for (int n=0;n<fieldInfo.length;++n) {
+                currentConfig[n]=(Def)fieldInfo[n].clone();
+                if (!useDefaultValues) currentConfig[n].defValue=null;
+            }
         }
         protected int nFields=0;
         public void registerField(String name) throws Exception {
@@ -127,6 +138,12 @@ public class FieldProcessor {
 
         public void checkRequiredFields() throws Exception {
         }
+
+        public void setValue(Object id, Object value) throws Exception {
+            if (value instanceof Date) getField(id).currentValue = dateFormat.format((Date)value);
+            else getField(id).currentValue = value.toString();
+        }
+
     }
 
 }

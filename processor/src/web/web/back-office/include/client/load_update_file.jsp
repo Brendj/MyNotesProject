@@ -14,7 +14,6 @@
 <%-- Панель загрузки клиентов из файла --%>
 <h:panelGrid id="clientUpdateFileLoaderPanel" binding="#{mainPage.clientUpdateFileLoadPage.pageComponent}"
              styleClass="borderless-grid">
-
     <rich:fileUpload id="clientUpdateFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                      addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                      cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
