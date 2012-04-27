@@ -133,13 +133,8 @@ public class ClientManager {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME); //tokens[9];
-            String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME); //tokens[8];
-            String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME); //tokens[10];
-            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
-
-            //Date contractDate = fieldConfig.getValueDate(ClientManager.FieldId.CONTRACT_DATE);//dateFormat.parse(tokens[3]);
-            //int payForSms = fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS);
+            //tokens[0];
+            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID);
 
             long contractId = Long.parseLong(contractIdText);
             Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
@@ -147,52 +142,94 @@ public class ClientManager {
                 throw new Exception("Клиент не найден: "+contractId);
             }
 
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+            //tokens[1];
+            String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);
+            if (password.equals("X")) password = ""+contractId;
+            client.setPassword(password);
+            //tokens[2];
+            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null)
+                client.setContractState(fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE));
 
+            //dateFormat.parse(tokens[3]);
+            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DATE)!=null)
+                client.setContractTime(fieldConfig.getValueDate(ClientManager.FieldId.CONTRACT_DATE));
+            //tokens[4];
+            String contractSurname = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_SURNAME);
+            //tokens[5];
+            String contractFirstName = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_NAME);
+            //tokens[6];
+            String contractSecondName = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_SECONDNAME);
+            //tokens[7];
+            String contractDoc = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DOC);
+            Person contractPerson = client.getContractPerson();
+            if(contractFirstName!=null && StringUtils.isNotEmpty(contractFirstName))
+                contractPerson.setFirstName(contractFirstName);
+            if(contractSurname!=null && StringUtils.isNotEmpty(contractSurname))
+                contractPerson.setSurname(contractSurname);
+            if(contractSecondName!=null && StringUtils.isNotEmpty(contractSecondName))
+                contractPerson.setSecondName(contractSecondName);
+            if(contractDoc!=null && StringUtils.isNotEmpty(contractDoc))
+                contractPerson.setIdDocument(contractDoc);
+            persistenceSession.save(contractPerson);
+            client.setContractPerson(contractPerson);
+
+            //tokens[8];
+            String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME);
+            //tokens[9];
+            String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME);
+            //tokens[10];
+            String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME);
             Person person = client.getPerson();
-            if(firstName!=null) person.setFirstName(firstName);
-            if(secondName!=null) person.setSecondName(secondName);
-            if(surname!=null) person.setSurname(surname);
-            if(fieldConfig.getValue(ClientManager.FieldId.DOC)!=null) person.setIdDocument(fieldConfig.getValue(ClientManager.FieldId.DOC));//tokens[11]);
+            if(firstName!=null && StringUtils.isNotEmpty(firstName))
+                person.setFirstName(firstName);
+            if(secondName!=null && StringUtils.isNotEmpty(secondName))
+                person.setSecondName(secondName);
+            if(surname!=null  && StringUtils.isNotEmpty(surname))
+                person.setSurname(surname);
+            //tokens[11])
+            if(fieldConfig.getValue(ClientManager.FieldId.DOC)!=null)
+                person.setIdDocument(fieldConfig.getValue(ClientManager.FieldId.DOC));//tokens[11]);
             persistenceSession.save(person);
             client.setPerson(person);
 
-            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_EMAIL)!=null)
-                client.setNotifyViaEmail(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_EMAIL));
-            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_SMS)!=null)
-                client.setNotifyViaSMS(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS));
-            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null)
-                client.setContractState(fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE));
-            if(fieldConfig.getValue(FieldId.PAY_FOR_SMS)!=null)
-                client.setPayForSMS(fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS));
-            long expenditureLimit = 0;
-            if (fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT)!=null) {
-                expenditureLimit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
-                client.setExpenditureLimit(expenditureLimit);
-            }
+            //tokens[12])
             if(fieldConfig.getValue(FieldId.ADDRESS)!=null)
                 client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS));
+            //tokens[13])
             if(fieldConfig.getValue(FieldId.PHONE)!=null)
                 client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));
+            //tokens[14])
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
-            if (mobilePhone!=null) {
+            if (mobilePhone!=null && StringUtils.isNotEmpty(mobilePhone)) {
                 mobilePhone = Client.checkAndConvertMobile(mobilePhone);
                 if (mobilePhone==null) throw new Exception("Неправильный формат мобильного телефона");
-                client.setMobile(mobilePhone);//tokens[14]);
+                client.setMobile(mobilePhone);
             }
+            //tokens[15]);
             if(fieldConfig.getValue(FieldId.EMAIL)!=null)
-                client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
-            if(fieldConfig.getValue(FieldId.COMMENTS)!=null)
-                client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
-            if(fieldConfig.getValue(FieldId.SAN)!=null)
-                client.setSanWithConvert(fieldConfig.getValue(ClientManager.FieldId.SAN));
+                client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));
+            //tokens[16])
+            if(fieldConfig.getValue(FieldId.PAY_FOR_SMS)!=null)
+                client.setPayForSMS(fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS));
+            //tokens[17])
+            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_EMAIL)!=null)
+                client.setNotifyViaEmail(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_EMAIL));
+            //tokens[18])
+            if(fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_SMS)!=null)
+                client.setNotifyViaSMS(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS));
+            //tokens[19]);
             if (fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT)!=null) {
-                long limit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));//tokens[19]);
+                long limit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));
                 client.setLimit(limit);
             }
+            //tokens[20])
+            if(fieldConfig.getValue(FieldId.COMMENTS)!=null)
+                client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
+
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP)!=null) {
-                String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
+                //tokens[21];
+                String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
                 ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(),
                         clientGroupName);
                 if (clientGroup == null) {
@@ -200,6 +237,16 @@ public class ClientManager {
                 }
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
+            //tokens[22])
+            if(fieldConfig.getValue(FieldId.SAN)!=null)
+                client.setSanWithConvert(fieldConfig.getValue(ClientManager.FieldId.SAN));
+            //tokens[23])
+            long expenditureLimit = 0;
+            if (fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT)!=null) {
+                expenditureLimit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//old value tokens[19]);
+                client.setExpenditureLimit(expenditureLimit);
+            }
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             client.setClientRegistryVersion(clientRegistryVersion);
 
             long idOfClient = client.getIdOfClient();
