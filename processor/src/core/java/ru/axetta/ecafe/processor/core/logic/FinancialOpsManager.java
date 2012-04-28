@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SMSService;
@@ -18,7 +19,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.StringReader;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 @Scope("singleton")
@@ -206,11 +211,35 @@ public class FinancialOpsManager {
 
         getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, objectContragent);
         session.save(clientPayment);
-        ////
-        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
+
         String text="Зачислено "+ CurrencyStringUtils.copecksToRubles(paySum)+"; баланс "+CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum)+" ("+client.getContractId()+" "+client.getPerson().getSurname()+" "+client.getPerson().getFirstName()+")";
+        ///// Отправка информации о балансе на почтовый ящик
+        StringReader stringReader = new StringReader(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_EMAIL_TEXT));
+        Properties properties = new Properties();
+        properties.load(stringReader);
+        if(client.isNotifyViaEmail()){
+            List<File> files = new LinkedList<File>();
+            String balanceEmailMessageText = properties.getProperty("ecafe.processor.email.service.balanceMessageText").replaceAll("\\[br\\]","\n");
+            String balanceEmailSubject = properties.getProperty("ecafe.processor.email.service.balanceSubject");
+            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[paySum\\]",CurrencyStringUtils.copecksToRubles(paySum));
+            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[balance\\]",CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum));
+            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[contractId\\]",String.valueOf(client.getContractId()));
+            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[surName\\]",client.getPerson().getSurname());
+            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[firstName\\]",client.getPerson().getFirstName());
+            RuntimeContext.getInstance().getSupportEmailSender().postSupportEmail(client.getEmail(),balanceEmailSubject,balanceEmailMessageText,files);
+        }
+        ////
+        String balanceSMSMessageText = properties.getProperty("ecafe.processor.sms.service.balanceMessageText").replaceAll("\\[br\\]","\n");
+        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[paySum\\]",CurrencyStringUtils.copecksToRubles(paySum));
+        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[balance\\]",CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum));
+        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[contractId\\]",String.valueOf(client.getContractId()));
+        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[surName\\]",client.getPerson().getSurname());
+        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[firstName\\]",client.getPerson().getFirstName());
+
+        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
         if (text.length()>68) text=text.substring(0, 67)+"..";
-        smsService.sendSMSAsync(client.getIdOfClient(), ClientSms.TYPE_PAYMENT_REGISTERED, text);
+        if (balanceSMSMessageText.length()>68) balanceSMSMessageText=balanceSMSMessageText.substring(0, 67)+"..";
+        smsService.sendSMSAsync(client.getIdOfClient(), ClientSms.TYPE_PAYMENT_REGISTERED, balanceSMSMessageText);
     }
 
     static Boolean useOperatorScheme = null;
