@@ -24,6 +24,8 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.userCreatePage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
+    <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userCreatePage.email}" maxlength="128" styleClass="input-text"/>
     <h:outputText escape="true" value="Права пользователя" styleClass="output-text" />
     <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.items}" var="item">
         <rich:column>

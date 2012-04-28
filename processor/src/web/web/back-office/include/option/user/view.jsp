@@ -16,6 +16,8 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.userViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />
+    <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.userViewPage.email}" styleClass="input-text"/>
     <h:outputText escape="true" value="Дата последних изменений" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.userViewPage.updateTime}" styleClass="input-text"
                  converter="timeConverter" />
