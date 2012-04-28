@@ -89,6 +89,7 @@ public class MainPage {
     private final BasicWorkspacePage orgGroupPage = new BasicWorkspacePage();
     //categories orgs
     private final BasicWorkspacePage categoryOrgGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage optionsGroupPage = new BasicWorkspacePage();
 
     private final OrgListPage orgListPage = new OrgListPage();
     private Long selectedIdOfOrg;
@@ -410,6 +411,10 @@ public class MainPage {
     //***//
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
+    }
+
+    public BasicWorkspacePage getOptionsGroupPage() {
+        return optionsGroupPage;
     }
 
     public Object showCategoryOrgGroupPage() {
@@ -2315,7 +2320,7 @@ public class MainPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to load clients from file", e);
+            logger.error("Failed to update clients from file", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам",
                             null));
