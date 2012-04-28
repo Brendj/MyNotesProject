@@ -35,6 +35,15 @@ public class User {
     private Date updateTime;
     private Contragent contragent;
     private Set<Function> functions = new HashSet<Function>();
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     User() {
         // For Hibernate
