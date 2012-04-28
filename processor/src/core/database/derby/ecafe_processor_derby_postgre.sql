@@ -34,7 +34,7 @@ CREATE TABLE CF_Contragents (
   CreatedDate             BIGINT            NOT NULL,
   LastUpdate              BIGINT            NOT NULL,
   PublicKey               VARCHAR(1024)     NOT NULL,
-  NeedAccountTranslate    INTEGER           NOT NULL,  
+  NeedAccountTranslate    INTEGER           NOT NULL,
   CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
   CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
   CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)
@@ -85,14 +85,14 @@ CREATE TABLE CF_Orgs (
 CREATE TABLE CF_ClientGroups (
   IdOfOrg                 BIGINT            NOT NULL,
   IdOfClientGroup         BIGINT            NOT NULL,
-  GroupName               VARCHAR(64)       NOT NULL,  
+  GroupName               VARCHAR(64)       NOT NULL,
   CONSTRAINT CF_ClientGroups_pk PRIMARY KEY (IdOfOrg, IdOfClientGroup),
-  CONSTRAINT CF_ClientGroups_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg)  
+  CONSTRAINT CF_ClientGroups_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg)
 );
 
 CREATE TABLE CF_Clients (
   IdOfClient              BIGINT            NOT NULL,
-  Version                 BIGINT            NOT NULL,        
+  Version                 BIGINT            NOT NULL,
   IdOfOrg                 BIGINT            NOT NULL,
   IdOfPerson              BIGINT            NOT NULL,
   IdOfContractPerson      BIGINT            NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE CF_Clients (
   Password                VARCHAR(128)      NOT NULL,
   PayForSMS               INTEGER           NOT NULL,
   FreePayMaxCount         INTEGER,
-  FreePayCount            INTEGER           NOT NULL,        
+  FreePayCount            INTEGER           NOT NULL,
   LastFreePayTime         BIGINT,
   DiscountMode            INTEGER           NOT NULL,
   Balance                 BIGINT            NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE CF_Cards (
   CardNo                  BIGINT            NOT NULL,
   CardType                INTEGER           NOT NULL,
   CreatedDate             BIGINT            NOT NULL,
-  LastUpdate              BIGINT            NOT NULL,    
+  LastUpdate              BIGINT            NOT NULL,
   State                   INTEGER           NOT NULL,
   LockReason              VARCHAR(64),
   ValidDate               BIGINT            NOT NULL,
@@ -175,14 +175,14 @@ CREATE TABLE CF_Transactions (
 
 CREATE TABLE CF_Users (
   IdOfUser                BIGINT            NOT NULL,
-  Version                 BIGINT            NOT NULL,        
+  Version                 BIGINT            NOT NULL,
   UserName                VARCHAR(64)       NOT NULL,
   Password                VARCHAR(128)      NOT NULL,
   LastChange              BIGINT            NOT NULL,
   Phone                   VARCHAR(32)       NOT NULL,
   IdOfContragent          BIGINT,
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
-  CONSTRAINT CF_Users_ShortName UNIQUE (UserName),        
+  CONSTRAINT CF_Users_ShortName UNIQUE (UserName),
   CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
@@ -233,7 +233,7 @@ CREATE TABLE CF_MenuDetails (
   MinCa                   DECIMAL(5, 2),
   MinP                    DECIMAL(5, 2),
   MinMg                   DECIMAL(5, 2),
-  MinFe                   DECIMAL(5, 2),  
+  MinFe                   DECIMAL(5, 2),
   CONSTRAINT CF_MenuDetail_pk PRIMARY KEY (IdOfMenuDetail),
   CONSTRAINT CF_MenuDetail_IdOfMenu_fk FOREIGN KEY (IdOfMenu) REFERENCES CF_Menu (IdOfMenu)
 );
@@ -346,7 +346,7 @@ CREATE TABLE CF_ContragentPayments (
   PayType                 INTEGER       NOT NULL,
   State                   INTEGER       NOT NULL,
   CreatedDate             BIGINT        NOT NULL,
-  PaymentDate             BIGINT,          
+  PaymentDate             BIGINT,
   CONSTRAINT CF_ContragentPayments_pk PRIMARY KEY (IdOfContragentPayment),
   CONSTRAINT CF_ContragentPayments_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent),
   CONSTRAINT CF_ContragentPayments_IdOfTransaction_fk FOREIGN KEY (IdOfTransaction) REFERENCES CF_Transactions (IdOfTransaction)
@@ -364,13 +364,13 @@ CREATE TABLE CF_ClientPaymentOrders (
   IdOfPayment             VARCHAR(128)  NOT NULL,
   CONSTRAINT CF_ClientPaymentOrders_pk PRIMARY KEY (IdOfClientPaymentOrder),
   CONSTRAINT CF_ClientPaymentOrders_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent),
-  CONSTRAINT CF_ClientPaymentOrders_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient)  
+  CONSTRAINT CF_ClientPaymentOrders_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient)
 );
 
 CREATE TABLE CF_ClientPayments (
   IdOfClientPayment       BIGINT        NOT NULL,
   IdOfTransaction         BIGINT        NOT NULL,
-  PaymentMethod           INTEGER       NOT NULL,        
+  PaymentMethod           INTEGER       NOT NULL,
   PaySum                  BIGINT        NOT NULL,
   PayType                 INTEGER       NOT NULL,
   CreatedDate             BIGINT        NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE CF_DiaryTimesheet (
   CONSTRAINT CF_DiaryTimesheet_C6 FOREIGN KEY (IdOfOrg, C6) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass),
   CONSTRAINT CF_DiaryTimesheet_C7 FOREIGN KEY (IdOfOrg, C7) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass),
   CONSTRAINT CF_DiaryTimesheet_C8 FOREIGN KEY (IdOfOrg, C8) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass),
-  CONSTRAINT CF_DiaryTimesheet_C9 FOREIGN KEY (IdOfOrg, C9) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass)  
+  CONSTRAINT CF_DiaryTimesheet_C9 FOREIGN KEY (IdOfOrg, C9) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass)
 );
 
 CREATE TABLE CF_DiaryValues (
@@ -431,7 +431,7 @@ CREATE TABLE CF_DiaryValues (
   Value                   VARCHAR(10)     NOT NULL,
   CONSTRAINT CF_DiaryValues_pk PRIMARY KEY (IdOfOrg, IdOfClient, IdOfClass, RecDate, VType),
   CONSTRAINT CF_DiaryValues_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
-  CONSTRAINT CF_DiaryValues_IdOfOrg_IdOfClass_fk FOREIGN KEY (IdOfOrg, IdOfClass) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass),        
+  CONSTRAINT CF_DiaryValues_IdOfOrg_IdOfClass_fk FOREIGN KEY (IdOfOrg, IdOfClass) REFERENCES CF_DiaryClasses (IdOfOrg, IdOfClass),
   CONSTRAINT CF_DiaryValues_IdOfClient FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient)
 );
 
@@ -478,7 +478,7 @@ CREATE TABLE CF_Registry (
 CREATE TABLE CF_ReportHandleRules (
   IdOfReportHandleRule    BIGINT          NOT NULL,
   RuleName                VARCHAR(64)     NOT NULL,
-  Subject                 VARCHAR(128)    NOT NULL,        
+  Subject                 VARCHAR(128)    NOT NULL,
   DocumentFormat          INTEGER         NOT NULL,
   Route0                  VARCHAR(128)    NOT NULL,
   Route1                  VARCHAR(128),
@@ -492,7 +492,6 @@ CREATE TABLE CF_ReportHandleRules (
   Route9                  VARCHAR(128),
   Remarks                 VARCHAR(1024),
   Enabled                 INTEGER         NOT NULL,
-  TemplateFileName 		  character varying(64)
   CONSTRAINT CF_ReportHandleRules_pk PRIMARY KEY (IdOfReportHandleRule)
 );
 
@@ -501,7 +500,7 @@ CREATE TABLE CF_RuleConditions (
   IdOfReportHandleRule    BIGINT          NOT NULL,
   ConditionOperation      INTEGER         NOT NULL,
   ConditionArgument       VARCHAR(128),
-  ConditionConstant       VARCHAR(128),        
+  ConditionConstant       VARCHAR(128),
   CONSTRAINT CF_RuleConditions_pk PRIMARY KEY (IdOfRuleCondition),
   CONSTRAINT CF_RuleConditions_IdOfReportHandleRule_fk FOREIGN KEY (IdOfReportHandleRule) REFERENCES CF_ReportHandleRules (IdOfReportHandleRule)
 );
@@ -530,7 +529,7 @@ CREATE TABLE CF_SchedulerJobs (
   CronExpression          VARCHAR(128)    NOT NULL,
   JobName                 VARCHAR(128)    NOT NULL,
   Enabled                 INTEGER         NOT NULL,
-  CONSTRAINT CF_SchedulerJobs_pk PRIMARY KEY (IdOfSchedulerJob)  
+  CONSTRAINT CF_SchedulerJobs_pk PRIMARY KEY (IdOfSchedulerJob)
 );
 
 CREATE TABLE CF_Generators (
@@ -549,7 +548,7 @@ CREATE TABLE CF_Generators (
   IdOfClientPayment       BIGINT          NOT NULL,
   IdOfCall                BIGINT          NOT NULL,
   IdOfNotification        BIGINT          NOT NULL,
-  IdOfSync                BIGINT          NOT NULL,  
+  IdOfSync                BIGINT          NOT NULL,
   IdOfReportHandleRule    BIGINT          NOT NULL,
   IdOfRuleCondition       BIGINT          NOT NULL,
   IdOfSchedulerJob        BIGINT          NOT NULL,
@@ -892,5 +891,22 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 13, 120407, 0);
+VALUES(2, 2, 12, 120407, 0);
 
+INSERT INTO cf_options(
+        idofoption, optiontext)
+VALUES (10,
+        '
+        ecafe.processor.sms.service.enterEventMessageText=[eventName] [eventTime] ([surName] [firstName]). Баланс: [balance] р.
+ecafe.processor.email.service.enterEventMessageText=Уважаемый клиент, [br][br][eventName] [eventTime] ([surName] [firstName]). [br]Текущий баланс лицевого счета [balance] рублей.[br][br]С уважением,[br]Служба поддержки клиентов
+ecafe.processor.email.service.balanceMessageText=Уважаемый клиент, [br][br]на Ваш лицевой счет ([contractId] [surName] [firstName]) были зачислены средства в размере [paySum] рублей.[br]Текущий баланс лицевого счета [balance] рублей.[br][br]С уважением,[br]Служба поддержки клиентов
+ecafe.processor.sms.service.balanceMessageText=Зачислено [paySum]; баланс [balance] ([contractId] [surName] [firstName])
+ecafe.processor.email.service.enterEventSubject=Уведомление о времени прихода и ухода ребенка
+ecafe.processor.email.service.balanceSubject=Уведомление о пополнении баланса
+
+        '
+        );
+
+
+insert into CF_Options(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
+VALUES(2, 2, 12, 120407, 0);
