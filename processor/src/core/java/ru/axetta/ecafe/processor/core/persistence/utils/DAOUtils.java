@@ -116,6 +116,16 @@ public class DAOUtils {
         return (User)criteria.uniqueResult();
     }
 
+    public static User findUser(EntityManager entityManager, String userName) throws Exception {
+        //javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
+        //Criteria criteria = persistenceSession.createCriteria(User.class);
+        //q.setParameter()
+        javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
+        q.setParameter("userName", userName);
+        //criteria.add(Restrictions.eq("userName", userName));
+        return (User) q.getSingleResult();
+    }
+
     public static User getUserReference(Session persistenceSession, long idOfUser) throws Exception {
         return (User) persistenceSession.load(User.class, idOfUser);
     }

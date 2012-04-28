@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -97,4 +98,10 @@ public class DAOService {
         if (l.size()==0) return null;
         return (Org)l.get(0);
     }
+
+    @Transactional
+    public User setUserInfo(User user){
+        return em.merge(user);
+    }
+
 }
