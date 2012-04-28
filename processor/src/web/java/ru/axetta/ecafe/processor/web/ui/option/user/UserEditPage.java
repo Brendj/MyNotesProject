@@ -26,6 +26,7 @@ public class UserEditPage extends BasicWorkspacePage {
     private String plainPassword;
     private String plainPasswordConfirmation;
     private String phone;
+    private String email;
     private FunctionSelector functionSelector = new FunctionSelector();
 
     public String getPageFilename() {
@@ -80,6 +81,14 @@ public class UserEditPage extends BasicWorkspacePage {
         this.phone = phone;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public FunctionSelector getFunctionSelector() {
         return functionSelector;
     }
@@ -100,6 +109,7 @@ public class UserEditPage extends BasicWorkspacePage {
             user.setPassword(plainPassword);
         }
         user.setPhone(phone);
+        user.setEmail(email);
         user.setFunctions(functionSelector.getSelected(session));
         user.setUpdateTime(new Date());
         session.update(user);
@@ -110,6 +120,7 @@ public class UserEditPage extends BasicWorkspacePage {
         this.idOfUser = user.getIdOfUser();
         this.userName = user.getUserName();
         this.phone = user.getPhone();
+        this.email = user.getEmail();
         this.functionSelector.fill(session, user.getFunctions());
     }
 }

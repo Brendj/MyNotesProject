@@ -25,6 +25,7 @@ public class UserCreatePage extends BasicWorkspacePage {
     private String plainPassword;
     private String plainPasswordConfirmation;
     private String phone;
+    private String email;
     private final FunctionSelector functionSelector = new FunctionSelector();
 
     public String getPageFilename() {
@@ -71,6 +72,14 @@ public class UserCreatePage extends BasicWorkspacePage {
         this.phone = phone;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public FunctionSelector getFunctionSelector() {
         return functionSelector;
     }
@@ -82,6 +91,7 @@ public class UserCreatePage extends BasicWorkspacePage {
     public void createUser(Session session) throws Exception {
         User user = new User(userName, plainPassword, phone, new Date());
         user.setFunctions(functionSelector.getSelected(session));
+        user.setEmail(email);
         session.save(user);
     }
 }

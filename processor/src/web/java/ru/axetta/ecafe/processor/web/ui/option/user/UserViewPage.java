@@ -23,6 +23,7 @@ public class UserViewPage extends BasicWorkspacePage {
     private Long idOfUser;
     private String userName;
     private String phone;
+    private String email;
     private Date updateTime;
     private final FunctionViewer functionViewer = new FunctionViewer();
 
@@ -42,6 +43,10 @@ public class UserViewPage extends BasicWorkspacePage {
         return phone;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -56,6 +61,7 @@ public class UserViewPage extends BasicWorkspacePage {
         this.userName = user.getUserName();
         this.updateTime = user.getUpdateTime();
         this.phone = user.getPhone();
+        this.email = user.getEmail();
         this.functionViewer.fill(user);
     }
 
