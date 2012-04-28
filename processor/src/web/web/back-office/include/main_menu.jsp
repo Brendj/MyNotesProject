@@ -370,9 +370,15 @@
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
                         action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
 
+    <rich:panelMenuGroup id="optionsGroupMenu" label="Настройки" binding="#{mainPage.optionsGroupPage.mainMenuComponent}"
+                         rendered="true" >
+        <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
+                            action="#{optionPage.show}" reRender="workspaceForm"/>
 
-    <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
-                        action="#{optionPage.show}" reRender="workspaceForm"/>
+        <rich:panelMenuItem id="showMessageConfigureMenuItem" binding="#{messageConfigurePage.mainMenuComponent}"
+                            label="Шаблоны уведомлений" action="#{messageConfigurePage.show}" reRender="workspaceForm"/>
+    </rich:panelMenuGroup>
+
 
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
