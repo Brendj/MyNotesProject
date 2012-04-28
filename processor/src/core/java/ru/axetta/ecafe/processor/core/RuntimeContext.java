@@ -107,7 +107,6 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM=PROCESSOR_PARAM_BASE+".clientroom.hiddenPages";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
     private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
-    //private static final String REPORT_TEMPLATE_FILE_PATH = REPORT_PARAM_BASE + ".path";
     private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
     private static final String EVENT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".event";
     private static final String AUTO_REPORT_MAIL_PARAM_BASE = AUTO_REPORT_PARAM_BASE + ".mail";
@@ -261,6 +260,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return supportEmailSender;
     }
 
+    public EventNotificationPostman getEventNotificationPostman() {
+        return eventNotificationPostman;
+    }
+
     public RBKMoneyConfig getPartnerRbkMoneyConfig() {
         return partnerRbkMoneyConfig;
     }
@@ -382,7 +385,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientSmsDeliveryStatusUpdater = createClientSmsDeliveryStatusUpdater(properties, executorService,
                     scheduler, sessionFactory, smsService);
 
-            this.payformUrl = buildPayformUrl(properties);
+             this.payformUrl = buildPayformUrl(properties);
             this.payformGroupUrl = buildPayformGroupUrl(properties);
             this.messageIdGenerator = createMessageIdGenerator(properties, sessionFactory);
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
