@@ -39,11 +39,9 @@ public class RegisterReport extends BasicReportForOrgJob {
              class SumArrayList<E> extends ArrayList {
                  public void sum(int ind, Object number) {
                      if (get(ind) instanceof Long) {
-                         Long num = Long.valueOf(String.valueOf(get(ind)));
-                         this.add(ind, num + Long.valueOf(String.valueOf(number)));
-                     } else if (get(ind) instanceof Integer) {
-                         Integer num = Integer.valueOf(String.valueOf(get(ind)));
-                         this.add(ind, num + Integer.valueOf(String.valueOf(number)));
+                         Long num = (Long)get(ind);
+                         this.remove(ind);
+                         this.add(ind, num + (Long)number);
                      }
                  }
              }
@@ -225,7 +223,7 @@ public class RegisterReport extends BasicReportForOrgJob {
                     resultRows.add(resultRow);
                 }
 
-                int classNum = (grName.charAt(0) >= '1' && grName.charAt(0) <= '4')? 0 : 1;
+                int classNum = getClassNumber(grName)<5? 0 : 1;//(grName.charAt(0) >= '1' && grName.charAt(0) <= '4')? 0 : 1;
                 if (detailName.equals("Завтрак")) {
                     resultRow.getBreakfastCost().sum(classNum, price);
                     resultRow.getBreakfastCount().sum(classNum, count);
@@ -300,6 +298,18 @@ public class RegisterReport extends BasicReportForOrgJob {
     @Override
     public int getDefaultReportPeriod() {
         return REPORT_PERIOD_PREV_PREV_PREV_DAY;
+    }
+
+    private static int getClassNumber(String groupName) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < groupName.length() && groupName.charAt(i) >= '0' && groupName.charAt(i) <= '9'; i++)
+                sb.append(groupName.charAt(i));
+            return Integer.parseInt(sb.toString());
+        } catch (Exception e) {
+            return 0;
+        }
+
     }
 }
 
