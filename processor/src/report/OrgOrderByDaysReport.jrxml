@@ -8,8 +8,8 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.1000000000000187"/>
-	<property name="ireport.x" value="1475"/>
+	<property name="ireport.zoom" value="1.6105100000000279"/>
+	<property name="ireport.x" value="184"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -1015,224 +1015,224 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(20))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(20).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2541" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(28))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(28).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="737" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(6))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(6).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2377" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(26))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(26).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="327" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(1))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(1).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1639" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(17))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(17).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1065" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(10))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(10).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1557" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(16))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(16).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2049" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(22))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(22).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2623" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(29))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(29).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2131" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(23))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(23).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1967" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(21))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(21).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1229" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(12))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(12).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2787" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(31))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(31).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1393" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(14))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(14).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2295" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(25))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(25).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="819" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(7))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(7).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="983" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(9))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(9).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1475" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(15))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(15).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1147" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(11))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(11).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1803" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(19))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(19).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2705" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(30))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(30).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="409" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(2))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(2).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2213" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(24))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(24).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="655" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(5))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(5).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="573" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(4))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(4).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="491" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(3))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(3).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1721" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(18))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(18).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="2459" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(27))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(27).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="901" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(8))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(8).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1311" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(13))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(13).toString())))/100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="245" y="0" width="41" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[((Double)$F{sumRow}.get(0))/100]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{sumRow}.get(0).toString())))/100]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
