@@ -48,6 +48,10 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String defaultSupplierName;
     private String INN;
     private String OGRN;
+    private String mailingListReportsOnNutrition;
+    private String mailingListReportsOnVisits;
+    private String mailingListReports1;
+    private String mailingListReports2;
     private List<CategoryOrg> categoryOrg;
 
     public List<CategoryOrg> getCategoryOrg() {
@@ -198,6 +202,42 @@ public class OrgViewPage extends BasicWorkspacePage {
             Org menuExchangeSourceOrg = (Org) session.load(Org.class, menuExchangeSourceOrgId);
             menuExchangeSourceOrgName = menuExchangeSourceOrg.getShortName();
         }
+
+        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
+        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
+        this.mailingListReports1 = org.getMailingListReports1();
+        this.mailingListReports2 = org.getMailingListReports2();
     }
 
+    public String getMailingListReportsOnNutrition() {
+        return mailingListReportsOnNutrition;
+    }
+
+    public void setMailingListReportsOnNutrition(String mailingListReportsOnNutrition) {
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+    }
+
+    public String getMailingListReportsOnVisits() {
+        return mailingListReportsOnVisits;
+    }
+
+    public void setMailingListReportsOnVisits(String mailingListReportsOnVisits) {
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+    }
+
+    public String getMailingListReports1() {
+        return mailingListReports1;
+    }
+
+    public void setMailingListReports1(String mailingListReports1) {
+        this.mailingListReports1 = mailingListReports1;
+    }
+
+    public String getMailingListReports2() {
+        return mailingListReports2;
+    }
+
+    public void setMailingListReports2(String mailingListReports2) {
+        this.mailingListReports2 = mailingListReports2;
+    }
 }

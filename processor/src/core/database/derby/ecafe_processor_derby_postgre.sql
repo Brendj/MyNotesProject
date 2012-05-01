@@ -76,6 +76,10 @@ CREATE TABLE CF_Orgs (
   DefaultSupplier         BIGINT            NOT NULL,
   OGRN                    character varying(32),
   INN                     character varying(32),
+  mailingListReportsOnNutrition character varying(1024),
+  mailingListReportsOnVisits character varying(1024),
+  mailingListReports1 character varying(1024),
+  mailingListReports2 character varying(1024),
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),
@@ -891,7 +895,7 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 12, 120407, 0);
+VALUES(2, 2, 15, 120501, 0);
 
 INSERT INTO cf_options(
         idofoption, optiontext)

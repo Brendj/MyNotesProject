@@ -4,10 +4,13 @@
 
 package ru.axetta.ecafe.processor.core;
 
+import jxl.common.log.LoggerName;
+
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.event.EventDocumentBuilder;
 import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -249,14 +252,41 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         }
                         if (null != reportDocument) {
                             String subject = fillTemplate(currRule.getSubject(), reportProperties);
+                            // извлекаем id органиазции
+                            Long idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
+                            // загружаем списки рассылок по id
+                            Map<String, String> mailListMap = null;
+                            if (idOfOrg != null) {
+                                mailListMap = loadMailLists(idOfOrg);
+                            }
                             for (String currAddress : currRule.getRouteAdresses()) {
                                 if (StringUtils.isNotEmpty(currAddress)) {
-                                    String address = fillTemplate(currAddress, reportProperties);
+                                    String address = fillTemplate(currAddress, reportProperties).trim();
                                     if (StringUtils.isNotEmpty(address)) {
-                                        try {
-                                            autoReportPostman.postReport(address, subject, reportDocument);
-                                        } catch (Exception e) {
-                                            logger.error("Failed to post report", e);
+                                        // если указан не конкретный адрес, а наименование списка рассылки
+                                        if (address.startsWith("{") && address.endsWith("}") && mailListMap!=null) {
+                                            // излекаем списик адресов рассылки
+                                            // address - содержит тип рассылки: {Список рассылки отчетов по питанию}, {Список рассылки отчетов по посещению}, {Список рассылки №1}, {Список рассылки №2}
+                                            String addressList = mailListMap.get(address);
+                                            if (StringUtils.isNotEmpty(addressList)) {
+                                                // обходим все адреса в рассылке
+                                                String addresses[] = addressList.split(";");
+                                                for (String addrFromList : addresses) {
+                                                    try {
+                                                        autoReportPostman.postReport(addrFromList, subject, reportDocument);
+                                                    } catch (Exception e) {
+                                                        logger.error("Failed to post report", e);
+                                                    }
+                                                }
+                                            } else {
+                                                logger.error(String.format("Failed to post report. Не определен список рассылки %s для организации с идентификатором %d", address, idOfOrg));
+                                            }
+                                        } else {
+                                            try {
+                                                autoReportPostman.postReport(address, subject, reportDocument);
+                                            } catch (Exception e) {
+                                                logger.error("Failed to post report", e);
+                                            }
                                         }
                                     }
                                 }
@@ -266,6 +296,28 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 }
             }
         }
+    }
+
+    // Метод для загрузки адресов рассылок
+    private Map<String, String> loadMailLists(Long orgId) {
+        Map<String, String> mailListMap = new HashMap<String, String>();
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            transaction = session.beginTransaction();
+            Criteria criteria = ReportHandleRule.createOrgByIdCriteria(session, orgId);
+            Org org = (Org)criteria.uniqueResult();
+            mailListMap.put("{Список рассылки отчетов по питанию}", org.getMailingListReportsOnNutrition());
+            mailListMap.put("{Список рассылки отчетов по посещению}", org.getMailingListReportsOnVisits());
+            mailListMap.put("{Список рассылки №1}", org.getMailingListReports1());
+            mailListMap.put("{Список рассылки №2}", org.getMailingListReports2());
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return mailListMap;
     }
 
     static String fillTemplate(String pattern, Properties properties) {

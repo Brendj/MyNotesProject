@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
@@ -262,6 +264,10 @@ public class ReportHandleRule {
                 .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
                 .add(Restrictions.like("conditionConstant", RuleCondition.EVENT_TYPE_BASE_PART + ".%",
                         MatchMode.START));
+    }
+
+    public static Criteria createOrgByIdCriteria(Session session, long id) {
+        return session.createCriteria(Org.class).add(Restrictions.eq("idOfOrg", id));
     }
 
     @Override

@@ -63,6 +63,12 @@ public class Org {
     private String OGRN;
     private String INN;
     private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
+    private String mailingListReportsOnNutrition;
+    private String mailingListReportsOnVisits;
+    private String mailingListReports1;
+    private String mailingListReports2;
+
+
 
     public Set<CategoryOrg> getCategories(){
         return Collections.unmodifiableSet(getCategoriesInternal());
@@ -98,9 +104,17 @@ public class Org {
         // For Hibernate only
     }
 
+    /*
+        private String mailingListReportsOnNutrition;
+    private String mailingListReportsOnVisits;
+    private String mailingListReports1;
+    private String mailingListReports2;
+    * */
+
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, int state, long cardLimit, String publicKey, Long priceOfSms,
-            Long subscriptionPrice, Contragent defaultSupplier, String INN, String ORGN) throws Exception {
+            Long subscriptionPrice, Contragent defaultSupplier, String INN, String ORGN, String mailingListReportsOnNutrition,
+            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
         this.shortName = shortName;
         this.officialName = officialName;
         this.address = address;
@@ -118,6 +132,10 @@ public class Org {
         this.defaultSupplier = defaultSupplier;
         this.OGRN=ORGN;
         this.INN=INN;
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+        this.mailingListReports1 = mailingListReports1;
+        this.mailingListReports2 = mailingListReports2;
     }
 
     public Long getIdOfOrg() {
@@ -446,6 +464,38 @@ public class Org {
     public Set<EnterEvent> getEnterEvents() {
         return Collections.unmodifiableSet(getEnterEventsInternal());
     }*/
+
+    public String getMailingListReportsOnNutrition() {
+        return mailingListReportsOnNutrition;
+    }
+
+    public void setMailingListReportsOnNutrition(String mailingListReportsOnNutrition) {
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+    }
+
+    public String getMailingListReportsOnVisits() {
+        return mailingListReportsOnVisits;
+    }
+
+    public void setMailingListReportsOnVisits(String mailingListReportsOnVisits) {
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+    }
+
+    public String getMailingListReports1() {
+        return mailingListReports1;
+    }
+
+    public void setMailingListReports1(String mailingListReports1) {
+        this.mailingListReports1 = mailingListReports1;
+    }
+
+    public String getMailingListReports2() {
+        return mailingListReports2;
+    }
+
+    public void setMailingListReports2(String mailingListReports2) {
+        this.mailingListReports2 = mailingListReports2;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -81,6 +81,19 @@
                  styleClass="input-text" />
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReportsOnNutrition}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки отчетов по посещению" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReportsOnVisits}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки №1" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReports1}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReports2}" styleClass="input-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

@@ -100,6 +100,19 @@
     <h:inputSecret value="#{mainPage.orgEditPage.plainSsoPasswordConfirmation}" maxlength="64"
                    rendered="#{mainPage.orgEditPage.changeSsoPassword}"
                    readonly="#{!mainPage.orgEditPage.changeSsoPassword}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnNutrition}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки отчетов по посещению" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnVisits}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки №1" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReports1}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text" />
+
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"

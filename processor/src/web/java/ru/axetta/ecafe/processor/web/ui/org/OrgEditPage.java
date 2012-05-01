@@ -53,6 +53,10 @@ public class OrgEditPage extends BasicWorkspacePage
     private ContragentItem defaultSupplier = new ContragentItem();
     private String INN;
     private String OGRN;
+    private String mailingListReportsOnNutrition;
+    private String mailingListReportsOnVisits;
+    private String mailingListReports1;
+    private String mailingListReports2;
 
     public String getINN() {
         return INN;
@@ -318,6 +322,10 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setDefaultSupplier(defaultSupplier);
         org.setINN(INN);
         org.setOGRN(OGRN);
+        org.setMailingListReportsOnNutrition(mailingListReportsOnNutrition);
+        org.setMailingListReportsOnVisits(mailingListReportsOnVisits);
+        org.setMailingListReports1(mailingListReports1);
+        org.setMailingListReports2(mailingListReports2);
         session.update(org);
         fill(org);
         /////
@@ -348,6 +356,10 @@ public class OrgEditPage extends BasicWorkspacePage
         this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
         this.OGRN=org.getOGRN();
         this.INN=getINN();
+        this.mailingListReportsOnNutrition = getMailingListReportsOnNutrition();
+        this.mailingListReportsOnVisits = getMailingListReportsOnVisits();
+        this.mailingListReports1 = getMailingListReports1();
+        this.mailingListReports2 = getMailingListReports2();
     }
 
 
@@ -382,5 +394,37 @@ public class OrgEditPage extends BasicWorkspacePage
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.defaultSupplier = new ContragentItem(contragent);
         }
+    }
+
+    public String getMailingListReportsOnNutrition() {
+        return mailingListReportsOnNutrition;
+    }
+
+    public void setMailingListReportsOnNutrition(String mailingListReportsOnNutrition) {
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+    }
+
+    public String getMailingListReportsOnVisits() {
+        return mailingListReportsOnVisits;
+    }
+
+    public void setMailingListReportsOnVisits(String mailingListReportsOnVisits) {
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+    }
+
+    public String getMailingListReports1() {
+        return mailingListReports1;
+    }
+
+    public void setMailingListReports1(String mailingListReports1) {
+        this.mailingListReports1 = mailingListReports1;
+    }
+
+    public String getMailingListReports2() {
+        return mailingListReports2;
+    }
+
+    public void setMailingListReports2(String mailingListReports2) {
+        this.mailingListReports2 = mailingListReports2;
     }
 }

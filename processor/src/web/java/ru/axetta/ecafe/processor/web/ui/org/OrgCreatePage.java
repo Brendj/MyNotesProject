@@ -49,6 +49,10 @@ public class OrgCreatePage extends BasicWorkspacePage
     private ContragentItem defaultSupplier = new ContragentItem();
     private String INN;
     private String OGRN;
+    private String mailingListReportsOnNutrition;
+    private String mailingListReportsOnVisits;
+    private String mailingListReports1;
+    private String mailingListReports2;
 
     public String getINN() {
         return INN;
@@ -293,7 +297,8 @@ public class OrgCreatePage extends BasicWorkspacePage
 
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
-                this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN);
+                this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
+                this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);
         if (StringUtils.isNotEmpty(plainSsoPassword)) {
@@ -302,5 +307,37 @@ public class OrgCreatePage extends BasicWorkspacePage
         session.save(org);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());
+    }
+
+    public String getMailingListReportsOnNutrition() {
+        return mailingListReportsOnNutrition;
+    }
+
+    public void setMailingListReportsOnNutrition(String mailingListReportsOnNutrition) {
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+    }
+
+    public String getMailingListReportsOnVisits() {
+        return mailingListReportsOnVisits;
+    }
+
+    public void setMailingListReportsOnVisits(String mailingListReportsOnVisits) {
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+    }
+
+    public String getMailingListReports1() {
+        return mailingListReports1;
+    }
+
+    public void setMailingListReports1(String mailingListReports1) {
+        this.mailingListReports1 = mailingListReports1;
+    }
+
+    public String getMailingListReports2() {
+        return mailingListReports2;
+    }
+
+    public void setMailingListReports2(String mailingListReports2) {
+        this.mailingListReports2 = mailingListReports2;
     }
 }
