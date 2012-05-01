@@ -38,6 +38,9 @@
     <h:outputText escape="true" value="Адреса рассылки" styleClass="output-text" />
     <h:inputText value="#{mainPage.reportRuleEditPage.routeAddresses}" maxlength="1024" style="width: 600px;"
                  styleClass="input-text" />
+    <h:outputText/>
+    <h:outputText escape="true" value="Списки рассылок организаций: #{mainPage.reportRuleEditPage.mailListNames}" styleClass="hint-output-text" style="width: 600px;"/>
+
     <h:outputText escape="true" value="Условия применения правила" styleClass="output-text" />
     <h:inputText value="#{mainPage.reportRuleEditPage.ruleConditionItems}" maxlength="1024" style="width: 600px;"
                  styleClass="input-text" />

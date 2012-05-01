@@ -26,7 +26,7 @@
     <h:inputText value="#{mainPage.orgEditPage.OGRN}" maxlength="32" styleClass="input-text" />
 
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="128" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
@@ -67,7 +67,7 @@
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.publicKey}" maxlength="1024" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.publicKey}" maxlength="1024" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Текущий номер пакета" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.idOfPacket}" maxlength="10" styleClass="input-text" />
     <h:outputText escape="true" value="Отправитель SMS" styleClass="output-text" />
@@ -102,16 +102,16 @@
                    readonly="#{!mainPage.orgEditPage.changeSsoPassword}" styleClass="input-text" />
 
     <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnNutrition}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnNutrition}" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="Список рассылки отчетов по посещению" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnVisits}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReportsOnVisits}" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="Список рассылки №1" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.mailingListReports1}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReports1}" styleClass="input-text long-field"/>
 
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text long-field" />
 
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">

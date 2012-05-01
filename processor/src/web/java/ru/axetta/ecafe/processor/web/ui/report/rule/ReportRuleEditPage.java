@@ -191,6 +191,23 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
         reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
 
         String[] addressList = this.routeAddresses.split(DELIMETER);
+
+        for (String addr : addressList) {
+            if (addr.trim().startsWith("{") && addr.trim().endsWith("}")) {
+                boolean ok = false;
+                for (String mailListName : ReportHandleRule.MAIL_LIST_NAMES) {
+                    if (mailListName.equals(addr)) {
+                        ok = true;
+                        break;
+                    }
+                }
+                if (ok == false) {
+                    throw new Exception("Некорректное имя рассылки.");
+                }
+            }
+
+        }
+
         reportHandleRule.setRoute0(StringUtils.trim(getString(addressList, 0)));
         reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
         reportHandleRule.setRoute2(StringUtils.trim(getString(addressList, 2)));
@@ -288,5 +305,9 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
             }
             stringBuilder.append(value);
         }
+    }
+
+    public String getMailListNames() {
+        return ReportHandleRule.getMailListNames();
     }
 }

@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
+import javax.persistence.metamodel.StaticMetamodel;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,10 @@ public class ReportHandleRule {
 
     public static final String UNKNOWN_FORMAT_NAME = "Неизвестный";
     public static final String[] FORMAT_NAMES = {"HTML", "XLS", "CSV", "PDF"};
+    public static final String[] MAIL_LIST_NAMES = { "{Список рассылки отчетов по питанию}",
+                                                     "{Список рассылки отчетов по посещению}",
+                                                     "{Список рассылки №1}",
+                                                     "{Список рассылки №2}"};
     public static final int HTML_FORMAT = 0;
     public static final int XLS_FORMAT = 1;
     public static final int CSV_FORMAT = 2;
@@ -294,5 +299,13 @@ public class ReportHandleRule {
                 + ", route2='" + route2 + '\'' + ", route3='" + route3 + '\'' + ", route4='" + route4 + '\''
                 + ", route5='" + route5 + '\'' + ", route6='" + route6 + '\'' + ", route7='" + route7 + '\''
                 + ", route8='" + route8 + '\'' + ", route9='" + route9 + '\'' + '}';
+    }
+
+    public static String getMailListNames() {
+        StringBuilder sb = new StringBuilder();
+        for (String name : MAIL_LIST_NAMES) {
+            sb.append(name).append(", ");
+        }
+        return sb.toString().substring(0, sb.length()-2);
     }
 }

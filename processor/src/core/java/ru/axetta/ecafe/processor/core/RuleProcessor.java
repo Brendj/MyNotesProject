@@ -307,10 +307,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             transaction = session.beginTransaction();
             Criteria criteria = ReportHandleRule.createOrgByIdCriteria(session, orgId);
             Org org = (Org)criteria.uniqueResult();
-            mailListMap.put("{Список рассылки отчетов по питанию}", org.getMailingListReportsOnNutrition());
-            mailListMap.put("{Список рассылки отчетов по посещению}", org.getMailingListReportsOnVisits());
-            mailListMap.put("{Список рассылки №1}", org.getMailingListReports1());
-            mailListMap.put("{Список рассылки №2}", org.getMailingListReports2());
+            mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[0], org.getMailingListReportsOnNutrition());
+            mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[1], org.getMailingListReportsOnVisits());
+            mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[2], org.getMailingListReports1());
+            mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[3], org.getMailingListReports2());
             transaction.commit();
             transaction = null;
         } finally {
