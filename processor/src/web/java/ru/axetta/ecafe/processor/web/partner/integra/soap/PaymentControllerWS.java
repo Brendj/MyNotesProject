@@ -5,10 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
-import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +22,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.security.Signature;
 
 @WebService()
 public class PaymentControllerWS extends HttpServlet implements PaymentController {

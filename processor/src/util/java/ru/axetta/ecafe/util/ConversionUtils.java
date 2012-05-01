@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.core.utils;
+package ru.axetta.ecafe.util;
 
 /**
  * Created by IntelliJ IDEA.

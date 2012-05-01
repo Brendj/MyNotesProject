@@ -8,8 +8,8 @@ import jxl.common.log.LoggerName;
 
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.event.EventDocumentBuilder;
-import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
+import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
@@ -186,14 +186,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     private final SessionFactory sessionFactory;
     private final AutoReportPostman autoReportPostman;
-    private final EventNotificationPostman eventNotificationPostman;
+    private final Postman eventNotificationPostman;
     private List<Rule> reportRules;
     private List<Rule> eventNotifications;
     private final Object reportRulesLock;
     private final Object eventNotificationsLock;
 
     public RuleProcessor(SessionFactory sessionFactory, AutoReportPostman autoReportPostman,
-            EventNotificationPostman eventNotificationPostman) {
+            Postman eventNotificationPostman) {
         this.sessionFactory = sessionFactory;
         this.autoReportPostman = autoReportPostman;
         this.eventNotificationPostman = eventNotificationPostman;

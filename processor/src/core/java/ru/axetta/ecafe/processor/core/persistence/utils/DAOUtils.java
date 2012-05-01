@@ -105,6 +105,9 @@ public class DAOUtils {
         if (l.size()==0) return null;
         return ((Card)l.get(0)).getClient();
     }
+    public static Client findClientByContractId(EntityManager em, long cardNo) throws Exception {
+        return findClientByContractId((Session)em.getDelegate(), cardNo);
+    }
 
     public static User findUser(Session persistenceSession, long idOfUser) throws Exception {
         return (User) persistenceSession.get(User.class, idOfUser);

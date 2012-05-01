@@ -187,6 +187,16 @@ public class Person {
         return 1 == contragents.size() && contragents.contains(contragent);
     }
 
+    public String getSurnameAndFirstLetters() {
+        String n = getSurname();
+        String fn = getFirstName();
+        if (fn.length()==0) return n;
+        fn = fn.substring(0, 1)+".";
+        String sn = getSecondName();
+        if (sn.length()!=0) sn=sn.substring(0, 1)+".";
+        return n+" "+fn+sn;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

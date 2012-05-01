@@ -16,7 +16,7 @@
                 groupClass="main-menu-group" itemClass="main-menu-item" hoveredGroupClass="main-menu-hovered-group"
                 hoveredItemClass="main-menu-hovered-item" topGroupClass="main-menu-top-group"
                 topItemClass="main-menu-top-item" iconCollapsedGroup="triangle" iconExpandedGroup="triangleDown"
-                iconItem="none" mode="server">
+                iconItem="none" mode="ajax">
 
 <rich:panelMenuGroup id="orgGroupMenu" label="Организации" binding="#{mainPage.orgGroupPage.mainMenuComponent}"
         rendered="#{mainPage.eligibleToViewOrgs}">
@@ -367,9 +367,6 @@
                      rendered="#{mainPage.eligibleToEditOptions}">
     <a4j:support event="onclick" action="#{mainPage.showOptionGroupPage}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
-                        action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
-
     <rich:panelMenuGroup id="optionsGroupMenu" label="Настройки" binding="#{mainPage.optionsGroupPage.mainMenuComponent}"
                          rendered="true" >
         <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
@@ -377,6 +374,9 @@
 
         <rich:panelMenuItem id="showMessageConfigureMenuItem" binding="#{messageConfigurePage.mainMenuComponent}"
                             label="Шаблоны уведомлений" action="#{messageConfigurePage.show}" reRender="workspaceForm"/>
+
+        <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
+                            action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
     </rich:panelMenuGroup>
 
 

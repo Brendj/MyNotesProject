@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.UriUtils;
 
@@ -110,14 +111,9 @@ public class ClientPasswordRecover {
                     url = UriUtils.putParam(url, CONTRACT_ID_PARAM, sContractId);
                     String hash = encryptURL(getPasswordSeed(session) + sDate + sContractId);
                     String strURL = UriUtils.putParam(url, PASS_PARAM, hash).toString();
-                    /* send URL to E-mail */
-                    StringBuilder emailText = new StringBuilder();
-                    /* Email text */
-                    emailText.append("Если Вы не запрашивали восстановление пароля, пожалуйста, удалите данное письмо. Для восстановления пароля перейдите по ссылке ");
-                    emailText.append(strURL);
-                    runtimeContext.getSupportEmailSender()
-                            .postSupportEmail(clientEmail, "Восстановление пароля", emailText.toString(), files);
-                    succeeded = CONTRACT_SEND_RECOVER_PASSWORD;
+
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendEmail(currClient,
+                            EventNotificationService.MESSAGE_RESTORE_PASSWORD, new String[]{"url", strURL});
                     logger.info("Sent recover password URL to '" + clientEmail + "'");
                 }
             } else {

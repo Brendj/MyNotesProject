@@ -4,32 +4,15 @@
 
 package ru.axetta.soap;
 
-import com.sun.deploy.net.HttpRequest;
 import junit.framework.TestCase;
 
 import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
-import ru.axetta.soap.test.PaymentController;
-import ru.axetta.soap.test.PaymentControllerWSService;
-import ru.axetta.soap.test.PaymentResult;
 
 import javax.net.ssl.*;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class Way4PaymentTest extends TestCase {
 

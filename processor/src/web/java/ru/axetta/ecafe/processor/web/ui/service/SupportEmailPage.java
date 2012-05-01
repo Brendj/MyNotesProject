@@ -77,7 +77,7 @@ public class SupportEmailPage extends BasicWorkspacePage {
 
     public void sendSupportEmail(Session session) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        runtimeContext.getSupportEmailSender().postSupportEmail(address, subject, text, files);
+        runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
     }
 
     public String clearUploadData() {

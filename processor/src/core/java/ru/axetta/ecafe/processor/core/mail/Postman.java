@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.mail;
 
-import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.ReportDocument;
-import ru.axetta.ecafe.processor.core.support.SupportEmailSender;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +32,7 @@ import java.util.Properties;
  * Time: 11:23:15
  * To change this template use File | Settings | File Templates.
  */
-public class Postman implements AutoReportPostman, EventNotificationPostman, SupportEmailSender {
+public class Postman implements AutoReportPostman {
 
     private static final Logger logger = LoggerFactory.getLogger(Postman.class);
 
@@ -116,24 +114,28 @@ public class Postman implements AutoReportPostman, EventNotificationPostman, Sup
         }
     }
 
-    private final MailSettings notificationMailSettings;
+    private final MailSettings reportMailSettings;
     private final MailSettings supportMailSettings;
 
-    public Postman(MailSettings notificationMailSettings, MailSettings supportMailSettings) {
-        this.notificationMailSettings = notificationMailSettings;
+    public Postman(MailSettings reportMailSettings, MailSettings supportMailSettings) {
+        this.reportMailSettings = reportMailSettings;
         this.supportMailSettings = supportMailSettings;
     }
 
     public void postReport(String address, String subject, ReportDocument reportDocument) throws Exception {
-        postFiles(notificationMailSettings, address, subject, reportDocument.getFiles());
+        postFiles(reportMailSettings, address, subject, reportDocument.getFiles());
     }
 
     public void postEvent(String address, String subject, ReportDocument eventDocument) throws Exception {
-        postFiles(notificationMailSettings, address, subject, eventDocument.getFiles());
+        postFiles(reportMailSettings, address, subject, eventDocument.getFiles());
+    }
+
+    public void postNotificationEmail(String address, String subject, String text) throws Exception {
+        postText(supportMailSettings, address, subject, text, null, false);
     }
 
     public void postSupportEmail(String address, String subject, String text, List<ru.axetta.ecafe.processor.core.mail.File> files) throws Exception {
-        postText(supportMailSettings, address, subject, text, files);
+        postText(supportMailSettings, address, subject, text, files, true);
     }
 
     private static Session createMailSession(MailSettings mailSettings) throws Exception {
@@ -207,7 +209,7 @@ public class Postman implements AutoReportPostman, EventNotificationPostman, Sup
         }
     }
 
-    private static void postText(MailSettings mailSettings, String address, String subject, String text, List<ru.axetta.ecafe.processor.core.mail.File> files)
+    private static void postText(MailSettings mailSettings, String address, String subject, String text, List<ru.axetta.ecafe.processor.core.mail.File> files, boolean sendCopyEmail)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Posting text with subject \"%s\" to \"%s\"", subject, address));
@@ -216,14 +218,14 @@ public class Postman implements AutoReportPostman, EventNotificationPostman, Sup
         MimeMessage mailMessage = new MimeMessage(mailSession);
         mailMessage.setFrom(mailSettings.getFromAddress());
         mailMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(address));
-        if (null != mailSettings.getCopyAddress()) {
+        if (sendCopyEmail && null != mailSettings.getCopyAddress()) {
             mailMessage.setRecipient(Message.RecipientType.CC, mailSettings.getCopyAddress());
         }
         mailMessage.setSubject(StringUtils.defaultString(subject), "utf-8");
         mailMessage.setSentDate(new Date());
 
         // Set the email attachment file
-        if (!files.isEmpty()) {
+        if (files!=null && !files.isEmpty()) {
             // Set the email message text.
             MimeBodyPart messagePart = new MimeBodyPart();
             messagePart.setText(text);
@@ -249,7 +251,7 @@ public class Postman implements AutoReportPostman, EventNotificationPostman, Sup
             mailMessage.setContent(multipart);
         }
         else {
-            ByteArrayDataSource byteArrayDataSource = new ByteArrayDataSource(text, "text/plain; charset=\"UTF-8\"");
+            ByteArrayDataSource byteArrayDataSource = new ByteArrayDataSource(text, "text/html; charset=\"UTF-8\"");
             mailMessage.setDataHandler(new DataHandler(byteArrayDataSource));
         }
 

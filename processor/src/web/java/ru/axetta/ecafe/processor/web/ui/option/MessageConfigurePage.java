@@ -4,16 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.option;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
+import javax.annotation.Resource;
 import java.util.Properties;
 import java.util.Set;
 
@@ -35,10 +32,11 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String enterEventEmailMessageText;
     private String enterEventSMSMessageText;
 
-    private Properties messageProperties;
+    private String passwordRestoreEmailSubject;
+    private String passwordRestoreEmailMessageText;
 
-    @Autowired
-    RuntimeContext runtimeContext;
+    @Resource
+    EventNotificationService eventNotificationService;
 
     public String getPageFilename() {
         return "option/message_configure";
@@ -47,51 +45,37 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     /* Page action */
     @Override
     public void onShow() throws Exception {
-        messageProperties = new Properties();
-        StringReader stringReader = new StringReader(runtimeContext.getOptionValueString(Option.OPTION_EMAIL_TEXT));
-        Properties properties = new Properties();
-        properties.load(stringReader);
-        balanceEmailMessageText = properties.getProperty("ecafe.processor.email.service.balanceMessageText")
+        balanceEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_EMAIL_TEXT)
                 .replaceAll("\\[br\\]","\n");
-        balanceEmailSubject = properties.getProperty("ecafe.processor.email.service.balanceSubject");
-        balanceSMSMessageText = properties.getProperty("ecafe.processor.sms.service.balanceMessageText");
-        enterEventEmailMessageText = properties.getProperty("ecafe.processor.email.service.enterEventMessageText")
-                .replaceAll("\\[br\\]","\n");
-        enterEventEmailSubject = properties.getProperty("ecafe.processor.email.service.enterEventSubject");
-        enterEventSMSMessageText = properties.getProperty("ecafe.processor.sms.service.enterEventMessageText");
+        balanceEmailSubject = eventNotificationService.getNotificationText(
+                EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        balanceSMSMessageText = eventNotificationService.getNotificationText(
+                EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_SMS);
+        enterEventEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_EMAIL_TEXT)
+                .replaceAll("\\[br\\]", "\n");
+        enterEventEmailSubject = eventNotificationService.getNotificationText(
+                EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        enterEventSMSMessageText = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_SMS);
+        passwordRestoreEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_TEXT);
+        passwordRestoreEmailSubject = eventNotificationService.getNotificationText(EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_SUBJECT);
     }
 
     public Object save() throws Exception {
         try {
-            Properties properties = new Properties();
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\n","[br]");
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\r","");
-            properties.setProperty("ecafe.processor.email.service.balanceMessageText",balanceEmailMessageText);
-            properties.setProperty("ecafe.processor.email.service.balanceSubject",balanceEmailSubject);
-            balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\n","");
-            balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\r","");
-            properties.setProperty("ecafe.processor.sms.service.balanceMessageText",balanceSMSMessageText);
+            eventNotificationService.updateMessageTemplates(new String[]{
+                    EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_EMAIL_TEXT,
+                    enterEventEmailMessageText, EventNotificationService.NOTIFICATION_ENTER_EVENT,
+                    EventNotificationService.TYPE_EMAIL_SUBJECT, enterEventEmailSubject,
+                    EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_SMS,
+                    enterEventSMSMessageText, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
+                    EventNotificationService.TYPE_EMAIL_TEXT, balanceEmailMessageText,
+                    EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    balanceEmailSubject, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
+                    EventNotificationService.TYPE_SMS, balanceSMSMessageText,
+                    EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_TEXT,
+                    passwordRestoreEmailMessageText, EventNotificationService.MESSAGE_RESTORE_PASSWORD,
+                    EventNotificationService.TYPE_EMAIL_SUBJECT, passwordRestoreEmailSubject});
 
-            enterEventEmailMessageText=enterEventEmailMessageText.replaceAll("\\n","[br]");
-            enterEventEmailMessageText=enterEventEmailMessageText.replaceAll("\\r","");
-            properties.setProperty("ecafe.processor.email.service.enterEventMessageText",enterEventEmailMessageText);
-            properties.setProperty("ecafe.processor.email.service.enterEventSubject",enterEventEmailSubject);
-            enterEventSMSMessageText=enterEventSMSMessageText.replaceAll("\\n","");
-            enterEventSMSMessageText=enterEventSMSMessageText.replaceAll("\\r","");
-            properties.setProperty("ecafe.processor.sms.service.enterEventMessageText",enterEventSMSMessageText);
-
-            StringBuilder stringBuilder = new StringBuilder();
-            Set stringSet = properties.keySet();
-            for (Object key: stringSet){
-                String sKey = (String) key;
-                stringBuilder.append(sKey);
-                stringBuilder.append("=");
-                String sValue = properties.getProperty(sKey);
-                stringBuilder.append(sValue);
-                stringBuilder.append("\r\n");
-            }
-            runtimeContext.setOptionValue(Option.OPTION_EMAIL_TEXT, stringBuilder.toString());
-            runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены.");
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при сохранении", e);
@@ -152,5 +136,21 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setBalanceEmailSubject(String balanceEmailSubject) {
         this.balanceEmailSubject = balanceEmailSubject;
+    }
+
+    public String getPasswordRestoreEmailSubject() {
+        return passwordRestoreEmailSubject;
+    }
+
+    public void setPasswordRestoreEmailSubject(String passwordRestoreEmailSubject) {
+        this.passwordRestoreEmailSubject = passwordRestoreEmailSubject;
+    }
+
+    public String getPasswordRestoreEmailMessageText() {
+        return passwordRestoreEmailMessageText;
+    }
+
+    public void setPasswordRestoreEmailMessageText(String passwordRestoreEmailMessageText) {
+        this.passwordRestoreEmailMessageText = passwordRestoreEmailMessageText;
     }
 }

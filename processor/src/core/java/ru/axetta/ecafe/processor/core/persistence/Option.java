@@ -17,7 +17,8 @@ public class Option {
             OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_JOURNAL_TRANSACTIONS=6, OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP=7,
             OPTION_NFP_SERVICE_ADDRESS=8,
             OPTION_PASSWORD_RESTORE_SEED =9,
-            OPTION_MAX=9;
+            OPTION_NOTIFICATION_TEXT = 10,
+            OPTION_MAX=10;
 
     public static String getDefaultValue(int nOption) {
         switch (nOption) {
@@ -28,6 +29,7 @@ public class Option {
             case OPTION_JOURNAL_TRANSACTIONS: return "0";
             case OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP: return "1";
             case OPTION_NFP_SERVICE_ADDRESS: return "http://193.47.154.34:7002/uec-service-war/TransactionService";
+            case OPTION_NOTIFICATION_TEXT: return "";
         }
         return null;
     }

@@ -9,16 +9,11 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
+import ru.axetta.ecafe.util.ConversionUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
-
-import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.util.LinkedList;
 

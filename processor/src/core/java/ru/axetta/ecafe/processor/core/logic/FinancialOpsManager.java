@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -28,6 +29,8 @@ import java.util.Properties;
 @Component
 @Scope("singleton")
 public class FinancialOpsManager {
+    @Resource
+    EventNotificationService eventNotificationService;
 
     CurrentPositionsManager getCurrentPositionsManager(Session session) {
         return new CurrentPositionsManager(session);
@@ -212,34 +215,13 @@ public class FinancialOpsManager {
         getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, objectContragent);
         session.save(clientPayment);
 
-        String text="Зачислено "+ CurrencyStringUtils.copecksToRubles(paySum)+"; баланс "+CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum)+" ("+client.getContractId()+" "+client.getPerson().getSurname()+" "+client.getPerson().getFirstName()+")";
-        ///// Отправка информации о балансе на почтовый ящик
-        StringReader stringReader = new StringReader(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_EMAIL_TEXT));
-        Properties properties = new Properties();
-        properties.load(stringReader);
-        if(client.isNotifyViaEmail()){
-            List<File> files = new LinkedList<File>();
-            String balanceEmailMessageText = properties.getProperty("ecafe.processor.email.service.balanceMessageText").replaceAll("\\[br\\]","\n");
-            String balanceEmailSubject = properties.getProperty("ecafe.processor.email.service.balanceSubject");
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[paySum\\]",CurrencyStringUtils.copecksToRubles(paySum));
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[balance\\]",CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum));
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[contractId\\]",String.valueOf(client.getContractId()));
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[surName\\]",client.getPerson().getSurname());
-            balanceEmailMessageText=balanceEmailMessageText.replaceAll("\\[firstName\\]",client.getPerson().getFirstName());
-            RuntimeContext.getInstance().getSupportEmailSender().postSupportEmail(client.getEmail(),balanceEmailSubject,balanceEmailMessageText,files);
-        }
-        ////
-        String balanceSMSMessageText = properties.getProperty("ecafe.processor.sms.service.balanceMessageText").replaceAll("\\[br\\]","\n");
-        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[paySum\\]",CurrencyStringUtils.copecksToRubles(paySum));
-        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[balance\\]",CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum));
-        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[contractId\\]",String.valueOf(client.getContractId()));
-        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[surName\\]",client.getPerson().getSurname());
-        balanceSMSMessageText=balanceSMSMessageText.replaceAll("\\[firstName\\]",client.getPerson().getFirstName());
-
-        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
-        if (text.length()>68) text=text.substring(0, 67)+"..";
-        if (balanceSMSMessageText.length()>68) balanceSMSMessageText=balanceSMSMessageText.substring(0, 67)+"..";
-        smsService.sendSMSAsync(client.getIdOfClient(), ClientSms.TYPE_PAYMENT_REGISTERED, balanceSMSMessageText);
+        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
+                "paySum",CurrencyStringUtils.copecksToRubles(paySum),
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum),
+                "contractId",String.valueOf(client.getContractId()),
+                "surname",client.getPerson().getSurname(),
+                "firstName",client.getPerson().getFirstName()
+            });
     }
 
     static Boolean useOperatorScheme = null;

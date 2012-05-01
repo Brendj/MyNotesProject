@@ -73,7 +73,7 @@
         <h:outputText escape="true" value="#{item.sourceTypeAsString}" styleClass="output-text" />
     </rich:column>
     <f:facet name="footer">
-        <rich:datascroller for="clientPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+        <rich:datascroller for="clientAccountTransTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -143,79 +143,6 @@
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                           stepControls="auto" boundaryControls="hide">
-            <f:facet name="previous">
-                <h:graphicImage value="/images/16x16/left-arrow.png" />
-            </f:facet>
-            <f:facet name="next">
-                <h:graphicImage value="/images/16x16/right-arrow.png" />
-            </f:facet>
-        </rich:datascroller>
-    </f:facet>
-</rich:dataTable>
-<h:outputText value="Сообщения:"/>
-<rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
-                columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"
-                footerClass="data-table-footer">
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Ид. транзакции" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Идентификатор" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.idOfSms}" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Телефонный номер" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Тип содержимого" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.contentsType}" converter="smsContentsTypeConverter"
-                      styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Статус доставки" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.deliveryStatus}" converter="smsDeliveryStatusConverter"
-                      styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Время отправки в шлюз" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.serviceSendTime}" converter="timeConverter"
-                      styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Время отправки" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.sendTime}" converter="timeConverter" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Время доставки" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.deliveryTime}" converter="timeConverter" styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Стоимость" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.price}" converter="copeckSumConverter" styleClass="output-text" />
-    </rich:column>
-    <f:facet name="footer">
-        <rich:datascroller for="clientSmsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -325,6 +252,80 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+<h:outputText value="SMS-сообщения:"/>
+<rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"
+                footerClass="data-table-footer">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид. транзакции" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Идентификатор" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.idOfSms}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Телефонный номер" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Тип содержимого" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.contentsType}" converter="smsContentsTypeConverter"
+                      styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Статус доставки" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.deliveryStatus}" converter="smsDeliveryStatusConverter"
+                      styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время отправки в шлюз" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.serviceSendTime}" converter="timeConverter"
+                      styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время отправки" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.sendTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время доставки" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.deliveryTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Стоимость" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.price}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="clientSmsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
 </h:panelGrid>
 <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 </h:panelGrid>

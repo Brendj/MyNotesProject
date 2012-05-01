@@ -16,7 +16,9 @@
             <h:outputText escape="true" value="#{mainPage.currentWorkspacePage.pageTitle}" />
         </f:facet>
         <f:subview id="workspacePageSubView">
-            <c:import url="/back-office/include/${mainPage.currentWorkspacePage.pageFilename}.jsp" />
+            <a4j:outputPanel>
+                <c:import url="/back-office/include/${mainPage.currentWorkspacePage.pageFilename}.jsp" />
+            </a4j:outputPanel>
         </f:subview>
     </rich:panel>
 </a4j:form>

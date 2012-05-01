@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 import java.io.FileInputStream;
 import java.lang.Exception;
 import java.security.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,7 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 
-import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
+import ru.axetta.ecafe.util.ConversionUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import ru.axetta.soap.test.PaymentController;
 import ru.axetta.soap.test.PaymentControllerWSService;
@@ -125,7 +123,7 @@ public class PaymentWSTest extends TestCase {
         String payload=rq.substring(0, pos), signData=rq.substring(pos+SIGNATURE_PARAM.length());
         Signature sign=Signature.getInstance("SHA1withRSA");
         sign.initVerify(pk);
-        byte[] signBytes=ConversionUtils.hex2ByteArray(signData);
+        byte[] signBytes= ConversionUtils.hex2ByteArray(signData);
         sign.update(payload.getBytes());
         return sign.verify(signBytes);
 

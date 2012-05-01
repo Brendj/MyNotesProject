@@ -3,7 +3,7 @@ package ru.axetta.ecafe.processor.web.partner.elecsnet;
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.utils.ConversionUtils;
+import ru.axetta.ecafe.util.ConversionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;

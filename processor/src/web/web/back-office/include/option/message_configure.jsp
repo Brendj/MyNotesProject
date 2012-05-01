@@ -22,12 +22,12 @@
                     <h:outputText value="[paySum] - размер зачисленных средств" styleClass="output-text" />
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
                     <h:outputText value="[contractId] - номер договора клиента" styleClass="output-text" />
-                    <h:outputText value="[surName] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
-        <rich:tab label="SMS уведомления о времени прихода и ухода ребенка" id="enterEvent-SMS">
+        <rich:tab label="SMS уведомления о посещении" id="enterEvent-SMS">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Текст:" styleClass="output-text" />
                 <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.enterEventSMSMessageText}" styleClass="input-text" />
@@ -35,10 +35,10 @@
                 <h:panelGrid>
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
                     <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
-                    <h:outputText value="[surName] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
-                    <h:outputText value="[eventName] - событие прихода или ухода ребенка" styleClass="output-text" />
-                    <h:outputText value="[eventTime] - время прихода или ухода ребенка" styleClass="output-text" />
+                    <h:outputText value="[eventName] - название события" styleClass="output-text" />
+                    <h:outputText value="[eventTime] - время события" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
@@ -53,12 +53,12 @@
                     <h:outputText value="[paySum] - размер зачисленных средств" styleClass="output-text" />
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
                     <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
-                    <h:outputText value="[surName] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
-        <rich:tab label="E-mail уведомления о времени прихода и ухода ребенка" id="enterEvent-Email">
+        <rich:tab label="E-mail уведомления о посещении">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
                 <h:inputText value="#{messageConfigurePage.enterEventEmailSubject}" size="80" maxlength="128" styleClass="input-text" />
@@ -68,10 +68,22 @@
                 <h:panelGrid>
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
                     <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
-                    <h:outputText value="[surName] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
-                    <h:outputText value="[eventName] - событие прихода или ухода ребенка" styleClass="output-text" />
-                    <h:outputText value="[eventTime] - время прихода или ухода ребенка" styleClass="output-text" />
+                    <h:outputText value="[eventName] - название события" styleClass="output-text" />
+                    <h:outputText value="[eventTime] - время события" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
+        <rich:tab label="E-mail сброса пароля">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.passwordRestoreEmailSubject}" size="80" maxlength="128" styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea id="passwordRestore-Email-text" rows="15" cols="80" value="#{messageConfigurePage.passwordRestoreEmailMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[url] - URL для сброса пароля" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

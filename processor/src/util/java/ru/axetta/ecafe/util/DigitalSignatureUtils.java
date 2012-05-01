@@ -5,11 +5,14 @@
 package ru.axetta.ecafe.util;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.CharEncoding;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
@@ -116,4 +119,20 @@ public class DigitalSignatureUtils {
         return null != findSignatureNode(document);
     }
 
+
+    public static String generateHmac(String algo, String key, String data) throws Exception {
+		String result;
+        // Get an hmac_sha1 key from the raw key bytes
+        byte[] keyBytes = ConversionUtils.hex2ByteArray(key);
+        SecretKeySpec signingKey = new SecretKeySpec(keyBytes, algo);
+
+        // Get an hmac_sha1 Mac instance and initialize with the signing key
+        Mac mac = Mac.getInstance(algo);
+        mac.init(signingKey);
+
+        // Compute the hmac on input data bytes
+        byte[] rawHmac = mac.doFinal(data.getBytes());
+
+        return ConversionUtils.byteArray2Hex(rawHmac);
+    }
 }

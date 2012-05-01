@@ -896,21 +896,3 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
 VALUES(2, 2, 15, 120501, 0);
-
-INSERT INTO cf_options(
-        idofoption, optiontext)
-VALUES (10,
-        '
-        ecafe.processor.sms.service.enterEventMessageText=[eventName] [eventTime] ([surName] [firstName]). Баланс: [balance] р.
-ecafe.processor.email.service.enterEventMessageText=Уважаемый клиент, [br][br][eventName] [eventTime] ([surName] [firstName]). [br]Текущий баланс лицевого счета [balance] рублей.[br][br]С уважением,[br]Служба поддержки клиентов
-ecafe.processor.email.service.balanceMessageText=Уважаемый клиент, [br][br]на Ваш лицевой счет ([contractId] [surName] [firstName]) были зачислены средства в размере [paySum] рублей.[br]Текущий баланс лицевого счета [balance] рублей.[br][br]С уважением,[br]Служба поддержки клиентов
-ecafe.processor.sms.service.balanceMessageText=Зачислено [paySum]; баланс [balance] ([contractId] [surName] [firstName])
-ecafe.processor.email.service.enterEventSubject=Уведомление о времени прихода и ухода ребенка
-ecafe.processor.email.service.balanceSubject=Уведомление о пополнении баланса
-
-        '
-        );
-
-
-insert into CF_Options(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 12, 120407, 0);

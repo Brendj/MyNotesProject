@@ -17,7 +17,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.EmailService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
@@ -1397,55 +1397,17 @@ public class Processor implements SyncProcessor,
                             null);
                     resEnterEvents.addItem(item);
 
-                    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-                    // отправить уведомление по смс
-                    boolean notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(
-                            Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
-                    /*
-                    Criteria criteriaClientBySMS = persistenceSession.createCriteria(Client.class);
-                    criteriaClientBySMS.add( Restrictions.and(
-                            Restrictions.eq("idOfClient", e.getIdOfClient())),
-                            Restrictions.eq("notifyViaSMS", )
-                    );
-                    
-                    boolean sendedSMSOfClient = 
-                      */
-                    logger.info("Preparing to send SMS, notifyBySMSAboutEnterEvent - " + notifyBySMSAboutEnterEvent
-                                + ", today - " + isDateToday(e.getEvtDateTime())
-                                + ", date - " + e.getEvtDateTime()
-                                + ", idOfClient - " + e.getIdOfClient()
-                                + ", direction - " + e.getPassDirection());
-
                     if(isDateToday(e.getEvtDateTime()) &&
                             e.getIdOfClient() != null &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)){
-                        if(notifyBySMSAboutEnterEvent){
-                            sendEnterEventSms(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
-                        }
-                        if(client.isNotifyViaEmail()){
-                            sendEnterEventEmail(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
-                        }
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotificationAsync(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
+                                generateNotificationParams(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime())
+                        );
                     }
 
-                    /*
-                    if (notifyBySMSAboutEnterEvent &&
-                        isDateToday(e.getEvtDateTime()) &&
-                        e.getIdOfClient() != null &&
-                        (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
-                        e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT))
-                        sendEnterEventSms(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
-
-                    if(client.isNotifyViaEmail() &&
-                            isDateToday(e.getEvtDateTime()) &&
-                            e.getIdOfClient() != null &&
-                            (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
-                                    e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)){
-                        sendEnterEventEmail(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
-                    }
-                      */
                     /// Формирование журнала транзакции
-                    if (runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) &&
+                    if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                             e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)
                              && e.getIdOfCard()!=null) {
@@ -2229,8 +2191,7 @@ public class Processor implements SyncProcessor,
     }
 
 
-    /* Метод генерации сообщения о проходах */
-    private String generateMessageTextOfEnterEvent(Session session, Client client, int passDirection, Date eventDate, String messageText) throws Exception{
+    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate) throws Exception{
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY)
             eventName = "Вход в школу";
@@ -2246,61 +2207,14 @@ public class Processor implements SyncProcessor,
         int minute = calendar.get(Calendar.MINUTE);
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
-        messageText=messageText.replaceAll("\\[balance\\]",CurrencyStringUtils.copecksToRubles(client.getBalance()));
-        messageText=messageText.replaceAll("\\[contractId\\]",String.valueOf(client.getContractId()));
-        messageText=messageText.replaceAll("\\[surName\\]",client.getPerson().getSurname());
-        messageText=messageText.replaceAll("\\[firstName\\]",client.getPerson().getFirstName());
-        messageText=messageText.replaceAll("\\[eventName\\]",eventName);
-        messageText=messageText.replaceAll("\\[eventTime\\]",time);
-        return  messageText;
-        //return String.format(eventName + " " + time + " (" + clientName + "). Баланс: %s р",
-        //        CurrencyStringUtils.copecksToRubles(client.getBalance()));
-    }
-
-    private Properties loadPropertiesMessageConfig() throws IOException {
-        StringReader stringReader = new StringReader(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_EMAIL_TEXT));
-        Properties properties = new Properties();
-        properties.load(stringReader);
-        return properties;
-    }
-
-    private void sendEnterEventEmail(Session session, Client client, int passDirection, Date eventDate) throws Exception {
-        Properties properties = loadPropertiesMessageConfig();
-        String enterEventEmailMessageText = properties.getProperty("ecafe.processor.email.service.enterEventMessageText").replaceAll("\\[br\\]","\n");
-        String enterEventEmailSubject = properties.getProperty("ecafe.processor.email.service.enterEventSubject");
-        enterEventEmailMessageText = generateMessageTextOfEnterEvent(session, client, passDirection, eventDate, enterEventEmailMessageText);
-        /* Отправка сообщения на почтовый ящик */
-        List<File> files = new LinkedList<File>();
-        RuntimeContext.getInstance().getSupportEmailSender().postSupportEmail(client.getEmail(),enterEventEmailSubject,enterEventEmailMessageText,files);
-        /* Есть разработка аналогичного класса, как с СМС, по отправке email */
-        //EmailService emailService = RuntimeContext.getAppContext().getBean(EmailService.class);
-        //emailService.sendEmailAsync(client.getIdOfClient(), emailText);
-    }
-
-    private void sendEnterEventSms(Session session, Client client, int passDirection, Date eventDate) throws Exception {
-       /* String eventName = "";
-        if (passDirection == EnterEvent.ENTRY)
-            eventName = "Вход в школу";
-        else if (passDirection == EnterEvent.EXIT)
-            eventName = "Выход из школы";
-        else if (passDirection == EnterEvent.RE_ENTRY)
-            eventName = "Повторный вход в школу";
-        else if (passDirection == EnterEvent.RE_EXIT)
-            eventName = "Повторный выход из школы";
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(eventDate);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
-        String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
-        String smsText = String.format(eventName + " " + time + " (" + clientName + "). Баланс: %s р",
-                CurrencyStringUtils.copecksToRubles(client.getBalance()));
-         */
-        Properties properties = loadPropertiesMessageConfig();
-        String enterEventSMSMessageText = properties.getProperty("ecafe.processor.sms.service.enterEventMessageText").replaceAll("\\[br\\]","\n");
-        enterEventSMSMessageText = generateMessageTextOfEnterEvent(session, client, passDirection, eventDate, enterEventSMSMessageText);
-        SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
-        smsService.sendSMSAsync(client.getIdOfClient(), ClientSms.TYPE_ENTER_EVENT_NOTIFY, enterEventSMSMessageText);
+        return new String[]{
+            "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
+            "contractId", String.valueOf(client.getContractId()),
+            "surname", client.getPerson().getSurname(),
+            "firstName", client.getPerson().getFirstName(),
+            "eventName", eventName,
+            "eventTime", time
+        };
     }
 
     private static boolean isDateToday(Date date) {

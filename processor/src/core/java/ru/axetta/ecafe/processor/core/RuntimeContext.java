@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
-import ru.axetta.ecafe.processor.core.event.EventNotificationPostman;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
@@ -32,7 +31,6 @@ import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.support.SupportEmailSender;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.updater.DBUpdater;
@@ -140,15 +138,13 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private ClientPasswordRecover clientPasswordRecover;
 
-    private AutoReportPostman autoReportPostman;
-    private EventNotificationPostman eventNotificationPostman;
     private RuleProcessor autoReportProcessor;
     private EventProcessor eventProcessor;
     private AutoReportGenerator autoReportGenerator;
     private String payformUrl;
     private String payformGroupUrl;
     private ISmsService smsService;
-    private SupportEmailSender supportEmailSender;
+    private Postman postman;
     private ClientSmsDeliveryStatusUpdater clientSmsDeliveryStatusUpdater;
     private MessageIdGenerator messageIdGenerator;
     private ContractIdGenerator clientContractIdGenerator;
@@ -256,12 +252,8 @@ public class RuntimeContext implements ApplicationContextAware {
         return clientPasswordRecover;
     }
 
-    public SupportEmailSender getSupportEmailSender() {
-        return supportEmailSender;
-    }
-
-    public EventNotificationPostman getEventNotificationPostman() {
-        return eventNotificationPostman;
+    public Postman getPostman() {
+        return postman;
     }
 
     public RBKMoneyConfig getPartnerRbkMoneyConfig() {
@@ -324,7 +316,6 @@ public class RuntimeContext implements ApplicationContextAware {
         configProperties = properties;
         Scheduler scheduler = null;
         ExecutorService executorService = null;
-        Postman postman = null;
         ProcessLogger processLogger = null;
         RuleProcessor ruleProcessor = null;
         EventNotificator eventNotificator = null;
@@ -341,9 +332,6 @@ public class RuntimeContext implements ApplicationContextAware {
             this.scheduler = scheduler;
 
             postman = createPostman(properties, sessionFactory);
-            this.supportEmailSender = postman;
-            this.autoReportPostman = postman;
-            this.eventNotificationPostman = postman;
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
@@ -666,9 +654,9 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating postman.");
         }
-        Postman.MailSettings notificationMailSettings = readMailSettings(properties, AUTO_REPORT_MAIL_PARAM_BASE);
+        Postman.MailSettings reportMailSettings = readMailSettings(properties, AUTO_REPORT_MAIL_PARAM_BASE);
         Postman.MailSettings supportMailSettings = readMailSettings(properties, SUPPORT_MAIL_PARAM_BASE);
-        Postman postman = new Postman(notificationMailSettings, supportMailSettings);
+        Postman postman = new Postman(reportMailSettings, supportMailSettings);
         if (logger.isDebugEnabled()) {
             logger.debug("Postman created.");
         }
@@ -688,7 +676,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private static RuleProcessor createRuleHandler(Properties properties, SessionFactory sessionFactory,
-            AutoReportPostman autoReportPostman, EventNotificationPostman eventNotificationPostman) throws Exception {
+            AutoReportPostman autoReportPostman, Postman eventNotificationPostman) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating discountrule processor.");
         }

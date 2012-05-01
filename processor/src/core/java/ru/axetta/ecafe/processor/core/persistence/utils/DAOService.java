@@ -104,4 +104,11 @@ public class DAOService {
         return em.merge(user);
     }
 
+    @Transactional
+    public Client getClientByContractId(long contractId) throws Exception {
+        Client cl = DAOUtils.findClientByContractId(em, contractId);
+        if (cl==null) return null;
+        return cl;
+    }
+
 }
