@@ -355,11 +355,11 @@ public class OrgEditPage extends BasicWorkspacePage
         this.subscriptionPrice = org.getSubscriptionPrice();
         this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
         this.OGRN=org.getOGRN();
-        this.INN=getINN();
-        this.mailingListReportsOnNutrition = getMailingListReportsOnNutrition();
-        this.mailingListReportsOnVisits = getMailingListReportsOnVisits();
-        this.mailingListReports1 = getMailingListReports1();
-        this.mailingListReports2 = getMailingListReports2();
+        this.INN=org.getINN();
+        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
+        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
+        this.mailingListReports1 = org.getMailingListReports1();
+        this.mailingListReports2 = org.getMailingListReports2();
     }
 
 
