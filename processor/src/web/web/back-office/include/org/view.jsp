@@ -13,9 +13,9 @@
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortName}" styleClass="input-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortName}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.INN}" styleClass="input-text" />
