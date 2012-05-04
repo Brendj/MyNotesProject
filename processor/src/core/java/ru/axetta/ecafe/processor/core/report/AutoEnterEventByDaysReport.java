@@ -126,10 +126,12 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             public String getTimeEnter(ArrayList<Event> eventList) {
                 if (eventList == null || eventList.isEmpty())
                     return null;
-                for (Event e : getSortedEventList(eventList)) {
-                    if (e.getPassdirection() == EnterEvent.ENTRY)
-                        return timeFormat.format(new Date(e.getTime()));
-                }
+                for (int i = 0; i<getSortedEventList(eventList).size(); i++)
+                    if (eventList.get(i).getPassdirection() == EnterEvent.ENTRY ||
+                            (getSortedEventList(eventList).size()>=2 && i!=getSortedEventList(eventList).size()-1
+                                    && eventList.get(i).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL &&
+                                    eventList.get(i+1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
+                        return timeFormat.format(new Date(eventList.get(i).getTime()));
                 return null;
             }
 
@@ -137,7 +139,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                 if (eventList == null || eventList.isEmpty())
                     return "";
                 for (int i = getSortedEventList(eventList).size()-1; i>=0; i--)
-                    if (eventList.get(i).getPassdirection() == EnterEvent.EXIT)
+                    if (eventList.get(i).getPassdirection() == EnterEvent.EXIT ||
+                            (getSortedEventList(eventList).size()>=2 && i!=0 &&
+                                    eventList.get(i).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL &&
+                                    eventList.get(i-1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
                 return null;
             }
@@ -246,10 +251,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                     resultRows.add(reportItem);
                 }
                 // ищем список событий по дню
-                ArrayList<Event> events = reportItem.getEventMap().get(day);
+                ArrayList<Event> events = reportItem.getEventMap().get(day-1);
                 if (events == null) {
                     events = new ArrayList<Event>(31);
-                    reportItem.getEventMap().put(day, events);
+                    reportItem.getEventMap().put(day-1, events);
                 }
                 // добавляем событие входа или выхода
                 events.add(new Event(time, passdirection));
