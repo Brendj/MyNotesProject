@@ -39,7 +39,7 @@ public class ReportTemplateFileNameMenu {
         SelectItem[] items = new SelectItem[templateFilesNameList.size()];
         int i = 0;
         for (File file : templateFilesNameList) {
-            items[i++] = new SelectItem(file.getName());
+            items[i++] = new SelectItem(file.getAbsolutePath().substring(reportPath.length()));
         }
         return items;
     }
@@ -49,7 +49,7 @@ public class ReportTemplateFileNameMenu {
      * @param dirName - имя директории для поиска
      * @param templateFilesNameList - список имен файлов шаблонов отчетов
      */
-    static void getTemplateFilesname(String dirName, List<File> templateFilesNameList) {
+    public static void getTemplateFilesname(String dirName, List<File> templateFilesNameList) {
         File dir = new File(dirName);
         File[] files = dir.listFiles();
         if (files!=null) {
@@ -61,7 +61,6 @@ public class ReportTemplateFileNameMenu {
                 }
             }
         }
-
     }
 
     public SelectItem[] getItems() {

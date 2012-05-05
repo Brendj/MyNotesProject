@@ -36,6 +36,7 @@ import ru.axetta.ecafe.processor.web.ui.report.rule.*;
 import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
+import ru.axetta.ecafe.processor.web.ui.option.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -278,6 +279,13 @@ public class MainPage {
     // Levadny (11.02.2012)
     private final OrgDiscountsReportPage orgDiscountsReportPage = new OrgDiscountsReportPage();
     private final AllOrgsDiscountsReportPage allOrgsDiscountsReportPage = new AllOrgsDiscountsReportPage();
+
+    private final ReportTemplateManagerPage reportTemplateManagerPage = new ReportTemplateManagerPage();
+    private String removedReportTemplate;
+
+    public ReportTemplateManagerPage getReportTemplateManagerPage() {
+        return reportTemplateManagerPage;
+    }
 
     public AllOrgsDiscountsReportPage getAllOrgsDiscountsReportPage() {
         return allOrgsDiscountsReportPage;
@@ -3397,6 +3405,23 @@ public class MainPage {
         }
     }
 
+    public void reportTemplateLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        try {
+            if (item.isTempFile()) {
+                reportTemplateManagerPage.checkAndSaveFile(item);
+            } else {
+                throw new Exception("Invalid file");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load file", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла", null));
+        }
+    }
+
+
     public BasicWorkspacePage getServiceGroupPage() {
         return serviceGroupPage;
     }
@@ -4816,6 +4841,14 @@ public class MainPage {
             HibernateUtils.close(persistenceSession, logger);
             
         }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // Levadny (01.05.2012)
+    public Object showReportTemplateManagerPage() {
+        reportTemplateManagerPage.load();
+        currentWorkspacePage = reportTemplateManagerPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -6637,7 +6670,7 @@ public class MainPage {
     }
 
     public Object setExpenditureLimit() {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -6655,6 +6688,26 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public String getRemovedReportTemplate() {
+        return removedReportTemplate;
+    }
+
+    public void setRemovedReportTemplate(String removedReportTemplate) {
+        this.removedReportTemplate = removedReportTemplate;
+    }
+
+    public Object removeReportTemplate() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            reportTemplateManagerPage.removeTemplate(removedReportTemplate);
+        } catch (Exception e) {
+            logger.error("Error on deleting report template file.", e);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона.", null));
         }
         return null;
     }

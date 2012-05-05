@@ -93,7 +93,11 @@
     </f:subview>
 
     <f:subview id="categoryDeleteSubView">
-        <c:import url="include/confirm_delete.jsp" />
+        <c:import url="include/option/confirm_delete.jsp" />
+    </f:subview>
+	
+	<f:subview id="templateDeleteSubView">
+        <c:import url="include/option/confirm_delete.jsp" />
     </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">

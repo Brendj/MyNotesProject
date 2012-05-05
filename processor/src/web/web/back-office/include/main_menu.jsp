@@ -377,6 +377,10 @@
 
         <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
                             action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
+
+        <rich:panelMenuItem id="showReportTemplateManagerMenuItem" binding="#{mainPage.reportTemplateManagerPage.mainMenuComponent}" label="Управление шаблонами отчетов"
+                            action="#{mainPage.showReportTemplateManagerPage}" reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
 

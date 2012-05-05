@@ -36,10 +36,10 @@
         <property name="subscriptionPrice" column="SubscriptionPrice" type="long" not-null="true"/>
         <property name="OGRN" column="OGRN" type="string" length="32"/>
         <property name="INN" column="INN" type="string" length="32"/>
-        <property name="mailingListReportsOnNutrition" column="mailingListReportsOnNutrition" type="string" length="256" />
-        <property name="mailingListReportsOnVisits" column="mailingListReportsOnVisits" type="string" length="256" />
-        <property name="mailingListReports1" column="mailingListReports1" type="string" length="256" />
-        <property name="mailingListReports2" column="mailingListReports2" type="string" length="256" />
+        <property name="mailingListReportsOnNutrition" column="mailingListReportsOnNutrition" type="string" length="1024" />
+        <property name="mailingListReportsOnVisits" column="mailingListReportsOnVisits" type="string" length="1024" />
+        <property name="mailingListReports1" column="mailingListReports1" type="string" length="1024" />
+        <property name="mailingListReports2" column="mailingListReports2" type="string" length="1024" />
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>
