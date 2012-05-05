@@ -92,7 +92,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         properties.put(this.comparatorArgument, String.format("%s%s%s", properties.get(this.comparatorArgument), value, DELIMETER));
                         result = true;//return true;//continue;
                     }
-                    if (StringUtils.equals(prop, value))
+                    if (StringUtils.equals(prop.trim(), value.trim()))
                         return true;
                 }
             }
