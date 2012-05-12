@@ -19,7 +19,9 @@
     <h:panelGrid columns="2">
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" />
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="#{categoryOrgEditPage.idOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+        </a4j:commandButton>
         <h:outputText styleClass="output-text" id="categoryOrgEditFilter" escape="true" value=" {#{categoryOrgEditPage.filter}}" />
     </h:panelGrid>
 

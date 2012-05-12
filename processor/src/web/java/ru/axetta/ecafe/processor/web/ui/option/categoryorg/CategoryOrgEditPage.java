@@ -85,6 +85,10 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
         return null;
     }
 
+    public String getIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
     public Long getSelectedIdOfCategoryOrg() {
         return selectedIdOfCategoryOrg;
     }
