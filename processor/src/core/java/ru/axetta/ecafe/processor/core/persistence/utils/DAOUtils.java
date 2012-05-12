@@ -595,6 +595,12 @@ public class DAOUtils {
         return q.getResultList();
     }
 
+    public static List getCategoryOrgWithIds(Session session, List<Long> idOfCategoryOrgList) {
+        String idOfCategoryOrgs=idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+        Query query = session.createQuery("from CategoryOrg where idOfCategoryOrg in ("+idOfCategoryOrgs+")");
+        return query.list();
+    }
+
     public static EnterEvent getLastEnterEvent(Session session, Client client) {
         Query q = session.createQuery("from EnterEvent where client=:client order by evtDateTime desc");
         q.setMaxResults(1);
