@@ -1349,6 +1349,21 @@ public class MainPage {
     }
 
     //01.11.2011
+    /* Параметр фильтра по организациям в странице выбора списка оганизаций
+     * если строка не пуста и заполнена номерами идентификаторов организаций
+      * то отобразится диалоговое окно с организациями где будут помечены галочками
+      * те организации идентификаторы которых перечислены черз запятую в этой строке
+      * иначе отобразится весь список организаций без проставленных галочек*/
+    private String orgFilterOfSelectOrgListSelectPage = "";
+
+    public String getOrgFilterOfSelectOrgListSelectPage() {
+        return orgFilterOfSelectOrgListSelectPage;
+    }
+
+    public void setOrgFilterOfSelectOrgListSelectPage(String orgFilterOfSelectOrgListSelectPage) {
+        this.orgFilterOfSelectOrgListSelectPage = orgFilterOfSelectOrgListSelectPage;
+    }
+
     public Object showOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
@@ -1360,7 +1375,11 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.fill(persistenceSession);
+                if(orgFilterOfSelectOrgListSelectPage.length()==0){
+                    orgListSelectPage.fill(persistenceSession);
+                } else {
+                    orgListSelectPage.fill(persistenceSession,orgFilterOfSelectOrgListSelectPage);
+                }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 orgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
@@ -5957,6 +5976,17 @@ public class MainPage {
         return categoryOrgListSelectPage;
     }
 
+    String categoryOrgFilterOfSelectCategoryOrgListSelectPage;
+
+    public String getCategoryOrgFilterOfSelectCategoryOrgListSelectPage() {
+        return categoryOrgFilterOfSelectCategoryOrgListSelectPage;
+    }
+
+    public void setCategoryOrgFilterOfSelectCategoryOrgListSelectPage(
+            String categoryOrgFilterOfSelectCategoryOrgListSelectPage) {
+        this.categoryOrgFilterOfSelectCategoryOrgListSelectPage = categoryOrgFilterOfSelectCategoryOrgListSelectPage;
+    }
+
     public Object showCategoryOrgListSelectPage(){
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategoryOrgListSelectPage.CompleteHandlerList) {
@@ -5968,7 +5998,11 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                categoryOrgListSelectPage.fill(persistenceSession);
+                if(categoryOrgFilterOfSelectCategoryOrgListSelectPage.length()==0){
+                    categoryOrgListSelectPage.fill(persistenceSession);
+                } else {
+                    categoryOrgListSelectPage.fill(persistenceSession, categoryOrgFilterOfSelectCategoryOrgListSelectPage);
+                }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 categoryOrgListSelectPage.pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
