@@ -49,6 +49,20 @@
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
     <rich:calendar value="#{mainPage.orgEditPage.contractTime}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />
+
+    <%-- Список категорий к которым пренадлежит организация --%>
+    <h:outputText escape="true" value="Категории" styleClass="output-text" />
+    <h:panelGroup>
+        <h:inputText value="#{mainPage.orgEditPage.filterOrg}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfCategoryOrgList}" target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
+        </a4j:commandButton>
+
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Должность" styleClass="output-text" />
@@ -85,7 +99,6 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
-
     <h:outputText escape="true" value="Сменить пароль для единого входа" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeSsoPassword}" styleClass="output-text">
         <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />

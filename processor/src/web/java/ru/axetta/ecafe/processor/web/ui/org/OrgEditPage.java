@@ -4,16 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.hibernate.Session;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +25,8 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class OrgEditPage extends BasicWorkspacePage
-        implements OrgSelectPage.CompleteHandler, ContragentSelectPage.CompleteHandler {
+        implements OrgSelectPage.CompleteHandler,// OrgListSelectPage.CompleteHandlerList,
+        CategoryOrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
 
     private Long idOfOrg;
     private String shortName;
@@ -58,21 +61,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
 
-    public String getINN() {
-        return INN;
-    }
 
-    public void setINN(String INN) {
-        this.INN = INN;
-    }
-
-    public String getOGRN() {
-        return OGRN;
-    }
-
-    public void setOGRN(String OGRN) {
-        this.OGRN = OGRN;
-    }
 
     public static class ContragentItem {
 
@@ -98,8 +87,187 @@ public class OrgEditPage extends BasicWorkspacePage
         }
     }
 
+
+    public void fill(Session session, Long idOfOrg) throws Exception {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        fill(org);
+        ////
+        menuExchangeSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
+        reloadMenuExchangeSourceOrgName(session);
+    }
+
+    public void updateOrg(Session session, Long idOfOrg) throws Exception {
+        Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        org.setShortName(shortName);
+        org.setOfficialName(officialName);
+        org.setAddress(address);
+        org.setPhone(phone);
+        Person officialPerson = org.getOfficialPerson();
+        officialPerson.setFirstName(officialPersonFirstName);
+        officialPerson.setSurname(officialPersonSurname);
+        officialPerson.setSecondName(officialPersonSecondName);
+        org.setOfficialPosition(officialPosition);
+        org.setContractId(contractId);
+        org.setContractTime(contractTime);
+        org.setState(state);
+        org.setCardLimit(cardLimit);
+        org.setPublicKey(publicKey);
+        org.setIdOfPacket(idOfPacket);
+        if (changeSsoPassword) {
+            org.setSsoPassword(plainSsoPassword);
+        }
+        org.setSmsSender(this.smsSender);
+        org.setPriceOfSms(this.priceOfSms);
+        org.setSubscriptionPrice(this.subscriptionPrice);
+
+        org.setDefaultSupplier(defaultSupplier);
+        org.setINN(INN);
+        org.setOGRN(OGRN);
+        org.setMailingListReportsOnNutrition(mailingListReportsOnNutrition);
+        org.setMailingListReportsOnVisits(mailingListReportsOnVisits);
+        org.setMailingListReports1(mailingListReports1);
+        org.setMailingListReports2(mailingListReports2);
+        if (!this.idOfCategoryOrgList.isEmpty()) {
+            org.getCategories().clear();
+            List categoryOrgList = DAOUtils.getCategoryOrgWithIds(session, this.idOfCategoryOrgList);
+            for (Object object: categoryOrgList){
+                org.getCategories().add((CategoryOrg) object);
+            }
+        }
+        session.update(org);
+        fill(org);
+        /////
+        DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
+    }
+
+    private void fill(Org org) throws Exception {
+        this.idOfOrg = org.getIdOfOrg();
+        this.shortName = org.getShortName();
+        this.officialName = org.getOfficialName();
+        this.address = org.getAddress();
+        this.phone = org.getPhone();
+        Person officialPerson = org.getOfficialPerson();
+        this.officialPersonId = officialPerson.getIdOfPerson();
+        this.officialPersonFirstName = officialPerson.getFirstName();
+        this.officialPersonSurname = officialPerson.getSurname();
+        this.officialPersonSecondName = officialPerson.getSecondName();
+        this.officialPosition = org.getOfficialPosition();
+        this.contractId = org.getContractId();
+        this.contractTime = org.getContractTime();
+        this.state = org.getState();
+        this.cardLimit = org.getCardLimit();
+        this.publicKey = org.getPublicKey();
+        this.idOfPacket = org.getIdOfPacket();
+        this.smsSender = org.getSmsSender();
+        this.priceOfSms = org.getPriceOfSms();
+        this.subscriptionPrice = org.getSubscriptionPrice();
+        this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
+        this.OGRN=org.getOGRN();
+        this.INN=org.getINN();
+        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
+        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
+        this.mailingListReports1 = org.getMailingListReports1();
+        this.mailingListReports2 = org.getMailingListReports2();
+        idOfCategoryOrgList.clear();
+        this.filterOrg ="";
+        if(!org.getCategories().isEmpty()){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CategoryOrg categoryOrg: org.getCategories()){
+                stringBuilder.append(categoryOrg.getCategoryName());
+                stringBuilder.append("; ");
+                idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+            }
+            this.filterOrg = stringBuilder.substring(0,stringBuilder.length()-2);
+        }
+    }
+
+
+    /*public void setMenuExchangeSourceOrg(Long menuExchangeSourceOrg) {
+       this.menuExchangeSourceOrg = menuExchangeSourceOrg;
+   } */
+
+    public Long getMenuExchangeSourceOrg() {
+        return menuExchangeSourceOrg;
+    }
+
+    public String getMenuExchangeSourceOrgName() {
+        return menuExchangeSourceOrgName;
+    }
+
+    private void reloadMenuExchangeSourceOrgName(Session session) {
+        if (menuExchangeSourceOrg == null) {
+            menuExchangeSourceOrgName = null;
+        } else {
+            Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
+            menuExchangeSourceOrgName = org.getShortName();
+        }
+    }
+
+    /* interface implements methods */
+    private String filterOrg = "Не выбрано";
+    private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
+
+    public String getIdOfCategoryOrgList() {
+        return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getFilterOrg() {
+        return filterOrg;
+    }
+
+    @Override
+    public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+        if(null != categoryOrgMap) {
+            idOfCategoryOrgList = new ArrayList<Long>();
+            if(categoryOrgMap.isEmpty()){
+                filterOrg = "Не выбрано";
+
+            } else {
+                filterOrg="";
+                for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
+                    idOfCategoryOrgList.add(idOfCategoryOrg);
+                    filterOrg=filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
+                }
+                filterOrg = filterOrg.substring(0,filterOrg.length()-1);
+            }
+
+        }
+    }
+
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.menuExchangeSourceOrg = idOfOrg;
+        reloadMenuExchangeSourceOrgName(session);
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags) throws Exception {
+        if (null != idOfContragent) {
+            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            this.defaultSupplier = new ContragentItem(contragent);
+        }
+    }
+
     public String getPageFilename() {
         return "org/edit";
+    }
+
+
+    /* Getters and Setters */
+    public String getINN() {
+        return INN;
+    }
+
+    public void setINN(String INN) {
+        this.INN = INN;
+    }
+
+    public String getOGRN() {
+        return OGRN;
+    }
+
+    public void setOGRN(String OGRN) {
+        this.OGRN = OGRN;
     }
 
     public OrgStateMenu getOrgStateMenu() {
@@ -284,116 +452,6 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public ContragentItem getDefaultSupplier() {
         return defaultSupplier;
-    }
-
-    public void fill(Session session, Long idOfOrg) throws Exception {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        fill(org);
-        ////
-        menuExchangeSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
-        reloadMenuExchangeSourceOrgName(session);
-    }
-
-    public void updateOrg(Session session, Long idOfOrg) throws Exception {
-        Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        org.setShortName(shortName);
-        org.setOfficialName(officialName);
-        org.setAddress(address);
-        org.setPhone(phone);
-        Person officialPerson = org.getOfficialPerson();
-        officialPerson.setFirstName(officialPersonFirstName);
-        officialPerson.setSurname(officialPersonSurname);
-        officialPerson.setSecondName(officialPersonSecondName);
-        org.setOfficialPosition(officialPosition);
-        org.setContractId(contractId);
-        org.setContractTime(contractTime);
-        org.setState(state);
-        org.setCardLimit(cardLimit);
-        org.setPublicKey(publicKey);
-        org.setIdOfPacket(idOfPacket);
-        if (changeSsoPassword) {
-            org.setSsoPassword(plainSsoPassword);
-        }
-        org.setSmsSender(this.smsSender);
-        org.setPriceOfSms(this.priceOfSms);
-        org.setSubscriptionPrice(this.subscriptionPrice);
-
-        org.setDefaultSupplier(defaultSupplier);
-        org.setINN(INN);
-        org.setOGRN(OGRN);
-        org.setMailingListReportsOnNutrition(mailingListReportsOnNutrition);
-        org.setMailingListReportsOnVisits(mailingListReportsOnVisits);
-        org.setMailingListReports1(mailingListReports1);
-        org.setMailingListReports2(mailingListReports2);
-        session.update(org);
-        fill(org);
-        /////
-        DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
-    }
-
-    private void fill(Org org) throws Exception {
-        this.idOfOrg = org.getIdOfOrg();
-        this.shortName = org.getShortName();
-        this.officialName = org.getOfficialName();
-        this.address = org.getAddress();
-        this.phone = org.getPhone();
-        Person officialPerson = org.getOfficialPerson();
-        this.officialPersonId = officialPerson.getIdOfPerson();
-        this.officialPersonFirstName = officialPerson.getFirstName();
-        this.officialPersonSurname = officialPerson.getSurname();
-        this.officialPersonSecondName = officialPerson.getSecondName();
-        this.officialPosition = org.getOfficialPosition();
-        this.contractId = org.getContractId();
-        this.contractTime = org.getContractTime();
-        this.state = org.getState();
-        this.cardLimit = org.getCardLimit();
-        this.publicKey = org.getPublicKey();
-        this.idOfPacket = org.getIdOfPacket();
-        this.smsSender = org.getSmsSender();
-        this.priceOfSms = org.getPriceOfSms();
-        this.subscriptionPrice = org.getSubscriptionPrice();
-        this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
-        this.OGRN=org.getOGRN();
-        this.INN=org.getINN();
-        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
-        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
-        this.mailingListReports1 = org.getMailingListReports1();
-        this.mailingListReports2 = org.getMailingListReports2();
-    }
-
-
-    /*public void setMenuExchangeSourceOrg(Long menuExchangeSourceOrg) {
-       this.menuExchangeSourceOrg = menuExchangeSourceOrg;
-   } */
-
-    public Long getMenuExchangeSourceOrg() {
-        return menuExchangeSourceOrg;
-    }
-
-    public String getMenuExchangeSourceOrgName() {
-        return menuExchangeSourceOrgName;
-    }
-
-    private void reloadMenuExchangeSourceOrgName(Session session) {
-        if (menuExchangeSourceOrg == null) {
-            menuExchangeSourceOrgName = null;
-        } else {
-            Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
-            menuExchangeSourceOrgName = org.getShortName();
-        }
-    }
-
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        this.menuExchangeSourceOrg = idOfOrg;
-        reloadMenuExchangeSourceOrgName(session);
-    }
-
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags) throws Exception {
-        if (null != idOfContragent) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            this.defaultSupplier = new ContragentItem(contragent);
-        }
     }
 
     public String getMailingListReportsOnNutrition() {
