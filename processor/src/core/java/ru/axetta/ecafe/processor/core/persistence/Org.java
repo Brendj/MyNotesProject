@@ -71,7 +71,8 @@ public class Org {
 
 
     public Set<CategoryOrg> getCategories(){
-        return Collections.unmodifiableSet(getCategoriesInternal());
+        return getCategoriesInternal();
+        //return Collections.unmodifiableSet(getCategoriesInternal());
     }
 
     private Set<CategoryOrg> getCategoriesInternal() {
