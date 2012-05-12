@@ -29,7 +29,9 @@
         <h:panelGroup>
             <a4j:commandButton id="categoryOrgAjaxButton" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryOrgListString}" target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
+              </a4j:commandButton>
             <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true" value=" {#{ruleEditPage.filterOrg}}" />
         </h:panelGroup>
 

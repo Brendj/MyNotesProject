@@ -51,6 +51,10 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
 
+    public String getIdOfCategoryOrgListString() {
+        return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
     public Set<CategoryDiscount> getCategoryDiscountSet() {
         return categoryDiscountSet;
     }
@@ -299,10 +303,12 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
             this.categoryDiscounts=stringBuilder.toString();
         }
+        this.idOfCategoryOrgList.clear();
         if(!discountRule.getCategoryOrgs().isEmpty()){
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
                  stringBuilder.append(categoryOrg.getCategoryName());
+                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
                  stringBuilder.append("; ");
             }
         }
