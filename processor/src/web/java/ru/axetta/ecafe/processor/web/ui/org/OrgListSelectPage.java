@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgEditPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -15,6 +18,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -103,6 +107,20 @@ public class OrgListSelectPage extends BasicPage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public void fill(Session session, String orgFilter) throws Exception {
+        List<Item> items = new LinkedList<Item>();
+        List orgs = retrieveOrgs(session);
+        String[] idOfOrgs = orgFilter.split(",");
+        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+        for (Object object : orgs) {
+            Org org = (Org) object;
+            Item item = new Item(org);
+            if(longSet.contains(String.valueOf(org.getIdOfOrg()).trim())) item.setSelected(true);
+            items.add(item);
+        }
+        this.items = items;
     }
 
     public void fill(Session session) throws Exception {
