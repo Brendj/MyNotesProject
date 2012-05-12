@@ -87,6 +87,20 @@ public class CategoryOrgListSelectPage extends BasicPage {
         }
     }
 
+    public void fill(Session session, String categoryOrgFilter) throws Exception {
+        List<Item> items = new LinkedList<Item>();
+        List categoryOrgs = retrieveCategory(session);
+        String[] idOfOrgs = categoryOrgFilter.split(",");
+        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+        for (Object object : categoryOrgs) {
+            CategoryOrg categoryOrg = (CategoryOrg) object;
+            Item item = new Item(categoryOrg);
+            if(longSet.contains(String.valueOf(categoryOrg.getIdOfCategoryOrg()).trim())) item.setSelected(true);
+            items.add(item);
+        }
+        this.items = items;
+    }
+
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
         List categoryOrgs = retrieveCategory(session);
