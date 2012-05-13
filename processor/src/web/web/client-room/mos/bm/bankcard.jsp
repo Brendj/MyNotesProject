@@ -7,8 +7,15 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Random" %>
 <%@ page import="ru.axetta.ecafe.util.DigitalSignatureUtils" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.TimeZone" %>
+<%@ page import="java.util.Date" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
+//    response.setHeader("Cache-Control","no-cache"); //HTTP 1.1
+  //  response.setHeader("Pragma","no-cache"); //HTTP 1.0
+    //response.setDateHeader ("Expires", 0); //prevents caching at the proxy server
+
     String action=request.getParameter("action");
     String errorMessage=null;
     if (action!=null && action.equals("complete")) {
@@ -47,25 +54,31 @@
             if (client!=null) {
                 String amount = ((lSum/100)+"."+(lSum%100));
                 String currency = "RUR";
-                String redirectUrl = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.url", "http://3ds2.mmbank.ru/cgi-bin/cgi_link");
-                String terminalId = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.terminal", "30000077");
+                String redirectUrl = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.url", "https://3ds2.mmbank.ru:8443/cgi-bin/cgi_link");
+                String terminalId = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.terminal", "30000078");
                 String paymentId = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.payment", "906");
-                String merchName = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.merchant.name", "Информационный город");
+                String merchName = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.merchant.name", "Infogorod");
                 String merchURL = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.merchant.name", "dit.mos.ru");
-                String paymentDesc = "Пополнение л/с "+client.getPerson().getSurnameAndFirstLetters()+" ("+lContractId+")";
+                String paymentDesc = ""+lContractId;//"Пополнение л/с "+client.getPerson().getSurnameAndFirstLetters()+" ("+lContractId+")";
                 String order = ""+System.currentTimeMillis();
                 String trType = "6";
                 String nonce = "";
+                SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyyMMddHHmmss");
+                dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String timestamp = dateFormatGmt.format(new Date());
+
                 Random r = new Random(System.currentTimeMillis());
                 for (int n=0;n<16;++n) nonce+=Integer.toHexString(r.nextInt(15));
+                nonce = nonce.toUpperCase();
                 URI url = new URI(request.getRequestURL().toString());
                 url = UriUtils.getURIWithNoParams(url);
                 url = UriUtils.putParam(url, "action", "complete");
                 String backRef = url.toString();
                 ///
-                String hmacInput = amount.length()+amount+currency.length()+currency+order.length()+order+paymentDesc.length()+paymentDesc+merchName.length()+merchName+merchURL.length()+merchURL+"-"+terminalId.length()+terminalId+"-"+trType.length()+trType+"---"+nonce.length()+nonce+backRef.length()+backRef;
+
+                String hmacInput = amount.length()+amount+currency.length()+currency+order.length()+order+paymentDesc.getBytes("UTF-8").length+paymentDesc+merchName.getBytes("UTF-8").length+merchName+merchURL.length()+merchURL+"-"+terminalId.length()+terminalId+"-"+trType.length()+trType+"--"+timestamp.length()+timestamp+nonce.length()+nonce+backRef.length()+backRef+paymentId.length()+paymentId+(""+lContractId).length()+lContractId+"-";
                 String key = RuntimeContext.getInstance().getPropertiesValue("bankOfMoscow.paymentGateway.key", "1423E4AE3874B0342D164AC25E79EADB");
-                String hmac = DigitalSignatureUtils.generateHmac("HmacSHA1", key, hmacInput);
+                String hmac = DigitalSignatureUtils.generateHmac("HmacSHA1", key, hmacInput.getBytes("UTF-8"));
 %>
 <html><head>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -81,10 +94,12 @@
 <input name="BACKREF" size="30" value="<%=backRef%>" maxlength="100" type="HIDDEN">
 <input name="TRTYPE" size="2" value="<%=trType%>" maxlength="2" type="HIDDEN">
 <input name="PAYMENT" size="3" value="<%=paymentId%>" maxlength="3" type="HIDDEN">
-<input name="PAYMENT_TO" size="10" value="200485" maxlength="40" type="HIDDEN">
+<input name="PAYMENT_TO" size="10" value="<%=lContractId%>" maxlength="40" type="HIDDEN">
 <input name="MERCH_NAME" size="15" value="<%=merchName%>" maxlength="15" type="HIDDEN">
 <input name="MERCH_URL" size="15" value="<%=merchURL%>" maxlength="15" type="HIDDEN">
+<input name="TIMESTAMP" value="<%=timestamp%>" type="HIDDEN">
 <input name="NONCE" value="<%=nonce%>" type="HIDDEN">
+<input name="HMACINPUT" value="<%=hmacInput%>" type="HIDDEN">
 <input name="P_SIGN" value="<%=hmac%>" type="HIDDEN">
 </form>
 <script>

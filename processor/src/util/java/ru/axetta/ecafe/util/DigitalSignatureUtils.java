@@ -120,7 +120,7 @@ public class DigitalSignatureUtils {
     }
 
 
-    public static String generateHmac(String algo, String key, String data) throws Exception {
+    public static String generateHmac(String algo, String key, byte[] data) throws Exception {
 		String result;
         // Get an hmac_sha1 key from the raw key bytes
         byte[] keyBytes = ConversionUtils.hex2ByteArray(key);
@@ -131,7 +131,7 @@ public class DigitalSignatureUtils {
         mac.init(signingKey);
 
         // Compute the hmac on input data bytes
-        byte[] rawHmac = mac.doFinal(data.getBytes());
+        byte[] rawHmac = mac.doFinal(data);
 
         return ConversionUtils.byteArray2Hex(rawHmac);
     }

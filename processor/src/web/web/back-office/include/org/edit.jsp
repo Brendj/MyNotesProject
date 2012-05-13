@@ -53,7 +53,7 @@
     <%-- Список категорий к которым пренадлежит организация --%>
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGroup>
-        <h:inputText value="#{mainPage.orgEditPage.filterOrg}" readonly="true" styleClass="input-text"
+        <h:inputText value="#{mainPage.orgEditPage.filterOrg}" readonly="true" styleClass="input-text" maxlength="128"
                      style="margin-right: 2px;" />
         <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"

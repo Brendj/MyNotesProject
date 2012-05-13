@@ -526,14 +526,25 @@ private static final String RC_OK_DESC="OK";
         return menuListResult;
     }
 
+    public  void calendarResetTime(Calendar date) {
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+    }
 
     private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
         Criteria menuCriteria = session.createCriteria(Menu.class);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate); toCal.setTime(endDate);
+        calendarResetTime(fromCal); calendarResetTime(toCal);
+        fromCal.add(Calendar.HOUR, -1);
         menuCriteria.add(Restrictions.eq("org", org));
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuCriteria.add(Restrictions.ge("menuDate", startDate));
-        menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        //menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
 
         List menus = menuCriteria.list();
         MenuListExt menuListExt = objectFactory.createMenuListExt();

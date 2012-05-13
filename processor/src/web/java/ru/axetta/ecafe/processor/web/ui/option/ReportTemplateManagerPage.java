@@ -93,16 +93,17 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
     }
 
     public void load() {
-        List<File> templateFilesNameList = new ArrayList<File>();
-        reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        if (reportPath!=null) {
-            ReportTemplateFileNameMenu.getTemplateFilesname(reportPath, templateFilesNameList);
-        } else {
-            logger.error("Report templates path is not specified");
-        }
         items.clear();
-        for (File file : templateFilesNameList) {
-            items.add(new Item(file.getAbsolutePath().substring(reportPath.length())));
+        ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        if (reportPath==null || reportPath.isEmpty()) {
+            logAndPrintMessage("Не настроен путь к директории шаблонов отчетов", null);
+        }
+        else{
+            SelectItem[] templateFilesNameList = reportTemplateFileNameMenu.getItemsWithForcedReload();
+            for (SelectItem s : templateFilesNameList) {
+                items.add(new Item(s.getLabel()));
+            }
         }
     }
 

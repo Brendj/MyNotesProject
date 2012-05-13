@@ -26,11 +26,15 @@ import java.util.List;
 public class ReportTemplateFileNameMenu {
     private static final Logger logger = LoggerFactory.getLogger(ReportTemplateFileNameMenu.class);
 
-    private SelectItem[] items = readAllItems();
+    private SelectItem[] items;
 
     private static SelectItem[] readAllItems() {
-        List<File> templateFilesNameList = new ArrayList<File>();
         String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        File rootFile = new File(reportPath);
+        String fullReportPath="";
+        if (rootFile.exists()) fullReportPath = rootFile.getAbsolutePath();
+
+        List<File> templateFilesNameList = new ArrayList<File>();
         if (reportPath!=null) {
             getTemplateFilesname(reportPath, templateFilesNameList);
         } else {
@@ -39,7 +43,7 @@ public class ReportTemplateFileNameMenu {
         SelectItem[] items = new SelectItem[templateFilesNameList.size()];
         int i = 0;
         for (File file : templateFilesNameList) {
-            items[i++] = new SelectItem(file.getAbsolutePath().substring(reportPath.length()));
+            items[i++] = new SelectItem(file.getAbsolutePath().substring(fullReportPath.length()+1));
         }
         return items;
     }
@@ -64,6 +68,11 @@ public class ReportTemplateFileNameMenu {
     }
 
     public SelectItem[] getItems() {
+        if (items==null) items = readAllItems();
+        return items;
+    }
+    public SelectItem[] getItemsWithForcedReload() {
+        items = readAllItems();
         return items;
     }
 

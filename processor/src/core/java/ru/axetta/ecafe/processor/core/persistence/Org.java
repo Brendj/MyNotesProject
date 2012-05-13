@@ -79,7 +79,7 @@ public class Org {
         return categoriesInternal;
     }
 
-    private void setCategoriesInternal(Set<CategoryOrg> categoriesInternal) {
+    public void setCategoriesInternal(Set<CategoryOrg> categoriesInternal) {
         this.categoriesInternal = categoriesInternal;
     }
 

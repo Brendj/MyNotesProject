@@ -171,7 +171,7 @@ public class ClientFilter {
 
     public boolean isEmpty() {
         return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
-                && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty();
+                && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty();
     }
 
     public String getStatus() {
@@ -184,6 +184,7 @@ public class ClientFilter {
     public void clear() {
         org = new OrgItem();
         contractId = null;
+        filterClientId = null;
         person = new PersonItem();
         contractPerson = new PersonItem();
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;

@@ -100,8 +100,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final String email;
         private final Integer payForSMS;
         private final boolean notifyViaEmail;
-        private final boolean notifyViaSMS;
-        private final long cardCount;
+        private boolean notifyViaSMS;
         private final String clientGroupName;
         private final Long balance;
         private Long limit;
@@ -153,7 +152,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             this.payForSMS = client.getPayForSMS();
             this.notifyViaSMS = client.isNotifyViaSMS();
             this.notifyViaEmail = client.isNotifyViaEmail();
-            this.cardCount = client.getCards().size();
             this.balance = client.getBalance();
             this.limit = client.getLimit();
             this.expenditureLimit = client.getExpenditureLimit();
@@ -230,10 +228,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return notifyViaSMS;
         }
 
-        public long getCardCount() {
-            return cardCount;
-        }
-
         public String getClientGroupName() {
             return clientGroupName;
         }
@@ -243,12 +237,16 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return this.getIdOfClient().toString();
         }
 
+        public void setNotifyViaSMS(boolean notifyViaSMS) {
+            this.notifyViaSMS = notifyViaSMS;
+        }
     }
 
     private List<Item> items = Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
     private Long limit = 0L;
     private Long expenditureLimit = 0L;
+    private boolean notifyViaSMS = false;
 
 
     public Long getExpenditureLimit() {
@@ -265,6 +263,14 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setLimit(Long limit) {
         this.limit = limit;
+    }
+
+    public boolean isNotifyViaSMS() {
+        return notifyViaSMS;
+    }
+
+    public void setNotifyViaSMS(boolean notifyViaSMS) {
+        this.notifyViaSMS = notifyViaSMS;
     }
 
     public String getPageFilename() {
@@ -395,6 +401,20 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception("Ошибка при установлении лимита дневных трат овердрафта.");
         for (Item item : this.getItems()) {
             item.setExpenditureLimit(expenditureLimit);
+        }
+        printMessage("Данные обновлены.");
+    }
+
+    public void setNotifyViaSMS(Session session) throws Exception {
+        if (this.items.isEmpty())
+            return;
+        List<Long> clientsId = new ArrayList<Long>();
+        for (Item item : this.items) {
+            clientsId.add(item.getIdOfClient());
+        }
+        DAOUtils.changeClientGroupNotifyViaSMS(session, notifyViaSMS, clientsId);
+        for (Item item : this.getItems()) {
+            item.setNotifyViaSMS(notifyViaSMS);
         }
         printMessage("Данные обновлены.");
     }

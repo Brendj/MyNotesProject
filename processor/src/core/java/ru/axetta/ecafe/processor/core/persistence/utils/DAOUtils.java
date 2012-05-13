@@ -636,4 +636,15 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("classId", classId));
         return (Contragent) criteria.uniqueResult();
     }
+
+    public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)
+            throws Exception {
+        org.hibernate.Query q = session.createQuery("update Client set notifyViaSMS = :notifyViaSMS, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
+        q.setBoolean("notifyViaSMS", notifyViaSMS);
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при изменении параметров SMS уведомления");
+    }
 }

@@ -123,6 +123,13 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Группа" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.clientGroupName}"
+                          styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Текущий баланс" />
             </f:facet>
             <h:outputText escape="true" value="#{item.balance}" converter="copeckSumConverter"
@@ -179,7 +186,7 @@
 
     <c:if test="${!ru.axetta.ecafe.processor.web.ui.MainPage.sessionInstance.eligibleToEditClients}" >
         <rich:simpleTogglePanel switchType="client" label="Групповые операции" opened="false">
-            <rich:tabPanel>
+            <rich:tabPanel switchType="client">
                 <rich:tab label="Изменение лимита овердрафта">
                     <h:panelGrid columns="2">
                         <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
@@ -208,6 +215,15 @@
                         <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
                         <rich:spacer/>
                         <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
+                                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                    </h:panelGrid>
+                </rich:tab>
+                <rich:tab label="SMS-уведомления">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Включить SMS-уведомления" styleClass="output-text"/>
+                        <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaSMS}" styleClass="output-text" />
+                        <rich:spacer/>
+                        <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaSMS}"
                                        reRender="workspaceTogglePanel" styleClass="command-button" />
                     </h:panelGrid>
                 </rich:tab>

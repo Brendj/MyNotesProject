@@ -272,8 +272,8 @@ CREATE TABLE CF_Assortment (
   IdOfAst                 BIGINT            NOT NULL,  -- surrogate key
   IdOfOrg                 BIGINT            NOT NULL,
   BeginDate               BIGINT            NOT NULL,
-  ShortName               VARCHAR(60)       NOT NULL,
-  FullName                VARCHAR(60)       NOT NULL,
+  ShortName               VARCHAR(128)      NOT NULL,
+  FullName                VARCHAR(128)      NOT NULL,
   GroupName               VARCHAR(60)       NOT NULL,
   MenuOrigin              INT               NOT NULL,
   MenuOutput              VARCHAR(32)       NOT NULL,

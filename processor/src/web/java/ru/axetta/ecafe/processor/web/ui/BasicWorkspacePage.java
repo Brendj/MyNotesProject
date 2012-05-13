@@ -149,7 +149,7 @@ public class BasicWorkspacePage extends BasicPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         logger.error(msg, e);
         facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+": "+e, null));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+(e==null?"":": "+e), null));
     }
 
 }

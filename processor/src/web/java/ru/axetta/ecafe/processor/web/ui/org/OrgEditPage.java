@@ -128,8 +128,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReportsOnVisits(mailingListReportsOnVisits);
         org.setMailingListReports1(mailingListReports1);
         org.setMailingListReports2(mailingListReports2);
-        if (!this.idOfCategoryOrgList.isEmpty()) {
-            org.getCategories().clear();
+        org.setCategoriesInternal(new HashSet<CategoryOrg>());
+        if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
+        else {
             List categoryOrgList = DAOUtils.getCategoryOrgWithIds(session, this.idOfCategoryOrgList);
             for (Object object: categoryOrgList){
                 org.getCategories().add((CategoryOrg) object);
@@ -171,7 +172,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports2 = org.getMailingListReports2();
         idOfCategoryOrgList.clear();
         this.filterOrg ="";
-        if(!org.getCategories().isEmpty()){
+        if(org.getCategories()!=null && !org.getCategories().isEmpty()){
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg: org.getCategories()){
                 stringBuilder.append(categoryOrg.getCategoryName());
@@ -205,7 +206,7 @@ public class OrgEditPage extends BasicWorkspacePage
     }
 
     /* interface implements methods */
-    private String filterOrg = "Не выбрано";
+    private String filterOrg;
     private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
 
     public String getIdOfCategoryOrgList() {
@@ -213,18 +214,15 @@ public class OrgEditPage extends BasicWorkspacePage
     }
 
     public String getFilterOrg() {
+        if (idOfCategoryOrgList.isEmpty()) return "Нет";
         return filterOrg;
     }
 
     @Override
     public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
         if(null != categoryOrgMap) {
             idOfCategoryOrgList = new ArrayList<Long>();
-            if(categoryOrgMap.isEmpty()){
-                filterOrg = "Не выбрано";
-
-            } else {
+            if(!categoryOrgMap.isEmpty()){
                 filterOrg="";
                 for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
                     idOfCategoryOrgList.add(idOfCategoryOrg);
