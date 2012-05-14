@@ -126,25 +126,30 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             public String getTimeEnter(ArrayList<Event> eventList) {
                 if (eventList == null || eventList.isEmpty())
                     return null;
-                for (int i = 0; i<getSortedEventList(eventList).size(); i++)
-                    if (eventList.get(i).getPassdirection() == EnterEvent.ENTRY ||
+                /*
+                for (int i = 0; i<getSortedEventList(eventList).size(); i++) {
+                    Event evt = eventList.get(i);
+                    if (evt.getPassdirection() == EnterEvent.ENTRY ||
                             (getSortedEventList(eventList).size()>=2 && i!=getSortedEventList(eventList).size()-1
                                     && eventList.get(i).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL &&
                                     eventList.get(i+1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
-                return null;
+                }*/
+                //return null;
+                return timeFormat.format(new Date(eventList.get(0).getTime()));
             }
 
             public String getTimeExit(ArrayList<Event> eventList) {
                 if (eventList == null || eventList.isEmpty())
                     return "";
-                for (int i = getSortedEventList(eventList).size()-1; i>=0; i--)
+                /*for (int i = getSortedEventList(eventList).size()-1; i>=0; i--)
                     if (eventList.get(i).getPassdirection() == EnterEvent.EXIT ||
                             (getSortedEventList(eventList).size()>=2 && i!=0 &&
                                     eventList.get(i).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL &&
                                     eventList.get(i-1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
-                return null;
+                return null;*/
+                return timeFormat.format(new Date(eventList.get(eventList.size()-1).getTime()));
             }
 
             public List<String> getTimeList() {

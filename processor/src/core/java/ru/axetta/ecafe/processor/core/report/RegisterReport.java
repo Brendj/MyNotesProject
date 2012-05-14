@@ -36,27 +36,30 @@ public class RegisterReport extends BasicReportForOrgJob {
 
         public static class RegisterReportItem {
 
-             class SumArrayList<E> extends ArrayList {
-                 public void sum(int ind, Object number) {
-                     if (get(ind) instanceof Long) {
-                         Long num = (Long)get(ind);
-                         this.remove(ind);
-                         this.add(ind, num + (Long)number);
-                     }
+             class SumArray extends ArrayList {
+                 long[] vals;
+                 public SumArray(int size) {
+                     vals = new long[size];
+                 } 
+                 public void sum(int ind, Long number) {
+                     vals[ind]+=number;
+                 }
+                 public Long get(int index) {
+                     return vals[index];
                  }
              }
 
-            public static final int CLASSES_1_4 = 0, CLASSES_5_11 = 1;
+            public static final int CLASSES_1_4 = 0, CLASSES_5_11 = 1, CLASSES_COUNT=2;
 
-            SumArrayList<Long> breakfastCount = new SumArrayList<Long>(); // завтрак
-            SumArrayList<Long> breakfastCost = new SumArrayList<Long>();
-            SumArrayList<Long> breakfastSum = new SumArrayList<Long>();
-            SumArrayList<Long> lunchCount = new SumArrayList<Long>(); // обед
-            SumArrayList<Long> lunchCost = new SumArrayList<Long>();
-            SumArrayList<Long> lunchSum = new SumArrayList<Long>();
-            SumArrayList<Long> afternoonSnackCount = new SumArrayList<Long>(); // полдник
-            SumArrayList<Long> afternoonSnackCost = new SumArrayList<Long>();
-            SumArrayList<Long> afternoonSnackSum = new SumArrayList<Long>();
+            SumArray breakfastCount = new SumArray(CLASSES_COUNT); // завтрак
+            SumArray breakfastCost = new SumArray(CLASSES_COUNT);
+            SumArray breakfastSum = new SumArray(CLASSES_COUNT);
+            SumArray lunchCount = new SumArray(CLASSES_COUNT); // обед
+            SumArray lunchCost = new SumArray(CLASSES_COUNT);
+            SumArray lunchSum = new SumArray(CLASSES_COUNT);
+            SumArray afternoonSnackCount = new SumArray(CLASSES_COUNT); // полдник
+            SumArray afternoonSnackCost = new SumArray(CLASSES_COUNT);
+            SumArray afternoonSnackSum = new SumArray(CLASSES_COUNT);
 
             private Date date;
 
@@ -69,75 +72,75 @@ public class RegisterReport extends BasicReportForOrgJob {
                     this.date = new Date(date);
             }
 
-            public SumArrayList<Long> getBreakfastSum() {
+            public SumArray getBreakfastSum() {
                 return breakfastSum;
             }
 
-            public void setBreakfastSum(SumArrayList<Long> breakfastSum) {
+            public void setBreakfastSum(SumArray breakfastSum) {
                 this.breakfastSum = breakfastSum;
             }
 
-            public SumArrayList<Long> getLunchSum() {
+            public SumArray getLunchSum() {
                 return lunchSum;
             }
 
-            public void setLunchSum(SumArrayList<Long> lunchSum) {
+            public void setLunchSum(SumArray lunchSum) {
                 this.lunchSum = lunchSum;
             }
 
-            public SumArrayList<Long> getAfternoonSnackSum() {
+            public SumArray getAfternoonSnackSum() {
                 return afternoonSnackSum;
             }
 
-            public void setAfternoonSnackSum(SumArrayList<Long> afternoonSnackSum) {
+            public void setAfternoonSnackSum(SumArray afternoonSnackSum) {
                 this.afternoonSnackSum = afternoonSnackSum;
             }
 
-            public SumArrayList<Long> getBreakfastCount() {
+            public SumArray getBreakfastCount() {
                 return breakfastCount;
             }
 
-            public void setBreakfastCount(SumArrayList<Long> breakfastCount) {
+            public void setBreakfastCount(SumArray breakfastCount) {
                 this.breakfastCount = breakfastCount;
             }
 
-            public SumArrayList<Long> getBreakfastCost() {
+            public SumArray getBreakfastCost() {
                 return breakfastCost;
             }
 
-            public void setBreakfastCost(SumArrayList<Long> breakfastCost) {
+            public void setBreakfastCost(SumArray breakfastCost) {
                 this.breakfastCost = breakfastCost;
             }
 
-            public SumArrayList<Long> getLunchCount() {
+            public SumArray getLunchCount() {
                 return lunchCount;
             }
 
-            public void setLunchCount(SumArrayList<Long> lunchCount) {
+            public void setLunchCount(SumArray lunchCount) {
                 this.lunchCount = lunchCount;
             }
 
-            public SumArrayList<Long> getLunchCost() {
+            public SumArray getLunchCost() {
                 return lunchCost;
             }
 
-            public void setLunchCost(SumArrayList<Long> lunchCost) {
+            public void setLunchCost(SumArray lunchCost) {
                 this.lunchCost = lunchCost;
             }
 
-            public SumArrayList<Long> getAfternoonSnackCount() {
+            public SumArray getAfternoonSnackCount() {
                 return afternoonSnackCount;
             }
 
-            public void setAfternoonSnackCount(SumArrayList<Long> afternoonSnackCount) {
+            public void setAfternoonSnackCount(SumArray afternoonSnackCount) {
                 this.afternoonSnackCount = afternoonSnackCount;
             }
 
-            public SumArrayList<Long> getAfternoonSnackCost() {
+            public SumArray getAfternoonSnackCost() {
                 return afternoonSnackCost;
             }
 
-            public void setAfternoonSnackCost(SumArrayList<Long> afternoonSnackCost) {
+            public void setAfternoonSnackCost(SumArray afternoonSnackCost) {
                 this.afternoonSnackCost = afternoonSnackCost;
             }
 
@@ -179,7 +182,7 @@ public class RegisterReport extends BasicReportForOrgJob {
             Calendar c = Calendar.getInstance();
             Query query = session.createSQLQuery("SELECT count(*), o.CreatedDate/(1000*60*60*24) xdt, sum(od.socDiscount) AS SUM1, sum(od.Qty*od.socDiscount) AS SUM2, od.menuDetailName, cg.groupname "+
                 " FROM CF_ORDERS o, CF_ORDERDETAILS od, CF_CLIENTS c, CF_CLIENTGROUPS cg " +
-                " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
+                " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg and cg.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
                 " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
                 " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
                 " (od.menuDetailName = 'Обед' OR od.menuDetailName = 'Завтрак' OR od.menuDetailName = 'Полдник')" +
@@ -208,17 +211,6 @@ public class RegisterReport extends BasicReportForOrgJob {
                 RegisterReportItem resultRow = mapItems.get(day);
                 if (resultRow == null) {
                     resultRow = new RegisterReportItem(timeMs);
-                    for (int classNum = 0; classNum < 2; classNum++) {
-                        resultRow.getAfternoonSnackCost().add(classNum, 0L);
-                        resultRow.getAfternoonSnackCount().add(classNum, 0L);
-                        resultRow.getAfternoonSnackSum().add(classNum, 0L);
-                        resultRow.getBreakfastCost().add(classNum, 0L);
-                        resultRow.getBreakfastCount().add(classNum, 0L);
-                        resultRow.getBreakfastSum().add(classNum, 0L);
-                        resultRow.getLunchCost().add(classNum, 0L);
-                        resultRow.getLunchCount().add(classNum, 0L);
-                        resultRow.getLunchSum().add(classNum, 0L);
-                    }
                     mapItems.put(day, resultRow);
                     resultRows.add(resultRow);
                 }
@@ -231,7 +223,7 @@ public class RegisterReport extends BasicReportForOrgJob {
                 } else if (detailName.equals("Обед")) {
                     resultRow.getLunchCost().sum(classNum, price);
                     resultRow.getLunchCount().sum(classNum, count);
-                    resultRow.getLunchCount().sum(classNum, count);
+                    //resultRow.getLunchCount().sum(classNum, count);
                     resultRow.getLunchSum().sum(classNum, sum);
                 } else if (detailName.equals("Полдник")) {
                     resultRow.getAfternoonSnackCost().sum(classNum, price);
@@ -240,17 +232,6 @@ public class RegisterReport extends BasicReportForOrgJob {
                 }
             }
             RegisterReportItem resultRow = new RegisterReportItem(null);
-            for (int classNum = 0; classNum < 2; classNum++) {
-                resultRow.getAfternoonSnackCost().add(classNum, 0L);
-                resultRow.getAfternoonSnackCount().add(classNum, 0L);
-                resultRow.getAfternoonSnackSum().add(classNum, 0L);
-                resultRow.getBreakfastCost().add(classNum, 0L);
-                resultRow.getBreakfastCount().add(classNum, 0L);
-                resultRow.getBreakfastSum().add(classNum, 0L);
-                resultRow.getLunchCost().add(classNum, 0L);
-                resultRow.getLunchCount().add(classNum, 0L);
-                resultRow.getLunchSum().add(classNum, 0L);
-            }
             for (RegisterReportItem row : resultRows) {
                 for (int classNum = 0; classNum < 2; classNum++) {
                     resultRow.getBreakfastCost().sum(classNum, row.getBreakfastCost().get(classNum));
