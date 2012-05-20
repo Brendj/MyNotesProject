@@ -27,7 +27,7 @@ public class Publication {
     private String author;
     private String title;
     private String title2;
-    private String publicationDate;
+    private String publicationdate;
     private String publisher;
     private long version;
     private Set<Circulation> circulations = new HashSet<Circulation>();
@@ -137,12 +137,12 @@ public class Publication {
         this.title2 = title2;
     }
 
-    public String getPublicationDate() {
-        return publicationDate;
+    public String getPublicationdate() {
+        return publicationdate;
     }
 
-    public void setPublicationDate(String publicationDate) {
-        this.publicationDate = publicationDate;
+    public void setPublicationdate(String publicationdate) {
+        this.publicationdate = publicationdate;
     }
 
     public String getPublisher() {
@@ -205,7 +205,7 @@ public class Publication {
                 + bibliographicLevel + '\'' + ", hierarchicalLevel='" + hierarchicalLevel + '\'' + ", codingLevel='"
                 + codingLevel + '\'' + ", formOfCatalogingDescription='" + formOfCatalogingDescription + '\''
                 + ", data='" + data + '\'' + ", author='" + author + '\'' + ", title='" + title + '\'' + ", title2='"
-                + title2 + '\'' + ", publicationDate='" + publicationDate + '\'' + ", publisher='" + publisher + '\''
+                + title2 + '\'' + ", publicationdate='" + publicationdate + '\'' + ", publisher='" + publisher + '\''
                 + ", version=" + version + ", circulations=" + circulations + '}';
     }
 }

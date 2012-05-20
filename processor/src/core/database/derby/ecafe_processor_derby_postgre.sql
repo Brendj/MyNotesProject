@@ -307,7 +307,6 @@ CREATE TABLE CF_Orders (
   SocDiscount     BIGINT        NOT NULL DEFAULT 0,
   TrdDiscount     BIGINT        NOT NULL DEFAULT 0,
   GrantSum        BIGINT        NOT NULL,
-  sumByCard            BIGINT        NOT NULL,
   CreatedDate     BIGINT        NOT NULL,
   SumByCard       BIGINT        NOT NULL,
   SumByCash       BIGINT        NOT NULL,

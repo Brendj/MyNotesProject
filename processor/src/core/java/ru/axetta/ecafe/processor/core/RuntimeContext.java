@@ -313,6 +313,9 @@ public class RuntimeContext implements ApplicationContextAware {
 
         String basePath="/";
         Properties properties = loadConfig();
+        if (properties == null) {
+            properties = new Properties();
+        }
         configProperties = properties;
         Scheduler scheduler = null;
         ExecutorService executorService = null;
@@ -373,7 +376,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientSmsDeliveryStatusUpdater = createClientSmsDeliveryStatusUpdater(properties, executorService,
                     scheduler, sessionFactory, smsService);
 
-             this.payformUrl = buildPayformUrl(properties);
+            this.payformUrl = buildPayformUrl(properties);
             this.payformGroupUrl = buildPayformGroupUrl(properties);
             this.messageIdGenerator = createMessageIdGenerator(properties, sessionFactory);
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);

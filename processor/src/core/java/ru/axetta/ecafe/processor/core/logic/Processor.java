@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.PaymentProcessEvent;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
-import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
@@ -19,29 +18,25 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
-import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.Session;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -129,6 +124,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResDiary resDiary = null;
         SyncResponse.ResEnterEvents resEnterEvents = null;
         SyncResponse.ResLibraryData resLibraryData = null;
+        SyncResponse.ResLibraryData2 resLibraryData2 = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         try {
@@ -166,7 +162,7 @@ public class Processor implements SyncProcessor,
                 } catch (Exception e) {
                     resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
                     logger.error(String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg()),
-                                                e);
+                            e);
                 }
 
                 // Process menu from Org
@@ -208,8 +204,9 @@ public class Processor implements SyncProcessor,
 
                 // Process enterEvents
                 try {
-                    if (request.getEnterEvents() != null)
+                    if (request.getEnterEvents() != null) {
                         resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+                    }
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
@@ -217,10 +214,20 @@ public class Processor implements SyncProcessor,
 
                 // Process library data
                 try {
-                    if (request.getEnterEvents() != null)
+                    if (request.getEnterEvents() != null) {
                         resLibraryData = processSyncLibraryData(request.getLibraryData());
+                    }
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process library data, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
+                }
+
+                try {
+                    if (request.getEnterEvents() != null) {
+                        resLibraryData2 = processSyncLibraryData2(request.getLibraryData2());
+                    }
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process library data 2, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
                 }
 
@@ -236,8 +243,9 @@ public class Processor implements SyncProcessor,
                 try {
                     correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to process numbers of Orders, IdOfOrg == %s",
-                            request.getIdOfOrg()), e);
+                    logger.error(
+                            String.format("Failed to process numbers of Orders, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
                 }
 
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
@@ -254,8 +262,9 @@ public class Processor implements SyncProcessor,
 
                 // Process enterEvents
                 try {
-                    if (request.getEnterEvents() != null)
+                    if (request.getEnterEvents() != null) {
                         resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+                    }
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
@@ -273,10 +282,11 @@ public class Processor implements SyncProcessor,
         }
 
         // Build and return response
-        SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(), request.getOrg().getShortName(), idOfPacket,
-                request.getProtoVersion(), syncEndTime, "", accRegistry, resPaymentRegistry, accIncRegistry,
-                clientRegistry, resOrgStructure, resMenuExchange, resDiary, "", resEnterEvents, resLibraryData,
-                resCategoriesDiscountsAndRules, correctingNumbersOrdersRegistry);
+        SyncResponse response = new SyncResponse(request.getType(), request.getIdOfOrg(),
+                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
+                correctingNumbersOrdersRegistry);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -349,8 +359,8 @@ public class Processor implements SyncProcessor,
             SyncResponse.ResPaymentRegistry.Item resAcc;
             try {
                 resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, payment);
-                if (resAcc.getResult()!=0) {
-                    logger.error("Failure in response payment registry: "+resAcc);
+                if (resAcc.getResult() != 0) {
+                    logger.error("Failure in response payment registry: " + resAcc);
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to process payment == %s", payment), e);
@@ -432,9 +442,8 @@ public class Processor implements SyncProcessor,
             if (null != order) {
                 // if order == payment (may be last sync result was not transferred to client)
                 Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
-                if ((("" + orderCardNo).equals("" + payment.getCardNo()))
-                        && (order.getCreateTime().equals(payment.getTime())) && (order.getSumByCard()
-                        .equals(payment.getSumByCard()))) {
+                if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
+                        .equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 0,
                             "Order is already registered");
                 } else {
@@ -537,15 +546,15 @@ public class Processor implements SyncProcessor,
                         String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
             }
-            if (0 != payment.getSumByCard() && card==null) {
+            if (0 != payment.getSumByCard() && card == null) {
                 // Check if card is specified
                 return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 240, String.format(
                         "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                         idOfOrg, payment.getIdOfOrder(), idOfClient));
             }
             // Create order
-            RuntimeContext.getFinancialOpsManager().createOrderCharge(persistenceSession, payment, idOfOrg, client,
-                    card);
+            RuntimeContext.getFinancialOpsManager()
+                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card);
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
@@ -573,8 +582,8 @@ public class Processor implements SyncProcessor,
                 totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();
             }
             // Check payment sums
-            if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment
-                    .getSocDiscount() + payment.getTrdDiscount() + payment.getGrant()) {
+            if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
+                    .getTrdDiscount() + payment.getGrant()) {
                 return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 300,
                         String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
@@ -662,19 +671,19 @@ public class Processor implements SyncProcessor,
                 long paymentSum = payment.getSum();
                 if (payment.isResetBalance()) {
                     paymentSum -= client.getBalance();
-                    logger.info("Processing payment with balance reset: " + client + "; current balance="
-                            + client.getBalance() + "; set balance=" + paymentSum);
+                    logger.info("Processing payment with balance reset: " + client + "; current balance=" + client
+                            .getBalance() + "; set balance=" + paymentSum);
                 }
-                RuntimeContext.getFinancialOpsManager().createClientPayment(persistenceSession, client,
-                        payment.getPaymentMethod(), paymentSum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT,
-                        payment.getPayTime(), payment.getIdOfPayment(), contragent, payment.getAddPaymentMethod(),
-                        payment.getAddIdOfPayment());
+                RuntimeContext.getFinancialOpsManager()
+                        .createClientPayment(persistenceSession, client, payment.getPaymentMethod(), paymentSum,
+                                ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, payment.getPayTime(), payment.getIdOfPayment(),
+                                contragent, payment.getAddPaymentMethod(), payment.getAddIdOfPayment());
 
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, client.getContractId(), null, client.getBalance(),
-                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, null);
+                    idOfClient, client.getContractId(), null, client.getBalance(), PaymentProcessResult.OK.getCode(),
+                    PaymentProcessResult.OK.getDescription(), client, null);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -715,29 +724,45 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
-            if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
-            if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
-            if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
-            if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
-            if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
-            if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
-            if (clientParamItem.getSurname()!=null) client.getPerson().setSurname(clientParamItem.getSurname());
-            if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
+            if (clientParamItem.getAddress() != null) {
+                client.setAddress(clientParamItem.getAddress());
+            }
+            if (clientParamItem.getEmail() != null) {
+                client.setEmail(clientParamItem.getEmail());
+            }
+            if (clientParamItem.getMobilePhone() != null) {
+                client.setMobile(clientParamItem.getMobilePhone());
+            }
+            if (clientParamItem.getName() != null) {
+                client.getPerson().setFirstName(clientParamItem.getName());
+            }
+            if (clientParamItem.getPhone() != null) {
+                client.setPhone(clientParamItem.getPhone());
+            }
+            if (clientParamItem.getSecondName() != null) {
+                client.getPerson().setSecondName(clientParamItem.getSecondName());
+            }
+            if (clientParamItem.getSurname() != null) {
+                client.getPerson().setSurname(clientParamItem.getSurname());
+            }
+            if (clientParamItem.getRemarks() != null) {
+                client.setRemarks(clientParamItem.getRemarks());
+            }
 
             /* распарсим строку с категориями */
-            if(clientParamItem.getCategoriesDiscounts()!= null){
+            if (clientParamItem.getCategoriesDiscounts() != null) {
                 String categories = clientParamItem.getCategoriesDiscounts();
                 client.setCategoriesDiscounts(categories);
-                if(!categories.equals("")){
+                if (!categories.equals("")) {
                     String[] catArray = categories.split(",");
                     List<Long> idOfCategoryDiscount = new ArrayList<Long>();
-                    for (String number: catArray){
+                    for (String number : catArray) {
                         idOfCategoryDiscount.add(Long.parseLong(number.trim()));
                     }
                     Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
-                    categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount",idOfCategoryDiscount));
+                    categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscount));
                     Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
-                    for(Object object: categoryDiscountCriteria.list()){
+                    for (Object object : categoryDiscountCriteria.list()) {
                         categoryDiscountSet.add((CategoryDiscount) object);
                     }
                     client.setCategories(categoryDiscountSet);
@@ -757,37 +782,44 @@ public class Processor implements SyncProcessor,
 
     // 12-01-2012 Kadyrov D.I.
 
-    private SyncResponse.CorrectingNumbersOrdersRegistry processSyncCorrectingNumbersOrdersRegistry (Long idOfOrg) throws Exception{
+    private SyncResponse.CorrectingNumbersOrdersRegistry processSyncCorrectingNumbersOrdersRegistry(Long idOfOrg)
+            throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria orderCriteria = persistenceSession.createCriteria(Order.class);
-            orderCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            orderCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
             orderCriteria.setProjection(Projections.max("compositeIdOfOrder.idOfOrder"));
-            List orderMax=orderCriteria.list();
+            List orderMax = orderCriteria.list();
             Criteria orderDetailCriteria = persistenceSession.createCriteria(OrderDetail.class);
-            orderDetailCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            orderDetailCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
             orderDetailCriteria.setProjection(Projections.max("compositeIdOfOrderDetail.idOfOrderDetail"));
-            List orderDetailMax=orderDetailCriteria.list();
+            List orderDetailMax = orderDetailCriteria.list();
 
             Criteria enterEventCriteria = persistenceSession.createCriteria(EnterEvent.class);
-            enterEventCriteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+            enterEventCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
             enterEventCriteria.setProjection(Projections.max("compositeIdOfEnterEvent.idOfEnterEvent"));
             List enterEventMax = enterEventCriteria.list();
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
             Long idOfOrderMax = (Long) orderMax.get(0),
-                 idOfOrderDetail = (Long) orderDetailMax.get(0),
-                 idOfEnterEvent = (Long) enterEventMax.get(0);
-            if (idOfOrderMax == null) idOfOrderMax = 0L;
-            if (idOfOrderDetail == null) idOfOrderDetail = 0L;
-            if  (idOfEnterEvent == null) idOfEnterEvent = 0L;
+                    idOfOrderDetail = (Long) orderDetailMax.get(0),
+                    idOfEnterEvent = (Long) enterEventMax.get(0);
+            if (idOfOrderMax == null) {
+                idOfOrderMax = 0L;
+            }
+            if (idOfOrderDetail == null) {
+                idOfOrderDetail = 0L;
+            }
+            if (idOfEnterEvent == null) {
+                idOfEnterEvent = 0L;
+            }
             return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail, idOfEnterEvent);
             //return null;
-        }  finally {
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -807,10 +839,14 @@ public class Processor implements SyncProcessor,
             for (ClientGroup clientGroup : organization.getClientGroups()) {
                 if (clientGroup.isTemporaryGroup()) {
                     // добавляем временную группу в список для удаления если она уже есть в постоянных
-                    if (findClientGroupByName(clientGroup.getGroupName(), reqStructure))
+                    if (findClientGroupByName(clientGroup.getGroupName(), reqStructure)) {
                         superfluousClientGroups.add(clientGroup);
+                    }
                 } else {
-                    if (!findClientGroupById(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), reqStructure)) superfluousClientGroups.add(clientGroup);
+                    if (!findClientGroupById(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(),
+                            reqStructure)) {
+                        superfluousClientGroups.add(clientGroup);
+                    }
                 }
             }
             // Удаляем "лишние" группы
@@ -847,16 +883,19 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private static boolean findClientGroupById(long idOfClientGroup, SyncRequest.OrgStructure reqStructure) throws Exception {
+    private static boolean findClientGroupById(long idOfClientGroup, SyncRequest.OrgStructure reqStructure)
+            throws Exception {
         Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
         while (reqGroups.hasMoreElements()) {
-            if (idOfClientGroup==reqGroups.nextElement().getIdOfGroup()) {
+            if (idOfClientGroup == reqGroups.nextElement().getIdOfGroup()) {
                 return true;
             }
         }
         return false;
     }
-    private static boolean findClientGroupByName(String groupName, SyncRequest.OrgStructure reqStructure) throws Exception {
+
+    private static boolean findClientGroupByName(String groupName, SyncRequest.OrgStructure reqStructure)
+            throws Exception {
         Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
         while (reqGroups.hasMoreElements()) {
             if (groupName.equals(reqGroups.nextElement().getName())) {
@@ -1340,35 +1379,37 @@ public class Processor implements SyncProcessor,
 
             for (SyncRequest.EnterEvents.EnterEvent e : enterEvents.getEvents()) {
                 // Check enter event existence
-                EnterEvent ee = DAOUtils
-                    .findEnterEvent(persistenceSession, new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
+                EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
+                        new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
                 if (null != ee) {
                     // if enter event exists (may be last sync result was not transferred to client)
-                    if (((ee.getClient() == null && e.getIdOfClient() == null) ||
-                         (ee.getClient() != null && ee.getClient().getIdOfClient().equals(e.getIdOfClient())))
-                        && ee.getEvtDateTime().equals(e.getEvtDateTime())
-                        && ((ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) ||
-                            (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard())))) {
-                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
-                                SyncResponse.ResEnterEvents.Item.RC_OK,
-                            "Enter event already registered");
+                    if (((ee.getClient() == null && e.getIdOfClient() == null) || (ee.getClient() != null && ee
+                            .getClient().getIdOfClient().equals(e.getIdOfClient()))) && ee.getEvtDateTime()
+                            .equals(e.getEvtDateTime()) && (
+                            (ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) || (
+                                    ee.getIdOfTempCard() != null && ee.getIdOfTempCard()
+                                            .equals(e.getIdOfTempCard())))) {
+                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
+                                e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_OK,
+                                "Enter event already registered");
                         resEnterEvents.addItem(item);
                     } else {
-                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
+                        SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
+                                e.getIdOfEnterEvent(),
                                 SyncResponse.ResEnterEvents.Item.RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES,
-                            "Enter event already registered but attributes differ, idOfOrg == " + e.getIdOfOrg() +
-                                    ", idOfEnterEvent == " + e.getIdOfEnterEvent());
+                                "Enter event already registered but attributes differ, idOfOrg == " + e.getIdOfOrg() +
+                                        ", idOfEnterEvent == " + e.getIdOfEnterEvent());
                         resEnterEvents.addItem(item);
                     }
-                }
-                else {
+                } else {
                     // find client by id
                     Client client = null;
                     if (e.getIdOfClient() != null) {
                         client = (Client) persistenceSession.get(Client.class, e.getIdOfClient());
-                        if (client==null) {
-                            SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
-                                "Client not found: "+e.getIdOfClient());
+                        if (client == null) {
+                            SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
+                                    e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
+                                    "Client not found: " + e.getIdOfClient());
                             resEnterEvents.addItem(item);
                             continue;
                         }
@@ -1393,45 +1434,60 @@ public class Processor implements SyncProcessor,
                     persistenceSession.save(enterEvent);
 
 
-                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(), 0,
-                            null);
+                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
+                            0, null);
                     resEnterEvents.addItem(item);
 
-                    if(isDateToday(e.getEvtDateTime()) &&
+                    if (isDateToday(e.getEvtDateTime()) &&
                             e.getIdOfClient() != null &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
-                                    e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)){
-                        RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotificationAsync(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
-                                generateNotificationParams(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime())
-                        );
+                                    e.getPassDirection() == EnterEvent.RE_ENTRY
+                                    || e.getPassDirection() == EnterEvent.RE_EXIT)) {
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                .sendNotificationAsync(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
+                                        generateNotificationParams(persistenceSession, client, e.getPassDirection(),
+                                                e.getEvtDateTime()));
                     }
 
                     /// Формирование журнала транзакции
                     if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
-                            e.getPassDirection() == EnterEvent.RE_ENTRY || e.getPassDirection() == EnterEvent.RE_EXIT)
-                             && e.getIdOfCard()!=null) {
+                                    e.getPassDirection() == EnterEvent.RE_ENTRY
+                                    || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
                         Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
-                        if (card==null) {
-                            logger.error("Не найдена карта по событию прохода: idOfOrg="+enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()+", idOfEnterEvent="+enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()+", idOfCard="+e.getIdOfCard());
+                        if (card == null) {
+                            logger.error("Не найдена карта по событию прохода: idOfOrg=" + enterEvent
+                                    .getCompositeIdOfEnterEvent().getIdOfOrg() + ", idOfEnterEvent=" + enterEvent
+                                    .getCompositeIdOfEnterEvent().getIdOfEnterEvent() + ", idOfCard=" + e
+                                    .getIdOfCard());
                         }
 
-                        if (card!=null && card.getCardType()==Card.TYPE_UEC) {
+                        if (card != null && card.getCardType() == Card.TYPE_UEC) {
                             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
-                            orgCriteria.add(Restrictions.eq("idOfOrg",e.getIdOfOrg()));
+                            orgCriteria.add(Restrictions.eq("idOfOrg", e.getIdOfOrg()));
                             Org org = (Org) orgCriteria.uniqueResult();
                             String transCode;
-                            switch (e.getPassDirection()){
-                                case EnterEvent.ENTRY: case EnterEvent.RE_ENTRY: transCode="IN"; break;
-                                case EnterEvent.EXIT: case EnterEvent.RE_EXIT: transCode="OUT";  break;
-                                default: transCode=null;
+                            switch (e.getPassDirection()) {
+                                case EnterEvent.ENTRY:
+                                case EnterEvent.RE_ENTRY:
+                                    transCode = "IN";
+                                    break;
+                                case EnterEvent.EXIT:
+                                case EnterEvent.RE_EXIT:
+                                    transCode = "OUT";
+                                    break;
+                                default:
+                                    transCode = null;
                             }
-                            if (transCode!=null) {
-                                TransactionJournal transactionJournal = new TransactionJournal(enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
-                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(), org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_ACC,
-                                        transCode,
-                                        TransactionJournal.CARD_TYPE_CODE_UEC, TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()] , Long.toHexString(card.getCardNo()),
-                                        client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), e.getEnterName());
+                            if (transCode != null) {
+                                TransactionJournal transactionJournal = new TransactionJournal(
+                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
+                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(),
+                                        org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_ACC, transCode,
+                                        TransactionJournal.CARD_TYPE_CODE_UEC,
+                                        TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()],
+                                        Long.toHexString(card.getCardNo()), client.getSan(), client.getContractId(),
+                                        client.getClientGroupTypeAsString(), e.getEnterName());
                                 persistenceSession.save(transactionJournal);
                             }
                         }
@@ -1457,6 +1513,13 @@ public class Processor implements SyncProcessor,
         return resEnterEvents;
     }
 
+    /* private void processSyncLibraryData2(SyncRequest.LibraryData2 libraryData) {
+       Session persistenceSession = null;
+       Transaction persistenceTransaction = null;
+       SyncResponse.ResLibraryData2 resLibraryData2 = new SyncResponse.ResLibraryData2();
+
+   } */
+
     private SyncResponse.ResLibraryData processSyncLibraryData(SyncRequest.LibraryData libraryData) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1468,23 +1531,22 @@ public class Processor implements SyncProcessor,
             for (SyncRequest.LibraryData.Publications.Publication p : libraryData.getPublications()
                     .getPublicationList()) {
                 // Check publication existence
-                Publication pbctn = DAOUtils
-                    .findPublication(persistenceSession,
-                            new CompositeIdOfPublication(p.getIdOfPublication(), p.getIdOfOrg()));
+                Publication pbctn = DAOUtils.findPublication(persistenceSession,
+                        new CompositeIdOfPublication(p.getIdOfPublication(), p.getIdOfOrg()));
                 if (p.getAction().equalsIgnoreCase("n") && null != pbctn) {
                     // if publication exists (may be last sync result was not transferred to client)
                     if (pbctn.getRecordStatus().equals(p.getRecordStatus()) &&
-                        pbctn.getRecordType().equals(p.getRecordType()) &&
-                        pbctn.getBibliographicLevel().equals(p.getBibliographicLevel()) &&
-                        pbctn.getHierarchicalLevel().equals(p.getHierarchicalLevel()) &&
-                        pbctn.getCodingLevel().equals(p.getCodingLevel()) &&
-                        pbctn.getFormOfCatalogingDescription().equals(p.getFormOfCatalogingDescription())) {
+                            pbctn.getRecordType().equals(p.getRecordType()) &&
+                            pbctn.getBibliographicLevel().equals(p.getBibliographicLevel()) &&
+                            pbctn.getHierarchicalLevel().equals(p.getHierarchicalLevel()) &&
+                            pbctn.getCodingLevel().equals(p.getCodingLevel()) &&
+                            pbctn.getFormOfCatalogingDescription().equals(p.getFormOfCatalogingDescription())) {
                         SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
-                            p.getIdOfPublication(), p.getVersion(), 0, "Publication already registered");
+                                p.getIdOfPublication(), p.getVersion(), 0, "Publication already registered");
                         resLibraryData.getPublications().addItem(item);
                     } else {
                         SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
-                            p.getIdOfPublication(), p.getVersion(), 2, "Publication already registered " +
+                                p.getIdOfPublication(), p.getVersion(), 2, "Publication already registered " +
                                 "but attributes differ, idOfOrg == " + p.getIdOfOrg() +
                                 ", idOfPublication == " + p.getIdOfPublication());
                         resLibraryData.getPublications().addItem(item);
@@ -1492,9 +1554,9 @@ public class Processor implements SyncProcessor,
                 } else if (p.getAction().equalsIgnoreCase("u") && null == pbctn) {
                     SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
                             p.getIdOfPublication(), p.getVersion(), 3, "Can't update publication, " +
-                                "record haven't been found, idOfOrg == " + p.getIdOfOrg() +
-                                ", idOfPublication == " + p.getIdOfPublication());
-                        resLibraryData.getPublications().addItem(item);
+                            "record haven't been found, idOfOrg == " + p.getIdOfOrg() +
+                            ", idOfPublication == " + p.getIdOfPublication());
+                    resLibraryData.getPublications().addItem(item);
                 } else {
                     Publication publication = new Publication();
                     publication.setCompositeIdOfPublication(
@@ -1509,7 +1571,7 @@ public class Processor implements SyncProcessor,
                     publication.setAuthor(p.getAuthor());
                     publication.setTitle(p.getTitle());
                     publication.setTitle2(p.getTitle2());
-                    publication.setPublicationDate(p.getPublicationDate());
+                    publication.setPublicationdate(p.getPublicationDate());
                     publication.setPublisher(p.getPublisher());
                     publication.setVersion(p.getVersion());
 
@@ -1520,7 +1582,7 @@ public class Processor implements SyncProcessor,
                     }
 
                     SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
-                        p.getIdOfPublication(), p.getVersion(), 0, null);
+                            p.getIdOfPublication(), p.getVersion(), 0, null);
                     resLibraryData.getPublications().addItem(item);
                 }
             }
@@ -1553,27 +1615,27 @@ public class Processor implements SyncProcessor,
                 int errCode = 0;
                 String error = null;
                 // Check circulation existence
-                Circulation crcltn = DAOUtils
-                    .findCirculation(persistenceSession, new CompositeIdOfCirculation(c.getIdOfCirculation(), c.getIdOfOrg()));
+                Circulation crcltn = DAOUtils.findCirculation(persistenceSession,
+                        new CompositeIdOfCirculation(c.getIdOfCirculation(), c.getIdOfOrg()));
                 if (c.getAction().equalsIgnoreCase("n") && null != crcltn) {
                     // if circulation exists (may be last sync result was not transferred to client)
                     if (crcltn.getClient().getIdOfClient().equals(c.getIdOfClient()) &&
-                        crcltn.getIdOfPublication() == c.getIdOfPublication() &&
-                        crcltn.getIssuanceDate().equals(c.getIssuanceDate()) &&
-                        crcltn.getRefundDate().equals(c.getRefundDate())) {
+                            crcltn.getIdOfPublication() == c.getIdOfPublication() &&
+                            crcltn.getIssuanceDate().equals(c.getIssuanceDate()) &&
+                            crcltn.getRefundDate().equals(c.getRefundDate())) {
                         SyncResponse.ResLibraryData.Circulations.Circulation item = new SyncResponse.ResLibraryData.Circulations.Circulation(
-                            c.getIdOfCirculation(), c.getVersion(), 0, "Circulation already registered");
+                                c.getIdOfCirculation(), c.getVersion(), 0, "Circulation already registered");
                         resLibraryData.getCirculations().addItem(item);
                     } else {
                         SyncResponse.ResLibraryData.Circulations.Circulation item = new SyncResponse.ResLibraryData.Circulations.Circulation(
-                            c.getIdOfCirculation(), c.getVersion(), 2, "Circulation already registered " +
+                                c.getIdOfCirculation(), c.getVersion(), 2, "Circulation already registered " +
                                 "but attributes differ, idOfOrg == " + c.getIdOfOrg() +
                                 ", idOfCirculation == " + c.getIdOfCirculation());
                         resLibraryData.getCirculations().addItem(item);
                     }
                 } else if (c.getAction().equalsIgnoreCase("u") && null == crcltn) {
                     SyncResponse.ResLibraryData.Circulations.Circulation item = new SyncResponse.ResLibraryData.Circulations.Circulation(
-                        c.getIdOfCirculation(), c.getVersion(), 3, "Can't update circulation, " +
+                            c.getIdOfCirculation(), c.getVersion(), 3, "Can't update circulation, " +
                             "record haven't been found, idOfOrg == " + c.getIdOfOrg() +
                             ", idOfCirculation == " + c.getIdOfCirculation());
                     resLibraryData.getCirculations().addItem(item);
@@ -1582,14 +1644,14 @@ public class Processor implements SyncProcessor,
                     Client client = (Client) persistenceSession.get(Client.class, c.getIdOfClient());
                     if (client != null) {
                         // Сформировать объект Publication
-                        CompositeIdOfPublication compositeIdOfPublication =
-                            new CompositeIdOfPublication(c.getIdOfPublication(), c.getIdOfOrg());
+                        CompositeIdOfPublication compositeIdOfPublication = new CompositeIdOfPublication(
+                                c.getIdOfPublication(), c.getIdOfOrg());
                         Publication publication = (Publication) persistenceSession
-                            .get(Publication.class, compositeIdOfPublication);
+                                .get(Publication.class, compositeIdOfPublication);
                         if (publication != null) {
                             Circulation circulation = new Circulation();
                             circulation.setCompositeIdOfCirculation(
-                                new CompositeIdOfCirculation(c.getIdOfCirculation(), c.getIdOfOrg()));
+                                    new CompositeIdOfCirculation(c.getIdOfCirculation(), c.getIdOfOrg()));
                             circulation.setClient(client);
                             circulation.setPublication(publication);
                             circulation.setIdOfPublication(c.getIdOfPublication());
@@ -1607,7 +1669,8 @@ public class Processor implements SyncProcessor,
                             }
                         } else {
                             errCode = 4;
-                            error = "Publication not found for circulation with idOfCirculation " + c.getIdOfCirculation();
+                            error = "Publication not found for circulation with idOfCirculation " + c
+                                    .getIdOfCirculation();
                         }
                     } else {
                         errCode = 4;
@@ -1615,7 +1678,7 @@ public class Processor implements SyncProcessor,
                     }
 
                     SyncResponse.ResLibraryData.Circulations.Circulation item = new SyncResponse.ResLibraryData.Circulations.Circulation(
-                        c.getIdOfCirculation(), c.getVersion(), errCode, error);
+                            c.getIdOfCirculation(), c.getVersion(), errCode, error);
                     resLibraryData.getCirculations().addItem(item);
                 }
             }
@@ -1645,11 +1708,191 @@ public class Processor implements SyncProcessor,
         return resLibraryData;
     }
 
+    private SyncResponse.ResLibraryData2 processSyncLibraryData2(SyncRequest.LibraryData2 libraryData2) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        SyncResponse.ResLibraryData2 resLibraryData2 = new SyncResponse.ResLibraryData2();
+        long version = 0;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            version = DAOUtils.getNextVersion(persistenceSession);
+            resLibraryData2.setPubls(new SyncResponse.ResLibraryData2.Publs());
+
+            //First of all return all new versioned updates to client
+            //generate new version value and put all updates with new generated version
+            for (SyncRequest.LibraryData2.Publs.Publ p : libraryData2.getPubls().getPublList()) {
+                Publ pbctn = null;
+                if (p.getIdOfPubl() != null) {
+                    pbctn = DAOUtils.findPubl(persistenceSession, p.getIdOfPubl());
+                }
+                if (pbctn == null) {
+                    // Try to find by ISBN
+                    if (p.getIsbn() != null) {
+                        pbctn = DAOUtils.findPublByISBN(persistenceSession, p.getIsbn());
+                    }
+                }
+                if (pbctn == null) {
+                    try {
+                        String hash = createKey(p.getAuthor(), p.getTitle(), p.getTitle2(), p.getPublisher());
+                        pbctn = DAOUtils.findPublByHash(persistenceSession, hash);
+                    } catch (Exception e) {
+                        logger.error("Error creating hash from publication fields", e);
+
+                    }
+                }
+                // If find - update in database, else create new record
+                if (pbctn == null) {
+                    pbctn = new Publ();
+                }
+
+                pbctn.setAuthor(p.getAuthor());
+                pbctn.setIsbn(p.getIsbn());
+                pbctn.setData(p.getData());
+                pbctn.setPublicationdate(p.getPublicationDate());
+                pbctn.setPublisher(p.getPublisher());
+                pbctn.setTitle(p.getTitle());
+                pbctn.setTitle2(p.getTitle2());
+                pbctn.setHash(createKey(p.getAuthor(), p.getTitle(), p.getTitle2(), p.getPublisher()));
+                pbctn.setVersion(version);
+
+                String errCode =
+                        "Publication " + ((pbctn.getIdofpubl() == null) ? "added" : "updated") + " successfully";
+                if (pbctn.getIdofpubl() != null) {
+                    persistenceSession.merge(pbctn);
+                } else {
+                    persistenceSession.save(pbctn);
+                }
+
+                SyncResponse.ResLibraryData2.Publs.Publ item = new SyncResponse.ResLibraryData2.Publs.Publ(
+                        pbctn.getIdofpubl(), 0, errCode);
+                //Add info about updates to the response
+                resLibraryData2.getPubls().addItem(item);
+                //Add info about all updates to the client (updates with version >= client version)
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Save publication to database error: ", e);
+            SyncResponse.ResLibraryData2.Publs publs = new SyncResponse.ResLibraryData2.Publs();
+
+            for (SyncRequest.LibraryData2.Publs.Publ p : libraryData2.getPubls().getPublList()) {
+                SyncResponse.ResLibraryData2.Publs.Publ item = new SyncResponse.ResLibraryData2.Publs.Publ(
+                        p.getIdOfPubl(), 1, "Save to database error");
+                publs.addItem(item);
+            }
+            resLibraryData2.setPubls(publs);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        //Return common updates to client
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            SyncResponse.ResLibraryData2.CommonUpdate commonUpdate = new SyncResponse.ResLibraryData2.CommonUpdate(
+                    version - 1);
+            long clientVersion = libraryData2.getVersion();
+            List<Publ> publs = DAOUtils.listPubls(persistenceSession, clientVersion, version);
+            for (Publ publ : publs) {
+                SyncResponse.ResLibraryData2.CommonUpdate.Publ cup = new SyncResponse.ResLibraryData2.CommonUpdate.Publ(
+                        publ.getIdofpubl(), publ.getIsbn(), publ.getData(), publ.getAuthor(), publ.getTitle(),
+                        publ.getTitle2(), publ.getPublicationdate(), publ.getPublisher(), publ.getHash(),
+                        publ.getVersion());
+                commonUpdate.addItem(cup);
+            }
+            resLibraryData2.setCommonUpdate(commonUpdate);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Sending common update to the client error: ", e);
+            resLibraryData2.setCommonUpdate(new SyncResponse.ResLibraryData2.CommonUpdate(0));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            for (SyncRequest.LibraryData2.Circuls.Circul circul : libraryData2.getCirculs().getCirculationList()) {
+                int errCode = 0;
+                String error = null;
+
+                Circul crcl = null;
+                Long circulId = circul.getIdofcircul();
+                if (circul.getIdofcircul() != null) {
+                    crcl = DAOUtils.findCircul(persistenceSession, circul.getIdofcircul());
+                    if (crcl != null) {
+                        if (circul.isDelete()) {
+                            persistenceSession.delete(crcl);
+                        } else {
+                            crcl.setQuantity(circul.getQuantity());
+                            crcl.setIssuanceDate(circul.getIssuancedate());
+                            crcl.setRefundDate(circul.getRefundDate());
+                            crcl.setRealRefundDate(circul.getRealRefundDate());
+                            persistenceSession.merge(crcl);
+                        }
+                    } else {
+                        errCode = 1;
+                        error = "Circulation was not found in database";
+                    }
+                } else {
+                    Client client = (Client) persistenceSession.get(Client.class, circul.getIdofclient());
+                    Publ publ = (Publ) persistenceSession.get(Publ.class, circul.getIdofpubl());
+                    Org org = (Org) persistenceSession.get(Org.class, circul.getIdoforg());
+                    crcl = new Circul();
+                    crcl.setClient(client);
+                    crcl.setPubl(publ);
+                    crcl.setOrg(org);
+                    crcl.setQuantity(circul.getQuantity());
+                    crcl.setIssuanceDate(circul.getIssuancedate());
+                    crcl.setRefundDate(circul.getRefundDate());
+                    crcl.setRealRefundDate(circul.getRealRefundDate());
+                    persistenceSession.save(crcl);
+                }
+
+                SyncResponse.ResLibraryData2.Circuls.Circul item = new SyncResponse.ResLibraryData2.Circuls.Circul(
+                        (circulId == null) ? crcl.getIdOfCircul() : circulId, errCode, error, circul.getIdofclient(),
+                        circul.getIdofpubl(), circul.getIdoforg());
+                resLibraryData2.getCirculs().addItem(item);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Circulations processing error: ", e);
+            SyncResponse.ResLibraryData2.Circuls circuls = new SyncResponse.ResLibraryData2.Circuls();
+            for (SyncRequest.LibraryData2.Circuls.Circul c : libraryData2.getCirculs().getCirculationList()) {
+                SyncResponse.ResLibraryData2.Circuls.Circul item = new SyncResponse.ResLibraryData2.Circuls.Circul(
+                        c.getIdofcircul(), 1, "Circulations processing error", c.getIdofclient(), c.getIdofpubl(),
+                        c.getIdoforg());
+                circuls.addItem(item);
+            }
+            resLibraryData2.setCirculs(circuls);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return resLibraryData2;
+    }
+
+    private static String createKey(String author, String title, String title2, String publisher)
+            throws NoSuchAlgorithmException {
+        return CryptoUtils.MD5(author + title + title2 + publisher);
+    }
+
     private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules =
-                new SyncResponse.ResCategoriesDiscountsAndRules();
+        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new SyncResponse.ResCategoriesDiscountsAndRules();
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -1657,8 +1900,8 @@ public class Processor implements SyncProcessor,
             Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<CategoryOrg> categoryOrgSet = org.getCategories();
-            if(!categoryOrgSet.isEmpty()){
-                for(Object object: criteriaDiscountRule.list()){
+            if (!categoryOrgSet.isEmpty()) {
+                for (Object object : criteriaDiscountRule.list()) {
                     DiscountRule discountRule = (DiscountRule) object;
                     /*
                    * проверяем вхождение одного множества в другое
@@ -1668,78 +1911,76 @@ public class Processor implements SyncProcessor,
                    *
                    * Если все категории организации содержатся в правиле то выводим
                    * */
-                    boolean bIncludeRule=false;
-                    if (discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
-                    else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                    boolean bIncludeRule = false;
+                    if (discountRule.getCategoryOrgs().isEmpty()) {
+                        bIncludeRule = true;
+                    } else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())) {
                         bIncludeRule = true;
                     }
-                     /*
-                    if(categoryOrgSet.isEmpty()){
-                        if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
-                    } else {
-                        if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
-                        else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
-                            bIncludeRule = true;
-                        }
-                    }
+                    /*
+                 if(categoryOrgSet.isEmpty()){
+                     if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
+                 } else {
+                     if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
+                     else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
+                         bIncludeRule = true;
+                     }
+                 }
 
-                    if(discountRule.getCategoryOrgs().isEmpty()
-                    || (!categoryOrgSet.isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())))
-                       */
+                 if(discountRule.getCategoryOrgs().isEmpty()
+                 || (!categoryOrgSet.isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())))
+                    */
                     if (bIncludeRule) {
-                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                                new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri = new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
+                                discountRule);
                         resCategoriesDiscountsAndRules.addDCRI(dcri);
                     }
                 }
-            }  /* Организация не пренадлежит ни к одной категории*/
-               else{
-                for(Object object: criteriaDiscountRule.list()){
+            }  /* Организация не пренадлежит ни к одной категории*/ else {
+                for (Object object : criteriaDiscountRule.list()) {
                     DiscountRule discountRule = (DiscountRule) object;
                     /* если правила не установлены категории организаций то отправляем*/
-                    if(discountRule.getCategoryOrgs().isEmpty()){
-                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                                new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(discountRule);
+                    if (discountRule.getCategoryOrgs().isEmpty()) {
+                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri = new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
+                                discountRule);
                         resCategoriesDiscountsAndRules.addDCRI(dcri);
                     }
                 }
             }
 
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
-            
+
             List<CategoryDiscount> categoryDiscounts = criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
-                SyncResponse.ResCategoriesDiscountsAndRules.DCI dci =
-                        new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
-                                categoryDiscount.getIdOfCategoryDiscount(),
-                                categoryDiscount.getCategoryName(),
-                                categoryDiscount.getDiscountRules());
+                SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
+                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
+                        categoryDiscount.getDiscountRules());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }
-             /*
-            criteria = persistenceSession.createCriteria(DiscountRule.class);
-            List<DiscountRule> discountRules = criteria.list();
-            for (DiscountRule discountRule : discountRules) {
-                SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                        new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
-                                discountRule.getIdOfRule(),
-                                discountRule.getDescription(),
-                                discountRule.getCategoryDiscounts(),
-                                discountRule.getComplex0(),
-                                discountRule.getComplex1(),
-                                discountRule.getComplex2(),
-                                discountRule.getComplex3(),
-                                discountRule.getComplex4(),
-                                discountRule.getComplex5(),
-                                discountRule.getComplex6(),
-                                discountRule.getComplex7(),
-                                discountRule.getComplex8(),
-                                discountRule.getComplex9(),
-                                discountRule.getPriority(),
-                                discountRule.isOperationOr());
-                resCategoriesDiscountsAndRules.addDCRI(dcri);
-            }
-               */
+            /*
+         criteria = persistenceSession.createCriteria(DiscountRule.class);
+         List<DiscountRule> discountRules = criteria.list();
+         for (DiscountRule discountRule : discountRules) {
+             SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
+                     new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
+                             discountRule.getIdOfRule(),
+                             discountRule.getDescription(),
+                             discountRule.getCategoryDiscounts(),
+                             discountRule.getComplex0(),
+                             discountRule.getComplex1(),
+                             discountRule.getComplex2(),
+                             discountRule.getComplex3(),
+                             discountRule.getComplex4(),
+                             discountRule.getComplex5(),
+                             discountRule.getComplex6(),
+                             discountRule.getComplex7(),
+                             discountRule.getComplex8(),
+                             discountRule.getComplex9(),
+                             discountRule.getPriority(),
+                             discountRule.isOperationOr());
+             resCategoriesDiscountsAndRules.addDCRI(dcri);
+         }
+            */
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -1947,8 +2188,8 @@ public class Processor implements SyncProcessor,
                                 "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
-                    RuntimeContext.getFinancialOpsManager().createClientPaymentWithOrder(persistenceSession,
-                            clientPaymentOrder, client);
+                    RuntimeContext.getFinancialOpsManager()
+                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client);
                 }
             }
 
@@ -2030,13 +2271,16 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
+    public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
+            int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
+            Long cardPrintedNo) throws Exception {
         Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
-        if (client==null) throw new Exception("Клиент не найден: "+idOfClient);
+        if (client == null) {
+            throw new Exception("Клиент не найден: " + idOfClient);
+        }
         Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
-        if (c!=null) {
-            throw new Exception("Карта уже зарегистрирована на клиента: "+c.getClient().getIdOfClient());
+        if (c != null) {
+            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
         }
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
@@ -2057,7 +2301,8 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime, cardPrintedNo);
+            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
+                    validTime, lifeState, lockReason, issueTime, cardPrintedNo);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -2144,8 +2389,9 @@ public class Processor implements SyncProcessor,
             Org organization = client.getOrg();
             long subscriptionPrice = organization.getSubscriptionPrice();
             if (subscriptionPrice != 0L) {
-                RuntimeContext.getFinancialOpsManager().createSubscriptionFeeCharge(persistenceSession,
-                        idOfSubscriptionFee, client, subscriptionPrice);
+                RuntimeContext.getFinancialOpsManager()
+                        .createSubscriptionFeeCharge(persistenceSession, idOfSubscriptionFee, client,
+                                subscriptionPrice);
             }
 
             persistenceSession.flush();
@@ -2191,16 +2437,18 @@ public class Processor implements SyncProcessor,
     }
 
 
-    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate) throws Exception{
+    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate)
+            throws Exception {
         String eventName = "";
-        if (passDirection == EnterEvent.ENTRY)
+        if (passDirection == EnterEvent.ENTRY) {
             eventName = "Вход в школу";
-        else if (passDirection == EnterEvent.EXIT)
+        } else if (passDirection == EnterEvent.EXIT) {
             eventName = "Выход из школы";
-        else if (passDirection == EnterEvent.RE_ENTRY)
+        } else if (passDirection == EnterEvent.RE_ENTRY) {
             eventName = "Повторный вход в школу";
-        else if (passDirection == EnterEvent.RE_EXIT)
+        } else if (passDirection == EnterEvent.RE_EXIT) {
             eventName = "Повторный выход из школы";
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(eventDate);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -2208,13 +2456,9 @@ public class Processor implements SyncProcessor,
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
         return new String[]{
-            "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
-            "contractId", String.valueOf(client.getContractId()),
-            "surname", client.getPerson().getSurname(),
-            "firstName", client.getPerson().getFirstName(),
-            "eventName", eventName,
-            "eventTime", time
-        };
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                String.valueOf(client.getContractId()), "surname", client.getPerson().getSurname(), "firstName",
+                client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
     }
 
     private static boolean isDateToday(Date date) {
@@ -2223,9 +2467,10 @@ public class Processor implements SyncProcessor,
         Calendar dateCalendar = Calendar.getInstance();
         dateCalendar.setTime(date);
         if (today.get(Calendar.DATE) == dateCalendar.get(Calendar.DATE) &&
-            today.get(Calendar.MONTH) == dateCalendar.get(Calendar.MONTH) &&
-            today.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR))
+                today.get(Calendar.MONTH) == dateCalendar.get(Calendar.MONTH) &&
+                today.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR)) {
             return true;
+        }
         return false;
     }
 

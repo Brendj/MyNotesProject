@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Publ" table="CF_Publ">
+        <id name="idofpubl" column="IdOfPubl" type="long">
+            <generator class="hilo">
+                <param name="table">CF_Generators</param>
+                <param name="column">IdOfPubl</param>
+                <param name="max_lo">3</param>
+            </generator>
+        </id>
+        <property name="isbn" column="isbn" type="string" length="15" not-null="false"/>
+        <property name="data" column="data" type="string" not-null="false"/>
+        <property name="author" column="author" type="string" length="255" not-null="false"/>
+        <property name="title" column="title" type="string" length="512" not-null="false"/>
+        <property name="title2" column="title2" type="string" length="255" not-null="false"/>
+        <property name="publicationdate" column="publicationdate" type="string" length="15" not-null="false"/>
+        <property name="publisher" column="publisher" type="string" length="255" not-null="false"/>
+        <property name="hash" column="hash" type="string" length="32" not-null="false"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+    </class>
+</hibernate-mapping>

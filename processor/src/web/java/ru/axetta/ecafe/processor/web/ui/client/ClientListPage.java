@@ -296,7 +296,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
         if (!clientFilter.isEmpty()) {
-            List clients = clientFilter.retrieveClients(session);
+                List clients = clientFilter.retrieveClients(session);
             for (Object object : clients) {
                 Client client = (Client) object;
                 items.add(new Item(client));

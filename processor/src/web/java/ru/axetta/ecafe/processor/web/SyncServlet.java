@@ -34,6 +34,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,6 +68,7 @@ public class SyncServlet extends HttpServlet {
             // Read XML request
             try {
                 requestData = readRequest(request);
+                //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -111,6 +113,7 @@ public class SyncServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
+            /* Must be commented for testing!!! */
             try {
                 if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
@@ -175,6 +178,16 @@ public class SyncServlet extends HttpServlet {
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
         }
+    }
+    
+    private static RequestData readRequestFromFile() throws Exception {
+        RequestData requestData = new RequestData();
+        FileInputStream fileInputStream = new FileInputStream("F:/Projects/request.xml");
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        requestData.document = documentBuilder.parse(fileInputStream);
+        return requestData;
     }
 
     private static RequestData readRequest(HttpServletRequest httpRequest) throws Exception {

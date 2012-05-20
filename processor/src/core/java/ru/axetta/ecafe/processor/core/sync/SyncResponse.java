@@ -1054,6 +1054,370 @@ public class SyncResponse {
         }
     }
 
+    public static class ResLibraryData2 {
+
+        private Publs publs = new Publs();
+        private Circuls circuls = new Circuls();
+        private CommonUpdate commonUpdate;
+        private int status;
+
+        public Publs getPubls() {
+            return publs;
+        }
+
+        public void setPubls(Publs publs) {
+            this.publs = publs;
+        }
+
+        public Circuls getCirculs() {
+            return circuls;
+        }
+
+        public void setCirculs(Circuls circuls) {
+            this.circuls = circuls;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public CommonUpdate getCommonUpdate() {
+            return commonUpdate;
+        }
+
+        public void setCommonUpdate(CommonUpdate commonUpdate) {
+            this.commonUpdate = commonUpdate;
+        }
+
+        public Element toElement(Document document) throws Exception {
+            Element element = document.createElement("ResLibraryData2");
+            element.appendChild(publs.toElement(document));
+            element.appendChild(circuls.toElement(document));
+            element.appendChild(commonUpdate.toElement(document));
+            return element;
+        }
+
+        public static class Publs {
+
+            public static class Publ {
+
+                private final long idOfPubl;
+                private final int errCode;
+                private final String error;
+
+                public Publ(long idOfPubl, int errCode, String error) {
+                    this.idOfPubl = idOfPubl;
+                    this.errCode = errCode;
+                    this.error = error;
+                }
+
+                public long getIdOfPublication() {
+                    return idOfPubl;
+                }
+
+                public int getErrCode() {
+                    return errCode;
+                }
+
+                public String getError() {
+                    return error;
+                }
+
+                public Element toElement(Document document) throws Exception {
+                    Element element = document.createElement("Publ");
+                    element.setAttribute("IdOfPublication", Long.toString(this.idOfPubl));
+                    element.setAttribute("ErrCode", Long.toString(this.errCode));
+                    if (null != this.error) {
+                        element.setAttribute("Error", this.error);
+                    }
+
+                    return element;
+                }
+
+
+            }
+
+            private final List<Publ> publList = new LinkedList<Publ>();
+
+            public void addItem(Publ publ) {
+                this.publList.add(publ);
+            }
+
+            public Enumeration<Publ> getPublList() {
+                return Collections.enumeration(publList);
+            }
+
+            public Element toElement(Document document) throws Exception {
+                Element element = document.createElement("Publs");
+                for (Publ publ : this.publList) {
+                    element.appendChild(publ.toElement(document));
+                }
+                return element;
+            }
+
+            @Override
+            public String toString() {
+                return "Publs{" + "publList=" + publList + '}';
+            }
+        }
+
+        public static class Circuls {
+            
+            private int result = 0;
+
+            public static class Circul {
+
+                private final Long idOfCircul;
+                private final int errCode;
+                private final String error;
+                private final long idOfClient;
+                private final long idOfPublication;
+                private final long idOfOrg;
+
+                public Circul(Long idOfCircul, int errCode, String error, long idOfClient, long idOfPublication, long idOfOrg) {
+                    this.idOfCircul = idOfCircul;
+                    this.errCode = errCode;
+                    this.error = error;
+                    this.idOfClient = idOfClient;
+                    this.idOfPublication = idOfPublication;
+                    this.idOfOrg = idOfOrg;
+                }
+
+                public long getIdOfCircul() {
+                    return idOfCircul;
+                }
+
+                public int getErrCode() {
+                    return errCode;
+                }
+
+                public String getError() {
+                    return error;
+                }
+
+                public long getIdOfClient() {
+                    return idOfClient;
+                }
+
+                public long getIdOfPublication() {
+                    return idOfPublication;
+                }
+
+                public long getIdOfOrg() {
+                    return idOfOrg;
+                }
+
+                public Element toElement(Document document) throws Exception {
+                    Element element = document.createElement("Circul");
+                    element.setAttribute("IdOfCirculation", Long.toString(this.idOfCircul));
+                    element.setAttribute("ErrCode", Long.toString(this.errCode));
+                    if (null != this.error) {
+                        element.setAttribute("Error", this.error);
+                    }
+                    element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
+                    element.setAttribute("IdOfPublication", Long.toString(this.idOfPublication));
+                    element.setAttribute("IdOfOrg", Long.toString(this.idOfOrg));
+                    return element;
+                }
+
+                @Override
+                public String toString() {
+                    return "Circul{" +
+                            "idOfCircul=" + idOfCircul +
+                            ", errCode=" + errCode +
+                            ", error='" + error + '\'' +
+                            ", idOfClient=" + idOfClient +
+                            ", idOfPublication=" + idOfPublication +
+                            ", idOfOrg=" + idOfOrg +
+                            '}';
+                }
+            }
+
+            private final List<Circul> circulList = new LinkedList<Circul>();
+
+            public int getResult() {
+                return result;
+            }
+
+            public void setResult(int result) {
+                this.result = result;
+            }
+
+            public void addItem(Circul circul) {
+                this.circulList.add(circul);
+            }
+
+            public Enumeration<Circul> getCirculList() {
+                return Collections.enumeration(circulList);
+            }
+
+            public Element toElement(Document document) throws Exception {
+                Element element = document.createElement("Circuls");
+                for (Circul circul : this.circulList) {
+                    element.appendChild(circul.toElement(document));
+                }
+                return element;
+            }
+
+            @Override
+            public String toString() {
+                return "Circuls{" + "circulList=" + circulList + '}';
+            }
+        }
+
+        public static class CommonUpdate {
+
+            private final long upToVersion;
+
+            public CommonUpdate(long upToVersion) {
+                this.upToVersion = upToVersion;
+
+            }
+
+            public static class Publ {
+
+                private Long idofpubl;
+                private String isbn;
+                private String data;
+                private String author;
+                private String title;
+                private String title2;
+                private String publicationdate;
+                private String publisher;
+                private String hash;
+                private long version;
+
+                public Publ() {
+                }
+
+                public Publ(long idofpubl, String isbn, String data, String author, String title, String title2, String publicationDate,
+                        String publisher, String hash, long version) {
+                    this.idofpubl = idofpubl;
+                    this.data = data;
+                    this.author = author;
+                    this.title = title;
+                    this.title2 = title2;
+                    this.publicationdate = publicationDate;
+                    this.publisher = publisher;
+                    this.hash = hash;
+                    this.version = version;
+                }
+
+                public Long getIdofpubl() {
+                    return idofpubl;
+                }
+
+                public String getIsbn() {
+                    return isbn;
+                }
+
+                public String getData() {
+                    return data;
+                }
+
+                public String getAuthor() {
+                    return author;
+                }
+
+                public String getTitle() {
+                    return title;
+                }
+
+                public String getTitle2() {
+                    return title2;
+                }
+
+                public String getPublicationdate() {
+                    return publicationdate;
+                }
+
+                public String getPublisher() {
+                    return publisher;
+                }
+
+                public String getHash() {
+                    return hash;
+                }
+
+                public long getVersion() {
+                    return version;
+                }
+
+                public Element toElement(Document document) throws Exception {
+                    Element element = document.createElement("Publ");
+                    element.setAttribute("IdOfPublication", Long.toString(this.idofpubl));
+                    element.setAttribute("ISBN", this.isbn);
+                    element.setAttribute("Data", this.data);
+                    element.setAttribute("Author", this.author);
+                    element.setAttribute("Title", this.title);
+                    element.setAttribute("Title2", this.title2);
+                    element.setAttribute("PublicationDate", this.publicationdate);
+                    element.setAttribute("Publisher", this.hash);
+                    element.setAttribute("Version", Long.toString(this.version));
+                    return element;
+                }
+
+                @Override
+                public String toString() {
+                    return "Publ{" +
+                            "idofpubl=" + idofpubl +
+                            ", isbn='" + isbn + '\'' +
+                            ", data='" + data + '\'' +
+                            ", author='" + author + '\'' +
+                            ", title='" + title + '\'' +
+                            ", title2='" + title2 + '\'' +
+                            ", publicationdate='" + publicationdate + '\'' +
+                            ", publisher='" + publisher + '\'' +
+                            ", hash='" + hash + '\'' +
+                            ", version=" + version +
+                            '}';
+                }
+            }
+
+            private final List<Publ> publList = new LinkedList<Publ>();
+
+            public void addItem(Publ publ) {
+                this.publList.add(publ);
+            }
+            
+            public void addAll(List<Publ> publs) {
+                publList.addAll(publs);
+            }
+
+            public Enumeration<Publ> getPublList() {
+                return Collections.enumeration(publList);
+            }
+
+            public Element toElement(Document document) throws Exception {
+                Element element = document.createElement("CommonUpdate");
+                for (Publ publ : this.publList) {
+                    element.appendChild(publ.toElement(document));
+                }
+                return element;
+            }
+
+            @Override
+            public String toString() {
+                return "CommonUpdate{" +
+                        "publList=" + publList +
+                        '}';
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "ResLibraryData2{" +
+                    "publs=" + publs +
+                    ", circuls=" + circuls +
+                    ", commonUpdate=" + commonUpdate +
+                    '}';
+        }
+    }
+
     public static class ResCategoriesDiscountsAndRules {
         public static class DCI {
             private long idOfCategoryDiscount;
@@ -1300,6 +1664,7 @@ public class SyncResponse {
     private final String message;
     private final ResEnterEvents resEnterEvents;
     private final ResLibraryData resLibraryData;
+    private final ResLibraryData2 resLibraryData2;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
 
@@ -1310,7 +1675,7 @@ public class SyncResponse {
     public SyncResponse(int type, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
-            ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData,
+            ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry) {
         this.type = type;
         this.idOfOrg = idOfOrg;
@@ -1329,6 +1694,7 @@ public class SyncResponse {
         this.message = message;
         this.resEnterEvents = resEnterEvents;
         this.resLibraryData = resLibraryData;
+        this.resLibraryData2 = resLibraryData2;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
     }
@@ -1409,6 +1775,11 @@ public class SyncResponse {
         // ResLibraryData
         if (resLibraryData != null) {
             ecafeEnvelopeElement.appendChild(resLibraryData.toElement(document));
+        }
+
+        // ResLibraryData2
+        if (resLibraryData2 != null) {
+            ecafeEnvelopeElement.appendChild(resLibraryData2.toElement(document));
         }
 
         // ResCategoriesDiscountsAndRules

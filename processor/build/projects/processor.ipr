@@ -405,6 +405,7 @@
     </copyright>
     <module2copyright />
   </component>
+  <component name="DataSourceManagerImpl" compressed="false" hash="1534250319" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -870,75 +871,8 @@
     <resource url="http://www.jboss.org/j2ee/dtd/jboss-ds_5_0.dtd" location="$USER_HOME$/jboss-5.0.1.GA/docs/dtd/jboss-ds_5_0.dtd" />
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
-  </component>
-  <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="processor at JBoss 7.0.2 public" type="JBossConfiguration" factoryName="Local">
-      <option name="OPEN_IN_BROWSER" value="false" />
-      <option name="OPEN_IN_BROWSER_URL" value="https://localhost:8443/processor/back-office/index.faces" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Djboss.platform.mbeanserver -Djboss.bind.address=&quot;0.0.0.0&quot; -Djboss.server.log.threshold=&quot;INFO&quot; -Xms512m -Xmx2048m -XX:PermSize=512m -XX:MaxPermSize=1024m" />
-      <option name="UPDATING_POLICY" value="redeploy-artifacts" />
-      <deployment>
-        <artifact name="j2ee:j2ee exploded">
-          <settings />
-        </artifact>
-      </deployment>
-      <server-settings>
-        <option name="SERVER" />
-        <option name="USERNAME" value="" />
-        <option name="PASSWORD" value="" />
-      </server-settings>
-      <log_file path="$PROJECT_DIR$/../../data/logs/processor.log" checked="true" skipped="true" show_all="false" alias="ECafe Log" />
-      <log_file path="$USER_HOME$/jboss-5.0.1.GA/server/default/log/server.log" checked="true" skipped="true" show_all="false" alias="JBoss Log" />
-      <extension name="coverage" enabled="false" merge="false" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="9999" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:/bin/run.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:/bin/shutdown.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" -s jnp://localhost:2147483647 -S" />
-        </SHUTDOWN>
-        <EnvironmentVariables>
-          <option name="NAME" value="JAVA_HOME" />
-          <option name="VALUE" value="/usr" />
-          <option name="IS_PREDEFINED" value="false" />
-        </EnvironmentVariables>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:/bin/run.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:/bin/shutdown.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" -s jnp://localhost:2147483647 -S" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <method>
-        <option name="BuildArtifacts" enabled="true">
-          <artifact name="j2ee:j2ee exploded" />
-        </option>
-      </method>
-    </configuration>
   </component>
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">

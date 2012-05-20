@@ -21,7 +21,7 @@
         <property name="author" column="Author" type="string" length="255" not-null="false"/>
         <property name="title" column="Title" type="string" length="512" not-null="false"/>
         <property name="title2" column="Title2" type="string" length="255" not-null="false"/>
-        <property name="publicationDate" column="PublicationDate" type="string" length="15" not-null="false"/>
+        <property name="publicationdate" column="PublicationDate" type="string" length="15" not-null="false"/>
         <property name="publisher" column="Publisher" type="string" length="255" not-null="false"/>
         <property name="version" column="Version" type="long" not-null="true"/>
     </class>

@@ -12,16 +12,14 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Transaction;
-import org.hibernate.Session;
+import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
 
@@ -646,5 +644,47 @@ public class DAOUtils {
         q.setParameterList("clientsId", clientsId);
         if (q.executeUpdate() != clientsId.size())
             throw new Exception("Ошибка при изменении параметров SMS уведомления");
+    }
+
+    public static Publ findPubl(Session persistenceSession, long idOfPubl) throws Exception {
+        return (Publ) persistenceSession.get(Publ.class, idOfPubl);
+    }
+
+    public static Publ findPubl(Session persistenceSession, String author, String title, String title2, String publisher) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("author", author));
+        criteria.add(Restrictions.eq("title", title));
+        criteria.add(Restrictions.eq("title2", title2));
+        criteria.add(Restrictions.eq("publisher", publisher));
+        return (Publ) criteria.uniqueResult();
+    }
+
+    public static Publ findPublByISBN(Session persistenceSession, String isbn) {
+        Criteria criteria = persistenceSession.createCriteria(Publ.class);
+        criteria.add(Restrictions.eq("isbn", isbn));
+        return (Publ) criteria.uniqueResult();
+    }
+
+    public static Publ findPublByHash(Session persistenceSession, String hash) {
+        Criteria criteria = persistenceSession.createCriteria(Publ.class);
+        criteria.add(Restrictions.eq("hash", hash));
+        return (Publ) criteria.uniqueResult();
+    }
+
+    public static List<Publ> listPubls(Session session, long versionFrom, long versionTo) {
+        Criteria criteria = session.createCriteria(Publ.class);
+        criteria.add(Restrictions.gt("version", versionFrom));
+        criteria.add(Restrictions.lt("version", versionTo));
+        return criteria.list();
+    }
+
+    public static Circul findCircul(Session persistenceSession, long idOfCircul) throws Exception {
+        return (Circul) persistenceSession.get(Circul.class, idOfCircul);
+    }
+
+    public static long getNextVersion(Session session) {
+        SQLQuery query = session.createSQLQuery("SELECT nextval('version')");
+        long version = ((BigInteger) query.uniqueResult()).longValue();
+        return version;
     }
 }

@@ -296,7 +296,7 @@
                         <%=circulation.getPublication().getTitle2()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getPublicationDate()%>
+                        <%=circulation.getPublication().getPublicationdate()%>
                     </td>
                     <td>
                         <%=circulation.getPublication().getPublisher()%>

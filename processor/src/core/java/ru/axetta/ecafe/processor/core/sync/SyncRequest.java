@@ -39,7 +39,9 @@ public class SyncRequest {
         Node node = namedNodeMap.getNamedItem(name);
         if (null == node) {
             node = namedNodeMap.getNamedItem(name.toUpperCase());
-            if (node==null) return null;
+            if (node == null) {
+                return null;
+            }
         }
         return Long.parseLong(node.getTextContent());
     }
@@ -101,8 +103,8 @@ public class SyncRequest {
                             menuGroup = MenuDetail.DEFAULT_GROUP_NAME;
                         }
 
-                        return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu, menuOutput, type,
-                                menuGroup, menuOrigin);
+                        return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
+                                menuOutput, type, menuGroup, menuOrigin);
                     }
 
                 }
@@ -119,8 +121,8 @@ public class SyncRequest {
                 private final String menuGroup;
                 private final int menuOrigin;
 
-                public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty, long rPrice,
-                        String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin) {
+                public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
+                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin) {
                     this.discount = discount;
                     this.socDiscount = socDiscount;
                     this.idOfOrderDetail = idOfOrderDetail;
@@ -182,8 +184,8 @@ public class SyncRequest {
                 public String toString() {
                     return "Purchase{" + "discount=" + discount + "socDiscount=" + socDiscount + ", idOfOrderDetail="
                             + idOfOrderDetail + ", name='" + name + '\'' + ", qty=" + qty + ", rPrice=" + rPrice
-                            + ", rootMenu='" + rootMenu + '\'' + ", menuOutput='" + menuOutput + '\'' + ", type="
-                            + type + ", menuGroup='" + menuGroup + '\'' + ", menuOrigin=" + menuOrigin + '}';
+                            + ", rootMenu='" + rootMenu + '\'' + ", menuOutput='" + menuOutput + '\'' + ", type=" + type
+                            + ", menuGroup='" + menuGroup + '\'' + ", menuOrigin=" + menuOrigin + '}';
                 }
             }
 
@@ -204,15 +206,20 @@ public class SyncRequest {
                     long rSum = getLongValue(namedNodeMap, "rSum");
                     if (namedNodeMap.getNamedItem("Discount") != null) {
                         long discount = getLongValue(namedNodeMap, "Discount");
-                        if (discount == rSum)
+                        if (discount == rSum) {
                             socDiscount = discount;
-                        else
+                        } else {
                             trdDiscount = discount;
+                        }
                     } else {
                         socDiscount = getLongValueNullSafe(namedNodeMap, "SocDiscount");
                         trdDiscount = getLongValueNullSafe(namedNodeMap, "TrdDiscount");
-                        if (socDiscount==null) socDiscount=0L;
-                        if (trdDiscount==null) trdDiscount=0L;
+                        if (socDiscount == null) {
+                            socDiscount = 0L;
+                        }
+                        if (trdDiscount == null) {
+                            trdDiscount = 0L;
+                        }
                     }
                     long grant = getLongValue(namedNodeMap, "Grant");
                     Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
@@ -221,8 +228,9 @@ public class SyncRequest {
                     long sumByCard = getLongValue(namedNodeMap, "SumByCard");
                     long sumByCash = getLongValue(namedNodeMap, "SumByCash");
                     Long idOfPOS = null;
-                    if (namedNodeMap.getNamedItem("IdOfPOS") != null)
+                    if (namedNodeMap.getNamedItem("IdOfPOS") != null) {
                         idOfPOS = getLongValue(namedNodeMap, "IdOfPOS");
+                    }
                     List<Purchase> purchases = new LinkedList<Purchase>();
                     Node purchaseNode = paymentNode.getFirstChild();
                     while (null != purchaseNode) {
@@ -232,8 +240,8 @@ public class SyncRequest {
                         }
                         purchaseNode = purchaseNode.getNextSibling();
                     }
-                    return new Payment(cardNo, date, socDiscount, trdDiscount, grant, idOfClient, idOfOrder, idOfCashier, sumByCard,
-                            sumByCash, rSum, idOfPOS, purchases);
+                    return new Payment(cardNo, date, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
+                            idOfCashier, sumByCard, sumByCash, rSum, idOfPOS, purchases);
                 }
 
             }
@@ -252,8 +260,9 @@ public class SyncRequest {
             private final Long idOfPOS;
             private final List<Purchase> purchases;
 
-            public Payment(Long cardNo, Date time, long socDiscount, long trdDiscount, long grant, Long idOfClient, long idOfOrder,
-                    long idOfCashier, long sumByCard, long sumByCash, long rSum, Long idOfPOS, List<Purchase> purchases) {
+            public Payment(Long cardNo, Date time, long socDiscount, long trdDiscount, long grant, Long idOfClient,
+                    long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long rSum, Long idOfPOS,
+                    List<Purchase> purchases) {
                 this.cardNo = cardNo;
                 this.time = time;
                 this.socDiscount = socDiscount;
@@ -400,9 +409,9 @@ public class SyncRequest {
                     String email = getStringValueNullSafe(namedNodeMap, "Email");
                     String fax = getStringValueNullSafe(namedNodeMap, "Fax");
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
-                    return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
-                            discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
-                            mobilePhone, fax, email, remarks);
+                    return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
+                            categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, fax, email,
+                            remarks);
                 }
 
             }
@@ -455,7 +464,7 @@ public class SyncRequest {
                 return discountMode;
             }
 
-            public String getCategoriesDiscounts(){
+            public String getCategoriesDiscounts() {
                 return categoriesDiscounts;
             }
 
@@ -1593,9 +1602,8 @@ public class SyncRequest {
 
             @Override
             public String toString() {
-                return "ReqDiaryTimesheet{" + "date=" + date + ", idOfClientGroup=" + idOfClientGroup + ", classes="
-                        + (classes == null ? null : Arrays.asList(classes)) + ", reqDiaryValues=" + reqDiaryValues
-                        + '}';
+                return "ReqDiaryTimesheet{" + "date=" + date + ", idOfClientGroup=" + idOfClientGroup + ", classes=" + (
+                        classes == null ? null : Arrays.asList(classes)) + ", reqDiaryValues=" + reqDiaryValues + '}';
             }
         }
 
@@ -1655,9 +1663,10 @@ public class SyncRequest {
 
         public static class EnterEvent {
 
-            public EnterEvent(long idOfEnterEvent, long idOfOrg, String enterName, String turnstileAddr, int passDirection,
-                    int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard, Date evtDateTime,
-                    Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum, Date issueDocDate, Date visitDateTime) {
+            public EnterEvent(long idOfEnterEvent, long idOfOrg, String enterName, String turnstileAddr,
+                    int passDirection, int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard,
+                    Date evtDateTime, Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum,
+                    Date issueDocDate, Date visitDateTime) {
                 this.idOfEnterEvent = idOfEnterEvent;
                 this.idOfOrg = idOfOrg;
                 this.enterName = enterName;
@@ -1710,17 +1719,18 @@ public class SyncRequest {
                             .parse(enterEventNode.getAttributes().getNamedItem("EvtDateTime").getTextContent());
                     Long idOfVisitor = null;
                     if (enterEventNode.getAttributes().getNamedItem("IdOfVisitor") != null) {
-                        idOfVisitor = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
+                        idOfVisitor = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
                     }
                     String visitorFullName = null;
                     if (enterEventNode.getAttributes().getNamedItem("VisitorFullName") != null) {
-                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName").getTextContent();
+                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName")
+                                .getTextContent();
                     }
                     Integer docType = null;
                     if (enterEventNode.getAttributes().getNamedItem("DocType") != null) {
-                        docType = Integer.parseInt(
-                                enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
+                        docType = Integer
+                                .parseInt(enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
                     }
                     String docSerialNum = null;
                     if (enterEventNode.getAttributes().getNamedItem("DocSerialNum") != null) {
@@ -1728,15 +1738,17 @@ public class SyncRequest {
                     }
                     Date issueDocDate = null;
                     if (enterEventNode.getAttributes().getNamedItem("IssueDocDate") != null) {
-                        issueDocDate = loadContext.dateOnlyFormat.parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
+                        issueDocDate = loadContext.dateOnlyFormat
+                                .parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
                     }
                     Date visitDateTime = null;
                     if (enterEventNode.getAttributes().getNamedItem("VisitDateTime") != null) {
                         visitDateTime = timeFormat
                                 .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
                     }
-                    return new EnterEvent(idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
-                            idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType, docSerialNum, issueDocDate, visitDateTime);
+                    return new EnterEvent(idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode,
+                            idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
+                            docSerialNum, issueDocDate, visitDateTime);
                 }
             }
 
@@ -1872,7 +1884,8 @@ public class SyncRequest {
             public static class Circulation {
 
                 public Circulation(String action, long idOfCirculation, long idOfClient, long idOfPublication,
-                       long idOfOrg, Date issuanceDate, Date refundDate, Date realRefundDate, int status, long version) {
+                        long idOfOrg, Date issuanceDate, Date refundDate, Date realRefundDate, int status,
+                        long version) {
                     this.action = action;
                     this.idOfCirculation = idOfCirculation;
                     this.idOfClient = idOfClient;
@@ -1912,8 +1925,8 @@ public class SyncRequest {
                                 .parseInt(circulationNode.getAttributes().getNamedItem("Status").getTextContent());
                         long version = Long
                                 .parseLong(circulationNode.getAttributes().getNamedItem("Version").getTextContent());
-                        return new Circulation(action, idOfCirculation, idOfClient, idOfPublication, idOfOrg, issuanceDate,
-                                refundDate, realRefundDate, status, version);
+                        return new Circulation(action, idOfCirculation, idOfClient, idOfPublication, idOfOrg,
+                                issuanceDate, refundDate, realRefundDate, status, version);
                     }
                 }
 
@@ -2020,8 +2033,8 @@ public class SyncRequest {
 
             public static class Publication {
 
-                public Publication(String action, long idOfPublication, long idOfOrg, String recordStatus, String recordType,
-                        String bibliographicLevel, String hierarchicalLevel, String codingLevel,
+                public Publication(String action, long idOfPublication, long idOfOrg, String recordStatus,
+                        String recordType, String bibliographicLevel, String hierarchicalLevel, String codingLevel,
                         String formOfCatalogingDescription, String data, String author, String title, String title2,
                         String publicationDate, String publisher, long version) {
                     this.action = action;
@@ -2084,12 +2097,12 @@ public class SyncRequest {
                         if (publicationNode.getAttributes().getNamedItem("Publisher") != null) {
                             publisher = publicationNode.getAttributes().getNamedItem("Publisher").getTextContent();
                         }
-                        long version = Long.parseLong(
-                                publicationNode.getAttributes().getNamedItem("Version").getTextContent());
+                        long version = Long
+                                .parseLong(publicationNode.getAttributes().getNamedItem("Version").getTextContent());
 
-                        return new Publication(action, idOfPublication, idOfOrg, recordStatus, recordType, bibliographicLevel,
-                                hierarchicalLevel, codingLevel, formOfCatalogingDescription, data, author, title,
-                                title2, publicationDate, publisher, version);
+                        return new Publication(action, idOfPublication, idOfOrg, recordStatus, recordType,
+                                bibliographicLevel, hierarchicalLevel, codingLevel, formOfCatalogingDescription, data,
+                                author, title, title2, publicationDate, publisher, version);
                     }
                 }
 
@@ -2269,7 +2282,393 @@ public class SyncRequest {
         }
     }
 
+
+    public static class LibraryData2 {
+
+
+        public static class Publs {
+
+            public static class Publ {
+
+                public Publ(Long idOfPubl, String isbn, String data, String author, String title, String title2,
+                        String publicationDate, String publisher) {
+                    this.idOfPubl = idOfPubl;
+                    this.isbn = isbn;
+                    this.data = data;
+                    this.author = author;
+                    this.title = title;
+                    this.title2 = title2;
+                    this.publicationDate = publicationDate;
+                    this.publisher = publisher;
+                }
+
+                public static class Builder {
+
+                    public Publ build(Node publicationNode) throws Exception {
+
+                        Long idOfPublication = null;
+                        if (publicationNode.getAttributes().getNamedItem("IdOfPublication") != null) {
+                            String publicationId = publicationNode.getAttributes().getNamedItem("IdOfPublication")
+                                    .getTextContent();
+                            if ((publicationId != null) && (!publicationId.isEmpty())) {
+                                idOfPublication = Long.parseLong(publicationId);
+                            }
+                        }
+
+                        String isbn = null;
+                        if (publicationNode.getAttributes().getNamedItem("ISBN") != null) {
+                            isbn = publicationNode.getAttributes().getNamedItem("ISBN").getTextContent();
+                        }
+
+                        String data = null;
+                        if (publicationNode.getTextContent() != null) {
+                            data = publicationNode.getTextContent();
+                        }
+                        String author = null;
+                        if (publicationNode.getAttributes().getNamedItem("Author") != null) {
+                            author = publicationNode.getAttributes().getNamedItem("Author").getTextContent();
+                        }
+                        String title = null;
+                        if (publicationNode.getAttributes().getNamedItem("Title") != null) {
+                            title = publicationNode.getAttributes().getNamedItem("Title").getTextContent();
+                        }
+                        String title2 = null;
+                        if (publicationNode.getAttributes().getNamedItem("Title2") != null) {
+                            title2 = publicationNode.getAttributes().getNamedItem("Title2").getTextContent();
+                        }
+                        String publicationDate = null;
+                        if (publicationNode.getAttributes().getNamedItem("PublicationDate") != null) {
+                            publicationDate = publicationNode.getAttributes().getNamedItem("PublicationDate")
+                                    .getTextContent();
+                        }
+                        String publisher = null;
+                        if (publicationNode.getAttributes().getNamedItem("Publisher") != null) {
+                            publisher = publicationNode.getAttributes().getNamedItem("Publisher").getTextContent();
+                        }
+
+                        return new Publ(idOfPublication, isbn, data, author, title, title2, publicationDate, publisher);
+                    }
+                }
+
+                private final Long idOfPubl;
+                private final String isbn;
+                private final String data;
+                private final String author;
+                private final String title;
+                private final String title2;
+                private final String publicationDate;
+                private final String publisher;
+
+                public Long getIdOfPubl() {
+                    return idOfPubl;
+                }
+
+                public String getIsbn() {
+                    return isbn;
+                }
+
+                public String getData() {
+                    return data;
+                }
+
+                public String getAuthor() {
+                    return author;
+                }
+
+                public String getTitle() {
+                    return title;
+                }
+
+                public String getTitle2() {
+                    return title2;
+                }
+
+                public String getPublicationDate() {
+                    return publicationDate;
+                }
+
+                public String getPublisher() {
+                    return publisher;
+                }
+
+                @Override
+                public String toString() {
+                    return "Publ{" +
+                            "idOfPubl=" + idOfPubl +
+                            ", isbn='" + isbn + '\'' +
+                            ", data='" + data + '\'' +
+                            ", author='" + author + '\'' +
+                            ", title='" + title + '\'' +
+                            ", title2='" + title2 + '\'' +
+                            ", publicationDate='" + publicationDate + '\'' +
+                            ", publisher='" + publisher + '\'' +
+                            '}';
+                }
+            }
+
+            public static class Builder {
+
+                private final Publ.Builder publicationBuilder;
+
+                public Builder() {
+                    this.publicationBuilder = new Publ.Builder();
+                }
+
+                public Publs build(Node publicationsNode) throws Exception {
+                    List<Publ> publicationList = new ArrayList<Publ>();
+                    Node itemNode = publicationsNode.getFirstChild();
+                    while (null != itemNode) {
+                        if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Publ")) {
+                            publicationList.add(publicationBuilder.build(itemNode));
+                        }
+                        itemNode = itemNode.getNextSibling();
+                    }
+                    return new Publs(publicationList);
+                }
+            }
+
+            private final List<Publ> publicationList;
+
+            public Publs() {
+                this.publicationList = new ArrayList<Publ>();
+            }
+
+            public Publs(List<Publ> publicationList) {
+                this.publicationList = publicationList;
+            }
+
+            public List<Publ> getPublList() {
+                return publicationList;
+            }
+        }
+
+        public static class Circuls {
+
+            private final List<Circul> circulationList;
+
+            public static class Circul {
+
+                private final Long idofcircul;
+                private final long idofclient;
+                private final long idofpubl;
+                private final long idoforg;
+                private final Date issuancedate;
+                private final Date refundDate;
+                private final Date realRefundDate;
+                private final int quantity;
+                private final Boolean delete;
+
+                public Circul(Long idofcircul, long idofclient, long idofpubl, long idoforg, Date issuancedate,
+                        Date refundDate, Date realRefundDate, int quantity, Boolean delete) {
+                    this.idofcircul = idofcircul;
+                    this.idofclient = idofclient;
+                    this.idofpubl = idofpubl;
+                    this.idoforg = idoforg;
+                    this.issuancedate = issuancedate;
+                    this.refundDate = refundDate;
+                    this.realRefundDate = realRefundDate;
+                    this.quantity = quantity;
+                    this.delete = delete;
+                }
+
+                public static class Builder {
+
+                    public Circul build(Node circulationNode) throws Exception {
+
+                        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+                        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+                        timeFormat.setTimeZone(localTimeZone);
+
+                        Long idOfCirculation = null;
+                        if (circulationNode.getAttributes().getNamedItem("IdOfCirculation") != null) {
+                            String circulationId = circulationNode.getAttributes().getNamedItem("IdOfCirculation")
+                                    .getTextContent();
+                            if ((circulationId != null) && (!circulationId.isEmpty())) {
+                                idOfCirculation = Long.parseLong(circulationId);
+                            }
+                        }
+
+                        long idOfClient = Long
+                                .parseLong(circulationNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
+
+                        long idOfPublication = Long.parseLong(
+                                circulationNode.getAttributes().getNamedItem("IdOfPublication").getTextContent());
+
+                        long idOfOrg = Long
+                                .parseLong(circulationNode.getAttributes().getNamedItem("IdOfOrg").getTextContent());
+
+                        Date issuanceDate = null;
+                        if (circulationNode.getAttributes().getNamedItem("IssuanceDate") != null) {
+                            issuanceDate = timeFormat.parse(circulationNode.getAttributes().getNamedItem("IssuanceDate")
+                                    .getTextContent());
+                        }
+
+                        Date refundDate = null;
+                        if (circulationNode.getAttributes().getNamedItem("RefundDate") != null) {
+                            refundDate = timeFormat
+                                    .parse(circulationNode.getAttributes().getNamedItem("RefundDate").getTextContent());
+                        }
+
+                        Date realRefundDate = null;
+                        if (circulationNode.getAttributes().getNamedItem("RealRefundDate") != null) {
+                            realRefundDate = timeFormat
+                                    .parse(circulationNode.getAttributes().getNamedItem("RealRefundDate")
+                                            .getTextContent());
+                        }
+
+                        int quantity = Integer.parseInt(circulationNode.getAttributes().getNamedItem("Quantity").getTextContent());
+                        
+                        Boolean delete = null;
+                        if (circulationNode.getAttributes().getNamedItem("Delete") != null) {
+                            Boolean.parseBoolean(circulationNode.getAttributes().getNamedItem("Delete").getTextContent());
+                        }
+                        return new Circul(idOfCirculation, idOfClient, idOfPublication, idOfOrg, issuanceDate,
+                                refundDate, realRefundDate, quantity, delete);
+                    }
+                }
+
+                public Long getIdofcircul() {
+                    return idofcircul;
+                }
+
+                public long getIdofclient() {
+                    return idofclient;
+                }
+
+                public long getIdofpubl() {
+                    return idofpubl;
+                }
+
+                public long getIdoforg() {
+                    return idoforg;
+                }
+
+                public Date getIssuancedate() {
+                    return issuancedate;
+                }
+
+                public Date getRefundDate() {
+                    return refundDate;
+                }
+
+                public Date getRealRefundDate() {
+                    return realRefundDate;
+                }
+
+                public int getQuantity() {
+                    return quantity;
+                }
+
+                public Boolean isDelete() {
+                    return delete;
+                }
+
+                @Override
+                public String toString() {
+                    return "Circul{" +
+                            "idofcircul=" + idofcircul +
+                            ", idofclient=" + idofclient +
+                            ", idofpubl=" + idofpubl +
+                            ", idoforg=" + idoforg +
+                            ", issuancedate=" + issuancedate +
+                            ", refundDate=" + refundDate +
+                            ", realRefundDate=" + realRefundDate +
+                            ", quantity=" + quantity +
+                            '}';
+                }
+            }
+
+            public static class Builder {
+
+                private final Circul.Builder circulationBuilder;
+
+                public Builder() {
+                    this.circulationBuilder = new Circul.Builder();
+                }
+
+                public Circuls build(Node circulationsNode) throws Exception {
+                    List<Circul> circulationList = new ArrayList<Circul>();
+                    Node itemNode = circulationsNode.getFirstChild();
+                    while (null != itemNode) {
+                        if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Circulation")) {
+                            circulationList.add(circulationBuilder.build(itemNode));
+                        }
+                        itemNode = itemNode.getNextSibling();
+                    }
+                    return new Circuls(circulationList);
+                }
+            }
+
+            public Circuls() {
+                this.circulationList = new ArrayList<Circul>();
+            }
+
+            public Circuls(List<Circul> circulationList) {
+                this.circulationList = circulationList;
+            }
+
+            public List<Circul> getCirculationList() {
+                return circulationList;
+            }
+        }
+
+        public static class Builder {
+
+            private final Publs.Builder publicationsBuilder;
+            private final Circuls.Builder circulationBuilder;
+
+            public Builder() {
+                this.publicationsBuilder = new Publs.Builder();
+                this.circulationBuilder = new Circuls.Builder();
+            }
+
+            public LibraryData2 build(Node libraryData2Node) throws Exception {
+                Node itemNode = libraryData2Node.getFirstChild();
+                Publs publications = new Publs();
+                Circuls circulations = new Circuls();
+                long version = 0;
+                while (null != itemNode) {
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Publs")) {
+                        publications = publicationsBuilder.build(itemNode);
+                    }
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Circulations")) {
+                        circulations = circulationBuilder.build(itemNode);
+                    }
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Version")) {
+                        version = Long.parseLong(itemNode.getTextContent());
+                    }
+                    itemNode = itemNode.getNextSibling();
+                }
+                return new LibraryData2(publications, circulations, version);
+            }
+        }
+
+        public LibraryData2(Publs publications, Circuls circulations,long version) {
+            this.publications = publications;
+            this.circulations = circulations;
+            this.version = version;
+        }
+
+        private final Publs publications;
+        private final Circuls circulations;
+
+        long version;
+
+        public Publs getPubls() {
+            return publications;
+        }
+
+        public Circuls getCirculs() {
+            return circulations;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+    }
+
     public static class LoadContext {
+
         MenuGroups menuGroups;
         public long protoVersion;
         DateFormat timeFormat, dateOnlyFormat;
@@ -2289,6 +2688,7 @@ public class SyncRequest {
         private final MenuGroups.Builder menuGroupsBuilder;
         private final EnterEvents.Builder enterEventsBuilder;
         private final LibraryData.Builder libraryDataBuilder;
+        private final LibraryData2.Builder libraryData2Builder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2309,6 +2709,7 @@ public class SyncRequest {
             this.menuGroupsBuilder = new MenuGroups.Builder();
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.libraryDataBuilder = new LibraryData.Builder();
+            this.libraryData2Builder = new LibraryData2.Builder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2431,10 +2832,16 @@ public class SyncRequest {
                 libraryData = libraryDataBuilder.build(libraryDataNode, org.getIdOfOrg());
             }
 
+            Node libraryData2Node = findFirstChildElement(envelopeNode, "LibraryData2");
+            LibraryData2 libraryData2 = null;
+            if (libraryData2Node != null) {
+                libraryData2 = libraryData2Builder.build(libraryData2Node);
+            }
+
 
             return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData);
+                    enterEvents, libraryData, libraryData2);
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
@@ -2491,12 +2898,13 @@ public class SyncRequest {
     private final int type;
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
+    private final LibraryData2 libraryData2;
 
     public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, LibraryData libraryData) {
+            EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2) {
         this.protoVersion = protoVersion;
         this.type = type;
         this.idOfOrg = org.getIdOfOrg();
@@ -2514,6 +2922,7 @@ public class SyncRequest {
         this.message = message;
         this.enterEvents = enterEvents;
         this.libraryData = libraryData;
+        this.libraryData2 = libraryData2;
     }
 
     public long getProtoVersion() {
@@ -2576,6 +2985,10 @@ public class SyncRequest {
         return libraryData;
     }
 
+    public LibraryData2 getLibraryData2() {
+        return libraryData2;
+    }
+
     @Override
     public String toString() {
         return "SyncRequest{" + "protoVersion=" + protoVersion + ", idOfOrg=" + idOfOrg + ", syncTime=" + syncTime
@@ -2587,11 +3000,13 @@ public class SyncRequest {
 
     private static Double getCalories(NamedNodeMap namedNodeMap, String name) {
         Node node = namedNodeMap.getNamedItem(name);
-        if (null == node)
+        if (null == node) {
             return null;
+        }
         String calString = node.getTextContent();
-        if (calString.equals(""))
+        if (calString.equals("")) {
             return null;
+        }
         String replacedString = calString.replaceAll(",", ".");
         return Double.parseDouble(replacedString);
     }
