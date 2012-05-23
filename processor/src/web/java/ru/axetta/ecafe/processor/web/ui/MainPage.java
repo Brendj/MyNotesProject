@@ -19,11 +19,13 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.*;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
+import ru.axetta.ecafe.processor.web.ui.report.productGuide.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
@@ -178,6 +180,7 @@ public class MainPage {
     private final ReportRuleEditPage reportRuleEditPage = new ReportRuleEditPage();
     private final ReportRuleCreatePage reportRuleCreatePage = new ReportRuleCreatePage();
 
+
     // Report online manipulation (baybikov 05.10.2011)
     private final BasicWorkspacePage reportOnlineGroupPage = new BasicWorkspacePage();
 
@@ -283,12 +286,117 @@ public class MainPage {
     private final ReportTemplateManagerPage reportTemplateManagerPage = new ReportTemplateManagerPage();
     private String removedReportTemplate;
 
+
+    private final ProductGuideListPage productGuideListPage = new ProductGuideListPage();
+    private final ProductGuideLoadPage productGuideLoadPage = new ProductGuideLoadPage();
+    private long removedProductGuideItemId;
+    private long selectedIdOfProductGuide;
+
+    private final ConfigurationProviderCreatePage configurationProviderCreatePage = new ConfigurationProviderCreatePage();
+    private final ConfigurationProviderListPage configurationProviderListPage = new ConfigurationProviderListPage();
+    private final ConfigurationProviderViewPage configurationProviderViewPage = new ConfigurationProviderViewPage();
+    private final ConfigurationProviderEditPage configurationProviderEditPage = new ConfigurationProviderEditPage();
+    private final SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage = new SelectedConfigurationProviderGroupPage();
+    private final BasicWorkspacePage configurationProviderGroupPage = new BasicWorkspacePage();
+    private long removedConfigurationProviderItemId;
+    private long selectedIdOfConfigurationProvider;
+
+    private final BasicWorkspacePage reportGroupPage = new BasicWorkspacePage();
+
+    private String currentConfigurationProvider;
+
+    private Long editedProductGuideItemId;
+
+    public Long getEditedProductGuideItemId() {
+        return editedProductGuideItemId;
+    }
+
+    public void setEditedProductGuideItemId(Long editedProductGuideItemId) {
+        this.editedProductGuideItemId = editedProductGuideItemId;
+    }
+
+    public ProductGuideLoadPage getProductGuideLoadPage() {
+        return productGuideLoadPage;
+    }
+
+    public String getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(String currentConfigurationProvider) {
+//        if (currentConfigurationProvider instanceof ConfigurationProvider) {
+//            this.currentConfigurationProvider = (ConfigurationProvider)currentConfigurationProvider;
+        this.currentConfigurationProvider = currentConfigurationProvider;
+        //updateProductGuideListPage();
+//        }
+    }
+
+    public SelectedConfigurationProviderGroupPage getSelectedConfigurationProviderGroupPage() {
+        return selectedConfigurationProviderGroupPage;
+    }
+
+    public ConfigurationProviderEditPage getConfigurationProviderEditPage() {
+        return configurationProviderEditPage;
+    }
+
+    public ConfigurationProviderViewPage getConfigurationProviderViewPage() {
+        return configurationProviderViewPage;
+    }
+
+    public long getRemovedConfigurationProviderItemId() {
+        return removedConfigurationProviderItemId;
+    }
+
+    public void setRemovedConfigurationProviderItemId(long removedConfigurationProviderItemId) {
+        this.removedConfigurationProviderItemId = removedConfigurationProviderItemId;
+    }
+
+    public long getSelectedIdOfConfigurationProvider() {
+        return selectedIdOfConfigurationProvider;
+    }
+
+    public void setSelectedIdOfConfigurationProvider(long selectedIdOfConfigurationProvider) {
+        this.selectedIdOfConfigurationProvider = selectedIdOfConfigurationProvider;
+    }
+
+    public ConfigurationProviderListPage getConfigurationProviderListPage() {
+        return configurationProviderListPage;
+    }
+
+    public BasicWorkspacePage getConfigurationProviderGroupPage() {
+        return configurationProviderGroupPage;
+    }
+
+    public ConfigurationProviderCreatePage getConfigurationProviderCreatePage() {
+        return configurationProviderCreatePage;
+    }
+
+    public long getRemovedProductGuideItemId() {
+        return removedProductGuideItemId;
+    }
+
+    public long getSelectedIdOfProductGuide() {
+        return selectedIdOfProductGuide;
+    }
+
+    public void setSelectedIdOfProductGuide(long selectedIdOfProductGuide) {
+        this.selectedIdOfProductGuide = selectedIdOfProductGuide;
+    }
+
+    public void setRemovedProductGuideItemId(long removedProductGuideItemId) {
+        this.removedProductGuideItemId = removedProductGuideItemId;
+    }
+
     public ReportTemplateManagerPage getReportTemplateManagerPage() {
         return reportTemplateManagerPage;
     }
 
     public AllOrgsDiscountsReportPage getAllOrgsDiscountsReportPage() {
         return allOrgsDiscountsReportPage;
+    }
+
+    public BasicWorkspacePage getReportGroupPage() {
+        return reportGroupPage;
     }
 
     // Levadny (11.02.2012)
@@ -6265,6 +6373,11 @@ public class MainPage {
         return null;
     }
 
+    public Object showReportGroupPage() {
+        currentWorkspacePage = reportGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
 
 
     // baybikov (06.12.2011)
@@ -6282,6 +6395,7 @@ public class MainPage {
     public String showCurrentPositionCSVList() {
         return "showCurrentPositionCSVList";
     }
+
 
     //private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
     ///* For ru.axetta.ecafe.processor.core.test only */
@@ -6417,7 +6531,7 @@ public class MainPage {
     //
 
     User currentUser;
-    User getCurrentUser() throws Exception {
+    public User getCurrentUser() throws Exception {
         if (currentUser==null) {
             FacesContext context = FacesContext.getCurrentInstance();
             String userName = context.getExternalContext().getRemoteUser();
@@ -6766,6 +6880,392 @@ public class MainPage {
             facesContext
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона.", null));
         }
+        return null;
+    }
+
+    public Object removeProductGuideItem() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productGuideListPage.remove(persistenceSession, currentConfigurationProvider, removedProductGuideItemId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error on deleting guide product item.", e);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении продукта из справочника продуктов.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }    
+
+    public ProductGuideListPage getProductGuideListPage() {
+        return productGuideListPage;
+    }
+
+
+    public Object showProductGuideListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productGuideListPage.fillConfigurationProviderComboBox(persistenceSession);
+            productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = productGuideListPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill product guide list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object updateProductGuideListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+        } catch (Exception e) {
+            logger.error("Failed to fill product guide list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object updateProducts() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productGuideListPage.updateProducts(persistenceSession, getCurrentUser(),
+                    this.getCurrentConfigurationProvider());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранена успешно.", null));
+            this.editedProductGuideItemId = null;            
+        } catch (ProductGuideListPage.ProductGuideException ex) {
+            logger.error("Failed to fill product guide list page", ex);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(),
+                            null));
+        } catch (Exception e) {
+            logger.error("Failed to edit products", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при редактирования данных продуктов питания.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object createConfigurationProvider() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderCreatePage.create(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Создано успешно.", null));
+            currentWorkspacePage = configurationProviderCreatePage;
+        } catch (Exception e) {
+            logger.error("Failed to create configuration provider item", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при создании конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showConfigurationProviderGroupPage() {
+        currentWorkspacePage = configurationProviderGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object removeСonfigurationProviderItem() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderListPage.remove(persistenceSession, removedConfigurationProviderItemId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error on deleting configuration provider item.", e);
+            facesContext
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showConfigurationProviderEditPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderEditPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            //showSelectedConfigurationProviderGroupPage();
+            currentWorkspacePage = configurationProviderEditPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill configuration provider edit page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы редактирования данных конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showСonfigurationProviderViewPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderViewPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            showSelectedConfigurationProviderGroupPage();
+            //selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = configurationProviderViewPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill configuration provider view page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showConfigurationProviderListPage() {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = configurationProviderListPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill configuration provider view page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showConfigurationProviderCreatePage() {
+        currentWorkspacePage = configurationProviderCreatePage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showSelectedConfigurationProviderGroupPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            selectedConfigurationProviderGroupPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = selectedConfigurationProviderGroupPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill configuration provider select page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора данных конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object updateConfigurationProvider() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            configurationProviderEditPage.update(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            //showSelectedConfigurationProviderGroupPage();
+            currentWorkspacePage = configurationProviderEditPage;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранено успешно.", null));
+        } catch (Exception e) {
+            logger.error("Failed on update configuration provider", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при сохранении конфигурации провайдера.", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public void productGuideLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        InputStream inputStream = null;
+        long dataSize = 0;
+        try {
+            if (currentConfigurationProvider==null) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не указана конфигурация поставщика.", null));
+                return;
+            }
+            if (item.isTempFile()) {
+                File file = item.getFile();
+                dataSize = file.length();
+                inputStream = new FileInputStream(file);
+            } else {
+                byte[] data = item.getData();
+                dataSize = data.length;
+                inputStream = new ByteArrayInputStream(data);
+            }
+            productGuideLoadPage.loadProductGuide(inputStream, dataSize);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to load product guide items from file", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных справочника продуктов: "+e,
+                            null));
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public Object showProductGuideLoadPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productGuideLoadPage.fillConfigurationProviderComboBox(persistenceSession);
+            productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = productGuideLoadPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill product guide list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object addEditedProductGuideItemId(Long id) {
+        productGuideListPage.setEdited(id);
+        return null;
+    }
+
+    public Object addProductGuideInListPage() {
+        productGuideListPage.insert();
         return null;
     }
 }

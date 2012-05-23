@@ -16,16 +16,31 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid styleClass="borderless-grid" columns="1" width="400px">
+<h:panelGrid styleClass="borderless-grid" columns="1" width="700px">
 
     <rich:dataTable id="reportTemplateListTable" value="#{mainPage.reportTemplateManagerPage.items}" var="item"
-            columnClasses="left-aligned-column, center-aligned-column" width="100%">
+            columnClasses="left-aligned-column, center-aligned-column, right-aligned-column, center-aligned-column" width="100%">
         <rich:column headerClass="column-header" >
             <f:facet name="header">
                 <h:outputText escape="true" value="Имя файла" />
             </f:facet>
             <h:outputText escape="true" value="#{item.name}" styleClass="output-text" />
         </rich:column>
+
+        <rich:column headerClass="column-header" >
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата изменения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.dateEdit}" converter="timeConverter" styleClass="output-text" />
+        </rich:column>
+
+        <rich:column headerClass="column-header" >
+            <f:facet name="header">
+                <h:outputText escape="true" value="Размер (Кб)" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.sizeInStr}"  styleClass="output-text" />
+        </rich:column>
+
         <rich:column headerClass="column-header" >
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />

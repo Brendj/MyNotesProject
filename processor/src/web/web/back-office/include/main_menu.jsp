@@ -378,9 +378,6 @@
         <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}" label="Конфигурация"
                             action="#{mainPage.showConfigurationPage}" reRender="workspaceForm"/>
 
-        <rich:panelMenuItem id="showReportTemplateManagerMenuItem" binding="#{mainPage.reportTemplateManagerPage.mainMenuComponent}" label="Управление шаблонами отчетов"
-                            action="#{mainPage.showReportTemplateManagerPage}" reRender="workspaceForm"/>
-
     </rich:panelMenuGroup>
 
 
@@ -407,59 +404,7 @@
 
     </rich:panelMenuGroup>
 
-    <rich:panelMenuGroup id="reportJobGroupMenu" binding="#{mainPage.reportJobGroupPage.mainMenuComponent}"
-                         label="Расписание отчетов"
-                         rendered="#{mainPage.eligibleToViewReports}">
-        <a4j:support event="onclick" action="#{mainPage.showReportJobGroupPage}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="reportJobListMenuItem" binding="#{mainPage.reportJobListPage.mainMenuComponent}"
-                            label="Список задач" action="#{mainPage.showReportJobListPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuGroup id="selectedReportJobGroupMenu"
-                             binding="#{mainPage.selectedReportJobGroupPage.mainMenuComponent}"
-                             label="#{mainPage.selectedReportJobGroupPage.title}" rendered="false">
-            <a4j:support event="onclick" action="#{mainPage.showSelectedReportJobGroupPage}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="reportJobViewMenuItem" binding="#{mainPage.reportJobViewPage.mainMenuComponent}"
-                                label="Просмотр" action="#{mainPage.showReportJobViewPage}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="reportJobEditMenuItem" binding="#{mainPage.reportJobEditPage.mainMenuComponent}"
-                                label="Редактирование" action="#{mainPage.showReportJobEditPage}"
-                                reRender="workspaceForm" />
-        </rich:panelMenuGroup>
-
-        <rich:panelMenuItem id="reportJobCreateMenuItem" binding="#{mainPage.reportJobCreatePage.mainMenuComponent}"
-                            label="Добавить задачу" action="#{mainPage.showReportJobCreatePage}" reRender="workspaceForm" />
-
-    </rich:panelMenuGroup>
-
-
-    <rich:panelMenuGroup id="reportRuleGroupMenu" binding="#{mainPage.reportRuleGroupPage.mainMenuComponent}"
-                         label="Обработка отчетов"
-                         rendered="#{mainPage.eligibleToViewReports}">
-        <a4j:support event="onclick" action="#{mainPage.showReportRuleGroupPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="reportRuleListMenuItem" binding="#{mainPage.reportRuleListPage.mainMenuComponent}"
-                            label="Список правил" action="#{mainPage.showReportRuleListPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuGroup id="selectedReportRuleGroupMenu"
-                             binding="#{mainPage.selectedReportRuleGroupPage.mainMenuComponent}"
-                             label="#{mainPage.selectedReportRuleGroupPage.title}" rendered="false">
-            <a4j:support event="onclick" action="#{mainPage.showSelectedReportRuleGroupPage}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="reportRuleViewMenuItem" binding="#{mainPage.reportRuleViewPage.mainMenuComponent}"
-                                label="Просмотр" action="#{mainPage.showReportRuleViewPage}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="reportRuleEditMenuItem" binding="#{mainPage.reportRuleEditPage.mainMenuComponent}"
-                                label="Редактирование" action="#{mainPage.showReportRuleEditPage}"
-                                reRender="workspaceForm" />
-        </rich:panelMenuGroup>
-
-        <rich:panelMenuItem id="reportRuleCreateMenuItem" binding="#{mainPage.reportRuleCreatePage.mainMenuComponent}"
-                            label="Добавить правило" action="#{mainPage.showReportRuleCreatePage}"
-                            reRender="workspaceForm" />
-
-    </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организаций" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
                          rendered="true" >
@@ -535,6 +480,112 @@
                             label="Регистрация" action="#{ruleCreatePage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="reportGroupMenu" binding="#{mainPage.reportGroupPage.mainMenuComponent}"
+                         label="Отчеты">
+        <a4j:support event="onclick" action="#{mainPage.showReportGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="showReportTemplateManagerMenuItem" binding="#{mainPage.reportTemplateManagerPage.mainMenuComponent}" label="Шаблоны отчетов"
+                            action="#{mainPage.showReportTemplateManagerPage}" reRender="workspaceForm"/>
+
+
+        <rich:panelMenuGroup id="reportJobGroupMenu" binding="#{mainPage.reportJobGroupPage.mainMenuComponent}"
+                             label="Расписание отчетов"
+                             rendered="#{mainPage.eligibleToViewReports}">
+            <a4j:support event="onclick" action="#{mainPage.showReportJobGroupPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="reportJobListMenuItem" binding="#{mainPage.reportJobListPage.mainMenuComponent}"
+                                label="Список задач" action="#{mainPage.showReportJobListPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuGroup id="selectedReportJobGroupMenu"
+                                 binding="#{mainPage.selectedReportJobGroupPage.mainMenuComponent}"
+                                 label="#{mainPage.selectedReportJobGroupPage.title}" rendered="false">
+                <a4j:support event="onclick" action="#{mainPage.showSelectedReportJobGroupPage}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="reportJobViewMenuItem" binding="#{mainPage.reportJobViewPage.mainMenuComponent}"
+                                    label="Просмотр" action="#{mainPage.showReportJobViewPage}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="reportJobEditMenuItem" binding="#{mainPage.reportJobEditPage.mainMenuComponent}"
+                                    label="Редактирование" action="#{mainPage.showReportJobEditPage}"
+                                    reRender="workspaceForm" />
+            </rich:panelMenuGroup>
+
+            <rich:panelMenuItem id="reportJobCreateMenuItem" binding="#{mainPage.reportJobCreatePage.mainMenuComponent}"
+                                label="Добавить задачу" action="#{mainPage.showReportJobCreatePage}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+
+        <rich:panelMenuGroup id="reportRuleGroupMenu" binding="#{mainPage.reportRuleGroupPage.mainMenuComponent}"
+                             label="Обработка отчетов"
+                             rendered="#{mainPage.eligibleToViewReports}">
+            <a4j:support event="onclick" action="#{mainPage.showReportRuleGroupPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="reportRuleListMenuItem" binding="#{mainPage.reportRuleListPage.mainMenuComponent}"
+                                label="Список правил" action="#{mainPage.showReportRuleListPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuGroup id="selectedReportRuleGroupMenu"
+                                 binding="#{mainPage.selectedReportRuleGroupPage.mainMenuComponent}"
+                                 label="#{mainPage.selectedReportRuleGroupPage.title}" rendered="false">
+                <a4j:support event="onclick" action="#{mainPage.showSelectedReportRuleGroupPage}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="reportRuleViewMenuItem" binding="#{mainPage.reportRuleViewPage.mainMenuComponent}"
+                                    label="Просмотр" action="#{mainPage.showReportRuleViewPage}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="reportRuleEditMenuItem" binding="#{mainPage.reportRuleEditPage.mainMenuComponent}"
+                                    label="Редактирование" action="#{mainPage.showReportRuleEditPage}"
+                                    reRender="workspaceForm" />
+            </rich:panelMenuGroup>
+
+            <rich:panelMenuItem id="reportRuleCreateMenuItem" binding="#{mainPage.reportRuleCreatePage.mainMenuComponent}"
+                                label="Добавить правило" action="#{mainPage.showReportRuleCreatePage}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+
+    </rich:panelMenuGroup>
+
+
+
+    <rich:panelMenuGroup id="productGiudeGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
+                         label="Справочник продуктов"
+                         rendered="#{mainPage.eligibleToViewRule}">
+        <a4j:support event="onclick" action="#{mainPage.showProductGuideGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="productGuideListMenuItem" label="Список"
+                            binding="#{mainPage.productGuideListPage.mainMenuComponent}"
+                            action="#{mainPage.showProductGuideListPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="productGuideLoadMenuItem" label="Загрузить из файла"
+                            binding="#{mainPage.productGuideLoadPage.mainMenuComponent}"
+                            action="#{mainPage.showProductGuideLoadPage}" reRender="workspaceForm" />        
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="configurationProviderGroupMenu" binding="#{mainPage.configurationProviderGroupPage.mainMenuComponent}"
+                         label="Конфигурации поставщика">
+        <a4j:support event="onclick" action="#{mainPage.showConfigurationProviderGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"
+                            binding="#{mainPage.configurationProviderListPage.mainMenuComponent}"
+                            action="#{mainPage.showConfigurationProviderListPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Добавить"
+                            binding="#{mainPage.configurationProviderCreatePage.mainMenuComponent}"
+                            action="#{mainPage.showConfigurationProviderCreatePage}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedConfigurationProviderGroupMenu"
+                                 binding="#{mainPage.selectedConfigurationProviderGroupPage.mainMenuComponent}"
+                                 label="#{mainPage.selectedConfigurationProviderGroupPage.title}" rendered="false">
+            <a4j:support event="onclick" action="#{mainPage.showSelectedConfigurationProviderGroupPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="configurationProviderViewMenuItem" binding="#{mainPage.configurationProviderViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{mainPage.showСonfigurationProviderViewPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="configurationProviderEditMenuItem" binding="#{mainPage.configurationProviderEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{mainPage.showConfigurationProviderEditPage}"
+                                reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+    </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
 </rich:panelMenu>

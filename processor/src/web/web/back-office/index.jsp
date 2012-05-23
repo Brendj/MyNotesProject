@@ -100,6 +100,14 @@
         <c:import url="include/option/confirm_delete.jsp" />
     </f:subview>
 
+	<f:subview id="productGuideItemDeleteSubView">
+        <c:import url="include/report/product_guide/confirm_delete.jsp" />
+    </f:subview>
+
+    <f:subview id="configurationProviderItemDeleteSubView">
+        <c:import url="include/option/configuration_provider/confirm_delete.jsp" />
+    </f:subview>
+
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">

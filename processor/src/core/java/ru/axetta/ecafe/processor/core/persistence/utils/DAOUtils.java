@@ -687,4 +687,28 @@ public class DAOUtils {
         long version = ((BigInteger) query.uniqueResult()).longValue();
         return version;
     }
+
+    public static Object findProductGuide(Session session, Long id) {
+        Criteria criteria = session.createCriteria(ProductGuide.class);
+        criteria.add(Restrictions.eq("idOfProductGuide", id));
+        return criteria.uniqueResult();
+    }
+
+    public static List findConfigurationProvider(Session session) {
+        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
+        return criteria.list();
+    }
+
+    public static Object findConfigurationProvider(Session session, Long id) {
+        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
+        criteria.add(Restrictions.eq("idOfConfigurationProvider", id));
+        return criteria.uniqueResult();
+    }
+
+    public static Object findConfigurationProvider(Session session, String name) {
+        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
+        criteria.add(Restrictions.eq("name", name));
+        return criteria.uniqueResult();
+    }
+
 }

@@ -43,7 +43,8 @@ public class ReportTemplateFileNameMenu {
         SelectItem[] items = new SelectItem[templateFilesNameList.size()];
         int i = 0;
         for (File file : templateFilesNameList) {
-            items[i++] = new SelectItem(file.getAbsolutePath().substring(fullReportPath.length()+1));
+            items[i] = new SelectItem(file.getAbsolutePath().substring(fullReportPath.length()+1));
+            items[i++].setValue(file);
         }
         return items;
     }

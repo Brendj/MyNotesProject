@@ -20,7 +20,10 @@ import javax.faces.model.SelectItem;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,7 +34,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ReportTemplateManagerPage extends BasicWorkspacePage {
-    private static final Logger logger = LoggerFactory.getLogger(ReportTemplateManagerPage.class);
+    //private static final Logger logger = LoggerFactory.getLogger(ReportTemplateManagerPage.class);
     private String relativePath;
     private String reportPath;
 
@@ -44,16 +47,20 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
         load();
     }
 
-    //public void processValueChange(ValueChangeEvent valueChangeEvent) {
-    //    relativePath = (String)valueChangeEvent.getNewValue();
-    //}
-
-    public class Item {
+    public class Item implements Comparable{
         private String name = "";
-        private String relativePath;
+        private Date dateEdit;
+        private long size;
 
-        public Item(String name) {
+        public Item(String name, Date dateEdit, long size) {
             this.name = name;
+            this.dateEdit = dateEdit;
+            this.size = size;
+        }
+
+        public String getSizeInStr() {
+            DecimalFormat f = new DecimalFormat("#####0.#");
+            return f.format(size/1024.0);
         }
 
         public String getName() {
@@ -68,8 +75,12 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
             return relativePath;
         }
 
-        public void setRelativePath(String relativePath) {
-            this.relativePath = relativePath;
+        public Date getDateEdit() {
+            return dateEdit;
+        }
+
+        public void setDateEdit(Date dateEdit) {
+            this.dateEdit = dateEdit;
         }
 
         @Override
@@ -79,6 +90,28 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
 
         public String getNameWithPath() {
             return relativePath+name;
+        }
+
+        @Override
+        public int compareTo(Object o)  {
+            if (o instanceof Item) {
+                Item item = (Item)o;
+                if (item.getName().indexOf("\\")>=0) {
+                    if (this.getName().indexOf("\\")>=0) {
+                        return item.getName().compareTo(this.getName())*-1;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    if (this.getName().indexOf("\\")>=0) {
+                        return -1;
+                    } else {
+                        return item.getName().compareTo(this.getName())*-1;
+                    }
+                }
+
+            } else
+                return 0;
         }
     }
 
@@ -102,7 +135,8 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
         else{
             SelectItem[] templateFilesNameList = reportTemplateFileNameMenu.getItemsWithForcedReload();
             for (SelectItem s : templateFilesNameList) {
-                items.add(new Item(s.getLabel()));
+                File file = (File)s.getValue();
+                items.add(new Item(s.getLabel(), new Date(file.lastModified()), file.length()));
             }
         }
     }
@@ -111,8 +145,19 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
         return "option/reportTemplateManager";
     }
 
+    public void checkPath() {
+        int i = 0;
+        while (relativePath.charAt(i) == '.' ||
+                relativePath.charAt(i) == '/' ||
+                relativePath.charAt(i) == '\\')
+            i++;
+        relativePath = relativePath.substring(i);
+    }
+
 
     public void checkAndSaveFile(UploadItem item) throws Exception {
+        checkPath();
+
         if (StringUtils.isNotEmpty(relativePath) && !relativePath.endsWith("/") && !relativePath.endsWith("\\")) relativePath+='/';
         String path = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + (relativePath==null?"":relativePath);
         File file = new File(path + item.getFileName());
@@ -136,9 +181,4 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
     public void setRelativePath(String relativePath) {
         this.relativePath = relativePath;
     }
-
-    //public void loadFiles(File file) {
-    //
-    //}
-
 }
