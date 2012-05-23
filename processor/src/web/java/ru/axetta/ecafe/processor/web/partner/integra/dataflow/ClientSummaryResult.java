@@ -15,4 +15,11 @@ public class ClientSummaryResult {
     public ClientSummaryExt clientSummary;
     public Long resultCode;
     public String description;
+
+    public ClientSummaryResult(ClientSummaryExt clientSummary, Long resultCode, String description) {
+        this.clientSummary = clientSummary;
+        this.resultCode = resultCode;
+        this.description = description;
+    }
+    public ClientSummaryResult() {}
 }

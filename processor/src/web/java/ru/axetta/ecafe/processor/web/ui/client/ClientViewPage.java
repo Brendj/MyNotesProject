@@ -101,6 +101,17 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long limit;
     private Long expenditureLimit;
     private String clientGroupName;
+    private Long externalId;
+    private String clientGUID;
+
+
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public String getClientGUID() {
+        return clientGUID;
+    }
 
     // Kadyrov (22.12.2011)
     private String san;
@@ -265,6 +276,8 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.balance = client.getBalance();
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
+        this.clientGUID = client.getClientGUID();
+        this.externalId = client.getExternalId();
 
         // опекуны
         // (Kadyrov D) 23.12.2011

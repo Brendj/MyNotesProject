@@ -32,6 +32,9 @@ public interface ClientRoomController {
     ClientSummaryResult getSummary(@WebParam(name="contractId") Long contractId);
     @WebMethod (operationName = "getSummaryBySan")
     ClientSummaryResult getSummary(@WebParam(name="san") String san);
+    @WebMethod (operationName = "getSummaryByTypedId")
+    ClientSummaryResult getSummaryByTypedId(@WebParam(name="id")String id, @WebParam(name="idType")int idType);
+
     @WebMethod (operationName = "getPurchaseList")
     PurchaseListResult getPurchaseList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPurchaseListBySan")
@@ -79,4 +82,6 @@ public interface ClientRoomController {
     @WebMethod
     public Result changeExpenditureLimit(@WebParam(name="contractId") Long contractId, @WebParam(name="limit") long limit);
 
+    @WebMethod
+    public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, @WebParam(name="state") int state);
 }

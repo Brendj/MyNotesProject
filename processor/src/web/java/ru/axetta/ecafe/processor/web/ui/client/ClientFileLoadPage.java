@@ -196,7 +196,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig,
             Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) {
-        String[] tokens = line.split(";");
+        String[] tokens = line.split(";", -1);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {

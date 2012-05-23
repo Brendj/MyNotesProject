@@ -157,42 +157,12 @@ private static final String RC_OK_DESC="OK";
     class ClientRequest {
 
         public Data process(Long contractId, Processor processor) {
-            ObjectFactory objectFactory = new ObjectFactory();
-            Data data = objectFactory.createData();
-            data.setIdOfContract(contractId);
-
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.eq("contractId", contractId));
-                Client client = (Client) clientCriteria.uniqueResult();
-                if (client == null) {
-                    data.setResultCode(RC_CLIENT_NOT_FOUND);
-                    data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
-                } else {
-                    processor.process(client, data, objectFactory, persistenceSession, persistenceTransaction);
-                    data.setResultCode(RC_OK);
-                    data.setDescription(RC_OK_DESC);
-                }
-                persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed to process client room controller request", e);
-                data.setResultCode(RC_INTERNAL_ERROR);
-                data.setDescription(e.toString());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-            return data;
+            return process(contractId, CLIENT_ID_INTERNALID, processor);
         }
 
-        public Data process(String san, Processor processor) {
+        final static int CLIENT_ID_INTERNALID=0, CLIENT_ID_SAN=1, CLIENT_ID_EXTERNAL_ID=2, CLIENT_ID_GUID=3;
+
+        public Data process(Object id, int clientIdType, Processor processor) {
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
 
@@ -203,7 +173,11 @@ private static final String RC_OK_DESC="OK";
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
+                if (clientIdType==CLIENT_ID_INTERNALID) clientCriteria.add(Restrictions.eq("contractId", (Long)id));
+                else if (clientIdType==CLIENT_ID_SAN) clientCriteria.add(Restrictions.ilike("san", (String)id, MatchMode.EXACT));
+                else if (clientIdType==CLIENT_ID_EXTERNAL_ID) clientCriteria.add(Restrictions.eq("externalId", (Long)id));
+                else if (clientIdType==CLIENT_ID_GUID) clientCriteria.add(Restrictions.eq("clientGUID", (String)id));
+
                 List<Client> clients = clientCriteria.list();
 
                 if (clients.isEmpty()) {
@@ -232,6 +206,7 @@ private static final String RC_OK_DESC="OK";
             }
             return data;
         }
+
 
 }
 
@@ -294,7 +269,30 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public ClientSummaryResult getSummary(String san) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                processSummary(client, data, objectFactory, session);
+            }
+        });
+
+        ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
+        clientSummaryResult.clientSummary = data.getClientSummaryExt();
+        clientSummaryResult.resultCode = data.getResultCode();
+        clientSummaryResult.description = data.getDescription();
+        return clientSummaryResult;
+    }
+
+    @Override
+    public ClientSummaryResult getSummaryByTypedId(String id, int idType) {
+        Object idVal=null;
+        if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) idVal = Long.parseLong(id);
+        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_EXTERNAL_ID) idVal = Long.parseLong(id);
+        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN) idVal = id;
+        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_GUID) idVal = id;
+        else return new ClientSummaryResult(null, RC_INVALID_DATA, "idType invalid");
+
+        Data data = new ClientRequest().process(idVal, idType, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory, session);
@@ -358,7 +356,7 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPurchaseList(client, data, objectFactory, session, endDate, startDate);
@@ -435,7 +433,7 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public PaymentListResult getPaymentList(String san, final Date startDate, final Date endDate) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processPaymentList(client, data, objectFactory, session, endDate, startDate);
@@ -495,7 +493,7 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
@@ -603,7 +601,7 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public CardListResult getCardList(String san) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processCardList(client, data, objectFactory);
@@ -653,7 +651,7 @@ private static final String RC_OK_DESC="OK";
 
     @Override
     public EnterEventListResult getEnterEventList(String san, final Date startDate, final Date endDate) {
-        Data data = new ClientRequest().process(san, new Processor() {
+        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processEnterEventList(client, data, objectFactory, session, endDate, startDate);
@@ -934,6 +932,7 @@ private static final String RC_OK_DESC="OK";
     }
 
     XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {
+        if (date==null) return null;
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
         XMLGregorianCalendar xc = DatatypeFactory.newInstance()
@@ -1037,5 +1036,57 @@ private static final String RC_OK_DESC="OK";
             r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
         }
         return r;
+    }
+
+    @Override
+    public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, int state) {
+        final int fState = state;
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                processCirculationList(client, data, objectFactory, session, fState);
+            }
+        });
+
+        CirculationListResult circListResult = new CirculationListResult();
+        circListResult.circulationList = data.getCirculationItemList();
+        circListResult.resultCode = data.getResultCode();
+        circListResult.description = data.getDescription();
+        return circListResult;
+    }
+
+    public final static int CIRCULATION_STATUS_FILTER_ALL=-1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS=-2;
+    private void processCirculationList(Client client, Data data, ObjectFactory objectFactory, Session session, int state)
+            throws DatatypeConfigurationException {
+        Criteria circulationCriteria = session.createCriteria(Circulation.class);
+        circulationCriteria.add(Restrictions.eq("client", client));
+        if (state==CIRCULATION_STATUS_FILTER_ALL_ON_HANDS) {
+            circulationCriteria.add(Restrictions.or(Restrictions.eq("status", Circulation.EXTENDED), Restrictions.eq("status", Circulation.ISSUED)));
+        }
+        else if (state!=CIRCULATION_STATUS_FILTER_ALL) circulationCriteria.add(Restrictions.eq("status", state));
+        circulationCriteria.addOrder(org.hibernate.criterion.Order.desc("issuanceDate"));
+
+        List<Circulation> circulationList = circulationCriteria.list();
+
+        CirculationItemList ciList = objectFactory.createCirculationItemList();
+        for (Circulation c : circulationList) {
+            CirculationItem ci = new CirculationItem();
+            ci.setIssuanceDate(toXmlDateTime(c.getIssuanceDate()));
+            ci.setStatus(c.getStatus());
+            ci.setRealRefundDate(toXmlDateTime(c.getRealRefundDate()));
+            ci.setRefundDate(toXmlDateTime(c.getRefundDate()));
+            Publication p = c.getPublication();
+            if (p!=null) {
+                PublicationItem pi = new PublicationItem();
+                pi.setAuthor(p.getAuthor());
+                pi.setPublisher(p.getPublisher());
+                pi.setTitle(p.getTitle());
+                pi.setTitle2(p.getTitle2());
+                pi.setPublicationDate(p.getPublicationDate());
+                ci.setPublication(pi);
+            }
+            ciList.getC().add(ci);
+        }
+        data.setCirculationItemList(ciList);
     }
 }

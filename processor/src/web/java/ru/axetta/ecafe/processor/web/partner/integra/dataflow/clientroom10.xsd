@@ -14,7 +14,6 @@
                 <xsd:element minOccurs="0" maxOccurs="1" name="MenuListExt" type="MenuListExt"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="CardList" type="CardList"/>
                 <xsd:element minOccurs="0" maxOccurs="1" name="EnterEventList" type="EnterEventList"/>
-                <xsd:element minOccurs="0" maxOccurs="1" name="CirculationItemList" type="CirculationItemList"/>
             </xsd:sequence>
             <xsd:attribute name="IdOfContract" type="xsd:long"/>
             <xsd:attribute name="ResultCode" type="xsd:long"/>

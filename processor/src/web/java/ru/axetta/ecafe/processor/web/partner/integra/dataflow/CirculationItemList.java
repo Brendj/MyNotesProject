@@ -10,16 +10,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for PurchaseListExt complex type.
+ * <p>Java class for CirculationItemList complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="PurchaseListExt">
+ * &lt;complexType name="CirculationItemList">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="P" type="{}PurchaseExt" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="C" type="{}CirculationItem" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,41 +29,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PurchaseListExt", propOrder = {
-    "p"
+@XmlType(name = "CirculationItemList", propOrder = {
+    "c"
 })
-public class PurchaseListExt {
+public class CirculationItemList {
 
-    @XmlElement(name = "P")
-    protected List<PurchaseExt> p;
+    @XmlElement(name = "C")
+    protected List<CirculationItem> c;
 
     /**
-     * Gets the value of the p property.
+     * Gets the value of the c property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the p property.
+     * This is why there is not a <CODE>set</CODE> method for the c property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getP().add(newItem);
+     *    getC().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link PurchaseExt }
+     * {@link CirculationItem }
      * 
      * 
      */
-    public List<PurchaseExt> getP() {
-        if (p == null) {
-            p = new ArrayList<PurchaseExt>();
+    public List<CirculationItem> getC() {
+        if (c == null) {
+            c = new ArrayList<CirculationItem>();
         }
-        return this.p;
+        return this.c;
     }
 
 }

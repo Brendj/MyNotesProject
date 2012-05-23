@@ -192,6 +192,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Long limit;
     private String san;
     private String guardsan;
+    private Long externalId;
+    private String clientGUID;
 
     public String getSan() {
         return san;
@@ -381,6 +383,22 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.limit = limit;
     }
 
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getClientGUID() {
+        return clientGUID;
+    }
+
+    public void setClientGUID(String clientGUID) {
+        this.clientGUID = clientGUID;
+    }
+
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -439,6 +457,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setMobile(this.mobile);
         client.setEmail(this.email);
         client.setRemarks(this.remarks);
+        if (this.externalId==null || this.externalId==0) client.setExternalId(null);
+        else client.setExternalId(this.externalId);
+        if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
+        else client.setClientGUID(this.clientGUID);
 
         // Категории скидок
           /*

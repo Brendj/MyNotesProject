@@ -141,9 +141,6 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
             int lineNo = 0;
             int successLineNumber = 0;
-            /* массив с именами колонок */
-            String colums[]={}; //= {"ContractState", "MobilePhone","NotifyViaSMS",
-            // "PersonFirstName","PersonSurName","PersonSecondName"};
 
             ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
 
@@ -184,7 +181,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
 
     private LineResult updateClient(ClientManager.ClientFieldConfigForUpdate fieldConfig, String line,
             int lineNo) {
-        String[] tokens = line.split(";");
+        String[] tokens = line.split(";", -1);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {

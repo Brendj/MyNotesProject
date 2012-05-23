@@ -182,6 +182,8 @@ public class ClientEditPage extends BasicWorkspacePage
     private Long expenditureLimit;
     private String clientGroupName;
     private Long idOfClientGroup;
+    private Long externalId;
+    private String clientGUID;
 
     public String getClientGroupName() {
         return clientGroupName;
@@ -412,6 +414,22 @@ public class ClientEditPage extends BasicWorkspacePage
         this.freePayMaxCount = freePayMaxCount;
     }
 
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getClientGUID() {
+        return clientGUID;
+    }
+
+    public void setClientGUID(String clientGUID) {
+        this.clientGUID = clientGUID;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
@@ -486,6 +504,10 @@ public class ClientEditPage extends BasicWorkspacePage
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
         client.setGuardSan(this.guardsan);
+        if (this.externalId==null || this.externalId==0) client.setExternalId(null);
+        else client.setExternalId(this.externalId);
+        if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
+        else client.setClientGUID(this.clientGUID);
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
@@ -549,6 +571,8 @@ public class ClientEditPage extends BasicWorkspacePage
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();
+        this.externalId = client.getExternalId();
+        this.clientGUID = client.getClientGUID();
         /* filter fill*/
         StringBuilder categoriesFilter = new StringBuilder();
         if(!client.getCategories().isEmpty()){
