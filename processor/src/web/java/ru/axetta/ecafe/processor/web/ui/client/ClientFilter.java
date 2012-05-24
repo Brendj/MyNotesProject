@@ -16,6 +16,8 @@ import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.model.SelectItem;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,6 +28,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientFilter {
+
+
 
     public static class OrgItem {
 
@@ -119,7 +123,21 @@ public class ClientFilter {
     private PersonItem contractPerson = new PersonItem();
     private final ClientCardOwnMenu clientCardOwnMenu = new ClientCardOwnMenu();
     private int clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
+    private final ClientBalanceFilter clientBalanceMenu = new ClientBalanceFilter();
+    private Integer clientBalanceCondition =  ClientBalanceFilter.NO_CONDITION;
     private String filterClientId;
+
+    public ClientBalanceFilter getClientBalanceMenu() {
+        return clientBalanceMenu;
+    }
+
+    public int getClientBalanceCondition() {
+        return clientBalanceCondition;
+    }
+
+    public void setClientBalanceCondition(int clientBalanceCondition) {
+        this.clientBalanceCondition = clientBalanceCondition;
+    }
 
     public String getFilterClientId() {
         return filterClientId;
@@ -188,6 +206,7 @@ public class ClientFilter {
         person = new PersonItem();
         contractPerson = new PersonItem();
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
+        clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws HibernateException {
@@ -218,6 +237,20 @@ public class ClientFilter {
                     break;
             }
         }
+        if(ClientBalanceFilter.NO_CONDITION != clientBalanceCondition){
+            switch (clientBalanceCondition){
+                case ClientBalanceFilter.LT_ZERO:
+                    criteria.add(Restrictions.lt("balance",0L));
+                    break;
+                case ClientBalanceFilter.EQ_ZERO:
+                    criteria.add(Restrictions.eq("balance",0L));
+                    break;
+                case ClientBalanceFilter.GT_ZERO:
+                    criteria.add(Restrictions.gt("balance",0L));
+                    break;
+            }
+        }
+
         //todo - add more conditions
         if (StringUtils.isNotEmpty(this.contractId)) {
             criteria.add(Restrictions.eq("contractId", Long.parseLong(this.contractId.replaceAll("\\s", ""))));
