@@ -287,6 +287,7 @@ public class MainPage {
     private String removedReportTemplate;
 
 
+    private final BasicWorkspacePage productGuideGroupPage = new BasicWorkspacePage();
     private final ProductGuideListPage productGuideListPage = new ProductGuideListPage();
     private final ProductGuideLoadPage productGuideLoadPage = new ProductGuideLoadPage();
     private long removedProductGuideItemId;
@@ -306,6 +307,10 @@ public class MainPage {
     private String currentConfigurationProvider;
 
     private Long editedProductGuideItemId;
+
+    public BasicWorkspacePage getProductGuideGroupPage() {
+        return productGuideGroupPage;
+    }
 
     public Long getEditedProductGuideItemId() {
         return editedProductGuideItemId;
@@ -6396,6 +6401,12 @@ public class MainPage {
         return "showCurrentPositionCSVList";
     }
 
+
+    public Object showProductGuideGroupPage() {
+        currentWorkspacePage = productGuideGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
 
     //private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
     ///* For ru.axetta.ecafe.processor.core.test only */
