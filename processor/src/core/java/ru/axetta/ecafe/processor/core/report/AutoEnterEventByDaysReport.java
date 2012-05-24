@@ -86,8 +86,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             // все события храним в списках по дням (1 список на 1 день)
             private Map<Integer, ArrayList<Event>> eventMap = new HashMap<Integer, ArrayList<Event>>(31);
             private String groupName;
-            // флаги для того, чтобы не сортировать списки повторно
-            private Set<Integer> setOfSortFlags = new HashSet<Integer>();
 
 
             public ReportItem(Integer id, String fio, String groupName) {
@@ -115,17 +113,11 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                 return fio;
             }
 
-            public ArrayList<Event> getSortedEventList(ArrayList<Event> eventList) {
-                if (!setOfSortFlags.contains(eventList.hashCode()) && !eventList.isEmpty()) {
-                    Collections.sort(eventList);
-                    setOfSortFlags.add(eventList.hashCode());
-                }
-                return eventList;
-            }
-
+            boolean sorted;
             public String getTimeEnter(ArrayList<Event> eventList) {
                 if (eventList == null || eventList.isEmpty())
                     return null;
+                if (!sorted) sort();
                 /*
                 for (int i = 0; i<getSortedEventList(eventList).size(); i++) {
                     Event evt = eventList.get(i);
@@ -142,6 +134,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             public String getTimeExit(ArrayList<Event> eventList) {
                 if (eventList == null || eventList.isEmpty())
                     return "";
+                if (!sorted) sort();
                 /*for (int i = getSortedEventList(eventList).size()-1; i>=0; i--)
                     if (eventList.get(i).getPassdirection() == EnterEvent.EXIT ||
                             (getSortedEventList(eventList).size()>=2 && i!=0 &&
@@ -149,7 +142,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                                     eventList.get(i-1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
                 return null;*/
-                return timeFormat.format(new Date(eventList.get(eventList.size()-1).getTime()));
+                return timeFormat.format(new Date(eventList.get(eventList.size() - 1).getTime()));
+            }
+
+            private void sort() {
+                for (Map.Entry<Integer, ArrayList<Event>> me : getEventMap().entrySet()) {
+                    Collections.sort(me.getValue());
+                }
+                sorted=true;
             }
 
             public List<String> getTimeList() {

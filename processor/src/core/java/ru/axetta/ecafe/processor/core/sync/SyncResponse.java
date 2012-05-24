@@ -307,6 +307,8 @@ public class SyncResponse {
             private final Integer freePayMaxCount;
             private final String categoriesDiscounts;
             private final ClientGroup clientGroup;
+            private final boolean notifyViaEmail;
+            private final boolean notifyViaSMS;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -324,6 +326,8 @@ public class SyncResponse {
                 this.freePayMaxCount = client.getFreePayMaxCount();
                 this.categoriesDiscounts = client.getCategoriesDiscounts();
                 this.clientGroup=client.getClientGroup();
+                this.notifyViaEmail=client.isNotifyViaEmail();
+                this.notifyViaSMS=client.isNotifyViaSMS();
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
@@ -387,6 +391,8 @@ public class SyncResponse {
                 element.setAttribute("Address", this.address);
                 element.setAttribute("Phone", this.phone);
                 element.setAttribute("Mobile", this.mobile);
+                element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
+                element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
                 }

@@ -76,6 +76,8 @@ public class Client {
     private String categoriesDiscounts;
     private String san;
     private String guardSan;
+    private Long externalId;
+    private String clientGUID;
     private Set<Card> cards = new HashSet<Card>();
     private Set<Call> calls = new HashSet<Call>();
     private Set<Notification> notifications = new HashSet<Notification>();
@@ -414,6 +416,22 @@ public class Client {
 
     public void setDiscountMode(Integer discountMode) {
         this.discountMode = discountMode;
+    }
+
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getClientGUID() {
+        return clientGUID;
+    }
+
+    public void setClientGUID(String clientGUID) {
+        this.clientGUID = clientGUID;
     }
 
     private Set<Card> getCardsInternal() {

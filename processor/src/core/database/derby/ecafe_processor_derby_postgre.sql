@@ -127,12 +127,17 @@ CREATE TABLE CF_Clients (
   CategoriesDiscounts     VARCHAR(60)       NOT NULL DEFAULT '',
   San                     VARCHAR(11),
   GuardSan                VARCHAR(64),
+  ExternalId              BIGINT,
+  ClientGUID              VARCHAR(40),
   CONSTRAINT CF_Clients_pk PRIMARY KEY (IdOfClient),
   CONSTRAINT CF_Clients_ContractId UNIQUE (ContractId),
   CONSTRAINT CF_Clients_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_Clients_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson),
   CONSTRAINT CF_Clients_IdOfContractPerson_fk FOREIGN KEY (IdOfContractPerson) REFERENCES CF_Persons (IdOfPerson)
 );
+
+CREATE index "cf_clients_externalid_idx" ON CF_Clients (ExternalId);
+CREATE index "cf_clients_clientguid_idx" ON CF_Clients (ClientGUID);
 
 CREATE TABLE CF_ContragentClientAccounts (
   IdOfContragent          BIGINT            NOT NULL,
@@ -933,4 +938,4 @@ ALTER TABLE cf_provider_configurations OWNER TO postgres;
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 17, 120523, 0);
+VALUES(2, 2, 18, 120524, 0);

@@ -724,30 +724,16 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
-            if (clientParamItem.getAddress() != null) {
-                client.setAddress(clientParamItem.getAddress());
-            }
-            if (clientParamItem.getEmail() != null) {
-                client.setEmail(clientParamItem.getEmail());
-            }
-            if (clientParamItem.getMobilePhone() != null) {
-                client.setMobile(clientParamItem.getMobilePhone());
-            }
-            if (clientParamItem.getName() != null) {
-                client.getPerson().setFirstName(clientParamItem.getName());
-            }
-            if (clientParamItem.getPhone() != null) {
-                client.setPhone(clientParamItem.getPhone());
-            }
-            if (clientParamItem.getSecondName() != null) {
-                client.getPerson().setSecondName(clientParamItem.getSecondName());
-            }
-            if (clientParamItem.getSurname() != null) {
-                client.getPerson().setSurname(clientParamItem.getSurname());
-            }
-            if (clientParamItem.getRemarks() != null) {
-                client.setRemarks(clientParamItem.getRemarks());
-            }
+            if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
+            if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
+            if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
+            if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
+            if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
+            if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
+            if (clientParamItem.getSurname()!=null) client.getPerson().setSurname(clientParamItem.getSurname());
+            if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
+            if (clientParamItem.getNotifyViaEmail()!=null) client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
+            if (clientParamItem.getNotifyViaSMS()!=null) client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
 
             /* распарсим строку с категориями */
             if (clientParamItem.getCategoriesDiscounts() != null) {
@@ -1551,13 +1537,13 @@ public class Processor implements SyncProcessor,
                                 ", idOfPublication == " + p.getIdOfPublication());
                         resLibraryData.getPublications().addItem(item);
                     }
-                } else if (p.getAction().equalsIgnoreCase("u") && null == pbctn) {
+                } /*else if (p.getAction().equalsIgnoreCase("u") && null == pbctn) {
                     SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
                             p.getIdOfPublication(), p.getVersion(), 3, "Can't update publication, " +
                             "record haven't been found, idOfOrg == " + p.getIdOfOrg() +
                             ", idOfPublication == " + p.getIdOfPublication());
                     resLibraryData.getPublications().addItem(item);
-                } else {
+                } */ else {
                     Publication publication = new Publication();
                     publication.setCompositeIdOfPublication(
                             new CompositeIdOfPublication(p.getIdOfPublication(), p.getIdOfOrg()));
@@ -1575,10 +1561,15 @@ public class Processor implements SyncProcessor,
                     publication.setPublisher(p.getPublisher());
                     publication.setVersion(p.getVersion());
 
-                    if (p.getAction().equalsIgnoreCase("n")) {
+                    /*if (p.getAction().equalsIgnoreCase("n")) {
                         persistenceSession.save(publication);
                     } else if (p.getAction().equalsIgnoreCase("u")) {
                         persistenceSession.merge(publication);
+                    }*/
+                    if (pbctn!=null) {
+                        persistenceSession.merge(publication);
+                    } else {
+                        persistenceSession.save(publication);
                     }
 
                     SyncResponse.ResLibraryData.Publications.Publication item = new SyncResponse.ResLibraryData.Publications.Publication(
@@ -1949,6 +1940,7 @@ public class Processor implements SyncProcessor,
             }
 
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
+
 
             List<CategoryDiscount> categoryDiscounts = criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {

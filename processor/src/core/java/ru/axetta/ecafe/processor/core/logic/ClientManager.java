@@ -50,7 +50,9 @@ public class ClientManager {
         EXPENDITURE_LIMIT,
         CONTRACT_STATE,
         GROUP,
-        SAN
+        SAN,
+        EXTERNAL_ID,
+        CLIENT_GUID
     }
 
     static FieldProcessor.Def[] fieldInfo={
@@ -83,6 +85,8 @@ public class ClientManager {
             new FieldProcessor.Def(26, false, false, "Карта-тип", null, FieldId.CARD_TYPE, false),
             new FieldProcessor.Def(27, false, false, "Карта-выдана", "#CURRENT_DATE", FieldId.CARD_ISSUED, false),
             new FieldProcessor.Def(28, false, false, "Карта-срок", "#5", FieldId.CARD_EXPIRY, false),
+            new FieldProcessor.Def(29, false, false, "Внешний идентификатор", null, FieldId.EXTERNAL_ID, true),
+            new FieldProcessor.Def(30, false, false, "GUID", null, FieldId.CLIENT_GUID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -143,9 +147,11 @@ public class ClientManager {
             }
 
             //tokens[1];
-            String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);
-            if (password.equals("X")) password = ""+contractId;
-            client.setPassword(password);
+            if (fieldConfig.getValue(ClientManager.FieldId.PASSWORD)!=null) {
+                String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);
+                if (password.equals("X")) password = ""+contractId;
+                client.setPassword(password);
+            }
             //tokens[2];
             if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null)
                 client.setContractState(fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE));
@@ -246,6 +252,17 @@ public class ClientManager {
                 expenditureLimit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//old value tokens[19]);
                 client.setExpenditureLimit(expenditureLimit);
             }
+            //
+            if (fieldConfig.getValue(ClientManager.FieldId.EXTERNAL_ID)!=null) {
+                if (fieldConfig.getValue(ClientManager.FieldId.EXTERNAL_ID).isEmpty()) client.setExternalId(null);
+                else client.setExternalId(fieldConfig.getValueLong(ClientManager.FieldId.EXTERNAL_ID));
+            }
+            if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID)!=null) {
+                String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+                if (clientGUID.isEmpty()) client.setClientGUID(null);
+                else client.setClientGUID(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+            }
+
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             client.setClientRegistryVersion(clientRegistryVersion);
 

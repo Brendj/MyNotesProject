@@ -409,9 +409,13 @@ public class SyncRequest {
                     String email = getStringValueNullSafe(namedNodeMap, "Email");
                     String fax = getStringValueNullSafe(namedNodeMap, "Fax");
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
-                    return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
-                            categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, fax, email,
-                            remarks);
+                    String notifyViaEmail = getStringValueNullSafe(namedNodeMap, "NotifyViaEmail");
+                    String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
+
+                    return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
+                            discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
+                            mobilePhone, fax, email, remarks, notifyViaEmail==null?null:notifyViaEmail.equals("1"),
+                            notifyViaSMS==null?null:notifyViaSMS.equals("1"));
                 }
 
             }
@@ -423,10 +427,12 @@ public class SyncRequest {
             private final Date lastFreePayTime;
             private final int discountMode;
             private final String categoriesDiscounts;
+            private final Boolean notifyViaEmail, notifyViaSMS;
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
-                    String address, String phone, String mobilePhone, String fax, String email, String remarks) {
+                    String address, String phone, String mobilePhone, String fax, String email, String remarks,
+                    Boolean notifyViaEmail, Boolean notifyViaSMS) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -442,6 +448,8 @@ public class SyncRequest {
                 this.fax = fax;
                 this.email = email;
                 this.remarks = remarks;
+                this.notifyViaEmail = notifyViaEmail;
+                this.notifyViaSMS = notifyViaSMS;
             }
 
             public long getIdOfClient() {
@@ -502,6 +510,14 @@ public class SyncRequest {
 
             public String getRemarks() {
                 return remarks;
+            }
+
+            public Boolean getNotifyViaEmail() {
+                return notifyViaEmail;
+            }
+
+            public Boolean getNotifyViaSMS() {
+                return notifyViaSMS;
             }
 
             @Override
@@ -2669,7 +2685,7 @@ public class SyncRequest {
 
     public static class LoadContext {
 
-        MenuGroups menuGroups;
+MenuGroups menuGroups;
         public long protoVersion;
         DateFormat timeFormat, dateOnlyFormat;
     }
@@ -2839,7 +2855,7 @@ public class SyncRequest {
             }
 
 
-            return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, libraryData, libraryData2);
         }

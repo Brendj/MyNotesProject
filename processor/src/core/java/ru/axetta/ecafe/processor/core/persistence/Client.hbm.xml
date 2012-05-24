@@ -57,10 +57,10 @@
         <property name="limit" column='"Limit"' type="long" not-null="true"/>
         <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
         <property name="categoriesDiscounts" column="CategoriesDiscounts" type="string" not-null="true"/>
-
-        <!-- Kadirov D (22.12.2011) -->
         <property name="san" column="San" type="string" length="11" not-null="false"/>
         <property name="guardSan" column="GuardSan" type="string" length="64" not-null="false"/>
+        <property name="externalId" column="ExternalId" type="long" not-null="false"/>
+        <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
 
         <set name="cardsInternal" inverse="true" cascade="all">
             <key column="IdOfClient"/>

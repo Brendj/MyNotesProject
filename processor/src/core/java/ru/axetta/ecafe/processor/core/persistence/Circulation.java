@@ -14,6 +14,8 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class Circulation {
+    public final static int ISSUED=0, EXTENDED=1, LOST=2, REFUNDED=3;
+
     private CompositeIdOfCirculation compositeIdOfCirculation;
     private long idOfPublication;
     private long idOfOrg;
