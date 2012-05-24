@@ -137,11 +137,11 @@ public class Publication {
         this.title2 = title2;
     }
 
-    public String getPublicationdate() {
+    public String getPublicationDate() {
         return publicationdate;
     }
 
-    public void setPublicationdate(String publicationdate) {
+    public void setPublicationDate(String publicationdate) {
         this.publicationdate = publicationdate;
     }
 

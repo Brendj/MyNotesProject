@@ -1557,7 +1557,7 @@ public class Processor implements SyncProcessor,
                     publication.setAuthor(p.getAuthor());
                     publication.setTitle(p.getTitle());
                     publication.setTitle2(p.getTitle2());
-                    publication.setPublicationdate(p.getPublicationDate());
+                    publication.setPublicationDate(p.getPublicationDate());
                     publication.setPublisher(p.getPublisher());
                     publication.setVersion(p.getVersion());
 
