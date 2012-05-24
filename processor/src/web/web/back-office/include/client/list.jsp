@@ -66,6 +66,11 @@
                              styleClass="input-text">
                 <f:selectItems value="#{mainPage.clientListPage.clientFilter.clientCardOwnMenu.items}" />
             </h:selectOneMenu>
+            <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
+            <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientBalanceCondition}"
+                             styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientListPage.clientFilter.clientBalanceMenu.items}" />
+            </h:selectOneMenu>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -83,7 +88,7 @@
     </a4j:status>
 
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" >
             <f:facet name="header">
