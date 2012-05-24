@@ -40,3 +40,4 @@ ALTER TABLE CF_GENERATORS ADD COLUMN
 
 ALTER TABLE cf_provider_configurations OWNER TO postgres;
 
+alter table cf_reporthandlerules ALTER COLUMN templatefilename type character varying(256);
