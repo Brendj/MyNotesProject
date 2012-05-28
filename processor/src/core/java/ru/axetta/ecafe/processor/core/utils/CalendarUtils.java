@@ -65,4 +65,11 @@ public class CalendarUtils {
         calendar.add(Calendar.MILLISECOND, -1);
         return calendar.getTimeInMillis();
     }
+
+    public static Date subTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, -1);
+        return calendar.getTime();
+    }
 }

@@ -500,6 +500,7 @@ CREATE TABLE CF_ReportHandleRules (
   Route9                  VARCHAR(128),
   Remarks                 VARCHAR(1024),
   Enabled                 INTEGER         NOT NULL,
+  templatefilename        VARCHAR(256),
   CONSTRAINT CF_ReportHandleRules_pk PRIMARY KEY (IdOfReportHandleRule)
 );
 

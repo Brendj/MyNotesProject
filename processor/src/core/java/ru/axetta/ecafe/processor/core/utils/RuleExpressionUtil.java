@@ -36,10 +36,11 @@ public class RuleExpressionUtil {
         "contragentName",
         "category",
         "idOfMenuSourceOrg",
-        "enterEventType"};
+        "enterEventType",
+        "groupByMenuGroup"};
 
     // Аргементы, которые предназначены не для фильтрации, а для передачи параметров
-    private static int POST_ARGS[] = {23};
+    private static int POST_ARGS[] = {23, 24};
 
     public static boolean isPostArgument(String argName) {
         for (int i = 0; i < ARGUMENT_NAMES.length; i++) {

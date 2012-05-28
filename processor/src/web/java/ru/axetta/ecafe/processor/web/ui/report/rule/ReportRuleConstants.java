@@ -103,7 +103,9 @@ public class ReportRuleConstants {
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
-            new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся")};
+            new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
+            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам")
+    };
 
     public static final ReportHint[] REPORT_HINTS = {
             new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
@@ -118,7 +120,8 @@ public class ReportRuleConstants {
             new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
-            new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24})
+            new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25})
     };
 
     private ReportRuleConstants() {
