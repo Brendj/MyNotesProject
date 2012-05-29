@@ -53,6 +53,15 @@ public class OrderDetail {
     private int menuOrigin;
     private String menuGroup;
     private int state;
+    private String itemCode;
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
 
     public String getMenuGroup() {
         return menuGroup;
