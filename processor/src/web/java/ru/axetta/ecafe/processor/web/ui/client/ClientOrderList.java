@@ -52,6 +52,7 @@ public class ClientOrderList {
             private final Long rPrice;
             private final String menuDetailName;
             private final String rootMenu;
+            private final String itemCode;
 
             public Detail(OrderDetail orderDetail) {
                 this.qty = orderDetail.getQty();
@@ -59,6 +60,11 @@ public class ClientOrderList {
                 this.rPrice = orderDetail.getRPrice();
                 this.menuDetailName = orderDetail.getMenuDetailName();
                 this.rootMenu = orderDetail.getRootMenu();
+                this.itemCode = orderDetail.getItemCode();
+            }
+
+            public String getItemCode() {
+                return itemCode;
             }
 
             public Long getQty() {
