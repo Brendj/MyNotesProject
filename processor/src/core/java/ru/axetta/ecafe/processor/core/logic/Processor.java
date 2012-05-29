@@ -577,6 +577,9 @@ public class Processor implements SyncProcessor,
                         purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getRPrice(),
                         purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
                         purchase.getMenuOutput(), purchase.getType());
+                if(purchase.getItemCode() != null){
+                    orderDetail.setItemCode(purchase.getItemCode());
+                }
                 persistenceSession.save(orderDetail);
                 totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
                 totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();
@@ -1196,6 +1199,7 @@ public class Processor implements SyncProcessor,
                 menuDetail.setMinP(reqMenuDetail.getMinP());
                 menuDetail.setMinMg(reqMenuDetail.getMinMg());
                 menuDetail.setMinFe(reqMenuDetail.getMinFe());
+
                 persistenceSession.save(menuDetail);
                 menu.addMenuDetail(menuDetail);
             }
