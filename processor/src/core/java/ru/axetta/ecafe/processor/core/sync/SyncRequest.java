@@ -80,6 +80,12 @@ public class SyncRequest {
                         long rPrice = getLongValue(namedNodeMap, "rPrice");
                         String rootMenu = getStringValueNullSafe(namedNodeMap, "RootMenu");
                         String menuOutput = getStringValueNullSafe(namedNodeMap, "O");
+
+                        String itemCode = getStringValueNullSafe(namedNodeMap, "ItemCode");
+                        if(itemCode != null){
+                            /* если значение не пусто то урежем лишнее и запишем данные только в 32 символа */
+                            itemCode = StringUtils.substring(itemCode.trim(),0,32);
+                        }
                         if (menuOutput == null) {
                             menuOutput = "";
                         }
@@ -104,7 +110,7 @@ public class SyncRequest {
                         }
 
                         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                                menuOutput, type, menuGroup, menuOrigin);
+                                menuOutput, type, menuGroup, menuOrigin, itemCode);
                     }
 
                 }
@@ -120,9 +126,10 @@ public class SyncRequest {
                 private final int type;
                 private final String menuGroup;
                 private final int menuOrigin;
+                private final String itemCode;
 
                 public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
-                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin) {
+                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin, String itemCode) {
                     this.discount = discount;
                     this.socDiscount = socDiscount;
                     this.idOfOrderDetail = idOfOrderDetail;
@@ -134,6 +141,11 @@ public class SyncRequest {
                     this.type = type;
                     this.menuGroup = menuGroup;
                     this.menuOrigin = menuOrigin;
+                    this.itemCode = itemCode;
+                }
+
+                public String getItemCode() {
+                    return itemCode;
                 }
 
                 public long getDiscount() {
@@ -981,6 +993,7 @@ public class SyncRequest {
                 private final Double minFe;
                 private final int menuOrigin;
                 private final int availableNow;
+
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, long price,
                         int menuOrigin, int availableNow, Double protein, Double fat, Double carbohydrates,
