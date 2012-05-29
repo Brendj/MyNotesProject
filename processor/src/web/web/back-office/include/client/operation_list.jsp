@@ -220,6 +220,9 @@
                         columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column"
                         footerClass="data-table-footer">
             <rich:column>
+                <h:outputText escape="true" value="#{detail.itemCode}" styleClass="output-text" />
+            </rich:column>
+            <rich:column>
                 <h:outputText escape="true" value="#{detail.menuDetailName}" styleClass="output-text" />
             </rich:column>
             <rich:column>
