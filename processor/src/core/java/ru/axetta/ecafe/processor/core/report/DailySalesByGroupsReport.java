@@ -132,11 +132,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
 
             complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
-            complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
-            complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
-            complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
-            complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
-            complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
+            complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // С†РµРЅС‚СЂР°Р»РёР·РѕРІР°РЅРЅС‹Р№ 11-18
+            complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // С†РµРЅС‚СЂР°Р»РёР·РѕРІР°РЅРЅС‹Р№ 7-10
+            complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // Р»РѕРєР°Р»СЊРЅС‹Р№ 11-18
+            complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // Р»РѕРєР°Р»СЊРЅС‹Р№ 7-10
+            complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // СЃРІРѕР±РѕРґРЅС‹Р№ РІС‹Р±Рѕh
             complexQuery_1.setParameter("startTime", startTime.getTime());
             complexQuery_1.setParameter("endTime", endTime.getTime());
 
@@ -147,7 +147,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             for (Object o : mealsList) {
                 vals=(Object[])o;
                 //int menuOrigin = Integer.parseInt(vals[0].toString());
-                String menuGroup = "Платное комплексное питание";
+                String menuGroup = "РџР»Р°С‚РЅРѕРµ РєРѕРјРїР»РµРєСЃРЅРѕРµ РїРёС‚Р°РЅРёРµ";
                 String menuName = vals[4].toString(); // od.MenuType
                 long count = Long.parseLong(vals[1].toString());
                 long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
@@ -157,7 +157,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 long grant = vals[7]==null?0:Long.parseLong(vals[7].toString());
                 long tradeDiscount = (long)( ((double)(discount - socdiscount)/(double)(discount + socdiscount + rPrice + grant))*100 );
                 if (tradeDiscount > 0)
-                    menuName = String.format("%s (скидка %d%%)", menuName, tradeDiscount);
+                    menuName = String.format("%s (СЃРєРёРґРєР° %d%%)", menuName, tradeDiscount);
                 //MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                 mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                 payMealRows.add(mealRow);
@@ -165,7 +165,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             Collections.sort(payMealRows);
             mealRows.addAll(payMealRows);
 
-            //// бесплатное питание
+            //// Р±РµСЃРїР»Р°С‚РЅРѕРµ РїРёС‚Р°РЅРёРµ
             Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName " +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
                     " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
@@ -183,7 +183,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             for (Object o : mealsList) {
                 vals=(Object[])o;
                 //int menuOrigin = Integer.parseInt(vals[0].toString());
-                String menuGroup = "Бесплатное комплексное питание";
+                String menuGroup = "Р‘РµСЃРїР»Р°С‚РЅРѕРµ РєРѕРјРїР»РµРєСЃРЅРѕРµ РїРёС‚Р°РЅРёРµ";
                 String menuName = vals[4].toString(); // od.MenuType
                 long count = Long.parseLong(vals[1].toString());
                 long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
