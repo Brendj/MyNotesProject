@@ -113,6 +113,12 @@
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
 
+    <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.clientEditPage.discountMode}">
+        <f:selectItems value="#{mainPage.clientEditPage.selectItemList}"/>
+    </h:selectOneMenu>
+
+
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
 
     <h:panelGroup>

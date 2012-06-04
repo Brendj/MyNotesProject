@@ -16,6 +16,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -27,6 +28,8 @@ import java.util.*;
  */
 public class ClientEditPage extends BasicWorkspacePage
         implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList, ClientGroupSelectPage.CompleteHandler {
+
+
 
 
     public static class OrgItem {
@@ -184,6 +187,24 @@ public class ClientEditPage extends BasicWorkspacePage
     private Long idOfClientGroup;
     private Long externalId;
     private String clientGUID;
+    private Integer discountMode;
+    private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+
+    public List<SelectItem> getSelectItemList() {
+        return selectItemList;
+    }
+
+    public void setSelectItemList(List<SelectItem> selectItemList) {
+        this.selectItemList = selectItemList;
+    }
+
+    public Integer getDiscountMode() {
+        return discountMode;
+    }
+
+    public void setDiscountMode(Integer discountMode) {
+        this.discountMode = discountMode;
+    }
 
     public String getClientGroupName() {
         return clientGroupName;
@@ -196,6 +217,7 @@ public class ClientEditPage extends BasicWorkspacePage
     // Kadyrov (22.12.2011)
     private String san;
     private String guardsan;
+
     public String getSan() {
         return san;
     }
@@ -211,8 +233,6 @@ public class ClientEditPage extends BasicWorkspacePage
     public void setGuardsan(String guardsan) {
         this.guardsan = guardsan;
     }
-
-
 
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
@@ -449,6 +469,16 @@ public class ClientEditPage extends BasicWorkspacePage
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }
+        this.selectItemList = new LinkedList<SelectItem>();
+        /* если у клиента уже выбрана льгота то она будет первой */
+        if(null!=client.getDiscountMode() && client.getDiscountMode()>0){
+            this.selectItemList.add(new SelectItem(client.getDiscountMode(),Client.DISCOUNT_MODE_NAMES[client.getDiscountMode()]));
+        }
+        this.selectItemList.add(new SelectItem(0,Client.DISCOUNT_MODE_NAMES[0]));
+        for (Integer i=1;i<Client.DISCOUNT_MODE_NAMES.length; i++){
+            SelectItem selectItem = new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]);
+            if(!i.equals(client.getDiscountMode())) this.selectItemList.add(selectItem);
+        }
         this.clientGroupName =client.getClientGroup() == null? "" : client.getClientGroup().getGroupName();
         fill(client);
     }
@@ -511,6 +541,7 @@ public class ClientEditPage extends BasicWorkspacePage
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
+        if(null != discountMode) client.setDiscountMode(discountMode);
         client.setPayForSMS(this.payForSMS);
 
         /* категори скидок */
@@ -573,6 +604,7 @@ public class ClientEditPage extends BasicWorkspacePage
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
+        this.discountMode = client.getDiscountMode();
         /* filter fill*/
         StringBuilder categoriesFilter = new StringBuilder();
         if(!client.getCategories().isEmpty()){
