@@ -453,7 +453,7 @@
 
         </rich:panelMenuGroup>
 
-        <rich:panelMenuItem id="categoryCreateMenuItem"
+        <rich:panelMenuItem id="categoryCreateMenuItem" binding="#{categoryDiscountCreatePage.mainMenuComponent}"
                             label="Регистрация" action="#{categoryDiscountCreatePage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
