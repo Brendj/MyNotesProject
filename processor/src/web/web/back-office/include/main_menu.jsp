@@ -408,9 +408,9 @@
 
     <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организаций" binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}"
                          rendered="true" >
-        <%--
+
         <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
-            --%>
+
 
         <rich:panelMenuItem id="showCategoryOrgsListMenuItem" binding="#{categoryOrgListPage.mainMenuComponent}"
                             label="Список" action="#{categoryOrgListPage.show}" reRender="workspaceForm" />
