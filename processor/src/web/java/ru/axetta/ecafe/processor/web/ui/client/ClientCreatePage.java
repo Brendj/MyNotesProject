@@ -20,6 +20,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -194,6 +195,29 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String guardsan;
     private Long externalId;
     private String clientGUID;
+    private Integer discountMode;
+    private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+
+    /* Является ли данный тип льгот как "Льгота по категорям" если да то TRUE, False в противном случает */
+    public Boolean getDiscountModeIsCategory(){
+        return discountMode == Client.DISCOUNT_MODE_BY_CATEGORY;
+    }
+
+    public Integer getDiscountMode() {
+        return discountMode;
+    }
+
+    public void setDiscountMode(Integer discountMode) {
+        this.discountMode = discountMode;
+    }
+
+    public List<SelectItem> getSelectItemList() {
+        return selectItemList;
+    }
+
+    public void setSelectItemList(List<SelectItem> selectItemList) {
+        this.selectItemList = selectItemList;
+    }
 
     public String getSan() {
         return san;
@@ -410,7 +434,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             contractPerson = new PersonItem();
         }
         payForSMS = 1;
-
+        this.selectItemList = new LinkedList<SelectItem>();
+        for (Integer i=0;i<Client.DISCOUNT_MODE_NAMES.length; i++){
+            this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
+        }
         // Категории скидок
         /*
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
@@ -433,6 +460,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
         }
     }
+
+    public Object changeClientCategory() {
+        if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
+            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        }
+        return null;
+    }
+
 
     public void createClient(Session persistenceSession) throws Exception {
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
@@ -462,6 +497,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
         else client.setClientGUID(this.clientGUID);
 
+        if(null != discountMode) client.setDiscountMode(discountMode);
+        if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){
+            throw new Exception("Выберите хотя бы одну категорию льгот");
+        }
         // Категории скидок
           /*
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {

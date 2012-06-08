@@ -41,6 +41,7 @@ public class Client {
     public static final String UNKNOWN_CONTRACT_STATE_NAME = "Статус неизвестен";
     public static final int DISCOUNT_MODE_NONE = 0;
     public static final int INITIAL_DISCOUNT_MODE = DISCOUNT_MODE_NONE;
+    public static final int DISCOUNT_MODE_BY_CATEGORY = 3;
     public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
 
     private Long idOfClient;

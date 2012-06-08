@@ -115,16 +115,16 @@
 
     <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientEditPage.discountMode}">
+        <a4j:support event="onchange" reRender="clientCategory" action="#{mainPage.clientEditPage.changeClientCategory}"/>
         <f:selectItems value="#{mainPage.clientEditPage.selectItemList}"/>
     </h:selectOneMenu>
 
+    <h:outputText escape="true" value="Категории" styleClass="output-text"/>
 
-    <h:outputText escape="true" value="Категории" styleClass="output-text" />
-
-    <h:panelGroup>
+    <h:panelGroup id="clientCategory">
         <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" >
+                           styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.clientEditPage.discountModeIsCategory}">
              <f:param name="fullList" value="false" />
         </a4j:commandButton>
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />

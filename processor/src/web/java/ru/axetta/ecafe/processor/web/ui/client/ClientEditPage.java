@@ -189,6 +189,11 @@ public class ClientEditPage extends BasicWorkspacePage
     private String clientGUID;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+    private String san;
+    private String guardsan;
+    private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
+    private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
+    private Integer freePayMaxCount;
 
     public List<SelectItem> getSelectItemList() {
         return selectItemList;
@@ -196,6 +201,11 @@ public class ClientEditPage extends BasicWorkspacePage
 
     public void setSelectItemList(List<SelectItem> selectItemList) {
         this.selectItemList = selectItemList;
+    }
+
+    /* Является ли данный тип льгот как "Льгота по категорям" если да то TRUE, False в противном случает */
+    public Boolean getDiscountModeIsCategory(){
+        return discountMode == Client.DISCOUNT_MODE_BY_CATEGORY;
     }
 
     public Integer getDiscountMode() {
@@ -214,10 +224,6 @@ public class ClientEditPage extends BasicWorkspacePage
         this.clientGroupName = clientGroupName;
     }
 
-    // Kadyrov (22.12.2011)
-    private String san;
-    private String guardsan;
-
     public String getSan() {
         return san;
     }
@@ -233,10 +239,6 @@ public class ClientEditPage extends BasicWorkspacePage
     public void setGuardsan(String guardsan) {
         this.guardsan = guardsan;
     }
-
-    private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
-    private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
-    private Integer freePayMaxCount;
 
     public int getContractIdMaxLength() {
         return CONTRACT_ID_MAX_LENGTH;
@@ -497,6 +499,13 @@ public class ClientEditPage extends BasicWorkspacePage
         }
     }
 
+    public Object changeClientCategory() {
+        if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
+            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        }
+        return null;
+    }
+
     public void updateClient(Session persistenceSession, Long idOfClient) throws Exception {
         String mobile = Client.checkAndConvertMobile(this.mobile);
         if (mobile==null) throw new Exception("Неверный формат мобильного телефона");
@@ -541,9 +550,11 @@ public class ClientEditPage extends BasicWorkspacePage
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
-        if(null != discountMode) client.setDiscountMode(discountMode);
         client.setPayForSMS(this.payForSMS);
-
+        if(null != discountMode) client.setDiscountMode(discountMode);
+        if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){
+            throw new Exception("Выберите хотя бы одну категорию льгот");
+        }
         /* категори скидок */
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         StringBuilder clientCategories = new StringBuilder();
