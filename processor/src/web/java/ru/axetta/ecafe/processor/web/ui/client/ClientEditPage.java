@@ -502,6 +502,7 @@ public class ClientEditPage extends BasicWorkspacePage
     public Object changeClientCategory() {
         if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+            filter = "Не выбрано";
         }
         return null;
     }

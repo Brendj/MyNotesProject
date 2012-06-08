@@ -438,6 +438,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         for (Integer i=0;i<Client.DISCOUNT_MODE_NAMES.length; i++){
             this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
         }
+        this.discountMode = Client.DISCOUNT_MODE_NONE;
         // Категории скидок
         /*
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
@@ -464,6 +465,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     public Object changeClientCategory() {
         if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+            filter = "Не выбрано";
         }
         return null;
     }

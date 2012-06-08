@@ -97,7 +97,7 @@
 
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
 
-    <h:panelGroup>
+    <h:panelGroup id="clientCategory">
         <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.clientCreatePage.discountModeIsCategory}">
