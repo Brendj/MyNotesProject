@@ -54,7 +54,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
 
-private static final String RC_OK_DESC="OK";
+    private static final String RC_OK_DESC="OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
     private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
@@ -91,17 +91,6 @@ private static final String RC_OK_DESC="OK";
                     clientSummaryExt.setFirstName(client.getPerson().getFirstName());
                     clientSummaryExt.setLastName(client.getPerson().getSurname());
                     clientSummaryExt.setMiddleName(client.getPerson().getSecondName());
-                    /* нет необходимости их отправлять */
-                    //clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
-                    //clientSummaryExt.setBalance(client.getBalance());
-                    //clientSummaryExt.setOverdraftLimit(client.getLimit());
-                    //clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
-                    //clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
-                    //clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
-                    //clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
-                    //clientSummaryExt.setMobilePhone(client.getMobile());
-                    //clientSummaryExt.setEmail(client.getEmail());
-
                     classStudentList.getC().add(clientSummaryExt);
                 }
             }
@@ -309,29 +298,42 @@ private static final String RC_OK_DESC="OK";
     private void processSummary(Client client, Data data, ObjectFactory objectFactory, Session session)
             throws DatatypeConfigurationException {
         ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
+        /* Номер контракта */
         clientSummaryExt.setContractId(client.getContractId());
+        /* дата заключения контракта */
         clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
+        /* Текущий баланс клиента */
         clientSummaryExt.setBalance(client.getBalance());
+        /* лимит овердрафта */
         clientSummaryExt.setOverdraftLimit(client.getLimit());
+        /* Статус контракта (Текстовое значение) */
         clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
+        /*ограничения дневных затрат за день*/
         clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
+        /* ФИО Клиента */
         clientSummaryExt.setFirstName(client.getPerson().getFirstName());
         clientSummaryExt.setLastName(client.getPerson().getSurname());
         clientSummaryExt.setMiddleName(client.getPerson().getSecondName());
+        /* Флаги увидомлений клиента (Истина/ложь)*/
         clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
         clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
+        /* контактный телефон и емайл адрес электронной почты */
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
+        /* Возвращает самое последнее событие прохода (Вход или Выход) */
         EnterEvent ee = DAOUtils.getLastEnterEvent(session, client);
         if (ee!=null) {
+            /* Код прохода */
             clientSummaryExt.setLastEnterEventCode(ee.getEventCode());
+            /* Дата прохода */
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
-
+        /* Группа к которой относится клиент (Наименование класса учиника) */
         if (client.getClientGroup() == null)
             clientSummaryExt.setGrade(null);
         else
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
+        /* Официальное наименование Учебного учереждения */
         clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
         data.setClientSummaryExt(clientSummaryExt);
     }
