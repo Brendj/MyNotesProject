@@ -571,7 +571,10 @@ CREATE TABLE CF_Generators (
   IdOfCategoryDiscount    BIGINT          NOT NULL,
   IdOfRule		  BIGINT                  NOT NULL,
   idofproductguide        bigint          NOT NULL DEFAULT 0,
-  idofconfigurationprovider bigint        NOT NULL DEFAULT 0
+  idofconfigurationprovider bigint        NOT NULL DEFAULT 0,
+  idofproduct             bigint          NOT NULL DEFAULT 0,
+  idofproducts            bigint          NOT NULL DEFAULT 0,
+  idoftechnologicalmap    bigint          NOT NULL DEFAULT 0
 );
 
 CREATE TABLE CF_SubscriptionFee (

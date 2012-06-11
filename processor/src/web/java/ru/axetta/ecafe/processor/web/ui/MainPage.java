@@ -25,6 +25,8 @@ import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
+import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.TechnologicalMapCreatePage;
+import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.product.ProductCreatePage;
 import ru.axetta.ecafe.processor.web.ui.report.productGuide.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -307,6 +309,39 @@ public class MainPage {
     private String currentConfigurationProvider;
 
     private Long editedProductGuideItemId;
+
+    private final BasicWorkspacePage technologicalMapGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage productGroupPage = new BasicWorkspacePage();
+    private final TechnologicalMapCreatePage technologicalMapCreatePage = new TechnologicalMapCreatePage();
+    private ProductCreatePage productCreatePage = new ProductCreatePage();
+
+    public TechnologicalMapCreatePage getTechnologicalMapCreatePage() {
+        return technologicalMapCreatePage;
+    }
+
+    public BasicWorkspacePage getProductGroupPage() {
+        return productGroupPage;
+    }
+
+    public BasicWorkspacePage getTechnologicalMapGroupPage() {
+        return technologicalMapGroupPage;
+    }
+
+    public Stack<BasicPage> getModalPages() {
+        return modalPages;
+    }
+
+    public void setModalPages(Stack<BasicPage> modalPages) {
+        this.modalPages = modalPages;
+    }
+
+    public ProductCreatePage getProductCreatePage() {
+        return productCreatePage;
+    }
+
+    public void setProductCreatePage(ProductCreatePage productCreatePage) {
+        this.productCreatePage = productCreatePage;
+    }
 
     public BasicWorkspacePage getProductGuideGroupPage() {
         return productGuideGroupPage;
@@ -7277,6 +7312,59 @@ public class MainPage {
 
     public Object addProductGuideInListPage() {
         productGuideListPage.insert();
+        return null;
+    }
+
+    public Object showProductCreatePage() {
+        currentWorkspacePage = productCreatePage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object createProduct() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            productCreatePage.createProduct(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Новый продукт создан успешно.",
+                            null));
+        } catch (Exception e) {
+            logger.error("Failed create product.", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании нового продукта.",
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showTechnologicalMapGroupPage() {
+        currentWorkspacePage = technologicalMapGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showProductGroupPage() {
+        currentWorkspacePage = productGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showTechnologicalMapCreatePage() {
+        currentWorkspacePage = technologicalMapCreatePage;
+        updateSelectedMainMenu();
         return null;
     }
 }
