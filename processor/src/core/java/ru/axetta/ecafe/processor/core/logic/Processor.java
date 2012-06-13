@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -127,6 +128,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResLibraryData2 resLibraryData2 = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        DistributionManager distributionManager = null;
         try {
             if (request.getType() == SyncRequest.TYPE_FULL) {
                 // Generate IdOfPacket
@@ -248,6 +250,15 @@ public class Processor implements SyncProcessor,
                             e);
                 }
 
+                // Process Distribution Manager
+                try {
+                    distributionManager =  processDistributionManager(request.getDistributionManager());
+                } catch (Exception e) {
+                    logger.error(
+                            String.format("Failed to process numbers of Orders, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
+                }
+
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
                 // запрос на получение пополнений
                 try {
@@ -286,7 +297,7 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry);
+                correctingNumbersOrdersRegistry, distributionManager);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -419,6 +430,12 @@ public class Processor implements SyncProcessor,
                 }
             }
         }
+    }
+
+    /* TODO: логика обработки менеджера глобальных объектов */
+    private DistributionManager processDistributionManager(DistributionManager distributionManager){
+
+        return distributionManager;
     }
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,

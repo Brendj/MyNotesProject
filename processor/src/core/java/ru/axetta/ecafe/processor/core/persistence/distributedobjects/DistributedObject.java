@@ -37,9 +37,13 @@ public abstract class DistributedObject implements Comparable<DistributedObject>
     /* меод создания узла элемента */
     public abstract Element toElement(Document document);
     /* метод парсинга элемента */
-    public abstract DistributedObject parseXML(Node node);
+    public abstract boolean parseXML(Node node);
     /* Метод определения названия элемента */
     public abstract String getNodeName();
+
+    protected Long getLongValue(String name){
+        return null;
+    }
 
     @Override
     public int compareTo(DistributedObject o) {

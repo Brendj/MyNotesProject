@@ -31,14 +31,34 @@ public class ProductGuide extends DistributedObject {
             element = document.createElement("M");
         }
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        element.setAttribute("version", Long.toString(this.getGlobalVersion()));
         return element;
     }
 
     @Override
-    public ProductGuide parseXML(Node node) {
-        ProductGuide productGuide = new ProductGuide();
+    public boolean parseXML(Node node) {
+        ProductGuide productGuide = null;
         NamedNodeMap namedNodeMap = node.getAttributes();
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (Node.ELEMENT_NODE == node.getNodeType()) {
+             if(node.getNodeName().equals("C")){
+                 Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
+                 this.setGlobalId(guid);
+                 this.setVersion(0);
+                 //productGuide.setVersion(version);
+                 //productGuide.setFullName(node.getAttributes().getNamedItem("FullName").getTextContent());
+                 return true;
+             }
+            if(node.getNodeName().equals("M")){
+                Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
+                this.setGlobalId(guid);
+                Long version = Long.parseLong(node.getAttributes().getNamedItem("V").getTextContent());
+                this.setVersion(0);
+                //productGuide.setVersion(version);
+                //productGuide.setFullName(node.getAttributes().getNamedItem("FullName").getTextContent());
+                return true;
+            }
+        }
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

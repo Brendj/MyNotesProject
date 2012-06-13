@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1673,6 +1674,7 @@ public class SyncResponse {
     private final ResLibraryData2 resLibraryData2;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
+    private final DistributionManager distributionManager;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
@@ -1682,7 +1684,8 @@ public class SyncResponse {
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
-            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry) {
+            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, DistributionManager distributionManager) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1703,6 +1706,7 @@ public class SyncResponse {
         this.resLibraryData2 = resLibraryData2;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
+        this.distributionManager = distributionManager;
     }
 
     public Document toDocument() throws Exception {
@@ -1797,6 +1801,11 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
         }
 
+        // Distribution Manager
+        if(distributionManager != null){
+            ecafeEnvelopeElement.appendChild(distributionManager.getElements(document));
+        }
+
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);
         document.appendChild(dataElement);
@@ -1857,6 +1866,10 @@ public class SyncResponse {
 
     public ResLibraryData getResLibraryData() {
         return resLibraryData;
+    }
+
+    public DistributionManager getDistributionManager() {
+        return distributionManager;
     }
 
     @Override

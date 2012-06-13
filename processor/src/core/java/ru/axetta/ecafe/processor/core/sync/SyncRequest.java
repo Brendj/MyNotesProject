@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -2869,11 +2870,12 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
+            DistributionManager distributionManager = new DistributionManager();
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-
+                         distributionManager.parseXML(itemNode);
                     }
                     itemNode = itemNode.getNextSibling();
                 }
@@ -2882,7 +2884,7 @@ MenuGroups menuGroups;
 
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2);
+                    enterEvents, libraryData, libraryData2, distributionManager);
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
@@ -2940,14 +2942,17 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
+    private final DistributionManager distributionManager;
 
     public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2) {
+            EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2,
+            DistributionManager distributionManager) {
         this.protoVersion = protoVersion;
         this.type = type;
+        this.distributionManager = distributionManager;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -3028,6 +3033,10 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
 
     public LibraryData2 getLibraryData2() {
         return libraryData2;
+    }
+
+    public DistributionManager getDistributionManager() {
+        return distributionManager;
     }
 
     @Override
