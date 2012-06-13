@@ -5,20 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.ValueChangeEvent;
-import javax.faces.event.ValueChangeListener;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
