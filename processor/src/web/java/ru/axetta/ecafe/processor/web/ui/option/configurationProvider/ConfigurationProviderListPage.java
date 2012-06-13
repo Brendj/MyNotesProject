@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
-import ru.axetta.ecafe.processor.core.persistence.User;
+/*import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.User;*/
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
