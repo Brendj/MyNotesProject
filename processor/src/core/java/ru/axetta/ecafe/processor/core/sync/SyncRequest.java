@@ -2867,6 +2867,18 @@ MenuGroups menuGroups;
                 libraryData2 = libraryData2Builder.build(libraryData2Node);
             }
 
+            /*  Универсальный модуль распределенной синхронизации объектов */
+            Node roNode = findFirstChildElement(envelopeNode, "RO");
+            if(roNode != null){
+                Node itemNode = roNode.getFirstChild();
+                while (null != itemNode) {
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
+
+                    }
+                    itemNode = itemNode.getNextSibling();
+                }
+            }
+
 
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,

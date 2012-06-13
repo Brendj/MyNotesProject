@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -16,7 +17,6 @@ import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
@@ -689,9 +689,11 @@ public class DAOUtils {
     }
 
     public static Object findProductGuide(Session session, Long id) {
-        Criteria criteria = session.createCriteria(ProductGuide.class);
-        criteria.add(Restrictions.eq("idOfProductGuide", id));
-        return criteria.uniqueResult();
+        //Criteria criteria = session.createCriteria(ProductGuide.class);
+        ////criteria.add(Restrictions.eq("idOfProductGuide", id));
+        //criteria.add(Restrictions.eq("globalId", id));
+        //return criteria.uniqueResult();
+        return session.get(ProductGuide.class, id);
     }
 
     public static List findConfigurationProvider(Session session) {

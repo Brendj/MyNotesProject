@@ -21,7 +21,7 @@
             <key>
                 <column name="idofconfigurationprovider"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ProductGuide"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide"/>
         </set>
     </class>
 </hibernate-mapping>
