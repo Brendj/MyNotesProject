@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,45 +43,45 @@ public class DistributionManager {
     private HashMap<String, Element> stringElementHashMap = new HashMap<String, Element>();
     private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
 
-    private Element getProductElement(Document document){
-        return document.createElement("RO");
-    }
+    private Element confirmNode;
 
     public void addDistributedObjectItem(DistributedObjectItem distributedObjectItem){
         distributedObjectItems.add(distributedObjectItem);
     }
 
-    public Element getElements(Document document) throws JAXBException {
-        Element elementRO = document.createElement("RO");
-        elementRO.appendChild(getConfirmElement(document));
-        /* Запрос БД вернуть все distributedObject и зположить в список тега <0/>*/
-        stringElementHashMap.clear();
-        List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide();
-        distributedObjectList.addAll(productGuideList);
-        for (DistributedObject distributedObject: distributedObjectList){
-            if(!stringElementHashMap.containsKey(distributedObject.getNodeName())){
-                Element distributedObjectElement = document.createElement(distributedObject.getNodeName());
-                elementRO.appendChild(distributedObjectElement);
-                stringElementHashMap.put(distributedObject.getNodeName(),distributedObjectElement);
+    private void generateNodesByList(List list, Element appendElement, Document document){
+        HashMap<String, Element> elementMap = new HashMap<String, Element>();
+        for (Object object: list){
+            String action = "";
+            DistributedObject distributedObject = null;
+            if(object instanceof DistributedObject){
+                distributedObject = (DistributedObject) object;
+                action = "O";
             }
-            stringElementHashMap.get(distributedObject.getNodeName()).appendChild(distributedObject.toElement(document,"O"));
+            if(object instanceof DistributedObjectItem) {
+                distributedObject = ((DistributedObjectItem) object).getDistributedObject();
+                action = ((DistributedObjectItem) object).getAction();
+            }
+            if(distributedObject == null) continue;
+            if(!elementMap.containsKey(distributedObject.getNodeName())){
+                Element distributedObjectElement = document.createElement(distributedObject.getNodeName());
+                appendElement.appendChild(distributedObjectElement);
+                elementMap.put(distributedObject.getNodeName(),distributedObjectElement);
+            }
+            elementMap.get(distributedObject.getNodeName()).appendChild(distributedObject.toElement(document,action));
         }
-        return elementRO;
+
     }
 
-    private Element getConfirmElement(Document document) {
+    public Element getElements(Document document) throws JAXBException {
+        Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
-        for (DistributedObjectItem distributedObjectItem: distributedObjectItems){
-            DistributedObject distributedObject = distributedObjectItem.getDistributedObject();
-            if(!stringElementHashMap.containsKey(distributedObject.getNodeName())){
-                Element distributedObjectElement = document.createElement(distributedObject.getNodeName());
-                confirmElement.appendChild(distributedObjectElement);
-                stringElementHashMap.put(distributedObject.getNodeName(),distributedObjectElement);
-            }
-            stringElementHashMap.get(distributedObject.getNodeName()).appendChild(distributedObject.toElement(document,
-                    distributedObjectItem.getAction()));
-        }
-        return confirmElement;
+        generateNodesByList(distributedObjectItems, confirmElement,document);
+        elementRO.appendChild(confirmElement);
+        List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide();
+        distributedObjectList.addAll(productGuideList);
+        generateNodesByList(distributedObjectList, elementRO,document);
+        return elementRO;
     }
 
     public void parseXML(Node node) throws Exception {
@@ -101,6 +102,28 @@ public class DistributionManager {
                 }
             }
         }
+    }
+
+    private static Node findFirstChildElement(Node node, String name) throws Exception {
+        Node currNode = node.getFirstChild();
+        while (null != currNode) {
+            if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
+                return currNode;
+            }
+            currNode = currNode.getNextSibling();
+        }
+        return null;
+    }
+
+    private static Node findFirstChildTextNode(Node node) throws Exception {
+        Node currNode = node.getFirstChild();
+        while (null != currNode) {
+            currNode = currNode.getNextSibling();
+            if (Node.TEXT_NODE == currNode.getNodeType()) {
+                return currNode;
+            }
+        }
+        return null;
     }
 
     public static class DistributedObjectItem{

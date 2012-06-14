@@ -31,16 +31,19 @@ public class ProductGuide extends DistributedObject {
         Element element =  document.createElement(action);
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
         element.setAttribute("version", Long.toString(this.getGlobalVersion()));
-
+        if(action == "O"){
+            element.setAttribute("code", this.getCode());
+            element.setAttribute("fullName", this.getFullName());
+            element.setAttribute("okpCode", this.getOkpCode());
+           // element.setAttribute("idOfConfigurationProvider", Long.toString(this.getIdofconfigurationprovider()));
+        }
         return element;
     }
 
     @Override
     public String parseXML(Node node) {
-        ProductGuide productGuide = null;
-        NamedNodeMap namedNodeMap = node.getAttributes();
         String result ="";
-        if (Node.ELEMENT_NODE == node.getNodeType() && (node.getNodeName()=="C"||node.getNodeName()=="M")) {
+        if (Node.ELEMENT_NODE == node.getNodeType()) {
             Long gid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
             this.setGlobalId(gid);
             String version = (node.getAttributes().getNamedItem("V")!=null?node.getAttributes().getNamedItem("V").getTextContent():null);
@@ -51,23 +54,6 @@ public class ProductGuide extends DistributedObject {
                 this.setVersion(0);
                 result = "C";
             }
-             /*if(node.getNodeName().equals("C")){
-                 Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
-                 this.setGlobalId(guid);
-                 this.setVersion(0);
-                 //productGuide.setVersion(version);
-                 //productGuide.setFullName(node.getAttributes().getNamedItem("FullName").getTextContent());
-                 return true;
-             }
-            if(node.getNodeName().equals("M")){
-                Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
-                this.setGlobalId(guid);
-                Long version = Long.parseLong(node.getAttributes().getNamedItem("V").getTextContent());
-                this.setVersion(version);
-                //productGuide.setVersion(version);
-                //productGuide.setFullName(node.getAttributes().getNamedItem("FullName").getTextContent());
-                return true;
-            }*/
         }
         return result;
         //return false;  //To change body of implemented methods use File | Settings | File Templates.
