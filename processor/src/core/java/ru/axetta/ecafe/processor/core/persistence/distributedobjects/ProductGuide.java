@@ -31,6 +31,7 @@ public class ProductGuide extends DistributedObject {
         Element element =  document.createElement(action);
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
         element.setAttribute("version", Long.toString(this.getGlobalVersion()));
+
         return element;
     }
 
@@ -79,10 +80,11 @@ public class ProductGuide extends DistributedObject {
 
     //private Long idOfProductGuide;
     private String code;
+
     private String fullName;
     private String productName;
     private String okpCode;
-   // private long version;
+    // private long version;
     private User userCreate;
     private User userEdit;
     private User userDelete;
@@ -91,7 +93,6 @@ public class ProductGuide extends DistributedObject {
     private Date deleteTime;
     private boolean deleted;*/
     private Long idofconfigurationprovider;
-
     public Long getIdofconfigurationprovider() {
         return idofconfigurationprovider;
     }
@@ -99,10 +100,10 @@ public class ProductGuide extends DistributedObject {
     public void setIdofconfigurationprovider(Long idofconfigurationprovider) {
         this.idofconfigurationprovider = idofconfigurationprovider;
     }
+
     public Long getIdOfProductGuide() {
         return getGlobalId();
     }
-
     public void setIdOfProductGuide(Long idOfProductGuide) {
         setGlobalId(idOfProductGuide);
     }
@@ -130,10 +131,10 @@ public class ProductGuide extends DistributedObject {
     public void setOkpCode(String okpCode) {
         this.okpCode = okpCode;
     }
+
     public long getVersion() {
         return getGlobalVersion();
     }
-
     public void setVersion(long version) {
         setGlobalVersion(version);
     }
@@ -161,7 +162,24 @@ public class ProductGuide extends DistributedObject {
     public void setUserDelete(User userDelete) {
         this.userDelete = userDelete;
     }
-/*
+
+    public boolean isDeleted() {
+        return super.isStatus();
+    }
+
+    public void setDeleted(boolean deleted) {
+        super.setStatus(deleted);
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    /*
     public Date getCreateTime() {
         return createTime;
     }
@@ -185,20 +203,17 @@ public class ProductGuide extends DistributedObject {
     public void setDeleteTime(Date deleteTime) {
         this.deleteTime = deleteTime;
     }*/
-
-    public boolean isDeleted() {
-        return super.isStatus();
-    }
-
-    public void setDeleted(boolean deleted) {
-        super.setStatus(deleted);
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
+    @Override
+    public String toString() {
+        return "ProductGuide{" +
+                "code='" + code + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", productName='" + productName + '\'' +
+                ", okpCode='" + okpCode + '\'' +
+                ", userCreate=" + userCreate +
+                ", userEdit=" + userEdit +
+                ", userDelete=" + userDelete +
+                ", idofconfigurationprovider=" + idofconfigurationprovider +
+                '}';
     }
 }

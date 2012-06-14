@@ -4,10 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -26,35 +36,11 @@ import java.util.*;
 
 public class DistributionManager {
 
-    private static class DistributedObjectItem{
-
-        private String action;
-        private DistributedObject distributedObject;
-
-        private DistributedObjectItem(String action, DistributedObject distributedObject) {
-            this.action = action;
-            this.distributedObject = distributedObject;
-        }
-
-        public String getAction() {
-            return action;
-        }
-
-        public void setAction(String action) {
-            this.action = action;
-        }
-
-        public DistributedObject getDistributedObject() {
-            return distributedObject;
-        }
-
-        public void setDistributedObject(DistributedObject distributedObject) {
-            this.distributedObject = distributedObject;
-        }
-    }
+    private Logger logger = LoggerFactory.getLogger(DistributionManager.class);
 
     private List<DistributedObjectItem> distributedObjectItems = new LinkedList<DistributedObjectItem>();
     private HashMap<String, Element> stringElementHashMap = new HashMap<String, Element>();
+    private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
 
     private Element getProductElement(Document document){
         return document.createElement("RO");
@@ -68,6 +54,17 @@ public class DistributionManager {
         Element elementRO = document.createElement("RO");
         elementRO.appendChild(getConfirmElement(document));
         /* Запрос БД вернуть все distributedObject и зположить в список тега <0/>*/
+        stringElementHashMap.clear();
+        List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide();
+        distributedObjectList.addAll(productGuideList);
+        for (DistributedObject distributedObject: distributedObjectList){
+            if(!stringElementHashMap.containsKey(distributedObject.getNodeName())){
+                Element distributedObjectElement = document.createElement(distributedObject.getNodeName());
+                elementRO.appendChild(distributedObjectElement);
+                stringElementHashMap.put(distributedObject.getNodeName(),distributedObjectElement);
+            }
+            stringElementHashMap.get(distributedObject.getNodeName()).appendChild(distributedObject.toElement(document,"O"));
+        }
         return elementRO;
     }
 
@@ -96,7 +93,7 @@ public class DistributionManager {
                     ProductGuide productGuide = new ProductGuide();
                     String action = productGuide.parseXML(node);
                     if(action != null){
-                       addDistributedObjectItem(new DistributedObjectItem(action,productGuide));
+                       addDistributedObjectItem(new DistributedObjectItem(action, productGuide));
                         /* занесение в бд */
                     }
                     node = node.getNextSibling();
@@ -105,4 +102,32 @@ public class DistributionManager {
             }
         }
     }
+
+    public static class DistributedObjectItem{
+
+        private String action;
+        private DistributedObject distributedObject;
+
+        private DistributedObjectItem(String action, DistributedObject distributedObject) {
+            this.action = action;
+            this.distributedObject = distributedObject;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
+
+        public DistributedObject getDistributedObject() {
+            return distributedObject;
+        }
+
+        public void setDistributedObject(DistributedObject distributedObject) {
+            this.distributedObject = distributedObject;
+        }
+    }
 }
+

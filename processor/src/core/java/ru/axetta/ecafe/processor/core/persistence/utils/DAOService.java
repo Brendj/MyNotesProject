@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Component
@@ -33,6 +35,12 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    @Transactional
+    public List<ProductGuide> getProductGuide(){
+        TypedQuery<ProductGuide> query = em.createQuery("from ProductGuide",ProductGuide.class);
+        return  query.getResultList();
     }
 
     @Transactional
