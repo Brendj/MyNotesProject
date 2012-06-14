@@ -8,6 +8,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 /**
@@ -17,6 +21,7 @@ import java.util.Date;
  * Time: 14:50
  * To change this template use File | Settings | File Templates.
  */
+
 public abstract class DistributedObject implements Comparable<DistributedObject> {
 
     /* Идентификатор объекта */
@@ -33,11 +38,10 @@ public abstract class DistributedObject implements Comparable<DistributedObject>
     private Date deleteTime;
     /* статус объекта (активен/удален) */
     private boolean status;
-
     /* меод создания узла элемента */
-    public abstract Element toElement(Document document);
+    public abstract Element toElement(Document document,String action);
     /* метод парсинга элемента */
-    public abstract boolean parseXML(Node node);
+    public abstract String parseXML(Node node);
     /* Метод определения названия элемента */
     public abstract String getNodeName();
 

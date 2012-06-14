@@ -11,6 +11,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 /**
@@ -23,24 +27,30 @@ import java.util.Date;
 public class ProductGuide extends DistributedObject {
 
     @Override
-    public Element toElement(Document document) {
-        Element element = null;
-        if(this.getVersion()==0){
-            element = document.createElement("C");
-        } else {
-            element = document.createElement("M");
-        }
+    public Element toElement(Document document, String action) {
+        Element element =  document.createElement(action);
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
         element.setAttribute("version", Long.toString(this.getGlobalVersion()));
         return element;
     }
 
     @Override
-    public boolean parseXML(Node node) {
+    public String parseXML(Node node) {
         ProductGuide productGuide = null;
         NamedNodeMap namedNodeMap = node.getAttributes();
-        if (Node.ELEMENT_NODE == node.getNodeType()) {
-             if(node.getNodeName().equals("C")){
+        String result ="";
+        if (Node.ELEMENT_NODE == node.getNodeType() && (node.getNodeName()=="C"||node.getNodeName()=="M")) {
+            Long gid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
+            this.setGlobalId(gid);
+            String version = (node.getAttributes().getNamedItem("V")!=null?node.getAttributes().getNamedItem("V").getTextContent():null);
+            if(version!=null) {
+                this.setVersion(Long.valueOf(version));
+                result = "M";
+            } else {
+                this.setVersion(0);
+                result = "C";
+            }
+             /*if(node.getNodeName().equals("C")){
                  Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
                  this.setGlobalId(guid);
                  this.setVersion(0);
@@ -52,13 +62,14 @@ public class ProductGuide extends DistributedObject {
                 Long guid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
                 this.setGlobalId(guid);
                 Long version = Long.parseLong(node.getAttributes().getNamedItem("V").getTextContent());
-                this.setVersion(0);
+                this.setVersion(version);
                 //productGuide.setVersion(version);
                 //productGuide.setFullName(node.getAttributes().getNamedItem("FullName").getTextContent());
                 return true;
-            }
+            }*/
         }
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return result;
+        //return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
