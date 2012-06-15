@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
 
 import org.springframework.context.annotation.Scope;
@@ -41,6 +42,64 @@ public class DAOService {
     public List<ProductGuide> getProductGuide(){
         TypedQuery<ProductGuide> query = em.createQuery("from ProductGuide",ProductGuide.class);
         return  query.getResultList();
+    }
+
+    @Transactional
+    public Boolean existProductGuide(Long id) {
+        TypedQuery<ProductGuide> query = em.createQuery("from ProductGuide where globalId=:id order by globalId",ProductGuide.class);
+        query.setParameter("id",id);
+        return query.getResultList().size()>0;
+    }
+
+    @Transactional
+    public void setDeleteStatusProductGuide(Long id, Boolean status) {
+        Query q = em.createQuery("update ProductGuide set status=:status,globalVersion=globalVersion+1 where globalId=:id");
+        q.setParameter("id", id);
+        q.setParameter("status", status);
+        int updateCount = q.executeUpdate();
+    }
+
+    @Transactional
+    public Long getProductGuideVersion(Long globalId) {
+        Query query = em.createQuery("select globalVersion from ProductGuide where globalId=:globalId");
+        query.setParameter("globalId",globalId);
+        Number version = (Number) query.getSingleResult();
+        return version.longValue();
+    }
+
+    public void setProductGuideVersion(Long globalId, Long globalVersion){
+        Query q = em.createQuery("update ProductGuide set globalVersion=:globalVersion where globalId=:globalId");
+        q.setParameter("globalId", globalId);
+        q.setParameter("globalVersion", globalVersion);
+        int updateCount = q.executeUpdate();
+    }
+
+    @Transactional
+    public ProductGuide mergeProductGuide(ProductGuide productGuide) {
+        if(productGuide.getGlobalId()!=null){
+            Query q = em.createQuery("update ProductGuide set productName=:productName, okpCode=:okpCode,fullName=:fullName,code=:code,idOfConfigurationProvider=:idOfConfigurationProvider,globalVersion=globalVersion+1 where globalId=:id");
+            q.setParameter("id", productGuide.getGlobalId());
+            q.setParameter("code", productGuide.getCode());
+            q.setParameter("fullName", productGuide.getFullName());
+            q.setParameter("okpCode", productGuide.getOkpCode());
+            q.setParameter("productName", productGuide.getProductName());
+            q.setParameter("idOfConfigurationProvider", productGuide.getIdofconfigurationprovider());
+            int updateCount = q.executeUpdate();
+        } else {
+            em.persist(productGuide);
+        }
+        //em.persist(productGuide);
+        return productGuide;
+    }
+
+    @Transactional
+    public void createConflict(DOConflict conflict) {
+        em.persist(conflict);
+    }
+
+    public void deleteProductGuide(Long id) {
+        ProductGuide productGuide = em.find(ProductGuide.class, id);
+        em.remove(productGuide);
     }
 
     @Transactional
@@ -118,5 +177,4 @@ public class DAOService {
         if (cl==null) return null;
         return cl;
     }
-
 }
