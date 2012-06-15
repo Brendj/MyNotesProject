@@ -22,12 +22,12 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-public abstract class DistributedObject implements Comparable<DistributedObject> {
+public abstract class DistributedObject{
 
     /* Идентификатор объекта */
-    private long globalId;
+    private Long globalId;
     /* версия объекта */
-    private long globalVersion;
+    private Long globalVersion;
     /* Идентификатор организации */
     private Long idOfOrg;
     /* дата создания объекта */
@@ -37,7 +37,9 @@ public abstract class DistributedObject implements Comparable<DistributedObject>
     /* дата удаления объекта */
     private Date deleteTime;
     /* статус объекта (активен/удален) */
-    private boolean status;
+    private Boolean status;
+    /* полуе локального идентификатора*/
+    private Long localID;
     /* меод создания узла элемента */
     public abstract Element toElement(Document document,String action);
     /* метод парсинга элемента */
@@ -45,29 +47,33 @@ public abstract class DistributedObject implements Comparable<DistributedObject>
     /* Метод определения названия элемента */
     public abstract String getNodeName();
 
-    protected Long getLongValue(String name){
-        return null;
-    }
-
-    @Override
-    public int compareTo(DistributedObject o) {
-        return getNodeName().compareTo(o.getNodeName());
+    public String getAttributeValue(Node node, String attributeName){
+        return (node.getAttributes().getNamedItem(attributeName)!=null?node.getAttributes().getNamedItem(
+                attributeName).getTextContent():null);
     }
 
     /* Getters and Setters */
-    public long getGlobalId() {
+    public Long getLocalID() {
+        return localID;
+    }
+
+    public void setLocalID(Long localID) {
+        this.localID = localID;
+    }
+
+    public Long getGlobalId() {
         return globalId;
     }
 
-    public void setGlobalId(long globalId) {
+    public void setGlobalId(Long globalId) {
         this.globalId = globalId;
     }
 
-    public long getGlobalVersion() {
+    public Long getGlobalVersion() {
         return globalVersion;
     }
 
-    public void setGlobalVersion(long globalVersion) {
+    public void setGlobalVersion(Long globalVersion) {
         this.globalVersion = globalVersion;
     }
 
@@ -103,11 +109,11 @@ public abstract class DistributedObject implements Comparable<DistributedObject>
         this.deleteTime = deleteTime;
     }
 
-    public boolean isStatus() {
+    public Boolean isStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 }

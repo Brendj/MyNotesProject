@@ -4,27 +4,22 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.DateType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
 
 /**
@@ -42,7 +37,7 @@ public class DistributionManager {
     private List<DistributedObjectItem> distributedObjectItems = new LinkedList<DistributedObjectItem>();
     private HashMap<String, Element> stringElementHashMap = new HashMap<String, Element>();
     private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
-
+    private Document confirmDocument = null;
     private Element confirmNode;
 
     public void addDistributedObjectItem(DistributedObjectItem distributedObjectItem){
@@ -78,24 +73,65 @@ public class DistributionManager {
         Element confirmElement = document.createElement("Confirm");
         generateNodesByList(distributedObjectItems, confirmElement,document);
         elementRO.appendChild(confirmElement);
+        //elementRO.appendChild(confirmNode);
+        //elementRO.appendChild(confirmDocument.importNode(confirmNode, true));
         List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide();
         distributedObjectList.addAll(productGuideList);
         generateNodesByList(distributedObjectList, elementRO,document);
         return elementRO;
     }
 
+    private Document getConfirmDocument() throws ParserConfigurationException {
+        if(confirmDocument == null){
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            //confirmDocument = documentBuilder.newDocument();
+            confirmDocument = new DocumentImpl();
+        }
+        return confirmDocument;
+    }
+
     public void parseXML(Node node) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             if(node.getNodeName().equals("Pr")){
-                /* в случае успеха при парсинге добавляем в список */
+                // в случае успеха при парсинге добавляем в список
                 node = node.getFirstChild();
                 node = node.getNextSibling();
                 while (node != null){
                     ProductGuide productGuide = new ProductGuide();
                     String action = productGuide.parseXML(node);
+                    //productGuide.setDeleteTime(new Date());
+                    //productGuide.setCreateTime(new Date());
+                    //productGuide.setEditTime(new Date());
                     if(action != null){
+                       if(productGuide.getAttributeValue(node,"D") == null){
+                           if(node.getNodeName().equals("C")){
+                               //productGuide = DAOService.getInstance().createProductGuide(productGuide);
+                               productGuide = DAOService.getInstance().mergeProductGuide(productGuide);
+                           }
+                           if(node.getNodeName().equals("M")){
+                               Long version = DAOService.getInstance().getProductGuideVersion(productGuide.getGlobalId());
+                               if(version != productGuide.getVersion()){
+                                   ProductGuide newProductGuide = DAOService.getInstance().mergeProductGuide(productGuide);
+                                   DOConflict conflict = new DOConflict();
+                                   conflict.setgVersionCur(productGuide.getVersion());
+                                   conflict.setgVersionInc(version);
+                                   conflict.setDistributedObjectClassName("ProductGuide");
+                                   conflict.setValueCur(newProductGuide.toString());
+                                   conflict.setValueInc(productGuide.toString());
+                                   conflict.setCreateConflictDate(new Date());
+                                   DAOService.getInstance().createConflict(conflict);
+                                   //DAOService.getInstance().setProductGuideVersion(productGuide.getGlobalId(),version);
+                               } else {
+                                   productGuide = DAOService.getInstance().mergeProductGuide(productGuide);
+                               }
+                               //productGuide = DAOService.getInstance().mergeProductGuide(productGuide);
+                           }
+
+                       } else {
+                           DAOService.getInstance().setDeleteStatusProductGuide(productGuide.getGlobalId(),productGuide.getAttributeValue(node,"D").equals("1"));
+                       }
                        addDistributedObjectItem(new DistributedObjectItem(action, productGuide));
-                        /* занесение в бд */
                     }
                     node = node.getNextSibling();
                     if(node !=null) node = node.getNextSibling();
