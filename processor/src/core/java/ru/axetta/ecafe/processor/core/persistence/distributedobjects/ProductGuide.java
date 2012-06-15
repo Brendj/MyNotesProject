@@ -30,12 +30,17 @@ public class ProductGuide extends DistributedObject {
     public Element toElement(Document document, String action) {
         Element element =  document.createElement(action);
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
-        element.setAttribute("version", Long.toString(this.getGlobalVersion()));
-        if(action == "O"){
-            element.setAttribute("code", this.getCode());
-            element.setAttribute("fullName", this.getFullName());
-            element.setAttribute("okpCode", this.getOkpCode());
-           // element.setAttribute("idOfConfigurationProvider", Long.toString(this.getIdofconfigurationprovider()));
+        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
+        if(getLocalID()!=null){
+            element.setAttribute("LID", Long.toString(this.getLocalID()));
+        }
+        if(isStatus() && !action.equals("O")){
+            element.setAttribute("D", isStatus()?"1":"0");
+        } else {
+            element.setAttribute("Code".toUpperCase(), this.getCode());
+            element.setAttribute("FullName".toUpperCase(), this.getFullName());
+            element.setAttribute("OkpCode".toUpperCase(), this.getOkpCode());
+            if(getIdofconfigurationprovider()!=null) element.setAttribute("IdOfConfigurationProvider".toUpperCase(), Long.toString(this.getIdofconfigurationprovider()));
         }
         return element;
     }
@@ -43,18 +48,31 @@ public class ProductGuide extends DistributedObject {
     @Override
     public String parseXML(Node node) {
         String result ="";
-        if (Node.ELEMENT_NODE == node.getNodeType()) {
-            Long gid = Long.parseLong(node.getAttributes().getNamedItem("GID").getTextContent());
-            this.setGlobalId(gid);
-            String version = (node.getAttributes().getNamedItem("V")!=null?node.getAttributes().getNamedItem("V").getTextContent():null);
-            if(version!=null) {
-                this.setVersion(Long.valueOf(version));
-                result = "M";
-            } else {
-                this.setVersion(0);
-                result = "C";
-            }
+        String stringVersion = getAttributeValue(node,"V");
+        if(stringVersion!=null) {
+            this.setVersion(Long.valueOf(stringVersion));
+            result = "M";
+        } else {
+            this.setVersion(Long.valueOf("0"));
+            result = "C";
         }
+        //setVersion(Long.parseLong(stringVersion));
+        String stringGid = getAttributeValue(node,"GID");
+        if(stringGid!=null) {
+            this.setGlobalId(Long.valueOf(stringGid));
+        }
+        String stringCode = getAttributeValue(node,"Code");
+        if(stringCode!=null) setCode(stringCode);
+        String stringFullName= getAttributeValue(node,"FullName");
+        if(stringFullName!=null) setFullName(stringFullName);
+        String stringOkpCode= getAttributeValue(node,"OkpCode");
+        if(stringOkpCode!=null) setOkpCode(stringOkpCode);
+        String stringLocalId= getAttributeValue(node,"LID");
+        if(stringLocalId!=null) setLocalID(Long.parseLong(stringLocalId));
+        String stringStatus= getAttributeValue(node,"D");
+        setStatus(stringLocalId!=null);
+        String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
+        if(stringIdOfConfigurationProvider!=null) setIdofconfigurationprovider(Long.parseLong(stringIdOfConfigurationProvider));
         return result;
         //return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -118,10 +136,10 @@ public class ProductGuide extends DistributedObject {
         this.okpCode = okpCode;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return getGlobalVersion();
     }
-    public void setVersion(long version) {
+    public void setVersion(Long version) {
         setGlobalVersion(version);
     }
 
@@ -149,11 +167,11 @@ public class ProductGuide extends DistributedObject {
         this.userDelete = userDelete;
     }
 
-    public boolean isDeleted() {
+    public Boolean isDeleted() {
         return super.isStatus();
     }
 
-    public void setDeleted(boolean deleted) {
+    public void setDeleted(Boolean deleted) {
         super.setStatus(deleted);
     }
 
