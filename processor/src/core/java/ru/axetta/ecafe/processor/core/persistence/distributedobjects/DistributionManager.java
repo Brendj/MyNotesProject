@@ -32,18 +32,36 @@ import java.util.*;
 
 public class DistributionManager {
 
+    /**
+     * Логгер
+     */
     private Logger logger = LoggerFactory.getLogger(DistributionManager.class);
-
+    /**
+     * Список успешно выполненных действий с распределенными объектами в виде  пар(действие, объект)
+     */
     private List<DistributedObjectItem> distributedObjectItems = new LinkedList<DistributedObjectItem>();
-    private HashMap<String, Element> stringElementHashMap = new HashMap<String, Element>();
+    //private HashMap<String, Element> stringElementHashMap = new HashMap<String, Element>();
+    /**
+     * Список глобальных объектов на базе процессинга
+     */
     private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
     private Document confirmDocument = null;
-    private Element confirmNode;
+   // private Element confirmNode;
+
 
     public void addDistributedObjectItem(DistributedObjectItem distributedObjectItem){
         distributedObjectItems.add(distributedObjectItem);
     }
 
+    /**
+     *  Оперирует с одним из двух видов списков: либо список выполненных действий либо список глобальных
+     *  объектов. В первом случае appendElement=<Confirm>. Во втором случае appendElement=<RO>
+     *   В обоих случаях appendElement заполняется элементами, сгенерированными по спискам
+     * @param list  либо список выполненных действий либо список глобальных
+     *  объектов
+     * @param appendElement   элемент, заполняемый другими элементами (Элемент <Confirm> либо элемент  <RO>)
+     * @param document  выходной xml документ
+     */
     private void generateNodesByList(List list, Element appendElement, Document document){
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         for (Object object: list){
@@ -68,6 +86,12 @@ public class DistributionManager {
 
     }
 
+    /**
+     * Создает  элемент <RO> выходного xml документа
+     * @param document   выходной xml документ
+     * @return  элемент <RO> выходного xml документа
+     * @throws JAXBException
+     */
     public Element getElements(Document document) throws JAXBException {
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
@@ -91,6 +115,13 @@ public class DistributionManager {
         return confirmDocument;
     }
 
+    /**
+     * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
+     * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
+     * в список - поле distributedObjectItems.
+     * @param node  Элемент <Pr>
+     * @throws Exception
+     */
     public void parseXML(Node node) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             if(node.getNodeName().equals("Pr")){
@@ -162,9 +193,18 @@ public class DistributionManager {
         return null;
     }
 
+    /**
+     * Пара {(Распределенный объект), (действие, которое необходимо выполнить с объектом) }
+     */
     public static class DistributedObjectItem{
 
+        /**
+         *   действие, которое необходимо выполнить(или выполнено) с объектом
+         */
         private String action;
+        /**
+         *   Распределенный объект
+         */
         private DistributedObject distributedObject;
 
         private DistributedObjectItem(String action, DistributedObject distributedObject) {

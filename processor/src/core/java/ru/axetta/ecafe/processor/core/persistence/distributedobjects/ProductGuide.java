@@ -24,8 +24,16 @@ import java.util.Date;
  * Time: 14:47
  * To change this template use File | Settings | File Templates.
  */
+
 public class ProductGuide extends DistributedObject {
 
+    /**
+     * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
+     * Атрибуты данного элемента приравниваются соответствующим полям объекта this.
+     * @param document  выходной xml документ, создаваемый сервлетом SyncServlet при синхронизации
+     * @param action    имя создаваемого элемента(одно из трех: С, M ,O )
+     * @return  созданный элемент
+     */
     @Override
     public Element toElement(Document document, String action) {
         Element element =  document.createElement(action);
@@ -45,6 +53,12 @@ public class ProductGuide extends DistributedObject {
         return element;
     }
 
+    /**
+     * Считывает информацию из элемента node входного xml документа и заполняет ею
+     * объект this
+     * @param node элемент <C> либо <M> входного xml документа, потомок элемента <Pr> в секции <RO>
+     * @return имя элемента node
+     */
     @Override
     public String parseXML(Node node) {
         String result ="";
