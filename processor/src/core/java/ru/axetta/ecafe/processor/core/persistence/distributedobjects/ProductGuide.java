@@ -42,13 +42,20 @@ public class ProductGuide extends DistributedObject {
         if(getLocalID()!=null){
             element.setAttribute("LID", Long.toString(this.getLocalID()));
         }
-        if(isStatus() && !action.equals("O")){
-            element.setAttribute("D", isStatus()?"1":"0");
-        } else {
+        if(action.equals("O")){
+
+            if(isStatus())  {
+
+                element.setAttribute("D", isStatus()?"1":"0");
+               return element;
+            }
+
             element.setAttribute("Code".toUpperCase(), this.getCode());
             element.setAttribute("FullName".toUpperCase(), this.getFullName());
             element.setAttribute("OkpCode".toUpperCase(), this.getOkpCode());
             if(getIdofconfigurationprovider()!=null) element.setAttribute("IdOfConfigurationProvider".toUpperCase(), Long.toString(this.getIdofconfigurationprovider()));
+
+
         }
         return element;
     }
@@ -84,7 +91,8 @@ public class ProductGuide extends DistributedObject {
         String stringLocalId= getAttributeValue(node,"LID");
         if(stringLocalId!=null) setLocalID(Long.parseLong(stringLocalId));
         String stringStatus= getAttributeValue(node,"D");
-        setStatus(stringLocalId!=null);
+        if(stringStatus==null){setStatus(false);}else{setStatus(stringStatus.equals("1")?true:false);}
+       // setStatus(stringLocalId!=null);
         String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
         if(stringIdOfConfigurationProvider!=null) setIdofconfigurationprovider(Long.parseLong(stringIdOfConfigurationProvider));
         return result;
