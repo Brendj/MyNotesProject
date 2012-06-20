@@ -30,57 +30,27 @@ public class ProductGuide extends DistributedObject {
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
      * Атрибуты данного элемента приравниваются соответствующим полям объекта this.
-     * @param document  выходной xml документ, создаваемый сервлетом SyncServlet при синхронизации
-     * @param action    имя создаваемого элемента(одно из трех: С, M ,O )
+     * @param element  выходной xml документ, создаваемый сервлетом SyncServlet при синхронизации
      * @return  созданный элемент
      */
     @Override
-    public Element toElement(Document document, String action) {
-        Element element =  document.createElement(action);
-        element.setAttribute("GID", Long.toString(this.getGlobalId()));
-        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
-        if(getLocalID()!=null){
-            element.setAttribute("LID", Long.toString(this.getLocalID()));
-        }
-        if(action.equals("O")){
-
-            if(isStatus())  {
-
-                element.setAttribute("D", isStatus()?"1":"0");
-               return element;
-            }
-
-            element.setAttribute("Code".toUpperCase(), this.getCode());
-            element.setAttribute("FullName".toUpperCase(), this.getFullName());
-            element.setAttribute("OkpCode".toUpperCase(), this.getOkpCode());
-            if(getIdofconfigurationprovider()!=null) element.setAttribute("IdOfConfigurationProvider".toUpperCase(), Long.toString(this.getIdofconfigurationprovider()));
-
-
-        }
-        return element;
+    protected void appendAttributes(Element element) {
+        element.setAttribute("Code", this.getCode());
+        element.setAttribute("FullName", this.getFullName());
+        element.setAttribute("OkpCode", this.getOkpCode());
+        element.setAttribute("ProductName", this.getProductName());
+        if(getIdofconfigurationprovider()!=null) element.setAttribute("IdOfConfigurationProvider", Long.toString(this.getIdofconfigurationprovider()));
     }
 
-    /**
-     * Считывает информацию из элемента node входного xml документа и заполняет ею
-     * объект this
-     * @param node элемент <C> либо <M> входного xml документа, потомок элемента <Pr> в секции <RO>
-     * @return имя элемента node
-     */
     @Override
-    public String parseXML(Node node) {
-        String result ="";
-        String stringVersion = getAttributeValue(node,"V");
-        if(stringVersion!=null) {
-            this.setVersion(Long.valueOf(stringVersion));
-            result = "M";
-        } else {
-            this.setVersion(Long.valueOf("0"));
-            result = "C";
-        }
-        //setVersion(Long.parseLong(stringVersion));
+    public ProductGuide build(Node node) {
         String stringGid = getAttributeValue(node,"GID");
         if(stringGid!=null) {
-            this.setGlobalId(Long.valueOf(stringGid));
+            setIdOfProductGuide(Long.valueOf(stringGid));
+        }
+        String stringVersion = getAttributeValue(node,"V");
+        if(stringVersion!=null) {
+            setVersion(Long.valueOf(stringVersion));
         }
         String stringCode = getAttributeValue(node,"Code");
         if(stringCode!=null) setCode(stringCode);
@@ -90,13 +60,13 @@ public class ProductGuide extends DistributedObject {
         if(stringOkpCode!=null) setOkpCode(stringOkpCode);
         String stringLocalId= getAttributeValue(node,"LID");
         if(stringLocalId!=null) setLocalID(Long.parseLong(stringLocalId));
+        String stringProductName= getAttributeValue(node,"ProductName");
+        if(stringProductName!=null) setProductName(stringProductName);
         String stringStatus= getAttributeValue(node,"D");
-        if(stringStatus==null){setStatus(false);}else{setStatus(stringStatus.equals("1")?true:false);}
-       // setStatus(stringLocalId!=null);
+        setStatus(stringStatus!=null);
         String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
         if(stringIdOfConfigurationProvider!=null) setIdofconfigurationprovider(Long.parseLong(stringIdOfConfigurationProvider));
-        return result;
-        //return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return this;
     }
 
     @Override
