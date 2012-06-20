@@ -25,29 +25,50 @@ import java.util.Date;
 public abstract class DistributedObject{
 
     /* Идентификатор объекта */
-    private Long globalId;
+    protected Long globalId;
     /* версия объекта */
-    private Long globalVersion;
+    protected Long globalVersion;
     /* Идентификатор организации */
-    private Long idOfOrg;
-    /* дата создания объекта */
-    private Date createTime;
+    protected Long idOfOrg;
+     /* дата создания объекта */
+    protected Date createTime;
     /* дата мзминения объекта */
-    private Date editTime;
+    protected Date editTime;
     /* дата удаления объекта */
-    private Date deleteTime;
+    protected Date deleteTime;
     /* статус объекта (активен/удален) */
-    private Boolean status;
+    protected Boolean status;
     /* полуе локального идентификатора*/
-    private Long localID;
+    protected Long localID;
     /* меод создания узла элемента */
-    public abstract Element toElement(Document document,String action);
+    protected abstract void appendAttributes(Element element);
+    public Element toElement(Element element){
+        element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
+        if(isStatus()){
+            element.setAttribute("D", "1");
+        } else {
+            appendAttributes(element);
+        }
+        return element;
+    };
     /* метод парсинга элемента */
-    public abstract String parseXML(Node node);
+    public abstract DistributedObject build(Node node);
     /* Метод определения названия элемента */
     public abstract String getNodeName();
 
-    public String getAttributeValue(Node node, String attributeName){
+    protected void setAttribute(Element element, String name, Object value){
+        if(value!=null) {
+            if(value instanceof Boolean) {
+                element.setAttribute(name, ((Boolean)value?"1":"0"));
+            } else {
+                element.setAttribute(name,String.valueOf(value));
+            }
+
+        }
+    }
+
+    protected String getAttributeValue(Node node, String attributeName){
         return (node.getAttributes().getNamedItem(attributeName)!=null?node.getAttributes().getNamedItem(
                 attributeName).getTextContent():null);
     }

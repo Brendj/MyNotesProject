@@ -1,3 +1,5 @@
+-- Поле с номером организации в таблице глобального объекта
+ALTER TABLE cf_product_guide ADD COLUMN idoforg bigint;
 -- Таблица версий распределенных объектов
 CREATE TABLE cf_do_version
 (
@@ -10,6 +12,7 @@ CREATE TABLE cf_do_version
 CREATE TABLE cf_do_conflicts
 (
   idofdoconflict bigserial,
+  idoforg bigint,
   distributedobjectclassname character varying(64),
   createconflictdate bigint,
   gversion_inc bigint,

@@ -252,6 +252,7 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
+
                     distributionManager =  processDistributionManager(request.getDistributionManager());
                 } catch (Exception e) {
                     logger.error(

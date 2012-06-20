@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
 
 import org.springframework.context.annotation.Scope;
@@ -20,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -52,11 +54,10 @@ public class DAOService {
     }
 
     @Transactional
-    public void setDeleteStatusProductGuide(Long id, Boolean status) {
-        Query q = em.createQuery("update ProductGuide set status=:status,globalVersion=globalVersion+1 where globalId=:id");
-        q.setParameter("id", id);
-        q.setParameter("status", status);
-        int updateCount = q.executeUpdate();
+    public void setStatusDistributedObject(DistributedObject distributedObject, Boolean status) {
+        distributedObject = em.find(distributedObject.getClass(), distributedObject.getGlobalId());
+        distributedObject.setStatus(status);
+        distributedObject = em.merge(distributedObject);
     }
 
     @Transactional
@@ -67,17 +68,44 @@ public class DAOService {
         return version.longValue();
     }
 
-    public void setProductGuideVersion(Long globalId, Long globalVersion){
-        Query q = em.createQuery("update ProductGuide set globalVersion=:globalVersion where globalId=:globalId");
-        q.setParameter("globalId", globalId);
-        q.setParameter("globalVersion", globalVersion);
-        int updateCount = q.executeUpdate();
+    @Transactional
+    public DistributedObject createDistributedObject(DistributedObject distributedObject){
+        return em.merge(distributedObject);
+    }
+
+    @Transactional
+    public DistributedObject mergeDistributedObject(DistributedObject distributedObject){
+        Long incVersion = distributedObject.getGlobalVersion();
+        String toStringDistributedObject = distributedObject.toString();
+        distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
+        if(distributedObject.getGlobalVersion()==incVersion) {
+            distributedObject.setGlobalVersion(distributedObject.getGlobalVersion()+1);
+        } else {
+            distributedObject.setGlobalVersion(incVersion);
+            DOConflict conflict = new DOConflict();
+            conflict.setgVersionCur(distributedObject.getGlobalVersion());
+            conflict.setIdOfOrg(distributedObject.getIdOfOrg());
+            conflict.setgVersionInc(incVersion);
+            conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+            conflict.setValueCur(distributedObject.toString());
+            conflict.setValueInc(toStringDistributedObject);
+            conflict.setCreateConflictDate(new Date());
+            createConflict(conflict);
+        }
+        return em.merge(distributedObject);
     }
 
     @Transactional
     public ProductGuide mergeProductGuide(ProductGuide productGuide) {
         if(productGuide.getGlobalId()!=null){
-            Query q = em.createQuery("update ProductGuide set productName=:productName, okpCode=:okpCode,fullName=:fullName,code=:code,idOfConfigurationProvider=:idOfConfigurationProvider,globalVersion=globalVersion+1 where globalId=:id");
+            String versionQuery;
+            Long version = getProductGuideVersion(productGuide.getGlobalId());
+            if(productGuide.getGlobalVersion()!=version){
+                versionQuery = "globalVersion="+productGuide.getGlobalVersion();
+            } else {
+                versionQuery = "globalVersion=globalVersion+1";
+            }
+            Query q = em.createQuery("update ProductGuide set productName=:productName, okpCode=:okpCode,fullName=:fullName,code=:code,idOfConfigurationProvider=:idOfConfigurationProvider,"+versionQuery+" where globalId=:id");
             q.setParameter("id", productGuide.getGlobalId());
             q.setParameter("code", productGuide.getCode());
             q.setParameter("fullName", productGuide.getFullName());

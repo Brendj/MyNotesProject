@@ -11,6 +11,7 @@
             <generator class="identity"/>
         </id>
 
+        <property name="idOfOrg" column="idOfOrg" type="long"/>
         <property name="distributedObjectClassName" column="DistributedObjectClassName" type="string" length="64"/>
         <property name="createConflictDate" column="CreateConflictDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="gVersionInc" column="gVersion_inc" type="long"/>

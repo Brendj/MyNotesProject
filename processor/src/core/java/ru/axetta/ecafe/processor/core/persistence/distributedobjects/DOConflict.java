@@ -24,6 +24,15 @@ public class DOConflict {
     private long gVersionCur;
     private String valueInc;
     private String valueCur;
+    private long idOfOrg;
+
+    public long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
 
     public String getValueCur() {
         return valueCur;
