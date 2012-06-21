@@ -41,8 +41,28 @@ public class DAOService {
     }
 
     @Transactional
-    public List<ProductGuide> getProductGuide(){
-        TypedQuery<ProductGuide> query = em.createQuery("from ProductGuide",ProductGuide.class);
+    public List<ProductGuide> getProductGuide(Long currentMaxVersion,Long idOfOrg){
+        TypedQuery<ProductGuide> query ;
+        if(idOfOrg==null){
+
+            if(currentMaxVersion==null){
+                query = em.createQuery("from ProductGuide",ProductGuide.class); }
+            else{
+                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion",ProductGuide.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+            }
+        }else{
+            if(currentMaxVersion==null){
+                query = em.createQuery("from ProductGuide where idOfOrg=:idOfOrg",ProductGuide.class);
+                query.setParameter("idOfOrg",idOfOrg);
+            }
+            else{
+                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and idOfOrg=:idOfOrg",ProductGuide.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+                query.setParameter("idOfOrg",idOfOrg);
+            }
+
+        }
         return  query.getResultList();
     }
 

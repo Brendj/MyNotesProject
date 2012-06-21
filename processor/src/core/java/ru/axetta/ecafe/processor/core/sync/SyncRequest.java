@@ -2875,7 +2875,8 @@ MenuGroups menuGroups;
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                         distributionManager.parseXML(itemNode);
+                        distributionManager.setIdOfOrg(org.getIdOfOrg());
+                        distributionManager.parseXML(itemNode);
                     }
                     itemNode = itemNode.getNextSibling();
                 }

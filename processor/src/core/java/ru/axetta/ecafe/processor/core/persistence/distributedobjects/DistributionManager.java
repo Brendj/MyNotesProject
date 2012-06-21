@@ -34,7 +34,7 @@ public class DistributionManager {
     private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
     private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();
     private Long idOfOrg;
-
+    private HashMap<String,Long>currentMaxVersions=new HashMap<String, Long>();
     /**
      * Создает  элемент <RO> выходного xml документа
      * @param document   выходной xml документ
@@ -54,7 +54,7 @@ public class DistributionManager {
             elementMap.get(confirmObject.getNodeName()).appendChild(confirmObject.toElement(element));
         }
         elementRO.appendChild(confirmElement);
-        List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide();
+        List<ProductGuide> productGuideList = DAOService.getInstance().getProductGuide(currentMaxVersions.get("Pr"),idOfOrg);
         distributedObjectList.addAll(productGuideList);
         elementMap.clear();
         for (DistributedObject distributedObject: distributedObjectList){
@@ -91,6 +91,7 @@ public class DistributionManager {
     public void parseXML(Node node) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             String objectName = node.getNodeName();
+            currentMaxVersions.put(objectName,Long.parseLong(getAttributeValue(node,"V")));
             node = node.getFirstChild();
             node = node.getNextSibling();
             /**/

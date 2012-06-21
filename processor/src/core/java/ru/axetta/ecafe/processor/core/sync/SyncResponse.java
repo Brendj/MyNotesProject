@@ -1803,7 +1803,7 @@ public class SyncResponse {
 
         // Distribution Manager
         if(distributionManager != null){
-            ecafeEnvelopeElement.appendChild(distributionManager.getElements(document));
+            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
