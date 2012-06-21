@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.DateType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.slf4j.Logger;
@@ -16,10 +12,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
 
 /**
@@ -40,6 +32,7 @@ public class DistributionManager {
      * Список глобальных объектов на базе процессинга
      */
     private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
+    private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();
     private Long idOfOrg;
 
     /**
@@ -87,7 +80,7 @@ public class DistributionManager {
         return (node.getAttributes().getNamedItem(attributeName)!=null?node.getAttributes().getNamedItem(
                 attributeName).getTextContent():null);
     }
-    private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();
+
     /**
      * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
      * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
@@ -100,30 +93,53 @@ public class DistributionManager {
             String objectName = node.getNodeName();
             node = node.getFirstChild();
             node = node.getNextSibling();
+            /**/
             while (node != null){
                 DistributedObject distributedObject = createDistributedObject(objectName);
                 distributedObject = distributedObject.build(node);
                 distributedObject.setIdOfOrg(idOfOrg);
                 ConfirmObject confirmObject = new ConfirmObject();
-                if(node.getNodeName().equals("C")){
-                    distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
-                    confirmObject.setNodeName(objectName);
-                    confirmObject.setAction(node.getNodeName());
-                    confirmObject.setLocalID(Long.parseLong(getAttributeValue(node,"LID")));
-                    confirmObject.setGlobalId(distributedObject.getGlobalId());
-                    confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
-                    confirmObjectList.add(confirmObject);
-                }
-                if(node.getNodeName().equals("M")){
-                    distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject);
+                if(getAttributeValue(node,"D")==null){
+                    if(node.getNodeName().equals("C")){
+                        distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
+                        confirmObject.setNodeName(objectName);
+                        confirmObject.setAction(node.getNodeName());
+                        confirmObject.setLocalID(Long.parseLong(getAttributeValue(node,"LID")));
+                        confirmObject.setGlobalId(distributedObject.getGlobalId());
+                        confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
+                        confirmObjectList.add(confirmObject);
+                    }
+                    if(node.getNodeName().equals("M")){
+                        Long version =Long.parseLong(getAttributeValue(node,"V"));
+                        String toStringDistributedObject = distributedObject.toString();
+                        if( DAOService.getInstance().getDistributedObjectVersion(distributedObject).equals(version)) {
+                            distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject,null);
+                        } else {
+                            distributedObject.setGlobalVersion(version);
+                            distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, version);
+                            DOConflict conflict = new DOConflict();
+                            conflict.setgVersionCur(distributedObject.getGlobalVersion());
+                            conflict.setIdOfOrg(idOfOrg);
+                            conflict.setgVersionInc(version);
+                            conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+                            conflict.setValueCur(distributedObject.toString());
+                            conflict.setValueInc(toStringDistributedObject);
+                            conflict.setCreateConflictDate(new Date());
+                            DAOService.getInstance().createConflict(conflict);
+                        }
+                        confirmObject.setNodeName(objectName);
+                        confirmObject.setAction(node.getNodeName());
+                        confirmObject.setGlobalId(Long.parseLong(getAttributeValue(node,"GID")));
+                        confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
+                        confirmObjectList.add(confirmObject);
+                    }
+                } else {
+                    distributedObject = DAOService.getInstance().setStatusDistributedObject(distributedObject,getAttributeValue(node,"D").equals("1"));
                     confirmObject.setNodeName(objectName);
                     confirmObject.setAction(node.getNodeName());
                     confirmObject.setGlobalId(Long.parseLong(getAttributeValue(node,"GID")));
                     confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
-                    if(getAttributeValue(node,"D")!=null) {
-                        confirmObject.setStatus(getAttributeValue(node,"D").equals("1"));
-                    }
-                    confirmObjectList.add(confirmObject);
+                    confirmObject.setStatus(getAttributeValue(node,"D").equals("1"));
                 }
                 node = node.getNextSibling();
                 if(node !=null) node = node.getNextSibling();
@@ -131,6 +147,7 @@ public class DistributionManager {
         }
     }
 
+    /* Getter and Setters */
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
     }

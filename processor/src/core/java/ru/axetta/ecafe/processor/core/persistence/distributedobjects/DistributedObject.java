@@ -43,13 +43,13 @@ public abstract class DistributedObject{
     /* меод создания узла элемента */
     protected abstract void appendAttributes(Element element);
     public Element toElement(Element element){
-        element.setAttribute("GID", Long.toString(this.getGlobalId()));
-        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         if(isStatus()){
             element.setAttribute("D", "1");
         } else {
             appendAttributes(element);
         }
+        element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
     };
     /* метод парсинга элемента */

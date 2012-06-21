@@ -35,11 +35,11 @@ public class ProductGuide extends DistributedObject {
      */
     @Override
     protected void appendAttributes(Element element) {
-        element.setAttribute("Code", this.getCode());
         element.setAttribute("FullName", this.getFullName());
-        element.setAttribute("OkpCode", this.getOkpCode());
         element.setAttribute("ProductName", this.getProductName());
-        if(getIdofconfigurationprovider()!=null) element.setAttribute("IdOfConfigurationProvider", Long.toString(this.getIdofconfigurationprovider()));
+        element.setAttribute("Code", this.getCode());
+        element.setAttribute("OkpCode", this.getOkpCode());
+        if(getIdOfConfigurationProvider()!=null) element.setAttribute("IdOfConfigurationProvider", Long.toString(this.getIdOfConfigurationProvider()));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ProductGuide extends DistributedObject {
         }
         String stringVersion = getAttributeValue(node,"V");
         if(stringVersion!=null) {
-            setVersion(Long.valueOf(stringVersion));
+            setGlobalVersion(Long.valueOf(stringVersion));
         }
         String stringCode = getAttributeValue(node,"Code");
         if(stringCode!=null) setCode(stringCode);
@@ -65,7 +65,7 @@ public class ProductGuide extends DistributedObject {
         String stringStatus= getAttributeValue(node,"D");
         setStatus(stringStatus!=null);
         String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
-        if(stringIdOfConfigurationProvider!=null) setIdofconfigurationprovider(Long.parseLong(stringIdOfConfigurationProvider));
+        if(stringIdOfConfigurationProvider!=null) setIdOfConfigurationProvider(Long.parseLong(stringIdOfConfigurationProvider));
         return this;
     }
 
@@ -88,13 +88,14 @@ public class ProductGuide extends DistributedObject {
     private Date editTime;
     private Date deleteTime;
     private boolean deleted;*/
-    private Long idofconfigurationprovider;
-    public Long getIdofconfigurationprovider() {
-        return idofconfigurationprovider;
+    private Long idOfConfigurationProvider;
+
+    public Long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
     }
 
-    public void setIdofconfigurationprovider(Long idofconfigurationprovider) {
-        this.idofconfigurationprovider = idofconfigurationprovider;
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
     public Long getIdOfProductGuide() {
@@ -126,13 +127,6 @@ public class ProductGuide extends DistributedObject {
 
     public void setOkpCode(String okpCode) {
         this.okpCode = okpCode;
-    }
-
-    public Long getVersion() {
-        return getGlobalVersion();
-    }
-    public void setVersion(Long version) {
-        setGlobalVersion(version);
     }
 
     public User getUserCreate() {
@@ -209,7 +203,7 @@ public class ProductGuide extends DistributedObject {
                 ", userCreate=" + userCreate +
                 ", userEdit=" + userEdit +
                 ", userDelete=" + userDelete +
-                ", idofconfigurationprovider=" + idofconfigurationprovider +
+                ", idOfConfigurationProvider=" + idOfConfigurationProvider +
                 '}';
     }
 }

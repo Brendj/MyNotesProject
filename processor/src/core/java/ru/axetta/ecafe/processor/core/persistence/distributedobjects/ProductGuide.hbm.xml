@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide" table="cf_product_guide" optimistic-lock="version">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide" table="cf_product_guide">
         <id name="globalId" column="idofproductguide" type="long">
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
@@ -30,7 +30,7 @@
         <many-to-one name="userCreate" column="idofusercreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="idofuserdelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="idofuseredit" class="ru.axetta.ecafe.processor.core.persistence.User" />
-        <property name="idofconfigurationprovider" column="idofconfigurationprovider" type="long"/>
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
     </class>
 </hibernate-mapping>

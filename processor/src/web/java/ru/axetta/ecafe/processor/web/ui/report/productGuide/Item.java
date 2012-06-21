@@ -162,7 +162,7 @@ public class Item {
     }
 
     public String getGetAdditionInfo() {
-        if (code == null || code.equals("") || idOfProductGuide==Item.NOT_SAVED_IN_DB_ID)
+        if (code == null || code.equals("") || idOfProductGuide==Item.NOT_SAVED_IN_DB_ID || this.userCreate==null)
             return "";
         StringBuilder sb = new StringBuilder();
         sb.append("<span  style=\"white-space:nowrap\">");

@@ -54,31 +54,35 @@ public class DAOService {
     }
 
     @Transactional
-    public void setStatusDistributedObject(DistributedObject distributedObject, Boolean status) {
+    public DistributedObject setStatusDistributedObject(DistributedObject distributedObject, Boolean status) {
         distributedObject = em.find(distributedObject.getClass(), distributedObject.getGlobalId());
         distributedObject.setStatus(status);
-        distributedObject = em.merge(distributedObject);
-    }
-
-    @Transactional
-    public Long getProductGuideVersion(Long globalId) {
-        Query query = em.createQuery("select globalVersion from ProductGuide where globalId=:globalId");
-        query.setParameter("globalId",globalId);
-        Number version = (Number) query.getSingleResult();
-        return version.longValue();
-    }
-
-    @Transactional
-    public DistributedObject createDistributedObject(DistributedObject distributedObject){
         return em.merge(distributedObject);
     }
 
     @Transactional
-    public DistributedObject mergeDistributedObject(DistributedObject distributedObject){
-        Long incVersion = distributedObject.getGlobalVersion();
-        String toStringDistributedObject = distributedObject.toString();
+    public Long getDistributedObjectVersion(DistributedObject distributedObject) {
+        distributedObject = em.find(distributedObject.getClass(), distributedObject.getGlobalId());
+        return distributedObject.getGlobalVersion();
+    }
+
+    @Transactional
+    public DistributedObject createDistributedObject(DistributedObject distributedObject){
+        distributedObject.setCreateTime(new Date());
+        return em.merge(distributedObject);
+    }
+
+    @Transactional
+    public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long version){
+       /* Long incVersion = distributedObject.getGlobalVersion();
+        String toStringDistributedObject = distributedObject.toString();*/
         distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
-        if(distributedObject.getGlobalVersion()==incVersion) {
+        if(version==null){
+            distributedObject.setGlobalVersion(distributedObject.getGlobalVersion()+1);
+        }else{
+            distributedObject.setGlobalVersion(version);
+        }
+        /*if(distributedObject.getGlobalVersion()==incVersion) {
             distributedObject.setGlobalVersion(distributedObject.getGlobalVersion()+1);
         } else {
             distributedObject.setGlobalVersion(incVersion);
@@ -91,33 +95,8 @@ public class DAOService {
             conflict.setValueInc(toStringDistributedObject);
             conflict.setCreateConflictDate(new Date());
             createConflict(conflict);
-        }
+        }*/
         return em.merge(distributedObject);
-    }
-
-    @Transactional
-    public ProductGuide mergeProductGuide(ProductGuide productGuide) {
-        if(productGuide.getGlobalId()!=null){
-            String versionQuery;
-            Long version = getProductGuideVersion(productGuide.getGlobalId());
-            if(productGuide.getGlobalVersion()!=version){
-                versionQuery = "globalVersion="+productGuide.getGlobalVersion();
-            } else {
-                versionQuery = "globalVersion=globalVersion+1";
-            }
-            Query q = em.createQuery("update ProductGuide set productName=:productName, okpCode=:okpCode,fullName=:fullName,code=:code,idOfConfigurationProvider=:idOfConfigurationProvider,"+versionQuery+" where globalId=:id");
-            q.setParameter("id", productGuide.getGlobalId());
-            q.setParameter("code", productGuide.getCode());
-            q.setParameter("fullName", productGuide.getFullName());
-            q.setParameter("okpCode", productGuide.getOkpCode());
-            q.setParameter("productName", productGuide.getProductName());
-            q.setParameter("idOfConfigurationProvider", productGuide.getIdofconfigurationprovider());
-            int updateCount = q.executeUpdate();
-        } else {
-            em.persist(productGuide);
-        }
-        //em.persist(productGuide);
-        return productGuide;
     }
 
     @Transactional
