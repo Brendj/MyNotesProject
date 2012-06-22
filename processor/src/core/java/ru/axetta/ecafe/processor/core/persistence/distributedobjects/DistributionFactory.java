@@ -22,8 +22,6 @@ public class DistributionFactory {
         DistributedObject distributedObject=null;
         switch (distributedObjectsEnum){
             case ProductGuide: distributedObject = new ProductGuide(); break;
-            case TestClass1: distributedObject = new TestClass1(); break;
-            case TestClass2: distributedObject = new TestClass2(); break;
         }
         return distributedObject;
     }
