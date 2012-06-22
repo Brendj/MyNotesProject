@@ -2870,13 +2870,12 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            DistributionManager distributionManager = new DistributionManager();
+            DistributionManager distributionManager = new DistributionManager(org.getIdOfOrg());
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        distributionManager.setIdOfOrg(org.getIdOfOrg());
-                        distributionManager.parseXML(itemNode);
+                        distributionManager.build(itemNode);
                     }
                     itemNode = itemNode.getNextSibling();
                 }
