@@ -45,10 +45,6 @@ public class ConfirmObject extends DistributedObject {
         return null;
     }
 
-    @Override
-    public String getNodeName() {
-        return nodeName;
-    }
 
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;

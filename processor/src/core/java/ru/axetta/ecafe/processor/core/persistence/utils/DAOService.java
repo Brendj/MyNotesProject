@@ -17,10 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +36,7 @@ public class DAOService {
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
+
 
     @Transactional
     public List<ProductGuide> getProductGuide(Long currentMaxVersion,Long idOfOrg){
@@ -93,30 +91,11 @@ public class DAOService {
     }
 
     @Transactional
-    public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long version){
-       /* Long incVersion = distributedObject.getGlobalVersion();
-        String toStringDistributedObject = distributedObject.toString();*/
-        distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
-        if(version==null){
-            distributedObject.setGlobalVersion(distributedObject.getGlobalVersion()+1);
-        }else{
-            distributedObject.setGlobalVersion(version);
-        }
-        /*if(distributedObject.getGlobalVersion()==incVersion) {
-            distributedObject.setGlobalVersion(distributedObject.getGlobalVersion()+1);
-        } else {
-            distributedObject.setGlobalVersion(incVersion);
-            DOConflict conflict = new DOConflict();
-            conflict.setgVersionCur(distributedObject.getGlobalVersion());
-            conflict.setIdOfOrg(distributedObject.getIdOfOrg());
-            conflict.setgVersionInc(incVersion);
-            conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-            conflict.setValueCur(distributedObject.toString());
-            conflict.setValueInc(toStringDistributedObject);
-            conflict.setCreateConflictDate(new Date());
-            createConflict(conflict);
-        }*/
-        return em.merge(distributedObject);
+    public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion){
+        Query q = em.createQuery("update " + distributedObject.getClass().getSimpleName() + " set globalVersion=:globalVersion");
+        q.setParameter("globalVersion", globalVersion);
+        q.executeUpdate();
+        return em.find(distributedObject.getClass(),distributedObject.getGlobalId());
     }
 
     @Transactional

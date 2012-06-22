@@ -23,7 +23,14 @@ import java.util.Date;
  */
 
 public abstract class DistributedObject{
+    protected String tagName;
+    public String getTagName() {
+        return tagName;
+    }
 
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
     /* Идентификатор объекта */
     protected Long globalId;
     /* версия объекта */
@@ -41,6 +48,15 @@ public abstract class DistributedObject{
     /* полуе локального идентификатора*/
     protected Long localID;
     /* меод создания узла элемента */
+    public Element toConfirmElement(Element element){
+        element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        if(isStatus()){
+            element.setAttribute("D", "1");
+        }
+        if(this.getLocalID()!=null) element.setAttribute("LID", Long.toString(this.getLocalID()));
+        if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
+        return element;
+    }
     protected abstract void appendAttributes(Element element);
     public Element toElement(Element element){
         if(isStatus()){
@@ -55,7 +71,7 @@ public abstract class DistributedObject{
     /* метод парсинга элемента */
     public abstract DistributedObject build(Node node);
     /* Метод определения названия элемента */
-    public abstract String getNodeName();
+    //public abstract String getNodeName();
 
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {

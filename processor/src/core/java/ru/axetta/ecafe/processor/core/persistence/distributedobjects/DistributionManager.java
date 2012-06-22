@@ -11,7 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -31,16 +37,21 @@ public class DistributionManager {
     /**
      * Список глобальных объектов на базе процессинга
      */
-    private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
-    private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();
+    /*private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
+    private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();*/
     private Long idOfOrg;
     private HashMap<String,Long>currentMaxVersions=new HashMap<String, Long>();
+
+    public DistributionManager(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
     /**
      * Создает  элемент <RO> выходного xml документа
      * @param document   выходной xml документ
      * @return  элемент <RO> выходного xml документа
      */
-    public Element toElement(Document document) {
+    /*public Element toElement(Document document) {
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
@@ -67,18 +78,120 @@ public class DistributionManager {
             elementMap.get(distributedObject.getNodeName()).appendChild(distributedObject.toElement(element));
         }
         return elementRO;
+    }  */
+
+    public Element toElement(Document document) throws Exception {
+        Element elementRO = document.createElement("RO");
+        Element confirmElement = document.createElement("Confirm");
+        HashMap<String, Element> elementMap = new HashMap<String, Element>();
+        String tagName;
+        for(int i=0; i<distributedObjects.size(); i++){
+            DistributedObject distributedObject = distributedObjects.get(i);
+            if(distributedObject.getTagName().equals("C")){
+                Long lid = distributedObject.getLocalID();
+                distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
+                distributedObject.setTagName("C");
+                distributedObject.setLocalID(lid);
+                distributedObjects.set(i,distributedObject);
+            }
+            if(distributedObjects.get(i).getTagName().equals("M")){
+                long objectVersion = distributedObject.getGlobalVersion();
+                Long currentMaxVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                if(objectVersion == currentMaxVersion){
+                    distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
+                } else {
+                    Element element =  document.createElement("O");
+                    element = distributedObject.toElement(element);
+
+                    TransformerFactory transFactory = TransformerFactory.newInstance();
+                    Transformer transformer = transFactory.newTransformer();
+                    StringWriter buffer = new StringWriter();
+                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                    transformer.transform(new DOMSource(element),new StreamResult(buffer));
+                    String stringElement = buffer.toString();
+
+                    distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
+                    DOConflict conflict = new DOConflict();
+                    conflict.setgVersionCur(currentMaxVersion);
+                    conflict.setIdOfOrg(idOfOrg);
+                    conflict.setgVersionInc(objectVersion);
+                    conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+
+                    element =  document.createElement("O");
+                    element = distributedObject.toElement(element);
+                    transFactory = TransformerFactory.newInstance();
+                    transformer = transFactory.newTransformer();
+                    buffer = new StringWriter();
+                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                    transformer.transform(new DOMSource(element),new StreamResult(buffer));
+                    conflict.setValueCur(buffer.toString());
+
+                    conflict.setValueInc(stringElement);
+                    conflict.setCreateConflictDate(new Date());
+                    DAOService.getInstance().createConflict(conflict);
+                }
+                distributedObject.setTagName("M");
+                distributedObjects.set(i,distributedObject);
+            }
+            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+            if(!elementMap.containsKey(tagName)){
+                Element distributedObjectElement = document.createElement(tagName);
+                confirmElement.appendChild(distributedObjectElement);
+                elementMap.put(tagName,distributedObjectElement);
+            }
+            Element element =  document.createElement(distributedObject.getTagName());
+            elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
+        }
+        elementRO.appendChild(confirmElement);
+        elementMap.clear();
+        for (DistributedObject distributedObject: distributedObjects){
+            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+            if(!elementMap.containsKey(tagName)){
+                Element distributedObjectElement = document.createElement(tagName);
+                elementRO.appendChild(distributedObjectElement);
+                elementMap.put(tagName,distributedObjectElement);
+            }
+            Element element =  document.createElement("O");
+            elementMap.get(tagName).appendChild(distributedObject.toElement(element));
+        }
+        return  elementRO;
+    }
+
+    public void process() {
+
     }
 
     private DistributedObject createDistributedObject(String nodeName){
-        if(nodeName.equals("Pr")) return new ProductGuide();
-        return null;
+        return DistributionFactory.createDistributedObject(DistributedObjectsEnum.parse(nodeName));
     }
 
 
+    private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum){
+        return DistributionFactory.createDistributedObject(distributedObjectsEnum);
+    }
 
     private String getAttributeValue(Node node, String attributeName){
         return (node.getAttributes().getNamedItem(attributeName)!=null?node.getAttributes().getNamedItem(
                 attributeName).getTextContent():null);
+    }
+
+    private List<DistributedObject> distributedObjects = new LinkedList<DistributedObject>();
+
+    public void build(Node node) throws Exception{
+        if (Node.ELEMENT_NODE == node.getNodeType()) {
+            DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
+            currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
+            node = node.getFirstChild();
+            node = node.getNextSibling();
+            while (node!=null){
+                DistributedObject distributedObject = createDistributedObject(currentObject);
+                distributedObject = distributedObject.build(node);
+                distributedObject.setIdOfOrg(idOfOrg);
+                distributedObjects.add(distributedObject);
+                node = node.getNextSibling();
+                if(node !=null) node = node.getNextSibling();
+            }
+        }
     }
 
     /**
@@ -88,13 +201,12 @@ public class DistributionManager {
      * @param node  Элемент <Pr>
      * @throws Exception
      */
-    public void parseXML(Node node) throws Exception {
+   /* public void parseXML(Node node) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             String objectName = node.getNodeName();
             currentMaxVersions.put(objectName,Long.parseLong(getAttributeValue(node,"V")));
             node = node.getFirstChild();
             node = node.getNextSibling();
-            /**/
             while (node != null){
                 DistributedObject distributedObject = createDistributedObject(objectName);
                 distributedObject = distributedObject.build(node);
@@ -146,12 +258,7 @@ public class DistributionManager {
                 if(node !=null) node = node.getNextSibling();
             }
         }
-    }
-
-    /* Getter and Setters */
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
+    }  */
 
 }
 

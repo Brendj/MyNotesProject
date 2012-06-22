@@ -35,11 +35,11 @@ public class ProductGuide extends DistributedObject {
      */
     @Override
     protected void appendAttributes(Element element) {
-        element.setAttribute("FullName", this.getFullName());
-        element.setAttribute("ProductName", this.getProductName());
-        element.setAttribute("Code", this.getCode());
-        element.setAttribute("OkpCode", this.getOkpCode());
-        if(getIdOfConfigurationProvider()!=null) element.setAttribute("IdOfConfigurationProvider", Long.toString(this.getIdOfConfigurationProvider()));
+        setAttribute(element,"FullName", fullName);
+        setAttribute(element,"ProductName", productName);
+        setAttribute(element,"Code", code);
+        setAttribute(element,"OkpCode", okpCode);
+        setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
     }
 
     @Override
@@ -66,28 +66,17 @@ public class ProductGuide extends DistributedObject {
         setStatus(stringStatus!=null);
         String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
         if(stringIdOfConfigurationProvider!=null) setIdOfConfigurationProvider(Long.parseLong(stringIdOfConfigurationProvider));
+        tagName = node.getNodeName();
         return this;
     }
 
-    @Override
-    public String getNodeName() {
-        return "Pr";
-    }
-
-    //private Long idOfProductGuide;
     private String code;
-
     private String fullName;
     private String productName;
     private String okpCode;
-    // private long version;
     private User userCreate;
     private User userEdit;
     private User userDelete;
-    /*private Date createTime;
-    private Date editTime;
-    private Date deleteTime;
-    private boolean deleted;*/
     private Long idOfConfigurationProvider;
 
     public Long getIdOfConfigurationProvider() {
