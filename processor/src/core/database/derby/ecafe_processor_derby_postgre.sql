@@ -957,7 +957,54 @@ CREATE TABLE cf_do_conflicts
   val_cur character varying(16548)
 );
 
+-- Таблица (справочник) технологических карт
+CREATE TABLE  cf_technological_map(
+  IdOfTechnoMap bigserial,
+  GlobalIdOfTechnoMap BIGINT DEFAULT NULL,
+  NameOfTechnologicalMap character varying(128) NOT NULL,
+  NumberOfTechologicalMap BIGINT NOT NULL,
+  TechnologyOfPreparation character varying(4096) NOT NULL,
+  TermOfRealization character varying(16) NOT NULL,
+  Energyvalue FLOAT DEFAULT NULL,
+  Proteins FLOAT DEFAULT NULL,
+  Carbohydrates FLOAT DEFAULT NULL,
+  Fats FLOAT DEFAULT NULL,
+  MicroElCa FLOAT DEFAULT NULL,
+  MicroElMg FLOAT DEFAULT NULL,
+  MicroElP FLOAT DEFAULT NULL,
+  MicroElFe FLOAT DEFAULT NULL,
+  VitaminA FLOAT DEFAULT NULL,
+  VitaminB1 FLOAT DEFAULT NULL,
+  VitaminB2 FLOAT DEFAULT NULL,
+  VitaminPp FLOAT DEFAULT NULL,
+  VitaminC FLOAT DEFAULT NULL,
+  VitaminE FLOAT DEFAULT NULL,
+  GlobalVersion BIGINT DEFAULT NULL,
+  OrgOwner BIGINT DEFAULT NULL,
+  DeletedState boolean NOT NULL DEFAULT false,
+  CreatedDate bigint,
+  LastUpdate bigint,
+  CONSTRAINT cf_technological_map_pk PRIMARY KEY (idoftechnomap )
+);
+
+CREATE TABLE cf_technological_map_products
+(
+  idoftechnomapproducts bigserial NOT NULL,
+  idoftechnomap bigint NOT NULL,
+  idofproducts bigint NOT NULL,
+  netweight double precision NOT NULL DEFAULT 0,
+  grossweight double precision NOT NULL DEFAULT 0,
+  globalversion bigint,
+  orgowner bigint,
+  deletedstate boolean NOT NULL DEFAULT false,
+  createddate bigint NOT NULL,
+  lastupdate bigint,
+  CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (idoftechnomapproducts )
+);
+
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
 VALUES(2, 2, 18, 120524, 0);
+
+
