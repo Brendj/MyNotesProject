@@ -591,8 +591,8 @@
                          label="Технологические карты">
         <a4j:support event="onclick" action="#{mainPage.showTechnologicalMapGroupPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Добавить"
-                            binding="#{mainPage.technologicalMapCreatePage.mainMenuComponent}"
-                            action="#{mainPage.showTechnologicalMapCreatePage}" reRender="workspaceForm" />
+                            binding="#{technologicalMapCreatePage.mainMenuComponent}"
+                            action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" />
         <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGroupPage.mainMenuComponent}"
                          label="Продукты">
             <a4j:support event="onclick" action="#{mainPage.showProductGroupPage}" reRender="workspaceForm" />
