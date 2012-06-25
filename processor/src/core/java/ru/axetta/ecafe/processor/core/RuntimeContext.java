@@ -29,6 +29,7 @@ import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.altarix.AltarixSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
@@ -806,15 +807,21 @@ public class RuntimeContext implements ApplicationContextAware {
         String password = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".password", "nkjngnnwdv");
         String sender = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".sender", "Novshkola");
         String timeZone = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".timeZone", "GMT-1");
+        String userServiceId=properties.getProperty(SMS_SERVICE_PARAM_BASE+".serviceId","14");
+
         ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone);
         ISmsService smsService = null;
         if (serviceType.equalsIgnoreCase("atompark")) {
             smsService = new AtomparkSmsServiceImpl(config);
         } else if (serviceType.equalsIgnoreCase("teralect")) {
             smsService = new TeralectSmsServiceImpl(config);
-        } else {
+        } else if(serviceType.equalsIgnoreCase("altarix")){
+            smsService = new AltarixSmsServiceImpl(config,userServiceId);
+
+        }else {
             throw new Exception("Invalid SMS service type: "+serviceType);
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("SMS service created.");
         }

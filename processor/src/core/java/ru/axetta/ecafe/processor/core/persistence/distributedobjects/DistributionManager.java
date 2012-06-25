@@ -40,6 +40,10 @@ public class DistributionManager {
     /*private List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
     private List<ConfirmObject> confirmObjectList = new LinkedList<ConfirmObject>();*/
     private Long idOfOrg;
+    /**
+     * Ключи = имена элементов (Пример элемента: <Pr>),
+     * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
+     */
     private HashMap<String,Long>currentMaxVersions=new HashMap<String, Long>();
 
     public DistributionManager(Long idOfOrg) {
