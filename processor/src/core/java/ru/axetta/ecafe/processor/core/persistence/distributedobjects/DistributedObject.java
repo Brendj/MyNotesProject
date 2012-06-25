@@ -84,9 +84,31 @@ public abstract class DistributedObject{
         }
     }
 
-    protected String getAttributeValue(Node node, String attributeName){
-        return (node.getAttributes().getNamedItem(attributeName)!=null?node.getAttributes().getNamedItem(
-                attributeName).getTextContent():null);
+    protected String getStringAttributeValue(Node node, String attributeName,Integer length){
+        StringBuilder result = new StringBuilder(getAttributeValue(node, attributeName));
+        if(result.length()>length) return result.substring(0, length);
+        return result.toString();
+    }
+
+    protected Long getLongAttributeValue(Node node, String attributeName){
+        Long result = null;
+        try{
+            result = Long.parseLong(getAttributeValue(node, attributeName));
+        } catch (Exception e){ result=null;}
+        return result;
+    }
+
+    protected Integer getIntegerAttributeValue(Node node, String attributeName){
+        Integer result = null;
+        try{
+            result = Integer.parseInt(getAttributeValue(node, attributeName));
+        } catch (Exception e){ result=null;}
+        return result;
+    }
+
+    private String getAttributeValue(Node node, String attributeName){
+        if(node.getAttributes().getNamedItem(attributeName)==null) return null;
+        return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
     }
 
     /* Getters and Setters */

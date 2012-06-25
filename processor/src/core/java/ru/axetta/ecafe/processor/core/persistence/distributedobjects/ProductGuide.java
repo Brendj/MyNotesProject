@@ -39,34 +39,36 @@ public class ProductGuide extends DistributedObject {
         setAttribute(element,"ProductName", productName);
         setAttribute(element,"Code", code);
         setAttribute(element,"OkpCode", okpCode);
+        setAttribute(element,"OrgOwner", idOfOrg);
         setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
     }
 
     @Override
     public ProductGuide build(Node node) {
-        String stringGid = getAttributeValue(node,"GID");
-        if(stringGid!=null) {
-            setIdOfProductGuide(Long.valueOf(stringGid));
-        }
-        String stringVersion = getAttributeValue(node,"V");
-        if(stringVersion!=null) {
-            setGlobalVersion(Long.valueOf(stringVersion));
-        }
-        String stringCode = getAttributeValue(node,"Code");
-        if(stringCode!=null) setCode(stringCode);
-        String stringFullName= getAttributeValue(node,"FullName");
-        if(stringFullName!=null) setFullName(stringFullName);
-        String stringOkpCode= getAttributeValue(node,"OkpCode");
-        if(stringOkpCode!=null) setOkpCode(stringOkpCode);
-        String stringLocalId= getAttributeValue(node,"LID");
-        if(stringLocalId!=null) setLocalID(Long.parseLong(stringLocalId));
-        String stringProductName= getAttributeValue(node,"ProductName");
-        if(stringProductName!=null) setProductName(stringProductName);
-        String stringStatus= getAttributeValue(node,"D");
-        setStatus(stringStatus!=null);
-        String stringIdOfConfigurationProvider= getAttributeValue(node,"IdOfConfigurationProvider");
-        if(stringIdOfConfigurationProvider!=null) setIdOfConfigurationProvider(Long.parseLong(stringIdOfConfigurationProvider));
+        /* Begin required params */
+        Long gid = getLongAttributeValue(node,"GID");
+        if(gid!=null) setIdOfProductGuide(gid);
+
+        Long version = getLongAttributeValue(node,"V");
+        if(version!=null) setGlobalVersion(version);
+
+        Long lid = getLongAttributeValue(node,"LID");
+        if(lid!=null) setLocalID(lid);
+
+        Integer status = getIntegerAttributeValue(node,"D");
+        setStatus(status!=null);
         tagName = node.getNodeName();
+        /* End required params */
+        String stringCode = getStringAttributeValue(node,"Code",16);
+        if(stringCode!=null) setCode(stringCode);
+        String stringFullName= getStringAttributeValue(node,"FullName",1024);
+        if(stringFullName!=null) setFullName(stringFullName);
+        String stringOkpCode= getStringAttributeValue(node,"OkpCode",32);
+        if(stringOkpCode!=null) setOkpCode(stringOkpCode);
+        String stringProductName= getStringAttributeValue(node,"ProductName",512);
+        if(stringProductName!=null) setProductName(stringProductName);
+        Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
+        if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);
         return this;
     }
 
