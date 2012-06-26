@@ -905,7 +905,7 @@ CREATE TABLE CF_Clients_CategoryDiscounts
 
 CREATE TABLE cf_product_guide
 (
-  idofproductguide bigint NOT NULL,
+  IdOfProductGuide bigint NOT NULL,
   code character varying(16) NOT NULL,
   full_name character varying(1024),
   product_name character varying(512),
@@ -914,45 +914,39 @@ CREATE TABLE cf_product_guide
   create_date bigint,
   edit_date bigint,
   delete_date bigint,
-  idofusercreate bigint,
-  idofuseredit bigint,
-  idofuserdelete bigint,
+  IdOfUserCreate bigint,
+  IdOfUserEdit bigint,
+  IdOfUserDelete bigint,
   deleted boolean NOT NULL DEFAULT false,
-  idofconfigurationprovider bigint,
-  CONSTRAINT fk_product_guide PRIMARY KEY (idofproductguide)
-)
-WITH (
-  OIDS=FALSE
+  IdOfConfigurationProvider bigint,
+  CONSTRAINT fk_product_guide PRIMARY KEY (IdOfProductGuide)
 );
 ALTER TABLE cf_product_guide OWNER TO postgres;
 
 CREATE TABLE cf_provider_configurations
 (
-  idofconfigurationprovider bigint NOT NULL DEFAULT 0,
+  idOfConfigurationProvider bigint NOT NULL DEFAULT 0,
   "name" character varying(64) NOT NULL,
-  CONSTRAINT pk_configuration_provider PRIMARY KEY (idofconfigurationprovider),
+  CONSTRAINT pk_configuration_provider PRIMARY KEY (idOfConfigurationProvider),
   CONSTRAINT cf_provider_configurations_name_key UNIQUE (name)
-)
-WITH (
-  OIDS=FALSE
 );
 ALTER TABLE cf_provider_configurations OWNER TO postgres;
 
 -- Таблица версий распределенных объектов
 CREATE TABLE cf_do_version
 (
-  idofdoobject bigserial,
-  distributedobjectclassname character varying(64),
-  currentversion bigint
+  IdOfDOObject bigserial,
+  DistributedObjectClassName character varying(64),
+  CurrentVersion bigint
 );
 -- Таблица конфликтов для распределенных объектов
 CREATE TABLE cf_do_conflicts
 (
-  idofdocconflict bigserial,
-  distributedobjectclassname character varying(64),
-  createconflictdate bigint,
-  gversion_inc bigint,
-  gversion_cur bigint,
+  idOfDOConflict bigserial,
+  DistributedObjectClassName character varying(64),
+  createConflictDate bigint,
+  gVersion_inc bigint,
+  gVersion_cur bigint,
   val_inc character varying(16548),
   val_cur character varying(16548)
 );
@@ -960,12 +954,14 @@ CREATE TABLE cf_do_conflicts
 -- Таблица (справочник) технологических карт
 CREATE TABLE  cf_technological_map(
   IdOfTechnoMap bigserial,
-  GlobalIdOfTechnoMap BIGINT DEFAULT NULL,
+
   NameOfTechnologicalMap character varying(128) NOT NULL,
-  NumberOfTechologicalMap BIGINT NOT NULL,
+  NumberOfTechnologicalMap BIGINT NOT NULL,
   TechnologyOfPreparation character varying(4096) NOT NULL,
-  TermOfRealization character varying(16) NOT NULL,
-  Energyvalue FLOAT DEFAULT NULL,
+  TermOfRealization character varying(128) NOT NULL,
+  TempOfPreparation character varying(32) NOT NULL,
+
+  EnergyValue FLOAT DEFAULT NULL,
   Proteins FLOAT DEFAULT NULL,
   Carbohydrates FLOAT DEFAULT NULL,
   Fats FLOAT DEFAULT NULL,
@@ -979,27 +975,33 @@ CREATE TABLE  cf_technological_map(
   VitaminPp FLOAT DEFAULT NULL,
   VitaminC FLOAT DEFAULT NULL,
   VitaminE FLOAT DEFAULT NULL,
+
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner BIGINT DEFAULT NULL,
   DeletedState boolean NOT NULL DEFAULT false,
+
   CreatedDate bigint,
   LastUpdate bigint,
+  DeleteDate bigint,
   CONSTRAINT cf_technological_map_pk PRIMARY KEY (idoftechnomap )
 );
 
 CREATE TABLE cf_technological_map_products
 (
-  idoftechnomapproducts bigserial NOT NULL,
-  idoftechnomap bigint NOT NULL,
-  idofproducts bigint NOT NULL,
-  netweight double precision NOT NULL DEFAULT 0,
-  grossweight double precision NOT NULL DEFAULT 0,
-  globalversion bigint,
-  orgowner bigint,
-  deletedstate boolean NOT NULL DEFAULT false,
-  createddate bigint NOT NULL,
-  lastupdate bigint,
-  CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (idoftechnomapproducts )
+  IdOfTechnoMapProducts bigserial NOT NULL,
+  IdOfTechnoMap bigint NOT NULL,
+  IdOfProductGuide bigint NOT NULL,
+  NetWeight double precision NOT NULL DEFAULT 0,
+  GrossWeight double precision NOT NULL DEFAULT 0,
+  GlobalVersion bigint,
+  OrgOwner bigint,
+  DeletedState boolean NOT NULL DEFAULT false,
+  CreatedDate bigint NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
+  CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
+  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnoMap) REFERENCES cf_technological_map (IdOfTechnoMap),
+  CONSTRAINT cf_technological_map_products_product_guide_fk FOREIGN KEY (IdOfProductGuide) REFERENCES cf_product_guide (IdOfProductGuide)
 );
 
 
