@@ -30,10 +30,12 @@
         <property name="proteins" column="Proteins" type="float" />
         <property name="carbohydrates" column="Carbohydrates" type="float" />
         <property name="fats" column="Fats" type="float" />
+
         <property name="microElCa" column="MicroElCa" type="float" />
         <property name="microElMg" column="MicroElMg" type="float" />
         <property name="microElP" column="MicroElP" type="float" />
         <property name="microElFe" column="MicroElFe" type="float" />
+
         <property name="vitaminA" column="VitaminA" type="float" />
         <property name="vitaminB1" column="VitaminB1" type="float" />
         <property name="vitaminB2" column="VitaminB2" type="float" />

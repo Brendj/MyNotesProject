@@ -94,6 +94,14 @@ public abstract class DistributedObject{
         return result.toString();
     }
 
+    protected Float getFloatAttributeValue(Node node, String attributeName){
+        Float result = null;
+        try{
+            result = Float.parseFloat(getAttributeValue(node, attributeName));
+        } catch (Exception e){ result=null;}
+        return result;
+    }
+
     protected Long getLongAttributeValue(Node node, String attributeName){
         Long result = null;
         try{

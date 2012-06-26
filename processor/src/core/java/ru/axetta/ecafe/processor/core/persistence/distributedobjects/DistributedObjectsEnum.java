@@ -12,7 +12,8 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  * To change this template use File | Settings | File Templates.
  */
 public enum DistributedObjectsEnum {
-    ProductGuide("Pr");
+    ProductGuide("Pr"),
+    TechnologicalMap("TechnologicalMap");
 
     private final String value;
     private DistributedObjectsEnum(String value) {

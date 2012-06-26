@@ -22,6 +22,7 @@ public class DistributionFactory {
         DistributedObject distributedObject=null;
         switch (distributedObjectsEnum){
             case ProductGuide: distributedObject = new ProductGuide(); break;
+            case TechnologicalMap: distributedObject = new TechnologicalMap(); break;
         }
         return distributedObject;
     }
