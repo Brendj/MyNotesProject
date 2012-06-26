@@ -4,26 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Products;
-import ru.axetta.ecafe.processor.core.persistence.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,11 +32,11 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        technologicalMap.setProducts(new ArrayList<Products>());
+        //technologicalMap.setProducts(new ArrayList<Products>());
     }
 
     public TechnologicalMapCreatePage() {
-        technologicalMap.setProducts(new ArrayList<Products>());
+        //technologicalMap.setProducts(new ArrayList<Products>());
     }
 
     public String getPageFilename() {
@@ -60,7 +51,8 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
     public void createTechnologicalMap() {
         try{
             DAOService.getInstance().persistEntity(technologicalMap);
-            printMessage("Новая технологическая карта создана успешно.");
+            printMessage("Новая технологическая карта создана успешно."+technologicalMap.toString());
+
         } catch (Exception e){
             printError("Ошибка при создании новой технологической карты.");
             logger.error("Error by create Technological Map.", e);
