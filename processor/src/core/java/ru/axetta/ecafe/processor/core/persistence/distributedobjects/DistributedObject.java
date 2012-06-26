@@ -23,43 +23,38 @@ import java.util.Date;
  */
 
 public abstract class DistributedObject{
-    protected String tagName;
-    public String getTagName() {
-        return tagName;
-    }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
-    }
     /* Идентификатор объекта */
     protected Long globalId;
     /* версия объекта */
     protected Long globalVersion;
     /* Идентификатор организации */
-    protected Long idOfOrg;
+    protected Long orgOwner;
      /* дата создания объекта */
-    protected Date createTime;
+    protected Date createdDate;
     /* дата мзминения объекта */
-    protected Date editTime;
+    protected Date lastUpdate;
     /* дата удаления объекта */
-    protected Date deleteTime;
+    protected Date deleteDate;
     /* статус объекта (активен/удален) */
-    protected Boolean status;
+    protected Boolean deletedState;
     /* полуе локального идентификатора*/
     protected Long localID;
     /* меод создания узла элемента */
     public Element toConfirmElement(Element element){
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
-        if(isStatus()){
+        if(getDeletedState()){
             element.setAttribute("D", "1");
         }
         if(this.getLocalID()!=null) element.setAttribute("LID", Long.toString(this.getLocalID()));
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
     }
+
     protected abstract void appendAttributes(Element element);
+
     public Element toElement(Element element){
-        if(isStatus()){
+        if(getDeletedState()){
             element.setAttribute("D", "1");
         } else {
             appendAttributes(element);
@@ -70,8 +65,17 @@ public abstract class DistributedObject{
     };
     /* метод парсинга элемента */
     public abstract DistributedObject build(Node node);
+
     /* Метод определения названия элемента */
-    //public abstract String getNodeName();
+    protected String tagName;
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
 
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {
@@ -136,43 +140,43 @@ public abstract class DistributedObject{
         this.globalVersion = globalVersion;
     }
 
-    public Long getIdOfOrg() {
-        return idOfOrg;
+    public Long getOrgOwner() {
+        return orgOwner;
     }
 
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
+    public void setOrgOwner(Long orgOwner) {
+        this.orgOwner = orgOwner;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public Date getEditTime() {
-        return editTime;
+    public Date getLastUpdate() {
+        return lastUpdate;
     }
 
-    public void setEditTime(Date editTime) {
-        this.editTime = editTime;
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
-    public Date getDeleteTime() {
-        return deleteTime;
+    public Date getDeleteDate() {
+        return deleteDate;
     }
 
-    public void setDeleteTime(Date deleteTime) {
-        this.deleteTime = deleteTime;
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
     }
 
-    public Boolean isStatus() {
-        return status;
+    public Boolean getDeletedState() {
+        return deletedState;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 }
