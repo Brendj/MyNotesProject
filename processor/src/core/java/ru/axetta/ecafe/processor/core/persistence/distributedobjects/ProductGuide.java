@@ -39,7 +39,7 @@ public class ProductGuide extends DistributedObject {
         setAttribute(element,"ProductName", productName);
         setAttribute(element,"Code", code);
         setAttribute(element,"OkpCode", okpCode);
-        setAttribute(element,"OrgOwner", idOfOrg);
+        setAttribute(element,"OrgOwner", orgOwner);
         setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
     }
 
@@ -56,7 +56,7 @@ public class ProductGuide extends DistributedObject {
         if(lid!=null) setLocalID(lid);
 
         Integer status = getIntegerAttributeValue(node,"D");
-        setStatus(status!=null);
+        setDeletedState(status != null);
         tagName = node.getNodeName();
         /* End required params */
         String stringCode = getStringAttributeValue(node,"Code",16);
@@ -144,14 +144,6 @@ public class ProductGuide extends DistributedObject {
         this.userDelete = userDelete;
     }
 
-    public Boolean isDeleted() {
-        return super.isStatus();
-    }
-
-    public void setDeleted(Boolean deleted) {
-        super.setStatus(deleted);
-    }
-
     public String getProductName() {
         return productName;
     }
@@ -160,41 +152,19 @@ public class ProductGuide extends DistributedObject {
         this.productName = productName;
     }
 
-    /*
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getEditTime() {
-        return editTime;
-    }
-
-    public void setEditTime(Date editTime) {
-        this.editTime = editTime;
-    }
-
-    public Date getDeleteTime() {
-        return deleteTime;
-    }
-
-    public void setDeleteTime(Date deleteTime) {
-        this.deleteTime = deleteTime;
-    }*/
     @Override
     public String toString() {
-        return "ProductGuide{" +
-                "code='" + code + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", productName='" + productName + '\'' +
-                ", okpCode='" + okpCode + '\'' +
-                ", userCreate=" + userCreate +
-                ", userEdit=" + userEdit +
-                ", userDelete=" + userDelete +
-                ", idOfConfigurationProvider=" + idOfConfigurationProvider +
-                '}';
+        final StringBuilder sb = new StringBuilder();
+        sb.append("ProductGuide");
+        sb.append("{productName ='").append(productName).append('\'');
+        sb.append(", code ='").append(code).append('\'');
+        sb.append(", fullName ='").append(fullName).append('\'');
+        sb.append(", idOfConfigurationProvider =").append(idOfConfigurationProvider);
+        sb.append(", okpCode ='").append(okpCode).append('\'');
+        sb.append(", globalId ='").append(globalId).append('\'');
+        sb.append(", globalVersion ='").append(globalVersion).append('\'');
+        sb.append(", deletedState ='").append(deletedState).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

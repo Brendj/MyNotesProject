@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" table="cf_technological_map" optimistic-lock="version">
+        <id name="globalId" column="IdOfTechnoMap" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Global params -->
+        <version name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+
+        <property name="nameOfTechnologicalMap" column="NameOfTechnologicalMap" type="string" length="128" />
+        <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="long"/>
+        <property name="technologyOfPreparation" column="TechnologyOfPreparation" type="string" length="4096" />
+        <property name="termOfRealization" column="TermOfRealization" type="string" length="128" />
+        <property name="tempOfPreparation" column="TempOfPreparation" type="string" length="128" />
+
+        <property name="energyValue" column="EnergyValue" type="float" />
+        <property name="proteins" column="Proteins" type="float" />
+        <property name="carbohydrates" column="Carbohydrates" type="float" />
+        <property name="fats" column="Fats" type="float" />
+        <property name="microElCa" column="MicroElCa" type="float" />
+        <property name="microElMg" column="MicroElMg" type="float" />
+        <property name="microElP" column="MicroElP" type="float" />
+        <property name="microElFe" column="MicroElFe" type="float" />
+        <property name="vitaminA" column="VitaminA" type="float" />
+        <property name="vitaminB1" column="VitaminB1" type="float" />
+        <property name="vitaminB2" column="VitaminB2" type="float" />
+        <property name="vitaminPp" column="VitaminPp" type="float" />
+        <property name="vitaminC" column="VitaminC" type="float" />
+        <property name="vitaminE" column="VitaminE" type="float" />
+    </class>
+</hibernate-mapping>

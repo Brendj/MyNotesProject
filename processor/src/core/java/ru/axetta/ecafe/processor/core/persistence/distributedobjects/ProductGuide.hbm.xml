@@ -14,13 +14,13 @@
                 <param name="max_lo">0</param>
             </generator>
         </id>
-        <version name="globalVersion" column="version" type="long"/>
-        <property name="idOfOrg" column="idOfOrg" type="long"/>
-        <property name="editTime" column="edit_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="deleteTime" column="delete_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="createTime" column="create_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+        <version name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
-        <property name="status" column="deleted" type="boolean"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
 
 
         <property name="code" column="code" type="string" length="16"/>
