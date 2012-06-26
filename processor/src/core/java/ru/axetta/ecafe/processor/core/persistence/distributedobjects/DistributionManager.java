@@ -11,10 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
@@ -34,22 +35,21 @@ public class DistributionManager {
      * Логгер
      */
     private Logger logger = LoggerFactory.getLogger(DistributionManager.class);
-    /**
-     * Список глобальных объектов на базе процессинга
-     */
+
     private Long idOfOrg;
     /**
      * Ключи = имена элементов (Пример элемента: <Pr>),
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
      */
-    private HashMap<String,Long>currentMaxVersions=new HashMap<String, Long>();
-
+    private HashMap<String,Long> currentMaxVersions=new HashMap<String, Long>();
+    /**
+     * Список глобальных объектов на базе процессинга
+     */
     private List<DistributedObject> distributedObjects = new LinkedList<DistributedObject>();
 
     public DistributionManager(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
     }
-
 
     /**
      * Создает  элемент <RO> выходного xml документа
@@ -76,15 +76,7 @@ public class DistributionManager {
                 if(objectVersion == currentMaxVersion){
                     distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
                 } else {
-                    Element element =  document.createElement("O");
-                    element = distributedObject.toElement(element);
-
-                    TransformerFactory transFactory = TransformerFactory.newInstance();
-                    Transformer transformer = transFactory.newTransformer();
-                    StringWriter buffer = new StringWriter();
-                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                    transformer.transform(new DOMSource(element),new StreamResult(buffer));
-                    String stringElement = buffer.toString();
+                    String stringElement = createStringElement(document, distributedObject);
 
                     distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
                     DOConflict conflict = new DOConflict();
@@ -93,14 +85,7 @@ public class DistributionManager {
                     conflict.setgVersionInc(objectVersion);
                     conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
 
-                    element =  document.createElement("O");
-                    element = distributedObject.toElement(element);
-                    transFactory = TransformerFactory.newInstance();
-                    transformer = transFactory.newTransformer();
-                    buffer = new StringWriter();
-                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                    transformer.transform(new DOMSource(element),new StreamResult(buffer));
-                    conflict.setValueCur(buffer.toString());
+                    conflict.setValueCur(createStringElement(document, distributedObject));
 
                     conflict.setValueInc(stringElement);
                     conflict.setCreateConflictDate(new Date());
@@ -120,6 +105,8 @@ public class DistributionManager {
         }
         elementRO.appendChild(confirmElement);
         elementMap.clear();
+        distributedObjects.clear();
+        distributedObjects.addAll(DAOService.getInstance().getProductGuide(currentMaxVersions.get("Pr"), idOfOrg));
         for (DistributedObject distributedObject: distributedObjects){
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
             if(!elementMap.containsKey(tagName)){
@@ -131,6 +118,18 @@ public class DistributionManager {
             elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
         return  elementRO;
+    }
+
+    private String createStringElement(Document document, DistributedObject distributedObject)
+            throws TransformerException {
+        Element element =  document.createElement("O");
+        element = distributedObject.toElement(element);
+        TransformerFactory transFactory = TransformerFactory.newInstance();
+        Transformer transformer = transFactory.newTransformer();
+        StringWriter buffer = new StringWriter();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.transform(new DOMSource(element),new StreamResult(buffer));
+        return buffer.toString();
     }
 
     /**
@@ -145,17 +144,16 @@ public class DistributionManager {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
             node = node.getFirstChild();
-            node = node.getNextSibling();
             while (node!=null){
                 DistributedObject distributedObject = createDistributedObject(currentObject);
                 distributedObject = distributedObject.build(node);
                 distributedObject.setOrgOwner(idOfOrg);
                 distributedObjects.add(distributedObject);
                 node = node.getNextSibling();
-                if(node !=null) node = node.getNextSibling();
             }
         }
     }
+
 
     private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum){
         return DistributionFactory.createDistributedObject(distributedObjectsEnum);
@@ -166,65 +164,10 @@ public class DistributionManager {
                 attributeName).getTextContent():null);
     }
 
-
-    /* public void parseXML(Node node) throws Exception {
-      if (Node.ELEMENT_NODE == node.getNodeType()) {
-          String objectName = node.getNodeName();
-          currentMaxVersions.put(objectName,Long.parseLong(getAttributeValue(node,"V")));
-          node = node.getFirstChild();
-          node = node.getNextSibling();
-          while (node != null){
-              DistributedObject distributedObject = createDistributedObject(objectName);
-              distributedObject = distributedObject.build(node);
-              distributedObject.setIdOfOrg(idOfOrg);
-              ConfirmObject confirmObject = new ConfirmObject();
-              if(getAttributeValue(node,"D")==null){
-                  if(node.getNodeName().equals("C")){
-                      distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
-                      confirmObject.setNodeName(objectName);
-                      confirmObject.setAction(node.getNodeName());
-                      confirmObject.setLocalID(Long.parseLong(getAttributeValue(node,"LID")));
-                      confirmObject.setGlobalId(distributedObject.getGlobalId());
-                      confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
-                      confirmObjectList.add(confirmObject);
-                  }
-                  if(node.getNodeName().equals("M")){
-                      Long version =Long.parseLong(getAttributeValue(node,"V"));
-                      String toStringDistributedObject = distributedObject.toString();
-                      if( DAOService.getInstance().getDistributedObjectVersion(distributedObject).equals(version)) {
-                          distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject,null);
-                      } else {
-                          distributedObject.setGlobalVersion(version);
-                          distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, version);
-                          DOConflict conflict = new DOConflict();
-                          conflict.setgVersionCur(distributedObject.getGlobalVersion());
-                          conflict.setIdOfOrg(idOfOrg);
-                          conflict.setgVersionInc(version);
-                          conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-                          conflict.setValueCur(distributedObject.toString());
-                          conflict.setValueInc(toStringDistributedObject);
-                          conflict.setCreateConflictDate(new Date());
-                          DAOService.getInstance().createConflict(conflict);
-                      }
-                      confirmObject.setNodeName(objectName);
-                      confirmObject.setAction(node.getNodeName());
-                      confirmObject.setGlobalId(Long.parseLong(getAttributeValue(node,"GID")));
-                      confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
-                      confirmObjectList.add(confirmObject);
-                  }
-              } else {
-                  distributedObject = DAOService.getInstance().setStatusDistributedObject(distributedObject,getAttributeValue(node,"D").equals("1"));
-                  confirmObject.setNodeName(objectName);
-                  confirmObject.setAction(node.getNodeName());
-                  confirmObject.setGlobalId(Long.parseLong(getAttributeValue(node,"GID")));
-                  confirmObject.setGlobalVersion(distributedObject.getGlobalVersion());
-                  confirmObject.setStatus(getAttributeValue(node,"D").equals("1"));
-              }
-              node = node.getNextSibling();
-              if(node !=null) node = node.getNextSibling();
-          }
-      }
-  }  */
+    /* Getter and Setters */
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
 
 }
 
