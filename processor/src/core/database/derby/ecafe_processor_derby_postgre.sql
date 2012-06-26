@@ -958,8 +958,8 @@ CREATE TABLE  cf_technological_map(
   NameOfTechnologicalMap character varying(128) NOT NULL,
   NumberOfTechnologicalMap BIGINT NOT NULL,
   TechnologyOfPreparation character varying(4096) NOT NULL,
-  TermOfRealization character varying(128) NOT NULL,
-  TempOfPreparation character varying(32) NOT NULL,
+  TermOfRealization character varying(128) DEFAULT NULL,
+  TempOfPreparation character varying(32) DEFAULT NULL,
 
   EnergyValue FLOAT DEFAULT NULL,
   Proteins FLOAT DEFAULT NULL,
