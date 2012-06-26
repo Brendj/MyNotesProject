@@ -4,13 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.persistence.Products;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,11 +21,10 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"NameOfTechnologicalMap", nameOfTechnologicalMap);
         setAttribute(element,"NumberOfTechnologicalMap", numberOfTechnologicalMap);
         setAttribute(element,"TechnologyOfPreparation", technologyOfPreparation);
-        setAttribute(element,"TimeOfRealization", timeOfRealization);
         setAttribute(element,"TempOfPreparation", tempOfPreparation);
         setAttribute(element,"TermOfRealization", termOfRealization);
 
-        setAttribute(element,"energyValue", energyValue);
+        setAttribute(element,"EnergyValue", energyValue);
         setAttribute(element,"Proteins", proteins);
         setAttribute(element,"Carbohydrates", carbohydrates);
         setAttribute(element,"Fats", fats);
@@ -72,9 +66,6 @@ public class TechnologicalMap extends DistributedObject {
 
         String stringTechnologyOfPreparation = getStringAttributeValue(node,"TechnologyOfPreparation",4096);
         if(stringTechnologyOfPreparation!=null) setTechnologyOfPreparation(stringTechnologyOfPreparation);
-
-        String stringTimeOfRealization = getStringAttributeValue(node,"TimeOfRealization",128);
-        if(stringTimeOfRealization!=null) setTimeOfRealization(stringTimeOfRealization);
 
         String stringTempOfPreparation = getStringAttributeValue(node,"TempOfPreparation",128);
         if(stringTempOfPreparation!=null) setTempOfPreparation(stringTempOfPreparation);

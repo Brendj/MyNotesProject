@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -88,7 +88,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             Set set = cp.getProducts();
             items = new ArrayList<Item>();
             for (Object o : set) {
-                ProductGuide pg = (ProductGuide)o;
+                Product pg = (Product)o;
                 if (!isShowDeleted() && pg.getDeletedState())
                     continue;
                 if (pg.getUserCreate()!=null)
@@ -118,11 +118,11 @@ public class ProductGuideListPage extends BasicWorkspacePage {
     }
 
     public void remove(Session session, String configurationProvider, long id) throws Exception {
-        ProductGuide productGuide = (ProductGuide)session.load(ProductGuide.class, id);
+        Product product = (Product)session.load(Product.class, id);
         cp = (ConfigurationProvider)DAOUtils.findConfigurationProvider(session, configurationProvider);
-        cp.getProducts().remove(productGuide);
+        cp.getProducts().remove(product);
         session.update(cp);
-        session.delete(productGuide);
+        session.delete(product);
         fill(session, MainPage.getSessionInstance().getCurrentConfigurationProvider());
     }
 
@@ -170,7 +170,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
 
 
 
-        ProductGuide pg = null;
+        Product pg = null;
         Long id = item.getIdOfProductGuide();
         if (id == Item.NOT_SAVED_IN_DB_ID)
             id = null;
@@ -184,7 +184,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             if (count > 1)
                 throw new ProductGuideException(String.format("Продуктов с кодом %s больше одного.", item.getCode()));
 
-            pg = (ProductGuide) DAOUtils.findProductGuide(persistenceSession, id);
+            pg = (Product) DAOUtils.findProductGuide(persistenceSession, id);
 
             if (!newCp.getIdOfConfigurationProvider().equals(item.getIdofconfigurationprovider())) {
                 ConfigurationProvider oldCp = (ConfigurationProvider)DAOUtils.findConfigurationProvider(persistenceSession, id);
@@ -198,7 +198,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             pg.setLastUpdate(new Date());
             pg.setUserEdit(user);
         } else {
-            pg = new ProductGuide();
+            pg = new Product();
             newCp.getProducts().add(pg);
             persistenceSession.update(newCp);
             pg.setUserCreate(user);

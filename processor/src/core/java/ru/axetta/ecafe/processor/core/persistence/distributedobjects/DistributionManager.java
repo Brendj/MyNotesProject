@@ -106,7 +106,15 @@ public class DistributionManager {
         elementRO.appendChild(confirmElement);
         elementMap.clear();
         distributedObjects.clear();
-        distributedObjects.addAll(DAOService.getInstance().getProductGuide(currentMaxVersions.get("Pr"), idOfOrg));
+        List<Product> productList = DAOService.getInstance().getProductGuide(currentMaxVersions.get("Pr"), idOfOrg);
+        if(!productList.isEmpty())distributedObjects.addAll(productList);
+        List<TechnologicalMap> technologicalMapList = DAOService.getInstance().getTechnologicalMap(
+                currentMaxVersions.get("TechnologicalMap"), idOfOrg);
+        if(!technologicalMapList.isEmpty()) distributedObjects.addAll(technologicalMapList);
+        List<TechnologicalMapProduct> technologicalMapProducts = DAOService.getInstance().getTechnologicalMapProducts(
+                currentMaxVersions.get("TechnologicalMapProduct"), idOfOrg);
+        if(!technologicalMapProducts.isEmpty()) distributedObjects.addAll(technologicalMapProducts);
+
         for (DistributedObject distributedObject: distributedObjects){
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
             if(!elementMap.containsKey(tagName)){

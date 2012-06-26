@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" table="cf_products" optimistic-lock="version">
+        <id name="globalId" column="idOfProducts" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <version name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <!-- End Global params -->
+        <property name="code" column="Code" type="string" length="16"/>
+        <property name="fullName" column="FullName" type="string" length="1024"/>
+        <property name="okpCode" column="OkpCode" type="string" length="32"/>
+        <property name="productName" column="ProductName" type="string" length="512"/>
+        <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
+        <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
+
+    </class>
+</hibernate-mapping>

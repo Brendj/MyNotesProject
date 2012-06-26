@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -75,22 +75,22 @@ public class ProductGuideManager {
             ConfigurationProvider configurationProviderp = (ConfigurationProvider) DAOUtils
                     .findConfigurationProvider(persistenceSession, MainPage.getSessionInstance().getCurrentConfigurationProvider());
 
-            ProductGuide productGuide = new ProductGuide();
-            productGuide.setOkpCode(config.getValue(FieldId.OKP_CODE));
-            productGuide.setDeletedState(!config.getValueBool(FieldId.DELETED_STATE));
-            productGuide.setCode(config.getValue(FieldId.CODE));
-            productGuide.setFullName(config.getValue(FieldId.FULL_NAME));
-            productGuide.setProductName(config.getValue(FieldId.PRODUCT_NAME));
-            productGuide.setUserCreate(MainPage.getSessionInstance().getCurrentUser());
-            productGuide.setCreatedDate(new Date());
-            persistenceSession.save(productGuide);
+            Product product = new Product();
+            product.setOkpCode(config.getValue(FieldId.OKP_CODE));
+            product.setDeletedState(!config.getValueBool(FieldId.DELETED_STATE));
+            product.setCode(config.getValue(FieldId.CODE));
+            product.setFullName(config.getValue(FieldId.FULL_NAME));
+            product.setProductName(config.getValue(FieldId.PRODUCT_NAME));
+            product.setUserCreate(MainPage.getSessionInstance().getCurrentUser());
+            product.setCreatedDate(new Date());
+            persistenceSession.save(product);
 
             //configurationProviderp.getProducts().add(productGuide);
             persistenceSession.update(configurationProviderp);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return productGuide.getIdOfProductGuide();
+            return product.getIdOfProductGuide();
         } catch (Exception e) {
             logger.info("Ошибка при обновлении данных клиента", e);
             throw new Exception(e.getMessage());

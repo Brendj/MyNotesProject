@@ -6,16 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +17,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ProductGuide extends DistributedObject {
+public class Product extends DistributedObject {
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
@@ -44,7 +36,7 @@ public class ProductGuide extends DistributedObject {
     }
 
     @Override
-    public ProductGuide build(Node node) {
+    public Product build(Node node) {
         /* Begin required params */
         Long gid = getLongAttributeValue(node,"GID");
         if(gid!=null) setIdOfProductGuide(gid);

@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -693,7 +693,7 @@ public class DAOUtils {
         ////criteria.add(Restrictions.eq("idOfProductGuide", id));
         //criteria.add(Restrictions.eq("globalId", id));
         //return criteria.uniqueResult();
-        return session.get(ProductGuide.class, id);
+        return session.get(Product.class, id);
     }
 
     public static List findConfigurationProvider(Session session) {

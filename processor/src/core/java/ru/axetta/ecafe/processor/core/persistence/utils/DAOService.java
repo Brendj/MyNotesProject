@@ -9,10 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGuide;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,23 +37,73 @@ public class DAOService {
 
 
     @Transactional
-    public List<ProductGuide> getProductGuide(Long currentMaxVersion,Long orgOwner){
-        TypedQuery<ProductGuide> query ;
+    public List<Product> getProductGuide(Long currentMaxVersion,Long orgOwner){
+        TypedQuery<Product> query ;
         if(orgOwner==null){
 
             if(currentMaxVersion==null){
-                query = em.createQuery("from ProductGuide",ProductGuide.class); }
+                query = em.createQuery("from ProductGuide",Product.class); }
             else{
-                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion",ProductGuide.class);
+                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion",Product.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
             }
         }else{
             if(currentMaxVersion==null){
-                query = em.createQuery("from ProductGuide where orgOwner=:orgOwner",ProductGuide.class);
+                query = em.createQuery("from ProductGuide where orgOwner=:orgOwner",Product.class);
                 query.setParameter("orgOwner",orgOwner);
             }
             else{
-                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",ProductGuide.class);
+                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",Product.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+                query.setParameter("orgOwner",orgOwner);
+            }
+
+        }
+        return  query.getResultList();
+    }
+
+    public List<TechnologicalMapProduct> getTechnologicalMapProducts(Long currentMaxVersion, Long orgOwner) {
+        TypedQuery<TechnologicalMapProduct> query ;
+        if(orgOwner==null){
+
+            if(currentMaxVersion==null){
+                query = em.createQuery("from TechnologicalMapProduct",TechnologicalMapProduct.class); }
+            else{
+                query=em.createQuery("from TechnologicalMapProduct where globalVersion>:currentMaxVersion",TechnologicalMapProduct.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+            }
+        }else{
+            if(currentMaxVersion==null){
+                query = em.createQuery("from TechnologicalMapProduct where orgOwner=:orgOwner",TechnologicalMapProduct.class);
+                query.setParameter("orgOwner",orgOwner);
+            }
+            else{
+                query=em.createQuery("from TechnologicalMapProduct where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",TechnologicalMapProduct.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+                query.setParameter("orgOwner",orgOwner);
+            }
+
+        }
+        return  query.getResultList();
+    }
+
+    public List<TechnologicalMap> getTechnologicalMap(Long currentMaxVersion, Long orgOwner) {
+        TypedQuery<TechnologicalMap> query ;
+        if(orgOwner==null){
+
+            if(currentMaxVersion==null){
+                query = em.createQuery("from TechnologicalMap",TechnologicalMap.class); }
+            else{
+                query=em.createQuery("from TechnologicalMap where globalVersion>:currentMaxVersion",TechnologicalMap.class);
+                query.setParameter("currentMaxVersion",currentMaxVersion);
+            }
+        }else{
+            if(currentMaxVersion==null){
+                query = em.createQuery("from TechnologicalMap where orgOwner=:orgOwner",TechnologicalMap.class);
+                query.setParameter("orgOwner",orgOwner);
+            }
+            else{
+                query=em.createQuery("from TechnologicalMap where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",TechnologicalMap.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
                 query.setParameter("orgOwner",orgOwner);
             }
@@ -67,7 +114,7 @@ public class DAOService {
 
     @Transactional
     public Boolean existProductGuide(Long id) {
-        TypedQuery<ProductGuide> query = em.createQuery("from ProductGuide where globalId=:id order by globalId",ProductGuide.class);
+        TypedQuery<Product> query = em.createQuery("from ProductGuide where globalId=:id order by globalId",Product.class);
         query.setParameter("id",id);
         return query.getResultList().size()>0;
     }
@@ -158,8 +205,8 @@ public class DAOService {
     }
 
     public void deleteProductGuide(Long id) {
-        ProductGuide productGuide = em.find(ProductGuide.class, id);
-        em.remove(productGuide);
+        Product product = em.find(Product.class, id);
+        em.remove(product);
     }
 
     @Transactional

@@ -10,7 +10,7 @@
         <id name="globalId" column="IdOfTechnoMap" type="long">
             <generator class="identity"/>
         </id>
-        <!-- Global params -->
+        <!-- Begin Global params -->
         <version name="globalVersion" column="GlobalVersion" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
@@ -19,6 +19,7 @@
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
+        <!-- End Global params -->
 
         <property name="nameOfTechnologicalMap" column="NameOfTechnologicalMap" type="string" length="128" />
         <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="long"/>

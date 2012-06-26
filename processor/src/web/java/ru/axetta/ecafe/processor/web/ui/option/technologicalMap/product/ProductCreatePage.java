@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.technologicalMap.product;
 
-import ru.axetta.ecafe.processor.core.persistence.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 
@@ -56,7 +54,7 @@ public class ProductCreatePage extends BasicWorkspacePage {
     }
 
     public void createProduct(Session session) throws Exception {
-        Product p = new Product();
+        TechnologicalMapProduct p = new TechnologicalMapProduct();
         p.setGrossMass(grossMass);
         p.setName(name);
         p.setNetMass(netMass);

@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +19,7 @@ public class DistributionFactory {
     public static DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum){
         DistributedObject distributedObject=null;
         switch (distributedObjectsEnum){
-            case ProductGuide: distributedObject = new ProductGuide(); break;
+            case ProductGuide: distributedObject = new Product(); break;
             case TechnologicalMap: distributedObject = new TechnologicalMap(); break;
         }
         return distributedObject;

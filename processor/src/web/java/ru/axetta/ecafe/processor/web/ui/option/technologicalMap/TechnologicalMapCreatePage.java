@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
 
-import ru.axetta.ecafe.processor.core.persistence.Products;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -28,15 +27,14 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapCreatePage.class);
     private TechnologicalMap technologicalMap = new TechnologicalMap();
-    private List<Products> productsList;
 
     @Override
     public void onShow() throws Exception {
-        //technologicalMap.setProducts(new ArrayList<Products>());
+
     }
 
     public TechnologicalMapCreatePage() {
-        //technologicalMap.setProducts(new ArrayList<Products>());
+
     }
 
     public String getPageFilename() {
