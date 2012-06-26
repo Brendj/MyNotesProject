@@ -31,7 +31,7 @@ public class ProductGuideManager {
     private static final Logger logger = LoggerFactory.getLogger(ProductGuideManager.class);
 
     public enum FieldId {
-        CODE, FULL_NAME, OKP_CODE, PRODUCT_NAME, DELETED
+        CODE, FULL_NAME, OKP_CODE, PRODUCT_NAME, DELETED_STATE
     }
 
     static FieldProcessor.Def[] fieldInfo={
@@ -40,7 +40,7 @@ public class ProductGuideManager {
             new FieldProcessor.Def(1, false, false, "FULL_NAME", null, FieldId.FULL_NAME, true),
             new FieldProcessor.Def(2, false, false, "OKP", null, FieldId.OKP_CODE, true),
             new FieldProcessor.Def(3, false, false, "PRODUCT_NAME", null, FieldId.PRODUCT_NAME, true),
-            new FieldProcessor.Def(4, false, false, "DELETED", "0", FieldId.DELETED, true),
+            new FieldProcessor.Def(4, false, false, "DELETED_STATE", "0", FieldId.DELETED_STATE, true),
     };
 
     public static class ProductGuideFieldConfig extends FieldProcessor.Config {
@@ -77,15 +77,15 @@ public class ProductGuideManager {
 
             ProductGuide productGuide = new ProductGuide();
             productGuide.setOkpCode(config.getValue(FieldId.OKP_CODE));
-            productGuide.setDeleted(!config.getValueBool(FieldId.OKP_CODE));
+            productGuide.setDeletedState(!config.getValueBool(FieldId.DELETED_STATE));
             productGuide.setCode(config.getValue(FieldId.CODE));
             productGuide.setFullName(config.getValue(FieldId.FULL_NAME));
             productGuide.setProductName(config.getValue(FieldId.PRODUCT_NAME));
             productGuide.setUserCreate(MainPage.getSessionInstance().getCurrentUser());
-            productGuide.setCreateTime(new Date());
+            productGuide.setCreatedDate(new Date());
             persistenceSession.save(productGuide);
 
-            configurationProviderp.getProducts().add(productGuide);
+            //configurationProviderp.getProducts().add(productGuide);
             persistenceSession.update(configurationProviderp);
 
             persistenceTransaction.commit();

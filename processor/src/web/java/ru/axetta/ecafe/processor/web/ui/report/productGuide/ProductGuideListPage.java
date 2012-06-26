@@ -89,7 +89,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             items = new ArrayList<Item>();
             for (Object o : set) {
                 ProductGuide pg = (ProductGuide)o;
-                if (!isShowDeleted() && pg.isDeleted())
+                if (!isShowDeleted() && pg.getDeletedState())
                     continue;
                 if (pg.getUserCreate()!=null)
                     pg.getUserCreate().getUserName();
@@ -98,8 +98,8 @@ public class ProductGuideListPage extends BasicWorkspacePage {
                 if (pg.getUserDelete()!=null)
                     pg.getUserDelete().getUserName(); // обращаемся к полю, чтобы оно загрузилось из бд хибернейтом
                 items.add(new Item(pg.getIdOfProductGuide(), pg.getCode(), pg.getFullName(), pg.getProductName(),
-                        pg.getOkpCode(), pg.getUserCreate(), pg.getUserEdit(), pg.getUserDelete(), pg.getCreateTime(),
-                        pg.getEditTime(), pg.getDeleteTime(), pg.isDeleted(), pg.getIdOfConfigurationProvider()));
+                        pg.getOkpCode(), pg.getUserCreate(), pg.getUserEdit(), pg.getUserDelete(), pg.getCreatedDate(),
+                        pg.getLastUpdate(), pg.getDeleteDate(), pg.getDeletedState(), pg.getIdOfConfigurationProvider()));
             }
         }
         //if (cp != null) {
@@ -195,26 +195,26 @@ public class ProductGuideListPage extends BasicWorkspacePage {
                 newCp.getProducts().add(pg);
                 persistenceSession.update(newCp);
             }
-            pg.setEditTime(new Date());
+            pg.setLastUpdate(new Date());
             pg.setUserEdit(user);
         } else {
             pg = new ProductGuide();
             newCp.getProducts().add(pg);
             persistenceSession.update(newCp);
             pg.setUserCreate(user);
-            pg.setCreateTime(new Date());
+            pg.setCreatedDate(new Date());
         }
 
         pg.setCode(item.getCode());
         pg.setFullName(item.getFullName());
         pg.setProductName(item.getProductName());
         pg.setOkpCode(item.getOkpCode());
-        pg.setDeleted(item.isDeleted());
+        pg.setDeletedState(item.isDeleted());
         if (item.isDeleted()) {
-            pg.setDeleteTime(new Date());
+            pg.setDeleteDate(new Date());
             pg.setUserDelete(user);
         } else {
-            pg.setDeleteTime(null);
+            pg.setDeleteDate(null);
             pg.setUserDelete(null);
         }
 
