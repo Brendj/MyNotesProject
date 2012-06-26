@@ -15,34 +15,34 @@
 
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
-        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.name}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
     </h:panelGrid>
     <%--<h:panelGrid columns="1">--%>
         <%--<h:outputText escape="true" value="Продукт" styleClass="output-text" />--%>
 
     <%--</h:panelGrid>--%>
 
-    <rich:dataTable id="productsTable" value="#{mainPage.technologicalMapCreatePage.technologicalMap.products}" var="item" >
+   <%-- <rich:dataTable id="productsTable" value="#{mainPage.technologicalMapCreatePage.technologicalMap.products}" var="item" >
         <rich:column headerClass="column-header" >
             <f:facet name="header">
                 <h:outputText escape="true" value="Наименование продукта" />
             </f:facet>
 
             <h:panelGrid columns="1">
-                <%--combobox with autocomplete--%>
-                <%--[combobox with autocomplete]--%>
-                <%--[combobox with autocomplete]--%>
+                &lt;%&ndash;combobox with autocomplete&ndash;%&gt;
+                &lt;%&ndash;[combobox with autocomplete]&ndash;%&gt;
+                &lt;%&ndash;[combobox with autocomplete]&ndash;%&gt;
             </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header" >
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
-            <%--pict with action delete product--%>
+            &lt;%&ndash;pict with action delete product&ndash;%&gt;
         </rich:column>
     </rich:dataTable>
     <a4j:commandButton value="Добавить продукт" action="#{mainPage.technologicalMapCreatePage.addProduct}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               reRender="workspaceTogglePanel" styleClass="command-button" />--%>
 
     <h:panelGrid columns="3">
         <f:facet name="">
@@ -74,26 +74,26 @@
         <h:outputText escape="true" value="P" styleClass="output-text" />
         <h:outputText escape="true" value="Fe" styleClass="output-text" />
 
-        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.ca}" styleClass="input-text"
+        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.microElCa}" styleClass="input-text"
                 validatorMessage="Количсество магния должно быть числом.">
             <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
         </h:inputText>
-        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.mg}" styleClass="input-text"
+        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.microElMg}" styleClass="input-text"
                 validatorMessage="Количсество фосфора должно быть числом.">
             <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
         </h:inputText>
-        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.p}" styleClass="input-text"
+        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.microElP}" styleClass="input-text"
                     validatorMessage="Количсество фосфора должно быть числом.">
             <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
         </h:inputText>
-        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.fe}" styleClass="input-text"
+        <h:inputText value="#{mainPage.technologicalMapCreatePage.technologicalMap.microElFe}" styleClass="input-text"
                     validatorMessage="Количсество железа должно быть числом.">
             <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
         </h:inputText>
 
     </h:panelGrid>
 
-    <h:inputTextarea value="#{mainPage.technologicalMapCreatePage.technologicalMap.technologyOfpreparation}" rows="3" />
+    <h:inputTextarea value="#{mainPage.technologicalMapCreatePage.technologicalMap.technologyOfPreparation}" rows="3" />
 
 
     <%--<h:outputText escape="true" value="Массва брутто (г)" styleClass="output-text" />--%>
@@ -111,7 +111,7 @@
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Создать технологическую карту" action="#{mainPage.technologicalMapCreatePage.createTechnologicalMap}"
+    <a4j:commandButton value="Создать технологическую карту" action="#{technologicalMapCreatePage.createTechnologicalMap}"
                        reRender="technologicalMapCreatePanel" styleClass="command-button" />
 </h:panelGrid>
 
