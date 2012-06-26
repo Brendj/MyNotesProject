@@ -40,9 +40,9 @@ public class DAOService {
 
 
     @Transactional
-    public List<ProductGuide> getProductGuide(Long currentMaxVersion,Long idOfOrg){
+    public List<ProductGuide> getProductGuide(Long currentMaxVersion,Long orgOwner){
         TypedQuery<ProductGuide> query ;
-        if(idOfOrg==null){
+        if(orgOwner==null){
 
             if(currentMaxVersion==null){
                 query = em.createQuery("from ProductGuide",ProductGuide.class); }
@@ -52,13 +52,13 @@ public class DAOService {
             }
         }else{
             if(currentMaxVersion==null){
-                query = em.createQuery("from ProductGuide where idOfOrg=:idOfOrg",ProductGuide.class);
-                query.setParameter("idOfOrg",idOfOrg);
+                query = em.createQuery("from ProductGuide where orgOwner=:orgOwner",ProductGuide.class);
+                query.setParameter("orgOwner",orgOwner);
             }
             else{
-                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and idOfOrg=:idOfOrg",ProductGuide.class);
+                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",ProductGuide.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
-                query.setParameter("idOfOrg",idOfOrg);
+                query.setParameter("orgOwner",orgOwner);
             }
 
         }
@@ -75,7 +75,7 @@ public class DAOService {
     @Transactional
     public DistributedObject setStatusDistributedObject(DistributedObject distributedObject, Boolean status) {
         distributedObject = em.find(distributedObject.getClass(), distributedObject.getGlobalId());
-        distributedObject.setStatus(status);
+        distributedObject.setDeletedState(status);
         return em.merge(distributedObject);
     }
 
@@ -125,7 +125,7 @@ public class DAOService {
 
     @Transactional
     public DistributedObject createDistributedObject(DistributedObject distributedObject){
-        distributedObject.setCreateTime(new Date());
+        distributedObject.setCreatedDate(new Date());
         TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
         query.setParameter("distributedObjectClassName",distributedObject.getClass().getSimpleName().toUpperCase());
         List<DOVersion> doVersionList = query.getResultList();
@@ -139,9 +139,9 @@ public class DAOService {
 
     @Transactional
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion){
-        Query q = em.createQuery("update " + distributedObject.getClass().getSimpleName() + " set globalVersion=:globalVersion, editTime=:editTime where globalId = :globalId ");
+        Query q = em.createQuery("update " + distributedObject.getClass().getSimpleName() + " set globalVersion=:globalVersion, lastUpdate=:lastUpdate where globalId = :globalId ");
         q.setParameter("globalVersion", globalVersion);
-        q.setParameter("editTime", new Date());
+        q.setParameter("lastUpdate", new Date());
         q.setParameter("globalId", distributedObject.getGlobalId());
         q.executeUpdate();
         return em.merge(distributedObject);
