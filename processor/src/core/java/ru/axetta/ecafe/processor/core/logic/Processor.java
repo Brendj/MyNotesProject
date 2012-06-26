@@ -435,7 +435,6 @@ public class Processor implements SyncProcessor,
 
     /* TODO: логика обработки менеджера глобальных объектов */
     private DistributionManager processDistributionManager(DistributionManager distributionManager){
-         distributionManager.process();
         return distributionManager;
     }
 
