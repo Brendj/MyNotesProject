@@ -28,11 +28,23 @@ import java.util.StringTokenizer;
  * To change this template use File | Settings | File Templates.
  */
 
+/**
+ * Коннектор к шлюзу Altarix
+ */
 public class AltarixSmsServiceImpl extends ISmsService {
 
+    /**
+     * Пара (дата отправки СМС, статус отправки)
+     */
     private static class SentParameters{
 
+        /**
+         * дата отправки СМС
+         */
         private Date sentDate;
+        /**
+         * Статус, записанный в ответе шлюза
+         */
         private int sentStatus;
 
         public SentParameters(Date sentDate,int sentStatus){
@@ -56,17 +68,35 @@ public class AltarixSmsServiceImpl extends ISmsService {
             this.sentStatus = sentStatus;
         }
     }
-    private String userServiceId;
+
     /**
+     * id сервиса партнера
+     */
+    private String userServiceId;
+    /**  Параметры отправки для отправленных сообщений
      * ключ = messageId, значение = пара(sentDate, sentStatus)
      */
     private HashMap<String,SentParameters> sentParameters =new HashMap<String, SentParameters>();
 
+    /**
+     * Конструктор
+     * @param config конфигурация коннектора
+     * @param userServiceId id сервиса партнера
+     */
     public AltarixSmsServiceImpl(Config config,String userServiceId){
          super(config);
          this.userServiceId=userServiceId;
 
     }
+
+    /**
+     * Отправляет на шлюз запрос составленный из Url шлюза параметров из аргумента queryParameters.
+     * Сохраняет параметры отправки в поле sentParameters
+     * @param queryParameters  параметры запроса
+     * @param messageId   id сообщения
+     * @return   ответ сервера в виде строки, содержащий статус отправки и UUID сообщения
+     * @throws Exception
+     */
     public  String sendServiceRequest(NameValuePair[] queryParameters,String messageId)
             throws Exception{
 
@@ -100,7 +130,7 @@ public class AltarixSmsServiceImpl extends ISmsService {
              httpMethod.releaseConnection();
          }
     }
-
+     @Override
     public  SendResponse sendTextMessage(String sender, String phoneNumber, String text)
             throws Exception{
         NameValuePair[] queryParameters=  createQueryParameters(userServiceId,phoneNumber,text,"send","sms");
@@ -116,6 +146,16 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
     }
 
+    /**
+     * Создает строку параметров запроса в виде массива пар
+     * @param serviceParam  параметр запроса к шлюзу
+     * @param msisdnParam  параметр запроса к шлюзу
+     * @param textParam  параметр запроса к шлюзу
+     * @param operationParam   параметр запроса к шлюзу
+     * @param typeParam     параметр запроса к шлюзу
+     * @return  массив пар (имя параметра, значение параметра)
+     * @throws Exception
+     */
     private NameValuePair[] createQueryParameters(String serviceParam,String msisdnParam,String textParam,String operationParam,String typeParam)throws Exception{
 
         NameValuePair[]queryParameters=new NameValuePair[] {
@@ -130,7 +170,7 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
        return queryParameters;
     }
-
+     @Override
     public  DeliveryResponse getDeliveryStatus(String messageId) throws Exception{
          SentParameters sentParametersByMessageId= sentParameters.get(messageId);
 
@@ -138,6 +178,11 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
     }
 
+    /**
+     * Извлекает из ответа шлюза статус отправки
+     * @param response  ответ шлюза
+     * @return  статус отправки СМС
+     */
     private Integer getStatus(String response){
         if(response==null){return null;}
         StringTokenizer st=new StringTokenizer(response,"|");
@@ -147,11 +192,22 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
     }
 
+    /**
+     * По ответу серверу делает вывод о статусе доставки
+     * @param deliveryStatus    статус из ответа шлюза
+     * @return статус доставки
+     */
     private int translateDeliveryStatus(int deliveryStatus){
         if(deliveryStatus==0)return DeliveryResponse.DELIVERED;
         else return DeliveryResponse.NOT_DELIVERED;
 
     }
+
+    /**
+     * По ответу сервера делает вывод о статусе отправки
+     * @param sendStatus статус из ответа шлюза
+     * @return   статус отправки
+     */
     private int translateSendStatus(int sendStatus){
         if(sendStatus==0)return SendResponse.MIN_SUCCESS_STATUS;
         else return SendResponse.COMMON_FAILURE;
