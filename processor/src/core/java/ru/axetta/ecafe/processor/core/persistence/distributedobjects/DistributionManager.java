@@ -120,18 +120,6 @@ public class DistributionManager {
         return  elementRO;
     }
 
-    private String createStringElement(Document document, DistributedObject distributedObject)
-            throws TransformerException {
-        Element element =  document.createElement("O");
-        element = distributedObject.toElement(element);
-        TransformerFactory transFactory = TransformerFactory.newInstance();
-        Transformer transformer = transFactory.newTransformer();
-        StringWriter buffer = new StringWriter();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.transform(new DOMSource(element),new StreamResult(buffer));
-        return buffer.toString();
-    }
-
     /**
      * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
      * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
@@ -152,6 +140,18 @@ public class DistributionManager {
                 node = node.getNextSibling();
             }
         }
+    }
+
+    private String createStringElement(Document document, DistributedObject distributedObject)
+            throws TransformerException {
+        Element element =  document.createElement("O");
+        element = distributedObject.toElement(element);
+        TransformerFactory transFactory = TransformerFactory.newInstance();
+        Transformer transformer = transFactory.newTransformer();
+        StringWriter buffer = new StringWriter();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.transform(new DOMSource(element),new StreamResult(buffer));
+        return buffer.toString();
     }
 
 
