@@ -35,95 +35,47 @@ public class DAOService {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
 
+    @Transactional
+    public <T> T findRefDistributedObject(Class<T> clazz, Long longIdOfTechnoMap){
+        return em.getReference(clazz, longIdOfTechnoMap);
+    }
 
     @Transactional
-    public List<Product> getProductGuide(Long currentMaxVersion,Long orgOwner){
-        TypedQuery<Product> query ;
+    public void setDeletedState(DistributedObject distributedObject){
+        distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
+        distributedObject.setDeletedState(true);
+        distributedObject = em.merge(distributedObject);
+    }
+
+    @Transactional
+    public <T> List<T> getDistributedObjects(Class<T> clazz){
+        return em.createQuery("from "+clazz.getSimpleName()+" where globalId>=0",clazz).getResultList();
+    }
+
+    @Transactional
+    public List<DistributedObject> getDistributedObjects(String className, Long currentMaxVersion,Long orgOwner){
+        TypedQuery<DistributedObject> query ;
         if(orgOwner==null){
 
             if(currentMaxVersion==null){
-                query = em.createQuery("from ProductGuide",Product.class); }
+                query = em.createQuery("from "+className,DistributedObject.class); }
             else{
-                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion",Product.class);
+                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion",DistributedObject.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
             }
         }else{
             if(currentMaxVersion==null){
-                query = em.createQuery("from ProductGuide where orgOwner=:orgOwner",Product.class);
+                query = em.createQuery("from "+className+" where orgOwner=:orgOwner",DistributedObject.class);
                 query.setParameter("orgOwner",orgOwner);
             }
             else{
-                query=em.createQuery("from ProductGuide where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",Product.class);
+                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",DistributedObject.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
                 query.setParameter("orgOwner",orgOwner);
             }
 
         }
         return  query.getResultList();
-    }
-
-    public List<TechnologicalMapProduct> getTechnologicalMapProducts(Long currentMaxVersion, Long orgOwner) {
-        TypedQuery<TechnologicalMapProduct> query ;
-        if(orgOwner==null){
-
-            if(currentMaxVersion==null){
-                query = em.createQuery("from TechnologicalMapProduct",TechnologicalMapProduct.class); }
-            else{
-                query=em.createQuery("from TechnologicalMapProduct where globalVersion>:currentMaxVersion",TechnologicalMapProduct.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-            }
-        }else{
-            if(currentMaxVersion==null){
-                query = em.createQuery("from TechnologicalMapProduct where orgOwner=:orgOwner",TechnologicalMapProduct.class);
-                query.setParameter("orgOwner",orgOwner);
-            }
-            else{
-                query=em.createQuery("from TechnologicalMapProduct where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",TechnologicalMapProduct.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-                query.setParameter("orgOwner",orgOwner);
-            }
-
-        }
-        return  query.getResultList();
-    }
-
-    public List<TechnologicalMap> getTechnologicalMap(Long currentMaxVersion, Long orgOwner) {
-        TypedQuery<TechnologicalMap> query ;
-        if(orgOwner==null){
-
-            if(currentMaxVersion==null){
-                query = em.createQuery("from TechnologicalMap",TechnologicalMap.class); }
-            else{
-                query=em.createQuery("from TechnologicalMap where globalVersion>:currentMaxVersion",TechnologicalMap.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-            }
-        }else{
-            if(currentMaxVersion==null){
-                query = em.createQuery("from TechnologicalMap where orgOwner=:orgOwner",TechnologicalMap.class);
-                query.setParameter("orgOwner",orgOwner);
-            }
-            else{
-                query=em.createQuery("from TechnologicalMap where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",TechnologicalMap.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-                query.setParameter("orgOwner",orgOwner);
-            }
-
-        }
-        return  query.getResultList();
-    }
-
-    @Transactional
-    public Boolean existProductGuide(Long id) {
-        TypedQuery<Product> query = em.createQuery("from ProductGuide where globalId=:id order by globalId",Product.class);
-        query.setParameter("id",id);
-        return query.getResultList().size()>0;
-    }
-
-    @Transactional
-    public DistributedObject setStatusDistributedObject(DistributedObject distributedObject, Boolean status) {
-        distributedObject = em.find(distributedObject.getClass(), distributedObject.getGlobalId());
-        distributedObject.setDeletedState(status);
-        return em.merge(distributedObject);
     }
 
     @Transactional
@@ -141,27 +93,6 @@ public class DAOService {
         }
         doVersion.setDistributedObjectClassName(name);
         return em.merge(doVersion);
-    }
-
-    @Transactional
-    public void saveVersionByDistributedObjects(String name, long v) {
-        TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
-        query.setParameter("distributedObjectClassName",name.toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        if(doVersionList.size()==0) {
-            doVersion = new DOVersion();
-        } else {
-            doVersion = doVersionList.get(0);
-        }
-        doVersion.setDistributedObjectClassName(name);
-        doVersion.setCurrentVersion(v);
-        em.persist(doVersion);
-    }
-
-    @Transactional
-    public DistributedObject getDistributedObject(DistributedObject distributedObject) {
-        return em.find(distributedObject.getClass(), distributedObject.getGlobalId());
     }
 
     @Transactional
@@ -272,7 +203,6 @@ public class DAOService {
         if (l.size()==0) return null;
         return (Org)l.get(0);
     }
-
     @Transactional
     public User setUserInfo(User user){
         return em.merge(user);
