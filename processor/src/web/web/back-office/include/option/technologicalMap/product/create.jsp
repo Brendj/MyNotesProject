@@ -13,7 +13,7 @@
              styleClass="borderless-grid" columns="2">
 
     <h:outputText escape="true" value="Наименование продукта" styleClass="output-text" />
-    <h:inputText value="#{mainPage.productCreatePage.name}" maxlength="256" styleClass="input-text long-field" />
+    <h:inputText value="#{mainPage.productCreatePage.nameOfProduct}" maxlength="256" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="Массва брутто (г)" styleClass="output-text" />
     <h:inputText value="#{mainPage.productCreatePage.grossMass}" maxlength="32" styleClass="input-text"
