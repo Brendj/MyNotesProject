@@ -97,7 +97,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
                     pg.getUserEdit().getUserName();
                 if (pg.getUserDelete()!=null)
                     pg.getUserDelete().getUserName(); // обращаемся к полю, чтобы оно загрузилось из бд хибернейтом
-                items.add(new Item(pg.getIdOfProductGuide(), pg.getCode(), pg.getFullName(), pg.getProductName(),
+                items.add(new Item(pg.getGlobalId(), pg.getCode(), pg.getFullName(), pg.getProductName(),
                         pg.getOkpCode(), pg.getUserCreate(), pg.getUserEdit(), pg.getUserDelete(), pg.getCreatedDate(),
                         pg.getLastUpdate(), pg.getDeleteDate(), pg.getDeletedState(), pg.getIdOfConfigurationProvider()));
             }

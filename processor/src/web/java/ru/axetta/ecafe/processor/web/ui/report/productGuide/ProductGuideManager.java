@@ -90,7 +90,7 @@ public class ProductGuideManager {
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return product.getIdOfProductGuide();
+            return product.getGlobalId();
         } catch (Exception e) {
             logger.info("Ошибка при обновлении данных клиента", e);
             throw new Exception(e.getMessage());
