@@ -40,7 +40,9 @@ public abstract class DistributedObject{
     protected Boolean deletedState;
     /* полуе локального идентификатора*/
     protected Long localID;
-    /* меод создания узла элемента */
+    /* имя узла элемента */
+    protected String tagName;
+    /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
         if(getDeletedState()){
@@ -50,9 +52,9 @@ public abstract class DistributedObject{
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
     }
-
+    /* меод добавления свойств наследника атрибутов в узел */
     protected abstract void appendAttributes(Element element);
-
+    /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
         if(getDeletedState()){
             element.setAttribute("D", "1");
@@ -62,12 +64,32 @@ public abstract class DistributedObject{
         element.setAttribute("GID", Long.toString(this.getGlobalId()));
         element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
+        /* Метод определения названия элемента */
     };
-    /* метод парсинга элемента */
-    public abstract DistributedObject build(Node node);
 
-    /* Метод определения названия элемента */
-    protected String tagName;
+    /* метод парсинга элемента */
+    public DistributedObject build(Node node){
+        /* Begin required params */
+        Long gid = getLongAttributeValue(node,"GID");
+        if(gid!=null) setGlobalId(gid);
+
+        Long version = getLongAttributeValue(node,"V");
+        if(version!=null) setGlobalVersion(version);
+
+        Long lid = getLongAttributeValue(node,"LID");
+        if(lid!=null) setLocalID(lid);
+
+        Integer status = getIntegerAttributeValue(node,"D");
+        setDeletedState(status != null);
+        tagName = node.getNodeName();
+        /* End required params */
+        if(deletedState){
+            return this;
+        }
+        return parseAttributes(node);
+    }
+
+    protected abstract DistributedObject parseAttributes(Node node);
 
     public String getTagName() {
         return tagName;
@@ -97,7 +119,12 @@ public abstract class DistributedObject{
     protected Float getFloatAttributeValue(Node node, String attributeName){
         Float result = null;
         try{
-            result = Float.parseFloat(getAttributeValue(node, attributeName));
+            String calString = getAttributeValue(node, attributeName);
+            if (calString==null || calString.equals("")) {
+                return null;
+            }
+            String replacedString = calString.replaceAll(",", ".");
+            result = Float.parseFloat(replacedString);
         } catch (Exception e){ result=null;}
         return result;
     }

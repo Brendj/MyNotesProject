@@ -63,36 +63,40 @@ public class DistributionManager {
         String tagName;
         for(int i=0; i<distributedObjects.size(); i++){
             DistributedObject distributedObject = distributedObjects.get(i);
-            if(distributedObject.getTagName().equals("C")){
-                Long lid = distributedObject.getLocalID();
-                distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
-                distributedObject.setTagName("C");
-                distributedObject.setLocalID(lid);
-                distributedObjects.set(i,distributedObject);
-            }
-            if(distributedObjects.get(i).getTagName().equals("M")){
-                long objectVersion = distributedObject.getGlobalVersion();
-                Long currentMaxVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
-                if(objectVersion == currentMaxVersion){
-                    distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
-                } else {
-                    String stringElement = createStringElement(document, distributedObject);
-
-                    distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
-                    DOConflict conflict = new DOConflict();
-                    conflict.setgVersionCur(currentMaxVersion);
-                    conflict.setIdOfOrg(idOfOrg);
-                    conflict.setgVersionInc(objectVersion);
-                    conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-
-                    conflict.setValueCur(createStringElement(document, distributedObject));
-
-                    conflict.setValueInc(stringElement);
-                    conflict.setCreateConflictDate(new Date());
-                    DAOService.getInstance().createConflict(conflict);
+            if(distributedObject.getDeletedState()){
+                DAOService.getInstance().setDeletedState(distributedObject);
+            } else {
+                if(distributedObject.getTagName().equals("C")){
+                    Long lid = distributedObject.getLocalID();
+                    distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
+                    distributedObject.setTagName("C");
+                    distributedObject.setLocalID(lid);
+                    distributedObjects.set(i,distributedObject);
                 }
-                distributedObject.setTagName("M");
-                distributedObjects.set(i,distributedObject);
+                if(distributedObjects.get(i).getTagName().equals("M")){
+                    long objectVersion = distributedObject.getGlobalVersion();
+                    Long currentMaxVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                    if(objectVersion == currentMaxVersion){
+                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
+                    } else {
+                        String stringElement = createStringElement(document, distributedObject);
+
+                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
+                        DOConflict conflict = new DOConflict();
+                        conflict.setgVersionCur(currentMaxVersion);
+                        conflict.setIdOfOrg(idOfOrg);
+                        conflict.setgVersionInc(objectVersion);
+                        conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+
+                        conflict.setValueCur(createStringElement(document, distributedObject));
+
+                        conflict.setValueInc(stringElement);
+                        conflict.setCreateConflictDate(new Date());
+                        DAOService.getInstance().createConflict(conflict);
+                    }
+                    distributedObject.setTagName("M");
+                    distributedObjects.set(i,distributedObject);
+                }
             }
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
             if(!elementMap.containsKey(tagName)){
@@ -106,14 +110,12 @@ public class DistributionManager {
         elementRO.appendChild(confirmElement);
         elementMap.clear();
         distributedObjects.clear();
-        List<Product> productList = DAOService.getInstance().getProductGuide(currentMaxVersions.get("Pr"), idOfOrg);
-        if(!productList.isEmpty())distributedObjects.addAll(productList);
-        List<TechnologicalMap> technologicalMapList = DAOService.getInstance().getTechnologicalMap(
-                currentMaxVersions.get("TechnologicalMap"), idOfOrg);
-        if(!technologicalMapList.isEmpty()) distributedObjects.addAll(technologicalMapList);
-        List<TechnologicalMapProduct> technologicalMapProducts = DAOService.getInstance().getTechnologicalMapProducts(
-                currentMaxVersions.get("TechnologicalMapProduct"), idOfOrg);
-        if(!technologicalMapProducts.isEmpty()) distributedObjects.addAll(technologicalMapProducts);
+        for (DistributedObjectsEnum distributedObjectsEnum: DistributedObjectsEnum.values()){
+            String name = distributedObjectsEnum.name();
+            List<DistributedObject> distributedObjectList = DAOService.getInstance().getDistributedObjects(name,
+                    currentMaxVersions.get(name), idOfOrg);
+            if(!distributedObjectList.isEmpty()) distributedObjects.addAll(distributedObjectList);
+        }
 
         for (DistributedObject distributedObject: distributedObjects){
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
@@ -139,6 +141,9 @@ public class DistributionManager {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
+            if(currentMaxVersions.get(currentObject.getValue())>=0){
+                DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
+            }
             node = node.getFirstChild();
             while (node!=null){
                 DistributedObject distributedObject = createDistributedObject(currentObject);
@@ -163,8 +168,16 @@ public class DistributionManager {
     }
 
 
-    private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum){
-        return DistributionFactory.createDistributedObject(distributedObjectsEnum);
+    private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception{
+        /*DistributedObject distributedObject=null;
+        switch (distributedObjectsEnum){
+            case Product: distributedObject = new Product(); break;
+            case TechnologicalMap: distributedObject = new TechnologicalMap(); break;
+            case TechnologicalMapProduct: distributedObject = new TechnologicalMapProduct(); break;
+        }*/
+        String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects."+distributedObjectsEnum.name();
+        Class cl =  Class.forName(name);
+        return (DistributedObject) cl.newInstance();
     }
 
     private String getAttributeValue(Node node, String attributeName){

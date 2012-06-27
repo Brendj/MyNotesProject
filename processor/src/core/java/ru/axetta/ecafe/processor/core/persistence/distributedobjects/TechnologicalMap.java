@@ -7,6 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -16,55 +20,60 @@ import org.w3c.dom.Node;
  */
 public class TechnologicalMap extends DistributedObject {
 
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
+
+    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
+        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
+    }
+
+    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.add(technologicalMapProduct);
+    }
+
+    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
+        return technologicalMapProductInternal;
+    }
+
+    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
+        this.technologicalMapProductInternal = technologicalMapProductInternal;
+    }
+
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element,"NameOfTechnologicalMap", nameOfTechnologicalMap);
-        setAttribute(element,"NumberOfTechnologicalMap", numberOfTechnologicalMap);
-        setAttribute(element,"TechnologyOfPreparation", technologyOfPreparation);
-        setAttribute(element,"TempOfPreparation", tempOfPreparation);
-        setAttribute(element,"TermOfRealization", termOfRealization);
+        setAttribute(element,"Name", nameOfTechnologicalMap);
+        setAttribute(element,"Number", numberOfTechnologicalMap);
+        setAttribute(element,"Technology", technologyOfPreparation);
+        setAttribute(element,"TempPreparation", tempOfPreparation);
+        setAttribute(element,"TermRealization", termOfRealization);
 
-        setAttribute(element,"EnergyValue", energyValue);
+        setAttribute(element,"Energy", energyValue);
         setAttribute(element,"Proteins", proteins);
         setAttribute(element,"Carbohydrates", carbohydrates);
         setAttribute(element,"Fats", fats);
 
-        setAttribute(element,"MicroElCa", microElCa);
-        setAttribute(element,"MicroElMg", microElMg);
-        setAttribute(element,"MicroElP", microElP);
-        setAttribute(element,"MicroElFe", microElFe);
+        setAttribute(element,"Ca", microElCa);
+        setAttribute(element,"Mg", microElMg);
+        setAttribute(element,"P", microElP);
+        setAttribute(element,"Fe", microElFe);
 
-        setAttribute(element,"VitaminA", vitaminA);
-        setAttribute(element,"VitaminB1", vitaminB1);
-        setAttribute(element,"VitaminB2", vitaminB2);
-        setAttribute(element,"VitaminPp", vitaminPp);
-        setAttribute(element,"VitaminC", vitaminC);
-        setAttribute(element,"VitaminE", vitaminE);
+        setAttribute(element,"VA", vitaminA);
+        setAttribute(element,"VB1", vitaminB1);
+        setAttribute(element,"VB2", vitaminB2);
+        setAttribute(element,"VPp", vitaminPp);
+        setAttribute(element,"VC", vitaminC);
+        setAttribute(element,"VE", vitaminE);
     }
 
     @Override
-    public TechnologicalMap build(Node node) {
-        /* Begin required params */
-        Long gid = getLongAttributeValue(node,"GID");
-        if(gid!=null) setGlobalId(gid);
+    protected TechnologicalMap parseAttributes(Node node) {
 
-        Long version = getLongAttributeValue(node,"V");
-        if(version!=null) setGlobalVersion(version);
-
-        Long lid = getLongAttributeValue(node,"LID");
-        if(lid!=null) setLocalID(lid);
-
-        Integer status = getIntegerAttributeValue(node,"D");
-        setDeletedState(status != null);
-        tagName = node.getNodeName();
-        /* End required params */
-        String stringNameOfTechnologicalMap = getStringAttributeValue(node,"NameOfTechnologicalMap",128);
+        String stringNameOfTechnologicalMap = getStringAttributeValue(node,"Name",128);
         if(stringNameOfTechnologicalMap!=null) setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
 
-        Long numberOfTechnologicalMap = getLongAttributeValue(node,"NumberOfTechnologicalMap");
+        Long numberOfTechnologicalMap = getLongAttributeValue(node,"Number");
         if(numberOfTechnologicalMap!=null) setNumberOfTechnologicalMap(numberOfTechnologicalMap);
 
-        String stringTechnologyOfPreparation = getStringAttributeValue(node,"TechnologyOfPreparation",4096);
+        String stringTechnologyOfPreparation = getStringAttributeValue(node,"Technology",4096);
         if(stringTechnologyOfPreparation!=null) setTechnologyOfPreparation(stringTechnologyOfPreparation);
 
         String stringTempOfPreparation = getStringAttributeValue(node,"TempOfPreparation",128);
@@ -73,7 +82,7 @@ public class TechnologicalMap extends DistributedObject {
         String stringTermOfRealization = getStringAttributeValue(node,"TermOfRealization",128);
         if(stringTermOfRealization!=null) setTermOfRealization(stringTermOfRealization);
 
-        Float floatEnergyValue = getFloatAttributeValue(node,"EnergyValue");
+        Float floatEnergyValue = getFloatAttributeValue(node,"Energy");
         if(floatEnergyValue!=null) setEnergyValue(floatEnergyValue);
 
         Float floatProteins = getFloatAttributeValue(node,"Proteins");
@@ -85,34 +94,34 @@ public class TechnologicalMap extends DistributedObject {
         Float floatFats = getFloatAttributeValue(node,"Fats");
         if(floatFats!=null) setFats(floatFats);
 
-        Float floatMicroElCa = getFloatAttributeValue(node,"MicroElCa");
+        Float floatMicroElCa = getFloatAttributeValue(node,"Ca");
         if(floatMicroElCa!=null) setMicroElCa(floatMicroElCa);
 
-        Float floatMicroElMg = getFloatAttributeValue(node,"MicroElMg");
+        Float floatMicroElMg = getFloatAttributeValue(node,"Mg");
         if(floatMicroElMg!=null) setMicroElMg(floatMicroElMg);
 
-        Float floatMicroElP = getFloatAttributeValue(node,"MicroElP");
+        Float floatMicroElP = getFloatAttributeValue(node,"P");
         if(floatMicroElP!=null) setMicroElP(floatMicroElP);
 
-        Float floatMicroElFe = getFloatAttributeValue(node,"MicroElFe");
+        Float floatMicroElFe = getFloatAttributeValue(node,"Fe");
         if(floatMicroElFe!=null) setMicroElFe(floatMicroElFe);
 
-        Float floatVitaminA = getFloatAttributeValue(node,"VitaminA");
+        Float floatVitaminA = getFloatAttributeValue(node,"VA");
         if(floatVitaminA!=null) setVitaminA(floatVitaminA);
 
-        Float floatVitaminB1 = getFloatAttributeValue(node,"VitaminB1");
+        Float floatVitaminB1 = getFloatAttributeValue(node,"VB1");
         if(floatVitaminB1!=null) setVitaminB1(floatVitaminB1);
 
-        Float floatVitaminB2 = getFloatAttributeValue(node,"VitaminB2");
+        Float floatVitaminB2 = getFloatAttributeValue(node,"VB2");
         if(floatVitaminB2!=null) setVitaminB2(floatVitaminB2);
 
-        Float floatVitaminPp = getFloatAttributeValue(node,"VitaminPp");
+        Float floatVitaminPp = getFloatAttributeValue(node,"VPp");
         if(floatVitaminPp!=null) setVitaminPp(floatVitaminPp);
 
-        Float floatVitaminC = getFloatAttributeValue(node,"VitaminC");
+        Float floatVitaminC = getFloatAttributeValue(node,"VC");
         if(floatVitaminC!=null) setVitaminC(floatVitaminC);
 
-        Float floatVitaminE = getFloatAttributeValue(node,"VitaminE");
+        Float floatVitaminE = getFloatAttributeValue(node,"VE");
         if(floatVitaminE!=null) setVitaminE(floatVitaminE);
 
         return this;

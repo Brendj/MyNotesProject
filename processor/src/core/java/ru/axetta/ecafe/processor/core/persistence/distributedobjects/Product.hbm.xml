@@ -13,6 +13,7 @@
         <!-- Begin Global params -->
         <version name="globalVersion" column="GlobalVersion" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
+
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -29,5 +30,9 @@
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
+        <set name="technologicalMapProductInternal" cascade="all">
+            <key column="IdOfTechnoMapProduct"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
+        </set>
     </class>
 </hibernate-mapping>

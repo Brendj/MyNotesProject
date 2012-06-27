@@ -4,8 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,46 +20,85 @@ import org.w3c.dom.Node;
  */
 public class TechnologicalMapProduct extends DistributedObject {
 
-    @Override
-    protected void appendAttributes(Element element) {
-        setAttribute(element,"NameOfProduct", nameOfProduct);
-        setAttribute(element,"GrossMass", grossMass);
-        setAttribute(element,"NetMass", netMass);
+
+    private long idOfProduct;
+    private long idOfTechnoMap;
+    private TechnologicalMap technologicalMap;
+    private Product product;
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public TechnologicalMap getTechnologicalMap() {
+        return technologicalMap;
+    }
+
+    public void setTechnologicalMap(TechnologicalMap technologicalMap) {
+        this.technologicalMap = technologicalMap;
+    }
+
+    public long getIdOfTechnoMap() {
+        return idOfTechnoMap;
+    }
+
+    public void setIdOfTechnoMap(long idOfTechnoMap) {
+        this.idOfTechnoMap = idOfTechnoMap;
+    }
+
+    public long getIdOfProduct() {
+        return idOfProduct;
+    }
+
+    public void setIdOfProduct(long idOfProduct) {
+        this.idOfProduct = idOfProduct;
     }
 
     @Override
-    public TechnologicalMapProduct build(Node node) {
-        /* Begin required params */
-        Long gid = getLongAttributeValue(node,"GID");
-        if(gid!=null) setGlobalId(gid);
+    protected void appendAttributes(Element element) {
+        setAttribute(element,"Name", nameOfProduct);
+        setAttribute(element,"GWeight", grossWeight);
+        setAttribute(element,"NWeight", netWeight);
+        setAttribute(element,"IdProduct", idOfProduct);
+        setAttribute(element,"IdTechnoMap", idOfTechnoMap);
+    }
 
-        Long version = getLongAttributeValue(node,"V");
-        if(version!=null) setGlobalVersion(version);
-
-        Long lid = getLongAttributeValue(node,"LID");
-        if(lid!=null) setLocalID(lid);
-
-        Integer status = getIntegerAttributeValue(node,"D");
-        setDeletedState(status != null);
-        tagName = node.getNodeName();
-        /* End required params */
-        String stringNameOfProduct = getStringAttributeValue(node,"NameOfProduct",512);
+    @Override
+    protected TechnologicalMapProduct parseAttributes(Node node) {
+        String stringNameOfProduct = getStringAttributeValue(node,"Name",512);
         if(stringNameOfProduct!=null) setNameOfProduct(stringNameOfProduct);
 
-        Float floatGrossMass = getFloatAttributeValue(node,"GrossMass");
-        if(floatGrossMass!=null) setGrossMass(floatGrossMass);
+        Float floatGrossMass = getFloatAttributeValue(node,"GWeight");
+        if(floatGrossMass!=null) setGrossWeight(floatGrossMass);
 
-        Float floatNetMass = getFloatAttributeValue(node,"NetMass");
-        if(floatNetMass!=null) setNetMass(floatNetMass);
+        Float floatNetMass = getFloatAttributeValue(node,"NWeight");
+        if(floatNetMass!=null) setNetWeight(floatNetMass);
+
+        Long longIdOfProduct = getLongAttributeValue(node, "IdProduct");
+        if(longIdOfProduct!=null) {
+            setIdOfProduct(longIdOfProduct);
+            //setProduct(DAOService.getInstance().findRefDistributedObject(Product.class, longIdOfProduct));
+        }
+
+        Long longIdOfTechnoMap = getLongAttributeValue(node,"IdTechnoMap");
+        if(longIdOfTechnoMap!=null) {
+            setIdOfTechnoMap(longIdOfTechnoMap);
+            //setTechnologicalMap(DAOService.getInstance().findRefDistributedObject(TechnologicalMap.class, longIdOfTechnoMap));
+        }
+
         return this;
     }
 
     //Наименование продукта
     private String nameOfProduct;
     //Масса брутто, г
-    private Float grossMass;
+    private double grossWeight;
     //Масса нетто, г
-    private Float netMass;
+    private double netWeight;
 
     public String getNameOfProduct() {
         return nameOfProduct;
@@ -65,19 +108,20 @@ public class TechnologicalMapProduct extends DistributedObject {
         this.nameOfProduct = nameOfProduct;
     }
 
-    public Float getGrossMass() {
-        return grossMass;
+    public double getNetWeight() {
+        return netWeight;
     }
 
-    public void setGrossMass(Float grossMass) {
-        this.grossMass = grossMass;
+    public void setNetWeight(double netWeight) {
+        this.netWeight = netWeight;
     }
 
-    public Float getNetMass() {
-        return netMass;
+    public double getGrossWeight() {
+        return grossWeight;
     }
 
-    public void setNetMass(Float netMass) {
-        this.netMass = netMass;
+    public void setGrossWeight(double grossWeight) {
+        this.grossWeight = grossWeight;
     }
+
 }

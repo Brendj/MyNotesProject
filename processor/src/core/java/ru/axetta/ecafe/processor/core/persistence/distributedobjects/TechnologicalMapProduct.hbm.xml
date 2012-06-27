@@ -21,8 +21,16 @@
         <!-- End Global params -->
 
         <property name="nameOfProduct" column="NameOfProduct" type="string" length="256"/>
-        <property name="grossMass" column="GrossMass" type="float" />
-        <property name="netMass" column="NetMass" type="float" />
+        <property name="grossWeight" column="GrossWeight" type="double" />
+        <property name="netWeight" column="NetWeight" type="double" />
 
+        <property name="idOfProduct" column="IdOfProduct" type="long"/>
+        <property name="idOfTechnoMap" column="IdOfTechnoMap" type="long"/>
+
+        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap"
+                     column="IdOfTechnoMap" not-null="true" update="false" insert="false"/>
+
+        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product"
+                     column="idOfProduct" not-null="true" update="false" insert="false"/>
     </class>
 </hibernate-mapping>

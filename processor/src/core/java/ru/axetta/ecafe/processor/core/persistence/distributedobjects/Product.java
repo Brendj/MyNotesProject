@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -18,6 +21,25 @@ import org.w3c.dom.Node;
  */
 
 public class Product extends DistributedObject {
+
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal;
+
+    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
+        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
+    }
+
+    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.add(technologicalMapProduct);
+    }
+
+    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
+        return technologicalMapProductInternal;
+    }
+
+    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
+        this.technologicalMapProductInternal = technologicalMapProductInternal;
+    }
+
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
@@ -36,21 +58,8 @@ public class Product extends DistributedObject {
     }
 
     @Override
-    public Product build(Node node) {
-        /* Begin required params */
-        Long gid = getLongAttributeValue(node,"GID");
-        if(gid!=null) setIdOfProductGuide(gid);
+    protected Product parseAttributes(Node node) {
 
-        Long version = getLongAttributeValue(node,"V");
-        if(version!=null) setGlobalVersion(version);
-
-        Long lid = getLongAttributeValue(node,"LID");
-        if(lid!=null) setLocalID(lid);
-
-        Integer status = getIntegerAttributeValue(node,"D");
-        setDeletedState(status != null);
-        tagName = node.getNodeName();
-        /* End required params */
         String stringCode = getStringAttributeValue(node,"Code",16);
         if(stringCode!=null) setCode(stringCode);
         String stringFullName= getStringAttributeValue(node,"FullName",1024);
@@ -79,13 +88,6 @@ public class Product extends DistributedObject {
 
     public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
         this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
-
-    public Long getIdOfProductGuide() {
-        return getGlobalId();
-    }
-    public void setIdOfProductGuide(Long idOfProductGuide) {
-        setGlobalId(idOfProductGuide);
     }
 
     public String getCode() {

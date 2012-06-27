@@ -43,5 +43,9 @@
         <property name="vitaminPp" column="VitaminPp" type="float" />
         <property name="vitaminC" column="VitaminC" type="float" />
         <property name="vitaminE" column="VitaminE" type="float" />
+        <set name="technologicalMapProductInternal" cascade="all">
+            <key column="IdOfTechnoMapProduct"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
+        </set>
     </class>
 </hibernate-mapping>
