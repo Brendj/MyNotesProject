@@ -55,17 +55,20 @@ CREATE TABLE cf_technological_map_products
 (
   IdOfTechnoMapProducts bigserial NOT NULL,
   IdOfTechnoMap bigint NOT NULL,
-  IdOfProducts bigint NOT NULL,
-  NameOfProduct character varying(512) not null,
-  NetWeight double precision NOT NULL DEFAULT 0,
+  IdOfProduct bigint NOT NULL,
+  MetWeight double precision NOT NULL DEFAULT 0,
   GrossWeight double precision NOT NULL DEFAULT 0,
   GlobalVersion bigint,
   OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,
   CreatedDate bigint NOT NULL,
-  LastUpdate bigint,
+  LastupDate bigint,
   DeleteDate bigint,
+  NameOfProduct character varying(256),
   CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
-  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnoMap) REFERENCES cf_technological_map (IdOfTechnoMap),
-  CONSTRAINT cf_technological_map_products_products_fk FOREIGN KEY (idOfProducts) REFERENCES cf_products (idOfProducts)
+  CONSTRAINT cf_technological_map_products_product FOREIGN KEY (IdOfProduct)
+      REFERENCES cf_product (IdOfProduct),
+  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnoMap)
+      REFERENCES cf_technological_map (IdOfTechnoMap)
 );
+
