@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 
+import java.util.Date;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -19,18 +21,18 @@ import org.hibernate.Session;
 public class ProductCreatePage extends BasicWorkspacePage {
 
     //Наименование продукта
-    private String name;
+    private String nameOfProduct;
     //Масса брутто, г
     private Float grossMass;
     //Масса нетто, г
     private Float netMass;
 
-    public String getName() {
-        return name;
+    public String getNameOfProduct() {
+        return nameOfProduct;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameOfProduct(String nameOfProduct) {
+        this.nameOfProduct = nameOfProduct;
     }
 
     public Float getGrossMass() {
@@ -55,9 +57,14 @@ public class ProductCreatePage extends BasicWorkspacePage {
 
     public void createProduct(Session session) throws Exception {
         TechnologicalMapProduct p = new TechnologicalMapProduct();
-        p.setGrossMass(grossMass);
-        p.setName(name);
-        p.setNetMass(netMass);
+        p.setGrossWeight(grossMass);
+        p.setNameOfProduct(nameOfProduct);
+        p.setNetWeight(netMass);
+        p.setCreatedDate(new Date());
+        p.setGlobalVersion(0L);
+        p.setDeletedState(false);
+        p.setIdOfProduct(-1L);
+        p.setIdOfTechnoMap(-1L);
         session.save(p);
     }
 
