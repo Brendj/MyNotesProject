@@ -28,8 +28,17 @@ import java.util.*;
 public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapCreatePage.class);
-    private TechnologicalMap technologicalMap = new TechnologicalMap();
+    private TechnologicalMap technologicalMap;
     private List<ProductItem> products = new LinkedList<ProductItem>();
+    private List<TechnologicalMapProduct> technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
+
+    public List<TechnologicalMapProduct> getTechnologicalMapProducts() {
+        return technologicalMapProducts;
+    }
+
+    public void setTechnologicalMapProducts(List<TechnologicalMapProduct> technologicalMapProducts) {
+        this.technologicalMapProducts = technologicalMapProducts;
+    }
 
     public List<ProductItem> getProducts() {
         return products;
@@ -37,11 +46,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-
-    }
-
-    public TechnologicalMapCreatePage() {
-
+         technologicalMap=new TechnologicalMap();
     }
 
     public String getPageFilename() {
@@ -54,9 +59,22 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     public void createTechnologicalMap() {
         try{
+            technologicalMap.setCreatedDate(new Date());
+            technologicalMap.setDeletedState(false);
+            technologicalMap.setGlobalVersion(0L);
             DAOService.getInstance().persistEntity(technologicalMap);
+            for (TechnologicalMapProduct technologicalMapProduct: technologicalMap.getTechnologicalMapProduct()){
+                technologicalMapProduct.setCreatedDate(new Date());
+                DAOService.getInstance().persistEntity(technologicalMapProduct);
+            }
+            /*for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
+                technologicalMapProduct.setIdOfTechnoMap(technologicalMap.getGlobalId());
+                technologicalMapProduct.setCreatedDate(new Date());
+                technologicalMapProduct.setDeletedState(false);
+                DAOService.getInstance().persistEntity(technologicalMapProduct);
+            }*/
             printMessage("Новая технологическая карта создана успешно."+technologicalMap.toString());
-
+            technologicalMap = new TechnologicalMap();
         } catch (Exception e){
             printError("Ошибка при создании новой технологической карты.");
             logger.error("Error by create Technological Map.", e);
@@ -66,6 +84,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
     public Object showProducts() {
         //TODO continue
         List<Product> productList = DAOService.getInstance().getDistributedObjects(Product.class);
+        products.clear();
         for (Product product: productList){
             products.add(new ProductItem(false,product));
         }
@@ -74,7 +93,20 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
 
     public Object addProducts() {
         //TODO continue
+        for (ProductItem productItem: products){
+            if(productItem.getChecked()){
+                TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
+                technologicalMapProduct.setIdOfProduct(productItem.product.getGlobalId());
+                technologicalMapProduct.setNameOfProduct(productItem.product.getProductName());
 
+               /* technologicalMapProduct.setIdOfTechnoMap(technologicalMap.getGlobalId());*/
+
+                technologicalMapProduct.setDeletedState(false);
+                technologicalMapProduct.setTechnologicalMap(technologicalMap);
+                technologicalMapProducts.add(technologicalMapProduct);
+                technologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
+            }
+        }
         return null;
     }
 

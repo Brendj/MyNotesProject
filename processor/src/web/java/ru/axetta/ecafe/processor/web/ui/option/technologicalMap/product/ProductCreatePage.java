@@ -64,7 +64,7 @@ public class ProductCreatePage extends BasicWorkspacePage {
         p.setGlobalVersion(0L);
         p.setDeletedState(false);
         p.setIdOfProduct(-1L);
-        p.setIdOfTechnoMap(-1L);
+      //  p.setIdOfTechnoMap(-1L);
         session.save(p);
     }
 
