@@ -22,7 +22,7 @@ public class TechnologicalMapProduct extends DistributedObject {
 
 
     private long idOfProduct;
-    private long idOfTechnoMap;
+   // private long idOfTechnoMap;
     private TechnologicalMap technologicalMap;
     private Product product;
 
@@ -41,14 +41,14 @@ public class TechnologicalMapProduct extends DistributedObject {
     public void setTechnologicalMap(TechnologicalMap technologicalMap) {
         this.technologicalMap = technologicalMap;
     }
-
+/*
     public long getIdOfTechnoMap() {
         return idOfTechnoMap;
     }
 
     public void setIdOfTechnoMap(long idOfTechnoMap) {
         this.idOfTechnoMap = idOfTechnoMap;
-    }
+    }*/
 
     public long getIdOfProduct() {
         return idOfProduct;
@@ -64,7 +64,7 @@ public class TechnologicalMapProduct extends DistributedObject {
         setAttribute(element,"GWeight", grossWeight);
         setAttribute(element,"NWeight", netWeight);
         setAttribute(element,"IdProduct", idOfProduct);
-        setAttribute(element,"IdTechnoMap", idOfTechnoMap);
+      //  setAttribute(element,"IdTechnoMap", idOfTechnoMap);
     }
 
     @Override
@@ -86,8 +86,8 @@ public class TechnologicalMapProduct extends DistributedObject {
 
         Long longIdOfTechnoMap = getLongAttributeValue(node,"IdTechnoMap");
         if(longIdOfTechnoMap!=null) {
-            setIdOfTechnoMap(longIdOfTechnoMap);
-            //setTechnologicalMap(DAOService.getInstance().findRefDistributedObject(TechnologicalMap.class, longIdOfTechnoMap));
+            //setIdOfTechnoMap(longIdOfTechnoMap);
+            setTechnologicalMap(DAOService.getInstance().findRefDistributedObject(TechnologicalMap.class, longIdOfTechnoMap));
         }
 
         return this;

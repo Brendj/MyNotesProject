@@ -30,9 +30,10 @@
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
+<!--
         <set name="technologicalMapProductInternal" cascade="all">
             <key column="IdOfTechnoMapProduct"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
-        </set>
+        </set>-->
     </class>
 </hibernate-mapping>

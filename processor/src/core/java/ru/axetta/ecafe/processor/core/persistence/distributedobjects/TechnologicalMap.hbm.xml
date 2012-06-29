@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" table="cf_technological_map" optimistic-lock="version">
-        <id name="globalId" column="IdOfTechnoMap" type="long">
+        <id name="globalId" column="idOfTechnologicalMaps" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
@@ -43,9 +43,13 @@
         <property name="vitaminPp" column="VitaminPp" type="float" />
         <property name="vitaminC" column="VitaminC" type="float" />
         <property name="vitaminE" column="VitaminE" type="float" />
-        <set name="technologicalMapProductInternal" cascade="all">
-            <key column="IdOfTechnoMapProduct"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
+
+        <set name="technologicalMapProductInternal" inverse="true" lazy="false">
+            <key>
+                <column name="idOfTechnologicalMaps" not-null="true" />
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" />
         </set>
+
     </class>
 </hibernate-mapping>

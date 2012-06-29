@@ -7,9 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,8 +20,8 @@ public class TechnologicalMap extends DistributedObject {
 
     private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
 
-    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
-        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
+    public List<TechnologicalMapProduct> getTechnologicalMapProduct(){
+        return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
     }
 
     public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
@@ -47,6 +45,7 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"TermRealization", termOfRealization);
 
         setAttribute(element,"Energy", energyValue);
+
         setAttribute(element,"Proteins", proteins);
         setAttribute(element,"Carbohydrates", carbohydrates);
         setAttribute(element,"Fats", fats);

@@ -48,6 +48,11 @@ public class DAOService {
     }
 
     @Transactional
+    public List<TechnologicalMapProduct> getTechnologicalMapProduct(Long id){
+        return em.createQuery("from TechnologicalMapProduct where idOfTechnoMap="+id,TechnologicalMapProduct.class).getResultList();
+    }
+
+    @Transactional
     public <T> List<T> getDistributedObjects(Class<T> clazz){
         return em.createQuery("from "+clazz.getSimpleName()+" where globalId>=0",clazz).getResultList();
     }
