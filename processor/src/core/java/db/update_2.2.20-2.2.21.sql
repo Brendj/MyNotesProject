@@ -22,7 +22,7 @@ CREATE TABLE cf_products
 );
 -- Таблица (справочник) технологических карт
 CREATE TABLE  cf_technological_map(
-  IdOfTechnoMap bigserial,
+  IdOfTechnologicalMaps bigserial,
   NameOfTechnologicalMap character varying(128) NOT NULL,
   NumberOfTechnologicalMap BIGINT NOT NULL,
   TechnologyOfPreparation character varying(4096) NOT NULL,
@@ -48,15 +48,15 @@ CREATE TABLE  cf_technological_map(
   CreatedDate bigint NOT NULL,
   LastUpdate bigint,
   DeleteDate bigint,
-  CONSTRAINT cf_technological_map_pk PRIMARY KEY (IdOfTechnoMap )
+  CONSTRAINT cf_technological_map_pk PRIMARY KEY (IdOfTechnologicalMaps )
 );
 
 CREATE TABLE cf_technological_map_products
 (
   IdOfTechnoMapProducts bigserial NOT NULL,
-  IdOfTechnoMap bigint NOT NULL,
-  IdOfProduct bigint NOT NULL,
-  MetWeight double precision NOT NULL DEFAULT 0,
+  IdOfTechnologicalMaps bigint NOT NULL,
+  IdOfProducts bigint NOT NULL,
+  NetWeight double precision NOT NULL DEFAULT 0,
   GrossWeight double precision NOT NULL DEFAULT 0,
   GlobalVersion bigint,
   OrgOwner bigint,
@@ -66,9 +66,9 @@ CREATE TABLE cf_technological_map_products
   DeleteDate bigint,
   NameOfProduct character varying(256),
   CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
-  CONSTRAINT cf_technological_map_products_product FOREIGN KEY (IdOfProduct)
-      REFERENCES cf_product (IdOfProduct),
-  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnoMap)
-      REFERENCES cf_technological_map (IdOfTechnoMap)
+  CONSTRAINT cf_technological_map_products_product FOREIGN KEY (IdOfProducts)
+      REFERENCES cf_products (IdOfProducts),
+  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnologicalMaps)
+      REFERENCES cf_technological_map (IdOfTechnologicalMaps)
 );
 
