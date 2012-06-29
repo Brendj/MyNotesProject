@@ -593,6 +593,9 @@
         <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Добавить"
                             binding="#{technologicalMapCreatePage.mainMenuComponent}"
                             action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="listTechnologicalMapMenuItem" label="Список"
+                            binding="#{technologicalMapListPage.mainMenuComponent}"
+                            action="#{technologicalMapListPage.show}" reRender="workspaceForm" />
         <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGroupPage.mainMenuComponent}"
                          label="Продукты">
             <a4j:support event="onclick" action="#{mainPage.showProductGroupPage}" reRender="workspaceForm" />
