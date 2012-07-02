@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Signature;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     final static String SIGNATURE_PARAM="&SIGNATURE=";
@@ -41,6 +42,11 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest) throws Exception {
         long clientId;
         ParseResult parseResult = getRequestParams();
+        int protoVersion = 0;
+        if (parseResult.getParam("V")!=null) {
+            protoVersion = parseResult.getReqIntParam("V");
+        }
+        
         if (parseResult.getParam("CARDID")!=null) {
             String cardId = parseResult.getReqParam("CARDID");
             Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getClientContractIdByCardId(cardId);
@@ -51,7 +57,12 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         }
         String opId=parseResult.getReqParam("OPID");
         String termId=parseResult.getReqParam("TERMID");
-        long contragentId=linkConfig.idOfContragent;
+        Long tspContragentId = null;
+        if (protoVersion>0) {
+            String sTspContragentId=parseResult.getParam("TSPID"); // идентификатор контрагента-получателя платежа (ТСП)
+            tspContragentId = sTspContragentId==null?null:(Long.parseLong(sTspContragentId));
+        }
+        long contragentId=linkConfig.idOfContragent; // идентификатор контрагента-агента по приему платежей
 
         int paymentMethod = ClientPayment.ATM_PAYMENT_METHOD;
 
@@ -63,15 +74,17 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
 
         String sum=parseResult.getParam("SUM");
         if (sum==null) {
-            return new OnlinePaymentProcessor.PayRequest(true,
-                    contragentId, paymentMethod, clientId,
+            return new OnlinePaymentProcessor.PayRequest(protoVersion, true,
+                    contragentId, tspContragentId, paymentMethod, clientId,
                     ""+opId, ""+termId, 0L, false);
         } else {
             String time=parseResult.getReqParam("TIME");
+            String paymentAdditionalId = termId+"/"+time;
+            if (tspContragentId!=null) paymentAdditionalId+="/TSP"+tspContragentId;
             boolean isRollback=parseResult.getParam("ROLLBACK")!=null && parseResult.getReqIntParam("ROLLBACK")==1;
-            return new OnlinePaymentProcessor.PayRequest(false,
-                    contragentId, paymentMethod, clientId,
-                    ""+opId, termId+"/"+time, parseResult.getReqLongParam("SUM"), isRollback);
+            return new OnlinePaymentProcessor.PayRequest(protoVersion, false,
+                    contragentId, tspContragentId, paymentMethod, clientId,
+                    ""+opId, paymentAdditionalId, parseResult.getReqLongParam("SUM"), isRollback);
         }
     }
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)
@@ -92,6 +105,16 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (response.getClientFullName()!=null) {
             vals.addLast("CLIENTFIO");
             vals.addLast(response.getClientFullName());
+        }
+        if (response.getProtoVersion()>0 && response.getTspContragentId()!=null) {
+            vals.addLast("TSPID");
+            vals.addLast(response.getTspContragentId());
+        }
+        if (response.getProtoVersion()>0 && response.getAddInfo()!=null) {
+            for (Map.Entry<String, String> e : response.getAddInfo().entrySet()) {
+                vals.addLast(e.getKey());
+                vals.addLast(e.getValue());
+            }
         }
 
         super.serializeResponseUrlEncoded(vals, httpResponse);

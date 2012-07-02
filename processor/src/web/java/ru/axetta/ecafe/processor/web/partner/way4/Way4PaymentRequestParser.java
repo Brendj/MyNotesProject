@@ -36,15 +36,15 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         //todo: уточнить какой будет termId при оплате через интернет
         int paymentMethod=ClientPayment.ATM_PAYMENT_METHOD;
         if (function.equals("bank_account")) {
-            return new OnlinePaymentProcessor.PayRequest(true,
-                    linkConfig.idOfContragent, paymentMethod, clientId,
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
+                    linkConfig.idOfContragent, null, paymentMethod, clientId,
                     ""+opId, null, 0L, false);
 
         } else if (function.equals("bank_payment")) {
             bPayRequest = true;
             String date=parseResult.getReqParam("DATE")+parseResult.getReqParam("TIME");
-            return new OnlinePaymentProcessor.PayRequest(false,
-                    linkConfig.idOfContragent, paymentMethod, clientId,
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, false,
+                    linkConfig.idOfContragent, null, paymentMethod, clientId,
                     opId, date+"/"+termId+"/"+opId, sum, false);
         } else {
             throw new Exception("Invalid function requested: "+function);

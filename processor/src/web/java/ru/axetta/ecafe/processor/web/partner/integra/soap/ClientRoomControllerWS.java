@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
@@ -320,12 +321,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         /* контактный телефон и емайл адрес электронной почты */
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
-        /* Возвращает самое последнее событие прохода (Вход или Выход) */
+        Contragent defaultMerchant = client.getOrg().getDefaultSupplier();
+        if (defaultMerchant!=null) {
+            clientSummaryExt.setDefaultMerchantId(defaultMerchant.getIdOfContragent());
+            clientSummaryExt.setDefaultMerchantInfo(ParameterStringUtils.extractParameters("TSP.", defaultMerchant.getRemarks()));
+        }
         EnterEvent ee = DAOUtils.getLastEnterEvent(session, client);
         if (ee!=null) {
-            /* Код прохода */
-            clientSummaryExt.setLastEnterEventCode(ee.getEventCode());
-            /* Дата прохода */
+            clientSummaryExt.setLastEnterEventCode(ee.getPassDirection());
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
         /* Группа к которой относится клиент (Наименование класса учиника) */

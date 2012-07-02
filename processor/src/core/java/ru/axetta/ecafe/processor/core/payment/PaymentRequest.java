@@ -80,7 +80,7 @@ public class PaymentRequest {
 
                     String addPaymentMethod = getStringValueNullSafe(namedNodeMap, "AddPaymentMethod");
                     String addIdOfPayment = getStringValueNullSafe(namedNodeMap, "AddIdOfPayment");
-                    return new Payment(idOfPayment, contractId, clientId, payTime, sum, paymentMethod, addPaymentMethod,
+                    return new Payment(idOfPayment, contractId, clientId, null, payTime, sum, paymentMethod, addPaymentMethod,
                             addIdOfPayment, bResetBalance);
                 }
 
@@ -92,17 +92,19 @@ public class PaymentRequest {
             private final String idOfPayment;
             private final Long contractId;
             private final Long clientId;
+            private final Long tspContragentId; 
             private final Date payTime;
             private final long sum;
             private final int paymentMethod;
             private final String addPaymentMethod;
             private final String addIdOfPayment;
 
-            public Payment(String idOfPayment, Long contractId, Long clientId, Date payTime, long sum, int paymentMethod,
+            public Payment(String idOfPayment, Long contractId, Long clientId, Long tspContragentId, Date payTime, long sum, int paymentMethod,
                     String addPaymentMethod, String addIdOfPayment, boolean bResetBalance) {
                 this.idOfPayment = idOfPayment;
                 this.contractId = contractId;
                 this.clientId = clientId;
+                this.tspContragentId = tspContragentId;
                 this.payTime = payTime;
                 this.sum = sum;
                 this.paymentMethod = paymentMethod;
@@ -112,12 +114,13 @@ public class PaymentRequest {
                 this.bResetBalance = bResetBalance;
             }
 
-            public Payment(boolean checkOnly, String idOfPayment, Long contractId, Long clientId, Date payTime, long sum,
+            public Payment(boolean checkOnly, String idOfPayment, Long contractId, Long clientId, Long tspContragentId, Date payTime, long sum,
                     int paymentMethod, String addPaymentMethod, String addIdOfPayment, boolean bResetBalance) {
                 this.checkOnly = checkOnly;
                 this.idOfPayment = idOfPayment;
                 this.contractId = contractId;
                 this.clientId = clientId;
+                this.tspContragentId = tspContragentId;
                 this.payTime = payTime;
                 this.sum = sum;
                 this.paymentMethod = paymentMethod;
@@ -166,11 +169,25 @@ public class PaymentRequest {
                 return addIdOfPayment;
             }
 
+            public Long getTspContragentId() {
+                return tspContragentId;
+            }
+
             @Override
             public String toString() {
-                return "Payment{" + "idOfPayment='" + idOfPayment + '\'' + ", contractId=" + contractId + ", payTime="
-                        + payTime + ", sum=" + sum + ", paymentMethod=" + paymentMethod + ", addPaymentMethod='"
-                        + addPaymentMethod + '\'' + ", addIdOfPayment='" + addIdOfPayment + '\'' + '}';
+                return "Payment{" +
+                        "bResetBalance=" + bResetBalance +
+                        ", checkOnly=" + checkOnly +
+                        ", idOfPayment='" + idOfPayment + '\'' +
+                        ", contractId=" + contractId +
+                        ", clientId=" + clientId +
+                        ", tspContragentId=" + tspContragentId +
+                        ", payTime=" + payTime +
+                        ", sum=" + sum +
+                        ", paymentMethod=" + paymentMethod +
+                        ", addPaymentMethod='" + addPaymentMethod + '\'' +
+                        ", addIdOfPayment='" + addIdOfPayment + '\'' +
+                        '}';
             }
         }
 

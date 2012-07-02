@@ -41,8 +41,8 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
         String opId="CHECK_ONLY";
         int paymentMethod=ClientPayment.KIOSK_PAYMENT_METHOD;
         if (requestType==TYPE_CHECK) {
-            return new OnlinePaymentProcessor.PayRequest(true,
-                    contragentId, paymentMethod, clientId,
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
+                    contragentId, null, paymentMethod, clientId,
                     ""+opId, null, 0L, false);
 
         } else {
@@ -50,8 +50,8 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
             int currency=parseResult.getReqIntParam("currency");
             long sum=parseResult.getReqLongParam("amount");
             String date=parseResult.getReqParam("date");
-            return new OnlinePaymentProcessor.PayRequest(false,
-                    contragentId, paymentMethod, clientId,
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, false,
+                    contragentId, null, paymentMethod, clientId,
                     opId, date+"/"+currency, sum, false);
         }
     }

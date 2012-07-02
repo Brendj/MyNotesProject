@@ -121,44 +121,51 @@ public class PaymentResponse {
             private final PaymentRequest.PaymentRegistry.Payment payment;
             private final Long idOfClient;
             private final Long contractId;
+            private final Long tspContragentId;
             private final Long idOfCard;
             private final Long balance;
             private final int result;
             private final String error;
             private final ClientInfo client;
             private final CardInfo card;
+            private final HashMap<String, String> addInfo;
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
-                    int result, String error) {
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
+                    int result, String error, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
+                this.tspContragentId = tspContragentId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
                 this.error = error;
                 this.client = null;
                 this.card = null;
+                this.addInfo = addInfo;
             }
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
-                    int result, String error, Client client) {
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
+                    int result, String error, Client client, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
+                this.tspContragentId = tspContragentId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
                 this.error = error;
                 this.client = new ClientInfo(client);
                 this.card = null;
+                this.addInfo = addInfo;
             }
 
-            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long idOfCard, Long balance,
-                    int result, String error, Client client, Card card) {
+            public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
+                    int result, String error, Client client, Card card, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
+                this.tspContragentId = tspContragentId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
                 this.result = result;
@@ -169,6 +176,7 @@ public class PaymentResponse {
                 } else {
                     this.card = new CardInfo(card);
                 }
+                this.addInfo = addInfo;
             }
 
             public Long getBalance() {
@@ -205,6 +213,14 @@ public class PaymentResponse {
 
             public CardInfo getCard() {
                 return card;
+            }
+
+            public Long getTspContragentId() {
+                return tspContragentId;
+            }
+
+            public HashMap<String, String> getAddInfo() {
+                return addInfo;
             }
 
             public Element toElement(Document document) throws Exception {

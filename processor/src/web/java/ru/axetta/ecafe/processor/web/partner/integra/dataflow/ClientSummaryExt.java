@@ -35,6 +35,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="NotifyViaEmail" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="MobilePhone" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Email" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="DefaultMerchantId" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="DefaultMerchantInfo" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -82,6 +84,10 @@ public class ClientSummaryExt {
     protected String mobilePhone;
     @XmlAttribute(name = "Email")
     protected String email;
+    @XmlAttribute(name = "DefaultMerchantId")
+    protected Long defaultMerchantId;
+    @XmlAttribute(name = "DefaultMerchantInfo")
+    protected String defaultMerchantInfo;
 
     /**
      * Gets the value of the contractId property.
@@ -489,6 +495,54 @@ public class ClientSummaryExt {
      */
     public void setEmail(String value) {
         this.email = value;
+    }
+
+    /**
+     * Gets the value of the defaultMerchantId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getDefaultMerchantId() {
+        return defaultMerchantId;
+    }
+
+    /**
+     * Sets the value of the defaultMerchantId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setDefaultMerchantId(Long value) {
+        this.defaultMerchantId = value;
+    }
+
+    /**
+     * Gets the value of the defaultMerchantInfo property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDefaultMerchantInfo() {
+        return defaultMerchantInfo;
+    }
+
+    /**
+     * Sets the value of the defaultMerchantInfo property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDefaultMerchantInfo(String value) {
+        this.defaultMerchantInfo = value;
     }
 
 }

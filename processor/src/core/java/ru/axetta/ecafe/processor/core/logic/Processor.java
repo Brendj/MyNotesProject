@@ -23,10 +23,7 @@ import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -39,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -81,7 +79,8 @@ public class Processor implements SyncProcessor,
         CARD_NOT_FOUND(120, "Card acceptable for transfer not found"),
         CONTRAGENT_NOT_FOUND(130, "Contragent not found"),
         PAYMENT_ALREADY_REGISTERED(140, "Payment is already registered"),
-        PAYMENT_NOT_FOUND(300, "Payment not found");
+        TSP_CONTRAGENT_IS_PROHIBITED(150, "Merchant (TSP) contragent is prohibited for this client"),
+        PAYMENT_NOT_FOUND(300, "Payment not found"),;
 
         private final int code;
         private final String description;
@@ -394,9 +393,9 @@ public class Processor implements SyncProcessor,
                 resAcc = processPayPaymentRegistryPayment(idOfContragent, payment);
             } catch (Exception e) {
                 logger.error(String.format("Failed to process payment == %s", payment), e);
-                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
+                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                         PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                        PaymentProcessResult.UNKNOWN_ERROR.getDescription());
+                        PaymentProcessResult.UNKNOWN_ERROR.getDescription(), null);
             }
             resPaymentRegistry.addItem(resAcc);
         }
@@ -656,29 +655,46 @@ public class Processor implements SyncProcessor,
 
             Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
             if (null == contragent) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                         PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s",
                                 PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
-                                payment.getContractId()));
+                                payment.getContractId()), null);
             }
             if (DAOUtils.existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                         PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
                         String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                                 PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
-                                payment.getIdOfPayment()));
+                                payment.getIdOfPayment()), null);
             }
             Client client = findPaymentClient(persistenceSession, contragent, payment.getContractId(),
                     payment.getClientId());
             if (null == client) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                         PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
                                 PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
-                                payment.getContractId(), payment.getClientId()));
+                                payment.getContractId(), payment.getClientId()), null);
             }
             Long idOfClient = client.getIdOfClient();
+            Long paymentTspContragentId=null;
+            HashMap<String, String> payAddInfo = new HashMap<String, String>();
+            Contragent defaultTsp = client.getOrg().getDefaultSupplier();
+            if (payment.getTspContragentId()!=null) {
+                // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
+                if (defaultTsp==null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
+                    return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+                            PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
+                            String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
+                                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(), payment.getTspContragentId(),
+                                    payment.getContractId(), payment.getClientId()), null);
+                }
+            }
+            if (defaultTsp!=null) {
+                paymentTspContragentId = defaultTsp.getIdOfContragent();
+                processContragentAddInfo(defaultTsp, payAddInfo);
+            }
             //Card paymentCard = client.findActiveCard(persistenceSession, null);
             /*if (null == paymentCard) {
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, idOfClient, null, client.getBalance(),
@@ -702,8 +718,8 @@ public class Processor implements SyncProcessor,
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, client.getContractId(), null, client.getBalance(), PaymentProcessResult.OK.getCode(),
-                    PaymentProcessResult.OK.getDescription(), client, null);
+                    idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(), PaymentProcessResult.OK.getCode(),
+                    PaymentProcessResult.OK.getDescription(), client, null, payAddInfo);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -711,6 +727,12 @@ public class Processor implements SyncProcessor,
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void processContragentAddInfo(Contragent contragent, HashMap<String, String> payAddInfo) {
+        if (contragent.getRemarks()!=null && contragent.getRemarks().length()>0) {
+            ParameterStringUtils.extractParameters("TSP.", contragent.getRemarks(), payAddInfo);
         }
     }
 
@@ -1217,7 +1239,7 @@ public class Processor implements SyncProcessor,
                 menuDetail.setMinMg(reqMenuDetail.getMinMg());
                 menuDetail.setMinFe(reqMenuDetail.getMinFe());
 
-                persistenceSession.save(menuDetail);
+persistenceSession.save(menuDetail);
                 menu.addMenuDetail(menuDetail);
             }
         }

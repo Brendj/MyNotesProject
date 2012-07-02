@@ -19,4 +19,6 @@ public class PaymentResult {
     public String desc;
     public Long bal;
     public String clientFIO;
+    public Long tspContragentId;
+    public String addInfo;
 }

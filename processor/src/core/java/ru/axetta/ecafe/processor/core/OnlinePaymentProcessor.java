@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class OnlinePaymentProcessor {
@@ -38,6 +39,7 @@ public class OnlinePaymentProcessor {
                     request.getPaymentId(),
                     clientId,
                     null,
+                    request.getTspContragentId(),
                     new Date(),
                     request.getSum(),
                     request.getPaymentMethod(),
@@ -49,17 +51,17 @@ public class OnlinePaymentProcessor {
                     request.getContragentId(), payment);
             ////
             PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
-            return new PayResponse(request.isCheckOnly(), processResult.getResult(),
-                    processResult.getError(), clientId, request.getPaymentId(), processResult.getBalance(),
+            return new PayResponse(request.protoVersion, request.isCheckOnly(), processResult.getResult(),
+                    processResult.getError(), processResult.getTspContragentId(), clientId, request.getPaymentId(), processResult.getBalance(),
                     (client==null || client.getPerson()==null)?null:client.getPerson().getFirstName(),
                     (client==null || client.getPerson()==null)?null:client.getPerson().getSurname(),
                     (client==null || client.getPerson()==null)?null:client.getPerson().getSecondName(),
-                    getCardPrintedNo(processResult.getCard()));
+                    getCardPrintedNo(processResult.getCard()), processResult.getAddInfo());
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
-            return new PayResponse(request.isCheckOnly(), Processor.PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                    Processor.PaymentProcessResult.UNKNOWN_ERROR.getDescription(), clientId, request.getPaymentId(), null,
-                    null, null, null, null);
+            return new PayResponse(request.protoVersion, request.isCheckOnly(), Processor.PaymentProcessResult.UNKNOWN_ERROR.getCode(),
+                    Processor.PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getTspContragentId(), clientId, request.getPaymentId(), null,
+                    null, null, null, null, null);
         }
     }
 
@@ -69,11 +71,14 @@ public class OnlinePaymentProcessor {
     }
 
     public static PayResponse generateErrorResponse(Processor.PaymentProcessResult result) {
-        return new OnlinePaymentProcessor.PayResponse(true, result.getCode(),
-            result.getDescription(), null, null, null, null, null, null, null);
+        return new OnlinePaymentProcessor.PayResponse(0, true, result.getCode(),
+            result.getDescription(), null, null, null, null, null, null, null, null, null);
     }
 
     public static class PayRequest {
+        public final static int V_0=0, V_1=1;
+        
+        private final int protoVersion;
         private final long contragentId;
         private final int paymentMethod;
 
@@ -81,12 +86,14 @@ public class OnlinePaymentProcessor {
         private final String paymentId;
         private final String paymentAdditionalId;
         private final long sum;
+        private final Long tspContragentId;
 
         private final boolean bCheckOnly;
 
-        public PayRequest(boolean bCheckOnly, long contragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
+        public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
             if (!bNegativeSum && sum<0) throw new Exception("Payment sum is negative: "+sum);
+            this.protoVersion = protoVersion;
             this.bCheckOnly=bCheckOnly;
             this.contragentId = contragentId;
             this.paymentMethod = paymentMethod;
@@ -94,6 +101,7 @@ public class OnlinePaymentProcessor {
             this.paymentId = paymentId;
             this.paymentAdditionalId = paymentAdditionalId;
             this.sum = sum;
+            this.tspContragentId = tspContragentId;
         }
 
         public boolean isCheckOnly() {
@@ -128,6 +136,14 @@ public class OnlinePaymentProcessor {
             return bCheckOnly;
         }
 
+        public Long getTspContragentId() {
+            return tspContragentId;
+        }
+
+        public int getProtoVersion() {
+            return protoVersion;
+        }
+
         @Override
         public String toString() {
             return "PayRequest{" + "contragentId=" + contragentId + ", paymentMethod=" + paymentMethod + ", clientId="
@@ -137,6 +153,7 @@ public class OnlinePaymentProcessor {
     }
 
     public static class PayResponse {
+        private final int protoVersion;
         private final boolean bCheckOnly;
         private final Long clientId;
         private final String paymentId, clientFirstName, clientSurname, clientSecondName;
@@ -144,12 +161,16 @@ public class OnlinePaymentProcessor {
         private final Long cardPrintedNo;
         private final int resultCode;
         private final String resultDescription;
+        private final Long tspContragentId;
+        private final HashMap<String, String> addInfo;
 
-        public PayResponse(boolean bCheckOnly, int resultCode, String resultDescription, Long clientId, String paymentId,
-                Long balance, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo) {
+        public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
+                Long balance, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
+            this.protoVersion = protoVersion;
             this.bCheckOnly = bCheckOnly;
             this.resultCode=resultCode;
             this.resultDescription=resultDescription;
+            this.tspContragentId = tspContragentId;
             this.clientId = clientId;
             this.paymentId = paymentId;
             this.balance = balance;
@@ -157,6 +178,7 @@ public class OnlinePaymentProcessor {
             this.clientFirstName = clientFirstName;
             this.clientSurname = clientSurname;
             this.cardPrintedNo = cardPrintedNo;
+            this.addInfo = addInfo;
         }
 
         public int getResultCode() {
@@ -203,12 +225,34 @@ public class OnlinePaymentProcessor {
             return bCheckOnly;
         }
 
+        public Long getTspContragentId() {
+            return tspContragentId;
+        }
+
+        public int getProtoVersion() {
+            return protoVersion;
+        }
+
+        public HashMap<String, String> getAddInfo() {
+            return addInfo;
+        }
+
         @Override
         public String toString() {
-            return "PayResponse{bCheckOnly=" +bCheckOnly + ", clientId=" + clientId + ", paymentId='" + paymentId + '\''
-                    + ", clientFullName='" + getClientFullName() + '\'' + ", balance=" + balance
-                    + ", cardPrintedNo=" + cardPrintedNo + ", resultCode=" + resultCode + ", resultDescription='"
-                    + resultDescription + '\'' + '}';
+            return "PayResponse{" +
+                    "protoVersion=" + protoVersion +
+                    ", bCheckOnly=" + bCheckOnly +
+                    ", clientId=" + clientId +
+                    ", paymentId='" + paymentId + '\'' +
+                    ", clientFirstName='" + clientFirstName + '\'' +
+                    ", clientSurname='" + clientSurname + '\'' +
+                    ", clientSecondName='" + clientSecondName + '\'' +
+                    ", balance=" + balance +
+                    ", cardPrintedNo=" + cardPrintedNo +
+                    ", resultCode=" + resultCode +
+                    ", resultDescription='" + resultDescription + '\'' +
+                    ", tspContragentId=" + tspContragentId +
+                    '}';
         }
     }
 

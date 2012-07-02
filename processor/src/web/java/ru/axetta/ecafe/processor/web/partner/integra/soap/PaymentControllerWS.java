@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
@@ -68,6 +69,9 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             paymentResult.desc = payResponse.getResultDescription();
             paymentResult.bal = payResponse.getBalance();
             paymentResult.clientFIO = payResponse.getClientFullName();
+            paymentResult.tspContragentId = payResponse.getTspContragentId();
+            paymentResult.addInfo = payResponse.getAddInfo()==null?null:ParameterStringUtils.toString(payResponse.getAddInfo());
+            payResponse.getTspContragentId();
         }
         catch (Exception e) {
             paymentResult.res = 100;
