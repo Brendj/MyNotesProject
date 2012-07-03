@@ -4,15 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +29,13 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class TechnologicalMapListPage extends BasicWorkspacePage {
+public class TechnologicalMapListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener  {
+
+    @Override
+    public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
+        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapListPage.class);
     private TechnologicalMap technologicalMap = new TechnologicalMap();
@@ -34,24 +44,23 @@ public class TechnologicalMapListPage extends BasicWorkspacePage {
     public List<TechnologicalMap> getTechnologicalMapList() {
         return technologicalMapList;
     }
-/*
-    public List<TechnologicalMapProduct> technologicalMapProducts(Long idOfTechnologicalMap){
-        return DAOService.getInstance().getTechnologicalMapProduct(idOfTechnologicalMap);
-    }*/
+
+    public String getPageTitle() {
+        return super.getPageTitle() + String.format(" (%d)", technologicalMapList.size());
+    }
+
+    @PersistenceContext
+    EntityManager em;
 
     @Override
     public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
+    }
+
+    public void reload() {
         technologicalMapList = DAOService.getInstance().getDistributedObjects(TechnologicalMap.class);
-        /*for (TechnologicalMap tm:technologicalMapList){
-            List<TechnologicalMapProduct> tmp= tm.getTechnologicalMapProduct();
-            for ()
-        }*/
-       /* technologicalMap.getTechnologicalMapProduct().*/
     }
 
-    public TechnologicalMapListPage() {
-
-    }
 
     public String getPageFilename() {
         return "option/technologicalMap/list";
