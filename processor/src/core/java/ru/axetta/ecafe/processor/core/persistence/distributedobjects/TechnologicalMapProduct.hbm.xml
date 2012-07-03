@@ -14,6 +14,9 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
+        <property name="guid" column="GUID" type="string" length="36" not-null="true"/>
+        <property name="refGUID" column="RefGUID" type="string" length="36"/>
+
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -26,7 +29,7 @@
 
         <property name="idOfProduct" column="IdOfProducts " type="long"/>
 
-        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select">
+        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select" lazy="false">
             <column name="idOfTechnologicalMaps" not-null="true" />
         </many-to-one>
       <!--  <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" fetch="select" unique="true">

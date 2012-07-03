@@ -28,6 +28,10 @@ public class TechnologicalMap extends DistributedObject {
         technologicalMapProductInternal.add(technologicalMapProduct);
     }
 
+    public void removeTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.remove(technologicalMapProduct);
+    }
+
     private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
         return technologicalMapProductInternal;
     }
