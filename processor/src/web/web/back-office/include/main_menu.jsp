@@ -590,41 +590,23 @@
     <rich:panelMenuGroup id="technologicalMapGroupMenu" binding="#{mainPage.technologicalMapGroupPage.mainMenuComponent}"
                          label="Технологические карты">
         <a4j:support event="onclick" action="#{mainPage.showTechnologicalMapGroupPage}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Добавить"
-                            binding="#{technologicalMapCreatePage.mainMenuComponent}"
-                            action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="listTechnologicalMapMenuItem" label="Список"
                             binding="#{technologicalMapListPage.mainMenuComponent}"
                             action="#{technologicalMapListPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGroupPage.mainMenuComponent}"
-                         label="Продукты">
-            <a4j:support event="onclick" action="#{mainPage.showProductGroupPage}" reRender="workspaceForm" />
-            <rich:panelMenuItem id="createProductMenuItem" label="Добавить"
-                            binding="#{mainPage.productCreatePage.mainMenuComponent}"
-                            action="#{mainPage.showProductCreatePage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Добавить"
+                            binding="#{technologicalMapCreatePage.mainMenuComponent}"
+                            action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" />
 
+        <rich:panelMenuGroup id="selectedTechnologicalMapGroupMenu" label="#{technologicalMapEditPage.currTechnologicalMap.nameOfTechnologicalMap}"
+                             rendered="false">  <%--
+            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
+                                                   --%>
+            <rich:panelMenuItem id="viewTechnologicalMapMenuItem" label="Редактирование"
+                                binding="#{technologicalMapEditPage.mainMenuComponent}"
+                                action="#{technologicalMapEditPage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
-        <%--<rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"--%>
-                            <%--binding="#{mainPage.configurationProviderListPage.mainMenuComponent}"--%>
-                            <%--action="#{mainPage.showConfigurationProviderListPage}" reRender="workspaceForm" />--%>
 
-        <%--<rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Добавить"--%>
-                            <%--binding="#{mainPage.configurationProviderCreatePage.mainMenuComponent}"--%>
-                            <%--action="#{mainPage.showConfigurationProviderCreatePage}" reRender="workspaceForm" />--%>
-
-        <%--<rich:panelMenuGroup id="selectedConfigurationProviderGroupMenu"--%>
-                                 <%--binding="#{mainPage.selectedConfigurationProviderGroupPage.mainMenuComponent}"--%>
-                                 <%--label="#{mainPage.selectedConfigurationProviderGroupPage.title}" rendered="false">--%>
-            <%--<a4j:support event="onclick" action="#{mainPage.showSelectedConfigurationProviderGroupPage}" reRender="workspaceForm" />--%>
-
-            <%--<rich:panelMenuItem id="configurationProviderViewMenuItem" binding="#{mainPage.configurationProviderViewPage.mainMenuComponent}"--%>
-                                <%--label="Просмотр" action="#{mainPage.showСonfigurationProviderViewPage}" reRender="workspaceForm" />--%>
-
-            <%--<rich:panelMenuItem id="configurationProviderEditMenuItem" binding="#{mainPage.configurationProviderEditPage.mainMenuComponent}"--%>
-                                <%--label="Редактирование" action="#{mainPage.showConfigurationProviderEditPage}"--%>
-                                <%--reRender="workspaceForm" />--%>
-        <%--</rich:panelMenuGroup>--%>
     </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
