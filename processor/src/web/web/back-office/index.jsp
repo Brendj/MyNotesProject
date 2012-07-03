@@ -32,6 +32,10 @@
         <c:import url="include/option/technologicalMap/product/select_list.jsp" />
     </f:subview>
 
+    <f:subview id="technologicalMapProductESelectSubView">
+        <c:import url="include/option/technologicalMap/product/select_list_edit.jsp" />
+    </f:subview>
+
     <f:subview id="orgSelectSubView">
         <c:import url="include/org/select.jsp" />
     </f:subview>
@@ -110,6 +114,10 @@
 
     <f:subview id="configurationProviderItemDeleteSubView">
         <c:import url="include/option/configuration_provider/confirm_delete.jsp" />
+    </f:subview>
+
+    <f:subview id="technologicalMapItemDeleteSubView">
+        <c:import url="include/option/technologicalMap/confirm_delete.jsp" />
     </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
