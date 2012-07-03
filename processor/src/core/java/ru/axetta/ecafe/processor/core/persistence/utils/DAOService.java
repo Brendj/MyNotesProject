@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @Scope("singleton")
@@ -70,11 +71,11 @@ public class DAOService {
             }
         }else{
             if(currentMaxVersion==null){
-                query = em.createQuery("from "+className+" where orgOwner=:orgOwner",DistributedObject.class);
+                query = em.createQuery("from "+className+" where (orgOwner=:orgOwner or orgOwner = NULL)",DistributedObject.class);
                 query.setParameter("orgOwner",orgOwner);
             }
             else{
-                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion and orgOwner=:orgOwner",DistributedObject.class);
+                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion and (orgOwner=:orgOwner or orgOwner = NULL)",DistributedObject.class);
                 query.setParameter("currentMaxVersion",currentMaxVersion);
                 query.setParameter("orgOwner",orgOwner);
             }
