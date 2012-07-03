@@ -9,31 +9,37 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания правила --%>
-<h:panelGrid id="technologicalMapCreatePanel" binding="#{technologicalMapCreatePage.pageComponent}"
+<h:panelGrid id="technologicalMapEditPanel" binding="#{technologicalMapEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
 
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
-        <h:inputText value="#{technologicalMapCreatePage.technologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
-        <h:inputText value="#{technologicalMapCreatePage.technologicalMap.numberOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.numberOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Статус технологической карты" styleClass="output-text" />
+        <h:selectOneListbox value="#{technologicalMapEditPage.currTechnologicalMap.deletedState}" size="1">
+            <f:selectItem itemLabel="Не удален" itemValue="false"/>
+            <f:selectItem itemLabel="Удален" itemValue="true"/>
+        </h:selectOneListbox>
     </h:panelGrid>
 
-    <rich:dataTable id="productsTable" value="#{technologicalMapCreatePage.technologicalMapProducts}" var="technologicalMapProduct" >
+
+    <rich:dataTable id="productsTable" value="#{technologicalMapEditPage.technologicalMapProducts}" var="technologicalMapProduct" >
 
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
                     <h:outputText escape="true" value="Наименование продукта" />
                 </rich:column>
-                <rich:column colspan="2" headerClass="center-aligned-column column-header">
+                <rich:column colspan="2" headerClass="center-aligned-column column-header" width="200%">
                     <h:outputText value="Норма расхода продуктов на 1 порцию массой нетто 100 г" escape="true"/>
                 </rich:column>
                 <rich:column rowspan="2" headerClass="center-aligned-column column-header">
                     <h:outputText value="Удалить" escape="true"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true">
+                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true" width="200%">
                     <h:outputText value="Масса брутто, г." escape="true"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column column-header" >
@@ -51,17 +57,20 @@
             <h:inputText value="#{technologicalMapProduct.netWeight}"/>
         </rich:column>
         <rich:column style="text-align:center">
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapCreatePage.deleteProduct}" reRender="productsTable">
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapEditPage.deleteProduct}" reRender="productsTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{technologicalMapProduct}"
-                                             target="#{technologicalMapCreatePage.currTechnologicalMapProduct}" />
+                                             target="#{technologicalMapEditPage.currTechnologicalMapProduct}" />
             </a4j:commandLink>
         </rich:column>
     </rich:dataTable>
 
-    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapCreatePage.showProducts}" reRender="technologicalMapProductModalPanel"
-                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductModalPanel')}.show();"
-                       styleClass="command-button"/>
+    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapEditPage.showProducts}" reRender="technologicalMapProductListModalPanel"
+                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductListModalPanel')}.show();"
+                       styleClass="command-button">
+        <f:setPropertyActionListener value="#{technologicalMapEditPage.currTechnologicalMap}"
+                                     target="#{productItemsPanel.technologicalMap}" />
+    </a4j:commandButton>
 
     <h:panelGrid columns="2">
         <f:facet name="header">
@@ -74,15 +83,15 @@
             <h:outputText escape="true" value="Белки" styleClass="output-text" />
             <h:outputText escape="true" value="Жиры" styleClass="output-text" />
             <h:outputText escape="true" value="Углеводы" styleClass="output-text" />
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.proteins}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.proteins}" styleClass="input-text"
                          validatorMessage="Количсество белков должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.fats}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.fats}" styleClass="input-text"
                          validatorMessage="Количсество жиров должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.carbohydrates}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.carbohydrates}" styleClass="input-text"
                          validatorMessage="Количсество углеводов должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
@@ -97,19 +106,19 @@
             <h:outputText escape="true" value="P" styleClass="output-text" />
             <h:outputText escape="true" value="Fe" styleClass="output-text" />
 
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.microElCa}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.microElCa}" styleClass="input-text"
                          validatorMessage="Количсество магния должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.microElMg}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.microElMg}" styleClass="input-text"
                          validatorMessage="Количсество фосфора должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.microElP}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.microElP}" styleClass="input-text"
                          validatorMessage="Количсество фосфора должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.microElFe}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.microElFe}" styleClass="input-text"
                          validatorMessage="Количсество железа должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
@@ -125,27 +134,27 @@
             <h:outputText escape="true" value="PP" styleClass="output-text" />
             <h:outputText escape="true" value="C" styleClass="output-text" />
             <h:outputText escape="true" value="E" styleClass="output-text" />
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminA}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminA}" styleClass="input-text"
                          validatorMessage="Количсество белков должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminB1}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminB1}" styleClass="input-text"
                          validatorMessage="Количсество жиров должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminB2}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminB2}" styleClass="input-text"
                          validatorMessage="Количсество углеводов должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminPp}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminPp}" styleClass="input-text"
                          validatorMessage="Количсество белков должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminC}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminC}" styleClass="input-text"
                          validatorMessage="Количсество жиров должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.vitaminE}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.vitaminE}" styleClass="input-text"
                          validatorMessage="Количсество углеводов должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
@@ -156,7 +165,7 @@
                 <h:outputText escape="true" value="Энергетическая ценность (ккал)" styleClass="output-text"/>
             </f:facet>
             <h:outputText escape="true" value="" />
-            <h:inputText value="#{technologicalMapCreatePage.technologicalMap.energyValue}" styleClass="input-text"
+            <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.energyValue}" styleClass="input-text"
                          validatorMessage="Количсество белков должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
@@ -164,13 +173,13 @@
     </h:panelGrid>
 
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>
-    <h:inputTextarea value="#{technologicalMapCreatePage.technologicalMap.technologyOfPreparation}" rows="3" />
+    <h:inputTextarea value="#{technologicalMapEditPage.currTechnologicalMap.technologyOfPreparation}" rows="3" />
 
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Создать технологическую карту" action="#{technologicalMapCreatePage.createTechnologicalMap}"
-                       reRender="technologicalMapCreatePanel" styleClass="command-button" />
+    <a4j:commandButton value="Сохранить технологическую карту" action="#{technologicalMapEditPage.save}"
+                       reRender="technologicalMapEditPanel" styleClass="command-button" />
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

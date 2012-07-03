@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
@@ -8,13 +8,13 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<rich:modalPanel id="technologicalMapProductModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
+<rich:modalPanel id="technologicalMapProductListModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText escape="true" value="Выберите продукты" />
     </f:facet>
     <a4j:form id="technologicalMapProductModalForm" styleClass="borderless-form"
               eventsQueue="technologicalMapProductSelectorFormEventsQueue">
-        <rich:dataTable value="#{technologicalMapCreatePage.products}" var="item" rowKeyVar="row">
+        <rich:dataTable value="#{technologicalMapEditPage.productItems}" var="item" rowKeyVar="row">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="№" />
@@ -35,13 +35,13 @@
             </rich:column>
         </rich:dataTable>
         <h:panelGrid columns="2">
-            <a4j:commandButton value="Ok" action="#{technologicalMapCreatePage.addProducts}"
+            <a4j:commandButton value="Ok" action="#{technologicalMapEditPage.addProducts}"
                                reRender="workspaceTogglePanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductModalPanel')}.hide();"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductListModalPanel')}.hide();"
                                styleClass="command-button" style="width: 80px; margin-right: 4px;" />
 
             <a4j:commandButton value="Отмена" styleClass="command-button"
-                               onclick="#{rich:component('technologicalMapProductModalPanel')}.hide();return false;" />
+                               onclick="#{rich:component('technologicalMapProductListModalPanel')}.hide();return false;" />
         </h:panelGrid>
     </a4j:form>
 </rich:modalPanel>
