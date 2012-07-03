@@ -42,9 +42,15 @@ public abstract class DistributedObject{
     protected Long localID;
     /* имя узла элемента */
     protected String tagName;
+    /* GUID объекта */
+    protected String guid;
+    /* GUID ссылка на корневой объект */
+    protected String refGUID;
+
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
-        element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        element.setAttribute("GUID", getGuid());
+        if(getRefGUID()!=null) element.setAttribute("refGUID",getRefGUID());
         if(getDeletedState()){
             element.setAttribute("D", "1");
         }
@@ -52,6 +58,7 @@ public abstract class DistributedObject{
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
     }
+
     /* меод добавления свойств наследника атрибутов в узел */
     protected abstract void appendAttributes(Element element);
     /* метод добавления общих атрибутов в узел */
@@ -61,17 +68,20 @@ public abstract class DistributedObject{
         } else {
             appendAttributes(element);
         }
-        element.setAttribute("GID", Long.toString(this.getGlobalId()));
+        element.setAttribute("GUID", getGuid());
+        if(getRefGUID()!=null) element.setAttribute("refGUID",getRefGUID());
         element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
         /* Метод определения названия элемента */
     };
-
     /* метод парсинга элемента */
     public DistributedObject build(Node node){
         /* Begin required params */
-        Long gid = getLongAttributeValue(node,"GID");
-        if(gid!=null) setGlobalId(gid);
+        String stringGUID = getStringAttributeValue(node,"GUID",36);
+        if(stringGUID!=null) setGuid(stringGUID);
+
+        String stringRefGUID = getStringAttributeValue(node,"refGUID",36);
+        if(stringRefGUID!=null) setRefGUID(stringRefGUID);
 
         Long version = getLongAttributeValue(node,"V");
         if(version!=null) setGlobalVersion(version);
@@ -91,14 +101,6 @@ public abstract class DistributedObject{
 
     protected abstract DistributedObject parseAttributes(Node node);
 
-    public String getTagName() {
-        return tagName;
-    }
-
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
-    }
-
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {
             if(value instanceof Boolean) {
@@ -111,6 +113,7 @@ public abstract class DistributedObject{
     }
 
     protected String getStringAttributeValue(Node node, String attributeName,Integer length){
+        if(getAttributeValue(node, attributeName)==null) return null;
         StringBuilder result = new StringBuilder(getAttributeValue(node, attributeName));
         if(result.length()>length) return result.substring(0, length);
         return result.toString();
@@ -157,6 +160,30 @@ public abstract class DistributedObject{
 
     public void setLocalID(Long localID) {
         this.localID = localID;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public String getRefGUID() {
+        return refGUID;
+    }
+
+    public void setRefGUID(String refGUID) {
+        this.refGUID = refGUID;
     }
 
     public Long getGlobalId() {
