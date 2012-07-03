@@ -46,7 +46,7 @@
                 changedHoverClass="hover" viewHoverClass="hover"
                 viewClass="inplace" changedClass="inplace"
                 selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"/>
+           <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"/>
         </rich:inplaceInput>
     </rich:column>
 
