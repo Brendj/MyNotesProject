@@ -203,6 +203,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             persistenceSession.update(newCp);
             pg.setUserCreate(user);
             pg.setCreatedDate(new Date());
+            pg.setGuid(UUID.randomUUID().toString());
         }
 
         pg.setCode(item.getCode());
