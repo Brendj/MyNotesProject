@@ -22,25 +22,6 @@ import java.util.Set;
 
 public class Product extends DistributedObject {
 
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal;
-
-    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
-        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
-    }
-
-    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
-        technologicalMapProductInternal.add(technologicalMapProduct);
-    }
-
-    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
-        return technologicalMapProductInternal;
-    }
-
-    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
-        this.technologicalMapProductInternal = technologicalMapProductInternal;
-    }
-
-
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
      * Атрибуты данного элемента приравниваются соответствующим полям объекта this.
@@ -57,6 +38,7 @@ public class Product extends DistributedObject {
         setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
     }
 
+
     @Override
     protected Product parseAttributes(Node node) {
 
@@ -70,7 +52,22 @@ public class Product extends DistributedObject {
         if(stringProductName!=null) setProductName(stringProductName);
         Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);
+        String stringGroupName = getStringAttributeValue(node, "GroupName", 512);
+        if(stringGroupName!=null) setGroupName(stringGroupName);
         return this;
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setCode( ((Product) distributedObject).getCode());
+        setFullName (((Product) distributedObject).getFullName());
+        setProductName( ((Product) distributedObject).getProductName());
+        setOkpCode (((Product) distributedObject).getOkpCode());
+        setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
+        setGroupName(((Product) distributedObject).getGroupName());
+        for (TechnologicalMapProduct technologicalMapProduct: ((Product) distributedObject).getTechnologicalMapProduct()){
+             addTechnologicalMapProduct(technologicalMapProduct);
+        }
     }
 
     private String code;
@@ -81,6 +78,32 @@ public class Product extends DistributedObject {
     private User userEdit;
     private User userDelete;
     private Long idOfConfigurationProvider;
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal;
+    private String groupName;
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
+        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
+    }
+
+    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.add(technologicalMapProduct);
+    }
+
+    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
+        return technologicalMapProductInternal;
+    }
+
+    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
+        this.technologicalMapProductInternal = technologicalMapProductInternal;
+    }
 
     public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
