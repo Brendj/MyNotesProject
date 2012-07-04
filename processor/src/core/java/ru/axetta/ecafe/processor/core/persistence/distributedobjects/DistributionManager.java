@@ -141,7 +141,7 @@ public class DistributionManager {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
-            if(currentMaxVersions.get(currentObject.getValue())>=0){
+            if(node.getFirstChild()!=null){
                 DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
             }
             node = node.getFirstChild();
