@@ -6,12 +6,20 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -29,6 +37,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 
+@Component
+@Scope("singleton")
 public class DistributionManager {
 
     /**
@@ -47,10 +57,9 @@ public class DistributionManager {
      */
     private List<DistributedObject> distributedObjects = new LinkedList<DistributedObject>();
 
-    public DistributionManager(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
-
+    public DistributionManager() {}
+    @PostConstruct
+    public void init(){}
     /**
      * Создает  элемент <RO> выходного xml документа
      * @param document   выходной xml документ
@@ -63,7 +72,7 @@ public class DistributionManager {
         String tagName;
         for(int i=0; i<distributedObjects.size(); i++){
             DistributedObject distributedObject = distributedObjects.get(i);
-            if(distributedObject.getDeletedState()){
+            /*if(distributedObject.getDeletedState()){
                 DAOService.getInstance().setDeletedState(distributedObject);
             } else {
                 if(distributedObject.getTagName().equals("C")){
@@ -97,7 +106,7 @@ public class DistributionManager {
                     distributedObject.setTagName("M");
                     distributedObjects.set(i,distributedObject);
                 }
-            }
+            }*/
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
             if(!elementMap.containsKey(tagName)){
                 Element distributedObjectElement = document.createElement(tagName);
@@ -130,6 +139,54 @@ public class DistributionManager {
         return  elementRO;
     }
 
+    @PersistenceContext
+    EntityManager entityManager;
+    /* метод работы с бд */
+    @Transactional
+    public void process() throws Exception{
+        List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document document = factory.newDocumentBuilder().newDocument();
+        for (DistributedObject distributedObject: distributedObjects){
+            if(distributedObject.getDeletedState()){
+                DAOService.getInstance().setDeletedState(distributedObject);
+            } else {
+                if(distributedObject.getTagName().equals("C")){
+                    Long lid = distributedObject.getLocalID();
+                    distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
+                    distributedObject.setTagName("C");
+                    distributedObject.setLocalID(lid);
+                }
+                if(distributedObject.getTagName().equals("M")){
+                    long objectVersion = distributedObject.getGlobalVersion();
+                    Long currentMaxVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                    if(objectVersion == currentMaxVersion){
+                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
+                    } else {
+
+                        String stringElement = createStringElement(document, distributedObject);
+
+                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
+                        DOConflict conflict = new DOConflict();
+                        conflict.setgVersionCur(currentMaxVersion);
+                        conflict.setIdOfOrg(idOfOrg);
+                        conflict.setgVersionInc(objectVersion);
+                        conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+
+                        conflict.setValueCur(createStringElement(document, distributedObject));
+
+                        conflict.setValueInc(stringElement);
+                        conflict.setCreateConflictDate(new Date());
+                        DAOService.getInstance().createConflict(conflict);
+                    }
+                    distributedObject.setTagName("M");
+                }
+                distributedObjectList.add(distributedObject);
+            }
+        }
+        distributedObjects = distributedObjectList;
+    }
+
     /**
      * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
      * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
@@ -138,6 +195,7 @@ public class DistributionManager {
      * @throws Exception
      */
     public void build(Node node) throws Exception{
+        distributedObjects.clear();
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
