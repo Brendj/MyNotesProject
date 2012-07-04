@@ -44,13 +44,10 @@ public abstract class DistributedObject{
     protected String tagName;
     /* GUID объекта */
     protected String guid;
-    /* GUID ссылка на корневой объект */
-    protected String refGUID;
 
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
         element.setAttribute("GUID", getGuid());
-        if(getRefGUID()!=null) element.setAttribute("refGUID",getRefGUID());
         if(getDeletedState()){
             element.setAttribute("D", "1");
         }
@@ -69,8 +66,7 @@ public abstract class DistributedObject{
             appendAttributes(element);
         }
         element.setAttribute("GUID", getGuid());
-        if(getRefGUID()!=null) element.setAttribute("refGUID",getRefGUID());
-        element.setAttribute("V", Long.toString(this.getGlobalVersion()));
+        element.setAttribute("V", String.valueOf(getGlobalVersion()));
         return element;
         /* Метод определения названия элемента */
     };
@@ -79,9 +75,6 @@ public abstract class DistributedObject{
         /* Begin required params */
         String stringGUID = getStringAttributeValue(node,"GUID",36);
         if(stringGUID!=null) setGuid(stringGUID);
-
-        String stringRefGUID = getStringAttributeValue(node,"refGUID",36);
-        if(stringRefGUID!=null) setRefGUID(stringRefGUID);
 
         Long version = getLongAttributeValue(node,"V");
         if(version!=null) setGlobalVersion(version);
@@ -100,6 +93,8 @@ public abstract class DistributedObject{
     }
 
     protected abstract DistributedObject parseAttributes(Node node);
+
+    public abstract void fill(DistributedObject distributedObject);
 
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {
@@ -176,14 +171,6 @@ public abstract class DistributedObject{
 
     public void setGuid(String guid) {
         this.guid = guid;
-    }
-
-    public String getRefGUID() {
-        return refGUID;
-    }
-
-    public void setRefGUID(String refGUID) {
-        this.refGUID = refGUID;
     }
 
     public Long getGlobalId() {
