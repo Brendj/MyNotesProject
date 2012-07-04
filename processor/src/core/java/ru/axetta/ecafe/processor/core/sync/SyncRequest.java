@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
@@ -945,6 +946,7 @@ public class SyncRequest {
                         Double fat = getMinorComponent(namedNodeMap, "Fat");
                         Double carbohydrates = getMinorComponent(namedNodeMap, "Carbohydrates");
                         Double calories = SyncRequest.getCalories(namedNodeMap, "Calories");
+
                         Double vitB1 = getMinorComponent(namedNodeMap, "VitB1");
                         Double vitC = getMinorComponent(namedNodeMap, "VitC");
                         Double vitA = getMinorComponent(namedNodeMap, "VitA");
@@ -2870,7 +2872,8 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            DistributionManager distributionManager = new DistributionManager(org.getIdOfOrg());
+            //DistributionManager distributionManager = new DistributionManager(org.getIdOfOrg());
+            DistributionManager distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
