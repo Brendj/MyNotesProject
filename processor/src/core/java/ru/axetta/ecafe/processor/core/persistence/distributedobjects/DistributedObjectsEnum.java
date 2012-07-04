@@ -13,8 +13,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  */
 public enum DistributedObjectsEnum {
     Product("Product"),
-    TechnologicalMap("TechnologicalMap"),
-    TechnologicalMapProduct("TechnologicalMapProduct");
+    TechnologicalMap("TechnologicalMap");
 
     private final String value;
     private DistributedObjectsEnum(String value) {
