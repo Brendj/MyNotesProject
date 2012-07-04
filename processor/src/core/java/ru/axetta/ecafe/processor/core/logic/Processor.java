@@ -251,7 +251,7 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
-
+                    request.getDistributionManager().setIdOfOrg(request.getIdOfOrg());
                     distributionManager =  processDistributionManager(request.getDistributionManager());
                 } catch (Exception e) {
                     logger.error(
@@ -433,7 +433,8 @@ public class Processor implements SyncProcessor,
     }
 
     /* TODO: логика обработки менеджера глобальных объектов */
-    private DistributionManager processDistributionManager(DistributionManager distributionManager){
+    private DistributionManager processDistributionManager(DistributionManager distributionManager) throws Exception{
+        RuntimeContext.getAppContext().getBean(DistributionManager.class).process();
         return distributionManager;
     }
 
