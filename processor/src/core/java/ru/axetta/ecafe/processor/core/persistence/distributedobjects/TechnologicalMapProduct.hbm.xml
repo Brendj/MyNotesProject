@@ -5,17 +5,16 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" table="cf_technological_map_products" optimistic-lock="version">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" table="cf_technological_map_products">
         <id name="globalId" column="IdOfTechnoMapProducts" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
-        <version name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
         <property name="guid" column="GUID" type="string" length="36" not-null="true"/>
-        <property name="refGUID" column="RefGUID" type="string" length="36"/>
 
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -26,15 +25,16 @@
         <property name="nameOfProduct" column="NameOfProduct" type="string" length="256"/>
         <property name="grossWeight" column="GrossWeight" type="double" />
         <property name="netWeight" column="NetWeight" type="double" />
-
+        <!--
         <property name="idOfProduct" column="IdOfProducts " type="long"/>
+        -->
 
         <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select" lazy="false">
             <column name="idOfTechnologicalMaps" not-null="true" />
         </many-to-one>
-      <!--  <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" fetch="select" unique="true">
+        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" fetch="select" unique="true" lazy="false">
             <column name="idOfProducts" not-null="true" />
-        </many-to-one>-->
+        </many-to-one>
 
       <!--  <property name="idOfTechnoMap" column="IdOfTechnoMap" type="long"/>-->
 
