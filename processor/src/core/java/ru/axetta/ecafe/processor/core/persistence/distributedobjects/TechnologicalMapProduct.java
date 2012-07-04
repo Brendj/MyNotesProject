@@ -21,8 +21,57 @@ import java.util.Set;
 public class TechnologicalMapProduct extends DistributedObject {
 
 
-    private long idOfProduct;
-   // private long idOfTechnoMap;
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setNameOfProduct(((TechnologicalMapProduct) distributedObject).getNameOfProduct());
+        setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
+        setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
+        setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
+        setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
+    }
+
+    @Override
+    protected void appendAttributes(Element element) {
+        setAttribute(element,"Name", nameOfProduct);
+        setAttribute(element,"GWeight", grossWeight);
+        setAttribute(element,"NWeight", netWeight);
+        if(product!=null) {
+            setAttribute(element,"RefGUID", getProduct().getGuid());
+        }
+     //   setAttribute(element,"IdProduct", idOfProduct);
+      //  setAttribute(element,"IdTechnoMap", idOfTechnoMap);
+    }
+
+    @Override
+    protected TechnologicalMapProduct parseAttributes(Node node) {
+        /*String stringNameOfProduct = getStringAttributeValue(node,"Name",512);
+        if(stringNameOfProduct!=null) setNameOfProduct(stringNameOfProduct);*/
+
+        Float floatGrossMass = getFloatAttributeValue(node,"GWeight");
+        if(floatGrossMass!=null) setGrossWeight(floatGrossMass);
+
+        Float floatNetMass = getFloatAttributeValue(node,"NWeight");
+        if(floatNetMass!=null) setNetWeight(floatNetMass);
+
+        String stringRefGUID = getStringAttributeValue(node,"RefGUID",36);
+        if(stringRefGUID!=null) {
+            setProduct(DAOService.getInstance().findProductByGUID(Product.class, stringRefGUID));
+           // setIdOfProduct(getProduct().getGlobalId());
+            if(product!=null) setNameOfProduct(getProduct().getProductName());
+        }
+
+        return this;
+    }
+
+    //Наименование продукта
+    private String nameOfProduct;
+
+    //Масса брутто, г
+    private double grossWeight;
+
+    //Масса нетто, г
+    private double netWeight;
+
     private TechnologicalMap technologicalMap;
     private Product product;
 
@@ -41,64 +90,6 @@ public class TechnologicalMapProduct extends DistributedObject {
     public void setTechnologicalMap(TechnologicalMap technologicalMap) {
         this.technologicalMap = technologicalMap;
     }
-/*
-    public long getIdOfTechnoMap() {
-        return idOfTechnoMap;
-    }
-
-    public void setIdOfTechnoMap(long idOfTechnoMap) {
-        this.idOfTechnoMap = idOfTechnoMap;
-    }*/
-
-    public long getIdOfProduct() {
-        return idOfProduct;
-    }
-
-    public void setIdOfProduct(long idOfProduct) {
-        this.idOfProduct = idOfProduct;
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {
-        setAttribute(element,"Name", nameOfProduct);
-        setAttribute(element,"GWeight", grossWeight);
-        setAttribute(element,"NWeight", netWeight);
-        setAttribute(element,"IdProduct", idOfProduct);
-      //  setAttribute(element,"IdTechnoMap", idOfTechnoMap);
-    }
-
-    @Override
-    protected TechnologicalMapProduct parseAttributes(Node node) {
-        String stringNameOfProduct = getStringAttributeValue(node,"Name",512);
-        if(stringNameOfProduct!=null) setNameOfProduct(stringNameOfProduct);
-
-        Float floatGrossMass = getFloatAttributeValue(node,"GWeight");
-        if(floatGrossMass!=null) setGrossWeight(floatGrossMass);
-
-        Float floatNetMass = getFloatAttributeValue(node,"NWeight");
-        if(floatNetMass!=null) setNetWeight(floatNetMass);
-
-        Long longIdOfProduct = getLongAttributeValue(node, "IdProduct");
-        if(longIdOfProduct!=null) {
-            setIdOfProduct(longIdOfProduct);
-            //setProduct(DAOService.getInstance().findRefDistributedObject(Product.class, longIdOfProduct));
-        }
-
-        Long longIdOfTechnoMap = getLongAttributeValue(node,"IdTechnoMap");
-        if(longIdOfTechnoMap!=null) {
-            //setIdOfTechnoMap(longIdOfTechnoMap);
-            setTechnologicalMap(DAOService.getInstance().findRefDistributedObject(TechnologicalMap.class, longIdOfTechnoMap));
-        }
-
-        return this;
-    }
-
-    //Наименование продукта
-    private String nameOfProduct;
-    //Масса брутто, г
-    private double grossWeight;
-    //Масса нетто, г
-    private double netWeight;
 
     public String getNameOfProduct() {
         return nameOfProduct;
