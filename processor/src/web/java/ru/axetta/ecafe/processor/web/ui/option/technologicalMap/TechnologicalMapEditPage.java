@@ -142,10 +142,8 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage {
             for (TechnologicalMapProduct tmp: technologicalMapProducts){
                 tm.addTechnologicalMapProduct(tmp);
                 tmp.setCreatedDate(new Date());
-                tmp.setRefGUID(tm.getGuid());
                 tmp.setGuid(UUID.randomUUID().toString());
                 tmp = em.merge(tmp);
-                //DAOService.getInstance().persistEntity(tmp);
             }
             currTechnologicalMap = em.merge(tm);
             printMessage("Технологическая карта сохранена успешно.");
@@ -178,7 +176,8 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage {
         for (ProductItem productItem: productItems){
             if(productItem.getChecked()){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-                technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
+             //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
+                technologicalMapProduct.setProduct(productItem.getProduct());
                 technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(currTechnologicalMap);

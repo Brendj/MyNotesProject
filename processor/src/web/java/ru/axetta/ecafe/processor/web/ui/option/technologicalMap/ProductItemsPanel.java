@@ -53,7 +53,8 @@ public class ProductItemsPanel {
         for (ProductItem productItem: productItems){
            if(productItem.getChecked()){
             TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-            technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
+           // technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
+               technologicalMapProduct.setProduct(productItem.getProduct());
             technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
             technologicalMapProduct.setDeletedState(false);
             technologicalMapProduct.setTechnologicalMap(technologicalMap);

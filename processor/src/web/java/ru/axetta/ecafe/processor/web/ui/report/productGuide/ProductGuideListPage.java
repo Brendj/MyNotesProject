@@ -197,6 +197,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             }
             pg.setLastUpdate(new Date());
             pg.setUserEdit(user);
+            pg.setGlobalVersion(pg.getGlobalVersion()+1);
         } else {
             pg = new Product();
             newCp.getProducts().add(pg);
@@ -204,6 +205,7 @@ public class ProductGuideListPage extends BasicWorkspacePage {
             pg.setUserCreate(user);
             pg.setCreatedDate(new Date());
             pg.setGuid(UUID.randomUUID().toString());
+            pg.setGlobalVersion(0L);
         }
 
         pg.setCode(item.getCode());

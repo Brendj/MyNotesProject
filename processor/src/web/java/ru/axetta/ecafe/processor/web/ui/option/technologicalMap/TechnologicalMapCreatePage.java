@@ -77,7 +77,6 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
             DAOService.getInstance().persistEntity(technologicalMap);
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMap.getTechnologicalMapProduct()){
                 technologicalMapProduct.setCreatedDate(new Date());
-                technologicalMapProduct.setRefGUID(tmUUID.toString());
                 technologicalMapProduct.setGuid(UUID.randomUUID().toString());
                 DAOService.getInstance().persistEntity(technologicalMapProduct);
             }
@@ -110,7 +109,8 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
         for (ProductItem productItem: products){
             if(productItem.getChecked()){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-                technologicalMapProduct.setIdOfProduct(productItem.product.getGlobalId());
+              //  technologicalMapProduct.setIdOfProduct(productItem.product.getGlobalId());
+                technologicalMapProduct.setProduct(productItem.getProduct());
                 technologicalMapProduct.setNameOfProduct(productItem.product.getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(technologicalMap);
