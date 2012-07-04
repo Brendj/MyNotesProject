@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -18,26 +19,32 @@ import java.util.*;
  */
 public class TechnologicalMap extends DistributedObject {
 
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
 
-    public List<TechnologicalMapProduct> getTechnologicalMapProduct(){
-        return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
-    }
+    @Override
+    public void fill(DistributedObject distributedObject) {
 
-    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
-        technologicalMapProductInternal.add(technologicalMapProduct);
-    }
+        setNameOfTechnologicalMap(((TechnologicalMap) distributedObject).getNameOfTechnologicalMap());
+        setNumberOfTechnologicalMap(((TechnologicalMap) distributedObject).getNumberOfTechnologicalMap());
+        setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
+        setTempOfPreparation(((TechnologicalMap) distributedObject).getTempOfPreparation());
+        setTermOfRealization(((TechnologicalMap) distributedObject).getTermOfRealization());
+        setGroupName(((TechnologicalMap) distributedObject).getGroupName());
+        setEnergyValue(((TechnologicalMap) distributedObject).getEnergyValue());
+        setProteins(((TechnologicalMap) distributedObject).getProteins());
+        setCarbohydrates(((TechnologicalMap) distributedObject).getCarbohydrates());
+        setFats(((TechnologicalMap) distributedObject).getFats());
 
-    public void removeTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
-        technologicalMapProductInternal.remove(technologicalMapProduct);
-    }
+        setMicroElCa(((TechnologicalMap) distributedObject).getMicroElCa());
+        setMicroElFe(((TechnologicalMap) distributedObject).getMicroElFe());
+        setMicroElMg(((TechnologicalMap) distributedObject).getMicroElMg());
+        setMicroElP(((TechnologicalMap) distributedObject).getMicroElP());
 
-    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
-        return technologicalMapProductInternal;
-    }
-
-    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
-        this.technologicalMapProductInternal = technologicalMapProductInternal;
+        setVitaminA(((TechnologicalMap) distributedObject).getVitaminA());
+        setVitaminB1(((TechnologicalMap) distributedObject).getVitaminB1());
+        setVitaminB2( ((TechnologicalMap) distributedObject).getVitaminB2());
+        setVitaminC(((TechnologicalMap) distributedObject).getVitaminC());
+        setVitaminE(((TechnologicalMap) distributedObject).getVitaminE());
+        setVitaminPp(((TechnologicalMap) distributedObject).getVitaminPp());
     }
 
     @Override
@@ -47,6 +54,8 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"Technology", technologyOfPreparation);
         setAttribute(element,"TempPreparation", tempOfPreparation);
         setAttribute(element,"TermRealization", termOfRealization);
+
+        setAttribute(element,"GroupName", groupName);
 
         setAttribute(element,"Energy", energyValue);
 
@@ -65,10 +74,19 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"VPp", vitaminPp);
         setAttribute(element,"VC", vitaminC);
         setAttribute(element,"VE", vitaminE);
+        Document document = element.getOwnerDocument();
+        for (TechnologicalMapProduct technologicalMapProduct: getTechnologicalMapProduct()){
+            Element tmpElement = document.createElement("Product");
+            technologicalMapProduct.appendAttributes(tmpElement);
+            element.appendChild(tmpElement);
+        }
     }
 
     @Override
     protected TechnologicalMap parseAttributes(Node node) {
+
+        String stringGroupName = getStringAttributeValue(node,"GroupName",512);
+        if(stringGroupName!=null) setGroupName(stringGroupName);
 
         String stringNameOfTechnologicalMap = getStringAttributeValue(node,"Name",128);
         if(stringNameOfTechnologicalMap!=null) setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
@@ -127,43 +145,85 @@ public class TechnologicalMap extends DistributedObject {
         Float floatVitaminE = getFloatAttributeValue(node,"VE");
         if(floatVitaminE!=null) setVitaminE(floatVitaminE);
 
+        node = node.getFirstChild();
+        while (node!=null){
+            TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
+            technologicalMapProduct = (TechnologicalMapProduct) technologicalMapProduct.build(node);
+            technologicalMapProduct.setTechnologicalMap(this);
+            technologicalMapProduct.setCreatedDate(new Date());
+            technologicalMapProduct.setGuid(UUID.randomUUID().toString());
+            this.addTechnologicalMapProduct(technologicalMapProduct);
+            node = node.getNextSibling();
+        }
         return this;
     }
 
-    private String nameOfTechnologicalMap;
-    private Long numberOfTechnologicalMap;
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
 
+    private String groupName;
+    private String nameOfTechnologicalMap;
+
+    private Long numberOfTechnologicalMap;
     //Технология приготовления
     private String technologyOfPreparation;
 
     private String timeOfRealization;
+
     // Температура приготовления
     private String tempOfPreparation;
     //Срок реализации в часах
     private String termOfRealization;
-
     // В 100 граммах данного блюда содержится:
     //Пищевые вещества, г
     private Float proteins;
+
     private Float carbohydrates;
     private Float fats;
-
     //Минеральные вещества, мг
     private Float microElCa;
+
     private Float microElMg;
     private Float microElP;
     private Float microElFe;
-
     //Энергетическая ценность (ккал)
     private Float energyValue;
 
     //Витамины, мг
     private Float vitaminA;
+
     private Float vitaminB1;
     private Float vitaminB2;
     private Float vitaminPp;
     private Float vitaminC;
     private Float vitaminE;
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public List<TechnologicalMapProduct> getTechnologicalMapProduct(){
+        return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
+    }
+
+    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.add(technologicalMapProduct);
+    }
+
+    public void removeTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
+        technologicalMapProductInternal.remove(technologicalMapProduct);
+    }
+
+    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
+        return technologicalMapProductInternal;
+    }
+
+    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
+        this.technologicalMapProductInternal = technologicalMapProductInternal;
+    }
 
     public String getTempOfPreparation() {
         return tempOfPreparation;
