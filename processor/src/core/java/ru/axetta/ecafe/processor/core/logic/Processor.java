@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -434,7 +435,12 @@ public class Processor implements SyncProcessor,
 
     /* TODO: логика обработки менеджера глобальных объектов */
     private DistributionManager processDistributionManager(DistributionManager distributionManager) throws Exception{
-        RuntimeContext.getAppContext().getBean(DistributionManager.class).process();
+        Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
+        for (String key : distributedObjectsListMap.keySet()) {
+            // Перебираем все типы объектов, каждый тип обрабатывается в отдельной! транзакции.
+            distributionManager.process(distributedObjectsListMap.get(key), key);
+        }
+        //RuntimeContext.getAppContext().getBean(DistributionManager.class).process(); Зачем доставать из контекста, если есть аргумент?
         return distributionManager;
     }
 
