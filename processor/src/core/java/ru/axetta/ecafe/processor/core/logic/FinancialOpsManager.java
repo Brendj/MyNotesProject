@@ -217,7 +217,7 @@ public class FinancialOpsManager {
 
         eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()+paySum),
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
                 "contractId",String.valueOf(client.getContractId()),
                 "surname",client.getPerson().getSurname(),
                 "firstName",client.getPerson().getFirstName()
