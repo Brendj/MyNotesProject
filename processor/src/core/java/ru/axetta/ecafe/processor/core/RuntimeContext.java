@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
+import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
@@ -153,6 +154,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private OrderCancelProcessor orderCancelProcessor;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
+    ////////////////////////////////////////////
+    private ChronopayConfig partnerChronopayConfig;
+    ///////////////////////////////////////////
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
@@ -260,7 +264,12 @@ public class RuntimeContext implements ApplicationContextAware {
     public RBKMoneyConfig getPartnerRbkMoneyConfig() {
         return partnerRbkMoneyConfig;
     }
+     ///////////////////////////////////////////////////////////
 
+    public ChronopayConfig getPartnerChronopayConfig() {
+        return partnerChronopayConfig;
+    }
+    //////////////////////////////////////////////////////////////
     public StdPayConfig getPartnerStdPayConfig() {
         return partnerStdPayConfig;
     }
@@ -345,6 +354,9 @@ public class RuntimeContext implements ApplicationContextAware {
             this.smsService = smsService;
 
             this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE);
+            //////////////////////////////////////////////////////////////////////////////////////////////
+            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE);
+            /////////////////////////////////////////////////////////////////////////////////////////////
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerStdPayConfig = new StdPayConfig(properties, PROCESSOR_PARAM_BASE);
