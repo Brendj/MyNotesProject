@@ -2721,6 +2721,7 @@ MenuGroups menuGroups;
         private final EnterEvents.Builder enterEventsBuilder;
         private final LibraryData.Builder libraryDataBuilder;
         private final LibraryData2.Builder libraryData2Builder;
+        private final DistributionManager distributionManager;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2742,6 +2743,7 @@ MenuGroups menuGroups;
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.libraryDataBuilder = new LibraryData.Builder();
             this.libraryData2Builder = new LibraryData2.Builder();
+            this.distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2872,13 +2874,12 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            //DistributionManager distributionManager = new DistributionManager(org.getIdOfOrg());
-            DistributionManager distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
+
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        distributionManager.build(itemNode);
+                        distributionManager.build(itemNode, org.getIdOfOrg());
                     }
                     itemNode = itemNode.getNextSibling();
                 }
@@ -2887,7 +2888,7 @@ MenuGroups menuGroups;
 
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2, RuntimeContext.getAppContext().getBean(DistributionManager.class));
+                    enterEvents, libraryData, libraryData2, distributionManager);
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
