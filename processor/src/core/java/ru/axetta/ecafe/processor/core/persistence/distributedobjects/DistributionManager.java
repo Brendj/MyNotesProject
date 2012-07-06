@@ -22,6 +22,8 @@ import org.w3c.dom.Node;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -49,7 +51,7 @@ public class DistributionManager {
      */
     private Logger logger = LoggerFactory.getLogger(DistributionManager.class);
 
-    private Long idOfOrg;
+    //private Long idOfOrg;
     /**
      * Ключи = имена элементов (Пример элемента: <Pr>),
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
@@ -62,13 +64,17 @@ public class DistributionManager {
     /* Пара ключ значение ключ имя класса значение список объектов этого класса */
     private Map<String, List<DistributedObject>> distributedObjectsListMap = new HashMap<String, List<DistributedObject>>();
 
-    /* Обязательно public метод спринг не может инициализировать */
-    public DistributionManager() {
-    }
+    private Map<String,String> errorMap = new HashMap<String, String>();
+
+    private Document document;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public DistributionManager() {}
 
     @PostConstruct
-    public void init() {
-    }
+    public void init() {}
 
     /**
      * Создает  элемент <RO> выходного xml документа
@@ -76,7 +82,7 @@ public class DistributionManager {
      * @param document выходной xml документ
      * @return элемент <RO> выходного xml документа
      */
-    public Element toElement(Document document) throws Exception {
+    public Element toElement(Document document, Long idOfOrg) throws Exception {
         /* Метод нужно переписать так, чтобы он использовал distributedObjectsListMap. CurrentMaxVersions - если без ее исользования обойтись нельзя
         (а так ли это?) нужно заполнять в методе Process.
          */
@@ -84,8 +90,9 @@ public class DistributionManager {
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         String tagName;
+        List<DistributedObject> distributedObjects = null;
         for(String key: distributedObjectsListMap.keySet()){
-            List<DistributedObject> distributedObjects = distributedObjectsListMap.get(key);
+            distributedObjects = distributedObjectsListMap.get(key);
             for (int i = 0; i < distributedObjects.size(); i++) {
                 DistributedObject distributedObject = distributedObjects.get(i);
                 tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
@@ -120,63 +127,61 @@ public class DistributionManager {
                 elementMap.get(tagName).appendChild(distributedObject.toElement(element));
             }
         }
+        if(!errorMap.isEmpty()){
+            Element errorElement = document.createElement("Errors");
+            for (String key: errorMap.keySet()){
+                Element error= document.createElement("Error");
+                error.setAttribute("type",key);
+                error.setAttribute("message",errorMap.get(key));
+            }
+            elementRO.appendChild(errorElement);
+        }
         return elementRO;
     }
 
-    @PersistenceContext
-    EntityManager entityManager;
-
+    @Transactional
+    private void createConflict(DistributedObject distributedObject, Long idOfOrg) throws Exception{
+        DOConflict conflict = new DOConflict();
+        conflict.setValueInc(createStringElement(getSimpleDocument(),distributedObject));
+        conflict.setgVersionInc(distributedObject.getGlobalVersion());
+        conflict.setIdOfOrg(idOfOrg);
+        conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+        TypedQuery<DistributedObject> query = entityManager.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",DistributedObject.class);
+        DistributedObject currDistributedObject = query.getSingleResult();
+        conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
+        conflict.setValueCur(createStringElement(getSimpleDocument(),currDistributedObject));
+        conflict.setCreateConflictDate(new Date());
+        entityManager.persist(conflict);
+    }
 
     /* метод работы с бд */
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public void process(List<DistributedObject> distributedObjects, String objectClass) throws Exception {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)//, isolation = Isolation.READ_COMMITTED)  дает ошибку http://stackoverflow.com/questions/5234240/hibernatespringjpaisolation-does-not-work
+    public void process(List<DistributedObject> distributedObjects, String objectClass, Long idOfOrg) throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
-        //List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
-        entityManager.find(TechnologicalMap.class,1L);
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            Document document = factory.newDocumentBuilder().newDocument();
             DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass);
             long currentMaxVersion = doVersion.getCurrentVersion();
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
-            //for (DistributedObject distributedObject: distributedObjects){
             for (DistributedObject distributedObject : distributedObjects) {
                 try {
                     if (distributedObject.getDeletedState()) {
-                        DAOService.getInstance().setDeletedState(distributedObject);
+                        if(updateDeleteState(distributedObject)) {
+                            throw new Exception("Error by set Delete State by "+distributedObject.getClass().getSimpleName()+" guid="+distributedObject.getGuid());
+                        }
                     } else {
                         if (distributedObject.getTagName().equals("C")) {
-                            Long lid = distributedObject.getLocalID();
-                            distributedObject = DAOService.getInstance()
-                                    .createDistributedObject(distributedObject, currentMaxVersion);
+                            distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
                             distributedObject.setTagName("C");
-                            distributedObject.setLocalID(lid);
                         }
                         if (distributedObject.getTagName().equals("M")) {
                             long objectVersion = distributedObject.getGlobalVersion();
-                            Long currentVersion = DAOService.getInstance()
+                            long currentVersion = DAOService.getInstance()
                                     .getDistributedObjectVersion(distributedObject);
-                            if (objectVersion == currentVersion) {
-                                distributedObject = DAOService.getInstance()
-                                        .mergeDistributedObject(distributedObject, currentMaxVersion);
-                            } else {
-
-                                String stringElement = createStringElement(document, distributedObject);
-
-                                distributedObject = DAOService.getInstance()
-                                        .mergeDistributedObject(distributedObject, objectVersion);
-                                DOConflict conflict = new DOConflict();
-                                conflict.setgVersionCur(currentVersion);
-                                conflict.setIdOfOrg(idOfOrg);
-                                conflict.setgVersionInc(objectVersion);
-                                conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-
-                                conflict.setValueCur(createStringElement(document, distributedObject));
-
-                                conflict.setValueInc(stringElement);
-                                conflict.setCreateConflictDate(new Date());
-                                DAOService.getInstance().createConflict(conflict);
+                            if (objectVersion != currentVersion)  {
+                                createConflict(distributedObject, idOfOrg);
                             }
+                            distributedObject = DAOService.getInstance()
+                                    .mergeDistributedObject(distributedObject, objectVersion);
                             distributedObject.setTagName("M");
                         }
                         //distributedObjectList.add(distributedObject);
@@ -184,6 +189,8 @@ public class DistributionManager {
                     }
                 } catch (Exception e) {
                     // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
+                    errorMap.put(distributedObject.getClass().getSimpleName(),e.getMessage());
+                    logger.trace("",e);
                 }
             }
         } catch (Exception e) {
@@ -202,7 +209,7 @@ public class DistributionManager {
      * @param node Элемент <Pr>
      * @throws Exception
      */
-    public void build(Node node) throws Exception {
+    public void build(Node node, Long idOfOrg) throws Exception {
         //distributedObjects.clear();
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
@@ -227,6 +234,62 @@ public class DistributionManager {
                 node = node.getNextSibling();
             }
         }
+    }
+
+    /* парсинг блока <Confirm/> не обработанных объектов*/
+    public void buildConfirm(Node node, Long idOfOrg) throws Exception{
+
+    }
+
+    private Document getSimpleDocument() throws Exception{
+        if(document==null){
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            document = factory.newDocumentBuilder().newDocument();
+        }
+        return document;
+    }
+
+    @Transactional
+    private Long getGlobalIDByGUID(DistributedObject distributedObject){
+        //   TypedQuery<Long> query=entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where this.quid='"+distributedObject.getGuid()+"'",Long.class);
+        TypedQuery<Long> query = entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",Long.class);
+        return   query.getSingleResult();
+        //   return query.getSingleResult();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private DistributedObject createDistributedObject(DistributedObject distributedObject, long currentVersion)
+            throws Exception {
+        try {
+            distributedObject.setCreatedDate(new Date());
+            // Версия должна быть одна на всех, и получена заранее.
+            /*TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+            query.setParameter("distributedObjectClassName",distributedObject.getClass().getSimpleName().toUpperCase());
+            List<DOVersion> doVersionList = query.getResultList();
+            if(doVersionList.size()==0) {
+                distributedObject.setGlobalVersion(0L);
+            } else {
+                distributedObject.setGlobalVersion(doVersionList.get(0).getCurrentVersion()-1);
+            }*/
+            distributedObject.setGlobalVersion(currentVersion);
+            return entityManager.merge(distributedObject);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw e;
+        }
+    }
+
+    @Transactional
+    private boolean updateDeleteState(DistributedObject distributedObject){
+        StringBuilder stringQuery = new StringBuilder("update ");
+        stringQuery.append(distributedObject.getClass().getSimpleName());
+        stringQuery.append(" set deletedState=:deletedState where guid='");
+        stringQuery.append(distributedObject.getGuid());
+        stringQuery.append("'");
+        Query q = entityManager.createQuery(stringQuery.toString());
+        q.setParameter("deletedState", true);
+        return (q.executeUpdate()!=0);
+        //if (q.executeUpdate()!=0) throw new Exception("Error by set Delete State by "+distributedObject.getClass().getSimpleName()+" guid="+distributedObject.getGuid());
     }
 
     private String createStringElement(Document document, DistributedObject distributedObject)
@@ -261,9 +324,9 @@ public class DistributionManager {
 
 
     /* Getter and Setters */
-    public void setIdOfOrg(Long idOfOrg) {
+   /* public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
-    }
+    }*/
 
     public Map<String, List<DistributedObject>> getDistributedObjectsListMap() {
         return distributedObjectsListMap;
