@@ -98,6 +98,7 @@
 <div class="output-text">
     Ваш запрос на перечисление средств принят.
     Начисление на Вашу карту будет призведено сразу после получения уведомления от платежной системы.
+    Это может занять несколько минут.
 </div>
 <a class="output-text" href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(backURI.toString()))%>">Вернуться к
     странице запроса на
