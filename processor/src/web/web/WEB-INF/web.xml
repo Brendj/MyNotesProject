@@ -63,6 +63,10 @@
         <servlet-class>ru.axetta.ecafe.processor.web.partner.rbkmoney.RBKMoneyPaymentServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ChronopayPaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.chronopay.ChronopayPaymentServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>SBRTOnlinePaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.sberbank_rt.SBRTOnlinePaymentServlet</servlet-class>
     </servlet>
@@ -112,6 +116,11 @@
     <servlet-mapping>
         <servlet-name>RBKMoneyPaymentServlet</servlet-name>
         <url-pattern>/rbkmoney/acceptpay</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ChronopayPaymentServlet</servlet-name>
+        <url-pattern>/chronopay/acceptpay</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -242,6 +251,7 @@
             <url-pattern>/payment-elecsnet</url-pattern>
             <url-pattern>/payment-std</url-pattern>
             <url-pattern>/rbkmoney/acceptpay</url-pattern>
+            <url-pattern>/chronopay/acceptpay</url-pattern>
             <url-pattern>/payment-way4</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
