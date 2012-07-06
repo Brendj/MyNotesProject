@@ -1736,7 +1736,7 @@ public class SyncResponse {
         ecafeEnvelopeElement.setAttribute("Date", timeFormat.format(this.time));
         ecafeEnvelopeElement.setAttribute("Options", this.options);
         ecafeEnvelopeElement.setAttribute("Type", TYPE_NAMES[type]);
-
+/*
         // ResPaymentRegistry
         if (null != resPaymentRegistry) {
             ecafeEnvelopeElement.appendChild(resPaymentRegistry.toElement(document));
@@ -1799,7 +1799,7 @@ public class SyncResponse {
         // CorrectingNumbersOrdersRegistry
         if (correctingNumbersOrdersRegistry != null){
             ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
-        }
+        }*/
 
         // Distribution Manager
         if(distributionManager != null){

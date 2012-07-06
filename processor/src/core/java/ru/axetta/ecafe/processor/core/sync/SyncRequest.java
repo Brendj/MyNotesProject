@@ -2887,7 +2887,7 @@ MenuGroups menuGroups;
 
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2, distributionManager);
+                    enterEvents, libraryData, libraryData2, RuntimeContext.getAppContext().getBean(DistributionManager.class));
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
