@@ -2193,7 +2193,7 @@ persistenceSession.save(menuDetail);
     }
 
     public void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus,
-            Long contragentSum, String idOfPayment) throws Exception {
+            Long contragentSum, String idOfPayment,String addIdOfPayment) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format(
                     "IdOfContragent: %d, IdOfClientPaymentOrder: %d, OrderStatus: %d, ContragentSum: %d, IdOfPayment: %s",
@@ -2216,7 +2216,7 @@ persistenceSession.save(menuDetail);
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
                         idOfContragent, clientPaymentOrder));
             }
-            if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
+            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
                 logger.warn(
                         String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
                 //throw new IllegalArgumentException(
@@ -2237,7 +2237,7 @@ persistenceSession.save(menuDetail);
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client);
+                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client, addIdOfPayment);
                 }
             }
 
