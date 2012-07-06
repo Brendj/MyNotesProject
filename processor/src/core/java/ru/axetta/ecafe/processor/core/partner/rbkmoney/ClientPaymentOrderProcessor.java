@@ -19,5 +19,5 @@ public interface ClientPaymentOrderProcessor {
     void changePaymentOrderStatus(Long idOfClient, Long idOfClientPaymentOrder, int orderStatus) throws Exception;
 
     void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus, Long contragentSum,
-            String idOfPayment) throws Exception;
+            String idOfPayment,String addIdOfPayment) throws Exception;
 }
