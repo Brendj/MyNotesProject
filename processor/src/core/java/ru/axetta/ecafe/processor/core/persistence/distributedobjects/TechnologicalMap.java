@@ -74,12 +74,12 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"VPp", vitaminPp);
         setAttribute(element,"VC", vitaminC);
         setAttribute(element,"VE", vitaminE);
-        Document document = element.getOwnerDocument();
+        /*Document document = element.getOwnerDocument();
         for (TechnologicalMapProduct technologicalMapProduct: getTechnologicalMapProduct()){
             Element tmpElement = document.createElement("Product");
             technologicalMapProduct.appendAttributes(tmpElement);
             element.appendChild(tmpElement);
-        }
+        }*/
     }
 
     @Override
@@ -145,7 +145,7 @@ public class TechnologicalMap extends DistributedObject {
         Float floatVitaminE = getFloatAttributeValue(node,"VE");
         if(floatVitaminE!=null) setVitaminE(floatVitaminE);
 
-        node = node.getFirstChild();
+        /*node = node.getFirstChild();
         while (node!=null){
             TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
             technologicalMapProduct = (TechnologicalMapProduct) technologicalMapProduct.build(node);
@@ -154,7 +154,7 @@ public class TechnologicalMap extends DistributedObject {
             technologicalMapProduct.setGuid(UUID.randomUUID().toString());
             this.addTechnologicalMapProduct(technologicalMapProduct);
             node = node.getNextSibling();
-        }
+        }*/
         return this;
     }
 

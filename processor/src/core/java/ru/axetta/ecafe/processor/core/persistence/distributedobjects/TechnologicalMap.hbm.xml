@@ -11,6 +11,7 @@
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
+
         <property name="globalVersion" column="GlobalVersion" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
@@ -46,6 +47,7 @@
         <property name="vitaminPp" column="VitaminPp" type="float" />
         <property name="vitaminC" column="VitaminC" type="float" />
         <property name="vitaminE" column="VitaminE" type="float" />
+
 
         <set name="technologicalMapProductInternal" inverse="true" lazy="false" cascade="all">
             <key>

@@ -32,20 +32,14 @@ public class TechnologicalMapProduct extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element,"Name", nameOfProduct);
         setAttribute(element,"GWeight", grossWeight);
         setAttribute(element,"NWeight", netWeight);
-        if(product!=null) {
-            setAttribute(element,"RefGUID", getProduct().getGuid());
-        }
-     //   setAttribute(element,"IdProduct", idOfProduct);
-      //  setAttribute(element,"IdTechnoMap", idOfTechnoMap);
+        setAttribute(element,"RefGUIDOfProduct", product.getGuid());
+        setAttribute(element,"RefGUIDOfTechnoMap", technologicalMap.getGuid());
     }
 
     @Override
     protected TechnologicalMapProduct parseAttributes(Node node) {
-        /*String stringNameOfProduct = getStringAttributeValue(node,"Name",512);
-        if(stringNameOfProduct!=null) setNameOfProduct(stringNameOfProduct);*/
 
         Float floatGrossMass = getFloatAttributeValue(node,"GWeight");
         if(floatGrossMass!=null) setGrossWeight(floatGrossMass);
@@ -53,12 +47,11 @@ public class TechnologicalMapProduct extends DistributedObject {
         Float floatNetMass = getFloatAttributeValue(node,"NWeight");
         if(floatNetMass!=null) setNetWeight(floatNetMass);
 
-        String stringRefGUID = getStringAttributeValue(node,"RefGUID",36);
-        if(stringRefGUID!=null) {
-            setProduct(DAOService.getInstance().findProductByGUID(Product.class, stringRefGUID));
-           // setIdOfProduct(getProduct().getGlobalId());
-            if(product!=null) setNameOfProduct(getProduct().getProductName());
-        }
+        String stringRefGUIDOfProduct = getStringAttributeValue(node,"RefGUIDOfProduct",36);
+        setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class,stringRefGUIDOfProduct));
+
+        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"RefGUIDOfTechnoMap",36);
+        setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class,stringRefGUIDOfTechnoMap));
 
         return this;
     }
