@@ -34,6 +34,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -109,6 +110,9 @@ public class Processor implements SyncProcessor,
         this.persistenceSessionFactory = persistenceSessionFactory;
         this.eventNotificator = eventNotificator;
     }
+
+    //@Autowired
+    //private DistributionManager distributionManager;
 
     public SyncResponse processSyncRequest(SyncRequest request) throws Exception {
         Date syncStartTime = new Date();
@@ -252,12 +256,10 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
-                    RuntimeContext.getAppContext().getBean(DistributionManager.class).setIdOfOrg(request.getIdOfOrg());
-                    //request.getDistributionManager().setIdOfOrg(request.getIdOfOrg());
-                    distributionManager =  processDistributionManager(request.getDistributionManager());
+                    distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
                 } catch (Exception e) {
                     logger.error(
-                            String.format("Failed to process numbers of Orders, IdOfOrg == %s", request.getIdOfOrg()),
+                            String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
                 }
 
@@ -435,18 +437,17 @@ public class Processor implements SyncProcessor,
     }
 
     /* TODO: логика обработки менеджера глобальных объектов */
-    private DistributionManager processDistributionManager(DistributionManager distributionManager) throws Exception{
-        /* спринговские аннотации не сработают так как Process не является спринговским бином */
+    private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
+        //RuntimeContext.getAppContext().getBean(DistributionManager.class).process();
+        //Map<String, List<DistributedObject>> distributedObjectsListMap = RuntimeContext.getAppContext().getBean(DistributionManager.class).getDistributedObjectsListMap();
         Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
-        //Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
         for (String key : distributedObjectsListMap.keySet()) {
             // Перебираем все типы объектов, каждый тип обрабатывается в отдельной! транзакции.
             //distributionManager.process(distributedObjectsListMap.get(key), key);
-            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(key), key);
+            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(key), key, idOfOrg);
         }
         //RuntimeContext.getAppContext().getBean(DistributionManager.class).process(); Зачем доставать из контекста, если есть аргумент?
-        //return distributionManager;
-        return RuntimeContext.getAppContext().getBean(DistributionManager.class);
+        return distributionManager;
     }
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
