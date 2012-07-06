@@ -41,7 +41,6 @@ import java.util.*;
  */
 
 @Component
-//@Scope("singleton") Почему singleton? DistributionManager создается свой под каждого клиента, одним объектом на всех тут никак не обойтись.
 @Scope("prototype")
 public class DistributionManager {
 
@@ -55,18 +54,16 @@ public class DistributionManager {
      * Ключи = имена элементов (Пример элемента: <Pr>),
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
      */
-    //private HashMap<String,Long> currentMaxVersions=new HashMap<String, Long>();
+    private HashMap<String,Long> currentMaxVersions=new HashMap<String, Long>();
     /**
      * Список глобальных объектов на базе процессинга
      */
     //private List<DistributedObject> distributedObjects = new LinkedList<DistributedObject>();
+    /* Пара ключ значение ключ имя класса значение список объектов этого класса */
     private Map<String, List<DistributedObject>> distributedObjectsListMap = new HashMap<String, List<DistributedObject>>();
 
-    public Map<String, List<DistributedObject>> getDistributedObjectsListMap() {
-        return distributedObjectsListMap;
-    }
-
-    private DistributionManager() {
+    /* Обязательно public метод спринг не может инициализировать */
+    public DistributionManager() {
     }
 
     @PostConstruct
@@ -87,86 +84,55 @@ public class DistributionManager {
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         String tagName;
-        for (int i = 0; i < distributedObjects.size(); i++) {
-            DistributedObject distributedObject = distributedObjects.get(i);
-            /*if(distributedObject.getDeletedState()){
-                DAOService.getInstance().setDeletedState(distributedObject);
-            } else {
-                if(distributedObject.getTagName().equals("C")){
-                    Long lid = distributedObject.getLocalID();
-                    distributedObject = DAOService.getInstance().createDistributedObject(distributedObject);
-                    distributedObject.setTagName("C");
-                    distributedObject.setLocalID(lid);
-                    distributedObjects.set(i,distributedObject);
+        for(String key: distributedObjectsListMap.keySet()){
+            List<DistributedObject> distributedObjects = distributedObjectsListMap.get(key);
+            for (int i = 0; i < distributedObjects.size(); i++) {
+                DistributedObject distributedObject = distributedObjects.get(i);
+                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+                if (!elementMap.containsKey(tagName)) {
+                    Element distributedObjectElement = document.createElement(tagName);
+                    confirmElement.appendChild(distributedObjectElement);
+                    elementMap.put(tagName, distributedObjectElement);
                 }
-                if(distributedObjects.get(i).getTagName().equals("M")){
-                    long objectVersion = distributedObject.getGlobalVersion();
-                    Long currentMaxVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
-                    if(objectVersion == currentMaxVersion){
-                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentMaxVersion+1);
-                    } else {
-                        String stringElement = createStringElement(document, distributedObject);
-
-                        distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
-                        DOConflict conflict = new DOConflict();
-                        conflict.setgVersionCur(currentMaxVersion);
-                        conflict.setIdOfOrg(idOfOrg);
-                        conflict.setgVersionInc(objectVersion);
-                        conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-
-                        conflict.setValueCur(createStringElement(document, distributedObject));
-
-                        conflict.setValueInc(stringElement);
-                        conflict.setCreateConflictDate(new Date());
-                        DAOService.getInstance().createConflict(conflict);
-                    }
-                    distributedObject.setTagName("M");
-                    distributedObjects.set(i,distributedObject);
+                Element element = document.createElement(distributedObject.getTagName());
+                elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
+            }
+            elementRO.appendChild(confirmElement);
+            elementMap.clear();
+            distributedObjects.clear();
+            for (DistributedObjectsEnum distributedObjectsEnum : DistributedObjectsEnum.values()) {
+                String name = distributedObjectsEnum.name();
+                List<DistributedObject> distributedObjectList = DAOService.getInstance()
+                        .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
+                if (!distributedObjectList.isEmpty()) {
+                    distributedObjects.addAll(distributedObjectList);
                 }
-            }*/
-            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
-            if (!elementMap.containsKey(tagName)) {
-                Element distributedObjectElement = document.createElement(tagName);
-                confirmElement.appendChild(distributedObjectElement);
-                elementMap.put(tagName, distributedObjectElement);
             }
-            Element element = document.createElement(distributedObject.getTagName());
-            elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
-        }
-        elementRO.appendChild(confirmElement);
-        elementMap.clear();
-        distributedObjects.clear();
-        for (DistributedObjectsEnum distributedObjectsEnum : DistributedObjectsEnum.values()) {
-            String name = distributedObjectsEnum.name();
-            List<DistributedObject> distributedObjectList = DAOService.getInstance()
-                    .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
-            if (!distributedObjectList.isEmpty()) {
-                distributedObjects.addAll(distributedObjectList);
-            }
-        }
 
-        for (DistributedObject distributedObject : distributedObjects) {
-            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
-            if (!elementMap.containsKey(tagName)) {
-                Element distributedObjectElement = document.createElement(tagName);
-                elementRO.appendChild(distributedObjectElement);
-                elementMap.put(tagName, distributedObjectElement);
+            for (DistributedObject distributedObject : distributedObjects) {
+                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+                if (!elementMap.containsKey(tagName)) {
+                    Element distributedObjectElement = document.createElement(tagName);
+                    elementRO.appendChild(distributedObjectElement);
+                    elementMap.put(tagName, distributedObjectElement);
+                }
+                Element element = document.createElement("O");
+                elementMap.get(tagName).appendChild(distributedObject.toElement(element));
             }
-            Element element = document.createElement("O");
-            elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
         return elementRO;
     }
 
-
     @PersistenceContext
     EntityManager entityManager;
+
 
     /* метод работы с бд */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public void process(List<DistributedObject> distributedObjects, String objectClass) throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         //List<DistributedObject> distributedObjectList = new LinkedList<DistributedObject>();
+        entityManager.find(TechnologicalMap.class,1L);
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document document = factory.newDocumentBuilder().newDocument();
@@ -237,11 +203,11 @@ public class DistributionManager {
      * @throws Exception
      */
     public void build(Node node) throws Exception {
-        distributedObjects.clear();
+        //distributedObjects.clear();
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             // При обработке в
-            //currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
+            currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
             // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
             /*if(node.getFirstChild()!=null){
                 DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
@@ -251,7 +217,7 @@ public class DistributionManager {
                 DistributedObject distributedObject = createDistributedObject(currentObject);
                 distributedObject = distributedObject.build(node);
                 distributedObject.setOrgOwner(idOfOrg);
-                distributedObjects.add(distributedObject);
+                //distributedObjects.add(distributedObject);
 
                 if (!distributedObjectsListMap.containsKey(currentObject.name())) {
                     distributedObjectsListMap.put(currentObject.name(), new LinkedList<DistributedObject>());
@@ -275,7 +241,6 @@ public class DistributionManager {
         return buffer.toString();
     }
 
-
     private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception {
         /*DistributedObject distributedObject=null;
         switch (distributedObjectsEnum){
@@ -294,9 +259,14 @@ public class DistributionManager {
                 .getNamedItem(attributeName).getTextContent() : null);
     }
 
+
     /* Getter and Setters */
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public Map<String, List<DistributedObject>> getDistributedObjectsListMap() {
+        return distributedObjectsListMap;
     }
 
 }
