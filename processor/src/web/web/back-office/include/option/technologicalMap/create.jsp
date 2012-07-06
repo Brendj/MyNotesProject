@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания правила --%>
+<%--@elvariable id="technologicalMapCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.TechnologicalMapCreatePage"--%>
 <h:panelGrid id="technologicalMapCreatePanel" binding="#{technologicalMapCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
@@ -59,8 +60,8 @@
         </rich:column>
     </rich:dataTable>
 
-    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapCreatePage.showProducts}" reRender="technologicalMapProductModalPanel"
-                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductModalPanel')}.show();"
+    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapCreatePage.showProducts}" reRender="technologicalMapProductSelectModalPanel"
+                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductSelectModalPanel')}.show();"
                        styleClass="command-button"/>
 
     <h:panelGrid columns="2">
