@@ -252,7 +252,8 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
-                    request.getDistributionManager().setIdOfOrg(request.getIdOfOrg());
+                    RuntimeContext.getAppContext().getBean(DistributionManager.class).setIdOfOrg(request.getIdOfOrg());
+                    //request.getDistributionManager().setIdOfOrg(request.getIdOfOrg());
                     distributionManager =  processDistributionManager(request.getDistributionManager());
                 } catch (Exception e) {
                     logger.error(
@@ -435,13 +436,17 @@ public class Processor implements SyncProcessor,
 
     /* TODO: логика обработки менеджера глобальных объектов */
     private DistributionManager processDistributionManager(DistributionManager distributionManager) throws Exception{
+        /* спринговские аннотации не сработают так как Process не является спринговским бином */
         Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
+        //Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
         for (String key : distributedObjectsListMap.keySet()) {
             // Перебираем все типы объектов, каждый тип обрабатывается в отдельной! транзакции.
-            distributionManager.process(distributedObjectsListMap.get(key), key);
+            //distributionManager.process(distributedObjectsListMap.get(key), key);
+            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(key), key);
         }
         //RuntimeContext.getAppContext().getBean(DistributionManager.class).process(); Зачем доставать из контекста, если есть аргумент?
-        return distributionManager;
+        //return distributionManager;
+        return RuntimeContext.getAppContext().getBean(DistributionManager.class);
     }
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
