@@ -4,11 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem;
+import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +29,24 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class TechnologicalMapCreatePage extends BasicWorkspacePage {
+public class TechnologicalMapCreatePage extends BasicWorkspacePage implements ProductSelect {
+
+    @Override
+    public void select(List<ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem> productItemList) {
+        if (!(productItemList == null || productItemList.isEmpty())) {
+            for (ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem productItem: productItemList){
+                TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
+                //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
+                technologicalMapProduct.setProduct(productItem.getProduct());
+                technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
+                technologicalMapProduct.setDeletedState(false);
+                technologicalMapProduct.setTechnologicalMap(technologicalMap);
+                //technologicalMapProducts.add(technologicalMapProduct);
+                technologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
+            }
+            technologicalMapProducts = technologicalMap.getTechnologicalMapProduct();
+        }
+    }
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapCreatePage.class);
     private TechnologicalMap technologicalMap;
@@ -74,12 +95,11 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
             technologicalMap.setGlobalVersion(0L);
             UUID tmUUID = UUID.randomUUID();
             technologicalMap.setGuid(tmUUID.toString());
-            DAOService.getInstance().persistEntity(technologicalMap);
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMap.getTechnologicalMapProduct()){
                 technologicalMapProduct.setCreatedDate(new Date());
                 technologicalMapProduct.setGuid(UUID.randomUUID().toString());
-                DAOService.getInstance().persistEntity(technologicalMapProduct);
             }
+            DAOService.getInstance().persistEntity(technologicalMap);
             printMessage("Новая технологическая карта создана успешно.");
             technologicalMap = new TechnologicalMap();
             technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
@@ -94,13 +114,15 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage {
         return null;
     }
 
-    public Object showProducts() {
+    public Object showProducts() throws Exception {
         //TODO continue
-        List<Product> productList = DAOService.getInstance().getDistributedObjects(Product.class);
+        /*List<Product> productList = DAOService.getInstance().getDistributedObjects(Product.class);
         products.clear();
         for (Product product: productList){
             products.add(new ProductItem(false,product));
-        }
+        }*/
+        RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).reload(new LinkedList<TechnologicalMapProduct>());
+        RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).pushCompleteHandlerList(RuntimeContext.getAppContext().getBean(getClass()));
         return null;
     }
 
