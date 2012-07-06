@@ -28,6 +28,10 @@
 
     <rich:calendar rendered="false" />
 
+    <f:subview id="technologicalMapProductsSelectSubView">
+        <c:import url="include/option/technologicalMap/product/select.jsp" />
+    </f:subview>
+
     <f:subview id="technologicalMapProductSelectSubView">
         <c:import url="include/option/technologicalMap/product/select_list.jsp" />
     </f:subview>
