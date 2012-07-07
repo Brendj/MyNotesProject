@@ -230,4 +230,12 @@ public class DAOService {
         if (cl==null) return null;
         return cl;
     }
+
+    @Transactional
+    public void addIntegraPartnerAccessPermissionToClient(Long idOfClient, String idOfIntegraPartner) throws Exception {
+        Client cl = em.find(Client.class, idOfClient);
+        if (cl==null) throw new Exception("Client not found: "+idOfClient);
+        cl.addIntegraPartnerAccessPermission(idOfIntegraPartner);
+        em.persist(cl);
+    }
 }

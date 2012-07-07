@@ -35,9 +35,8 @@ public class PaymentWSTest extends TestCase {
     public PaymentWSTest(String testName) {
         super(testName);
     }
-
-    @Override
-    protected void setUp() throws Exception {
+    
+    public static void setUpSSL() {
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -60,6 +59,11 @@ public class PaymentWSTest extends TestCase {
         }
     }
 
+    @Override
+    protected void setUp() throws Exception {
+        setUpSSL();
+    }
+
 
     @Override
     protected void tearDown() throws Exception {
@@ -69,7 +73,7 @@ public class PaymentWSTest extends TestCase {
     //String PUB_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxMrji+H3bfAfrZkjc6bGkK3nLLb+KpUvpmENknE/0nIkVjIvWMN8gTqJ7Oc7XP+ImpcatRb9dChM5QDru8K8XO46ABn4bUZX9V0xNGMEJRPtLAQdeEIa2p9QccuPW1DHcVbgkICy3eOAT87Q29GHp2PITRjL48mPd4A6dAwbg8QIDAQAB";
     String PUB_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxMrji+H3bfAfrZkjc6bGkK3nLLb+KpUvpmENknE/0nIkVjIvWMN8gTqJ7Oc7XP+ImpcatRb9dChM5QDru8K8XO46ABn4bUZX9V0xNGMEJRPtLAQdeEIa2p9QccuPW1DHcVbgkICy3eOAT87Q29GHp2PITRjL48mPd4A6dAwbg8QIDAQAB";
 
-    public class TestHostnameVerifier implements HostnameVerifier {
+    public static class TestHostnameVerifier implements HostnameVerifier {
         public boolean verify(String arg0, SSLSession arg1) {
             return true;
         }

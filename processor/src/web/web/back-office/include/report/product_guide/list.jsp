@@ -46,7 +46,7 @@
                 changedHoverClass="hover" viewHoverClass="hover"
                 viewClass="inplace" changedClass="inplace"
                 selectOnEdit="true" editEvent="ondblclick" >
-           <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"/>
+           <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId}" reRender="selectCurrentConfigurationProvider"/>
         </rich:inplaceInput>
     </rich:column>
 
@@ -60,7 +60,7 @@
                 changedHoverClass="hover" viewHoverClass="hover"
                 viewClass="inplace" changedClass="inplace"
                 selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
+            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId}" reRender="selectCurrentConfigurationProvider"  />
         </rich:inplaceInput>
     </rich:column>
 
@@ -73,7 +73,7 @@
                 changedHoverClass="hover" viewHoverClass="hover"
                 viewClass="inplace" changedClass="inplace"
                 selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
+            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId}" reRender="selectCurrentConfigurationProvider"  />
         </rich:inplaceInput>
     </rich:column>
 
@@ -86,7 +86,7 @@
                 changedHoverClass="hover" viewHoverClass="hover"
                 viewClass="inplace" changedClass="inplace"
                 selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
+            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId}" reRender="selectCurrentConfigurationProvider"  />
         </rich:inplaceInput>
     </rich:column>
 
@@ -96,7 +96,7 @@
         </f:facet>
         <h:selectBooleanCheckbox value="#{item.deleted}"
                                  styleClass="output-text" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
+            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId}" reRender="selectCurrentConfigurationProvider"  />
         </h:selectBooleanCheckbox>
     </rich:column>
 

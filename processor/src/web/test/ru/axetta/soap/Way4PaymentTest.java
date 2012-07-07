@@ -22,7 +22,13 @@ public class Way4PaymentTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        setUpClientSSL();
+    }
+
+
+    public static void setUpClientSSL() throws Exception {
         KeyStore ks = KeyStore.getInstance("pkcs12");
+
         ks.load(new FileInputStream("C:\\Temp\\certs\\ispp_test_org_demo.pfx"), "1".toCharArray());
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
@@ -47,9 +53,9 @@ public class Way4PaymentTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
-
-
+    
     @Override
     protected void tearDown() throws Exception {
     }

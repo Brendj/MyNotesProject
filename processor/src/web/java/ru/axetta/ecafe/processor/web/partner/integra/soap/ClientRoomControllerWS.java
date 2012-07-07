@@ -5,17 +5,21 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
+import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.ClientAuthToken;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -23,17 +27,23 @@ import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -54,12 +64,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
-
+    private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+    
     private static final String RC_OK_DESC="OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
     private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
     private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    private static final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+
+    @Resource
+    private WebServiceContext context;
+
 
     static class Processor {
 
@@ -70,7 +88,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ClassStudentListResult getStudentListByIdOfClientGroup(Long idOfClientGroup){
+    public ClassStudentListResult getStudentListByIdOfClientGroup(Long idOfClientGroup) {
+        authenticateRequest(null);
+
         ClassStudentListResult classStudentListResult = new ClassStudentListResult();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -110,6 +130,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientGroupListResult getGroupListByOrg(Long idOfOrg){
+        authenticateRequest(null);
+
         ClientGroupListResult clientGroupListResult = new ClientGroupListResult();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -243,6 +265,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryResult getSummary(Long contractId) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -259,6 +283,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryResult getSummary(String san) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -275,6 +301,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryResult getSummaryByTypedId(String id, int idType) {
+        authenticateRequest(null);
+
         Object idVal=null;
         if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) idVal = Long.parseLong(id);
         else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_EXTERNAL_ID) idVal = Long.parseLong(id);
@@ -345,6 +373,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -361,6 +391,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -421,6 +453,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PaymentListResult getPaymentList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -438,6 +472,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PaymentListResult getPaymentList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -482,6 +518,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public MenuListResult getMenuList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -498,6 +536,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -515,6 +555,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId,
             final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
         Data data = new OrgRequest().process(orgId, new Processor() {
             public void process(Org org, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -590,6 +632,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public CardListResult getCardList(Long contractId) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -606,6 +650,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public CardListResult getCardList(String san) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -640,6 +686,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public EnterEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -656,6 +704,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public EnterEventListResult getEnterEventList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
         Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
@@ -703,6 +753,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientsData getClientsByGuardSan(String guardSan) {
+        authenticateRequest(null);
+
         ClientsData data = new ClientsData();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -746,6 +798,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
+        authenticateRequest(null);
+
         AttachGuardSanResult data = new AttachGuardSanResult();
         EntityManager entityManager = null;
         EntityTransaction entityTransaction = null;
@@ -774,6 +828,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public AttachGuardSanResult attachGuardSan(Long contractId, String guardSan) {
+        authenticateRequest(null);
+
         AttachGuardSanResult data = new AttachGuardSanResult();
         EntityManager entityManager = null;
         EntityTransaction entityTransaction = null;
@@ -802,6 +858,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public DetachGuardSanResult detachGuardSan(String san, String guardSan) {
+        authenticateRequest(null);
+
         DetachGuardSanResult data = new DetachGuardSanResult();
 
         EntityManager entityManager = null;
@@ -832,6 +890,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public DetachGuardSanResult detachGuardSan(Long contractId, String guardSan) {
+        authenticateRequest(null);
+
         DetachGuardSanResult data = new DetachGuardSanResult();
 
         EntityManager entityManager = null;
@@ -949,6 +1009,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId) {
+        authenticateRequest(null);
+
         long lCardId = Long.parseLong(cardId);
         try {
             return DAOService.getInstance().getContractIdByCardNo(lCardId);
@@ -960,6 +1022,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryExt[] getSummaryByGuardSan(String guardSan) {
+        authenticateRequest(null);
+
         ClientsData cd = getClientsByGuardSan(guardSan);
         LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
         if (cd!=null && cd.clientList!=null) {
@@ -976,6 +1040,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "state") boolean state) {
+        authenticateRequest(contractId);
+
         Result r = new Result();
         r.resultCode=RC_OK;
         r.description=RC_OK_DESC;
@@ -989,6 +1055,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result enableNotificationByEmail(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "state") boolean state) {
+        authenticateRequest(contractId);
+
         Result r = new Result();
         r.resultCode=RC_OK;
         r.description=RC_OK_DESC;
@@ -1002,6 +1070,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result changeMobilePhone(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "mobilePhone") String mobilePhone) {
+        authenticateRequest(contractId);
+
         Result r = new Result();
         r.resultCode=RC_OK;
         r.description=RC_OK_DESC;
@@ -1020,6 +1090,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email) {
+        authenticateRequest(contractId);
+
         Result r = new Result();
         r.resultCode=RC_OK;
         r.description=RC_OK_DESC;
@@ -1032,6 +1104,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit) {
+        authenticateRequest(contractId);
+
         Result r = new Result(RC_OK, RC_OK_DESC);
         if (limit<0) {
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
@@ -1045,6 +1119,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, int state) {
+        authenticateRequest(contractId);
+
         final int fState = state;
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -1093,5 +1169,86 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ciList.getC().add(ci);
         }
         data.setCirculationItemList(ciList);
+    }
+
+    @Override
+    public Result authorizeClient(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "base64passwordHash") String base64passwordHash) {
+        IntegraPartnerConfig.LinkConfig partnerLinkConfig = null;
+        partnerLinkConfig = authenticateRequest(null);
+        try {
+
+            DAOService daoService = DAOService.getInstance();
+            Client client = daoService.getClientByContractId(contractId);
+            if (client==null) return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+    
+            if (client.hasEncryptedPassword(base64passwordHash)) {
+                if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+                    daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
+                }
+                return new Result(RC_OK, RC_OK_DESC);
+            } else {
+                return new Result(RC_CLIENT_AUTHORIZATION_FAILED, RC_CLIENT_AUTHORIZATION_FAILED_DESC);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to authorized client", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        }
+    }
+
+    IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
+        MessageContext jaxwsContext = context.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest)jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
+        String clientAddress = request.getRemoteAddr();
+        ////
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        X509Certificate[] certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+        ////
+        IntegraPartnerConfig.LinkConfig linkConfig = null;
+        String DNs="";
+        if (certificates!=null && certificates.length>0) {
+            for (int n=0;n<certificates.length;++n) {
+                String dn = certificates[0].getSubjectDN().getName();
+                linkConfig =  runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
+                if (linkConfig!=null) break;
+                DNs+=dn+";";
+            }
+        }
+        /////
+        // пробуем по имени и паролю
+        if (linkConfig==null) {
+            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy)jaxwsContext.get("org.apache.cxf.configuration.security.AuthorizationPolicy");
+            if (authorizationPolicy!=null && authorizationPolicy.getUserName()!=null) {
+                linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),  authorizationPolicy.getPassword());
+            }
+        }
+        /////
+        if (linkConfig==null) {
+            linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigWithAuthTypeNoneAndMatchingAddress(clientAddress);
+        } else {
+            // check remote addr
+            if (!linkConfig.matchAddress(clientAddress)) {
+                throw new Error("Integra partner auth failed: remote address does not match: "+clientAddress+" for link config: "+linkConfig.id+"; request: ip="+clientAddress+"; ssl DNs="+DNs);
+            }
+        }
+        /////
+        if (linkConfig==null) {
+            throw new Error("Integra partner auth failed: link config not found: ip="+clientAddress+"; ssl DNs="+DNs);
+        }
+        /////
+        if (contractId!=null && linkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+            DAOService daoService = DAOService.getInstance();
+            Client client = null;
+            try {
+                client = daoService.getClientByContractId(contractId);
+            } catch (Throwable e) {
+            }
+            if (client==null) throw new Error("Integra partner auth failed: client not found: contractId="+contractId+"; ip="+clientAddress+"; ssl DNs="+DNs);
+            
+            if (!client.hasIntegraPartnerAccessPermission(linkConfig.id)) {
+                throw new Error("Integra partner auth failed: access prohibited for client: contractId="+contractId+", authorize client first; ip="+clientAddress+"; ssl DNs="+DNs);
+            }
+        }
+        return linkConfig;
     }
 }

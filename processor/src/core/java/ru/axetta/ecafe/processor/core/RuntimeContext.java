@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
+import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -42,7 +43,6 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.cxf.BusFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
@@ -55,16 +55,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.*;
-import javax.print.attribute.standard.Finishings;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.StringReader;
@@ -76,7 +73,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 @Scope("singleton")
@@ -160,6 +156,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
+    private IntegraPartnerConfig integraPartnerConfig;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
@@ -171,6 +168,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public ElecsnetConfig getPartnerElecsnetConfig() {
         return partnerElecsnetConfig;
+    }
+
+    public IntegraPartnerConfig getIntegraPartnerConfig() {
+        return integraPartnerConfig;
     }
 
     public AutoReportGenerator getAutoReportGenerator() {
@@ -313,6 +314,8 @@ public class RuntimeContext implements ApplicationContextAware {
         RuntimeContext.sessionFactory = sessionFactory;
     }
 
+    
+    boolean criticalErrors;
 
     Properties configProperties;
 
@@ -359,7 +362,18 @@ public class RuntimeContext implements ApplicationContextAware {
             /////////////////////////////////////////////////////////////////////////////////////////////
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
-            this.partnerStdPayConfig = new StdPayConfig(properties, PROCESSOR_PARAM_BASE);
+            try {
+                this.partnerStdPayConfig = new StdPayConfig(properties, PROCESSOR_PARAM_BASE);
+            } catch (Exception e) {
+                logger.error("Failed to load std pay config: "+e);
+                criticalErrors = true;
+            }
+            try {
+                this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
+            } catch (Exception e) {
+                logger.error("Failed to load partner config: "+e);
+                criticalErrors = true;
+            }
 
             this.syncPrivateKey = loadSyncPrivateKeyData(properties);
             this.paymentPrivateKey = loadPaymentPrivateKeyData(properties);
@@ -834,7 +848,7 @@ public class RuntimeContext implements ApplicationContextAware {
             throw new Exception("Invalid SMS service type: "+serviceType);
         }
 
-        if (logger.isDebugEnabled()) {
+if (logger.isDebugEnabled()) {
             logger.debug("SMS service created.");
         }
         return smsService;
@@ -991,5 +1005,10 @@ public class RuntimeContext implements ApplicationContextAware {
             em.persist(o);
         }
     }
+
+    public boolean getCriticalErrors() {
+        return criticalErrors;
+    }
+
 }
 

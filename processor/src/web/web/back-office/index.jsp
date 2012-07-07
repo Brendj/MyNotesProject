@@ -131,6 +131,8 @@
                 <a4j:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
                     <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
                         <h:panelGroup style="text-align: right; float: right;">
+                            <h:outputText escape="true" rendered="#{runtimeContext.criticalErrors}" value="Критические ошибки в работе - необходимо проверить журнальный файл!"
+                                          styleClass="error-output-text" /><br />
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
                                           styleClass="output-text" /><br />
                             <h:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"

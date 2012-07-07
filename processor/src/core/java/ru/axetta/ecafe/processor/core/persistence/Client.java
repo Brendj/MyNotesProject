@@ -498,6 +498,9 @@ public class Client {
     public boolean hasPassword(String plainPassword) throws Exception {
         return StringUtils.equals(this.cypheredPassword, encryptPassword(plainPassword));
     }
+    public boolean hasEncryptedPassword(String encryptedPassword) throws Exception {
+        return StringUtils.equals(this.cypheredPassword, encryptedPassword);
+    }
 
     private Set<DiaryValue> getDiaryValuesInternal() {
         // For Hibernate only
@@ -651,7 +654,7 @@ public class Client {
                 + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts +'}';
     }
 
-    private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
+    public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
         MessageDigest hash = MessageDigest.getInstance("SHA1");
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
         DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
@@ -678,5 +681,18 @@ public class Client {
         if (mobilePhone.length()==10) mobilePhone="7"+mobilePhone;
         else if (mobilePhone.length()!=11) return null;
         return mobilePhone;
+    }
+
+    public boolean hasIntegraPartnerAccessPermission(String id) {
+        return getRemarks()!=null && getRemarks().contains("{integra.access:"+id+"}");
+    }
+    public void addIntegraPartnerAccessPermission(String id) {
+        if (!hasIntegraPartnerAccessPermission(id)) {
+            String r = getRemarks();
+            String accessMarker = "{integra.access:"+id+"}";
+            if (r==null) r=accessMarker;
+            else r+="\n"+accessMarker;
+            setRemarks(r);
+        }
     }
 }
