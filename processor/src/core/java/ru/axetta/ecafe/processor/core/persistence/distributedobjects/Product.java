@@ -22,6 +22,11 @@ import java.util.Set;
 
 public class Product extends DistributedObject {
 
+    @Override
+    public int getPriority() {
+        return 1;
+    }
+
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
      * Атрибуты данного элемента приравниваются соответствующим полям объекта this.

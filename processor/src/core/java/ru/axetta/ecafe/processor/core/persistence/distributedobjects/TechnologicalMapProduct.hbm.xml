@@ -22,7 +22,6 @@
                   not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <property name="nameOfProduct" column="NameOfProduct" type="string" length="256"/>
         <property name="grossWeight" column="GrossWeight" type="double" />
         <property name="netWeight" column="NetWeight" type="double" />
         <!--

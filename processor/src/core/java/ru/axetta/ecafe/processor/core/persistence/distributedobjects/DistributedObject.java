@@ -22,7 +22,16 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-public abstract class DistributedObject{
+public abstract class DistributedObject implements Comparable<DistributedObject>{
+
+    @Override
+    public int compareTo(DistributedObject o) {
+        if(getPriority()>o.getPriority()) return 1;
+        if(getPriority()<o.getPriority()) return -1;
+        return 0;
+    }
+
+    public abstract int getPriority();
 
     /* Идентификатор объекта */
     protected Long globalId;
@@ -38,8 +47,6 @@ public abstract class DistributedObject{
     protected Date deleteDate;
     /* статус объекта (активен/удален) */
     protected Boolean deletedState;
-    /* полуе локального идентификатора*/
-    protected Long localID;
     /* имя узла элемента */
     protected String tagName;
     /* GUID объекта */
@@ -51,7 +58,6 @@ public abstract class DistributedObject{
         if(getDeletedState()){
             element.setAttribute("D", "1");
         }
-        if(this.getLocalID()!=null) element.setAttribute("LID", Long.toString(this.getLocalID()));
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         return element;
     }
@@ -78,9 +84,6 @@ public abstract class DistributedObject{
 
         Long version = getLongAttributeValue(node,"V");
         if(version!=null) setGlobalVersion(version);
-
-        Long lid = getLongAttributeValue(node,"LID");
-        if(lid!=null) setLocalID(lid);
 
         Integer status = getIntegerAttributeValue(node,"D");
         setDeletedState(status != null);
@@ -149,14 +152,6 @@ public abstract class DistributedObject{
     }
 
     /* Getters and Setters */
-    public Long getLocalID() {
-        return localID;
-    }
-
-    public void setLocalID(Long localID) {
-        this.localID = localID;
-    }
-
     public String getTagName() {
         return tagName;
     }

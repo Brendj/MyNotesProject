@@ -60,9 +60,9 @@ public class DistributionManager {
     /**
      * Список глобальных объектов на базе процессинга
      */
-    //private List<DistributedObject> distributedObjects = new LinkedList<DistributedObject>();
+    //private List<DistributedObject> distributedObjects = new ArrayList<DistributedObject>();
     /* Пара ключ значение ключ имя класса значение список объектов этого класса */
-    private Map<String, List<DistributedObject>> distributedObjectsListMap = new HashMap<String, List<DistributedObject>>();
+    private Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
 
     private Map<String,String> errorMap = new HashMap<String, String>();
 
@@ -91,7 +91,7 @@ public class DistributionManager {
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         String tagName;
         List<DistributedObject> distributedObjects = null;
-        for(String key: distributedObjectsListMap.keySet()){
+        for(DistributedObjectsEnum key: distributedObjectsListMap.keySet()){
             distributedObjects = distributedObjectsListMap.get(key);
             for (int i = 0; i < distributedObjects.size(); i++) {
                 DistributedObject distributedObject = distributedObjects.get(i);
@@ -156,10 +156,10 @@ public class DistributionManager {
 
     /* метод работы с бд */
     @Transactional(propagation = Propagation.REQUIRES_NEW)//, isolation = Isolation.READ_COMMITTED)  дает ошибку http://stackoverflow.com/questions/5234240/hibernatespringjpaisolation-does-not-work
-    public void process(List<DistributedObject> distributedObjects, String objectClass, Long idOfOrg) throws Exception {
+    public void process(List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, Long idOfOrg) throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         try {
-            DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass);
+            DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
             long currentMaxVersion = doVersion.getCurrentVersion();
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             for (DistributedObject distributedObject : distributedObjects) {
@@ -224,12 +224,11 @@ public class DistributionManager {
                 DistributedObject distributedObject = createDistributedObject(currentObject);
                 distributedObject = distributedObject.build(node);
                 distributedObject.setOrgOwner(idOfOrg);
-                //distributedObjects.add(distributedObject);
 
-                if (!distributedObjectsListMap.containsKey(currentObject.name())) {
-                    distributedObjectsListMap.put(currentObject.name(), new LinkedList<DistributedObject>());
-                }
-                distributedObjectsListMap.get(currentObject.name()).add(distributedObject);
+                if (!distributedObjectsListMap.containsKey(currentObject)) {
+                    distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
+                }                                                                
+                distributedObjectsListMap.get(currentObject).add(distributedObject);
 
                 node = node.getNextSibling();
             }
@@ -328,7 +327,7 @@ public class DistributionManager {
         this.idOfOrg = idOfOrg;
     }*/
 
-    public Map<String, List<DistributedObject>> getDistributedObjectsListMap() {
+    public Map<DistributedObjectsEnum, List<DistributedObject>> getDistributedObjectsListMap() {
         return distributedObjectsListMap;
     }
 

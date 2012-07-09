@@ -20,10 +20,14 @@ import java.util.Set;
  */
 public class TechnologicalMapProduct extends DistributedObject {
 
+    @Override
+    public int getPriority() {
+        return 2;
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setNameOfProduct(((TechnologicalMapProduct) distributedObject).getNameOfProduct());
+        //setNameOfProduct(((TechnologicalMapProduct) distributedObject).getNameOfProduct());
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
@@ -57,7 +61,7 @@ public class TechnologicalMapProduct extends DistributedObject {
     }
 
     //Наименование продукта
-    private String nameOfProduct;
+    //private String nameOfProduct;
 
     //Масса брутто, г
     private double grossWeight;
@@ -83,14 +87,14 @@ public class TechnologicalMapProduct extends DistributedObject {
     public void setTechnologicalMap(TechnologicalMap technologicalMap) {
         this.technologicalMap = technologicalMap;
     }
-
+/*
     public String getNameOfProduct() {
         return nameOfProduct;
     }
 
     public void setNameOfProduct(String nameOfProduct) {
         this.nameOfProduct = nameOfProduct;
-    }
+    }*/
 
     public double getNetWeight() {
         return netWeight;

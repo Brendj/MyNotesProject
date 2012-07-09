@@ -12,16 +12,23 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  * To change this template use File | Settings | File Templates.
  */
 public enum DistributedObjectsEnum {
-    Product("Product"),
-    TechnologicalMap("TechnologicalMap"),
-    TechnologicalMapProduct("TechnologicalMapProduct");
+    Product("Product", 1),
+    TechnologicalMap("TechnologicalMap", 1),
+    TechnologicalMapProduct("TechnologicalMapProduct", 2);
 
     private final String value;
-    private DistributedObjectsEnum(String value) {
+    private final int priority;
+
+    private DistributedObjectsEnum(String value, int priority) {
         this.value = value;
+        this.priority = priority;
     }
     public String getValue() {
         return value;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public static DistributedObjectsEnum parse(String ids) {
@@ -36,14 +43,14 @@ public enum DistributedObjectsEnum {
     }
 
     public static DistributedObjectsEnum parse(Class clazz) {
-        DistributedObjectsEnum event = null; // Default
+        DistributedObjectsEnum distributedObjectsEnum = null; // Default
         String className = clazz.getSimpleName();
         for (DistributedObjectsEnum item : DistributedObjectsEnum.values()) {
             if (item.name().equalsIgnoreCase(className)) {
-                event = item;
+                distributedObjectsEnum = item;
                 break;
             }
         }
-        return event;
+        return distributedObjectsEnum;
     }
 }

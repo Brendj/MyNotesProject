@@ -19,6 +19,10 @@ import java.util.*;
  */
 public class TechnologicalMap extends DistributedObject {
 
+    @Override
+    public int getPriority() {
+        return 1;
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {
