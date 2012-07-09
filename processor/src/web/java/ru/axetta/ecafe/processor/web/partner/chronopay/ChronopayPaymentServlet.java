@@ -38,12 +38,25 @@ import java.util.Enumeration;
  * Time: 16:02:24
  * To change this template use File | Settings | File Templates.
  */
+
+/**
+ * Принимает callback от Chronopay и увеличивает баланс у клиента
+ */
 public class ChronopayPaymentServlet extends HttpServlet {
 
+    /**
+     * Логгер
+     */
     private static final Logger logger = LoggerFactory.getLogger(ChronopayPaymentServlet.class);
 
 
-
+    /**
+     * Вычисляет MD5-хеш строки
+     * @param str  строка
+     * @return  MD5-хеш строки
+     * @throws NoSuchAlgorithmException
+     * @throws UnsupportedEncodingException
+     */
     public static String getHash(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         //String s="f78spx";
         //String s="muffin break";
@@ -67,6 +80,14 @@ public class ChronopayPaymentServlet extends HttpServlet {
 
         doPost(request,response);
     }
+
+    /**
+     * Принимает уведомление о переводе средств на счет "Новой школы" и зачисляет деньги на баланс клиента
+     * @param request  callback от Chronopay
+     * @param response  либо сообщение об ошибке либо Сообщение "200 OK"
+     * @throws ServletException
+     * @throws IOException
+     */
      @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RuntimeContext runtimeContext = null;
