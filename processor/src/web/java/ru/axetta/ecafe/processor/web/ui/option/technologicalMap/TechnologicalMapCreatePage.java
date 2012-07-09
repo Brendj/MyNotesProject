@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMap
 import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class TechnologicalMapCreatePage extends BasicWorkspacePage implements ProductSelect {
 
     @Override
@@ -38,7 +40,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
                 //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
                 technologicalMapProduct.setProduct(productItem.getProduct());
-                technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
+               // technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(technologicalMap);
                 //technologicalMapProducts.add(technologicalMapProduct);
@@ -133,7 +135,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
               //  technologicalMapProduct.setIdOfProduct(productItem.product.getGlobalId());
                 technologicalMapProduct.setProduct(productItem.getProduct());
-                technologicalMapProduct.setNameOfProduct(productItem.product.getProductName());
+             //   technologicalMapProduct.setNameOfProduct(productItem.product.getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(technologicalMap);
                 technologicalMapProducts.add(technologicalMapProduct);

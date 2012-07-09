@@ -42,7 +42,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
                 //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
                 technologicalMapProduct.setProduct(productItem.getProduct());
-                technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
+                //technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(currTechnologicalMap);
                 //technologicalMapProducts.add(technologicalMapProduct);
@@ -129,31 +129,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
             TechnologicalMap tm = em.find(TechnologicalMap.class,currTechnologicalMap.getGlobalId());
 
             tm.fill(currTechnologicalMap);
-            /*
-
-            tm.setNameOfTechnologicalMap(currTechnologicalMap.getNameOfTechnologicalMap());
-            tm.setNumberOfTechnologicalMap(currTechnologicalMap.getNumberOfTechnologicalMap());
-            tm.setTechnologyOfPreparation(currTechnologicalMap.getTechnologyOfPreparation());
-            tm.setTempOfPreparation(currTechnologicalMap.getTempOfPreparation());
-            tm.setTermOfRealization(currTechnologicalMap.getTermOfRealization());
-
-            tm.setEnergyValue(currTechnologicalMap.getEnergyValue());
-            tm.setProteins(currTechnologicalMap.getProteins());
-            tm.setCarbohydrates(currTechnologicalMap.getCarbohydrates());
-            tm.setFats(currTechnologicalMap.getFats());
-
-            tm.setMicroElCa(currTechnologicalMap.getMicroElCa());
-            tm.setMicroElMg(currTechnologicalMap.getMicroElMg());
-            tm.setMicroElP(currTechnologicalMap.getMicroElP());
-            tm.setMicroElFe(currTechnologicalMap.getMicroElFe());
-
-            tm.setVitaminA(currTechnologicalMap.getVitaminA());
-            tm.setVitaminB1(currTechnologicalMap.getVitaminB1());
-            tm.setVitaminB2(currTechnologicalMap.getVitaminB2());
-            tm.setVitaminPp(currTechnologicalMap.getVitaminPp());
-            tm.setVitaminC(currTechnologicalMap.getVitaminC());
-            tm.setVitaminE(currTechnologicalMap.getVitaminE());
-            */
 
             tm.setLastUpdate(new Date());
             tm.setGlobalVersion(currTechnologicalMap.getGlobalVersion() + 1);
@@ -214,7 +189,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
              //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
                 technologicalMapProduct.setProduct(productItem.getProduct());
-                technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
+                //technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(currTechnologicalMap);
                 //technologicalMapProducts.add(technologicalMapProduct);

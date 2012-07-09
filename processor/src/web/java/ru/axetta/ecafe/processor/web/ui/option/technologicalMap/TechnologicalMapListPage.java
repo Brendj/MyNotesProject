@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -29,6 +30,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class TechnologicalMapListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener  {
 
     @Override
