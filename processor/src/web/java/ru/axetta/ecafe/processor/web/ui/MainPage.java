@@ -310,15 +310,25 @@ public class MainPage {
     private Long editedProductGuideItemId;
 
     private final BasicWorkspacePage technologicalMapGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage productGroupsGroupPage = new BasicWorkspacePage();
     private final TechnologicalMapCreatePage technologicalMapCreatePage = new TechnologicalMapCreatePage();
 
     public TechnologicalMapCreatePage getTechnologicalMapCreatePage() {
         return technologicalMapCreatePage;
     }
 
+    public BasicWorkspacePage getProductGroupsGroupPage() {
+        return productGroupsGroupPage;
+    }
+
     public BasicWorkspacePage getProductGroupPage() {
         return productGroupPage;
+    }
+
+    public BasicWorkspacePage getTechnologicalMapGroupsGroupPage(){
+        return technologicalMapGroupsGroupPage;
     }
 
     public BasicWorkspacePage getTechnologicalMapGroupPage() {
@@ -7307,6 +7317,12 @@ public class MainPage {
 
     public Object showTechnologicalMapGroupPage() {
         currentWorkspacePage = technologicalMapGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showTechnologicalMapGroupsGroupPage() {
+        currentWorkspacePage = technologicalMapGroupsGroupPage;
         updateSelectedMainMenu();
         return null;
     }
