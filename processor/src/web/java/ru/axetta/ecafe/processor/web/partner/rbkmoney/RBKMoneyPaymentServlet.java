@@ -84,7 +84,7 @@ public class RBKMoneyPaymentServlet extends HttpServlet {
                         .changePaymentOrderStatus(idOfContragent, protocolRequest.getOrderId(),
                                 PaymentStatusConverter.paymentStatusToOrderStatus(protocolRequest.getPaymentStatus()),
                                 CurrencyConverter.rublesToCopecks(protocolRequest.getRecipientAmount()),
-                                protocolRequest.getPaymentId(),null);
+                                protocolRequest.getPaymentId());
             } catch (Exception e) {
                 logger.error("Failed to change clientPaymentOrder state", e);
                 ProtocolResponse.fail().writeTo(response);
