@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObjectsEnum;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObjectsEnumComparator;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -440,12 +442,26 @@ public class Processor implements SyncProcessor,
     private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
         //RuntimeContext.getAppContext().getBean(DistributionManager.class).process();
         //Map<String, List<DistributedObject>> distributedObjectsListMap = RuntimeContext.getAppContext().getBean(DistributionManager.class).getDistributedObjectsListMap();
-        Map<String, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
-        for (String key : distributedObjectsListMap.keySet()) {
+        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
+        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
+        NavigableSet<DistributedObjectsEnum> set = new TreeSet<DistributedObjectsEnum>(distributedObjectsEnumComparator);
+        DistributedObjectsEnum[] tmp = new DistributedObjectsEnum[DistributedObjectsEnum.values().length];
+        DistributedObjectsEnum[] array = DistributedObjectsEnum.values(); // distributedObjectsListMap.keySet().toArray(tmp);
+        if(array.length>2){
+            Arrays.sort(array,distributedObjectsEnumComparator);
+        }
+        if(array.length==2){
+
+        }
+
+        for (int i=0; i<array.length; i++){
+            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
+        }
+        /*for (String key : distributedObjectsListMap.keySet()) {
             // Перебираем все типы объектов, каждый тип обрабатывается в отдельной! транзакции.
             //distributionManager.process(distributedObjectsListMap.get(key), key);
             RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(key), key, idOfOrg);
-        }
+        }*/
         //RuntimeContext.getAppContext().getBean(DistributionManager.class).process(); Зачем доставать из контекста, если есть аргумент?
         return distributionManager;
     }
@@ -2193,65 +2209,6 @@ persistenceSession.save(menuDetail);
     }
 
     public void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus,
-            Long contragentSum, String idOfPayment,String addIdOfPayment) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format(
-                    "IdOfContragent: %d, IdOfClientPaymentOrder: %d, OrderStatus: %d, ContragentSum: %d, IdOfPayment: %s",
-                    idOfContragent, idOfClientPaymentOrder, orderStatus, contragentSum, idOfPayment));
-        }
-        if (!(ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED == orderStatus
-                || ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus)) {
-            throw new IllegalArgumentException(String.format("Anacceptable OrderStatus: %d", orderStatus));
-        }
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            ClientPaymentOrder clientPaymentOrder = DAOUtils
-                    .getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
-            if (!idOfContragent.equals(clientPaymentOrder.getContragent().getIdOfContragent())) {
-                throw new IllegalArgumentException(String.format(
-                        "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
-                        idOfContragent, clientPaymentOrder));
-            }
-            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
-                logger.warn(
-                        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
-                //throw new IllegalArgumentException(
-                //        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
-            }
-            if (clientPaymentOrder.canApplyOrderStatus(orderStatus)) {
-                clientPaymentOrder.setOrderStatus(orderStatus);
-                clientPaymentOrder.setIdOfPayment(idOfPayment);
-                persistenceSession.update(clientPaymentOrder);
-                if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
-                    Client client = clientPaymentOrder.getClient();
-                    // Ищем подходящую карту
-                    /*Card paymentCard = client.findActiveCard(persistenceSession, null);
-                    if (null == paymentCard) {
-                        // Нет карты, подходящей для зачисления платежа
-                        throw new IllegalArgumentException(String.format(
-                                "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
-                                clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
-                    }  */
-                    RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client, addIdOfPayment);
-                }
-            }
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
-
-    public void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus,
             Long contragentSum, String idOfPayment) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format(
@@ -2275,7 +2232,7 @@ persistenceSession.save(menuDetail);
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
                         idOfContragent, clientPaymentOrder));
             }
-            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
+            if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
                 logger.warn(
                         String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
                 //throw new IllegalArgumentException(
@@ -2296,7 +2253,7 @@ persistenceSession.save(menuDetail);
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client);
+                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client);
                 }
             }
 
