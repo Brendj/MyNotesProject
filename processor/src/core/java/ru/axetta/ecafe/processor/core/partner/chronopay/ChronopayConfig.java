@@ -17,6 +17,10 @@ import java.util.Properties;
  * Time: 13:29
  * To change this template use File | Settings | File Templates.
  */
+
+/**
+ * Конфигурация Chronopay
+ */
 public class ChronopayConfig {
 
 
@@ -29,15 +33,38 @@ public class ChronopayConfig {
     public static final String CALLBACK_URL_PARAM=CHRONOPAY_PARAM_BASE+".callbackUrl";
 
 
-
+    /**
+     * параметр sharedSec, известный только Chronopay и itech
+     */
   private final String sharedSec;
+    /**
+     * Комиссия
+     */
   private final Double rate;
+    /**
+     * ip адрес хоста c которого отправляются уведомления о платеже
+     */
   private final String ip;
+    /**
+     * Имя контрагента, вданном случае - Chronopay
+     */
   private final String contragentName;
+    /**
+     * Url платежной страницы Chronopay
+     */
   private final String purchaseUri;
+    /**
+     * Адрес сервлета, который принимает уведомления о платеже
+     */
   private  final String callbackUrl;
 
-
+    /**
+     * Берет параметры конфигурации - поля класса из свойств properties, которые извлекаются из таблицы
+     * cf_options в базе процессинга
+     * @param properties свойства из таблицы cf_options в базе процессинга
+     * @param paramBaseName база имен параметров в объекте properties
+     * @throws Exception
+     */
     public ChronopayConfig(Properties properties, String paramBaseName) throws Exception {
            String sharedSecParam=paramBaseName+SHARED_SEC_PARAM;
            String rateParam=paramBaseName+RATE_PARAM;
