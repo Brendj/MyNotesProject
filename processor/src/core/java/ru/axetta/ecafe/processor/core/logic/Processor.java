@@ -2250,6 +2250,65 @@ persistenceSession.save(menuDetail);
         }
     }
 
+
+    public void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus,
+            Long contragentSum, String idOfPayment) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format(
+                    "IdOfContragent: %d, IdOfClientPaymentOrder: %d, OrderStatus: %d, ContragentSum: %d, IdOfPayment: %s",
+                    idOfContragent, idOfClientPaymentOrder, orderStatus, contragentSum, idOfPayment));
+        }
+        if (!(ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED == orderStatus
+                || ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus)) {
+            throw new IllegalArgumentException(String.format("Anacceptable OrderStatus: %d", orderStatus));
+        }
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            ClientPaymentOrder clientPaymentOrder = DAOUtils
+                    .getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
+            if (!idOfContragent.equals(clientPaymentOrder.getContragent().getIdOfContragent())) {
+                throw new IllegalArgumentException(String.format(
+                        "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
+                        idOfContragent, clientPaymentOrder));
+            }
+            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
+                logger.warn(
+                        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
+                //throw new IllegalArgumentException(
+                //        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
+            }
+            if (clientPaymentOrder.canApplyOrderStatus(orderStatus)) {
+                clientPaymentOrder.setOrderStatus(orderStatus);
+                clientPaymentOrder.setIdOfPayment(idOfPayment);
+                persistenceSession.update(clientPaymentOrder);
+                if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
+                    Client client = clientPaymentOrder.getClient();
+                    // Ищем подходящую карту
+                    /*Card paymentCard = client.findActiveCard(persistenceSession, null);
+                    if (null == paymentCard) {
+                        // Нет карты, подходящей для зачисления платежа
+                        throw new IllegalArgumentException(String.format(
+                                "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
+                                clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
+                    }  */
+                    RuntimeContext.getFinancialOpsManager()
+                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     private static void processSyncDiaryTimesheetDayValue(Session persistenceSession, Org organization, Date date,
             SyncRequest.ReqDiary.ReqDiaryTimesheet.ReqDiaryValue reqDiaryValue, String parsedDayValueType,
             String parsedDayValue) throws Exception {
