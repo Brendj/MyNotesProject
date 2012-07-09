@@ -89,6 +89,18 @@ public class ClientPayment {
         this.addIdOfPayment = addIdOfPayment;
     }
 
+    public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime) {
+        this.transaction = transaction;
+        this.paymentMethod = clientPaymentOrder.getPaymentMethod();
+        this.paySum = contragentSum;
+        this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
+        this.createTime = createTime;
+        this.idOfPayment = clientPaymentOrder.getIdOfPayment();
+        this.contragent = clientPaymentOrder.getContragent();
+        this.clientPaymentOrder = clientPaymentOrder;
+
+    }
+
     public Long getIdOfClientPayment() {
         return idOfClientPayment;
     }
