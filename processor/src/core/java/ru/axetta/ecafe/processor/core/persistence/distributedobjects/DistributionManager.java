@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
@@ -64,7 +65,8 @@ public class DistributionManager {
     /* Пара ключ значение ключ имя класса значение список объектов этого класса */
     private Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
 
-    private Map<String,String> errorMap = new HashMap<String, String>();
+    //private Map<String,String> errorMap = new HashMap<String, String>();
+    //private List<ErrorObject> errorObjectList = new ArrayList<ErrorObject>();
 
     private Document document;
 
@@ -102,40 +104,47 @@ public class DistributionManager {
                     elementMap.put(tagName, distributedObjectElement);
                 }
                 Element element = document.createElement(distributedObject.getTagName());
+                if(!(DistributedObjectsEnumComparator.isEmptyOrNull())){
+                    /*int index = DistributedObjectsEnumComparator.getErrorObjectList().indexOf(
+                            new ErrorObject(distributedObject.getClass(), distributedObject.getGuid()));*/
+                    ErrorObject errorObject = new ErrorObject(distributedObject.getClass(), distributedObject.getGuid());
+                    int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
+                    if(index != -1){
+                        element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
+                    }
+                }
                 elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
             }
             elementRO.appendChild(confirmElement);
             elementMap.clear();
             distributedObjects.clear();
-            for (DistributedObjectsEnum distributedObjectsEnum : DistributedObjectsEnum.values()) {
-                String name = distributedObjectsEnum.name();
-                List<DistributedObject> distributedObjectList = DAOService.getInstance()
-                        .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
-                if (!distributedObjectList.isEmpty()) {
-                    distributedObjects.addAll(distributedObjectList);
-                }
-            }
+        }
 
-            for (DistributedObject distributedObject : distributedObjects) {
-                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
-                if (!elementMap.containsKey(tagName)) {
-                    Element distributedObjectElement = document.createElement(tagName);
-                    elementRO.appendChild(distributedObjectElement);
-                    elementMap.put(tagName, distributedObjectElement);
-                }
-                Element element = document.createElement("O");
-                elementMap.get(tagName).appendChild(distributedObject.toElement(element));
+        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
+        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
+       // Arrays.sort(array,distributedObjectsEnumComparator);
+
+        distributedObjects = new ArrayList<DistributedObject>();
+        for (int i=0; i<array.length; i++){
+            String name = array[i].name();
+            List<DistributedObject> distributedObjectList = DAOService.getInstance()
+                    .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
+            if (!distributedObjectList.isEmpty()) {
+                distributedObjects.addAll(distributedObjectList);
             }
         }
-        if(!errorMap.isEmpty()){
-            Element errorElement = document.createElement("Errors");
-            for (String key: errorMap.keySet()){
-                Element error= document.createElement("Error");
-                error.setAttribute("type",key);
-                error.setAttribute("message",errorMap.get(key));
+
+        for (DistributedObject distributedObject : distributedObjects) {
+            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+            if (!elementMap.containsKey(tagName)) {
+                Element distributedObjectElement = document.createElement(tagName);
+                elementRO.appendChild(distributedObjectElement);
+                elementMap.put(tagName, distributedObjectElement);
             }
-            elementRO.appendChild(errorElement);
+            Element element = document.createElement("O");
+            elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
+
         return elementRO;
     }
 
@@ -189,8 +198,15 @@ public class DistributionManager {
                     }
                 } catch (Exception e) {
                     // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
-                    errorMap.put(distributedObject.getClass().getSimpleName(),e.getMessage());
-                    logger.trace("",e);
+                    ErrorObject errorObject = new ErrorObject();
+                    errorObject.setClazz(distributedObject.getClass());
+                    errorObject.setGuid(distributedObject.getGuid());
+                    errorObject.setMessage(e.getMessage());
+                    if(e instanceof DistributedObjectException){
+                        errorObject.setType(((DistributedObjectException) e).getType());
+                    }
+                    DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
+                    logger.error(errorObject.toString(), e);
                 }
             }
         } catch (Exception e) {
@@ -227,7 +243,7 @@ public class DistributionManager {
 
                 if (!distributedObjectsListMap.containsKey(currentObject)) {
                     distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
-                }                                                                
+                }
                 distributedObjectsListMap.get(currentObject).add(distributedObject);
 
                 node = node.getNextSibling();
@@ -249,10 +265,15 @@ public class DistributionManager {
     }
 
     @Transactional
-    private Long getGlobalIDByGUID(DistributedObject distributedObject){
+    private long getGlobalIDByGUID(DistributedObject distributedObject){
         //   TypedQuery<Long> query=entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where this.quid='"+distributedObject.getGuid()+"'",Long.class);
-        TypedQuery<Long> query = entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",Long.class);
-        return   query.getSingleResult();
+        TypedQuery<Long> query = null;
+        try{
+            query = entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",Long.class);
+            return query.getSingleResult();
+        } catch (Exception e){
+            return -1;
+        }
         //   return query.getSingleResult();
     }
 
@@ -260,6 +281,10 @@ public class DistributionManager {
     private DistributedObject createDistributedObject(DistributedObject distributedObject, long currentVersion)
             throws Exception {
         try {
+            long id = getGlobalIDByGUID(distributedObject);
+            if(id>0){
+                throw new DistributedObjectException(1);
+            }
             distributedObject.setCreatedDate(new Date());
             // Версия должна быть одна на всех, и получена заранее.
             /*TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
@@ -315,7 +340,6 @@ public class DistributionManager {
         return (DistributedObject) cl.newInstance();
     }
 
-
     private String getAttributeValue(Node node, String attributeName) {
         return (node.getAttributes().getNamedItem(attributeName) != null ? node.getAttributes()
                 .getNamedItem(attributeName).getTextContent() : null);
@@ -323,8 +347,8 @@ public class DistributionManager {
 
 
     /* Getter and Setters */
-   /* public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
+   /* public List<ErrorObject> getErrorObjectList() {
+        return errorObjectList;
     }*/
 
     public Map<DistributedObjectsEnum, List<DistributedObject>> getDistributedObjectsListMap() {

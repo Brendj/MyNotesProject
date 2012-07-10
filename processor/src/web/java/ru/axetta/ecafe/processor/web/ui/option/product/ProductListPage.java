@@ -2,11 +2,11 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.product.group;
+package ru.axetta.ecafe.processor.web.ui.option.product;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupCreatePage;
 
@@ -28,10 +28,10 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ProductGroupListPage extends BasicWorkspacePage {
+public class ProductListPage extends BasicWorkspacePage {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductGroupListPage.class);
-    private List<ProductGroup> productGroupList;
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductListPage.class);
+    private List<Product> productList;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -46,18 +46,18 @@ public class ProductGroupListPage extends BasicWorkspacePage {
 
     @Transactional
     private void reload() throws Exception{
-        productGroupList = entityManager.createQuery("FROM ProductGroup ORDER BY globalId",ProductGroup.class).getResultList();
+        productList = entityManager.createQuery("FROM Product ORDER BY globalId",Product.class).getResultList();
     }
 
     public String getPageFilename() {
-        return "option/product/group/list";
+        return "option/product/list";
     }
 
-    public List<ProductGroup> getProductGroupList() {
-        return productGroupList;
+    public List<Product> getProductList() {
+        return productList;
     }
 
-    public void setProductGroupList(List<ProductGroup> productGroupList) {
-        this.productGroupList = productGroupList;
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 }

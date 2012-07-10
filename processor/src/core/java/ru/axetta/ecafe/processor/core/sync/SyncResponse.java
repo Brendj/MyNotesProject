@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
 
@@ -1803,6 +1804,7 @@ public class SyncResponse {
 
         // Distribution Manager
         if(distributionManager != null){
+            //ecafeEnvelopeElement.appendChild(RuntimeContext.getAppContext().getBean(DistributionManager.class).toElement(document, idOfOrg));
             ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg));
         }
 

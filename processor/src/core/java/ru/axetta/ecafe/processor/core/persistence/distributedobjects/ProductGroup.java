@@ -9,6 +9,11 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -19,15 +24,11 @@ import org.w3c.dom.Node;
 public class ProductGroup extends DistributedObject {
 
     private String nameOfGroup;
+    private Set<Product> productInternal;
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element,"Name", nameOfGroup);
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
     }
 
     @Override
@@ -50,5 +51,25 @@ public class ProductGroup extends DistributedObject {
 
     public void setNameOfGroup(String nameOfGroup) {
         this.nameOfGroup = nameOfGroup;
+    }
+
+    public List<Product> getProducts(){
+        return Collections.unmodifiableList(new ArrayList<Product>(getProductInternal()));
+    }
+
+    public void addProduct(Product product){
+        productInternal.add(product);
+    }
+
+    public void removeProduct(Product product){
+        productInternal.remove(product);
+    }
+
+    private Set<Product> getProductInternal() {
+        return productInternal;
+    }
+
+    private void setProductInternal(Set<Product> productInternal) {
+        this.productInternal = productInternal;
     }
 }

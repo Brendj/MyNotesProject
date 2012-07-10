@@ -19,9 +19,14 @@ import java.util.*;
  */
 public class TechnologicalMap extends DistributedObject {
 
-    @Override
-    public int getPriority() {
-        return 1;
+    private TechnologicalMapGroup technologicalMapGroup;
+
+    public TechnologicalMapGroup getTechnologicalMapGroup() {
+        return technologicalMapGroup;
+    }
+
+    public void setTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup) {
+        this.technologicalMapGroup = technologicalMapGroup;
     }
 
     @Override
@@ -32,7 +37,7 @@ public class TechnologicalMap extends DistributedObject {
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
         setTempOfPreparation(((TechnologicalMap) distributedObject).getTempOfPreparation());
         setTermOfRealization(((TechnologicalMap) distributedObject).getTermOfRealization());
-        setGroupName(((TechnologicalMap) distributedObject).getGroupName());
+       /* setGroupName(((TechnologicalMap) distributedObject).getGroupName());*/
         setEnergyValue(((TechnologicalMap) distributedObject).getEnergyValue());
         setProteins(((TechnologicalMap) distributedObject).getProteins());
         setCarbohydrates(((TechnologicalMap) distributedObject).getCarbohydrates());
@@ -59,7 +64,7 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"TempPreparation", tempOfPreparation);
         setAttribute(element,"TermRealization", termOfRealization);
 
-        setAttribute(element,"GroupName", groupName);
+       /* setAttribute(element,"GroupName", groupName);*/
 
         setAttribute(element,"Energy", energyValue);
 
@@ -89,8 +94,8 @@ public class TechnologicalMap extends DistributedObject {
     @Override
     protected TechnologicalMap parseAttributes(Node node) {
 
-        String stringGroupName = getStringAttributeValue(node,"GroupName",512);
-        if(stringGroupName!=null) setGroupName(stringGroupName);
+       /* String stringGroupName = getStringAttributeValue(node,"GroupName",512);
+        if(stringGroupName!=null) setGroupName(stringGroupName);*/
 
         String stringNameOfTechnologicalMap = getStringAttributeValue(node,"Name",128);
         if(stringNameOfTechnologicalMap!=null) setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
@@ -164,7 +169,7 @@ public class TechnologicalMap extends DistributedObject {
 
     private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
 
-    private String groupName;
+  /*  private String groupName;*/
     private String nameOfTechnologicalMap;
 
     private Long numberOfTechnologicalMap;
@@ -201,13 +206,13 @@ public class TechnologicalMap extends DistributedObject {
     private Float vitaminC;
     private Float vitaminE;
 
-    public String getGroupName() {
+    /*public String getGroupName() {
         return groupName;
     }
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
+    }*/
 
     public List<TechnologicalMapProduct> getTechnologicalMapProduct(){
         return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));

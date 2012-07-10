@@ -22,16 +22,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-public abstract class DistributedObject implements Comparable<DistributedObject>{
-
-    @Override
-    public int compareTo(DistributedObject o) {
-        if(getPriority()>o.getPriority()) return 1;
-        if(getPriority()<o.getPriority()) return -1;
-        return 0;
-    }
-
-    public abstract int getPriority();
+public abstract class DistributedObject{
 
     /* Идентификатор объекта */
     protected Long globalId;

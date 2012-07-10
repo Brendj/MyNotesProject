@@ -573,6 +573,10 @@
             </rich:panelMenuGroup>
 
         </rich:panelMenuGroup>
+        <%--@elvariable id="productCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.product.ProductCreatePage"--%>
+        <rich:panelMenuItem id="productCreateMenuItem" label="Добавить"
+                            binding="#{productCreatePage.mainMenuComponent}"
+                            action="#{productCreatePage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="productGuideListMenuItem" label="Список"
                             binding="#{mainPage.productGuideListPage.mainMenuComponent}"

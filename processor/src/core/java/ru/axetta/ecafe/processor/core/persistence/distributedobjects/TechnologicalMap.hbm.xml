@@ -16,14 +16,14 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
-        <property name="guid" column="GUID" type="string" length="36" not-null="true"/>
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
 
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <!-- End Global params -->
-        <property name="groupName" column="GroupName" type="string" length="512"/>
+     <!--   <property name="groupName" column="GroupName" type="string" length="512"/>-->
 
         <property name="nameOfTechnologicalMap" column="NameOfTechnologicalMap" type="string" length="128" />
         <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="long"/>
@@ -48,10 +48,13 @@
         <property name="vitaminC" column="VitaminC" type="float" />
         <property name="vitaminE" column="VitaminE" type="float" />
 
+        <many-to-one name="technologicalMapGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup" fetch="select" lazy="false">
+            <column name="IdOfTechMapGroups" not-null="true" />
+        </many-to-one>
 
-        <set name="technologicalMapProductInternal" inverse="true" lazy="false" cascade="all">
+        <set name="technologicalMapProductInternal">
             <key>
-                <column name="idOfTechnologicalMaps" not-null="true" />
+                <column name="idOfTechnologicalMaps"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" />
         </set>

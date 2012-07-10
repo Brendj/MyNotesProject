@@ -71,7 +71,7 @@ public class DAOService {
 
     @Transactional
     public <T> List<T> getDistributedObjects(Class<T> clazz){
-        return em.createQuery("from "+clazz.getSimpleName()+" where globalId>=0 order by globalId",clazz).getResultList();
+        return em.createQuery("from "+clazz.getSimpleName()+" order by id",clazz).getResultList();
     }
 
     @Transactional

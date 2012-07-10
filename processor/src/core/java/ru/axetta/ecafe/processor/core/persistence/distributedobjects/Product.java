@@ -22,9 +22,14 @@ import java.util.Set;
 
 public class Product extends DistributedObject {
 
-    @Override
-    public int getPriority() {
-        return 1;
+    private ProductGroup productGroup;
+
+    public ProductGroup getProductGroup() {
+        return productGroup;
+    }
+
+    public void setProductGroup(ProductGroup productGroup) {
+        this.productGroup = productGroup;
     }
 
     /**
@@ -57,8 +62,8 @@ public class Product extends DistributedObject {
         if(stringProductName!=null) setProductName(stringProductName);
         Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);
-        String stringGroupName = getStringAttributeValue(node, "GroupName", 512);
-        if(stringGroupName!=null) setGroupName(stringGroupName);
+       /* String stringGroupName = getStringAttributeValue(node, "GroupName", 512);
+        if(stringGroupName!=null) setGroupName(stringGroupName);*/
         return this;
     }
 
@@ -69,7 +74,7 @@ public class Product extends DistributedObject {
         setProductName( ((Product) distributedObject).getProductName());
         setOkpCode (((Product) distributedObject).getOkpCode());
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
-        setGroupName(((Product) distributedObject).getGroupName());
+       /* setGroupName(((Product) distributedObject).getGroupName());*/
         for (TechnologicalMapProduct technologicalMapProduct: ((Product) distributedObject).getTechnologicalMapProduct()){
              addTechnologicalMapProduct(technologicalMapProduct);
         }
@@ -84,7 +89,7 @@ public class Product extends DistributedObject {
     private User userDelete;
     private Long idOfConfigurationProvider;
     private Set<TechnologicalMapProduct> technologicalMapProductInternal;
-    private String groupName;
+    /*private String groupName;
 
     public String getGroupName() {
         return groupName;
@@ -92,7 +97,7 @@ public class Product extends DistributedObject {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
+    }*/
 
     public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
         return Collections.unmodifiableSet(getTechnologicalMapProductInternal());

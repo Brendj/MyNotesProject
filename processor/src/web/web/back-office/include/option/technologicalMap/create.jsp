@@ -19,6 +19,11 @@
         <h:inputText value="#{technologicalMapCreatePage.technologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
         <h:inputText value="#{technologicalMapCreatePage.technologicalMap.numberOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
+        <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapCreatePage.currentIdOfTechnologicalMapGroup}" styleClass="input-text long-field">
+            <f:selectItems value="#{technologicalMapCreatePage.technologicalMapGroupMenu.items}" />
+        </h:selectOneMenu>
+
     </h:panelGrid>
 
     <rich:dataTable id="productsTable" value="#{technologicalMapCreatePage.technologicalMapProducts}" var="technologicalMapProduct" >
@@ -43,7 +48,7 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column >
-            <h:outputText value="#{technologicalMapProduct.nameOfProduct}"/>
+            <h:outputText value="#{technologicalMapProduct.product.fullName}"/>
         </rich:column>
         <rich:column>
             <h:inputText value="#{technologicalMapProduct.grossWeight}"/>

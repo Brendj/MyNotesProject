@@ -499,29 +499,17 @@ public class Processor implements SyncProcessor,
 
     /* TODO: логика обработки менеджера глобальных объектов */
     private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
-        //RuntimeContext.getAppContext().getBean(DistributionManager.class).process();
-        //Map<String, List<DistributedObject>> distributedObjectsListMap = RuntimeContext.getAppContext().getBean(DistributionManager.class).getDistributedObjectsListMap();
         Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
         DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
-        NavigableSet<DistributedObjectsEnum> set = new TreeSet<DistributedObjectsEnum>(distributedObjectsEnumComparator);
-        DistributedObjectsEnum[] tmp = new DistributedObjectsEnum[DistributedObjectsEnum.values().length];
-        DistributedObjectsEnum[] array = DistributedObjectsEnum.values(); // distributedObjectsListMap.keySet().toArray(tmp);
-        if(array.length>2){
-            Arrays.sort(array,distributedObjectsEnumComparator);
-        }
-        if(array.length==2){
-
-        }
+        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
+        Arrays.sort(array,distributedObjectsEnumComparator);
 
         for (int i=0; i<array.length; i++){
-            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
+            if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
+                RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
+            }
         }
-        /*for (String key : distributedObjectsListMap.keySet()) {
-            // Перебираем все типы объектов, каждый тип обрабатывается в отдельной! транзакции.
-            //distributionManager.process(distributedObjectsListMap.get(key), key);
-            RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(key), key, idOfOrg);
-        }*/
-        //RuntimeContext.getAppContext().getBean(DistributionManager.class).process(); Зачем доставать из контекста, если есть аргумент?
+
         return distributionManager;
     }
 

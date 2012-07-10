@@ -7,6 +7,11 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -17,15 +22,11 @@ import org.w3c.dom.Node;
 public class TechnologicalMapGroup extends DistributedObject {
 
     private String nameOfGroup;
+    private Set<TechnologicalMap> technologicalMapInternal;
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element,"Name", nameOfGroup);
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
     }
 
     @Override
@@ -48,5 +49,25 @@ public class TechnologicalMapGroup extends DistributedObject {
 
     public void setNameOfGroup(String nameOfGroup) {
         this.nameOfGroup = nameOfGroup;
+    }
+
+    public List<TechnologicalMap> getTechnologicalMaps(){
+        return Collections.unmodifiableList(new ArrayList<TechnologicalMap>(getTechnologicalMapInternal()));
+    }
+
+    public void addTechnologicalMap(TechnologicalMap technologicalMap){
+        technologicalMapInternal.add(technologicalMap);
+    }
+
+    public void removeTechnologicalMap(TechnologicalMap technologicalMap){
+        technologicalMapInternal.remove(technologicalMap);
+    }
+
+    private Set<TechnologicalMap> getTechnologicalMapInternal() {
+        return technologicalMapInternal;
+    }
+
+    private void setTechnologicalMapInternal(Set<TechnologicalMap> technologicalMapInternal) {
+        this.technologicalMapInternal = technologicalMapInternal;
     }
 }

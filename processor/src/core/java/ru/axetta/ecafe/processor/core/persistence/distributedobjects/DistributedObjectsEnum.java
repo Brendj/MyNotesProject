@@ -11,12 +11,16 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  * Time: 15:51
  * To change this template use File | Settings | File Templates.
  */
+/* TODO: надежнее будет сделать поле value типа Class */
 public enum DistributedObjectsEnum {
+    ProductGroup("ProductGroup",0),
+    TechnologicalMapGroup("TechnologicalMapGroup",0),
     Product("Product", 1),
     TechnologicalMap("TechnologicalMap", 1),
     TechnologicalMapProduct("TechnologicalMapProduct", 2);
 
     private final String value;
+    /* приоритет обработки объектов при синхронизации */
     private final int priority;
 
     private DistributedObjectsEnum(String value, int priority) {

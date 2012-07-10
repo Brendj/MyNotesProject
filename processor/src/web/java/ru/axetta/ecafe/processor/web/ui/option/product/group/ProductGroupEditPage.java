@@ -30,7 +30,7 @@ import javax.persistence.PersistenceContext;
 @Scope("session")
 public class ProductGroupEditPage extends BasicWorkspacePage {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapGroupCreatePage.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductGroupEditPage.class);
     private ProductGroup currentProductGroup;
     @PersistenceContext
     private EntityManager entityManager;

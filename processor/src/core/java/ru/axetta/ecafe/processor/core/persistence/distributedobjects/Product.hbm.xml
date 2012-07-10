@@ -16,14 +16,13 @@
 
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
-        <property name="guid" column="GUID" type="string" length="36" not-null="true"/>
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
 
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <!-- End Global params -->
-        <property name="groupName" column="GroupName" type="string" length="512"/>
         <property name="code" column="Code" type="string" length="16"/>
         <property name="fullName" column="FullName" type="string" length="1024"/>
         <property name="okpCode" column="OkpCode" type="string" length="32"/>
@@ -32,6 +31,11 @@
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
+
+        <many-to-one name="productGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup" fetch="select" lazy="false">
+            <column name="idOfProductGroups" not-null="true" />
+        </many-to-one>
+
 <!--
         <set name="technologicalMapProductInternal" cascade="all">
             <key column="IdOfTechnoMapProduct"/>

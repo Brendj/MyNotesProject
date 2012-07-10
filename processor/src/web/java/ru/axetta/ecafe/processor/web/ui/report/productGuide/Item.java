@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,12 +36,13 @@ public class Item {
     private boolean deleted;
     private Long idofconfigurationprovider;
     private boolean edited = false;
+    private ProductGroup productGroup;
 
     public Item() {}
 
     public Item(Long idOfProductGuide, String code, String fullName, String productName, String okpCode,
             User userCreate, User userEdit, User userDelete, Date createTime, Date editTime,
-            Date deleteTime, boolean deleted, Long idofconfigurationprovider) {
+            Date deleteTime, boolean deleted, Long idofconfigurationprovider, ProductGroup productGroup) {
         this.idOfProductGuide = idOfProductGuide;
         this.code = code;
         this.fullName = fullName;
@@ -54,8 +56,16 @@ public class Item {
         this.deleteTime = deleteTime;
         this.deleted = deleted;
         this.idofconfigurationprovider = idofconfigurationprovider;
+        this.productGroup = productGroup;
     }
 
+    public ProductGroup getProductGroup() {
+        return productGroup;
+    }
+
+    public void setProductGroup(ProductGroup productGroup) {
+        this.productGroup = productGroup;
+    }
 
     public Long getIdOfProductGuide() {
         return idOfProductGuide;

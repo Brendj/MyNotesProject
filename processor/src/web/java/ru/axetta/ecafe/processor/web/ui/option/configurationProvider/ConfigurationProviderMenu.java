@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleConstants;
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -28,6 +29,15 @@ public class ConfigurationProviderMenu {
         items = new SelectItem[list.size()];
         for (int i = 0; i < items.length; ++i) {
             items[i] = new SelectItem(list.get(i).getName());
+        }
+    }
+
+    public void readAllItems(List<ConfigurationProvider> list) {
+        //List<ConfigurationProvider> list = entityManager.createQuery("from ConfigurationProvider",ConfigurationProvider.class).getResultList();
+        //List<ConfigurationProvider> list = session.createQuery("from ConfigurationProvider").list();
+        items = new SelectItem[list.size()];
+        for (int i = 0; i < items.length; ++i) {
+            items[i] = new SelectItem(list.get(i).getIdOfConfigurationProvider(),list.get(i).getName());
         }
     }
 

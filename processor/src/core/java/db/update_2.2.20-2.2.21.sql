@@ -7,8 +7,8 @@ DROP TABLE cf_technologicalmap;
 CREATE TABLE cf_product_groups
 (
    IdOfProductGroups BigSerial,
-   NameOfGroup character varying(128) NOT NULL UNIQUE,
-   GUID character varying(36) NOT NULL,
+   NameOfGroup character varying(128) NOT NULL,
+   GUID character varying(36) NOT NULL UNIQUE,
    GlobalVersion BIGINT DEFAULT NULL,
    DeletedState boolean NOT NULL DEFAULT false,
    OrgOwner BIGINT DEFAULT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE cf_products
   FullName character varying(1024),
   ProductName character varying(512),
   OkpCode character varying(32),
-  GUID character varying(36) NOT NULL,
+  GUID character varying(36) NOT NULL UNIQUE,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner BIGINT DEFAULT NULL,
   DeletedState boolean NOT NULL DEFAULT false,
@@ -47,8 +47,8 @@ CREATE TABLE cf_products
 CREATE TABLE cf_technological_map_groups
 (
    IdOfTechMapGroups BigSerial,
-   NameOfGroup character varying(128) NOT NULL UNIQUE,
-   GUID character varying(36) NOT NULL,
+   NameOfGroup character varying(128) NOT NULL,
+   GUID character varying(36) NOT NULL UNIQUE,
    GlobalVersion BIGINT DEFAULT NULL,
    DeletedState boolean NOT NULL DEFAULT false,
    OrgOwner BIGINT DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE  cf_technological_map(
   VitaminPp FLOAT DEFAULT NULL,
   VitaminC FLOAT DEFAULT NULL,
   VitaminE FLOAT DEFAULT NULL,
-  GUID character varying(36) NOT NULL,
+  GUID character varying(36) NOT NULL UNIQUE,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner BIGINT DEFAULT NULL,
   DeletedState boolean NOT NULL DEFAULT false,
@@ -101,7 +101,7 @@ CREATE TABLE cf_technological_map_products
   IdOfProducts bigint NOT NULL,
   NetWeight double precision NOT NULL DEFAULT 0,
   GrossWeight double precision NOT NULL DEFAULT 0,
-  GUID character varying(36) NOT NULL,
+  GUID character varying(36) NOT NULL UNIQUE,
   GlobalVersion bigint,
   OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,

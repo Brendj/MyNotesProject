@@ -50,7 +50,7 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column >
-            <h:outputText value="#{technologicalMapProduct.nameOfProduct}"/>
+            <h:outputText value="#{technologicalMapProduct.product.fullName}"/>
         </rich:column>
         <rich:column>
             <h:inputText value="#{technologicalMapProduct.grossWeight}"/>
