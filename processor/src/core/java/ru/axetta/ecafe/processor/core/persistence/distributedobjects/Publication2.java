@@ -14,7 +14,7 @@ import org.w3c.dom.Node;
  * Time: 23:10
  * To change this template use File | Settings | File Templates.
  */
-public class Publication extends DistributedObject {
+public class Publication2 extends DistributedObject {
 
     //private Long idofpubl;
     private String isbn;
@@ -38,7 +38,7 @@ public class Publication extends DistributedObject {
     }
 
     @Override
-    protected Publication parseAttributes(Node node) {
+    protected Publication2 parseAttributes(Node node) {
 
         String stringIsbn = getStringAttributeValue(node,"isbn",32);
         if(stringIsbn!=null) setIsbn(stringIsbn);
@@ -59,14 +59,14 @@ public class Publication extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setIsbn( ((Publication) distributedObject).getIsbn());
-        setData (((Publication) distributedObject).getData());
-        setAuthor( ((Publication) distributedObject).getAuthor());
-        setTitle (((Publication) distributedObject).getTitle());
-        setTitle2(((Publication) distributedObject).getTitle2());
-        setPublicationdate(((Publication) distributedObject).getPublicationdate());
-        setPublisher(((Publication) distributedObject).getPublisher());
-        setHash(((Publication) distributedObject).getHash());
+        setIsbn( ((Publication2) distributedObject).getIsbn());
+        setData (((Publication2) distributedObject).getData());
+        setAuthor( ((Publication2) distributedObject).getAuthor());
+        setTitle (((Publication2) distributedObject).getTitle());
+        setTitle2(((Publication2) distributedObject).getTitle2());
+        setPublicationdate(((Publication2) distributedObject).getPublicationdate());
+        setPublisher(((Publication2) distributedObject).getPublisher());
+        setHash(((Publication2) distributedObject).getHash());
     }
 
     public String getIsbn() {

@@ -22,7 +22,7 @@ import java.util.Date;
  * Time: 21:07
  * To change this template use File | Settings | File Templates.
  */
-public class Circulation extends DistributedObject {
+public class Circulation2 extends DistributedObject {
 
     private Publ publ;
     private Org org;
@@ -43,7 +43,7 @@ public class Circulation extends DistributedObject {
     }
 
     @Override
-    protected Circulation parseAttributes(Node node) throws ParseException {
+    protected Circulation2 parseAttributes(Node node) throws ParseException {
         String stringIssuanceDate = getStringAttributeValue(node, "issuanceDate", 32);
         if (stringIssuanceDate != null) {
             setIssuanceDate(simpleDateFormat.parse(stringIssuanceDate));
@@ -65,10 +65,10 @@ public class Circulation extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setIssuanceDate(((Circulation) distributedObject).getIssuanceDate());
-        setRefundDate(((Circulation) distributedObject).getRefundDate());
-        setRealRefundDate(((Circulation) distributedObject).getRealRefundDate());
-        setQuantity(((Circulation) distributedObject).getQuantity());
+        setIssuanceDate(((Circulation2) distributedObject).getIssuanceDate());
+        setRefundDate(((Circulation2) distributedObject).getRefundDate());
+        setRealRefundDate(((Circulation2) distributedObject).getRealRefundDate());
+        setQuantity(((Circulation2) distributedObject).getQuantity());
     }
 
     public Publ getPubl() {

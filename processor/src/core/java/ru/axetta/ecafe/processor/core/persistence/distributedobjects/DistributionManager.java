@@ -179,8 +179,15 @@ public class DistributionManager {
             long currentMaxVersion = doVersion.getCurrentVersion();
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             DistributionManager dm = RuntimeContext.getAppContext().getBean(DistributionManager.class);
+            /*
+            DOProcessorFactory doProcessorFactory = DOProcessorFactory.getInstance();
+            DOProcessor doProcessor = doProcessorFactory.getProcessor(objectClass);
+             */
             for (DistributedObject distributedObject : distributedObjects) {
                 dm.processOneDistributedObject(distributedObject, currentMaxVersion, idOfOrg);
+                /*
+                doProcessor.process(distributionObject, currentMaxVersion, idOfOrg);
+                 */
             }
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
