@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication" table="cf_publication">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication" table="cf_publications">
         <id name="globalId" column="IdOfProductGroups" type="long">
             <generator class="identity"/>
         </id>
