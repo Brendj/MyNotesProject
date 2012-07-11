@@ -33,6 +33,42 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean journalTransactions;
     private Boolean sendJournalTransactionsToNFP;
     private String nfpServiceAddress;
+    private Boolean chronopaySection;
+    private Boolean rbkSection;
+    private Double chronopayRate;
+    private Double rbkRate;
+
+    public Double getRbkRate() {
+        return rbkRate;
+    }
+
+    public void setRbkRate(Double rbkRate) {
+        this.rbkRate = rbkRate;
+    }
+
+    public Double getChronopayRate() {
+        return chronopayRate;
+    }
+
+    public void setChronopayRate(Double chronopayRate) {
+        this.chronopayRate = chronopayRate;
+    }
+
+    public Boolean getChronopaySection() {
+        return chronopaySection;
+    }
+
+    public void setChronopaySection(Boolean chronopaySection) {
+        this.chronopaySection = chronopaySection;
+    }
+
+    public Boolean getRbkSection() {
+        return rbkSection;
+    }
+
+    public void setRbkSection(Boolean rbkSection) {
+        this.rbkSection = rbkSection;
+    }
 
     public Boolean getSendJournalTransactionsToNFP() {
         return sendJournalTransactionsToNFP;
@@ -106,6 +142,10 @@ public class OptionPage extends BasicWorkspacePage {
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
         sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
         nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
+        chronopaySection=runtimeContext.getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION);
+        rbkSection=runtimeContext.getOptionValueBool(Option.OPTION_RBK_SECTION);
+        rbkRate=runtimeContext.getOptionValueDouble(Option.OPTION_RBK_RATE);
+        chronopayRate=runtimeContext.getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE);
     }
 
     public Object save() {
@@ -117,6 +157,11 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
             runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);
+            runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_SECTION,chronopaySection);
+            runtimeContext.setOptionValue(Option.OPTION_RBK_SECTION, rbkSection);
+            runtimeContext.setOptionValue(Option.OPTION_RBK_RATE, rbkRate);
+            runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_RATE, chronopayRate);
+            runtimeContext.getPartnerChronopayConfig().setRate(chronopayRate);
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {

@@ -7,7 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
+<%--@elvariable id="optionPage" type="ru.axetta.ecafe.processor.web.ui.option.OptionPage"--%>
 <h:panelGrid id="optionPanelGrid" binding="#{optionPage.pageComponent}" styleClass="borderless-grid">
    <rich:tabPanel>
         <rich:tab label="Общие">
@@ -34,6 +34,23 @@
                 <h:inputText value="#{optionPage.nfpServiceAddress}" styleClass="input-text" size="40"/>
             </h:panelGrid>
         </rich:tab>
+
+       <rich:tab label="Платежные системы">
+           <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />
+           <h:panelGrid styleClass="borderless-grid" columns="4">
+
+               <h:outputText escape="true" value="Chronopay" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.chronopaySection}" styleClass="output-text" />
+               <h:outputText escape="true" value="Рамер комиссии" styleClass="output-text" />
+               <h:inputText value="#{optionPage.chronopayRate}" styleClass="input-text" size="10"/>
+
+               <h:outputText escape="true" value="RBKMoney" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.rbkSection}" styleClass="output-text" />
+               <h:outputText escape="true" value="Рамер комиссии" styleClass="output-text" />
+               <h:inputText value="#{optionPage.rbkRate}" styleClass="input-text" size="10"/>
+
+           </h:panelGrid>
+       </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">

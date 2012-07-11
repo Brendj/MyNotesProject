@@ -26,7 +26,7 @@ public class ChronopayConfig {
 
     public static final String CHRONOPAY_PARAM_BASE = ".chronopay";
     public static final String SHARED_SEC_PARAM=CHRONOPAY_PARAM_BASE+".sharedSec";
-    public static final String RATE_PARAM = CHRONOPAY_PARAM_BASE + ".rate";
+   // public static final String RATE_PARAM = CHRONOPAY_PARAM_BASE + ".rate";
     public static final String IP_PARAM=CHRONOPAY_PARAM_BASE+".ip";
     public static final String CONTRAGENT_NAME_PARAM = CHRONOPAY_PARAM_BASE + ".contragentName";
     public static final String PURCHASE_URI_NAME_PARAM = CHRONOPAY_PARAM_BASE + ".purchaseUri";
@@ -40,7 +40,7 @@ public class ChronopayConfig {
     /**
      * Комиссия
      */
-  private final Double rate;
+  private  Double rate;
     /**
      * ip адрес хоста c которого отправляются уведомления о платеже
      */
@@ -65,16 +65,17 @@ public class ChronopayConfig {
      * @param paramBaseName база имен параметров в объекте properties
      * @throws Exception
      */
-    public ChronopayConfig(Properties properties, String paramBaseName) throws Exception {
+    public ChronopayConfig(Properties properties, String paramBaseName,Double rate) throws Exception {
            String sharedSecParam=paramBaseName+SHARED_SEC_PARAM;
-           String rateParam=paramBaseName+RATE_PARAM;
+           //String rateParam=paramBaseName+RATE_PARAM;
            String ipParam=paramBaseName+IP_PARAM;
            String contragentNameParam=paramBaseName+CONTRAGENT_NAME_PARAM;
            String purchaseUriParam=paramBaseName+PURCHASE_URI_NAME_PARAM;
            String callbackUrlParam=paramBaseName+CALLBACK_URL_PARAM;
 
         this.sharedSec=properties.getProperty(sharedSecParam,"Babdkgfj03586FSEW#*fglsq[mc");
-        this.rate=Double.parseDouble(properties.getProperty(rateParam, "0"));
+        //this.rate=Double.parseDouble(properties.getProperty(rateParam, "0"));
+        this.rate=rate;
         this.ip=properties.getProperty(ipParam,"");
         this.contragentName=properties.getProperty(contragentNameParam,"Chronopay");
         this.purchaseUri=properties.getProperty(purchaseUriParam,"https://payments.chronopay.com/");
@@ -104,6 +105,10 @@ public class ChronopayConfig {
 
     public String getSharedSec() {
         return sharedSec;
+    }
+
+    public void setRate(Double rate) {
+        this.rate = rate;
     }
 
     public Double getRate() {

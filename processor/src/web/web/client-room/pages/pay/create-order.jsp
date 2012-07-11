@@ -35,6 +35,7 @@
 <%@ page import="java.net.Inet4Address" %>
 <%@ page import="java.net.InetAddress" %>
 <%@ page import="ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
 <%!
 
     public static String getHash(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
@@ -79,6 +80,10 @@
     final long MIN_COPECKS_SUM = 1000L;
 
     final String PRODUCT_ID_FOR_CHRONOPAY= "006387-0001-0001";
+     Boolean chronopaySection;
+     Boolean rbkSection;
+
+
 
     RuntimeContext runtimeContext = null;
     try {
@@ -134,8 +139,18 @@
 
         RBKMoneyConfig rbkMoneyConfig = runtimeContext.getPartnerRbkMoneyConfig();
         ChronopayConfig chronopayConfig=runtimeContext.getPartnerChronopayConfig();
-        if (!haveDataToProcess || !dataToProcessVerified) {%>
-<table border="1">
+
+        chronopaySection=runtimeContext.getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION);
+        rbkSection=runtimeContext.getOptionValueBool(Option.OPTION_RBK_SECTION);
+
+        if (!haveDataToProcess || !dataToProcessVerified) { %>
+
+
+  <table border="1">
+<%
+       if(chronopaySection){
+%>
+
      <tr>
     <td>
     <table class="borderless-grid">
@@ -201,6 +216,7 @@
      </td>
      </tr>
 
+       <%}if(rbkSection){%>
 
     <tr>
         <td>
@@ -320,7 +336,7 @@
 
    </tr>
 
-
+  <%}%>
 
 </table>
 <%

@@ -358,7 +358,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
             this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE);
             //////////////////////////////////////////////////////////////////////////////////////////////
-            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE);
+            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE));
             /////////////////////////////////////////////////////////////////////////////////////////////
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
@@ -983,6 +983,10 @@ if (logger.isDebugEnabled()) {
         return Integer.parseInt(getOptionValueString(optionId));
     }
 
+    public double getOptionValueDouble(int optionId) {
+        return Double.parseDouble(getOptionValueString(optionId));
+    }
+
     public String getOptionValueString(int optionId) {
         return optionsValues.get(optionId);
     }
@@ -994,6 +998,10 @@ if (logger.isDebugEnabled()) {
         setOptionValue(optionId, value?"1":"0");
     }
     public void setOptionValue(int optionId, int value) {
+        setOptionValue(optionId, value+"");
+    }
+
+    public void setOptionValue(int optionId, double value) {
         setOptionValue(optionId, value+"");
     }
 
