@@ -50,7 +50,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
             printMessage("Группа для продуктов сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении группы для продуктов.");
-            logger.trace("Error saved Product Group",e);
+            logger.error("Error saved Product Group",e);
         }
         return null;
     }

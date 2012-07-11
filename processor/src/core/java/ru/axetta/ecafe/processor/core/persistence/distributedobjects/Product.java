@@ -62,8 +62,7 @@ public class Product extends DistributedObject {
         if(stringProductName!=null) setProductName(stringProductName);
         Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);
-       /* String stringGroupName = getStringAttributeValue(node, "GroupName", 512);
-        if(stringGroupName!=null) setGroupName(stringGroupName);*/
+
         return this;
     }
 
@@ -74,10 +73,7 @@ public class Product extends DistributedObject {
         setProductName( ((Product) distributedObject).getProductName());
         setOkpCode (((Product) distributedObject).getOkpCode());
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
-       /* setGroupName(((Product) distributedObject).getGroupName());*/
-        for (TechnologicalMapProduct technologicalMapProduct: ((Product) distributedObject).getTechnologicalMapProduct()){
-             addTechnologicalMapProduct(technologicalMapProduct);
-        }
+
     }
 
     private String code;
@@ -88,32 +84,6 @@ public class Product extends DistributedObject {
     private User userEdit;
     private User userDelete;
     private Long idOfConfigurationProvider;
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal;
-    /*private String groupName;
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }*/
-
-    public Set<TechnologicalMapProduct> getTechnologicalMapProduct(){
-        return Collections.unmodifiableSet(getTechnologicalMapProductInternal());
-    }
-
-    public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct){
-        technologicalMapProductInternal.add(technologicalMapProduct);
-    }
-
-    private Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
-        return technologicalMapProductInternal;
-    }
-
-    private void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
-        this.technologicalMapProductInternal = technologicalMapProductInternal;
-    }
 
     public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
@@ -182,7 +152,7 @@ public class Product extends DistributedObject {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("ProductGuide");
+        sb.append("Product");
         sb.append("{productName ='").append(productName).append('\'');
         sb.append(", code ='").append(code).append('\'');
         sb.append(", fullName ='").append(fullName).append('\'');

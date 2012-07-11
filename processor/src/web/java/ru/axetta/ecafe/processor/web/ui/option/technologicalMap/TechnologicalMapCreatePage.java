@@ -7,12 +7,14 @@ package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
 import sun.util.resources.LocaleNames_da;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
 import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupMenu;
 import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem;
 import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItemsPanel;
@@ -44,19 +46,30 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     private TechnologicalMapProduct currTechnologicalMapProduct;
     private List<TechnologicalMapProduct> technologicalMapProducts;
     private TechnologicalMapGroupMenu technologicalMapGroupMenu = new TechnologicalMapGroupMenu();
-    private List<TechnologicalMapGroup> technologicalMapGroupList;
     private Long currentIdOfTechnologicalMapGroup;
+    private Long currentIdOfConfigurationProvider;
+    private ConfigurationProviderMenu configurationProviderMenu = new ConfigurationProviderMenu();
+    private List<ConfigurationProvider> configurationProviderList;
+    private List<TechnologicalMapGroup> technologicalMapGroupList;
 
     @Override
     public void onShow() throws Exception {
         technologicalMap=new TechnologicalMap();
         technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
-        technologicalMapGroupList = DAOService.getInstance().getDistributedObjects(TechnologicalMapGroup.class);
-        if(technologicalMapGroupList != null && !technologicalMapGroupList.isEmpty()){
+        technologicalMapGroupList = DAOService.getInstance()
+                .getDistributedObjects(TechnologicalMapGroup.class);
+        configurationProviderList = DAOService.getInstance().getDistributedObjects(
+                ConfigurationProvider.class);
+        if(getRendered()){
+            configurationProviderMenu.readAllItems(configurationProviderList);
             technologicalMapGroupMenu.readAllItems(technologicalMapGroupList);
         } else {
             printError("Отсутсвуют группы технологических карт.");
         }
+    }
+
+    public boolean getRendered(){
+        return !(configurationProviderList==null || configurationProviderList.isEmpty() || technologicalMapGroupList==null || technologicalMapGroupList.isEmpty());
     }
 
     @Override
@@ -64,15 +77,11 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
         if (!(productItemList == null || productItemList.isEmpty())) {
             for (ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem productItem: productItemList){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-                //   technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
                 technologicalMapProduct.setProduct(productItem.getProduct());
-                // technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
                 technologicalMapProduct.setDeletedState(false);
                 technologicalMapProduct.setTechnologicalMap(technologicalMap);
                 technologicalMapProducts.add(technologicalMapProduct);
-                //technologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
             }
-            //technologicalMapProducts = technologicalMap.getTechnologicalMapProduct();
         }
     }
 
@@ -87,6 +96,8 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
             technologicalMap.setGlobalVersion(0L);
             UUID tmUUID = UUID.randomUUID();
             technologicalMap.setGuid(tmUUID.toString());
+
+            technologicalMap.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
 
             technologicalMap.setTechnologicalMapGroup(DAOService.getInstance().findRefDistributedObject(TechnologicalMapGroup.class, currentIdOfTechnologicalMapGroup));
             DAOService.getInstance().persistEntity(technologicalMap);
@@ -112,15 +123,25 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     }
 
     public Object showProducts() throws Exception {
-        //TODO continue
-        /*List<Product> productList = DAOService.getInstance().getDistributedObjects(Product.class);
-        products.clear();
-        for (Product product: productList){
-            products.add(new ProductItem(false,product));
-        }*/
         RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).reload(new LinkedList<TechnologicalMapProduct>());
         RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).pushCompleteHandlerList(RuntimeContext.getAppContext().getBean(getClass()));
         return null;
+    }
+
+    public ConfigurationProviderMenu getConfigurationProviderMenu() {
+        return configurationProviderMenu;
+    }
+
+    public void setConfigurationProviderMenu(ConfigurationProviderMenu configurationProviderMenu) {
+        this.configurationProviderMenu = configurationProviderMenu;
+    }
+
+    public Long getCurrentIdOfConfigurationProvider() {
+        return currentIdOfConfigurationProvider;
+    }
+
+    public void setCurrentIdOfConfigurationProvider(Long currentIdOfConfigurationProvider) {
+        this.currentIdOfConfigurationProvider = currentIdOfConfigurationProvider;
     }
 
     public Long getCurrentIdOfTechnologicalMapGroup() {
@@ -164,48 +185,3 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     }
 
 }
-
-/*
-
-    public static class ProductItem{
-        private Boolean checked=false;
-        private Product product;
-
-        public ProductItem(Boolean checked, Product product) {
-            this.checked = checked;
-            this.product = product;
-        }
-
-        public Boolean getChecked() {
-            return checked;
-        }
-
-        public void setChecked(Boolean checked) {
-            this.checked = checked;
-        }
-
-        public Product getProduct() {
-            return product;
-        }
-
-        public void setProduct(Product product) {
-            this.product = product;
-        }
-    }
-    */
-/*
-public Object addProducts() {
-    for (ProductItem productItem: products){
-        if(productItem.getChecked()){
-            TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-          //  technologicalMapProduct.setIdOfProduct(productItem.product.getGlobalId());
-            technologicalMapProduct.setProduct(productItem.getProduct());
-         //   technologicalMapProduct.setNameOfProduct(productItem.product.getProductName());
-            technologicalMapProduct.setDeletedState(false);
-            technologicalMapProduct.setTechnologicalMap(technologicalMap);
-            technologicalMapProducts.add(technologicalMapProduct);
-            technologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
-        }
-    }
-    return null;
-}*/

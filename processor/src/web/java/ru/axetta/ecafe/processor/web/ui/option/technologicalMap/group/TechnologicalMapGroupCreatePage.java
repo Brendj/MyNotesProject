@@ -55,7 +55,7 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
             printMessage("Группа технологических карт сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии группы технологических карт.");
-            logger.trace("Error create Technological Map Group",e);
+            logger.error("Error create Technological Map Group",e);
         }
         return null;
     }

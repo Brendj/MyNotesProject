@@ -16,6 +16,10 @@
 
 
     <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Конфигурация поставщика" styleClass="output-text" />
+        <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapEditPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+            <f:selectItems value="#{technologicalMapEditPage.configurationProviderMenu.items}" />
+        </h:selectOneMenu>
         <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
         <h:inputText value="#{technologicalMapEditPage.currTechnologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
@@ -25,6 +29,10 @@
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
             <f:selectItem itemLabel="Удален" itemValue="true"/>
         </h:selectOneListbox>
+        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
+        <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapEditPage.currentIdOfTechnologicalMapGroup}" styleClass="input-text long-field">
+            <f:selectItems value="#{technologicalMapEditPage.technologicalMapGroupMenu.items}" />
+        </h:selectOneMenu>
     </h:panelGrid>
 
 
@@ -179,9 +187,11 @@
 
 </h:panelGrid>
 
-<h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить технологическую карту" action="#{technologicalMapEditPage.save}"
-                       reRender="technologicalMapEditPanel" styleClass="command-button" />
+<h:panelGrid styleClass="borderless-grid" columns="2">
+    <a4j:commandButton value="Сохранить" action="#{technologicalMapEditPage.save}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Восстановить" action="#{technologicalMapEditPage.show}"
+                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

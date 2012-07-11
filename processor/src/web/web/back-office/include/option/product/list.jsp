@@ -16,126 +16,112 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Конфигурация поставщика" styleClass="output-text" />
-    <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{mainPage.currentConfigurationProvider}" styleClass="input-text long-field" >
-        <f:selectItems value="#{mainPage.productGuideListPage.configurationProviderMenu.items}" />
-        <a4j:support event="onchange" action="#{mainPage.updateProductGuideListPage}" reRender="productGuideListTable"  />
-    </h:selectOneMenu>
+<%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.product.ProductEditPage"--%>
+<%--@elvariable id="productListPage" type="ru.axetta.ecafe.processor.web.ui.option.product.ProductListPage"--%>
+<h:panelGrid id="productListPage" binding="#{productListPage.pageComponent}"
+             styleClass="borderless-grid" columns="1">
+      <%--TODO: Добавить фильтры: по провайдерам, по группам, по статусам(скрыть или показать удаленные)--%>
+    <h:column>
+        <fieldset>
+            <legend><h:outputText value="Фильтры" styleClass="output-text" escape="true"/></legend>
+            <h:panelGrid columns="2">
+                <h:outputText value="Конфигурации провайдра" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{productListPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
+                    <f:selectItems value="#{productListPage.configurationProviderMenu.items}" />
+                    <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
+                </h:selectOneMenu>
+                <h:outputText value="Группа продукта" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectCurrentProductGroup" value="#{productListPage.currentIdOfProductGroup}" styleClass="input-text long-field">
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <f:selectItem itemLabel="Выберите группу" itemValue="-1"/>
+                    <f:selectItems value="#{productListPage.productGroupMenu.items}" />
+                    <f:selectItem itemLabel="Выберать без учета группы" itemValue="-2"/>
+                </h:selectOneMenu>
+                <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectDeletedStatus" value="#{productListPage.deletedStatusSelected}" styleClass="input-text long-field">
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <f:selectItem itemLabel="Скрыть" itemValue="false"/>
+                    <f:selectItem itemLabel="Показать" itemValue="true"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+        </fieldset>
+    </h:column>
 
-    <h:outputText escape="true" value="Удаленные элементы" styleClass="output-text" />
-    <h:selectOneMenu id="selectShowDeleted" value="#{mainPage.productGuideListPage.showDeletedSelectedText}" styleClass="input-text long-field" >
-        <f:selectItems value="#{mainPage.productGuideListPage.showDeletedComboMenu.items}" />
-        <a4j:support event="onchange" action="#{mainPage.updateProductGuideListPage}" reRender="productGuideListTable"  />
-    </h:selectOneMenu>
-
-</h:panelGrid>
-
-
-
-<rich:extendedDataTable id="productGuideListTable" value="#{mainPage.productGuideListPage.items}" var="item"
-        columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column" width="100%" rowKeyVar="row" rows="15"
-        sortMode="multi" selectionMode="single">
-
-    <rich:column headerClass="column-header"  sortable="true" sortBy="#{item.code}" filterBy="#{item.code}" filterEvent="onkeyup" width="100px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Код" />
+    <rich:dataTable id="productListTable" width="700" var="product" value="#{productListPage.productList}"
+                    rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="№" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{row+1}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Код" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{product.code}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Полное наименование пищевого продукта" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{product.fullName}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Товарное название" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{product.productName}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Код (коды) ОКП" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{product.okpCode}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Статус технологической карты" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{product.deletedState}" readonly="true" disabled="true"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Редактировать" escape="true"/>
+            </f:facet>
+            <h:commandLink action="#{productEditPage.show}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{product}" target="#{productEditPage.currentProduct}" />
+            </h:commandLink>
+        </rich:column>
+        <rich:column style="text-align:center">
+            <f:facet name="header">
+                <h:outputText value="Удалить" escape="true"/>
+            </f:facet>
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             oncomplete="#{rich:component('removedProductItemDeletePanel')}.show()">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{product}" target="#{productEditPage.currentProduct}" />
+            </a4j:commandLink>
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="productListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
         </f:facet>
-        <rich:inplaceInput layout="block" value="#{item.code}"
-                id="inplaceCode"
-                changedHoverClass="hover" viewHoverClass="hover"
-                viewClass="inplace" changedClass="inplace"
-                selectOnEdit="true" editEvent="ondblclick" >
-           <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"/>
-        </rich:inplaceInput>
-    </rich:column>
+    </rich:dataTable>
 
-    <rich:column headerClass="column-header" sortable="true" sortBy="#{item.fullName}" filterBy="#{item.fullName}" filterEvent="onkeyup" width="340px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Наименование пищевого продукта полное" />
-        </f:facet>
-        <rich:inplaceInput layout="block" value="#{item.fullName}"
-                id="inplaceFullName"
-                requiredMessage="Наименование пищевого продукта полное с кодом #{item.code} пусто."
-                changedHoverClass="hover" viewHoverClass="hover"
-                viewClass="inplace" changedClass="inplace"
-                selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
-        </rich:inplaceInput>
-    </rich:column>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 
-    <rich:column headerClass="column-header" sortable="true" sortBy="#{item.productName}" filterBy="#{item.productName}" filterEvent="onkeyup" width="170px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Товарное название" />
-        </f:facet>
-        <rich:inplaceInput layout="block" value="#{item.productName}"
-                id="inplaceProductName"
-                changedHoverClass="hover" viewHoverClass="hover"
-                viewClass="inplace" changedClass="inplace"
-                selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
-        </rich:inplaceInput>
-    </rich:column>
-
-    <rich:column headerClass="column-header" sortable="true" sortBy="#{item.okpCode}" filterBy="#{item.okpCode}" filterEvent="onkeyup" width="140px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Код (коды) ОКП" />
-        </f:facet>
-        <rich:inplaceInput layout="block" value="#{item.okpCode}"
-                id="inplaceOkpCode"
-                changedHoverClass="hover" viewHoverClass="hover"
-                viewClass="inplace" changedClass="inplace"
-                selectOnEdit="true" editEvent="ondblclick" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
-        </rich:inplaceInput>
-    </rich:column>
-
-    <rich:column headerClass="column-header" width="100px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Удален" />
-        </f:facet>
-        <h:selectBooleanCheckbox value="#{item.deleted}"
-                                 styleClass="output-text" >
-            <a4j:support event="onchange" action="#{mainPage.addEditedProductGuideItemId(item.idOfProductGuide)}" reRender="selectCurrentConfigurationProvider"  />
-        </h:selectBooleanCheckbox>
-    </rich:column>
-
-    <rich:column headerClass="column-header" width="100px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Доп. инф." />
-        </f:facet>
-        <h:graphicImage value="/images/16x16/person.png" style="border: 0;" />
-        <rich:toolTip>
-            <h:outputText escape="false" value="#{item.getAdditionInfo}" />
-        </rich:toolTip>
-    </rich:column>
-
-    <rich:column headerClass="column-header" width="110px" >
-        <f:facet name="header">
-            <h:outputText escape="true" value="Удалить" />
-        </f:facet>
-
-        <a4j:commandLink ajaxSingle="true" styleClass="command-link"  disabled="#{item.deleted}"
-                         oncomplete="#{rich:component('removedProductGuideItemDeletePanel')}.show()">
-            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-            <f:setPropertyActionListener value="#{item.idOfProductGuide}"
-                                         target="#{mainPage.removedProductGuideItemId}" />
-        </a4j:commandLink>
-
-    </rich:column>
-
-</rich:extendedDataTable>
-
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>
-
-<h:panelGrid columns="3" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateProducts}" reRender="mainMenu, workspaceTogglePanel"
-                       styleClass="command-button" />
-    <a4j:commandButton value="Восстановить" action="#{mainPage.showProductGuideListPage}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
-    <a4j:commandButton value="Добавить" action="#{mainPage.addProductGuideInListPage}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>

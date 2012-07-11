@@ -54,11 +54,25 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage {
         return "option/technologicalMap/group/list";
     }
 
+    public String getPageTitle() {
+        return super.getPageTitle() + String.format(" (%d)", technologicalMapGroupList.size());
+    }
+
     public List<TechnologicalMapGroup> getTechnologicalMapGroupList() {
         return technologicalMapGroupList;
     }
 
     public void setTechnologicalMapGroupList(List<TechnologicalMapGroup> technologicalMapGroupList) {
         this.technologicalMapGroupList = technologicalMapGroupList;
+    }
+
+    @Transactional
+    private boolean getNullOrEmpty(){
+        List<Long> tMGl = entityManager.createQuery("SELECT id FROM TechnologicalMapGroup",Long.class).getResultList();
+        return tMGl==null || tMGl.isEmpty();
+    }
+
+    public boolean getNullOrEmptyGroup(){
+        return getNullOrEmpty();
     }
 }

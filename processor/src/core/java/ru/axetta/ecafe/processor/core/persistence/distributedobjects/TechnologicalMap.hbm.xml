@@ -47,12 +47,13 @@
         <property name="vitaminPp" column="VitaminPp" type="float" />
         <property name="vitaminC" column="VitaminC" type="float" />
         <property name="vitaminE" column="VitaminE" type="float" />
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
         <many-to-one name="technologicalMapGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup" fetch="select" lazy="false">
             <column name="IdOfTechMapGroups" not-null="true" />
         </many-to-one>
 
-        <set name="technologicalMapProductInternal">
+        <set name="technologicalMapProductInternal" cascade="delete">
             <key>
                 <column name="idOfTechnologicalMaps"/>
             </key>

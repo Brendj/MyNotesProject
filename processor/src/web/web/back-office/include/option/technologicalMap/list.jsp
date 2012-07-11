@@ -14,6 +14,35 @@
 <%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.TechnologicalMapEditPage"--%>
 <h:panelGrid id="technologicalMapListPage" binding="#{technologicalMapListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
+
+    <h:column>
+        <fieldset>
+            <legend><h:outputText value="Фильтры" styleClass="output-text" escape="true"/></legend>
+            <h:panelGrid columns="2">
+                <h:outputText value="Конфигурации провайдра" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapListPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
+                    <f:selectItems value="#{technologicalMapListPage.configurationProviderMenu.items}" />
+                    <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
+                </h:selectOneMenu>
+                <h:outputText value="Группа продукта" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapListPage.currentIdOftechnologicalMapGroup}" styleClass="input-text long-field">
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
+                    <f:selectItems value="#{technologicalMapListPage.technologicalMapGroupMenu.items}" />
+                    <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
+                </h:selectOneMenu>
+                <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
+                <h:selectOneMenu id="selectDeletedStatus" value="#{technologicalMapListPage.deletedStatusSelected}" styleClass="input-text long-field">
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <f:selectItem itemLabel="Показать" itemValue="true"/>
+                    <f:selectItem itemLabel="Скрыть" itemValue="false"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+        </fieldset>
+    </h:column>
+
     <rich:dataTable id="technologicalMapListTable" width="700" var="technologicalMap" value="#{technologicalMapListPage.technologicalMapList}"
                     rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">

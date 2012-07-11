@@ -47,7 +47,7 @@ public class ProductGroupCreatePage extends BasicWorkspacePage {
             printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии группы.");
-            logger.trace("Error create product group",e);
+            logger.error("Error create product group",e);
         }
         return null;
     }

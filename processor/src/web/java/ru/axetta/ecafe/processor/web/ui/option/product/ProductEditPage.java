@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -68,11 +69,17 @@ public class ProductEditPage extends BasicWorkspacePage {
 
     public Object onSave(){
         try {
-            currentProduct = (Product) DAOService.getInstance().mergeDistributedObject(currentProduct,currentProduct.getGlobalVersion()+1);
+            Product p = entityManager.find(Product.class, currentProduct.getGlobalId());
+            p.fill(currentProduct);
+            p.setLastUpdate(new Date());
+            p.setDeletedState(currentProduct.getDeletedState());
+            p.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+            p.setProductGroup(DAOService.getInstance().findRefDistributedObject(ProductGroup.class,currentIdOfProductGroup));
+            currentProduct = (Product) DAOService.getInstance().mergeDistributedObject(p, currentProduct.getGlobalVersion()+1);
             printMessage("Продукт сохранен успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении продукта.");
-            logger.trace("Error saved Product",e);
+            logger.error("Error saved Product", e);
         }
         return null;
     }
@@ -80,27 +87,17 @@ public class ProductEditPage extends BasicWorkspacePage {
     @Transactional
     public void remove(){
         if(!currentProduct.getDeletedState()) {
-            printMessage("Продукт не может быть удалена.");
+            printMessage("Продукт не может быть удален.");
             return;
         }
         try{
             ProductGroup pg = entityManager.getReference(ProductGroup.class, currentProduct.getGlobalId());
             entityManager.remove(pg);
-            printMessage("Продукт удалена успешно.");
+            printMessage("Продукт успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении продукта.");
             logger.error("Error by delete Product.", e);
         }
-    }
-
-    @Transactional
-    private void reload() throws Exception{
-        currentProduct = entityManager.merge(currentProduct);
-    }
-
-    @Transactional
-    private void save() throws Exception{
-        currentProduct = (Product) DAOService.getInstance().mergeDistributedObject(currentProduct,currentProduct.getGlobalVersion()+1);
     }
 
     public String getPageFilename() {

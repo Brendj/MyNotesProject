@@ -19,15 +19,49 @@ import java.util.*;
  */
 public class TechnologicalMap extends DistributedObject {
 
+    /*  private String groupName;*/
+    private String nameOfTechnologicalMap;
+
+    private Long numberOfTechnologicalMap;
+
+    //Технология приготовления
+    private String technologyOfPreparation;
+
+    private String timeOfRealization;
+    // Температура приготовления
+    private String tempOfPreparation;
+
+    //Срок реализации в часах
+    private String termOfRealization;
+
+    // В 100 граммах данного блюда содержится:
+    //Пищевые вещества, г
+    private Float proteins;
+
+    private Float carbohydrates;
+    private Float fats;
+
+    //Минеральные вещества, мг
+    private Float microElCa;
+    private Float microElMg;
+    private Float microElP;
+
+    private Float microElFe;
+    //Энергетическая ценность (ккал)
+    private Float energyValue;
+    //Витамины, мг
+    private Float vitaminA;
+    private Float vitaminB1;
+
+    private Float vitaminB2;
+
+    private Float vitaminPp;
+    private Float vitaminC;
+    private Float vitaminE;
     private TechnologicalMapGroup technologicalMapGroup;
+    private long idOfConfigurationProvider;
 
-    public TechnologicalMapGroup getTechnologicalMapGroup() {
-        return technologicalMapGroup;
-    }
-
-    public void setTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup) {
-        this.technologicalMapGroup = technologicalMapGroup;
-    }
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -166,46 +200,6 @@ public class TechnologicalMap extends DistributedObject {
         }*/
         return this;
     }
-
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
-
-  /*  private String groupName;*/
-    private String nameOfTechnologicalMap;
-
-    private Long numberOfTechnologicalMap;
-    //Технология приготовления
-    private String technologyOfPreparation;
-
-    private String timeOfRealization;
-
-    // Температура приготовления
-    private String tempOfPreparation;
-    //Срок реализации в часах
-    private String termOfRealization;
-    // В 100 граммах данного блюда содержится:
-    //Пищевые вещества, г
-    private Float proteins;
-
-    private Float carbohydrates;
-    private Float fats;
-    //Минеральные вещества, мг
-    private Float microElCa;
-
-    private Float microElMg;
-    private Float microElP;
-    private Float microElFe;
-    //Энергетическая ценность (ккал)
-    private Float energyValue;
-
-    //Витамины, мг
-    private Float vitaminA;
-
-    private Float vitaminB1;
-    private Float vitaminB2;
-    private Float vitaminPp;
-    private Float vitaminC;
-    private Float vitaminE;
-
     /*public String getGroupName() {
         return groupName;
     }
@@ -392,6 +386,22 @@ public class TechnologicalMap extends DistributedObject {
 
     public void setVitaminE(Float vitaminE) {
         this.vitaminE = vitaminE;
+    }
+
+    public long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigurationProvider(long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
+    }
+
+    public TechnologicalMapGroup getTechnologicalMapGroup() {
+        return technologicalMapGroup;
+    }
+
+    public void setTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup) {
+        this.technologicalMapGroup = technologicalMapGroup;
     }
 
     @Override

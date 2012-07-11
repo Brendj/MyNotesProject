@@ -73,7 +73,7 @@ public class ProductCreatePage extends BasicWorkspacePage {
             printMessage("Продукт сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии продукта.");
-            logger.trace("Error create product",e);
+            logger.error("Error create product",e);
         }
         return null;
     }

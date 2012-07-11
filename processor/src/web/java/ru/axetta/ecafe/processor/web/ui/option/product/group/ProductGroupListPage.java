@@ -60,4 +60,13 @@ public class ProductGroupListPage extends BasicWorkspacePage {
     public void setProductGroupList(List<ProductGroup> productGroupList) {
         this.productGroupList = productGroupList;
     }
+    @Transactional
+    private boolean getNullOrEmpty(){
+        List<Long> pGl = entityManager.createQuery("SELECT id FROM ProductGroup",Long.class).getResultList();
+        return pGl==null || pGl.isEmpty();
+    }
+
+    public boolean getNullOrEmptyGroup(){
+        return getNullOrEmpty();
+    }
 }

@@ -15,6 +15,10 @@
 
 
     <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Конфигурация поставщика" styleClass="output-text" />
+        <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+            <f:selectItems value="#{technologicalMapCreatePage.configurationProviderMenu.items}" />
+        </h:selectOneMenu>
         <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
         <h:inputText value="#{technologicalMapCreatePage.technologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
@@ -23,7 +27,6 @@
         <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapCreatePage.currentIdOfTechnologicalMapGroup}" styleClass="input-text long-field">
             <f:selectItems value="#{technologicalMapCreatePage.technologicalMapGroupMenu.items}" />
         </h:selectOneMenu>
-
     </h:panelGrid>
 
     <rich:dataTable id="productsTable" value="#{technologicalMapCreatePage.technologicalMapProducts}" var="technologicalMapProduct" >

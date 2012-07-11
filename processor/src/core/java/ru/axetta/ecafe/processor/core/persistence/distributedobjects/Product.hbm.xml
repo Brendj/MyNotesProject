@@ -36,10 +36,5 @@
             <column name="idOfProductGroups" not-null="true" />
         </many-to-one>
 
-<!--
-        <set name="technologicalMapProductInternal" cascade="all">
-            <key column="IdOfTechnoMapProduct"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
-        </set>-->
     </class>
 </hibernate-mapping>

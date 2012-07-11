@@ -1,7 +1,8 @@
-DROP TABLE cf_product_guide;
-DROP TABLE cf_products;
-DROP TABLE cf_product;
-DROP TABLE cf_technologicalmap;
+DROP TABLE IF EXISTS cf_product_guide;
+DROP TABLE IF EXISTS cf_products;
+DROP TABLE IF EXISTS cf_product;
+DROP TABLE IF EXISTS cf_technologicalmap;
+DROP TABLE IF EXISTS cf_provider_configurations;
 
 -- Таблица групп продуктов
 CREATE TABLE cf_product_groups
@@ -88,6 +89,7 @@ CREATE TABLE  cf_technological_map(
   CreatedDate bigint NOT NULL,
   LastUpdate bigint,
   DeleteDate bigint,
+  IdOfConfigurationProvider bigint,
   CONSTRAINT cf_technological_map_pk PRIMARY KEY (IdOfTechnologicalMaps ),
   CONSTRAINT cf_technological_map_technological_map_groups_fk FOREIGN KEY (IdOfTechMapGroups)
       REFERENCES cf_technological_map_groups (IdOfTechMapGroups)
@@ -115,4 +117,16 @@ CREATE TABLE cf_technological_map_products
   CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnologicalMaps)
       REFERENCES cf_technological_map (IdOfTechnologicalMaps)
 );
+
+CREATE TABLE cf_provider_configurations
+(
+  IdOfConfigurationProvider BigSerial NOT NULL,
+  name character varying(64) NOT NULL,
+  CONSTRAINT pk_configuration_provider PRIMARY KEY (IdOfConfigurationProvider ),
+  CONSTRAINT cf_provider_configurations_name_key UNIQUE (name )
+);
+
+-- ссылка на конфигурации провайдера
+ALTER TABLE cf_orgs ADD COLUMN IdOfConfigurationProvider bigint;
+
 

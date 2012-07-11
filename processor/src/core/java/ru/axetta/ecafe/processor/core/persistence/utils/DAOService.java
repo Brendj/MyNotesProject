@@ -147,6 +147,7 @@ public class DAOService {
         DistributedObject d = em.find(distributedObject.getClass(),distributedObjectList.get(0).getGlobalId());
         d.fill(distributedObject);
         d.setGlobalVersion(globalVersion);
+        d.setDeletedState(distributedObject.getDeletedState());
         d.setLastUpdate(new Date());
         return em.merge(d);
     }
@@ -237,5 +238,11 @@ public class DAOService {
         if (cl==null) throw new Exception("Client not found: "+idOfClient);
         cl.addIntegraPartnerAccessPermission(idOfIntegraPartner);
         em.persist(cl);
+    }
+    @Transactional
+    public List<TechnologicalMapProduct> getTechnologicalMapProducts(TechnologicalMap technologicalMap) {
+        TypedQuery<TechnologicalMapProduct> query = em.createQuery("from TechnologicalMapProduct where technologicalMap=:technologicalMap", TechnologicalMapProduct.class);
+        query.setParameter("technologicalMap",technologicalMap);
+        return query.getResultList();
     }
 }

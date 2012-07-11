@@ -24,20 +24,29 @@
             <f:selectItems value="#{productEditPage.productGroupMenu.items}" />
         </h:selectOneMenu>
 
+        <h:outputText escape="true" value="Статус технологической карты" styleClass="output-text" />
+        <h:selectOneListbox value="#{productEditPage.currentProduct.deletedState}" size="1">
+            <f:selectItem itemLabel="Не удален" itemValue="false"/>
+            <f:selectItem itemLabel="Удален" itemValue="true"/>
+        </h:selectOneListbox>
+
         <h:outputText escape="true" value="Код" styleClass="output-text" />
-        <h:inputText value="#{productEditPage.product.code}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{productEditPage.currentProduct.code}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text" />
-        <h:inputText value="#{productEditPage.product.fullName}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{productEditPage.currentProduct.fullName}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Товарное название" styleClass="output-text" />
-        <h:inputText value="#{productEditPage.product.productName}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{productEditPage.currentProduct.productName}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text" />
-        <h:inputText value="#{productEditPage.product.okpCode}" maxlength="128" styleClass="input-text long-field" />
+        <h:inputText value="#{productEditPage.currentProduct.okpCode}" maxlength="128" styleClass="input-text long-field" />
 
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Создать продукт" action="#{productEditPage.onSave}"
-                           reRender="productGroupCreateCreatePanelGrid" styleClass="command-button" />
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <a4j:commandButton value="Сохранить" action="#{productEditPage.onSave}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
+        <a4j:commandButton value="Восстановить" action="#{productEditPage.show}"
+                           reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
     </h:panelGrid>
 
 </h:panelGrid>

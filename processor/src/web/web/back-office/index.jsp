@@ -28,6 +28,10 @@
 
     <rich:calendar rendered="false" />
 
+    <f:subview id="productSelectSubView">
+        <c:import url="include/option/product/confirm_delete.jsp" />
+    </f:subview>
+
     <f:subview id="productGroupsSelectSubView">
         <c:import url="include/option/product/group/confirm_delete.jsp" />
     </f:subview>
@@ -38,14 +42,6 @@
 
     <f:subview id="technologicalMapProductsSelectSubView">
         <c:import url="include/option/technologicalMap/product/select.jsp" />
-    </f:subview>
-
-    <f:subview id="technologicalMapProductSelectSubView">
-        <c:import url="include/option/technologicalMap/product/select_list.jsp" />
-    </f:subview>
-
-    <f:subview id="technologicalMapProductESelectSubView">
-        <c:import url="include/option/technologicalMap/product/select_list_edit.jsp" />
     </f:subview>
 
     <f:subview id="orgSelectSubView">
