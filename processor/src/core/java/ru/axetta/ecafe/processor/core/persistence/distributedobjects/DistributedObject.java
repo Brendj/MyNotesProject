@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -68,7 +69,7 @@ public abstract class DistributedObject{
         /* Метод определения названия элемента */
     };
     /* метод парсинга элемента */
-    public DistributedObject build(Node node){
+    public DistributedObject build(Node node) throws ParseException {
         /* Begin required params */
         String stringGUID = getStringAttributeValue(node,"GUID",36);
         if(stringGUID!=null) setGuid(stringGUID);
@@ -86,7 +87,7 @@ public abstract class DistributedObject{
         return parseAttributes(node);
     }
 
-    protected abstract DistributedObject parseAttributes(Node node);
+    protected abstract DistributedObject parseAttributes(Node node) throws ParseException;
 
     public abstract void fill(DistributedObject distributedObject);
 

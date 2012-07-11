@@ -57,7 +57,7 @@ public class DistributionManager {
      * Ключи = имена элементов (Пример элемента: <Pr>),
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
      */
-    private HashMap<String,Long> currentMaxVersions=new HashMap<String, Long>();
+    private HashMap<String, Long> currentMaxVersions = new HashMap<String, Long>();
     /**
      * Список глобальных объектов на базе процессинга
      */
@@ -73,10 +73,12 @@ public class DistributionManager {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public DistributionManager() {}
+    public DistributionManager() {
+    }
 
     @PostConstruct
-    public void init() {}
+    public void init() {
+    }
 
     /**
      * Создает  элемент <RO> выходного xml документа
@@ -93,7 +95,7 @@ public class DistributionManager {
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         String tagName;
         List<DistributedObject> distributedObjects = null;
-        for(DistributedObjectsEnum key: distributedObjectsListMap.keySet()){
+        for (DistributedObjectsEnum key : distributedObjectsListMap.keySet()) {
             distributedObjects = distributedObjectsListMap.get(key);
             for (int i = 0; i < distributedObjects.size(); i++) {
                 DistributedObject distributedObject = distributedObjects.get(i);
@@ -104,12 +106,13 @@ public class DistributionManager {
                     elementMap.put(tagName, distributedObjectElement);
                 }
                 Element element = document.createElement(distributedObject.getTagName());
-                if(!(DistributedObjectsEnumComparator.isEmptyOrNull())){
+                if (!(DistributedObjectsEnumComparator.isEmptyOrNull())) {
                     /*int index = DistributedObjectsEnumComparator.getErrorObjectList().indexOf(
                             new ErrorObject(distributedObject.getClass(), distributedObject.getGuid()));*/
-                    ErrorObject errorObject = new ErrorObject(distributedObject.getClass(), distributedObject.getGuid());
+                    ErrorObject errorObject = new ErrorObject(distributedObject.getClass(),
+                            distributedObject.getGuid());
                     int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
-                    if(index != -1){
+                    if (index != -1) {
                         element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
                     }
                 }
@@ -122,10 +125,10 @@ public class DistributionManager {
 
         DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-       // Arrays.sort(array,distributedObjectsEnumComparator);
+        // Arrays.sort(array,distributedObjectsEnumComparator);
 
         distributedObjects = new ArrayList<DistributedObject>();
-        for (int i=0; i<array.length; i++){
+        for (int i = 0; i < array.length; i++) {
             String name = array[i].name();
             List<DistributedObject> distributedObjectList = DAOService.getInstance()
                     .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
@@ -149,65 +152,35 @@ public class DistributionManager {
     }
 
     @Transactional
-    private void createConflict(DistributedObject distributedObject, Long idOfOrg) throws Exception{
+    private void createConflict(DistributedObject distributedObject, Long idOfOrg) throws Exception {
         DOConflict conflict = new DOConflict();
-        conflict.setValueInc(createStringElement(getSimpleDocument(),distributedObject));
+        conflict.setValueInc(createStringElement(getSimpleDocument(), distributedObject));
         conflict.setgVersionInc(distributedObject.getGlobalVersion());
         conflict.setIdOfOrg(idOfOrg);
         conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-        TypedQuery<DistributedObject> query = entityManager.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",DistributedObject.class);
+        TypedQuery<DistributedObject> query = entityManager.createQuery(
+                "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()
+                        + "'", DistributedObject.class);
         DistributedObject currDistributedObject = query.getSingleResult();
         conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
-        conflict.setValueCur(createStringElement(getSimpleDocument(),currDistributedObject));
+        conflict.setValueCur(createStringElement(getSimpleDocument(), currDistributedObject));
         conflict.setCreateConflictDate(new Date());
         entityManager.persist(conflict);
     }
 
     /* метод работы с бд */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)//, isolation = Isolation.READ_COMMITTED)  дает ошибку http://stackoverflow.com/questions/5234240/hibernatespringjpaisolation-does-not-work
-    public void process(List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, Long idOfOrg) throws Exception {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //, isolation = Isolation.READ_COMMITTED)  дает ошибку http://stackoverflow.com/questions/5234240/hibernatespringjpaisolation-does-not-work
+    public void process(List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, Long idOfOrg)
+            throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         try {
             DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
             long currentMaxVersion = doVersion.getCurrentVersion();
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
+            DistributionManager dm = RuntimeContext.getAppContext().getBean(DistributionManager.class);
             for (DistributedObject distributedObject : distributedObjects) {
-                try {
-                    if (distributedObject.getDeletedState()) {
-                        if(updateDeleteState(distributedObject)) {
-                            throw new Exception("Error by set Delete State by "+distributedObject.getClass().getSimpleName()+" guid="+distributedObject.getGuid());
-                        }
-                    } else {
-                        if (distributedObject.getTagName().equals("C")) {
-                            distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
-                            distributedObject.setTagName("C");
-                        }
-                        if (distributedObject.getTagName().equals("M")) {
-                            long objectVersion = distributedObject.getGlobalVersion();
-                            long currentVersion = DAOService.getInstance()
-                                    .getDistributedObjectVersion(distributedObject);
-                            if (objectVersion != currentVersion)  {
-                                createConflict(distributedObject, idOfOrg);
-                            }
-                            distributedObject = DAOService.getInstance()
-                                    .mergeDistributedObject(distributedObject, objectVersion);
-                            distributedObject.setTagName("M");
-                        }
-                        //distributedObjectList.add(distributedObject);
-                        // Почему нужно добавлять в distributedObjectList только те объекты, которые не помечены для удаления?
-                    }
-                } catch (Exception e) {
-                    // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
-                    ErrorObject errorObject = new ErrorObject();
-                    errorObject.setClazz(distributedObject.getClass());
-                    errorObject.setGuid(distributedObject.getGuid());
-                    errorObject.setMessage(e.getMessage());
-                    if(e instanceof DistributedObjectException){
-                        errorObject.setType(((DistributedObjectException) e).getType());
-                    }
-                    DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
-                    logger.error(errorObject.toString(), e);
-                }
+                dm.processOneDistributedObject(distributedObject, currentMaxVersion, idOfOrg);
             }
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -215,6 +188,49 @@ public class DistributionManager {
         }
         //distributedObjects = distributedObjectList; Может быть имеет смысле не менять сам список объектов? Либо удалять из него помеченные для удаления
 
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processOneDistributedObject(DistributedObject distributedObject, Long idOfOrg, long currentMaxVersion) {
+        try {
+            if (distributedObject.getDeletedState()) {
+                if (updateDeleteState(distributedObject)) {
+                    throw new Exception(
+                            "Error by set Delete State by " + distributedObject.getClass().getSimpleName() + " guid="
+                                    + distributedObject.getGuid());
+                }
+            } else {
+                if (distributedObject.getTagName().equals("C")) {
+                    distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
+                    distributedObject.setTagName("C");
+                }
+                if (distributedObject.getTagName().equals("M")) {
+                    long objectVersion = distributedObject.getGlobalVersion();
+                    long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                    if (objectVersion != currentVersion) {
+                        createConflict(distributedObject, idOfOrg);
+                    }
+                    distributedObject = DAOService.getInstance()
+                            .mergeDistributedObject(distributedObject, objectVersion);
+                    distributedObject.setTagName("M");
+                }
+                //distributedObjectList.add(distributedObject);
+                // Почему нужно добавлять в distributedObjectList только те объекты, которые не помечены для удаления?
+            }
+        } catch (Exception e) {
+            // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
+            ErrorObject errorObject = new ErrorObject();
+            errorObject.setClazz(distributedObject.getClass());
+            errorObject.setGuid(distributedObject.getGuid());
+            errorObject.setMessage(e.getMessage());
+            if (e instanceof DistributedObjectException) {
+                errorObject.setType(((DistributedObjectException) e).getType());
+            }
+            DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
+            logger.error(errorObject.toString(), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
     }
 
     /**
@@ -230,7 +246,7 @@ public class DistributionManager {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             // При обработке в
-            currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node,"V")));
+            currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node, "V")));
             // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
             /*if(node.getFirstChild()!=null){
                 DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
@@ -252,12 +268,12 @@ public class DistributionManager {
     }
 
     /* парсинг блока <Confirm/> не обработанных объектов*/
-    public void buildConfirm(Node node, Long idOfOrg) throws Exception{
+    public void buildConfirm(Node node, Long idOfOrg) throws Exception {
 
     }
 
-    private Document getSimpleDocument() throws Exception{
-        if(document==null){
+    private Document getSimpleDocument() throws Exception {
+        if (document == null) {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             document = factory.newDocumentBuilder().newDocument();
         }
@@ -265,13 +281,15 @@ public class DistributionManager {
     }
 
     @Transactional
-    private long getGlobalIDByGUID(DistributedObject distributedObject){
+    private long getGlobalIDByGUID(DistributedObject distributedObject) {
         //   TypedQuery<Long> query=entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where this.quid='"+distributedObject.getGuid()+"'",Long.class);
         TypedQuery<Long> query = null;
-        try{
-            query = entityManager.createQuery("select id from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'",Long.class);
+        try {
+            query = entityManager.createQuery(
+                    "select id from " + distributedObject.getClass().getSimpleName() + " where guid='"
+                            + distributedObject.getGuid() + "'", Long.class);
             return query.getSingleResult();
-        } catch (Exception e){
+        } catch (Exception e) {
             return -1;
         }
         //   return query.getSingleResult();
@@ -282,7 +300,7 @@ public class DistributionManager {
             throws Exception {
         try {
             long id = getGlobalIDByGUID(distributedObject);
-            if(id>0){
+            if (id > 0) {
                 throw new DistributedObjectException(1);
             }
             distributedObject.setCreatedDate(new Date());
@@ -303,8 +321,9 @@ public class DistributionManager {
         }
     }
 
+
     @Transactional
-    private boolean updateDeleteState(DistributedObject distributedObject){
+    private boolean updateDeleteState(DistributedObject distributedObject) {
         StringBuilder stringQuery = new StringBuilder("update ");
         stringQuery.append(distributedObject.getClass().getSimpleName());
         stringQuery.append(" set deletedState=:deletedState where guid='");
@@ -312,7 +331,7 @@ public class DistributionManager {
         stringQuery.append("'");
         Query q = entityManager.createQuery(stringQuery.toString());
         q.setParameter("deletedState", true);
-        return (q.executeUpdate()!=0);
+        return (q.executeUpdate() != 0);
         //if (q.executeUpdate()!=0) throw new Exception("Error by set Delete State by "+distributedObject.getClass().getSimpleName()+" guid="+distributedObject.getGuid());
     }
 
@@ -347,7 +366,7 @@ public class DistributionManager {
 
 
     /* Getter and Setters */
-   /* public List<ErrorObject> getErrorObjectList() {
+    /* public List<ErrorObject> getErrorObjectList() {
         return errorObjectList;
     }*/
 

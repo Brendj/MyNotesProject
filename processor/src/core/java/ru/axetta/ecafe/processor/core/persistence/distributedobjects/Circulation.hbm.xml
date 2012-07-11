@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" table="cf_circulation">
+        <id name="globalId" column="IdOfProductGroups" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <!-- End Global params -->
+
+        <many-to-one name="publ" class="ru.axetta.ecafe.processor.core.persistence.Publ" not-null="true"
+                     column="idofpubl"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"
+                     column="idoforg"/>
+
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient"
+                     not-null="true"/>
+
+        <property name="issuanceDate" column="IssuanceDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="refundDate" column="RefundDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="realRefundDate" column="RealRefundDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="false"/>
+        <property name="quantity" column="quantity" type="integer" not-null="true"/>
+
+    </class>
+</hibernate-mapping>
