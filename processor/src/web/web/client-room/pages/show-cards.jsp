@@ -40,7 +40,7 @@
 <table class="infotable">
     <tr class="header-tr">
         <td colspan="7">
-            <div class="output-text">Карты, соответствующие договору <%=clientAuthToken.getContractId()%>
+            <div class="output-text">Карты, соответствующие лицевому счету <%=clientAuthToken.getContractId()%>
             </div>
         </td>
     </tr>

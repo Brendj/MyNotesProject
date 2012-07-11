@@ -24,7 +24,7 @@
                     <table class="login-data-table">
                         <tr>
                             <td>
-                                <div class="output-text">Номер договора</div>
+                                <div class="output-text">Номер лицевого счета</div>
                             </td>
                             <td>
                                 <input type="text" name="<%=CONTRACT_ID_PARAM%>" size="16" maxlength="64"

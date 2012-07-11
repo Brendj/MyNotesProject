@@ -142,7 +142,7 @@
 <table>
     <tr>
         <td>
-            <div class="output-text">Номер договора</div>
+            <div class="output-text">Номер лицевого счета</div>
         </td>
         <td>
             <div class="output-text"><%=StringEscapeUtils.escapeHtml(ContractIdFormat.format(client.getContractId()))%>

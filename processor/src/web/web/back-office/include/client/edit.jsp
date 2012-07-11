@@ -39,7 +39,7 @@
                   rendered="#{mainPage.clientEditPage.changePassword}" />
     <h:inputSecret value="#{mainPage.clientEditPage.plainPasswordConfirmation}" maxlength="64"
                    rendered="#{mainPage.clientEditPage.changePassword}" styleClass="input-text" />
-    <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
+    <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.contractId}" converter="contractIdConverter"
                  maxlength="#{mainPage.clientEditPage.contractIdMaxLength}" styleClass="input-text" />
     <h:outputText escape="true" value="Статус договора" styleClass="output-text" />

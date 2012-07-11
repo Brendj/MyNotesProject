@@ -28,7 +28,7 @@
             <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientId}"  maxlength="10" styleClass="input-text"/>
             <h:outputText escape="true" value="Договор" styleClass="output-text" />
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
+                <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
                 <h:inputText value="#{mainPage.clientListPage.clientFilter.contractId}" maxlength="10"
                              styleClass="input-text" />
                 <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
@@ -102,7 +102,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Номер договора" />
+                <h:outputText escape="true" value="Номер лицевого счета" />
             </f:facet>
             <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.contractId}" converter="contractIdConverter"

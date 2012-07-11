@@ -7,7 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
+<%--@elvariable id="messageConfigurePage" type="ru.axetta.ecafe.processor.web.ui.option.MessageConfigurePage"--%>
 <% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditUsers())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
@@ -21,7 +21,7 @@
                 <h:panelGrid>
                     <h:outputText value="[paySum] - размер зачисленных средств" styleClass="output-text" />
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
-                    <h:outputText value="[contractId] - номер договора клиента" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
                     <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                 </h:panelGrid>
@@ -34,7 +34,7 @@
                 <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
                 <h:panelGrid>
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
-                    <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
                     <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                     <h:outputText value="[eventName] - название события" styleClass="output-text" />
@@ -52,7 +52,7 @@
                 <h:panelGrid>
                     <h:outputText value="[paySum] - размер зачисленных средств" styleClass="output-text" />
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
-                    <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
                     <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                 </h:panelGrid>
@@ -67,7 +67,7 @@
                 <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
                 <h:panelGrid>
                     <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
-                    <h:outputText value="[contractId] - номер контракта клиента" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
                     <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                     <h:outputText value="[eventName] - название события" styleClass="output-text" />

@@ -27,7 +27,7 @@
     <h:outputText escape="true" value="Повторите пароль" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.clientCreatePage.plainPasswordConfirmation}" maxlength="64"
                    styleClass="input-text" />
-    <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
+    <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-div" columns="3">
         <h:inputText value="#{mainPage.clientCreatePage.contractId}" converter="contractIdConverter"
                      maxlength="#{mainPage.clientCreatePage.contractIdMaxLength}" styleClass="input-text" />
