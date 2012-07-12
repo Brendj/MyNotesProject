@@ -20,6 +20,18 @@ import java.util.Set;
  */
 public class TechnologicalMapProduct extends DistributedObject {
 
+    //Масса брутто, г
+    private double grossWeight;
+
+    //Масса нетто, г
+    private double netWeight;
+
+    private TechnologicalMap technologicalMap;
+
+    private Product product;
+    //Наименование продукта вытягивается из таблицы продуктов
+    //private String nameOfProduct;
+
     @Override
     public void fill(DistributedObject distributedObject) {
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
@@ -32,8 +44,8 @@ public class TechnologicalMapProduct extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element,"GWeight", grossWeight);
         setAttribute(element,"NWeight", netWeight);
-        setAttribute(element,"RefGUIDOfProduct", product.getGuid());
-        setAttribute(element,"RefGUIDOfTechnoMap", technologicalMap.getGuid());
+        setAttribute(element,"GUIDProduct", product.getGuid());
+        setAttribute(element,"GUIDTechnoMap", technologicalMap.getGuid());
     }
 
     @Override
@@ -45,26 +57,14 @@ public class TechnologicalMapProduct extends DistributedObject {
         Float floatNetMass = getFloatAttributeValue(node,"NWeight");
         if(floatNetMass!=null) setNetWeight(floatNetMass);
 
-        String stringRefGUIDOfProduct = getStringAttributeValue(node,"RefGUIDOfProduct",36);
+        String stringRefGUIDOfProduct = getStringAttributeValue(node,"GUIDProduct",36);
         setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class,stringRefGUIDOfProduct));
 
-        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"RefGUIDOfTechnoMap",36);
+        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"GUIDTechnoMap",36);
         setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class,stringRefGUIDOfTechnoMap));
 
         return this;
     }
-
-    //Наименование продукта вытягивается из таблицы продуктов
-    //private String nameOfProduct;
-
-    //Масса брутто, г
-    private double grossWeight;
-
-    //Масса нетто, г
-    private double netWeight;
-
-    private TechnologicalMap technologicalMap;
-    private Product product;
 
     public Product getProduct() {
         return product;

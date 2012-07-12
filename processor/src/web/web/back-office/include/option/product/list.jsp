@@ -16,8 +16,8 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.product.ProductEditPage"--%>
-<%--@elvariable id="productListPage" type="ru.axetta.ecafe.processor.web.ui.option.product.ProductListPage"--%>
+<%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage"--%>
+<%--@elvariable id="productListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductListPage"--%>
 <h:panelGrid id="productListPage" binding="#{productListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
       <%--TODO: Добавить фильтры: по провайдерам, по группам, по статусам(скрыть или показать удаленные)--%>

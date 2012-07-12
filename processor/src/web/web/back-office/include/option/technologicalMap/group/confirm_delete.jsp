@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
+<%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
 <rich:modalPanel id="removedTechnologicalMapGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление группы техническох карт из справочника" styleClass="output-text" />

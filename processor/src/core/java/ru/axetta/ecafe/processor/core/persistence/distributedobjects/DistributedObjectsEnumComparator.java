@@ -21,6 +21,9 @@ public class DistributedObjectsEnumComparator implements Comparator<DistributedO
     private static List<ErrorObject> errorObjectList = new ArrayList<ErrorObject>();
 
     public static List<ErrorObject> getErrorObjectList() {
+        if(errorObjectList==null){
+            errorObjectList = new ArrayList<ErrorObject>();
+        }
         return errorObjectList;
     }
 

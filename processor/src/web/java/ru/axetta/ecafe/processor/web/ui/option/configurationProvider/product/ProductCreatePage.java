@@ -2,21 +2,20 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.product;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.option.product.group.ProductGroupMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -66,6 +65,10 @@ public class ProductCreatePage extends BasicWorkspacePage {
             product.setGuid(UUID.randomUUID().toString());
             product.setGlobalVersion(0L);
             product.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+
+            MainPage mainPage = MainPage.getSessionInstance();
+            product.setUserCreate(mainPage.getCurrentUser());
+
             product.setProductGroup(
                     DAOService.getInstance().findRefDistributedObject(ProductGroup.class, currentIdOfProductGroup));
             DAOService.getInstance().persistEntity(product);

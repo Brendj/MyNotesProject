@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,6 +65,9 @@ public class TechnologicalMap extends DistributedObject {
     private long idOfConfigurationProvider;
 
     private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
+    private User userCreate;
+    private User userDelete;
+    private User userEdit;
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -71,7 +77,7 @@ public class TechnologicalMap extends DistributedObject {
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
         setTempOfPreparation(((TechnologicalMap) distributedObject).getTempOfPreparation());
         setTermOfRealization(((TechnologicalMap) distributedObject).getTermOfRealization());
-       /* setGroupName(((TechnologicalMap) distributedObject).getGroupName());*/
+
         setEnergyValue(((TechnologicalMap) distributedObject).getEnergyValue());
         setProteins(((TechnologicalMap) distributedObject).getProteins());
         setCarbohydrates(((TechnologicalMap) distributedObject).getCarbohydrates());
@@ -117,6 +123,10 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"VPp", vitaminPp);
         setAttribute(element,"VC", vitaminC);
         setAttribute(element,"VE", vitaminE);
+
+        setAttribute(element,"GUIDTechnologicalMapGroup", technologicalMapGroup.getGuid());
+
+
         /*Document document = element.getOwnerDocument();
         for (TechnologicalMapProduct technologicalMapProduct: getTechnologicalMapProduct()){
             Element tmpElement = document.createElement("Product");
@@ -188,6 +198,10 @@ public class TechnologicalMap extends DistributedObject {
         Float floatVitaminE = getFloatAttributeValue(node,"VE");
         if(floatVitaminE!=null) setVitaminE(floatVitaminE);
 
+        String stringRefGUIDOfTechnologicalMapGroup = getStringAttributeValue(node,"GUIDTechnologicalMapGroup",36);
+        setTechnologicalMapGroup(DAOService.getInstance()
+                .findDistributedObjectByRefGUID(TechnologicalMapGroup.class, stringRefGUIDOfTechnologicalMapGroup));
+
         /*node = node.getFirstChild();
         while (node!=null){
             TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
@@ -200,13 +214,6 @@ public class TechnologicalMap extends DistributedObject {
         }*/
         return this;
     }
-    /*public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }*/
 
     public List<TechnologicalMapProduct> getTechnologicalMapProduct(){
         return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
@@ -398,6 +405,37 @@ public class TechnologicalMap extends DistributedObject {
 
     public TechnologicalMapGroup getTechnologicalMapGroup() {
         return technologicalMapGroup;
+    }
+
+    /*public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }*/
+    public User getUserEdit() {
+        return userEdit;
+    }
+
+    public void setUserEdit(User userEdit) {
+        this.userEdit = userEdit;
+    }
+
+    public User getUserDelete() {
+        return userDelete;
+    }
+
+    public void setUserDelete(User userDelete) {
+        this.userDelete = userDelete;
+    }
+
+    public User getUserCreate() {
+        return userCreate;
+    }
+
+    public void setUserCreate(User userCreate) {
+        this.userCreate = userCreate;
     }
 
     public void setTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup) {

@@ -9,8 +9,8 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания правила --%>
-<%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.TechnologicalMapEditPage"--%>
-<%--@elvariable id="productItemsPanel" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.productitemspanel"--%>
+<%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapEditPage"--%>
+<%--@elvariable id="productItemsPanel" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.productitemspanel"--%>
 <h:panelGrid id="technologicalMapEditPanel" binding="#{technologicalMapEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 

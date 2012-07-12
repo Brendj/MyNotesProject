@@ -25,7 +25,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.TechnologicalMapCreatePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapCreatePage;
 import ru.axetta.ecafe.processor.web.ui.report.productGuide.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;

@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания правила --%>
-<%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
+<%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
 <h:panelGrid id="technologicalMapGroupEditPanelGrid" binding="#{technologicalMapGroupEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">

@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 

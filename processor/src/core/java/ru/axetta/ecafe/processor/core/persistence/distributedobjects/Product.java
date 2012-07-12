@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,21 +23,20 @@ import java.util.Set;
 
 public class Product extends DistributedObject {
 
+    private String code;
+    private String fullName;
+    private String productName;
+    private String okpCode;
+    private User userCreate;
+    private User userEdit;
+    private User userDelete;
+    private Long idOfConfigurationProvider;
     private ProductGroup productGroup;
 
-    public ProductGroup getProductGroup() {
-        return productGroup;
-    }
-
-    public void setProductGroup(ProductGroup productGroup) {
-        this.productGroup = productGroup;
-    }
-
     /**
-     * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this. Имя потомка - action.
+     * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.
      * Атрибуты данного элемента приравниваются соответствующим полям объекта this.
      * @param element  выходной xml документ, создаваемый сервлетом SyncServlet при синхронизации
-     * @return  созданный элемент
      */
     @Override
     protected void appendAttributes(Element element) {
@@ -45,9 +45,10 @@ public class Product extends DistributedObject {
         setAttribute(element,"Code", code);
         setAttribute(element,"OkpCode", okpCode);
         setAttribute(element,"OrgOwner", orgOwner);
-        setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
-    }
+        //setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
 
+        setAttribute(element,"GUIDProductGroup", productGroup.getGuid());
+    }
 
     @Override
     protected Product parseAttributes(Node node) {
@@ -60,8 +61,12 @@ public class Product extends DistributedObject {
         if(stringOkpCode!=null) setOkpCode(stringOkpCode);
         String stringProductName= getStringAttributeValue(node,"ProductName",512);
         if(stringProductName!=null) setProductName(stringProductName);
-        Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
-        if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);
+        /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
+        if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
+
+        String stringRefGUIDOfProductGroup = getStringAttributeValue(node,"GUIDProductGroup",36);
+        setProductGroup(DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,stringRefGUIDOfProductGroup));
+
 
         return this;
     }
@@ -75,16 +80,6 @@ public class Product extends DistributedObject {
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
 
     }
-
-    private String code;
-    private String fullName;
-    private String productName;
-    private String okpCode;
-    private User userCreate;
-    private User userEdit;
-    private User userDelete;
-    private Long idOfConfigurationProvider;
-
     public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
     }
@@ -147,6 +142,14 @@ public class Product extends DistributedObject {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public ProductGroup getProductGroup() {
+        return productGroup;
+    }
+
+    public void setProductGroup(ProductGroup productGroup) {
+        this.productGroup = productGroup;
     }
 
     @Override

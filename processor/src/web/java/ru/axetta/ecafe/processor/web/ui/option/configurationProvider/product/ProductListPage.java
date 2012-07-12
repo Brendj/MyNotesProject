@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.product;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
@@ -11,8 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGrou
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.option.product.group.ProductGroupMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupCreatePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;

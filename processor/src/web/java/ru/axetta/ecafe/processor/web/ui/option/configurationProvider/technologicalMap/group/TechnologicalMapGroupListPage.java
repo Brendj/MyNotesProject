@@ -2,14 +2,11 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;

@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.product.group.ProductGroupEditPage"--%>
+<%--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupEditPage"--%>
 <rich:modalPanel id="removedProductGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление группы продуктов из справочника" styleClass="output-text" />

@@ -2,18 +2,19 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -128,6 +129,13 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
 
             tm.setLastUpdate(new Date());
             tm.setDeletedState(currTechnologicalMap.getDeletedState());
+
+            MainPage mainPage = MainPage.getSessionInstance();
+            if(tm.getDeletedState().equals(Boolean.TRUE) && currTechnologicalMap.getDeletedState().equals(Boolean.FALSE)){
+                tm.setUserDelete(mainPage.getCurrentUser());
+            } else {
+                tm.setUserEdit(mainPage.getCurrentUser());
+            }
 
             List<TechnologicalMapProduct> technologicalMapProductList = DAOService.getInstance().getTechnologicalMapProducts(tm);
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProductList){

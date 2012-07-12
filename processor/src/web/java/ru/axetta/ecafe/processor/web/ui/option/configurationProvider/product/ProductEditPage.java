@@ -2,16 +2,16 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.product;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.option.product.group.ProductGroupMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupCreatePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -74,6 +74,14 @@ public class ProductEditPage extends BasicWorkspacePage {
             p.setLastUpdate(new Date());
             p.setDeletedState(currentProduct.getDeletedState());
             p.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+
+            MainPage mainPage = MainPage.getSessionInstance();
+            if(p.getDeletedState().equals(Boolean.TRUE) && currentProduct.getDeletedState().equals(Boolean.FALSE)){
+                p.setUserDelete(mainPage.getCurrentUser());
+            } else {
+                p.setUserEdit(mainPage.getCurrentUser());
+            }
+
             p.setProductGroup(DAOService.getInstance().findRefDistributedObject(ProductGroup.class,currentIdOfProductGroup));
             currentProduct = (Product) DAOService.getInstance().mergeDistributedObject(p, currentProduct.getGlobalVersion()+1);
             printMessage("Продукт сохранен успешно.");

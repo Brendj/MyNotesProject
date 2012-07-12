@@ -23,7 +23,7 @@ CREATE TABLE cf_product_groups
 CREATE TABLE cf_products
 (
   IdOfProducts BigSerial,
-  IdOfProductGroups BigINT,
+  IdOfProductGroups BigINT NOT NULL,
   Code character varying(16) NOT NULL,
   FullName character varying(1024),
   ProductName character varying(512),
@@ -62,7 +62,7 @@ CREATE TABLE cf_technological_map_groups
 -- Таблица (справочник) технологических карт
 CREATE TABLE  cf_technological_map(
   IdOfTechnologicalMaps BigSerial,
-  IdOfTechMapGroups bigint,
+  IdOfTechMapGroups bigint NOT NULL,
   NameOfTechnologicalMap character varying(128) NOT NULL,
   NumberOfTechnologicalMap BIGINT NOT NULL,
   TechnologyOfPreparation character varying(4096) NOT NULL,
@@ -89,6 +89,9 @@ CREATE TABLE  cf_technological_map(
   CreatedDate bigint NOT NULL,
   LastUpdate bigint,
   DeleteDate bigint,
+  IdOfUserCreate bigint,
+  IdOfUserEdit bigint,
+  IdOfUserDelete bigint,
   IdOfConfigurationProvider bigint,
   CONSTRAINT cf_technological_map_pk PRIMARY KEY (IdOfTechnologicalMaps ),
   CONSTRAINT cf_technological_map_technological_map_groups_fk FOREIGN KEY (IdOfTechMapGroups)

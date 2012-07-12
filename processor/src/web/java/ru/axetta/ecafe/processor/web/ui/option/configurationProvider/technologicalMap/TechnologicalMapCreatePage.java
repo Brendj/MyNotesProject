@@ -2,30 +2,26 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.technologicalMap;
-
-import sun.util.resources.LocaleNames_da;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.group.TechnologicalMapGroupMenu;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -73,9 +69,9 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     }
 
     @Override
-    public void select(List<ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem> productItemList) {
+    public void select(List<ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem> productItemList) {
         if (!(productItemList == null || productItemList.isEmpty())) {
-            for (ru.axetta.ecafe.processor.web.ui.option.technologicalMap.technologicalMapProduct.ProductItem productItem: productItemList){
+            for (ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem productItem: productItemList){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
                 technologicalMapProduct.setProduct(productItem.getProduct());
                 technologicalMapProduct.setDeletedState(false);
@@ -98,6 +94,9 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
             technologicalMap.setGuid(tmUUID.toString());
 
             technologicalMap.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+
+            MainPage mainPage = MainPage.getSessionInstance();
+            technologicalMap.setUserCreate(mainPage.getCurrentUser());
 
             technologicalMap.setTechnologicalMapGroup(DAOService.getInstance().findRefDistributedObject(TechnologicalMapGroup.class, currentIdOfTechnologicalMapGroup));
             DAOService.getInstance().persistEntity(technologicalMap);

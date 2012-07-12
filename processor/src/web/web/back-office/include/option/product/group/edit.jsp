@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Панель создания правила --%>
-<%--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.product.group.ProductGroupEditPage"--%>
+<%--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupEditPage"--%>
 <h:panelGrid id="productGroupEditPanelGrid" binding="#{productGroupEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
