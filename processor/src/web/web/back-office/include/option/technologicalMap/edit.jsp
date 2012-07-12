@@ -16,7 +16,7 @@
 
 
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Конфигурация поставщика" styleClass="output-text" />
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
         <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapEditPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{technologicalMapEditPage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
@@ -29,7 +29,7 @@
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
             <f:selectItem itemLabel="Удален" itemValue="true"/>
         </h:selectOneListbox>
-        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
+        <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text" />
         <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapEditPage.currentIdOfTechnologicalMapGroup}" styleClass="input-text long-field">
             <f:selectItems value="#{technologicalMapEditPage.technologicalMapGroupMenu.items}" />
         </h:selectOneMenu>

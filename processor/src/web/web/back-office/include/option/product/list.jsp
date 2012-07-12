@@ -25,23 +25,23 @@
         <fieldset>
             <legend><h:outputText value="Фильтры" styleClass="output-text" escape="true"/></legend>
             <h:panelGrid columns="2">
-                <h:outputText value="Конфигурации провайдра" styleClass="output-text" escape="true"/>
+                <h:outputText value="Производственная конфигурация" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{productListPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
-                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
                     <f:selectItems value="#{productListPage.configurationProviderMenu.items}" />
                     <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
                 </h:selectOneMenu>
                 <h:outputText value="Группа продукта" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectCurrentProductGroup" value="#{productListPage.currentIdOfProductGroup}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Выберите группу" itemValue="-1"/>
                     <f:selectItems value="#{productListPage.productGroupMenu.items}" />
                     <f:selectItem itemLabel="Выберать без учета группы" itemValue="-2"/>
                 </h:selectOneMenu>
                 <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectDeletedStatus" value="#{productListPage.deletedStatusSelected}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="productListTable"/>
+                    <a4j:support event="onchange" action="#{productListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Скрыть" itemValue="false"/>
                     <f:selectItem itemLabel="Показать" itemValue="true"/>
                 </h:selectOneMenu>
@@ -83,7 +83,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Статус технологической карты" styleClass="output-text" escape="true"/>
+                <h:outputText value="Статус продукта" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:selectBooleanCheckbox value="#{product.deletedState}" readonly="true" disabled="true"/>
         </rich:column>

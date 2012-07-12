@@ -19,23 +19,23 @@
         <fieldset>
             <legend><h:outputText value="Фильтры" styleClass="output-text" escape="true"/></legend>
             <h:panelGrid columns="2">
-                <h:outputText value="Конфигурации провайдра" styleClass="output-text" escape="true"/>
+                <h:outputText value="Производственная конфигурация" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapListPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
                     <f:selectItems value="#{technologicalMapListPage.configurationProviderMenu.items}" />
                     <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
                 </h:selectOneMenu>
-                <h:outputText value="Группа продукта" styleClass="output-text" escape="true"/>
+                <h:outputText value="Группа технологических карт" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapListPage.currentIdOftechnologicalMapGroup}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
                     <f:selectItems value="#{technologicalMapListPage.technologicalMapGroupMenu.items}" />
                     <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
                 </h:selectOneMenu>
                 <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectDeletedStatus" value="#{technologicalMapListPage.deletedStatusSelected}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="technologicalMapListTable"/>
+                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
                     <f:selectItem itemLabel="Показать" itemValue="true"/>
                     <f:selectItem itemLabel="Скрыть" itemValue="false"/>
                 </h:selectOneMenu>

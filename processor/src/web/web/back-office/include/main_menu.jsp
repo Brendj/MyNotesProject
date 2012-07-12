@@ -547,7 +547,7 @@
 
 
 
-    <rich:panelMenuGroup id="productGiudeGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
+    <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
                          label="Справочник продуктов"
                          rendered="#{mainPage.eligibleToViewRule}">
         <a4j:support event="onclick" action="#{mainPage.showProductGuideGroupPage}" reRender="workspaceForm" />
@@ -605,7 +605,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="configurationProviderGroupMenu" binding="#{mainPage.configurationProviderGroupPage.mainMenuComponent}"
-                         label="Конфигурации поставщика">
+                         label="Производственная конфигурация">
         <a4j:support event="onclick" action="#{mainPage.showConfigurationProviderGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"

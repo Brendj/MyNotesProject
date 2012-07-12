@@ -14,7 +14,7 @@
              styleClass="borderless-grid" columns="1" rendered="#{productCreatePage.rendered}">
     <h:panelGrid columns="2">
 
-        <h:outputText escape="true" value="Конфигурация поставщика" styleClass="output-text" />
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
         <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{productCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{productCreatePage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
