@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Circulation" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
@@ -20,6 +20,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -283,23 +284,23 @@
     %>
                 <tr>
                     <td>
-                        <%=circulation.getCompositeIdOfCirculation().getIdOfCirculation() + " " +
-                            circulation.getCompositeIdOfCirculation().getIdOfOrg()%>
+                        <%=circulation.getGlobalId() + " " +
+                            circulation.getOrg().getIdOfOrg()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getAuthor()%>
+                        <%=circulation.getIssuable().getPublication().getAuthor()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getTitle()%>
+                        <%=circulation.getIssuable().getPublication().getTitle()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getTitle2()%>
+                        <%=circulation.getIssuable().getPublication().getTitle2()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getPublicationDate()%>
+                        <%=circulation.getIssuable().getPublication().getPublicationdate()%>
                     </td>
                     <td>
-                        <%=circulation.getPublication().getPublisher()%>
+                        <%=circulation.getIssuable().getPublication().getPublisher()%>
                     </td>
                     <td>
                         <%=StringEscapeUtils.escapeHtml(timeFormat.format(circulation.getIssuanceDate()))%>

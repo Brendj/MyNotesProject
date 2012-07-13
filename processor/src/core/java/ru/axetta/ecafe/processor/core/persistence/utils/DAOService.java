@@ -13,14 +13,11 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @Scope("singleton")
@@ -247,16 +244,16 @@ public class DAOService {
     }
 
     @Transactional
-    public Publication2 getPublicationByIsbn(String isbn) {
-        Query query = em.createQuery("from Publication2 where isbn=:isbn", Publication2.class);
+    public Publication getPublicationByIsbn(String isbn) {
+        Query query = em.createQuery("from Publication2 where isbn=:isbn", Publication.class);
         query.setParameter("isbn", isbn);
-        return (Publication2) query.getSingleResult();
+        return (Publication) query.getSingleResult();
     }
 
     @Transactional
-    public Publication2 getPublicationByHash(String hash) {
-        Query query = em.createQuery("from Publication2 where hash=:hash", Publication2.class);
+    public Publication getPublicationByHash(String hash) {
+        Query query = em.createQuery("from Publication2 where hash=:hash", Publication.class);
         query.setParameter("hash", hash);
-        return (Publication2) query.getSingleResult();
+        return (Publication) query.getSingleResult();
     }
 }

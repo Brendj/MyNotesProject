@@ -48,7 +48,7 @@ public class DefaultDistributedObjectProcessor extends AbstractDistributedObject
         try {
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {
-            // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
+            // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             ErrorObject errorObject = new ErrorObject();
             errorObject.setClazz(distributedObject.getClass());
             errorObject.setGuid(distributedObject.getGuid());

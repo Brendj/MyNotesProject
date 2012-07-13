@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation2" table="cf_circuls">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" table="cf_circuls">
         <id name="globalId" column="idofcircul" type="long">
             <generator class="identity"/>
         </id>
@@ -24,8 +24,8 @@
                   not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <many-to-one name="publication" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication2" not-null="true"
-                     column="idofpubl"/>
+        <many-to-one name="issuable" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Issuable" not-null="true"
+                     column="idofissuable"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"
                      column="idoforg"/>
 
@@ -40,6 +40,8 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="false"/>
         <property name="quantity" column="quantity" type="integer" not-null="true"/>
+
+        <property name="status" column="Status" type="integer" not-null="true" unique="false" optimistic-lock="true" lazy="false" generated="never" />
 
     </class>
 </hibernate-mapping>

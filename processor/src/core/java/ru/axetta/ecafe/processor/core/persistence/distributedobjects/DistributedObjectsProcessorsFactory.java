@@ -22,8 +22,8 @@ public class DistributedObjectsProcessorsFactory {
     private static ConcurrentHashMap<Class, Class> distributedObjectToProcessorMapping = new ConcurrentHashMap<Class, Class>();
     
     static {
-        //distributedObjectToProcessorMapping.put(Publication2.class, LibraryDistributedObjectProcessor.class);
-        distributedObjectToProcessorMapping.put(Circulation2.class, LibraryDistributedObjectProcessor.class);
+        //distributedObjectToProcessorMapping.put(Publication.class, LibraryDistributedObjectProcessor.class);
+        distributedObjectToProcessorMapping.put(Circulation.class, LibraryDistributedObjectProcessor.class);
     }
 
     private DistributedObjectsProcessorsFactory() {

@@ -5,15 +5,15 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
-import ru.axetta.ecafe.processor.web.ClientAuthToken;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
@@ -1156,14 +1156,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ci.setStatus(c.getStatus());
             ci.setRealRefundDate(toXmlDateTime(c.getRealRefundDate()));
             ci.setRefundDate(toXmlDateTime(c.getRefundDate()));
-            Publication p = c.getPublication();
+            Publication p = c.getIssuable().getPublication();
             if (p!=null) {
                 PublicationItem pi = new PublicationItem();
                 pi.setAuthor(p.getAuthor());
                 pi.setPublisher(p.getPublisher());
                 pi.setTitle(p.getTitle());
                 pi.setTitle2(p.getTitle2());
-                pi.setPublicationDate(p.getPublicationDate());
+                pi.setPublicationDate(p.getPublicationdate());
                 ci.setPublication(pi);
             }
             ciList.getC().add(ci);

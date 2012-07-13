@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Publ;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.w3c.dom.Element;
@@ -23,14 +22,17 @@ import java.util.Date;
  * Time: 21:07
  * To change this template use File | Settings | File Templates.
  */
-public class Circulation2 extends DistributedObject {
+public class Circulation extends DistributedObject {
 
-    private Publication2 publication;
+    public final static int ISSUED=0, EXTENDED=1, LOST=2, REFUNDED=3;
+
+    private Issuable issuable;
     private Org org;
     private Client client;
     private Date issuanceDate;
     private Date refundDate;
     private Date realRefundDate;
+    private int status;
     private int quantity;
 
     private long idoforg;
@@ -44,13 +46,13 @@ public class Circulation2 extends DistributedObject {
         setAttribute(element, "refundDate", refundDate);
         setAttribute(element, "realRefundDate", realRefundDate);
         setAttribute(element, "quantity", quantity);
-        //setAttribute(element, "idofpubl", idofpubl);
+        setAttribute(element, "status", status);
         setAttribute(element, "idoforg", idoforg);
         setAttribute(element, "idofclient", idofclient);
     }
 
     @Override
-    protected Circulation2 parseAttributes(Node node) throws ParseException {
+    protected Circulation parseAttributes(Node node) throws ParseException {
         String stringIssuanceDate = getStringAttributeValue(node, "issuanceDate", 32);
         if (stringIssuanceDate != null) {
             setIssuanceDate(simpleDateFormat.parse(stringIssuanceDate));
@@ -67,32 +69,37 @@ public class Circulation2 extends DistributedObject {
         if (stringQuantity != null) {
             setQuantity(Integer.parseInt(stringQuantity));
         }
+        Integer integerStatus = getIntegerAttributeValue(node, "status");
+        if (integerStatus != null) {
+            setStatus(integerStatus);
+        }
+
         //setIdofpubl(getLongAttributeValue(node, "idofpubl"));
         setIdoforg(getLongAttributeValue(node, "idoforg"));
         setIdofclient(getLongAttributeValue(node, "idofclient"));
 
-        String stringRefGUIDOfPublication = getStringAttributeValue(node,"GUIDPublication",36);
-        setPublication(DAOService.getInstance().findDistributedObjectByRefGUID(Publication2.class, stringRefGUIDOfPublication));
+        String stringRefGUIDOfPublication = getStringAttributeValue(node,"GUIDIssuable",36);
+        setIssuable(DAOService.getInstance().findDistributedObjectByRefGUID(Issuable.class, stringRefGUIDOfPublication));
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setIssuanceDate(((Circulation2) distributedObject).getIssuanceDate());
-        setRefundDate(((Circulation2) distributedObject).getRefundDate());
-        setRealRefundDate(((Circulation2) distributedObject).getRealRefundDate());
-        setQuantity(((Circulation2) distributedObject).getQuantity());
-        setIdofclient(((Circulation2) distributedObject).getIdofclient());
-        setIdoforg(((Circulation2) distributedObject).getIdoforg());
-        //setIdofpubl(((Circulation2) distributedObject).getIdofpubl());
+        setIssuanceDate(((Circulation) distributedObject).getIssuanceDate());
+        setRefundDate(((Circulation) distributedObject).getRefundDate());
+        setRealRefundDate(((Circulation) distributedObject).getRealRefundDate());
+        setQuantity(((Circulation) distributedObject).getQuantity());
+        setIdofclient(((Circulation) distributedObject).getIdofclient());
+        setIdoforg(((Circulation) distributedObject).getIdoforg());
+        //setIdofpubl(((Circulation) distributedObject).getIdofpubl());
     }
 
-    public Publication2 getPublication() {
-        return publication;
+    public Issuable getIssuable() {
+        return issuable;
     }
 
-    public void setPublication(Publication2 publication) {
-        this.publication = publication;
+    public void setIssuable(Issuable issuable) {
+        this.issuable = issuable;
     }
 
     public Org getOrg() {
@@ -167,4 +174,14 @@ public class Circulation2 extends DistributedObject {
     public void setIdofclient(long idofclient) {
         this.idofclient = idofclient;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+
 }

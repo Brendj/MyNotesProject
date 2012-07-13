@@ -410,14 +410,6 @@ public class DAOUtils {
         return (EnterEvent) persistenceSession.get(EnterEvent.class, compositeIdOfEnterEvent);
     }
 
-    public static Publication findPublication(Session persistenceSession, CompositeIdOfPublication compositeIdOfPublication) throws Exception {
-        return (Publication) persistenceSession.get(Publication.class, compositeIdOfPublication);
-    }
-
-    public static Circulation findCirculation(Session persistenceSession, CompositeIdOfCirculation compositeIdOfCirculation) throws Exception {
-        return (Circulation) persistenceSession.get(Circulation.class, compositeIdOfCirculation);
-    }
-
     public static boolean existContragentWithClass(Session persistenceSession, Integer classId)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
@@ -644,42 +636,6 @@ public class DAOUtils {
         q.setParameterList("clientsId", clientsId);
         if (q.executeUpdate() != clientsId.size())
             throw new Exception("Ошибка при изменении параметров SMS уведомления");
-    }
-
-    public static Publ findPubl(Session persistenceSession, long idOfPubl) throws Exception {
-        return (Publ) persistenceSession.get(Publ.class, idOfPubl);
-    }
-
-    public static Publ findPubl(Session persistenceSession, String author, String title, String title2, String publisher) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(Contragent.class);
-        criteria.add(Restrictions.eq("author", author));
-        criteria.add(Restrictions.eq("title", title));
-        criteria.add(Restrictions.eq("title2", title2));
-        criteria.add(Restrictions.eq("publisher", publisher));
-        return (Publ) criteria.uniqueResult();
-    }
-
-    public static Publ findPublByISBN(Session persistenceSession, String isbn) {
-        Criteria criteria = persistenceSession.createCriteria(Publ.class);
-        criteria.add(Restrictions.eq("isbn", isbn));
-        return (Publ) criteria.uniqueResult();
-    }
-
-    public static Publ findPublByHash(Session persistenceSession, String hash) {
-        Criteria criteria = persistenceSession.createCriteria(Publ.class);
-        criteria.add(Restrictions.eq("hash", hash));
-        return (Publ) criteria.uniqueResult();
-    }
-
-    public static List<Publ> listPubls(Session session, long versionFrom, long versionTo) {
-        Criteria criteria = session.createCriteria(Publ.class);
-        criteria.add(Restrictions.gt("version", versionFrom));
-        criteria.add(Restrictions.lt("version", versionTo));
-        return criteria.list();
-    }
-
-    public static Circul findCircul(Session persistenceSession, long idOfCircul) throws Exception {
-        return (Circul) persistenceSession.get(Circul.class, idOfCircul);
     }
 
     public static long getNextVersion(Session session) {

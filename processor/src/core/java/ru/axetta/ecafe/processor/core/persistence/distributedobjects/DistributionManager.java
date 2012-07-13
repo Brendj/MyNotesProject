@@ -190,15 +190,16 @@ public class DistributionManager {
             }*/
             node = node.getFirstChild();
             while (node != null) {
-                DistributedObject distributedObject = createDistributedObject(currentObject);
-                distributedObject = distributedObject.build(node);
-                distributedObject.setOrgOwner(idOfOrg);
+                if (Node.ELEMENT_NODE == node.getNodeType()) {
+                    DistributedObject distributedObject = createDistributedObject(currentObject);
+                    distributedObject = distributedObject.build(node);
+                    distributedObject.setOrgOwner(idOfOrg);
 
-                if (!distributedObjectsListMap.containsKey(currentObject)) {
-                    distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
+                    if (!distributedObjectsListMap.containsKey(currentObject)) {
+                        distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
+                    }
+                    distributedObjectsListMap.get(currentObject).add(distributedObject);
                 }
-                distributedObjectsListMap.get(currentObject).add(distributedObject);
-
                 node = node.getNextSibling();
             }
         }

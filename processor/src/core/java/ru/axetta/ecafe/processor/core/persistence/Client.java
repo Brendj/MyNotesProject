@@ -6,11 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Blob;
 import java.util.*;
 
 /**
@@ -88,7 +85,7 @@ public class Client {
     private Set<ClientSms> clientSms = new HashSet<ClientSms>();
     private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
-    private Set<Circulation> circulations = new HashSet<Circulation>();
+    //private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
 
@@ -603,20 +600,6 @@ public class Client {
             return clientCards.iterator().next();
         }
         return null;
-    }
-
-    private Set<Circulation> getCirculationsInternal() {
-        // For Hibernate only
-        return circulations;
-    }
-
-    private void setCirculationsInternal(Set<Circulation> cards) {
-        // For Hibernate only
-        this.circulations = circulations;
-    }
-
-    public Set<Circulation> getCirculations() {
-        return Collections.unmodifiableSet(getCirculationsInternal());
     }
 
     @Override

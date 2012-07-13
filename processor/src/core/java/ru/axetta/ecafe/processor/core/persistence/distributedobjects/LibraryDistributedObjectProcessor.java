@@ -60,7 +60,7 @@ public class LibraryDistributedObjectProcessor extends AbstractDistributedObject
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
-        Circulation2 circulation = (Circulation2) distributedObject;
+        Circulation circulation = (Circulation) distributedObject;
         
         Client client = entityManager.find(Client.class, circulation.getIdofclient());
         Org org = entityManager.find(Org.class, circulation.getIdoforg());

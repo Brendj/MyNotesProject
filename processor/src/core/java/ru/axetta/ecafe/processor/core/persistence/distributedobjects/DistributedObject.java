@@ -138,6 +138,16 @@ public abstract class DistributedObject{
         return result;
     }
 
+    protected Character getCharacterAttributeValue(Node node, String attributeName) {
+        Character result = null;
+        try {
+            result = getAttributeValue(node, attributeName).charAt(0);
+        } catch (Exception e) {
+            result = null;
+        }
+        return result;
+    }
+    
     private String getAttributeValue(Node node, String attributeName){
         if(node.getAttributes().getNamedItem(attributeName)==null) return null;
         return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
