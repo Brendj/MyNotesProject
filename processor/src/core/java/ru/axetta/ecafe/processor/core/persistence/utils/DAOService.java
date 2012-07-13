@@ -245,4 +245,18 @@ public class DAOService {
         query.setParameter("technologicalMap",technologicalMap);
         return query.getResultList();
     }
+
+    @Transactional
+    public Publication2 getPublicationByIsbn(String isbn) {
+        Query query = em.createQuery("from Publication2 where isbn=:isbn", Publication2.class);
+        query.setParameter("isbn", isbn);
+        return (Publication2) query.getSingleResult();
+    }
+
+    @Transactional
+    public Publication2 getPublicationByHash(String hash) {
+        Query query = em.createQuery("from Publication2 where hash=:hash", Publication2.class);
+        query.setParameter("hash", hash);
+        return (Publication2) query.getSingleResult();
+    }
 }

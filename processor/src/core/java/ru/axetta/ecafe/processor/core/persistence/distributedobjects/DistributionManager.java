@@ -155,7 +155,7 @@ public class DistributionManager {
                     .getInstance();
             String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects." + objectClass.name();
             Class clazz = Class.forName(name);
-            IDistributedObjectProcessor distributedObjectProcessor = distributedObjectsProcessorsFactory
+            AbstractDistributedObjectProcessor distributedObjectProcessor = distributedObjectsProcessorsFactory
                     .createProcessor(clazz);
 
             for (DistributedObject distributedObject : distributedObjects) {

@@ -24,7 +24,7 @@
                   not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <many-to-one name="publ" class="ru.axetta.ecafe.processor.core.persistence.Publ" not-null="true"
+        <many-to-one name="publication" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication2" not-null="true"
                      column="idofpubl"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"
                      column="idoforg"/>

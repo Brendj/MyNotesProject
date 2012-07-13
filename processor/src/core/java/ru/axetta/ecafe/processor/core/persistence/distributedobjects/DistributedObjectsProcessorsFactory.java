@@ -22,7 +22,7 @@ public class DistributedObjectsProcessorsFactory {
     private static ConcurrentHashMap<Class, Class> distributedObjectToProcessorMapping = new ConcurrentHashMap<Class, Class>();
     
     static {
-        distributedObjectToProcessorMapping.put(Publication2.class, LibraryDistributedObjectProcessor.class);
+        //distributedObjectToProcessorMapping.put(Publication2.class, LibraryDistributedObjectProcessor.class);
         distributedObjectToProcessorMapping.put(Circulation2.class, LibraryDistributedObjectProcessor.class);
     }
 
@@ -37,12 +37,12 @@ public class DistributedObjectsProcessorsFactory {
         return instance;
     }
 
-    public IDistributedObjectProcessor createProcessor(Class clazz) {
+    public AbstractDistributedObjectProcessor createProcessor(Class clazz) {
         Class distributedObjectProcessorClass = distributedObjectToProcessorMapping.get(clazz);
         if (distributedObjectProcessorClass != null) {
-            return (IDistributedObjectProcessor) RuntimeContext.getAppContext().getBean(distributedObjectProcessorClass);
+            return (AbstractDistributedObjectProcessor) RuntimeContext.getAppContext().getBean(distributedObjectProcessorClass);
         } else {
-            return (IDistributedObjectProcessor) RuntimeContext.getAppContext().getBean(DefaultDistributedObjectProcessor.class);
+            return (AbstractDistributedObjectProcessor) RuntimeContext.getAppContext().getBean(DefaultDistributedObjectProcessor.class);
         }
 
     }

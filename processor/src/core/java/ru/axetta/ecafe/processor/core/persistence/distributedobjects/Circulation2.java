@@ -24,13 +24,17 @@ import java.util.Date;
  */
 public class Circulation2 extends DistributedObject {
 
-    private Publ publ;
+    private Publication2 publication;
     private Org org;
     private Client client;
     private Date issuanceDate;
     private Date refundDate;
     private Date realRefundDate;
     private int quantity;
+
+    private long idofpubl;
+    private long idoforg;
+    private long idofclient;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MM yyyy HH:mm:ss");
 
@@ -71,12 +75,12 @@ public class Circulation2 extends DistributedObject {
         setQuantity(((Circulation2) distributedObject).getQuantity());
     }
 
-    public Publ getPubl() {
-        return publ;
+    public Publication2 getPublication() {
+        return publication;
     }
 
-    public void setPubl(Publ publ) {
-        this.publ = publ;
+    public void setPublication(Publication2 publication) {
+        this.publication = publication;
     }
 
     public Org getOrg() {
@@ -125,5 +129,30 @@ public class Circulation2 extends DistributedObject {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+
+    public long getIdofpubl() {
+        return idofpubl;
+    }
+
+    public void setIdofpubl(long idofpubl) {
+        this.idofpubl = idofpubl;
+    }
+
+    public long getIdoforg() {
+        return idoforg;
+    }
+
+    public void setIdoforg(long idoforg) {
+        this.idoforg = idoforg;
+    }
+
+    public long getIdofclient() {
+        return idofclient;
+    }
+
+    public void setIdofclient(long idofclient) {
+        this.idofclient = idofclient;
     }
 }
