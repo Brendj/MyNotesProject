@@ -47,7 +47,7 @@ public class Product extends DistributedObject {
         setAttribute(element,"OrgOwner", orgOwner);
         //setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
 
-        setAttribute(element,"GUIDProductGroup", productGroup.getGuid());
+        setAttribute(element,"GuidOfPG", productGroup.getGuid());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class Product extends DistributedObject {
         /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
 
-        String stringRefGUIDOfProductGroup = getStringAttributeValue(node,"GUIDProductGroup",36);
+        String stringRefGUIDOfProductGroup = getStringAttributeValue(node,"GuidOfPG",36);
         setProductGroup(DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,stringRefGUIDOfProductGroup));
 
 

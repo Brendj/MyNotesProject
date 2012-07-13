@@ -124,7 +124,7 @@ public class TechnologicalMap extends DistributedObject {
         setAttribute(element,"VC", vitaminC);
         setAttribute(element,"VE", vitaminE);
 
-        setAttribute(element,"GUIDTechnologicalMapGroup", technologicalMapGroup.getGuid());
+        setAttribute(element,"GuidOfTMG", technologicalMapGroup.getGuid());
 
 
         /*Document document = element.getOwnerDocument();
@@ -198,7 +198,7 @@ public class TechnologicalMap extends DistributedObject {
         Float floatVitaminE = getFloatAttributeValue(node,"VE");
         if(floatVitaminE!=null) setVitaminE(floatVitaminE);
 
-        String stringRefGUIDOfTechnologicalMapGroup = getStringAttributeValue(node,"GUIDTechnologicalMapGroup",36);
+        String stringRefGUIDOfTechnologicalMapGroup = getStringAttributeValue(node,"GuidOfTMG",36);
         setTechnologicalMapGroup(DAOService.getInstance()
                 .findDistributedObjectByRefGUID(TechnologicalMapGroup.class, stringRefGUIDOfTechnologicalMapGroup));
 

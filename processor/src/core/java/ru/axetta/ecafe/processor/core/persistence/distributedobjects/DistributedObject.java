@@ -46,7 +46,7 @@ public abstract class DistributedObject{
 
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
-        element.setAttribute("GUID", getGuid());
+        element.setAttribute("Guid", getGuid());
         if(getDeletedState()){
             element.setAttribute("D", "1");
         }
@@ -63,7 +63,7 @@ public abstract class DistributedObject{
         } else {
             appendAttributes(element);
         }
-        element.setAttribute("GUID", getGuid());
+        element.setAttribute("Guid", getGuid());
         element.setAttribute("V", String.valueOf(getGlobalVersion()));
         return element;
         /* Метод определения названия элемента */
@@ -71,7 +71,7 @@ public abstract class DistributedObject{
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException {
         /* Begin required params */
-        String stringGUID = getStringAttributeValue(node,"GUID",36);
+        String stringGUID = getStringAttributeValue(node,"Guid",36);
         if(stringGUID!=null) setGuid(stringGUID);
 
         Long version = getLongAttributeValue(node,"V");

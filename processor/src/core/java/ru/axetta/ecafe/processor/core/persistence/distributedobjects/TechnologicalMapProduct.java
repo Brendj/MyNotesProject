@@ -44,8 +44,8 @@ public class TechnologicalMapProduct extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element,"GWeight", grossWeight);
         setAttribute(element,"NWeight", netWeight);
-        setAttribute(element,"GUIDProduct", product.getGuid());
-        setAttribute(element,"GUIDTechnoMap", technologicalMap.getGuid());
+        setAttribute(element,"GuidOfP", product.getGuid());
+        setAttribute(element,"GuidOfTM", technologicalMap.getGuid());
     }
 
     @Override
@@ -57,10 +57,10 @@ public class TechnologicalMapProduct extends DistributedObject {
         Float floatNetMass = getFloatAttributeValue(node,"NWeight");
         if(floatNetMass!=null) setNetWeight(floatNetMass);
 
-        String stringRefGUIDOfProduct = getStringAttributeValue(node,"GUIDProduct",36);
+        String stringRefGUIDOfProduct = getStringAttributeValue(node,"GuidOfP",36);
         setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class,stringRefGUIDOfProduct));
 
-        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"GUIDTechnoMap",36);
+        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"GuidOfTM",36);
         setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class,stringRefGUIDOfTechnoMap));
 
         return this;
