@@ -67,8 +67,8 @@ public class SyncServlet extends HttpServlet {
             RequestData requestData = new RequestData();
             // Read XML request
             try {
-                //requestData = readRequest(request);
-                requestData = readRequestFromFile();  /* For tests only!!! */
+                requestData = readRequest(request);
+                //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -114,7 +114,7 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             /* Must be commented for testing!!! */
-           /* try {
+            try {
                 if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -124,7 +124,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
-            }*/
+            }
 
             // Parse XML request
             SyncRequest syncRequest;
