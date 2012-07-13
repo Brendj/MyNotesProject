@@ -182,6 +182,7 @@ public class DistributionManager {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
             // При обработке в
+            String attrValue = getAttributeValue(node, "V");
             currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node, "V")));
             // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
             /*if(node.getFirstChild()!=null){

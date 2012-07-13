@@ -35,9 +35,8 @@ public class LibraryDistributedObjectProcessor extends AbstractDistributedObject
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg, Document document) {
         try {
-            super.processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
+            processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {
-            // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
             ErrorObject errorObject = new ErrorObject();
             errorObject.setClazz(distributedObject.getClass());
             errorObject.setGuid(distributedObject.getGuid());
@@ -65,11 +64,9 @@ public class LibraryDistributedObjectProcessor extends AbstractDistributedObject
         
         Client client = entityManager.find(Client.class, circulation.getIdofclient());
         Org org = entityManager.find(Org.class, circulation.getIdoforg());
-        Publication2 publication = entityManager.find(Publication2.class, circulation.getIdofpubl());
 
         circulation.setClient(client);
         circulation.setOrg(org);
-        circulation.setPublication(publication);
         return entityManager.merge(distributedObject);
     }
 }

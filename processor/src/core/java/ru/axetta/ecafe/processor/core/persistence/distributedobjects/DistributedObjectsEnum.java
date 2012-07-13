@@ -18,8 +18,8 @@ public enum DistributedObjectsEnum {
     Product("Product", 1),
     TechnologicalMap("TechnologicalMap", 1),
     TechnologicalMapProduct("TechnologicalMapProduct", 2),
-    Circulation2("Circulation", 1),
-    Publication2("Publication", 0);
+    Circulation2("Circulation2", 1),
+    Publication2("Publication2", 0);
 
     private final String value;
     /* приоритет обработки объектов при синхронизации */

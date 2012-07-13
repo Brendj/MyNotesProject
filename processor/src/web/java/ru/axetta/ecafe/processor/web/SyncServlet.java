@@ -67,8 +67,8 @@ public class SyncServlet extends HttpServlet {
             RequestData requestData = new RequestData();
             // Read XML request
             try {
-                requestData = readRequest(request);
-                //requestData = readRequestFromFile();  /* For tests only!!! */
+                //requestData = readRequest(request);
+                requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -182,7 +182,7 @@ public class SyncServlet extends HttpServlet {
     
     private static RequestData readRequestFromFile() throws Exception {
         RequestData requestData = new RequestData();
-        FileInputStream fileInputStream = new FileInputStream("D:/Projects/request.xml");
+        FileInputStream fileInputStream = new FileInputStream("f:/Projects/axetta/request.xml");
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();

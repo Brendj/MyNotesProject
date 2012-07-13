@@ -46,7 +46,7 @@ public class DefaultDistributedObjectProcessor extends AbstractDistributedObject
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg, Document document) {
         try {
-            super.processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
+            processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {
             // Произошла ошибка при обрабоке одного объекта - нужна как то сообщить об этом пользователю
             ErrorObject errorObject = new ErrorObject();

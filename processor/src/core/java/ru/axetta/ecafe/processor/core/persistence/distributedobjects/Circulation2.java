@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Publ;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,7 +33,6 @@ public class Circulation2 extends DistributedObject {
     private Date realRefundDate;
     private int quantity;
 
-    private long idofpubl;
     private long idoforg;
     private long idofclient;
 
@@ -44,6 +44,9 @@ public class Circulation2 extends DistributedObject {
         setAttribute(element, "refundDate", refundDate);
         setAttribute(element, "realRefundDate", realRefundDate);
         setAttribute(element, "quantity", quantity);
+        //setAttribute(element, "idofpubl", idofpubl);
+        setAttribute(element, "idoforg", idoforg);
+        setAttribute(element, "idofclient", idofclient);
     }
 
     @Override
@@ -64,6 +67,12 @@ public class Circulation2 extends DistributedObject {
         if (stringQuantity != null) {
             setQuantity(Integer.parseInt(stringQuantity));
         }
+        //setIdofpubl(getLongAttributeValue(node, "idofpubl"));
+        setIdoforg(getLongAttributeValue(node, "idoforg"));
+        setIdofclient(getLongAttributeValue(node, "idofclient"));
+
+        String stringRefGUIDOfPublication = getStringAttributeValue(node,"GUIDPublication",36);
+        setPublication(DAOService.getInstance().findDistributedObjectByRefGUID(Publication2.class, stringRefGUIDOfPublication));
         return this;
     }
 
@@ -73,6 +82,9 @@ public class Circulation2 extends DistributedObject {
         setRefundDate(((Circulation2) distributedObject).getRefundDate());
         setRealRefundDate(((Circulation2) distributedObject).getRealRefundDate());
         setQuantity(((Circulation2) distributedObject).getQuantity());
+        setIdofclient(((Circulation2) distributedObject).getIdofclient());
+        setIdoforg(((Circulation2) distributedObject).getIdoforg());
+        //setIdofpubl(((Circulation2) distributedObject).getIdofpubl());
     }
 
     public Publication2 getPublication() {
@@ -132,13 +144,13 @@ public class Circulation2 extends DistributedObject {
     }
 
 
-    public long getIdofpubl() {
+    /*public long getIdofpubl() {
         return idofpubl;
     }
 
     public void setIdofpubl(long idofpubl) {
         this.idofpubl = idofpubl;
-    }
+    }*/
 
     public long getIdoforg() {
         return idoforg;
