@@ -13,6 +13,16 @@ public class SchemaVersionInfo {
     private int minorVersionNum;
     private int buildVersionNum;
     private Date updateTime;
+    private String commitText;
+
+    public String getCommitText() {
+        return commitText;
+    }
+
+    public void setCommitText(String commitText) {
+        this.commitText = commitText;
+    }
+
 
     public SchemaVersionInfo() {
 

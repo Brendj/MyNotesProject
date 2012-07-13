@@ -15,5 +15,6 @@
         <property name="middleVersionNum" column="MiddleVersionNum" type="int" not-null="true"/>
         <property name="minorVersionNum" column="MinorVersionNum" type="int" not-null="true"/>
         <property name="buildVersionNum" column="BuildVersionNum" type="int" not-null="true"/>
+        <property name="commitText" column="CommitText" type="string"/>
     </class>
 </hibernate-mapping>

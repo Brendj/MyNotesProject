@@ -8,11 +8,13 @@ package ru.axetta.ecafe.processor.core.updater;
 import ru.axetta.ecafe.processor.core.persistence.SchemaVersionInfo;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +88,19 @@ public class DBUpdater {
                         throw new Exception("не найден сценарий обновления базы: "+sqlFile);
                     }
                     logger.info("Executing update script: "+sqlFile);
-                    BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
+                    BufferedReader bufIn = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
                     String sqlCmd="";
+                    StringBuilder commitText = new StringBuilder();
                     for (;;) {
                         String l = bufIn.readLine();
                         if (l==null) break;
                         l = l.trim();
                         if (l.length()==0) continue;
-                        if (l.startsWith("--")) continue;
+                        if (l.startsWith("--")){
+                            commitText.append(l.substring(2,l.length()));
+                            commitText.append("\n");
+                            continue;
+                        }
                         if (sqlCmd.length()!=0) sqlCmd+=" ";
                         sqlCmd+=l;
                         if (sqlCmd.endsWith(";")) {
@@ -107,6 +114,7 @@ public class DBUpdater {
                         }
                     }
                     SchemaVersionInfo newSchemaVer = new SchemaVersionInfo(newVer, new Date());
+                    if(commitText!=null && commitText.length()>0) newSchemaVer.setCommitText(commitText.toString());
                     em.persist(newSchemaVer);
                     curSchemaVer =newSchemaVer;
                     bUpdated = true;
