@@ -204,6 +204,12 @@ public class DistributionManager {
         }
     }
 
+    public void buildConfirm(Node node, Long idOfOrg) throws Exception {
+        if (Node.ELEMENT_NODE == node.getNodeType()) {
+            DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
+        }
+    }
+
     private Document getSimpleDocument() throws Exception {
         if (document == null) {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
