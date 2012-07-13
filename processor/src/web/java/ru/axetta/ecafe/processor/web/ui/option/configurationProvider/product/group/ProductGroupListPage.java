@@ -48,7 +48,7 @@ public class ProductGroupListPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/group/list";
+        return "option/configuration_provider/product/group/list";
     }
 
     public List<ProductGroup> getProductGroupList() {

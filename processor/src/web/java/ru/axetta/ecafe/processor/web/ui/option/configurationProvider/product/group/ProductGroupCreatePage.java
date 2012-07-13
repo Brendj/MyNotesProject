@@ -52,7 +52,7 @@ public class ProductGroupCreatePage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/group/create";
+        return "option/configuration_provider/product/group/create";
     }
 
     public ProductGroup getProductGroup() {

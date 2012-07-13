@@ -80,7 +80,7 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/group/edit";
+        return "option/configuration_provider/technologicalMap/group/edit";
     }
 
     public TechnologicalMapGroup getCurrentTechnologicalMapGroup() {

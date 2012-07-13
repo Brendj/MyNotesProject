@@ -106,7 +106,7 @@ public class ProductListPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/list";
+        return "option/configuration_provider/product/list";
     }
 
     public Boolean getDeletedStatusSelected() {

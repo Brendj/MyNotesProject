@@ -52,7 +52,7 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/group/create";
+        return "option/configuration_provider/technologicalMap/group/create";
     }
 
     public TechnologicalMapGroup getTechnologicalMapGroup() {

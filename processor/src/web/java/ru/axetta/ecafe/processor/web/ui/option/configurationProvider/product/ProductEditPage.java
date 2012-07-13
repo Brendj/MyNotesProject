@@ -109,7 +109,7 @@ public class ProductEditPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/edit";
+        return "option/configuration_provider/product/edit";
     }
 
     public Product getCurrentProduct() {

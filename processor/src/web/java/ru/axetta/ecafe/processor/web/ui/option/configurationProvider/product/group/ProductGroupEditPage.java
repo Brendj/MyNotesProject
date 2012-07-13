@@ -80,7 +80,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/group/edit";
+        return "option/configuration_provider/product/group/edit";
     }
 
     public ProductGroup getCurrentProductGroup() {

@@ -82,7 +82,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/create";
+        return "option/configuration_provider/technologicalMap/create";
     }
 
     public void createTechnologicalMap() {

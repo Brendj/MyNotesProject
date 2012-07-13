@@ -72,16 +72,6 @@ public class ProductItemsPanel extends BasicPage {
 
     @Transactional
     private List<Product> retrieveProduct(){
-        /*CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Product> query = criteriaBuilder.createQuery(Product.class);
-        Root<Product> c = query.from(Product.class);
-        query.select(c);
-        //query.orderBy(criteriaBuilder.asc(c.get("globalId")));
-        if (StringUtils.isNotEmpty(filter) && !filter.equals("")) {
-            Expression<String> p = criteriaBuilder.parameter(String.class);
-            query.where(criteriaBuilder.like(c.<String>get("productName"), "%" + filter + "%"));
-            //query.where(criteriaBuilder.like(c.get("productName"), p));
-        }*/
         String where="";
         if (StringUtils.isNotEmpty(filter)){
             where = "where productName like '%"+filter+"%'";
@@ -89,31 +79,6 @@ public class ProductItemsPanel extends BasicPage {
         String query = "from Product "+ where + " order by id";
         return entityManager.createQuery(query, Product.class).getResultList();
     }
-
-    /*
-    public Object addProducts() {
-        //productItems = RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).getProductItems();
-        for (ProductItem productItem: productItems){
-           if(productItem.getChecked()){
-            TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-           // technologicalMapProduct.setIdOfProduct(productItem.getProduct().getGlobalId());
-               technologicalMapProduct.setProduct(productItem.getProduct());
-            technologicalMapProduct.setNameOfProduct(productItem.getProduct().getProductName());
-            technologicalMapProduct.setDeletedState(false);
-            technologicalMapProduct.setTechnologicalMap(technologicalMap);
-            technologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
-           }                                                                      from Product where productName like '%хлеб%' order by id
-        }
-
-        List<ProductItem> products = new LinkedList<ProductItem>();
-        for (ProductItem pi: productItems){
-            if(pi.getChecked()){
-                products.add(pi);
-            }
-        }
-        productItems = products;
-        return null;
-    }*/
 
     public TechnologicalMap getTechnologicalMap() {
         return technologicalMap;

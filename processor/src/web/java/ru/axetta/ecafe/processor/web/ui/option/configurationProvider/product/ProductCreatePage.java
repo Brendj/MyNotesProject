@@ -86,7 +86,7 @@ public class ProductCreatePage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/product/create";
+        return "option/configuration_provider/product/create";
     }
 
     public Long getCurrentIdOfProductGroup() {

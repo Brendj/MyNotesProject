@@ -48,7 +48,7 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage {
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/group/list";
+        return "option/configuration_provider/technologicalMap/group/list";
     }
 
     public String getPageTitle() {

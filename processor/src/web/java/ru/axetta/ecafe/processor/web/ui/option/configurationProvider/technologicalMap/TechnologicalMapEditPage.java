@@ -195,7 +195,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/edit";
+        return "option/configuration_provider/technologicalMap/edit";
     }
 
     public Long getCurrentIdOfConfigurationProvider() {

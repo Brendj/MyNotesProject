@@ -11,7 +11,12 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,6 +29,8 @@ import java.util.List;
  * Time: 22:21
  * To change this template use File | Settings | File Templates.
  */
+@Component
+@Scope("session")
 public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     private List<Item> items = Collections.emptyList();
@@ -53,5 +60,18 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
         ConfigurationProvider configurationProvider = (ConfigurationProvider)session.load(ConfigurationProvider.class, id);
         session.delete(configurationProvider);
         fill(session);
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Transactional
+    private boolean getNullOrEmpty(){
+        List<Long> tMGl = entityManager.createQuery("SELECT id FROM ConfigurationProvider",Long.class).getResultList();
+        return tMGl==null || tMGl.isEmpty();
+    }
+
+    public boolean getNullOrEmptyConfigurationProvider(){
+        return getNullOrEmpty();
     }
 }

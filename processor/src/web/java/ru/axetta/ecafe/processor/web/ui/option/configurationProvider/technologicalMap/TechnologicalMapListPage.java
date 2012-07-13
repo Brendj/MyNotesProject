@@ -113,7 +113,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
     }
 
     public String getPageFilename() {
-        return "option/technologicalMap/list";
+        return "option/configuration_provider/technologicalMap/list";
     }
 
     public TechnologicalMap getTechnologicalMap() {
