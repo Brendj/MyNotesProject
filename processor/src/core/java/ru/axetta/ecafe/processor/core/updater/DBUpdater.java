@@ -58,6 +58,11 @@ public class DBUpdater {
         }
 
         try {
+            String SQL_CHECK_TEXT_COLUMN = "SELECT attname FROM pg_attribute, pg_type WHERE typname = 'cf_schema_version_info' AND attname = 'committext'";
+            List list = em.createNativeQuery(SQL_CHECK_TEXT_COLUMN).getResultList();
+            if(list!=null && list.isEmpty()){
+                em.createNativeQuery("ALTER TABLE cf_schema_version_info ADD COLUMN committext text").executeUpdate();
+            }
             String SQL_GET_SCHEMAS="from SchemaVersionInfo order by majorVersionNum desc, middleVersionNum desc, minorVersionNum desc";
             List schemas = em.createQuery(SQL_GET_SCHEMAS).getResultList();
             SchemaVersionInfo curSchemaVer = (SchemaVersionInfo)(schemas.size()==0?null:schemas.get(0));
