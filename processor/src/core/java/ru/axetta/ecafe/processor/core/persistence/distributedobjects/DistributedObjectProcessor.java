@@ -4,8 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -29,13 +37,38 @@ import java.util.Date;
  * Time: 1:07
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractDistributedObjectProcessor {
+@Component
+@Scope("prototype")
+public class DistributedObjectProcessor {
 
     @PersistenceContext
     EntityManager entityManager;
 
-    public abstract void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
-            Document document);
+    private Logger logger = LoggerFactory.getLogger(DistributedObjectProcessor.class);
+
+    public static DistributedObjectProcessor getInstance() {
+        return RuntimeContext.getAppContext().getBean(DistributedObjectProcessor.class);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg, Document document) {
+        try {
+            distributedObject.preProcess();
+            processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
+        } catch (Exception e) {
+            // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
+            ErrorObject errorObject = new ErrorObject();
+            errorObject.setClazz(distributedObject.getClass());
+            errorObject.setGuid(distributedObject.getGuid());
+            errorObject.setMessage(e.getMessage());
+            if (e instanceof DistributedObjectException) {
+                errorObject.setType(((DistributedObjectException) e).getType());
+            }
+            DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
+            logger.error(errorObject.toString(), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+    }
 
     protected void processDistributedObject(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
             Document document) throws Exception {

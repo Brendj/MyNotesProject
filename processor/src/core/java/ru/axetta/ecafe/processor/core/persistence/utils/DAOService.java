@@ -256,4 +256,14 @@ public class DAOService {
         query.setParameter("hash", hash);
         return (Publication) query.getSingleResult();
     }
+    
+    @Transactional
+    public Org findOrById(long idOfOrg) {
+        return em.find(Org.class, idOfOrg);
+    }
+    
+    @Transactional
+    public Client findClientById(long idOfClient) {
+        return em.find(Client.class, idOfClient);
+    }
 }

@@ -9,8 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Set;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -29,6 +27,9 @@ public class TechnologicalMapProduct extends DistributedObject {
     private TechnologicalMap technologicalMap;
 
     private Product product;
+
+    private String guidOfP;
+    private String guidOfTM;
     //Наименование продукта вытягивается из таблицы продуктов
     //private String nameOfProduct;
 
@@ -42,28 +43,34 @@ public class TechnologicalMapProduct extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element,"GWeight", grossWeight);
-        setAttribute(element,"NWeight", netWeight);
-        setAttribute(element,"GuidOfP", product.getGuid());
-        setAttribute(element,"GuidOfTM", technologicalMap.getGuid());
+        setAttribute(element, "GWeight", grossWeight);
+        setAttribute(element, "NWeight", netWeight);
+        setAttribute(element, "GuidOfP", product.getGuid());
+        setAttribute(element, "GuidOfTM", technologicalMap.getGuid());
     }
 
     @Override
     protected TechnologicalMapProduct parseAttributes(Node node) {
 
-        Float floatGrossMass = getFloatAttributeValue(node,"GWeight");
-        if(floatGrossMass!=null) setGrossWeight(floatGrossMass);
+        Float floatGrossMass = getFloatAttributeValue(node, "GWeight");
+        if (floatGrossMass != null) {
+            setGrossWeight(floatGrossMass);
+        }
 
-        Float floatNetMass = getFloatAttributeValue(node,"NWeight");
-        if(floatNetMass!=null) setNetWeight(floatNetMass);
+        Float floatNetMass = getFloatAttributeValue(node, "NWeight");
+        if (floatNetMass != null) {
+            setNetWeight(floatNetMass);
+        }
 
-        String stringRefGUIDOfProduct = getStringAttributeValue(node,"GuidOfP",36);
-        setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class,stringRefGUIDOfProduct));
-
-        String stringRefGUIDOfTechnoMap = getStringAttributeValue(node,"GuidOfTM",36);
-        setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class,stringRefGUIDOfTechnoMap));
-
+        guidOfP = getStringAttributeValue(node, "GuidOfP", 36);
+        guidOfTM = getStringAttributeValue(node, "GuidOfTM", 36);
         return this;
+    }
+
+    @Override
+    public void preProcess() {
+        setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP));
+        setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM));
     }
 
     public Product getProduct() {
@@ -81,7 +88,7 @@ public class TechnologicalMapProduct extends DistributedObject {
     public void setTechnologicalMap(TechnologicalMap technologicalMap) {
         this.technologicalMap = technologicalMap;
     }
-/*
+    /*
     public String getNameOfProduct() {
         return nameOfProduct;
     }

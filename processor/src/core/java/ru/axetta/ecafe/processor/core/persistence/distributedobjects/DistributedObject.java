@@ -43,6 +43,9 @@ public abstract class DistributedObject{
     protected String tagName;
     /* GUID объекта */
     protected String guid;
+    
+    /* Node для последующего разбора */
+    private Node node;
 
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
@@ -71,7 +74,7 @@ public abstract class DistributedObject{
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException {
         /* Begin required params */
-        String stringGUID = getStringAttributeValue(node,"Guid",36);
+        String stringGUID = getStringAttributeValue(node,"GUID",36);
         if(stringGUID!=null) setGuid(stringGUID);
 
         Long version = getLongAttributeValue(node,"V");
@@ -85,6 +88,10 @@ public abstract class DistributedObject{
             return this;
         }
         return parseAttributes(node);
+    }
+
+    public void preProcess() {
+
     }
 
     protected abstract DistributedObject parseAttributes(Node node) throws ParseException;

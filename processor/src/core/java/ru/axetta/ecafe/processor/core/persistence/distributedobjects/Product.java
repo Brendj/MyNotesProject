@@ -32,6 +32,8 @@ public class Product extends DistributedObject {
     private User userDelete;
     private Long idOfConfigurationProvider;
     private ProductGroup productGroup;
+    
+    private String guidOfPG;
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.
@@ -63,12 +65,13 @@ public class Product extends DistributedObject {
         if(stringProductName!=null) setProductName(stringProductName);
         /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
-
-        String stringRefGUIDOfProductGroup = getStringAttributeValue(node,"GuidOfPG",36);
-        setProductGroup(DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,stringRefGUIDOfProductGroup));
-
-
+        guidOfPG = getStringAttributeValue(node,"GuidOfPG",36);
         return this;
+    }
+    
+    @Override
+    public void preProcess() {
+        setProductGroup(DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG));
     }
 
     @Override

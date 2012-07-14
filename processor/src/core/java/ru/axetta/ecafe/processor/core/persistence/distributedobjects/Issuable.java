@@ -18,11 +18,13 @@ import java.text.ParseException;
  * Time: 18:49
  * To change this template use File | Settings | File Templates.
  */
-public class Issuable extends DistributedObject{
+public class Issuable extends DistributedObject {
 
     private long barcode;
     private char type;
     private Publication publication;
+
+    private String guidPublication;
 
     @Override
     protected void appendAttributes(Element element) {
@@ -43,9 +45,13 @@ public class Issuable extends DistributedObject{
         }
 
 
-        String stringRefGUIDOfPublication = getStringAttributeValue(node,"GUIDPublication",36);
-        setPublication(DAOService.getInstance().findDistributedObjectByRefGUID(Publication.class, stringRefGUIDOfPublication));
+        guidPublication = getStringAttributeValue(node, "GUIDPublication", 36);
         return this;
+    }
+
+    @Override
+    public void preProcess() {
+        setPublication(DAOService.getInstance().findDistributedObjectByRefGUID(Publication.class, guidPublication));
     }
 
     @Override

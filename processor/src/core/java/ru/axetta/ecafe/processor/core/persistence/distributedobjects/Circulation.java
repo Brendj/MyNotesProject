@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public class Circulation extends DistributedObject {
 
-    public final static int ISSUED=0, EXTENDED=1, LOST=2, REFUNDED=3;
+    public final static int ISSUED = 0, EXTENDED = 1, LOST = 2, REFUNDED = 3;
 
     private Issuable issuable;
     private Org org;
@@ -37,6 +37,7 @@ public class Circulation extends DistributedObject {
 
     private long idoforg;
     private long idofclient;
+    private String guidIssuable;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MM yyyy HH:mm:ss");
 
@@ -78,9 +79,16 @@ public class Circulation extends DistributedObject {
         setIdoforg(getLongAttributeValue(node, "idoforg"));
         setIdofclient(getLongAttributeValue(node, "idofclient"));
 
-        String stringRefGUIDOfPublication = getStringAttributeValue(node,"GUIDIssuable",36);
-        setIssuable(DAOService.getInstance().findDistributedObjectByRefGUID(Issuable.class, stringRefGUIDOfPublication));
+        guidIssuable = getStringAttributeValue(node, "GUIDIssuable", 36);
         return this;
+    }
+
+    @Override
+    public void preProcess() {
+        DAOService daoService = DAOService.getInstance();
+        setIssuable(daoService.findDistributedObjectByRefGUID(Issuable.class, guidIssuable));
+        setOrg(daoService.findOrById(idoforg));
+        setClient(daoService.findClientById(idofclient));
     }
 
     @Override

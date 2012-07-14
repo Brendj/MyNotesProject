@@ -151,13 +151,7 @@ public class DistributionManager {
             long currentMaxVersion = doVersion.getCurrentVersion();
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
 
-            DistributedObjectsProcessorsFactory distributedObjectsProcessorsFactory = DistributedObjectsProcessorsFactory
-                    .getInstance();
-            String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects." + objectClass.name();
-            Class clazz = Class.forName(name);
-            AbstractDistributedObjectProcessor distributedObjectProcessor = distributedObjectsProcessorsFactory
-                    .createProcessor(clazz);
-
+            DistributedObjectProcessor distributedObjectProcessor = DistributedObjectProcessor.getInstance();
             for (DistributedObject distributedObject : distributedObjects) {
                 distributedObjectProcessor.process(distributedObject, currentMaxVersion, idOfOrg, getSimpleDocument());
 

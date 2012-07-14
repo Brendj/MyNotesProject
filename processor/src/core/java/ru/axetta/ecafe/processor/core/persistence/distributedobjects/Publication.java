@@ -35,6 +35,7 @@ public class Publication extends DistributedObject {
         setAttribute(element,"title2", title2);
         setAttribute(element,"publicationdate", publicationdate);
         setAttribute(element, "publisher", publisher);
+        setAttribute(element, "guid", guid);
     }
 
     @Override
