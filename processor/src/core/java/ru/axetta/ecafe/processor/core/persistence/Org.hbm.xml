@@ -81,6 +81,11 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
         </set>
 
+        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" fetch="select" lazy="false">
+            <column name="idOfConfigurationProvider" />
+        </many-to-one>
+
+
         <!-- Kadirov D (21.12.2011) -->
         <!--set name="enterEventsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>

@@ -23,5 +23,13 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product"/>
         </set>
+
+        <set name="orgInternal" lazy="false" cascade="all">
+            <key>
+                <column name="idOfConfigurationProvider"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
+        </set>
+
     </class>
 </hibernate-mapping>

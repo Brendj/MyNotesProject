@@ -67,7 +67,15 @@ public class Org {
     private String mailingListReportsOnVisits;
     private String mailingListReports1;
     private String mailingListReports2;
+    private ConfigurationProvider configurationProvider;
 
+    public ConfigurationProvider getConfigurationProvider() {
+        return configurationProvider;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
+        this.configurationProvider = configurationProvider;
+    }
 
 
     public Set<CategoryOrg> getCategories(){
