@@ -1,7 +1,7 @@
 -- Поле с номером организации в таблице глобального объекта
 ALTER TABLE cf_product_guide ADD COLUMN idoforg bigint;
 -- Добавлена таблица версий распределенных объектов
-CREATE TABLE cf_do_version
+CREATE TABLE cf_do_versions
 (
   idofdoobject bigserial,
   distributedobjectclassname character varying(64),
@@ -20,6 +20,15 @@ CREATE TABLE cf_do_conflicts
   val_inc character varying(16548),
   val_cur character varying(16548),
   CONSTRAINT cf_do_conflicts_pk PRIMARY KEY (idofdoconflict )
+);
+
+CREATE TABLE cf_do_confirms
+(
+  idofdoconfirm bigserial,
+  distributedobjectclassname character varying(64) NOT NULL,
+  GUID character varying(36) NOT NULL,
+  OrgOwner BIGINT DEFAULT NULL,
+  CONSTRAINT cf_do_confirm_pk PRIMARY KEY (idofdoconfirm )
 );
 
 -- Удаление не нужных таблиц
@@ -211,11 +220,28 @@ CREATE TABLE cf_circuls
   CONSTRAINT cf_circul_idoforg_fk FOREIGN KEY (idoforg)
       REFERENCES cf_orgs (idoforg),
   CONSTRAINT cf_circul_idofpubl_fk FOREIGN KEY (idofpubl)
-      REFERENCES cf_publs (idofpubl) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_publs (idofpubl),
   CONSTRAINT cf_circul_unq UNIQUE (idofclient , idofpubl , idoforg ),
   CONSTRAINT cf_circuls_guid_key UNIQUE (guid )
 );
 
+-- скрипт дает ошибку
+-- CREATE TABLE cf_issuable
+-- (
+--   idofissuable bigserial NOT NULL,
+--   barcode bigint,
+--   type character(1) NOT NULL DEFAULT 'i'::bpchar,
+--   idofpubl bigint NOT NULL,
+--   globalversion bigint,
+--   orgowner bigint,
+--   deletedstate boolean NOT NULL DEFAULT false,
+--   guid character varying(36) NOT NULL,
+--   lastupdate bigint,
+--   deletedate bigint,
+--   createddate bigint NOT NULL,
+--   CONSTRAINT cf_iissuable_pk PRIMARY KEY (idofissuable ),
+--   CONSTRAINT cf_issuable_idofpubl_fkey FOREIGN KEY (idofpubl)
+--       REFERENCES cf_publs (idofpubl)
+-- );
 
 
