@@ -74,7 +74,7 @@ public abstract class DistributedObject{
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException {
         /* Begin required params */
-        String stringGUID = getStringAttributeValue(node,"GUID",36);
+        String stringGUID = getStringAttributeValue(node,"Guid",36);
         if(stringGUID!=null) setGuid(stringGUID);
 
         Long version = getLongAttributeValue(node,"V");
@@ -90,9 +90,7 @@ public abstract class DistributedObject{
         return parseAttributes(node);
     }
 
-    public void preProcess() {
-
-    }
+    public void preProcess() throws DistributedObjectException{}
 
     protected abstract DistributedObject parseAttributes(Node node) throws ParseException;
 

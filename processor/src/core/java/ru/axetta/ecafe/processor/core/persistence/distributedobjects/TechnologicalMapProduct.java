@@ -68,9 +68,12 @@ public class TechnologicalMapProduct extends DistributedObject {
     }
 
     @Override
-    public void preProcess() {
-        setProduct(DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP));
-        setTechnologicalMap(DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM));
+    public void preProcess() throws DistributedObjectException{
+        Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
+        TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
+        if(tm==null || p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        setProduct(p);
+        setTechnologicalMap(tm);
     }
 
     public Product getProduct() {

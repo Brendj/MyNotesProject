@@ -70,8 +70,10 @@ public class Product extends DistributedObject {
     }
     
     @Override
-    public void preProcess() {
-        setProductGroup(DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG));
+    public void preProcess() throws DistributedObjectException{
+        ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
+        if(pg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        setProductGroup(pg);
     }
 
     @Override

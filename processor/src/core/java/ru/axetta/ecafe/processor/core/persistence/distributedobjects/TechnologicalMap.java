@@ -253,9 +253,10 @@ public class TechnologicalMap extends DistributedObject {
     }
 
     @Override
-    public void preProcess() {
-        setTechnologicalMapGroup(
-                DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMapGroup.class, guidOfTMG));
+    public void preProcess() throws DistributedObjectException{
+        TechnologicalMapGroup tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMapGroup.class, guidOfTMG);
+        if(tmg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        setTechnologicalMapGroup(tmg);
     }
 
     public List<TechnologicalMapProduct> getTechnologicalMapProduct() {

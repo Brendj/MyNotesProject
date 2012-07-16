@@ -14,7 +14,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 public class DistributedObjectException extends Exception {
 
     public enum ErrorType{
-        DUPLICATE_VALUE(1);
+        UNKNOWN_ERROR(1),
+        DUPLICATE_VALUE(2),
+        NOT_FOUND_VALUE(3);
 
         Integer value;
 
@@ -42,6 +44,10 @@ public class DistributedObjectException extends Exception {
 
     public DistributedObjectException(Integer type) {
         this.type = ErrorType.parse(type);
+    }
+
+    public DistributedObjectException(ErrorType errorType) {
+        this.type = errorType;
     }
 
     public Integer getType() {
