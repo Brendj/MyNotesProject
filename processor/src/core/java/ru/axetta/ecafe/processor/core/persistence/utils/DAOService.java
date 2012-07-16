@@ -54,6 +54,12 @@ public class DAOService {
         return list.get(0);
     }
 
+    public List<DistributedObject> findDistributedObjectByInGUID(String name, List<String> guids){
+        TypedQuery<DistributedObject> query = em.createQuery("from "+name+" where guid in (:guids)",DistributedObject.class);
+        query.setParameter("guids",guids);
+        return query.getResultList();
+    }
+
     public Product findProductByGUID(Class<Product> productClass, String stringRefGUID) {
         TypedQuery<Product> query = em.createQuery("from Product where guid='"+stringRefGUID+"'", Product.class);
         List<Product> productList = query.getResultList();
@@ -69,6 +75,14 @@ public class DAOService {
     @Transactional
     public <T> List<T> getDistributedObjects(Class<T> clazz){
         return em.createQuery("from "+clazz.getSimpleName()+" order by id",clazz).getResultList();
+    }
+
+    @Transactional
+    public List<String> getGUIDsInConfirms(String className, Long orgOwner){
+        TypedQuery<String> query ;
+        query = em.createQuery("Select guid from "+className+" where orgOwner=:orgOwner",String.class);
+        query.setParameter("orgOwner",orgOwner);
+        return  query.getResultList();
     }
 
     @Transactional
@@ -96,6 +110,19 @@ public class DAOService {
         }
         return  query.getResultList();
     }
+
+    @Transactional
+    public Long getVersionByDistributedObjects(Class clazz) {
+        TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+        query.setParameter("distributedObjectClassName", clazz.getSimpleName().toUpperCase());
+        List<DOVersion> doVersionList = query.getResultList();
+        Long version = new Long(1);
+        if(!doVersionList.isEmpty()){
+            version = version + doVersionList.get(0).getCurrentVersion();
+        }
+        return version;
+    }
+
 
     @Transactional
     public DOVersion updateVersionByDistributedObjects(String name) {

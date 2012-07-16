@@ -20,6 +20,7 @@ import org.w3c.dom.Node;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,7 +112,8 @@ public class DistributionManager {
             distributedObjects.clear();
         }
 
-        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
+        // Раскоментировать при не обходимости отсортированного вывода к клиенту
+        //DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
         // Arrays.sort(array,distributedObjectsEnumComparator);
 
@@ -122,6 +124,14 @@ public class DistributionManager {
                     .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
             if (!distributedObjectList.isEmpty()) {
                 distributedObjects.addAll(distributedObjectList);
+            }
+            List<String> guidList = DAOService.getInstance().getGUIDsInConfirms(name, idOfOrg);
+            List<DistributedObject> distributedObjectsConfirm = null;
+            if(guidList!=null && !guidList.isEmpty()){
+                distributedObjectsConfirm = DAOService.getInstance().findDistributedObjectByInGUID(name,guidList);
+            }
+            if (distributedObjectsConfirm!=null && !distributedObjectsConfirm.isEmpty()) {
+                distributedObjects.addAll(distributedObjectsConfirm);
             }
         }
 
@@ -162,6 +172,21 @@ public class DistributionManager {
         }
     }
 
+    @Transactional
+    public void clearConfirmTable(List<DOConfirm> confirmList){
+        for (DOConfirm confirm: confirmList){
+            TypedQuery<DOConfirm> query = entityManager.createQuery("from DOConfirm where distributedObjectClassName=:distributedObjectClassName and guid=:guid and orgOwner=:orgOwner",DOConfirm.class);
+            query.setParameter("distributedObjectClassName",confirm.getDistributedObjectClassName());
+            query.setParameter("guid",confirm.getGuid());
+            query.setParameter("orgOwner",confirm.getOrgOwner());
+            List<DOConfirm> confirms = query.getResultList();
+            if(confirms !=null && !confirms.isEmpty()){
+                for (DOConfirm c: confirms){
+                    DAOService.getInstance().deleteEntity(c);
+                }
+            }
+        }
+    }
 
     /**
      * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
@@ -174,34 +199,54 @@ public class DistributionManager {
     public void build(Node node, Long idOfOrg) throws Exception {
         //distributedObjects.clear();
         if (Node.ELEMENT_NODE == node.getNodeType()) {
-            DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-            // При обработке в
-            String attrValue = getAttributeValue(node, "V");
-            currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node, "V")));
-            // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
-            /*if(node.getFirstChild()!=null){
-                DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
-            }*/
-            node = node.getFirstChild();
-            while (node != null) {
-                if (Node.ELEMENT_NODE == node.getNodeType()) {
-                    DistributedObject distributedObject = createDistributedObject(currentObject);
-                    distributedObject = distributedObject.build(node);
-                    distributedObject.setOrgOwner(idOfOrg);
-
-                    if (!distributedObjectsListMap.containsKey(currentObject)) {
-                        distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
-                    }
-                    distributedObjectsListMap.get(currentObject).add(distributedObject);
+            if(node.getNodeName().equals("Confirm")){
+                Node childNode = node.getFirstChild();
+                while (childNode != null) {
+                    buildConfirm(childNode, idOfOrg);
+                    childNode = childNode.getNextSibling();
                 }
-                node = node.getNextSibling();
+            } else {
+                DistributedObjectsEnum currentObject = null;
+                currentObject = DistributedObjectsEnum.parse(node.getNodeName());
+                // При обработке в
+                String attrValue = getAttributeValue(node, "V");
+                currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node, "V")));
+                // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
+                /*if(node.getFirstChild()!=null){
+                    DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
+                }*/
+                node = node.getFirstChild();
+                while (node != null) {
+                    if (Node.ELEMENT_NODE == node.getNodeType()) {
+                        DistributedObject distributedObject = createDistributedObject(currentObject);
+                        distributedObject = distributedObject.build(node);
+                        distributedObject.setOrgOwner(idOfOrg);
+
+                        if (!distributedObjectsListMap.containsKey(currentObject)) {
+                            distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
+                        }
+                        distributedObjectsListMap.get(currentObject).add(distributedObject);
+                    }
+                    node = node.getNextSibling();
+                }
             }
         }
+    }
+
+    private List<DOConfirm> confirmDistributedObject = new ArrayList<DOConfirm>();
+
+    public List<DOConfirm> getConfirmDistributedObject() {
+        return confirmDistributedObject;
     }
 
     public void buildConfirm(Node node, Long idOfOrg) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
+            DOConfirm confirm = new DOConfirm();
+            confirm.setDistributedObjectClassName(currentObject.name());
+            confirm.setGuid(node.getAttributes().getNamedItem("Guid").getTextContent());
+            confirm.setOrgOwner(idOfOrg);
+            confirmDistributedObject.add(confirm);
         }
     }
 

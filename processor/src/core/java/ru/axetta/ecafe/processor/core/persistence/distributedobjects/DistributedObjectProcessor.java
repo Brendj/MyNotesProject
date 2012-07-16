@@ -55,6 +55,7 @@ public class DistributedObjectProcessor {
         try {
             distributedObject.preProcess();
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
+            processConfirmDistributedObject(distributedObject, idOfOrg);
         } catch (Exception e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             ErrorObject errorObject = new ErrorObject();
@@ -63,11 +64,22 @@ public class DistributedObjectProcessor {
             errorObject.setMessage(e.getMessage());
             if (e instanceof DistributedObjectException) {
                 errorObject.setType(((DistributedObjectException) e).getType());
+            } else {
+                errorObject.setType(DistributedObjectException.ErrorType.UNKNOWN_ERROR.getValue());
             }
             DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
             logger.error(errorObject.toString(), e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
+    }
+
+    @Transactional
+    private void processConfirmDistributedObject(DistributedObject distributedObject, Long idOfOrg) {
+        DOConfirm confirm = new DOConfirm();
+        confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+        confirm.setGuid(distributedObject.getGuid());
+        confirm.setOrgOwner(idOfOrg);
+        entityManager.persist(confirm);
     }
 
     protected void processDistributedObject(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
@@ -85,8 +97,9 @@ public class DistributedObjectProcessor {
             }
             if (distributedObject.getTagName().equals("M")) {
                 long objectVersion = distributedObject.getGlobalVersion();
-                long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
-                if (objectVersion != currentVersion) {
+                Long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+                if (objectVersion != currentVersion.longValue()) {
                     createConflict(distributedObject, idOfOrg, document);
                 }
                 distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
@@ -99,7 +112,7 @@ public class DistributedObjectProcessor {
             throws DistributedObjectException {
         long id = getGlobalIDByGUID(distributedObject);
         if (id > 0) {
-            throw new DistributedObjectException(1);
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.DUPLICATE_VALUE);
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);

@@ -502,6 +502,8 @@ public class Processor implements SyncProcessor,
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
         Arrays.sort(array,distributedObjectsEnumComparator);
 
+        RuntimeContext.getAppContext().getBean(DistributionManager.class).clearConfirmTable(distributionManager.getConfirmDistributedObject());
+
         for (int i=0; i<array.length; i++){
             if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
                 RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
