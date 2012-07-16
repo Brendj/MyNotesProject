@@ -10,17 +10,17 @@
 
 <%-- Панель создания правила --%>
 <%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage"--%>
-<h:panelGrid id="productGroupCreateCreatePanelGrid" binding="#{productEditPage.pageComponent}"
+<h:panelGrid id="productEditPanelGrid" binding="#{productEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1" rendered="#{productEditPage.rendered}">
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{productEditPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+        <h:selectOneMenu id="selectCurrentConfigurationProviderEdit" value="#{productEditPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{productEditPage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
 
         <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentProductGroup" value="#{productEditPage.currentIdOfProductGroup}" styleClass="input-text long-field">
+        <h:selectOneMenu id="selectCurrentProductGroupEdit" value="#{productEditPage.currentIdOfProductGroup}" styleClass="input-text long-field">
             <f:selectItems value="#{productEditPage.productGroupMenu.items}" />
         </h:selectOneMenu>
 

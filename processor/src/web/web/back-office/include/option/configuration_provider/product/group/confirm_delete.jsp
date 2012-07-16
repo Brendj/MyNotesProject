@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupEditPage"--%>
+<%--@elvariable id="productGroupListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupListPage"--%>
 <rich:modalPanel id="removedProductGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление группы продуктов из справочника" styleClass="output-text" />
@@ -25,7 +26,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{productGroupEditPage.remove}"
                                            oncomplete="#{rich:component('removedProductGroupItemDeletePanel')}.hide();"
-                                           reRender="mainMenu, technologicalMapListTable, #{productGroupEditPage.pageComponent.id}"
+                                           reRender="mainMenu, productGroupListTable, #{productGroupListPage.pageComponent.id}"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"
                                            onclick="#{rich:component('removedProductGroupItemDeletePanel')}.hide();return false;" />

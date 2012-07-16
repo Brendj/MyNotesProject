@@ -71,7 +71,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Редактировать" escape="true"/>
+                <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:commandLink action="#{technologicalMapEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
@@ -80,7 +80,7 @@
         </rich:column>
         <rich:column style="text-align:center">
             <f:facet name="header">
-                <h:outputText value="Удалить" escape="true"/>
+                <h:outputText value="Удалить" escape="true" styleClass="output-text"/>
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
                              oncomplete="#{rich:component('removedTechnologicalMapItemDeletePanel')}.show()">

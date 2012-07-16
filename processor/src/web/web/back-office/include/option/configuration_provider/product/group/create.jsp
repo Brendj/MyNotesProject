@@ -10,7 +10,7 @@
 
 <%-- Панель создания правила --%>
 <%--@elvariable id="productGroupCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupCreatePage"--%>
-<h:panelGrid id="productGroupCreateCreatePanelGrid" binding="#{productGroupCreatePage.pageComponent}"
+<h:panelGrid id="productGroupCreatePanelGrid" binding="#{productGroupCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
@@ -21,7 +21,7 @@
 
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Создать группу" action="#{productGroupCreatePage.onSave}"
-                       reRender="technologicalMapGroupCreatePanelGrid" styleClass="command-button" />
+                       reRender="productGroupCreatePanelGrid" styleClass="command-button" />
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

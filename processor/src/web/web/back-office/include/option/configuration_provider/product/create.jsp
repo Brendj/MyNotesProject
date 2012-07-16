@@ -10,17 +10,17 @@
 
 <%-- Панель создания правила --%>
 <%--@elvariable id="productCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductCreatePage"--%>
-<h:panelGrid id="productGroupCreateCreatePanelGrid" binding="#{productCreatePage.pageComponent}"
+<h:panelGrid id="productCreatePanelGrid" binding="#{productCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="1" rendered="#{productCreatePage.rendered}">
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{productCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
+        <h:selectOneMenu id="selectCurrentConfigurationProviderCreate" value="#{productCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{productCreatePage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
 
         <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentProductGroup" value="#{productCreatePage.currentIdOfProductGroup}" styleClass="input-text long-field">
+        <h:selectOneMenu id="selectCurrentProductGroupCreate" value="#{productCreatePage.currentIdOfProductGroup}" styleClass="input-text long-field">
             <f:selectItems value="#{productCreatePage.productGroupMenu.items}" />
         </h:selectOneMenu>
 
@@ -37,7 +37,7 @@
 
     <h:panelGrid styleClass="borderless-grid">
         <a4j:commandButton value="Создать продукт" action="#{productCreatePage.onSave}"
-                           reRender="productGroupCreateCreatePanelGrid" styleClass="command-button" />
+                           reRender="productCreatePanelGrid" styleClass="command-button" />
     </h:panelGrid>
 
 </h:panelGrid>
