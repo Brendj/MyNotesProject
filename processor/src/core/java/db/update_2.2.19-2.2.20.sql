@@ -42,10 +42,11 @@ DROP TABLE IF EXISTS cf_provider_configurations;
 CREATE TABLE cf_product_groups
 (
    IdOfProductGroups BigSerial,
-   NameOfGroup character varying(128) NOT NULL,
+   NameOfGroup character varying(512) NOT NULL,
    GUID character varying(36) NOT NULL UNIQUE,
    GlobalVersion BIGINT DEFAULT NULL,
    DeletedState boolean NOT NULL DEFAULT false,
+   ClassificationCode character varying(32) DEFAULT NULL,
    OrgOwner BIGINT DEFAULT NULL,
    CreatedDate bigint NOT NULL,
    LastUpdate bigint,
@@ -61,7 +62,8 @@ CREATE TABLE cf_products
   Code character varying(16) NOT NULL,
   FullName character varying(1024),
   ProductName character varying(512),
-  OkpCode character varying(32),
+  OkpCode character varying(128),
+  ClassificationCode character varying(32) DEFAULT NULL,
   GUID character varying(36) NOT NULL UNIQUE,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner BIGINT DEFAULT NULL,
@@ -158,9 +160,15 @@ CREATE TABLE cf_technological_map_products
 CREATE TABLE cf_provider_configurations
 (
   IdOfConfigurationProvider BigSerial NOT NULL,
-  name character varying(64) NOT NULL,
+  nameOfConfigurationProvider character varying(64) NOT NULL,
+  IdOfUserCreate bigint,
+  IdOfUserEdit bigint,
+  IdOfUserDelete bigint,
+  CreatedDate bigint NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
   CONSTRAINT pk_configuration_provider PRIMARY KEY (IdOfConfigurationProvider ),
-  CONSTRAINT cf_provider_configurations_name_key UNIQUE (name )
+  CONSTRAINT cf_provider_configurations_name_key UNIQUE (nameOfConfigurationProvider )
 );
 
 --В организациях Добавлена ссылка на производственную конфигурацию
@@ -226,22 +234,22 @@ CREATE TABLE cf_circuls
 );
 
 -- скрипт дает ошибку
--- CREATE TABLE cf_issuable
--- (
---   idofissuable bigserial NOT NULL,
---   barcode bigint,
---   type character(1) NOT NULL DEFAULT 'i'::bpchar,
---   idofpubl bigint NOT NULL,
---   globalversion bigint,
---   orgowner bigint,
---   deletedstate boolean NOT NULL DEFAULT false,
---   guid character varying(36) NOT NULL,
---   lastupdate bigint,
---   deletedate bigint,
---   createddate bigint NOT NULL,
---   CONSTRAINT cf_iissuable_pk PRIMARY KEY (idofissuable ),
---   CONSTRAINT cf_issuable_idofpubl_fkey FOREIGN KEY (idofpubl)
---       REFERENCES cf_publs (idofpubl)
--- );
+CREATE TABLE cf_issuable
+(
+  idofissuable bigserial NOT NULL,
+  barcode bigint,
+  type character(1) NOT NULL DEFAULT 'i',
+  idofpubl bigint NOT NULL,
+  globalversion bigint,
+  orgowner bigint,
+  deletedstate boolean NOT NULL DEFAULT false,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  CONSTRAINT cf_iissuable_pk PRIMARY KEY (idofissuable ),
+  CONSTRAINT cf_issuable_idofpubl_fkey FOREIGN KEY (idofpubl)
+      REFERENCES cf_publs (idofpubl)
+);
 
 
