@@ -125,13 +125,25 @@ public class DistributionManager {
             if (!distributedObjectList.isEmpty()) {
                 distributedObjects.addAll(distributedObjectList);
             }
+            for (DistributedObject distributedObject: distributedObjectList) {
+                DOConfirm confirm = new DOConfirm();
+                confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+                confirm.setGuid(distributedObject.getGuid());
+                confirm.setOrgOwner(idOfOrg);
+                DAOService.getInstance().persistEntity(confirm);
+            }
+
             List<String> guidList = DAOService.getInstance().getGUIDsInConfirms(name, idOfOrg);
             List<DistributedObject> distributedObjectsConfirm = null;
             if(guidList!=null && !guidList.isEmpty()){
                 distributedObjectsConfirm = DAOService.getInstance().findDistributedObjectByInGUID(name,guidList);
             }
             if (distributedObjectsConfirm!=null && !distributedObjectsConfirm.isEmpty()) {
-                distributedObjects.addAll(distributedObjectsConfirm);
+                for (DistributedObject distributedObject: distributedObjectsConfirm){
+                    if(!distributedObjectList.contains(distributedObject)){
+                        distributedObjects.add(distributedObject);
+                    }
+                }
             }
         }
 
