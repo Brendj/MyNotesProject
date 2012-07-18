@@ -55,7 +55,6 @@ public class DistributedObjectProcessor {
         try {
             distributedObject.preProcess();
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
-            processConfirmDistributedObject(distributedObject, idOfOrg);
         } catch (Exception e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             ErrorObject errorObject = new ErrorObject();
@@ -71,15 +70,6 @@ public class DistributedObjectProcessor {
             logger.error(errorObject.toString(), e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
-    }
-
-    @Transactional
-    private void processConfirmDistributedObject(DistributedObject distributedObject, Long idOfOrg) {
-        DOConfirm confirm = new DOConfirm();
-        confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-        confirm.setGuid(distributedObject.getGuid());
-        confirm.setOrgOwner(idOfOrg);
-        entityManager.persist(confirm);
     }
 
     protected void processDistributedObject(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
