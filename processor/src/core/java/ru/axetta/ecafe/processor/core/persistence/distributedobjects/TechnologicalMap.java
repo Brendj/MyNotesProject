@@ -517,4 +517,5 @@ public class TechnologicalMap extends DistributedObject {
         sb.append('}');
         return sb.toString();
     }
+
 }

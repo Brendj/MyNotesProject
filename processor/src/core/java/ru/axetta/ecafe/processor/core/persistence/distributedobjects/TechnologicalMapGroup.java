@@ -70,4 +70,5 @@ public class TechnologicalMapGroup extends DistributedObject {
     private void setTechnologicalMapInternal(Set<TechnologicalMap> technologicalMapInternal) {
         this.technologicalMapInternal = technologicalMapInternal;
     }
+
 }
