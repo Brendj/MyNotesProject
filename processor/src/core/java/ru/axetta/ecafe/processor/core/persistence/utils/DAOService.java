@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 
 import org.springframework.context.annotation.Scope;
@@ -33,6 +30,15 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    @Transactional
+    public void setConfigurationProviderInOrg(Long idOfOrg, ConfigurationProvider configurationProvider){
+        Org org = em.find(Org.class, idOfOrg);
+        if(org!=null){
+            org.setConfigurationProvider(configurationProvider);
+            org = em.merge(org);
+        }
     }
 
     @Transactional
@@ -80,8 +86,9 @@ public class DAOService {
     @Transactional
     public List<String> getGUIDsInConfirms(String className, Long orgOwner){
         TypedQuery<String> query ;
-        query = em.createQuery("Select guid from "+className+" where orgOwner=:orgOwner",String.class);
+        query = em.createQuery("Select guid from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName",String.class);
         query.setParameter("orgOwner",orgOwner);
+        query.setParameter("distributedObjectClassName",className);
         return  query.getResultList();
     }
 
