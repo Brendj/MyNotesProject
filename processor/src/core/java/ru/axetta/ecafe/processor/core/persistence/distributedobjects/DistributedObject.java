@@ -230,4 +230,27 @@ public abstract class DistributedObject{
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DistributedObject)) {
+            return false;
+        }
+
+        DistributedObject that = (DistributedObject) o;
+
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return guid != null ? guid.hashCode() : 0;
+    }
 }
