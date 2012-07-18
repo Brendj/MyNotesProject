@@ -25,17 +25,22 @@ public class ProductGroup extends DistributedObject {
 
     private String nameOfGroup;
     private Set<Product> productInternal;
+    private String сlassificationCode;
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element,"Name", nameOfGroup);
+        setAttribute(element,"ClassificationCode", сlassificationCode);
     }
 
     @Override
     protected ProductGroup parseAttributes(Node node) {
 
-        String stringNameOfGroup = getStringAttributeValue(node,"Name",128);
+        String stringNameOfGroup = getStringAttributeValue(node,"Name",512);
         if(stringNameOfGroup!=null) setNameOfGroup(stringNameOfGroup);
+
+        String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
+        if(stringClassificationCode!=null) setСlassificationCode(stringClassificationCode);
 
         return this;
     }
@@ -43,6 +48,7 @@ public class ProductGroup extends DistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
+        setСlassificationCode(((ProductGroup) distributedObject).getСlassificationCode());
     }
 
     public String getNameOfGroup() {
@@ -72,4 +78,13 @@ public class ProductGroup extends DistributedObject {
     private void setProductInternal(Set<Product> productInternal) {
         this.productInternal = productInternal;
     }
+
+    public String getСlassificationCode() {
+        return сlassificationCode;
+    }
+
+    public void setСlassificationCode(String сlassificationCode) {
+        this.сlassificationCode = сlassificationCode;
+    }
+
 }

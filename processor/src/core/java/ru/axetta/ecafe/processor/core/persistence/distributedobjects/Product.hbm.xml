@@ -27,6 +27,8 @@
         <property name="fullName" column="FullName" type="string" length="1024"/>
         <property name="okpCode" column="OkpCode" type="string" length="32"/>
         <property name="productName" column="ProductName" type="string" length="512"/>
+        <property name="classificationCode" column="ClassificationCode" type="string" length="32"/>
+
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />

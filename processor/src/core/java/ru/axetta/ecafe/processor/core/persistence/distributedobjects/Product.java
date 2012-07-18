@@ -34,6 +34,7 @@ public class Product extends DistributedObject {
     private ProductGroup productGroup;
     
     private String guidOfPG;
+    private String classificationCode;
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.
@@ -48,7 +49,7 @@ public class Product extends DistributedObject {
         setAttribute(element,"OkpCode", okpCode);
         setAttribute(element,"OrgOwner", orgOwner);
         //setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
-
+        setAttribute(element,"ClassificationCode", classificationCode);
         setAttribute(element,"GuidOfPG", productGroup.getGuid());
     }
 
@@ -59,16 +60,18 @@ public class Product extends DistributedObject {
         if(stringCode!=null) setCode(stringCode);
         String stringFullName= getStringAttributeValue(node,"FullName",1024);
         if(stringFullName!=null) setFullName(stringFullName);
-        String stringOkpCode= getStringAttributeValue(node,"OkpCode",32);
+        String stringOkpCode= getStringAttributeValue(node,"OkpCode",128);
         if(stringOkpCode!=null) setOkpCode(stringOkpCode);
         String stringProductName= getStringAttributeValue(node,"ProductName",512);
         if(stringProductName!=null) setProductName(stringProductName);
+        String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
+        if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
         /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
         guidOfPG = getStringAttributeValue(node,"GuidOfPG",36);
         return this;
     }
-    
+
     @Override
     public void preProcess() throws DistributedObjectException{
         ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
@@ -83,12 +86,13 @@ public class Product extends DistributedObject {
         setProductName( ((Product) distributedObject).getProductName());
         setOkpCode (((Product) distributedObject).getOkpCode());
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
+        setClassificationCode(((Product) distributedObject).getClassificationCode());
 
     }
+
     public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
     }
-
     public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
         this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
@@ -157,6 +161,14 @@ public class Product extends DistributedObject {
         this.productGroup = productGroup;
     }
 
+    public String getClassificationCode() {
+        return classificationCode;
+    }
+
+    public void setClassificationCode(String classificationCode) {
+        this.classificationCode = classificationCode;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -172,4 +184,5 @@ public class Product extends DistributedObject {
         sb.append('}');
         return sb.toString();
     }
+
 }
