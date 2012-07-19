@@ -16,40 +16,64 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<rich:dataTable id="configurationProviderListTable" value="#{mainPage.configurationProviderListPage.items}" var="item"
-        columnClasses="left-aligned-column, left-aligned-column, center-aligned-column" width="400px">
-    <rich:column headerClass="column-header" width="100px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Идентификаторв" />
-        </f:facet>
-        <h:commandLink value="#{item.idOfConfigurationProvider}" action="#{mainPage.showСonfigurationProviderViewPage}"
-                       styleClass="command-link">
-            <f:setPropertyActionListener value="#{item.idOfConfigurationProvider}" target="#{mainPage.selectedIdOfConfigurationProvider}" />
-        </h:commandLink>
-    </rich:column>
+<%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
+<%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderEditPage"--%>
+<%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
+<h:panelGrid id="configurationProviderEditPage" binding="#{configurationProviderListPage.pageComponent}"
+             styleClass="borderless-grid" columns="1">
 
-    <rich:column headerClass="column-header" width="250px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Имя" />
-        </f:facet>
-        <h:commandLink value="#{item.name}" action="#{mainPage.showСonfigurationProviderViewPage}"
-                       styleClass="command-link">
-            <f:setPropertyActionListener value="#{item.idOfConfigurationProvider}" target="#{mainPage.selectedIdOfConfigurationProvider}" />
-        </h:commandLink>
-    </rich:column>
+    <rich:dataTable id="configurationProviderListTable" value="#{configurationProviderListPage.configurationProviderList}" var="configurationProvider"
+                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column" width="400px" rowKeyVar="row">
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="№" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{row+1}" />
+        </rich:column>
 
-    <rich:column headerClass="column-header" width="50px">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Удалить" />
-        </f:facet>
+        <rich:column headerClass="column-header" width="250px">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Имя" styleClass="output-text"/>
+            </f:facet>
+            <h:commandLink value="#{configurationProvider.name}" action="#{configurationProviderEditPage.show}"
+                           styleClass="command-link">
+                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}" target="#{configurationProviderEditPage.selectedIdOfConfigurationProvider}" />
+                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.idOfConfigurationProvider}" />
+            </h:commandLink>
+        </rich:column>
 
-        <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                         oncomplete="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.show()">
-            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-            <f:setPropertyActionListener value="#{item.idOfConfigurationProvider}"
-                                         target="#{mainPage.removedConfigurationProviderItemId}" />
-        </a4j:commandLink>
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Организации" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <rich:dataList value="#{configurationProvider.orgs}" var="org" rendered="#{configurationProvider.orgs != null}">
+                <h:outputText value="#{org.shortName}"/>
+            </rich:dataList>
+        </rich:column>
+<%--
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="История изминений" styleClass="output-text" escape="true"/>
+            </f:facet>
+            &lt;%&ndash;<h:outputText value="Автор: #{CONFIGURATION_PROVIDER.userCreate.userName} Дата: " rendered="#{CONFIGURATION_PROVIDER.userCreate != null}"/>
+            <h:outputText value="#{CONFIGURATION_PROVIDER.createdDate}" converter="timeConverter"/>&ndash;%&gt;
+            <h:outputText value="#{CONFIGURATION_PROVIDER.history}" styleClass="output-text"/>
+        </rich:column>--%>
 
-    </rich:column>
+        <rich:column headerClass="column-header" width="50px">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Удалить" styleClass="output-text"/>
+            </f:facet>
 
-</rich:dataTable>
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             oncomplete="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.show()">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}"
+                                             target="#{mainPage.removedConfigurationProviderItemId}" />
+            </a4j:commandLink>
+
+        </rich:column>
+
+    </rich:dataTable>
+
+</h:panelGrid>

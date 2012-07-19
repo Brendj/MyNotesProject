@@ -16,16 +16,35 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Имя" styleClass="output-text" />
-    <h:inputText value="#{mainPage.configurationProviderCreatePage.item.name}" styleClass="input-text"/>
-</h:panelGrid>
+<%--@elvariable id="configurationProviderCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage"--%>
+<h:panelGrid id="configurationProviderCreatePanelGrid" binding="#{configurationProviderCreatePage.pageComponent}"
+             styleClass="borderless-grid" columns="1">
+    <h:panelGrid columns="2">
 
-<h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Создать" action="#{mainPage.createConfigurationProvider}" reRender="mainMenu, workspaceTogglePanel"/>
+        <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
+        <h:inputText value="#{configurationProviderCreatePage.currentConfigurationProvider.name}" maxlength="128" styleClass="input-text long-field" />
+
+        <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
+
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{configurationProviderCreatePage.filter}}" />
+        </h:panelGroup>
+
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <a4j:commandButton value="Создать продукт" action="#{configurationProviderCreatePage.save}"
+                           reRender="configurationProviderCreatePanelGrid" styleClass="command-button" />
+    </h:panelGrid>
+
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+
 </h:panelGrid>
+
