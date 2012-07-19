@@ -16,7 +16,7 @@ import org.w3c.dom.Node;
  * Time: 12:57
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMapProduct extends DistributedObject {
+public class TechnologicalMapProduct extends DistributedObject implements IConfigProvider {
 
     //Масса брутто, г
     private double grossWeight;
@@ -30,6 +30,15 @@ public class TechnologicalMapProduct extends DistributedObject {
 
     private String guidOfP;
     private String guidOfTM;
+    private Long idOfConfigurationProvider;
+
+    public Long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
+    }
     //Наименование продукта вытягивается из таблицы продуктов
     //private String nameOfProduct;
 

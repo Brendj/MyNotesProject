@@ -19,10 +19,19 @@ import java.util.Set;
  * Time: 14:45
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMapGroup extends DistributedObject {
+public class TechnologicalMapGroup extends DistributedObject implements IConfigProvider {
 
     private String nameOfGroup;
     private Set<TechnologicalMap> technologicalMapInternal;
+    private Long idOfConfigurationProvider;
+
+    public Long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

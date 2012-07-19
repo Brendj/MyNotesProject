@@ -21,7 +21,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 
-public class Product extends DistributedObject {
+public class Product extends DistributedObject implements IConfigProvider{
 
     private String code;
     private String fullName;

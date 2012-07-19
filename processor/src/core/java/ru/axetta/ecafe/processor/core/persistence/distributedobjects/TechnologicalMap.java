@@ -19,7 +19,7 @@ import java.util.*;
  * Time: 11:07
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMap extends DistributedObject {
+public class TechnologicalMap extends DistributedObject implements IConfigProvider {
 
     /*  private String groupName;*/
     private String nameOfTechnologicalMap;
@@ -61,7 +61,7 @@ public class TechnologicalMap extends DistributedObject {
     private Float vitaminC;
     private Float vitaminE;
     private TechnologicalMapGroup technologicalMapGroup;
-    private long idOfConfigurationProvider;
+    private Long idOfConfigurationProvider;
 
     private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
     private User userCreate;
@@ -440,11 +440,11 @@ public class TechnologicalMap extends DistributedObject {
         this.vitaminE = vitaminE;
     }
 
-    public long getIdOfConfigurationProvider() {
+    public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
     }
 
-    public void setIdOfConfigurationProvider(long idOfConfigurationProvider) {
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
         this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 

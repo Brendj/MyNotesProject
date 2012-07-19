@@ -27,6 +27,7 @@
         <!--
         <property name="idOfProduct" column="IdOfProducts " type="long"/>
         -->
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
         <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select" lazy="false">
             <column name="idOfTechnologicalMaps" not-null="true" />

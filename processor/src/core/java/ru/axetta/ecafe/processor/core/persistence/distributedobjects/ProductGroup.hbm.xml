@@ -25,6 +25,7 @@
         <!-- End Global params -->
         <property name="nameOfGroup" column="NameOfGroup" type="string" length="512"/>
         <property name="сlassificationCode" column="ClassificationCode" type="string" length="32"/>
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
         <set name="productInternal">
             <key>
