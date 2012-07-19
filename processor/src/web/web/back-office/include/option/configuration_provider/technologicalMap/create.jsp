@@ -68,8 +68,8 @@
         </rich:column>
     </rich:dataTable>
 
-    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapCreatePage.showProducts}" reRender="technologicalMapProductSelectModalPanel"
-                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapProductSelectModalPanel')}.show();"
+    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapCreatePage.showProducts}" reRender="modalTechnologicalMapListSelectorPanel"
+                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.show();"
                        styleClass="command-button"/>
 
     <h:panelGrid columns="2">
