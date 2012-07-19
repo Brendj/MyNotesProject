@@ -33,7 +33,7 @@ import java.util.*;
 public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
     private String filter;
-    private List<Long> idOfOrgList = new LinkedList<Long>();
+    private List<Long> idOfOrgList = new ArrayList<Long>();
 
     public String getCategoryName() {
         return categoryName;
