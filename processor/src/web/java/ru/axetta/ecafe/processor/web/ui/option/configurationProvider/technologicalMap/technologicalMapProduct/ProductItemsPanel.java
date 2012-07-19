@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -30,8 +31,8 @@ public class ProductItemsPanel extends BasicPage {
 
     private TechnologicalMap technologicalMap;
 
-    private List<ProductItem> productItems = new LinkedList<ProductItem>();
-
+    private List<ProductItem> productItems = new ArrayList<ProductItem>();
+    private List<Product> pr = new ArrayList<Product>();
     private String filter="";
 
     @PersistenceContext
@@ -42,7 +43,7 @@ public class ProductItemsPanel extends BasicPage {
     }
 
     public Object addProducts(){
-        List<ProductItem> productItemList = new LinkedList<ProductItem>();
+        List<ProductItem> productItemList = new ArrayList<ProductItem>();
         for (ProductItem productItem: productItems){
             if(productItem.getChecked()) productItemList.add(productItem);
         }
@@ -54,7 +55,6 @@ public class ProductItemsPanel extends BasicPage {
     }
 
     public void reload(List<TechnologicalMapProduct> technologicalMapProductList) throws Exception {
-        List<Product> pr = new LinkedList<Product>();
         for (TechnologicalMapProduct tmp: technologicalMapProductList){
             pr.add(tmp.getProduct());
         }
@@ -66,7 +66,11 @@ public class ProductItemsPanel extends BasicPage {
     }
 
     public Object updateTechnologicalMapProductListSelectPage(){
-        retrieveProduct();
+        List<Product> productList = retrieveProduct();
+        productItems.clear();
+        for (Product product: productList){
+            productItems.add(new ProductItem(pr.contains(product), product));
+        }
         return null;
     }
 
