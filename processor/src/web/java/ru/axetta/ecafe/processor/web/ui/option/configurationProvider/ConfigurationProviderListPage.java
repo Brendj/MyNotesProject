@@ -33,15 +33,25 @@ import java.util.List;
 @Scope("session")
 public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
-    private List<Item> items = Collections.emptyList();
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private List<ConfigurationProvider> configurationProviderList;
 
     public String getPageFilename() {
         return "option/configuration_provider/list";
     }
 
     public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", items.size());
+        return super.getPageTitle() + String.format(" (%d)", configurationProviderList.size());
     }
+
+    @Override
+    public void onShow() throws Exception {
+        configurationProviderList = entityManager.createQuery("from ConfigurationProvider order by id",ConfigurationProvider.class).getResultList();
+    }
+
+    /*private List<Item> items = Collections.emptyList();
 
     public List<Item> getItems() {
         return items;
@@ -57,13 +67,10 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
     }
 
     public void remove(Session session, long id) {
-        ConfigurationProvider configurationProvider = (ConfigurationProvider)session.load(ConfigurationProvider.class, id);
-        session.delete(configurationProvider);
+        ConfigurationProvider CONFIGURATION_PROVIDER = (ConfigurationProvider)session.load(ConfigurationProvider.class, id);
+        session.delete(CONFIGURATION_PROVIDER);
         fill(session);
-    }
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    }*/
 
     @Transactional
     private boolean getNullOrEmpty(){
@@ -73,5 +80,13 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     public boolean getNullOrEmptyConfigurationProvider(){
         return getNullOrEmpty();
+    }
+
+    public List<ConfigurationProvider> getConfigurationProviderList() {
+        return configurationProviderList;
+    }
+
+    public void setConfigurationProviderList(List<ConfigurationProvider> configurationProviderList) {
+        this.configurationProviderList = configurationProviderList;
     }
 }
