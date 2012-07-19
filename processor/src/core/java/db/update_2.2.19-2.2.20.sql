@@ -47,6 +47,7 @@ CREATE TABLE cf_product_groups
    GlobalVersion BIGINT DEFAULT NULL,
    DeletedState boolean NOT NULL DEFAULT false,
    ClassificationCode character varying(32) DEFAULT NULL,
+   IdOfConfigurationProvider bigint,
    OrgOwner BIGINT DEFAULT NULL,
    CreatedDate bigint NOT NULL,
    LastUpdate bigint,
@@ -90,6 +91,7 @@ CREATE TABLE cf_technological_map_groups
    DeletedState boolean NOT NULL DEFAULT false,
    OrgOwner BIGINT DEFAULT NULL,
    CreatedDate bigint NOT NULL,
+   IdOfConfigurationProvider bigint,
    LastUpdate bigint,
    DeleteDate bigint,
    CONSTRAINT cf_technological_map_groups_pk PRIMARY KEY (IdOfTechMapGroups )
@@ -150,6 +152,7 @@ CREATE TABLE cf_technological_map_products
   LastUpDate bigint,
   DeleteDate bigint,
   NameOfProduct character varying(256),
+  IdOfConfigurationProvider bigint,
   CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
   CONSTRAINT cf_technological_map_products_product FOREIGN KEY (IdOfProducts)
       REFERENCES cf_products (IdOfProducts),
@@ -209,6 +212,7 @@ CREATE TABLE cf_circuls
   idofclient bigint NOT NULL,
   idofpubl bigint NOT NULL,
   idoforg bigint NOT NULL,
+  idofissuable bigint NOT NULL,
   issuancedate bigint NOT NULL DEFAULT 0,
   refunddate bigint NOT NULL DEFAULT 0,
   realrefunddate bigint,
@@ -233,7 +237,6 @@ CREATE TABLE cf_circuls
   CONSTRAINT cf_circuls_guid_key UNIQUE (guid )
 );
 
--- скрипт дает ошибку
 CREATE TABLE cf_issuable
 (
   idofissuable bigserial NOT NULL,
