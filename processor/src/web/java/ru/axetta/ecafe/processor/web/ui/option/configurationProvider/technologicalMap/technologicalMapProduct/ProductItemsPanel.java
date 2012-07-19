@@ -78,7 +78,7 @@ public class ProductItemsPanel extends BasicPage {
     private List<Product> retrieveProduct(){
         String where="";
         if (StringUtils.isNotEmpty(filter)){
-            where = "where productName like '%"+filter+"%'";
+            where = "where UPPER(productName) like '%"+filter.toUpperCase()+"%'";
         }
         String query = "from Product "+ where + " order by id";
         return entityManager.createQuery(query, Product.class).getResultList();
