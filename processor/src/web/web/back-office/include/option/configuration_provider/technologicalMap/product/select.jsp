@@ -67,7 +67,7 @@
                 <td style="text-align: right;">
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Ok" action="#{productItemsPanel.addProducts}"
-                                           reRender="#{productItemsPanel.pageComponent.id}"
+                                           reRender="workspaceTogglePanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
                         <a4j:commandButton value="Отмена"
