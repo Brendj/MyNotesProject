@@ -14,23 +14,27 @@
              styleClass="borderless-grid" columns="1" rendered="#{productCreatePage.rendered}">
     <h:panelGrid columns="2">
 
-        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
         <h:selectOneMenu id="selectCurrentConfigurationProviderCreate" value="#{productCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{productCreatePage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
 
-        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentProductGroupCreate" value="#{productCreatePage.currentIdOfProductGroup}" styleClass="input-text long-field">
-            <f:selectItems value="#{productCreatePage.productGroupMenu.items}" />
-        </h:selectOneMenu>
+        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:outputText value="#{productCreatePage.currentProductGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; width: 370px; min-height: 18px; float: left; padding: 3px; border: 1px inset #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{productCreatePage.selectProductGroup}" reRender="productGroupSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
 
-        <h:outputText escape="true" value="Код" styleClass="output-text" />
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Код" styleClass="output-text required-field" />
         <h:inputText value="#{productCreatePage.product.code}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text" />
+        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text required-field" />
         <h:inputText value="#{productCreatePage.product.fullName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Товарное название" styleClass="output-text" />
+        <h:outputText escape="true" value="Товарное название" styleClass="output-text required-field" />
         <h:inputText value="#{productCreatePage.product.productName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text" />
+        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text required-field" />
         <h:inputText value="#{productCreatePage.product.okpCode}" maxlength="128" styleClass="input-text long-field" />
 
     </h:panelGrid>

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.gr
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 
+import javax.faces.component.UISelectItems;
 import javax.faces.model.SelectItem;
 import java.util.List;
 
@@ -21,10 +22,11 @@ public class ProductGroupMenu {
     private SelectItem[] items;
 
     public void readAllItems(List<ProductGroup> list) {
-        //List<ProductGroup> list = entityManager.createQuery("from ProductGroup",ProductGroup.class).getResultList();
         items = new SelectItem[list.size()];
         for (int i = 0; i < items.length; ++i) {
-            items[i] = new SelectItem(list.get(i).getGlobalId(),list.get(i).getNameOfGroup());
+            items[i] = new SelectItem();
+            items[i].setValue(list.get(i).getNameOfGroup());
+            items[i].setLabel(String.valueOf(list.get(i).getGlobalId()));
         }
     }
 

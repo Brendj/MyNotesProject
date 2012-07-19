@@ -19,10 +19,13 @@
             <f:selectItems value="#{productEditPage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
 
-        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentProductGroupEdit" value="#{productEditPage.currentIdOfProductGroup}" styleClass="input-text long-field">
-            <f:selectItems value="#{productEditPage.productGroupMenu.items}" />
-        </h:selectOneMenu>
+        <h:outputText escape="true" value="Группа продуктов" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:outputText value="#{productEditPage.currentProductGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; width: 370px; min-height: 18px; float: left; padding: 3px; border: 1px inset #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{productEditPage.selectProductGroup}" reRender="productGroupSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
 
         <h:outputText escape="true" value="Статус технологической карты" styleClass="output-text" />
         <h:selectOneListbox value="#{productEditPage.currentProduct.deletedState}" size="1">
