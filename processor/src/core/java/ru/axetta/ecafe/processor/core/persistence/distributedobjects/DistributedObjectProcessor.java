@@ -56,6 +56,7 @@ public class DistributedObjectProcessor {
         try {
             ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg, distributedObject.getClass());
             distributedObject.preProcess();
+            if(distributedObject instanceof IConfigProvider) ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
