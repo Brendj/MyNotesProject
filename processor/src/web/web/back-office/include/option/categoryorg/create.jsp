@@ -8,7 +8,7 @@
 <% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditRule())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
-
+<%--@elvariable id="categoryOrgCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgCreatePage"--%>
 <h:panelGrid id="categoryOrgCreateTable" binding="#{categoryOrgCreatePage.pageComponent}"
                  styleClass="borderless-grid" columns="2">
 
