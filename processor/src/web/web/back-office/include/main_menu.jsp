@@ -641,24 +641,30 @@
 
         </rich:panelMenuGroup>
 
+        <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
         <rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"
-                            binding="#{mainPage.configurationProviderListPage.mainMenuComponent}"
-                            action="#{mainPage.showConfigurationProviderListPage}" reRender="workspaceForm" />
+                            binding="#{configurationProviderListPage.mainMenuComponent}"
+                            action="#{configurationProviderListPage.show}" reRender="workspaceForm" />
 
+        <%--@elvariable id="configurationProviderCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage"--%>
         <rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Добавить"
-                            binding="#{mainPage.configurationProviderCreatePage.mainMenuComponent}"
-                            action="#{mainPage.showConfigurationProviderCreatePage}" reRender="workspaceForm" />
+                            binding="#{configurationProviderCreatePage.mainMenuComponent}"
+                            action="#{configurationProviderCreatePage.show}" reRender="workspaceForm" />
 
+        <%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
         <rich:panelMenuGroup id="selectedConfigurationProviderGroupMenu"
-                                 binding="#{mainPage.selectedConfigurationProviderGroupPage.mainMenuComponent}"
-                                 label="#{mainPage.selectedConfigurationProviderGroupPage.title}" rendered="false">
-            <a4j:support event="onclick" action="#{mainPage.showSelectedConfigurationProviderGroupPage}" reRender="workspaceForm" />
+                                 binding="#{selectedConfigurationProviderGroupPage.mainMenuComponent}"
+                                 label="#{selectedConfigurationProviderGroupPage.title}" rendered="false">
+            <a4j:support event="onclick" action="#{selectedConfigurationProviderGroupPage.show}" reRender="workspaceForm" />
 
+            <%--
             <rich:panelMenuItem id="configurationProviderViewMenuItem" binding="#{mainPage.configurationProviderViewPage.mainMenuComponent}"
                                 label="Просмотр" action="#{mainPage.showСonfigurationProviderViewPage}" reRender="workspaceForm" />
+            --%>
 
-            <rich:panelMenuItem id="configurationProviderEditMenuItem" binding="#{mainPage.configurationProviderEditPage.mainMenuComponent}"
-                                label="Редактирование" action="#{mainPage.showConfigurationProviderEditPage}"
+            <%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderEditPage"--%>
+            <rich:panelMenuItem id="configurationProviderEditMenuItem" binding="#{configurationProviderEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{configurationProviderEditPage.show}"
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
