@@ -83,6 +83,7 @@ public class ProductEditPage extends BasicWorkspacePage {
             }
 
             p.setProductGroup(DAOService.getInstance().findRefDistributedObject(ProductGroup.class,currentIdOfProductGroup));
+            DAOService.getInstance().setConfigurationProviderInDO(ProductGroup.class,currentIdOfProductGroup, currentIdOfConfigurationProvider);
             currentProduct = (Product) DAOService.getInstance().mergeDistributedObject(p, currentProduct.getGlobalVersion()+1);
             printMessage("Продукт сохранен успешно.");
         } catch (Exception e) {

@@ -4,14 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 
 import org.hibernate.Session;
 
@@ -26,7 +28,8 @@ import java.util.*;
  */
 public class OrgEditPage extends BasicWorkspacePage
         implements OrgSelectPage.CompleteHandler,// OrgListSelectPage.CompleteHandlerList,
-        CategoryOrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
+        CategoryOrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler,
+        ConfigurationProviderSelect {
 
     private Long idOfOrg;
     private String shortName;
@@ -60,7 +63,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReportsOnVisits;
     private String mailingListReports1;
     private String mailingListReports2;
-
+    private ConfigurationProvider configurationProvider;
+    private String configurationProviderName;
 
 
     public static class ContragentItem {
@@ -136,10 +140,21 @@ public class OrgEditPage extends BasicWorkspacePage
                 org.getCategories().add((CategoryOrg) object);
             }
         }
+
+        if(this.configurationProvider!=null){
+            ConfigurationProvider cp = (ConfigurationProvider) session.load(ConfigurationProvider.class, this.configurationProvider.getIdOfConfigurationProvider());
+            if(cp!=null){
+                org.setConfigurationProvider(cp);
+            }
+        }
+
+
         session.update(org);
         fill(org);
         /////
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
+        // save configuration provader
+        //DAOService.getInstance().setConfigurationProviderInOrg(idOfOrg,CONFIGURATION_PROVIDER);
     }
 
     private void fill(Org org) throws Exception {
@@ -180,6 +195,12 @@ public class OrgEditPage extends BasicWorkspacePage
                 idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
             this.filterOrg = stringBuilder.substring(0,stringBuilder.length()-2);
+        }
+
+        if(org.getConfigurationProvider()!=null){
+            this.configurationProviderName = org.getConfigurationProvider().getName();
+        } else {
+            this.configurationProviderName = "";
         }
     }
 
@@ -234,6 +255,19 @@ public class OrgEditPage extends BasicWorkspacePage
         }
     }
 
+    public Object showConfigurationProviderSelection() throws Exception{
+        RuntimeContext.getAppContext().getBean(ConfigurationProviderItemsPanel.class).reload();
+        RuntimeContext.getAppContext().getBean(ConfigurationProviderItemsPanel.class).pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        if(null != configurationProvider){
+            this.configurationProvider = configurationProvider;
+        }
+    }
+
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         this.menuExchangeSourceOrg = idOfOrg;
         reloadMenuExchangeSourceOrgName(session);
@@ -252,6 +286,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
     /* Getters and Setters */
+    public String getConfigurationProviderName() {
+        return configurationProviderName;
+    }
+
+    public void setConfigurationProviderName(String configurationProviderName) {
+        this.configurationProviderName = configurationProviderName;
+    }
+
     public String getINN() {
         return INN;
     }

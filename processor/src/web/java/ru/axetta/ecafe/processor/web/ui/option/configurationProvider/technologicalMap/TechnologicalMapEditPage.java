@@ -142,11 +142,13 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 DAOService.getInstance().deleteEntity(technologicalMapProduct);
             }
 
-            tm.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+            //tm.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
 
             tm.setTechnologicalMapGroup(DAOService.getInstance().findRefDistributedObject(TechnologicalMapGroup.class, currentIdOfTechnologicalMapGroup));
+            DAOService.getInstance().setConfigurationProviderInDO(TechnologicalMapGroup.class,currentIdOfTechnologicalMapGroup, currentIdOfConfigurationProvider);
 
             currTechnologicalMap = (TechnologicalMap) DAOService.getInstance().mergeDistributedObject(tm,tm.getGlobalVersion()+1);
+            DAOService.getInstance().setConfigurationProviderInDO(TechnologicalMap.class,currTechnologicalMap.getGlobalId(), currentIdOfConfigurationProvider);
 
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
                 if(technologicalMapProduct.getGlobalId()==null){
@@ -154,9 +156,11 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                     technologicalMapProduct.setGuid(UUID.randomUUID().toString());
                     technologicalMapProduct.setGlobalVersion(0L);
                     technologicalMapProduct.setTechnologicalMap(currTechnologicalMap);
+                    technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
                 } else {
                     technologicalMapProduct.setGlobalId(null);
                     technologicalMapProduct.setLastUpdate(new Date());
+                    technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
                     technologicalMapProduct.setGlobalVersion(technologicalMapProduct.getGlobalVersion()+1);
                 }
                 DAOService.getInstance().persistEntity(technologicalMapProduct);

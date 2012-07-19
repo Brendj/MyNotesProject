@@ -71,6 +71,9 @@ public class ProductCreatePage extends BasicWorkspacePage {
 
             product.setProductGroup(
                     DAOService.getInstance().findRefDistributedObject(ProductGroup.class, currentIdOfProductGroup));
+
+            DAOService.getInstance().setConfigurationProviderInDO(ProductGroup.class,currentIdOfProductGroup, currentIdOfConfigurationProvider);
+
             DAOService.getInstance().persistEntity(product);
             product = new Product();
             printMessage("Продукт сохранена успешно.");

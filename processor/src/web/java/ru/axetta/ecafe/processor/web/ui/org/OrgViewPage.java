@@ -5,10 +5,12 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage;
 
 import org.hibernate.Session;
 
@@ -53,6 +55,15 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports1;
     private String mailingListReports2;
     private List<CategoryOrg> categoryOrg;
+    private String configurationProviderName;
+
+    public String getConfigurationProviderName() {
+        return configurationProviderName;
+    }
+
+    public void setConfigurationProviderName(String configurationProviderName) {
+        this.configurationProviderName = configurationProviderName;
+    }
 
     public List<CategoryOrg> getCategoryOrg() {
         return categoryOrg;
@@ -203,10 +214,18 @@ public class OrgViewPage extends BasicWorkspacePage {
             menuExchangeSourceOrgName = menuExchangeSourceOrg.getShortName();
         }
 
+        ConfigurationProvider configurationProvider = org.getConfigurationProvider();
+        if (configurationProvider == null) {
+            configurationProviderName = "";
+        } else {
+           configurationProviderName = configurationProvider.getName();
+        }
+
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
         this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
+
     }
 
     public String getMailingListReportsOnNutrition() {
