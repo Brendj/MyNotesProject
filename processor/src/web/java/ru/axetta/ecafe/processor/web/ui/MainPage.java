@@ -313,11 +313,7 @@ public class MainPage {
     private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupsGroupPage = new BasicWorkspacePage();
-    private final TechnologicalMapCreatePage technologicalMapCreatePage = new TechnologicalMapCreatePage();
 
-    public TechnologicalMapCreatePage getTechnologicalMapCreatePage() {
-        return technologicalMapCreatePage;
-    }
 
     public BasicWorkspacePage getProductGroupsGroupPage() {
         return productGroupsGroupPage;
@@ -536,7 +532,7 @@ public class MainPage {
         return "logout";
     }
 
-    void updateSelectedMainMenu() {
+    public void updateSelectedMainMenu() {
         UIComponent mainMenuComponent = currentWorkspacePage.getMainMenuComponent();
         if (null != mainMenuComponent) {
             mainMenu.setValue(mainMenuComponent.getId());
@@ -6928,7 +6924,7 @@ public class MainPage {
         }
         return null;
     }
-
+                          /*
     public Object removeProductGuideItem() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6984,7 +6980,7 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
-
+                           /*
     public Object updateProductGuideListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7071,13 +7067,13 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
-
+                */
     public Object showConfigurationProviderGroupPage() {
         currentWorkspacePage = configurationProviderGroupPage;
         updateSelectedMainMenu();
         return null;
     }
-
+                  /*
     public Object removeСonfigurationProviderItem() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7101,7 +7097,6 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
-
     public Object showConfigurationProviderEditPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7242,7 +7237,7 @@ public class MainPage {
         }
         updateSelectedMainMenu();
         return null;
-    }
+    }                           */
 
     public void productGuideLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -7323,12 +7318,6 @@ public class MainPage {
 
     public Object showTechnologicalMapGroupsGroupPage() {
         currentWorkspacePage = technologicalMapGroupsGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object showTechnologicalMapCreatePage() {
-        currentWorkspacePage = technologicalMapCreatePage;
         updateSelectedMainMenu();
         return null;
     }
