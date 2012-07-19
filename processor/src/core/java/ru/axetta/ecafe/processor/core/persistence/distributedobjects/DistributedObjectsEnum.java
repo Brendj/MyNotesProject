@@ -13,24 +13,25 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  */
 /* TODO: надежнее будет сделать поле value типа Class */
 public enum DistributedObjectsEnum {
-    ProductGroup("ProductGroup",0),
-    TechnologicalMapGroup("TechnologicalMapGroup",0),
-    Product("Product", 1),
-    TechnologicalMap("TechnologicalMap", 1),
-    TechnologicalMapProduct("TechnologicalMapProduct", 2)/*,
-    Publication("Publication", 0),
-    Issuable("Issuable", 1),
-    Circulation("Circulation", 2)*/;
+    ProductGroup(ProductGroup.class,0),
+    TechnologicalMapGroup(TechnologicalMapGroup.class,0),
+    Product(Product.class, 1),
+    TechnologicalMap(TechnologicalMap.class, 1),
+    TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
+    Publication(Publication.class, 0),
+    Issuable(Issuable.class, 1),
+    Circulation(Circulation.class, 2);
 
-    private final String value;
+    private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */
     private final int priority;
 
-    private DistributedObjectsEnum(String value, int priority) {
-        this.value = value;
+    private DistributedObjectsEnum(Class<? extends DistributedObject> value, int priority) {
         this.priority = priority;
+        this.value = value;
     }
-    public String getValue() {
+
+    public Class<? extends DistributedObject> getValue() {
         return value;
     }
 
@@ -41,7 +42,7 @@ public enum DistributedObjectsEnum {
     public static DistributedObjectsEnum parse(String ids) {
         DistributedObjectsEnum distributedObjectsEnum = null; // Default
         for (DistributedObjectsEnum item : DistributedObjectsEnum.values()) {
-            if (item.getValue().equalsIgnoreCase(ids)) {
+            if (item.name().equalsIgnoreCase(ids)) {
                 distributedObjectsEnum = item;
                 break;
             }
@@ -50,10 +51,9 @@ public enum DistributedObjectsEnum {
     }
 
     public static DistributedObjectsEnum parse(Class clazz) {
-        DistributedObjectsEnum distributedObjectsEnum = null; // Default
-        String className = clazz.getSimpleName();
+        DistributedObjectsEnum distributedObjectsEnum = null;
         for (DistributedObjectsEnum item : DistributedObjectsEnum.values()) {
-            if (item.name().equalsIgnoreCase(className)) {
+            if (item.getValue().equals(clazz)) {
                 distributedObjectsEnum = item;
                 break;
             }
