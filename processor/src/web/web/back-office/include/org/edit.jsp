@@ -99,6 +99,16 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
+
+    <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.orgEditPage.configurationProviderName}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.orgEditPage.showConfigurationProviderSelection}" reRender="configurationProviderSelectModalPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Сменить пароль для единого входа" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeSsoPassword}" styleClass="output-text">
         <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />

@@ -82,6 +82,9 @@
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text" />
 
+    <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.configurationProviderName}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReportsOnNutrition}" styleClass="input-text long-field" />
 
