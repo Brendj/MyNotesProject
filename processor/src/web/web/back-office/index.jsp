@@ -21,12 +21,16 @@
 
 <body style="margin: 4px; padding: 0;">
 
-<f:view>
+<f:view>           z
     <rich:simpleTogglePanel rendered="false" />
 
     <rich:fileUpload rendered="false" />
 
     <rich:calendar rendered="false" />
+
+    <f:subview id="configurationProviderSelectSubView">
+        <c:import url="include/option/configuration_provider/select.jsp" />
+    </f:subview>
 
     <f:subview id="productSelectSubView">
         <c:import url="include/option/configuration_provider/product/confirm_delete.jsp" />
