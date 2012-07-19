@@ -88,7 +88,7 @@ public class DistributionManager {
             distributedObjects = distributedObjectsListMap.get(key);
             for (int i = 0; i < distributedObjects.size(); i++) {
                 DistributedObject distributedObject = distributedObjects.get(i);
-                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
                 if (!elementMap.containsKey(tagName)) {
                     Element distributedObjectElement = document.createElement(tagName);
                     confirmElement.appendChild(distributedObjectElement);
@@ -121,7 +121,7 @@ public class DistributionManager {
         for (int i = 0; i < array.length; i++) {
             String name = array[i].name();
             List<DistributedObject> distributedObjectList = DAOService.getInstance()
-                    .getDistributedObjects(name, currentMaxVersions.get(name), idOfOrg);
+                    .getDistributedObjects(array[i].getValue(), currentMaxVersions.get(name), idOfOrg);
             if (!distributedObjectList.isEmpty()) {
                 distributedObjects.addAll(distributedObjectList);
             }
@@ -148,7 +148,7 @@ public class DistributionManager {
         }
 
         for (DistributedObject distributedObject : distributedObjects) {
-            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).getValue();
+            tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
             if (!elementMap.containsKey(tagName)) {
                 Element distributedObjectElement = document.createElement(tagName);
                 elementRO.appendChild(distributedObjectElement);
@@ -222,7 +222,7 @@ public class DistributionManager {
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
                 // При обработке в
                 String attrValue = getAttributeValue(node, "V");
-                currentMaxVersions.put(currentObject.getValue(), Long.parseLong(getAttributeValue(node, "V")));
+                currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
                 // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
                 /*if(node.getFirstChild()!=null){
                     DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
@@ -272,14 +272,9 @@ public class DistributionManager {
 
 
     private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception {
-        /*DistributedObject distributedObject=null;
-        switch (distributedObjectsEnum){
-            case Product: distributedObject = new Product(); break;
-            case TechnologicalMap: distributedObject = new TechnologicalMap(); break;
-            case TechnologicalMapProduct: distributedObject = new TechnologicalMapProduct(); break;
-        }*/
-        String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects." + distributedObjectsEnum.name();
-        Class cl = Class.forName(name);
+        /*String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects." + distributedObjectsEnum.name();
+        Class cl = Class.forName(name);*/
+        Class cl = distributedObjectsEnum.getValue();
         return (DistributedObject) cl.newInstance();
     }
 
