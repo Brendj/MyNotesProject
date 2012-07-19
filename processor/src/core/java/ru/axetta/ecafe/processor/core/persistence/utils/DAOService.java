@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +32,15 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    @Transactional
+    public void setConfigurationProviderInDO(Class<? extends IConfigProvider> clazz,Long id, Long idOfConfigurationProvider){
+        IConfigProvider distributedObject = em.find(clazz, id);
+        if(distributedObject!=null){
+            distributedObject.setIdOfConfigurationProvider(idOfConfigurationProvider);
+            distributedObject = em.merge(distributedObject);
+        }
     }
 
     @Transactional
@@ -56,7 +67,9 @@ public class DAOService {
     public <T> T findDistributedObjectByRefGUID(Class<T> clazz, String guid){
         TypedQuery<T> query = em.createQuery("from "+clazz.getSimpleName()+" where guid='"+guid+"'",clazz);
         List<T> list = query.getResultList();
-        if(list.isEmpty()) return null;
+        if (list.isEmpty()) {
+            return null;
+        }
         return list.get(0);
     }
 
@@ -69,7 +82,9 @@ public class DAOService {
     public Product findProductByGUID(Class<Product> productClass, String stringRefGUID) {
         TypedQuery<Product> query = em.createQuery("from Product where guid='"+stringRefGUID+"'", Product.class);
         List<Product> productList = query.getResultList();
-        if(productList.isEmpty()) return null;
+        if (productList.isEmpty()) {
+            return null;
+        }
         return productList.get(0);
     }
 
@@ -93,28 +108,51 @@ public class DAOService {
     }
 
     @Transactional
-    public List<DistributedObject> getDistributedObjects(String className, Long currentMaxVersion,Long orgOwner){
-        TypedQuery<DistributedObject> query ;
-        if(orgOwner==null){
+    public ConfigurationProvider getConfigurationProvider(Long orgOwner, Class<? extends DistributedObject> clazz) throws Exception{
+        List list = Arrays.asList(clazz.getInterfaces());
+        ConfigurationProvider configurationProvider = null;
+        if(list.contains(IConfigProvider.class)){
+            TypedQuery<ConfigurationProvider> configurationProviderQuery = em.createQuery("select configurationProvider from Org where idOfOrg=:idOfOrg", ConfigurationProvider.class);
+            configurationProviderQuery.setParameter("idOfOrg",orgOwner);
+            List<ConfigurationProvider> configurationProviders = configurationProviderQuery.getResultList();
+            /* Если есть конфигурация синхронизируемой организации */
+            if(configurationProviders==null || configurationProviders.isEmpty()){
+                configurationProviderQuery = em.createQuery("select configurationProvider from Org where idOfOrg=(Select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg)", ConfigurationProvider.class);
+                configurationProviderQuery.setParameter("idOfOrg",orgOwner);
+                configurationProviders = configurationProviderQuery.getResultList();
+                if(!(configurationProviders==null || configurationProviders.isEmpty())) configurationProvider = configurationProviders.get(0);
+            } else {
+                configurationProvider = configurationProviders.get(0);
+            }
+            if(configurationProvider == null) {
+                //return new ArrayList<DistributedObject>(0);
+                // При выбрасывании исключения падает вся синхронизация как быть с библиотекой?
+                throw new DistributedObjectException(DistributedObjectException.ErrorType.CONFIGURATION_PROVIDER_NOT_FOUND);
+            }
+        }
+        return configurationProvider;
+    }
 
-            if(currentMaxVersion==null){
-                query = em.createQuery("from "+className+" order by globalId",DistributedObject.class); }
-            else{
-                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion order by globalId",DistributedObject.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-            }
-        }else{
-            if(currentMaxVersion==null){
-                query = em.createQuery("from "+className+" where (orgOwner=:orgOwner or orgOwner = NULL) order by globalId",DistributedObject.class);
-                query.setParameter("orgOwner",orgOwner);
-            }
-            else{
-                query=em.createQuery("from "+className+" where globalVersion>:currentMaxVersion and (orgOwner=:orgOwner or orgOwner = NULL) order by globalId",DistributedObject.class);
-                query.setParameter("currentMaxVersion",currentMaxVersion);
-                query.setParameter("orgOwner",orgOwner);
+    @Transactional
+    public List<DistributedObject> getDistributedObjects(Class<? extends DistributedObject> clazz, Long currentMaxVersion,Long orgOwner) throws Exception{
+        TypedQuery<DistributedObject> query ;
+        String where = "";
+
+        if(orgOwner != null){
+            List list = Arrays.asList(clazz.getInterfaces());
+            if(list.contains(IConfigProvider.class)){
+                ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
+                where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+            }  else {
+                where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
             }
 
         }
+        if(currentMaxVersion != null){
+            where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
+        }
+        String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
+        query = em.createQuery(select, DistributedObject.class);
         return  query.getResultList();
     }
 
@@ -152,7 +190,9 @@ public class DAOService {
     public Long getDistributedObjectVersion(DistributedObject distributedObject) {
         TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
         List<DistributedObject> distributedObjectList = query.getResultList();
-        if(distributedObjectList.isEmpty()) return null;
+        if (distributedObjectList.isEmpty()) {
+            return null;
+        }
         return distributedObjectList.get(0).getGlobalVersion();
     }
 
@@ -174,7 +214,9 @@ public class DAOService {
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion){
         TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
         List<DistributedObject> distributedObjectList = query.getResultList();
-        if(distributedObjectList.isEmpty()) return null;
+        if (distributedObjectList.isEmpty()) {
+            return null;
+        }
         DistributedObject d = em.find(distributedObject.getClass(),distributedObjectList.get(0).getGlobalId());
         d.fill(distributedObject);
         d.setGlobalVersion(globalVersion);
@@ -191,20 +233,26 @@ public class DAOService {
     @Transactional
     public Long getClientContractIdByCardId(String idOfCard) throws Exception {
         Client cl = DAOUtils.findClientByCardNo(em, Long.decode(idOfCard));
-        if (cl==null) return null;
+        if (cl == null) {
+            return null;
+        }
         return cl.getContractId();
     }
 
     @Transactional
     public void deleteEntity(Object entity) {
         entity = em.merge(entity);
-        if (entity!=null) em.remove(entity);
+        if (entity != null) {
+            em.remove(entity);
+        }
     }
 
     @Transactional
     public Long getContractIdByCardNo(long lCardId) throws Exception {
         Client client = DAOUtils.findClientByCardNo(em, lCardId);
-        if (client!=null) return client.getContractId();
+        if (client != null) {
+            return client.getContractId();
+        }
         return null;
     }
 
@@ -247,7 +295,9 @@ public class DAOService {
         Query q = em.createQuery("from Org where idOfOrg = :idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);
         List l = q.getResultList();
-        if (l.size()==0) return null;
+        if (l.size() == 0) {
+            return null;
+        }
         return (Org)l.get(0);
     }
 
@@ -259,14 +309,18 @@ public class DAOService {
     @Transactional
     public Client getClientByContractId(long contractId) throws Exception {
         Client cl = DAOUtils.findClientByContractId(em, contractId);
-        if (cl==null) return null;
+        if (cl == null) {
+            return null;
+        }
         return cl;
     }
 
     @Transactional
     public void addIntegraPartnerAccessPermissionToClient(Long idOfClient, String idOfIntegraPartner) throws Exception {
         Client cl = em.find(Client.class, idOfClient);
-        if (cl==null) throw new Exception("Client not found: "+idOfClient);
+        if (cl == null) {
+            throw new Exception("Client not found: " + idOfClient);
+        }
         cl.addIntegraPartnerAccessPermission(idOfIntegraPartner);
         em.persist(cl);
     }

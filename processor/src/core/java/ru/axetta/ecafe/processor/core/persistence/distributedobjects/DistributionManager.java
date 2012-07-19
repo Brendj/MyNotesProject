@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.slf4j.Logger;
@@ -120,8 +121,16 @@ public class DistributionManager {
         distributedObjects = new ArrayList<DistributedObject>();
         for (int i = 0; i < array.length; i++) {
             String name = array[i].name();
-            List<DistributedObject> distributedObjectList = DAOService.getInstance()
-                    .getDistributedObjects(array[i].getValue(), currentMaxVersions.get(name), idOfOrg);
+            List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>(0);
+            try{
+                distributedObjectList = DAOService.getInstance()
+                        .getDistributedObjects(array[i].getValue(), currentMaxVersions.get(name), idOfOrg);
+            } catch (DistributedObjectException e){
+                Element element = document.createElement(array[i].name());
+                element.setAttribute("errorType",String.valueOf(e.getType()));
+                elementRO.appendChild(element);
+                continue;
+            }
             if (!distributedObjectList.isEmpty()) {
                 distributedObjects.addAll(distributedObjectList);
             }
@@ -209,7 +218,6 @@ public class DistributionManager {
      * @throws Exception
      */
     public void build(Node node, Long idOfOrg) throws Exception {
-        //distributedObjects.clear();
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             if(node.getNodeName().equals("Confirm")){
                 Node childNode = node.getFirstChild();
@@ -220,7 +228,6 @@ public class DistributionManager {
             } else {
                 DistributedObjectsEnum currentObject = null;
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-                // При обработке в
                 String attrValue = getAttributeValue(node, "V");
                 currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
                 // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
@@ -272,8 +279,6 @@ public class DistributionManager {
 
 
     private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception {
-        /*String name = "ru.axetta.ecafe.processor.core.persistence.distributedobjects." + distributedObjectsEnum.name();
-        Class cl = Class.forName(name);*/
         Class cl = distributedObjectsEnum.getValue();
         return (DistributedObject) cl.newInstance();
     }

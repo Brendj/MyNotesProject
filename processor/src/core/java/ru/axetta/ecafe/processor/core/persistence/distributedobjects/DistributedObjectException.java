@@ -16,7 +16,8 @@ public class DistributedObjectException extends Exception {
     public enum ErrorType{
         UNKNOWN_ERROR(1),
         DUPLICATE_VALUE(2),
-        NOT_FOUND_VALUE(3);
+        NOT_FOUND_VALUE(3),
+        CONFIGURATION_PROVIDER_NOT_FOUND(4);
 
         Integer value;
 

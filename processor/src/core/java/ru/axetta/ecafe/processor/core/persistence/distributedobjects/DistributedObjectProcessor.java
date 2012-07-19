@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class DistributedObjectProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg, Document document) {
         try {
+            ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg, distributedObject.getClass());
             distributedObject.preProcess();
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {

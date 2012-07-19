@@ -179,7 +179,7 @@ ALTER TABLE cf_orgs ADD COLUMN IdOfConfigurationProvider bigint;
 
 CREATE TABLE cf_publs
 (
-  idofpubl bigint NOT NULL,
+  idofpubl BigSerial NOT NULL,
   data text,
   author character varying(255),
   title character varying(512),
@@ -208,7 +208,7 @@ CREATE INDEX cf_publ_idx
 
 CREATE TABLE cf_circuls
 (
-  idofcircul bigint NOT NULL,
+  idofcircul BigSerial NOT NULL,
   idofclient bigint NOT NULL,
   idofpubl bigint NOT NULL,
   idoforg bigint NOT NULL,
@@ -239,7 +239,7 @@ CREATE TABLE cf_circuls
 
 CREATE TABLE cf_issuable
 (
-  idofissuable bigserial NOT NULL,
+  idofissuable BigSerial NOT NULL,
   barcode bigint,
   type character(1) NOT NULL DEFAULT 'i',
   idofpubl bigint NOT NULL,
