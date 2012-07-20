@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -77,7 +78,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     }
 
     @Override
-    public void preProcess() throws DistributedObjectException{
+    public void preProcess() throws DistributedObjectException {
         Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
         TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
         if(tm==null || p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);

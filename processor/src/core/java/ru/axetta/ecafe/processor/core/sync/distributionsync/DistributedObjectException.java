@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
+package ru.axetta.ecafe.processor.core.sync.distributionsync;
 
 /**
  * Created with IntelliJ IDEA.

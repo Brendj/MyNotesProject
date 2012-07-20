@@ -4,9 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;

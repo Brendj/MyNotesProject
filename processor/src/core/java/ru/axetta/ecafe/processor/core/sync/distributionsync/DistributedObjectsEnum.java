@@ -2,7 +2,9 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
+package ru.axetta.ecafe.processor.core.sync.distributionsync;
+
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,11 +15,11 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  */
 /* TODO: надежнее будет сделать поле value типа Class */
 public enum DistributedObjectsEnum {
-    ProductGroup(ProductGroup.class,0),
-    TechnologicalMapGroup(TechnologicalMapGroup.class,0),
-    Product(Product.class, 1),
-    TechnologicalMap(TechnologicalMap.class, 1),
-    TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
+    ProductGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup.class,0),
+    TechnologicalMapGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup.class,0),
+    Product(ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product.class, 1),
+    TechnologicalMap(ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap.class, 1),
+    TechnologicalMapProduct(ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct.class, 2),
     Publication(Publication.class, 0),
     Issuable(Issuable.class, 1),
     Circulation(Circulation.class, 2);

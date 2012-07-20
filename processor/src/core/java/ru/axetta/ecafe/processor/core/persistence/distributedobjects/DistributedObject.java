@@ -4,14 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import org.w3c.dom.Document;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -90,7 +87,7 @@ public abstract class DistributedObject{
         return parseAttributes(node);
     }
 
-    public void preProcess() throws DistributedObjectException{}
+    public void preProcess() throws DistributedObjectException {}
 
     protected abstract DistributedObject parseAttributes(Node node) throws ParseException;
 

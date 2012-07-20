@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -253,7 +254,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     }
 
     @Override
-    public void preProcess() throws DistributedObjectException{
+    public void preProcess() throws DistributedObjectException {
         TechnologicalMapGroup tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMapGroup.class, guidOfTMG);
         if(tmg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setTechnologicalMapGroup(tmg);

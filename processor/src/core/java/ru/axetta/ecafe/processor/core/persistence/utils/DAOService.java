@@ -7,13 +7,14 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

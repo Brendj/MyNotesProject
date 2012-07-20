@@ -2,10 +2,13 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
+package ru.axetta.ecafe.processor.core.sync.distributionsync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.slf4j.Logger;

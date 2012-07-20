@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -61,6 +59,13 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
     }
 
     public String getNameOfGroup() {
+        return nameOfGroup;
+    }
+
+    public String getShortNameOfGroup() {
+        if(nameOfGroup.length()>35){
+            return nameOfGroup.substring(0,32)+"...";
+        }
         return nameOfGroup;
     }
 

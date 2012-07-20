@@ -16,9 +16,9 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObjectsEnum;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObjectsEnumComparator;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributionManager;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -37,7 +37,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**

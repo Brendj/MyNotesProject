@@ -6,12 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +19,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 
-public class Product extends DistributedObject implements IConfigProvider{
+public class Product extends DistributedObject implements IConfigProvider {
 
     private String code;
     private String fullName;
@@ -73,7 +71,7 @@ public class Product extends DistributedObject implements IConfigProvider{
     }
 
     @Override
-    public void preProcess() throws DistributedObjectException{
+    public void preProcess() throws DistributedObjectException {
         ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
         if(pg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setProductGroup(pg);
