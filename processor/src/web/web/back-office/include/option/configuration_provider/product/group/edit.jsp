@@ -13,13 +13,15 @@
 <h:panelGrid id="productGroupEditPanelGrid" binding="#{productGroupEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Наименование группы технологическох карт" styleClass="output-text" />
-        <h:inputText value="#{productGroupEditPage .currentProductGroup.nameOfGroup}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field" />
+        <h:inputTextarea value="#{productGroupEditPage.currentProductGroup.nameOfGroup}" cols="128" rows="4" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectOneListbox value="#{productGroupEditPage.currentProductGroup.deletedState}" size="1">
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
             <f:selectItem itemLabel="Удален" itemValue="true"/>
         </h:selectOneListbox>
+        <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
+        <h:inputText value="#{productGroupEditPage.currentProductGroup.сlassificationCode}" maxlength="32" styleClass="input-text long-field" />
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid">

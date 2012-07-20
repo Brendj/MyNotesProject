@@ -13,8 +13,10 @@
 <h:panelGrid id="productGroupCreatePanelGrid" binding="#{productGroupCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
-        <h:inputText value="#{productGroupCreatePage.productGroup.nameOfGroup}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field" />
+        <h:inputTextarea value="#{productGroupCreatePage.productGroup.nameOfGroup}" cols="128" rows="4" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
+        <h:inputText value="#{productGroupCreatePage.productGroup.сlassificationCode}" maxlength="32" styleClass="input-text long-field" />
     </h:panelGrid>
 
 </h:panelGrid>

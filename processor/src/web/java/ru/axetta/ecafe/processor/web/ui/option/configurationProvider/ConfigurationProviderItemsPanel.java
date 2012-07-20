@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
 
     private final Stack<ConfigurationProviderSelect> completeHandlerLists = new Stack<ConfigurationProviderSelect>();
 
-    private List<ConfigurationProvider> configurationProviderList = new ArrayList<ConfigurationProvider>();
-    private ConfigurationProvider selectConfigurationProvider = new ConfigurationProvider();
-    private String filter="";
+    private List<ConfigurationProvider> configurationProviderList;
+    private ConfigurationProvider selectConfigurationProvider;
+    private String filter;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -55,8 +56,11 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
         return null;
     }
 
+    @PostConstruct
     public void reload() throws Exception {
-        configurationProviderList = retrieveProduct();
+        configurationProviderList = new ArrayList<ConfigurationProvider>();
+        selectConfigurationProvider = new ConfigurationProvider();
+        filter="";
     }
 
     public Object updateConfigurationProviderSelectPage(){

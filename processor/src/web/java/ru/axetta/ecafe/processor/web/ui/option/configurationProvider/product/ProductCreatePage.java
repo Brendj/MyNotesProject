@@ -4,26 +4,25 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -35,45 +34,63 @@ import java.util.UUID;
  */
 @Component
 @Scope("session")
-public class ProductCreatePage extends BasicWorkspacePage implements ProductGroupSelect {
+public class ProductCreatePage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductCreatePage.class);
-    private Product product = new Product();
-    private Long currentIdOfConfigurationProvider;
+    private static final Logger logger = LoggerFactory.getLogger(ProductCreatePage.class);
+    private Product product;
+    private ConfigurationProvider currentConfigurationProvider;
     private ProductGroup currentProductGroup;
-    private ConfigurationProviderMenu configurationProviderMenu = new ConfigurationProviderMenu();
-    private ProductGroupMenu productGroupMenu = new ProductGroupMenu();
-    private List<ConfigurationProvider> configurationProviderList;
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private ProductGroupItemsPanel productGroupItemsPanel;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onShow() throws Exception {
-        configurationProviderList = DAOService.getInstance().getDistributedObjects(
-                ConfigurationProvider.class);
-
-        if(getRendered()){
-            configurationProviderMenu.readAllItems(configurationProviderList);
-        } else {
-            printError("Отсутсвуют поставщики продуктов.");
-        }
+        reload();
     }
+
+    private void reload() {
+        product = new Product();
+        currentConfigurationProvider = null;
+        currentProductGroup = null;
+    }
+
     public Object onSave(){
         try {
+            if(currentConfigurationProvider==null){
+                printError("Поле 'Производственная конфигурация' обязательное.");
+                return null;
+            }
+            if(currentProductGroup==null){
+                printError("Поле 'Группа продуктов' обязательное.");
+                return null;
+            }
+            if(product.getFullName()==null || product.getFullName().equals("")){
+                printError("Поле 'Полное наименование пищевого продукта' обязательное.");
+                return null;
+            }
+            if(product.getProductName()==null || product.getProductName().equals("")){
+                printError("Поле 'Товарное название' обязательное.");
+                return null;
+            }
             product.setCreatedDate(new Date());
             product.setDeletedState(false);
             product.setGuid(UUID.randomUUID().toString());
-            product.setGlobalVersion(0L);
-            product.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+            product.setGlobalVersion(daoService.getVersionByDistributedObjects(Product.class));
+            product.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
 
             MainPage mainPage = MainPage.getSessionInstance();
             product.setUserCreate(mainPage.getCurrentUser());
-
             product.setProductGroup(currentProductGroup);
-            DAOService.getInstance().setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(), currentIdOfConfigurationProvider);
+            daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
+                    currentConfigurationProvider.getIdOfConfigurationProvider());
 
-            DAOService.getInstance().persistEntity(product);
-            product = new Product();
+            daoService.persistEntity(product);
+            currentConfigurationProvider = new ConfigurationProvider();
+            reload();
             printMessage("Продукт сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии продукта.");
@@ -82,9 +99,28 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         return null;
     }
 
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        if(configurationProvider!=null){
+            currentConfigurationProvider = configurationProvider;
+        }
+    }
+
     public Object selectProductGroup() throws Exception{
-        RuntimeContext.getAppContext().getBean(ProductGroupItemsPanel.class).reload();
-        RuntimeContext.getAppContext().getBean(ProductGroupItemsPanel.class).pushCompleteHandler(RuntimeContext.getAppContext().getBean(getClass()));
+        productGroupItemsPanel.reload();
+        if(currentProductGroup!=null){
+            productGroupItemsPanel.setSelectProductGroup(currentProductGroup);
+        }
+        productGroupItemsPanel.pushCompleteHandler(this);
         return null;
     }
 
@@ -99,28 +135,16 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         return currentProductGroup;
     }
 
-    public boolean getRendered(){
-        return !(configurationProviderList==null || configurationProviderList.isEmpty());
-    }
-
     public String getPageFilename() {
         return "option/configuration_provider/product/create";
     }
 
-    public ProductGroupMenu getProductGroupMenu() {
-        return productGroupMenu;
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
     }
 
-    public void setProductGroupMenu(ProductGroupMenu productGroupMenu) {
-        this.productGroupMenu = productGroupMenu;
-    }
-
-    public Long getCurrentIdOfConfigurationProvider() {
-        return currentIdOfConfigurationProvider;
-    }
-
-    public void setCurrentIdOfConfigurationProvider(Long currentIdOfConfigurationProvider) {
-        this.currentIdOfConfigurationProvider = currentIdOfConfigurationProvider;
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 
     public Product getProduct() {
@@ -131,11 +155,4 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         this.product = product;
     }
 
-    public ConfigurationProviderMenu getConfigurationProviderMenu() {
-        return configurationProviderMenu;
-    }
-
-    public void setConfigurationProviderMenu(ConfigurationProviderMenu configurationProviderMenu) {
-        this.configurationProviderMenu = configurationProviderMenu;
-    }
 }

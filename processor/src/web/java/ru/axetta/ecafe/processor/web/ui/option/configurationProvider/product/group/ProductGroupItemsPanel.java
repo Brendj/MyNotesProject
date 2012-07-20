@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ public class ProductGroupItemsPanel extends BasicPage {
 
     private final Stack<ProductGroupSelect> completeHandlerLists = new Stack<ProductGroupSelect>();
 
-    private List<ProductGroup> productGroupList = new ArrayList<ProductGroup>();
-    private ProductGroup selectProductGroup = new ProductGroup();
-    private String filter="";
+    private List<ProductGroup> productGroupList;
+    private ProductGroup selectProductGroup;
+    private String filter;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -52,9 +53,11 @@ public class ProductGroupItemsPanel extends BasicPage {
         return null;
     }
 
+    @PostConstruct
     public void reload() throws Exception {
-        productGroupList = retrieveProduct();
-        selectProductGroup = new ProductGroup();
+         productGroupList = new ArrayList<ProductGroup>();
+         selectProductGroup = new ProductGroup();
+         filter="";
     }
 
     public Object updateConfigurationProviderSelectPage(){

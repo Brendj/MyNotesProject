@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGrou
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,23 +29,25 @@ import javax.persistence.PersistenceContext;
 @Scope("session")
 public class ProductGroupEditPage extends BasicWorkspacePage {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductGroupEditPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductGroupEditPage.class);
     private ProductGroup currentProductGroup;
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onShow() throws Exception {
-        //RuntimeContext.getAppContext().getBean(getClass()).reload();
         currentProductGroup = entityManager.merge(currentProductGroup);
-
     }
 
     public Object onSave(){
         try {
-            //RuntimeContext.getAppContext().getBean(getClass()).save();
-            //currentProductGroup = entityManager.merge(currentProductGroup);
-            currentProductGroup = (ProductGroup) DAOService.getInstance().mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
+            if(currentProductGroup.getNameOfGroup() == null || currentProductGroup.getNameOfGroup().equals("")){
+                printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
+            currentProductGroup = (ProductGroup) daoService.mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
             printMessage("Группа для продуктов сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении группы для продуктов.");
@@ -69,14 +73,8 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
     }
 
     @Transactional
-    private void reload() throws Exception{
-        //currentProductGroup = entityManager.find(ProductGroup.class, currentProductGroup.getGlobalId());
-        currentProductGroup = entityManager.merge(currentProductGroup);
-    }
-
-    @Transactional
     private void save() throws Exception{
-        currentProductGroup = (ProductGroup) DAOService.getInstance().mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
+        currentProductGroup = (ProductGroup) daoService.mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
     }
 
     public String getPageFilename() {

@@ -21,7 +21,7 @@
 
 <body style="margin: 4px; padding: 0;">
 
-<f:view>           z
+<f:view>
     <rich:simpleTogglePanel rendered="false" />
 
     <rich:fileUpload rendered="false" />

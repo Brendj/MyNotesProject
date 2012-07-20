@@ -10,24 +10,29 @@
 
 <%-- Панель создания правила --%>
 <%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage"--%>
-<h:panelGrid id="productEditPanelGrid" binding="#{productEditPage.pageComponent}"
-             styleClass="borderless-grid" columns="1" rendered="#{productEditPage.rendered}">
+<h:panelGrid id="productEditPanelGrid" binding="#{productEditPage.pageComponent}" styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
 
-        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:selectOneMenu id="selectCurrentConfigurationProviderEdit" value="#{productEditPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
-            <f:selectItems value="#{productEditPage.configurationProviderMenu.items}" />
-        </h:selectOneMenu>
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:outputText value="#{productEditPage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{productEditPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+
+        </h:panelGroup>
+
+
 
         <h:outputText escape="true" value="Группа продуктов" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
-            <h:outputText value="#{productEditPage.currentProductGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; width: 370px; min-height: 18px; float: left; padding: 3px; border: 1px inset #EEE; background-color: #ffffff;" />
+            <h:outputText value="#{productEditPage.currentProductGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
             <a4j:commandButton value="..." action="#{productEditPage.selectProductGroup}" reRender="productGroupSelectModalPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.show();"
                                styleClass="command-link" style="width: 25px; float: right;" />
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Статус технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectOneListbox value="#{productEditPage.currentProduct.deletedState}" size="1">
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
             <f:selectItem itemLabel="Удален" itemValue="true"/>
@@ -35,13 +40,14 @@
 
         <h:outputText escape="true" value="Код" styleClass="output-text" />
         <h:inputText value="#{productEditPage.currentProduct.code}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text" />
+        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text required-field" />
         <h:inputText value="#{productEditPage.currentProduct.fullName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Товарное название" styleClass="output-text" />
+        <h:outputText escape="true" value="Товарное название" styleClass="output-text required-field" />
         <h:inputText value="#{productEditPage.currentProduct.productName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text" />
+        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text required-field" />
         <h:inputText value="#{productEditPage.currentProduct.okpCode}" maxlength="128" styleClass="input-text long-field" />
-
+        <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
+        <h:inputText value="#{productEditPage.currentProduct.classificationCode}" maxlength="32" styleClass="input-text long-field" />
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

@@ -8,12 +8,12 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGrou
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.UUID;
 
@@ -28,21 +28,28 @@ import java.util.UUID;
 @Scope("session")
 public class ProductGroupCreatePage extends BasicWorkspacePage {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductGroupCreatePage.class);
-    private ProductGroup productGroup = new ProductGroup();
-    @PersistenceContext
-    private EntityManager entityManager;
+    private static final Logger logger = LoggerFactory.getLogger(ProductGroupCreatePage.class);
+    private ProductGroup productGroup;
+    @Autowired
+    private DAOService daoService;
 
     @Override
-    public void onShow() throws Exception {}
+    public void onShow() throws Exception {
+        productGroup = new ProductGroup();
+    }
 
     public Object onSave(){
         try {
+            if(productGroup.getNameOfGroup() == null || productGroup.getNameOfGroup().equals("")){
+                printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
             productGroup.setCreatedDate(new Date());
             productGroup.setDeletedState(false);
             productGroup.setGuid(UUID.randomUUID().toString());
-            productGroup.setGlobalVersion(0L);
-            DAOService.getInstance().persistEntity(productGroup);
+
+            productGroup.setGlobalVersion(daoService.getVersionByDistributedObjects(ProductGroup.class));
+            daoService.persistEntity(productGroup);
             printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии группы.");

@@ -18,11 +18,9 @@
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">
-                    <h:panelGrid styleClass="borderless-grid"><%--
-                        <h:inputText value="#{productGroupItemsPanel.selectProductGroup.nameOfGroup}" readonly="true" size="64"
-                                     styleClass="input-text" />--%>
+                    <h:panelGrid styleClass="borderless-grid">
                         <h:outputText value="#{productGroupItemsPanel.selectProductGroup.nameOfGroup}"  styleClass="output-text"
-                                      style="margin-right: 2px; width: 447px; float:left; min-height: 22px; padding: 3px; border: 1px inset #EEE; background-color: #ffffff;" />
+                                      style="margin-right: 2px; margin-top: 2px; width: 447px; float:left; min-height: 14px; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
                     </h:panelGrid>
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />

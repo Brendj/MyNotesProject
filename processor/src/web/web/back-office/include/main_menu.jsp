@@ -563,11 +563,15 @@
                 <rich:panelMenuItem id="createProductGroupsMenuItem" label="Добавить"
                                     binding="#{productGroupCreatePage.mainMenuComponent}"
                                     action="#{productGroupCreatePage.show}" reRender="workspaceForm" />
+                <%--@elvariable id="selectedProductGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupGroupPage"--%>
+                <rich:panelMenuGroup id="selectedProductGroupGroupMenu"
+                                         binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
+                                         label="#{selectedProductGroupGroupPage.title}" rendered="false">
+                        <a4j:support event="onclick" action="#{selectedProductGroupGroupPage.show}" reRender="workspaceForm" />
 
-                <rich:panelMenuGroup id="selectedProductGroupsGroupMenu" label="#{productGroupEditPage.currentProductGroup.nameOfGroup}"
-                                     rendered="false">  <%--
-            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                                                   --%>
+                        <%--
+<a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
+                        --%>
                     <rich:panelMenuItem id="viewProductGroupsMenuItem" label="Редактирование"
                                         binding="#{productGroupEditPage.mainMenuComponent}"
                                         action="#{productGroupEditPage.show}" reRender="workspaceForm" />
@@ -581,9 +585,9 @@
             <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
             <rich:panelMenuItem id="productCreateMenuItem" label="Добавить"
                                 binding="#{productCreatePage.mainMenuComponent}"
-                                action="#{productCreatePage.show}" reRender="workspaceForm" rendered="#{!(productGroupListPage.nullOrEmptyGroup or configurationProviderListPage.nullOrEmptyConfigurationProvider)}"/>
+                                action="#{productCreatePage.show}" reRender="workspaceForm"/>
 
-            <rich:panelMenuItem id="productListMenuItem" label="Список" rendered="#{!(productGroupListPage.nullOrEmptyGroup or configurationProviderListPage.nullOrEmptyConfigurationProvider)}"
+            <rich:panelMenuItem id="productListMenuItem" label="Список"
                                 binding="#{productListPage.mainMenuComponent}"
                                 action="#{productListPage.show}" reRender="workspaceForm" />
 
