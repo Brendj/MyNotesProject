@@ -29,19 +29,14 @@ import java.util.List;
 public class SelectedConfigurationProviderGroupPage extends BasicWorkspacePage {
 
     private String title;
-    private Long idOfConfigurationProvider;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private ConfigurationProvider selectConfigurationProvider;
 
     @Override
     public void onShow() throws Exception {
-        ConfigurationProvider configurationProvider = entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
-        if (null == configurationProvider) {
+        if (null == selectConfigurationProvider) {
             this.title = null;
         } else {
-            this.title = String.format("%d: %s", configurationProvider.getIdOfConfigurationProvider(),
-                    configurationProvider.getName());
+            this.title = String.format("%s",selectConfigurationProvider.getName());
         }
     }
 
@@ -49,11 +44,12 @@ public class SelectedConfigurationProviderGroupPage extends BasicWorkspacePage {
         return title;
     }
 
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
+    public ConfigurationProvider getSelectConfigurationProvider() {
+        return selectConfigurationProvider;
     }
 
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
+    public void setSelectConfigurationProvider(ConfigurationProvider selectConfigurationProvider) {
+        this.selectConfigurationProvider = selectConfigurationProvider;
     }
+
 }

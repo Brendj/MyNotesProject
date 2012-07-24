@@ -5,10 +5,21 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductListPage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapListPage;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,24 +28,57 @@ import org.hibernate.Session;
  * Time: 23:37
  * To change this template use File | Settings | File Templates.
  */
+@Component
+@Scope("session")
 public class ConfigurationProviderViewPage extends BasicWorkspacePage {
 
-    private Item item;
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationProviderCreatePage.class);
+    private ConfigurationProvider currentConfigurationProvider;
+    @Autowired
+    private SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage;
+    @Autowired
+    private TechnologicalMapListPage technologicalMapListPage;
+    @Autowired
+    private ProductListPage productListPage;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    public Item getItem() {
-        return item;
+    @Override
+    public void onShow() throws Exception {
+        selectedConfigurationProviderGroupPage.show();
+        currentConfigurationProvider = selectedConfigurationProviderGroupPage.getSelectConfigurationProvider();
     }
 
-    public void fill(Session persistenceSession, Long id) {
-        ConfigurationProvider cp = (ConfigurationProvider)DAOUtils.findConfigurationProvider(persistenceSession, id);
-        item = new Item(cp.getIdOfConfigurationProvider(), cp.getName(), cp.getProducts());
+    public Object showTechnologicalMaps() throws Exception{
+        technologicalMapListPage.setSelectedConfigurationProvider(currentConfigurationProvider);
+        //Показать и удаленный
+        technologicalMapListPage.setDeletedStatusSelected(true);
+        technologicalMapListPage.reload();
+        technologicalMapListPage.show();
+        return null;
+    }
+
+    public Object showProducts() throws Exception{
+        productListPage.setSelectedConfigurationProvider(currentConfigurationProvider);
+        /* Показать и удаленный */
+        productListPage.setDeletedStatusSelected(true);
+        productListPage.reload();
+        productListPage.show();
+        return null;
     }
 
     public String getPageFilename() {
         return "option/configuration_provider/view";
     }
 
-    public String getPageTitle() {
-        return super.getPageTitle();// + String.format(" / %s", item.getFullName());
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
     }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
+    }
+
+
+
 }

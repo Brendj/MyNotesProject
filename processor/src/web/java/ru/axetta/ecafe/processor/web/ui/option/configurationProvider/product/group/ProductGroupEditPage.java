@@ -35,9 +35,13 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private SelectedProductGroupGroupPage selectedProductGroupGroupPage;
 
     @Override
     public void onShow() throws Exception {
+        selectedProductGroupGroupPage.onShow();
+        currentProductGroup = selectedProductGroupGroupPage.getCurrentProductGroup();
         currentProductGroup = entityManager.merge(currentProductGroup);
     }
 
@@ -70,11 +74,6 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
             printError("Ошибка при удалении группа.");
             logger.error("Error by delete Product Group.", e);
         }
-    }
-
-    @Transactional
-    private void save() throws Exception{
-        currentProductGroup = (ProductGroup) daoService.mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
     }
 
     public String getPageFilename() {

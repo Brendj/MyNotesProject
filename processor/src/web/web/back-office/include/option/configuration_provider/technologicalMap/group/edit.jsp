@@ -13,9 +13,9 @@
 <h:panelGrid id="technologicalMapGroupEditPanelGrid" binding="#{technologicalMapGroupEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Наименование группы технологическох карт" styleClass="output-text" />
+        <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
         <h:inputText value="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup.nameOfGroup}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectOneListbox value="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup.deletedState}" size="1">
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
             <f:selectItem itemLabel="Удален" itemValue="true"/>

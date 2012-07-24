@@ -560,46 +560,57 @@
                 <rich:panelMenuItem id="listProductGroupsMenuItem" label="Список"
                                     binding="#{productGroupListPage.mainMenuComponent}"
                                     action="#{productGroupListPage.show}" reRender="workspaceForm" />
-                <rich:panelMenuItem id="createProductGroupsMenuItem" label="Добавить"
-                                    binding="#{productGroupCreatePage.mainMenuComponent}"
-                                    action="#{productGroupCreatePage.show}" reRender="workspaceForm" />
                 <%--@elvariable id="selectedProductGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupGroupPage"--%>
                 <rich:panelMenuGroup id="selectedProductGroupGroupMenu"
-                                         binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
-                                         label="#{selectedProductGroupGroupPage.title}" rendered="false">
-                        <a4j:support event="onclick" action="#{selectedProductGroupGroupPage.show}" reRender="workspaceForm" />
+                                     binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
+                                     label="#{selectedProductGroupGroupPage.title}" rendered="false">
+                    <a4j:support event="onclick" action="#{selectedProductGroupGroupPage.show}" reRender="workspaceForm" />
 
-                        <%--
-<a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                        --%>
-                    <rich:panelMenuItem id="viewProductGroupsMenuItem" label="Редактирование"
+                    <rich:panelMenuItem id="viewProductGroupsMenuItem" label="Просмотр"
+                                        binding="#{productGroupViewPage.mainMenuComponent}"
+                                        action="#{productGroupViewPage.show}" reRender="workspaceForm" />
+
+                    <rich:panelMenuItem id="editProductGroupsMenuItem" label="Редактирование"
                                         binding="#{productGroupEditPage.mainMenuComponent}"
                                         action="#{productGroupEditPage.show}" reRender="workspaceForm" />
 
                 </rich:panelMenuGroup>
 
+                <rich:panelMenuItem id="createProductGroupsMenuItem" label="Регистрация"
+                                    binding="#{productGroupCreatePage.mainMenuComponent}"
+                                    action="#{productGroupCreatePage.show}" reRender="workspaceForm" />
+
+
             </rich:panelMenuGroup>
             <%--@elvariable id="productCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductCreatePage"--%>
             <%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage"--%>
+            <%--@elvariable id="productViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductViewPage"--%>
             <%--@elvariable id="productListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductListPage"--%>
             <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
-            <rich:panelMenuItem id="productCreateMenuItem" label="Добавить"
-                                binding="#{productCreatePage.mainMenuComponent}"
-                                action="#{productCreatePage.show}" reRender="workspaceForm"/>
-
             <rich:panelMenuItem id="productListMenuItem" label="Список"
                                 binding="#{productListPage.mainMenuComponent}"
                                 action="#{productListPage.show}" reRender="workspaceForm" />
 
-            <rich:panelMenuGroup id="selectedProductMenu" label="#{productEditPage.currentProduct.productName}"
-                                 rendered="false">  <%--
-            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                                                   --%>
-                <rich:panelMenuItem id="viewProductMenuItem" label="Редактирование"
+            <%--@elvariable id="selectedProductGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupPage"--%>
+            <rich:panelMenuGroup id="selectedProductMenu"
+                                 binding="#{selectedProductGroupPage.mainMenuComponent}"
+                                 label="#{selectedProductGroupPage.title}" rendered="false">
+                <a4j:support event="onclick" action="#{selectedProductGroupPage.show}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="viewProductMenuItem" label="Просмотр"
+                                    binding="#{productViewPage.mainMenuComponent}"
+                                    action="#{productViewPage.show}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="editProductMenuItem" label="Редактирование"
                                     binding="#{productEditPage.mainMenuComponent}"
                                     action="#{productEditPage.show}" reRender="workspaceForm" />
 
             </rich:panelMenuGroup>
+
+            <rich:panelMenuItem id="productCreateMenuItem" label="Регистрация"
+                                binding="#{productCreatePage.mainMenuComponent}"
+                                action="#{productCreatePage.show}" reRender="workspaceForm"/>
+
         </rich:panelMenuGroup>
 
         <rich:panelMenuGroup id="technologicalMapGroupMenu" binding="#{mainPage.technologicalMapGroupPage.mainMenuComponent}"
@@ -607,41 +618,57 @@
             <a4j:support event="onclick" action="#{mainPage.showTechnologicalMapGroupPage}" reRender="workspaceForm" />
             <rich:panelMenuGroup id="technologicalMapGroupsGroupMenu" binding="#{mainPage.technologicalMapGroupsGroupPage.mainMenuComponent}"
                                  label="Группы технологических карт">
-
+                <%--@elvariable id="technologicalMapGroupListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupListPage"--%>
                 <rich:panelMenuItem id="listTechnologicalMapGroupsMenuItem" label="Список"
                                     binding="#{technologicalMapGroupListPage.mainMenuComponent}"
                                     action="#{technologicalMapGroupListPage.show}" reRender="workspaceForm" />
-                <rich:panelMenuItem id="createTechnologicalMapGroupsMenuItem" label="Добавить"
+
+                <%--@elvariable id="selectedTechnologicalMapGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.SelectedTechnologicalMapGroupGroupPage"--%>
+                <rich:panelMenuGroup id="selectedTechnologicalMapGroupsMenu"
+                                     binding="#{selectedTechnologicalMapGroupGroupPage.mainMenuComponent}"
+                                     label="#{selectedTechnologicalMapGroupGroupPage.title}" rendered="false">
+                    <a4j:support event="onclick" action="#{selectedTechnologicalMapGroupGroupPage.show}" reRender="workspaceForm" />
+
+                    <rich:panelMenuItem id="viewTechnologicalMapGroupsMenuItem" label="Просмотр"
+                                        binding="#{technologicalMapGroupViewPage.mainMenuComponent}"
+                                        action="#{technologicalMapGroupViewPage.show}" reRender="workspaceForm" />
+
+                    <rich:panelMenuItem id="editTechnologicalMapGroupsMenuItem" label="Редактирование"
+                                        binding="#{technologicalMapGroupEditPage.mainMenuComponent}"
+                                        action="#{technologicalMapGroupEditPage.show}" reRender="workspaceForm" />
+                </rich:panelMenuGroup>
+
+                <rich:panelMenuItem id="createTechnologicalMapGroupsMenuItem" label="Регистрация"
                                     binding="#{technologicalMapGroupCreatePage.mainMenuComponent}"
                                     action="#{technologicalMapGroupCreatePage.show}" reRender="workspaceForm" />
 
-                <rich:panelMenuGroup id="selectedTechnologicalMapGroupsGroupMenu" label="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup.nameOfGroup}"
-                                     rendered="false">  <%--
-            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                                                   --%>
-                    <rich:panelMenuItem id="viewTechnologicalMapGroupsMenuItem" label="Редактирование"
-                                        binding="#{technologicalMapGroupEditPage.mainMenuComponent}"
-                                        action="#{technologicalMapGroupEditPage.show}" reRender="workspaceForm" />
-
-                </rich:panelMenuGroup>
-
             </rich:panelMenuGroup>
+
             <rich:panelMenuItem id="listTechnologicalMapMenuItem" label="Список"
                                 binding="#{technologicalMapListPage.mainMenuComponent}"
-                                action="#{technologicalMapListPage.show}" reRender="workspaceForm"  rendered="#{!(technologicalMapGroupListPage.nullOrEmptyGroup or configurationProviderListPage.nullOrEmptyConfigurationProvider)}"/>
-            <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Добавить"
-                                binding="#{technologicalMapCreatePage.mainMenuComponent}"
-                                action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" rendered="#{!(technologicalMapGroupListPage.nullOrEmptyGroup or configurationProviderListPage.nullOrEmptyConfigurationProvider)}"/>
+                                action="#{technologicalMapListPage.show}" reRender="workspaceForm"/>
 
-            <rich:panelMenuGroup id="selectedTechnologicalMapGroupMenu" label="#{technologicalMapEditPage.currTechnologicalMap.nameOfTechnologicalMap}"
-                                 rendered="false">  <%--
-            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                                                   --%>
-                <rich:panelMenuItem id="viewTechnologicalMapMenuItem" label="Редактирование"
+            <rich:panelMenuGroup id="selectedTechnologicalMapsMenu"
+                                 binding="#{selectedTechnologicalMapGroupPage.mainMenuComponent}"
+                                 label="#{selectedTechnologicalMapGroupPage.title}" rendered="false">
+                <a4j:support event="onclick" action="#{selectedTechnologicalMapGroupPage.show}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="viewTechnologicalMapMenuItem" label="Просмотр"
+                                    binding="#{technologicalMapViewPage.mainMenuComponent}"
+                                    action="#{technologicalMapViewPage.show}" reRender="workspaceForm" />
+
+                <%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapEditPage"--%>
+                <rich:panelMenuItem id="editTechnologicalMapMenuItem" label="Редактирование"
                                     binding="#{technologicalMapEditPage.mainMenuComponent}"
                                     action="#{technologicalMapEditPage.show}" reRender="workspaceForm" />
 
             </rich:panelMenuGroup>
+
+            <%--@elvariable id="technologicalMapCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapCreatePage"--%>
+            <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Регистрация"
+                    binding="#{technologicalMapCreatePage.mainMenuComponent}"
+                    action="#{technologicalMapCreatePage.show}" reRender="workspaceForm"/>
+            <%--@elvariable id="technologicalMapListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapListPage"--%>
 
         </rich:panelMenuGroup>
 
@@ -651,7 +678,7 @@
                             action="#{configurationProviderListPage.show}" reRender="workspaceForm" />
 
         <%--@elvariable id="configurationProviderCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage"--%>
-        <rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Добавить"
+        <rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Регистрация"
                             binding="#{configurationProviderCreatePage.mainMenuComponent}"
                             action="#{configurationProviderCreatePage.show}" reRender="workspaceForm" />
 
@@ -661,10 +688,9 @@
                                  label="#{selectedConfigurationProviderGroupPage.title}" rendered="false">
             <a4j:support event="onclick" action="#{selectedConfigurationProviderGroupPage.show}" reRender="workspaceForm" />
 
-            <%--
-            <rich:panelMenuItem id="configurationProviderViewMenuItem" binding="#{mainPage.configurationProviderViewPage.mainMenuComponent}"
-                                label="Просмотр" action="#{mainPage.showСonfigurationProviderViewPage}" reRender="workspaceForm" />
-            --%>
+            <%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderViewPage"--%>
+            <rich:panelMenuItem id="configurationProviderViewMenuItem" binding="#{configurationProviderViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{configurationProviderViewPage.show}" reRender="workspaceForm" />
 
             <%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderEditPage"--%>
             <rich:panelMenuItem id="configurationProviderEditMenuItem" binding="#{configurationProviderEditPage.mainMenuComponent}"

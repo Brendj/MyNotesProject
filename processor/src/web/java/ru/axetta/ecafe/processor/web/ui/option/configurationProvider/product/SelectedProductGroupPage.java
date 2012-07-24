@@ -2,9 +2,9 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -23,20 +23,17 @@ import javax.persistence.PersistenceContext;
  */
 @Component
 @Scope("session")
-public class SelectedProductGroupGroupPage extends BasicWorkspacePage {
+public class SelectedProductGroupPage extends BasicWorkspacePage {
 
     private String title;
-    private ProductGroup currentProductGroup;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private Product currentProduct;
 
     @Override
     public void onShow() throws Exception {
-        if (null == currentProductGroup) {
+        if (null == currentProduct) {
             this.title = null;
         } else {
-            this.title = String.format("%s", currentProductGroup.getShortNameOfGroup());
+            this.title = String.format("%s", currentProduct.getProductName());
         }
     }
 
@@ -44,11 +41,11 @@ public class SelectedProductGroupGroupPage extends BasicWorkspacePage {
         return title;
     }
 
-    public ProductGroup getCurrentProductGroup() {
-        return currentProductGroup;
+    public Product getCurrentProduct() {
+        return currentProduct;
     }
 
-    public void setCurrentProductGroup(ProductGroup currentProductGroup) {
-        this.currentProductGroup = currentProductGroup;
+    public void setCurrentProduct(Product currentProduct) {
+        this.currentProduct = currentProduct;
     }
 }

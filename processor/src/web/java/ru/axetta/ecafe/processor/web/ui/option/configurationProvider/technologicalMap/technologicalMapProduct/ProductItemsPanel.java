@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Technologic
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import java.util.Stack;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class ProductItemsPanel extends BasicPage {
 
     private final Stack<ProductSelect> completeHandlerLists = new Stack<ProductSelect>();

@@ -2,10 +2,10 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
+package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
@@ -23,20 +23,20 @@ import javax.persistence.PersistenceContext;
  */
 @Component
 @Scope("session")
-public class SelectedProductGroupGroupPage extends BasicWorkspacePage {
+public class SelectedTechnologicalMapGroupGroupPage extends BasicWorkspacePage {
 
     private String title;
-    private ProductGroup currentProductGroup;
+    private TechnologicalMapGroup currentTechnologicalMapGroup;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
     public void onShow() throws Exception {
-        if (null == currentProductGroup) {
+        if (null == currentTechnologicalMapGroup) {
             this.title = null;
         } else {
-            this.title = String.format("%s", currentProductGroup.getShortNameOfGroup());
+            this.title = String.format("%s", currentTechnologicalMapGroup.getNameOfGroup());
         }
     }
 
@@ -44,11 +44,11 @@ public class SelectedProductGroupGroupPage extends BasicWorkspacePage {
         return title;
     }
 
-    public ProductGroup getCurrentProductGroup() {
-        return currentProductGroup;
+    public TechnologicalMapGroup getCurrentTechnologicalMapGroup() {
+        return currentTechnologicalMapGroup;
     }
 
-    public void setCurrentProductGroup(ProductGroup currentProductGroup) {
-        this.currentProductGroup = currentProductGroup;
+    public void setCurrentTechnologicalMapGroup(TechnologicalMapGroup currentTechnologicalMapGroup) {
+        this.currentTechnologicalMapGroup = currentTechnologicalMapGroup;
     }
 }

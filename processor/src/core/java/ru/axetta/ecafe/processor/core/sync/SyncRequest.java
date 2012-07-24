@@ -942,19 +942,19 @@ public class SyncRequest {
                         if (availableNowStr != null) {
                             availableNow = Integer.parseInt(availableNowStr);
                         }
-                        Double protein = getMinorComponent(namedNodeMap, "Protein");
-                        Double fat = getMinorComponent(namedNodeMap, "Fat");
-                        Double carbohydrates = getMinorComponent(namedNodeMap, "Carbohydrates");
-                        Double calories = SyncRequest.getCalories(namedNodeMap, "Calories");
+                        Double protein = getDoubleValue(namedNodeMap, "Protein");
+                        Double fat = getDoubleValue(namedNodeMap, "Fat");
+                        Double carbohydrates = getDoubleValue(namedNodeMap, "Carbohydrates");
+                        Double calories = getDoubleValue(namedNodeMap, "Calories");
 
-                        Double vitB1 = getMinorComponent(namedNodeMap, "VitB1");
-                        Double vitC = getMinorComponent(namedNodeMap, "VitC");
-                        Double vitA = getMinorComponent(namedNodeMap, "VitA");
-                        Double vitE = getMinorComponent(namedNodeMap, "VitE");
-                        Double minCa = getMinorComponent(namedNodeMap, "MinCa");
-                        Double minP = getMinorComponent(namedNodeMap, "MinP");
-                        Double minMg = getMinorComponent(namedNodeMap, "MinMg");
-                        Double minFe = getMinorComponent(namedNodeMap, "MinFe");
+                        Double vitB1 = getDoubleValue(namedNodeMap, "VitB1");
+                        Double vitC = getDoubleValue(namedNodeMap, "VitC");
+                        Double vitA = getDoubleValue(namedNodeMap, "VitA");
+                        Double vitE = getDoubleValue(namedNodeMap, "VitE");
+                        Double minCa = getDoubleValue(namedNodeMap, "MinCa");
+                        Double minP = getDoubleValue(namedNodeMap, "MinP");
+                        Double minMg = getDoubleValue(namedNodeMap, "MinMg");
+                        Double minFe = getDoubleValue(namedNodeMap, "MinFe");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg,
                                 minFe);
@@ -973,6 +973,19 @@ public class SyncRequest {
                             return null;
                         }
                         return node.getTextContent();
+                    }
+
+                    private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
+                        Node node = namedNodeMap.getNamedItem(name);
+                        if (null == node) {
+                            return null;
+                        }
+                        String calString = node.getTextContent();
+                        if (calString.equals("")) {
+                            return null;
+                        }
+                        String replacedString = calString.replaceAll(",", ".");
+                        return Double.parseDouble(replacedString);
                     }
                 }
 

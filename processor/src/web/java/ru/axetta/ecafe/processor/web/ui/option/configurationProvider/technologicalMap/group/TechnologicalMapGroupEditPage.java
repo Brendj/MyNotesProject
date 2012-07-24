@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,22 +32,28 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage {
     private TechnologicalMapGroup currentTechnologicalMapGroup;
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private SelectedTechnologicalMapGroupGroupPage selectedTechnologicalMapGroupGroupPage;
 
     @Override
     public void onShow() throws Exception {
-        //RuntimeContext.getAppContext().getBean(getClass()).reload();
+        selectedTechnologicalMapGroupGroupPage.onShow();
+        currentTechnologicalMapGroup = selectedTechnologicalMapGroupGroupPage.getCurrentTechnologicalMapGroup();
         currentTechnologicalMapGroup = entityManager.merge(currentTechnologicalMapGroup);
-        //reload();
     }
 
     public Object onSave(){
         try {
-            //RuntimeContext.getAppContext().getBean(getClass()).save();
-            //currentTechnologicalMapGroup = entityManager.merge(currentTechnologicalMapGroup);
-            currentTechnologicalMapGroup = (TechnologicalMapGroup) DAOService.getInstance().mergeDistributedObject(currentTechnologicalMapGroup,currentTechnologicalMapGroup.getGlobalVersion()+1);
-            printMessage("Группа технологических карт сохранена успешно.");
+            if(currentTechnologicalMapGroup.getNameOfGroup() == null || currentTechnologicalMapGroup.getNameOfGroup().equals("")){
+                printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
+            currentTechnologicalMapGroup = (TechnologicalMapGroup) daoService.mergeDistributedObject(currentTechnologicalMapGroup,currentTechnologicalMapGroup.getGlobalVersion()+1);
+            printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
-            printError("Ошибка при сохранении группы технологических карт.");
+            printError("Ошибка при сохранении группы.");
             logger.error("Error saved Technological Map Group",e);
         }
         return null;
@@ -66,17 +73,6 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage {
             printError("Ошибка при удалении группа.");
             logger.error("Error by delete Technological Map Group.", e);
         }
-    }
-
-    @Transactional
-    private void reload() throws Exception{
-        //currentTechnologicalMapGroup = entityManager.find(TechnologicalMapGroup.class, currentTechnologicalMapGroup.getGlobalId());
-        currentTechnologicalMapGroup = entityManager.merge(currentTechnologicalMapGroup);
-    }
-
-    @Transactional
-    private void save() throws Exception{
-        currentTechnologicalMapGroup = (TechnologicalMapGroup) DAOService.getInstance().mergeDistributedObject(currentTechnologicalMapGroup,currentTechnologicalMapGroup.getGlobalVersion()+1);
     }
 
     public String getPageFilename() {

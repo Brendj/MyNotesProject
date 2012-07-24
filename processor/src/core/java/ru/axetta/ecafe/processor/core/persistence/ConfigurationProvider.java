@@ -58,6 +58,10 @@ public class ConfigurationProvider {
         return new ArrayList<Org>(Collections.unmodifiableSet(getOrgInternal()));
     }
 
+    public Boolean getOrgEmpty(){
+        return orgInternal == null || orgInternal.isEmpty();
+    }
+
     public void addOrg(Org org){
         orgInternal.add(org);
     }

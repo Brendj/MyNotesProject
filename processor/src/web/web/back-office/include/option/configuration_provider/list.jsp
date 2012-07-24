@@ -35,10 +35,9 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Имя" styleClass="output-text"/>
             </f:facet>
-            <h:commandLink value="#{configurationProvider.name}" action="#{configurationProviderEditPage.show}"
+            <h:commandLink value="#{configurationProvider.name}" action="#{configurationProviderViewPage.show}"
                            styleClass="command-link">
-                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}" target="#{configurationProviderEditPage.selectedIdOfConfigurationProvider}" />
-                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.idOfConfigurationProvider}" />
+                <f:setPropertyActionListener value="#{configurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}"/>
             </h:commandLink>
         </rich:column>
 

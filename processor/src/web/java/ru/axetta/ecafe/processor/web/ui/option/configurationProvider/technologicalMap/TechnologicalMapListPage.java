@@ -10,10 +10,16 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupSelect;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -31,125 +37,108 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class TechnologicalMapListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener  {
+public class TechnologicalMapListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener ,
+        TechnologicalMapGroupSelect, ConfigurationProviderSelect {
+
+    private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapListPage.class);
+
+
+    private TechnologicalMap technologicalMap = new TechnologicalMap();
+    private List<TechnologicalMap> technologicalMapList;
+    private ConfigurationProvider selectedConfigurationProvider;
+
+    private TechnologicalMapGroup selectedTechnologicalMapGroup;
+    private Boolean deletedStatusSelected = Boolean.FALSE;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Autowired
+    private TechnologicalMapGroupItemsPanel technologicalMapGroupItemsPanel;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
-        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
+        daoService.deleteEntity(confirmDeletePage.getEntity());
+        reload();
     }
 
-    private static final Long ALL = -2L;
-    private static final Long NONE = -1L;
+    public String getPageTitle() {
+        return super.getPageTitle() + String.format(" (%d)",(getEmptyTechnologicalMap()?0:technologicalMapList.size()));
+    }
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapListPage.class);
-    private TechnologicalMap technologicalMap = new TechnologicalMap();
-    private List<TechnologicalMap> technologicalMapList;
+    public Boolean getEmptyTechnologicalMap(){
+        return technologicalMapList == null || technologicalMapList.isEmpty();
+    }
 
-    private Long currentIdOfConfigurationProvider=NONE;
-    private Long currentIdOftechnologicalMapGroup=NONE;
-    private ConfigurationProviderMenu configurationProviderMenu = new ConfigurationProviderMenu();
-    private TechnologicalMapGroupMenu technologicalMapGroupMenu = new TechnologicalMapGroupMenu();
-    private List<ConfigurationProvider> configurationProviderList;
-    private List<TechnologicalMapGroup> technologicalMapGroupList;
-    private Boolean deletedStatusSelected = Boolean.FALSE;
+    @Override
+    public void onShow() throws Exception {}
 
+    public Object onSearch() throws Exception{
+        reload();
+        return null;
+    }
 
+    public Object onClear() throws Exception{
+        selectedConfigurationProvider = null;
+        selectedTechnologicalMapGroup = null;
+        return null;
+    }
 
     public List<TechnologicalMap> getTechnologicalMapList() {
         return technologicalMapList;
     }
 
-    public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", technologicalMapList.size());
-    }
-
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Override
-    public void onShow() throws Exception {
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
-    }
-
-    public Object onChange() throws Exception{
-        reload();
-        return null;
-    }
-
     public void reload() {
-        //technologicalMapList = DAOService.getInstance().getDistributedObjects(TechnologicalMap.class);
-        configurationProviderList = DAOService.getInstance().getDistributedObjects(
-                ConfigurationProvider.class);
-        technologicalMapGroupList = DAOService.getInstance().getDistributedObjects(TechnologicalMapGroup.class);
-        if(getRendered()){
-            configurationProviderMenu.readAllItems(configurationProviderList);
-            technologicalMapGroupMenu.readAllItems(technologicalMapGroupList);
+        String where = "";
+        if(selectedConfigurationProvider!=null){
+            where = " idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
         }
-        String where="";
-        if(!currentIdOfConfigurationProvider.equals(ALL)){
-            where = where+ " idOfConfigurationProvider="+currentIdOfConfigurationProvider;
+        if(selectedTechnologicalMapGroup!=null){
+            where = (where.equals("")?"":where + " and ") + " technologicalMapGroup=:technologicalMapGroup";
         }
-        TechnologicalMapGroup tmg = null;
-        if(!currentIdOftechnologicalMapGroup.equals(ALL)){
-            tmg = DAOService.getInstance().findRefDistributedObject(TechnologicalMapGroup.class,currentIdOftechnologicalMapGroup);
-            if(tmg!=null){
-                if(!where.equals("")) where = where + " and ";
-                where = where+ " technologicalMapGroup=:technologicalMapGroup";
-            }
+        where = (where.equals("")?"":" where ") + where;
+        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap " + where, TechnologicalMap.class);
+        if(selectedTechnologicalMapGroup!=null){
+            query.setParameter("technologicalMapGroup", selectedTechnologicalMapGroup);
         }
-        if(!deletedStatusSelected){
-            if(!where.equals("")) where = where + " and ";
-            where = where+" deletedState=FALSE";
-        }
-        if(!where.equals("")) where  =" where "+ where;
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery("FROM TechnologicalMap "+where+" ORDER BY globalId",TechnologicalMap.class);
-        if(tmg!=null) query.setParameter("technologicalMapGroup", tmg);
         technologicalMapList = query.getResultList();
     }
 
-    public boolean getRendered(){
-        return !(configurationProviderList==null || configurationProviderList.isEmpty() || technologicalMapGroupList==null || technologicalMapGroupList.isEmpty());
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(selectedConfigurationProvider !=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        if(configurationProvider!=null){
+            selectedConfigurationProvider = configurationProvider;
+        }
+    }
+
+    public Object selectTechnologicalMapGroup() throws Exception{
+        technologicalMapGroupItemsPanel.reload();
+        technologicalMapGroupItemsPanel.setSelectTechnologicalMapGroup(selectedTechnologicalMapGroup);
+        technologicalMapGroupItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(TechnologicalMapGroup technologicalMapGroup) {
+        if(technologicalMapGroup!=null){
+            selectedTechnologicalMapGroup = technologicalMapGroup;
+        }
     }
 
     public String getPageFilename() {
         return "option/configuration_provider/technologicalMap/list";
-    }
-
-    public TechnologicalMap getTechnologicalMap() {
-        return technologicalMap;
-    }
-
-    public ConfigurationProviderMenu getConfigurationProviderMenu() {
-        return configurationProviderMenu;
-    }
-
-    public void setConfigurationProviderMenu(ConfigurationProviderMenu configurationProviderMenu) {
-        this.configurationProviderMenu = configurationProviderMenu;
-    }
-
-    public Long getCurrentIdOfConfigurationProvider() {
-        return currentIdOfConfigurationProvider;
-    }
-
-    public void setCurrentIdOfConfigurationProvider(Long currentIdOfConfigurationProvider) {
-        this.currentIdOfConfigurationProvider = currentIdOfConfigurationProvider;
-    }
-
-    public Long getCurrentIdOftechnologicalMapGroup() {
-        return currentIdOftechnologicalMapGroup;
-    }
-
-    public void setCurrentIdOftechnologicalMapGroup(Long currentIdOftechnologicalMapGroup) {
-        this.currentIdOftechnologicalMapGroup = currentIdOftechnologicalMapGroup;
-    }
-
-    public TechnologicalMapGroupMenu getTechnologicalMapGroupMenu() {
-        return technologicalMapGroupMenu;
-    }
-
-    public void setTechnologicalMapGroupMenu(TechnologicalMapGroupMenu technologicalMapGroupMenu) {
-        this.technologicalMapGroupMenu = technologicalMapGroupMenu;
     }
 
     public Boolean getDeletedStatusSelected() {
@@ -158,5 +147,21 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
 
     public void setDeletedStatusSelected(Boolean deletedStatusSelected) {
         this.deletedStatusSelected = deletedStatusSelected;
+    }
+
+    public ConfigurationProvider getSelectedConfigurationProvider() {
+        return selectedConfigurationProvider;
+    }
+
+    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
+        this.selectedConfigurationProvider = selectedConfigurationProvider;
+    }
+
+    public TechnologicalMapGroup getSelectedTechnologicalMapGroup() {
+        return selectedTechnologicalMapGroup;
+    }
+
+    public void setSelectedTechnologicalMapGroup(TechnologicalMapGroup selectedTechnologicalMapGroup) {
+        this.selectedTechnologicalMapGroup = selectedTechnologicalMapGroup;
     }
 }

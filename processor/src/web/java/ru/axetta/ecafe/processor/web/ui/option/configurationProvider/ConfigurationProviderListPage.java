@@ -51,37 +51,6 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
         configurationProviderList = entityManager.createQuery("from ConfigurationProvider order by id",ConfigurationProvider.class).getResultList();
     }
 
-    /*private List<Item> items = Collections.emptyList();
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void fill(Session persistenceSession) {
-        List list = DAOUtils.findConfigurationProvider(persistenceSession);
-        items = new ArrayList<Item>();
-        for (Object o : list) {
-            ConfigurationProvider cp = (ConfigurationProvider)o;
-            items.add(new Item(cp.getIdOfConfigurationProvider(), cp.getName(), cp.getProducts()));
-        }
-    }
-
-    public void remove(Session session, long id) {
-        ConfigurationProvider CONFIGURATION_PROVIDER = (ConfigurationProvider)session.load(ConfigurationProvider.class, id);
-        session.delete(CONFIGURATION_PROVIDER);
-        fill(session);
-    }*/
-
-    @Transactional
-    private boolean getNullOrEmpty(){
-        List<Long> tMGl = entityManager.createQuery("SELECT id FROM ConfigurationProvider",Long.class).getResultList();
-        return tMGl==null || tMGl.isEmpty();
-    }
-
-    public boolean getNullOrEmptyConfigurationProvider(){
-        return getNullOrEmpty();
-    }
-
     public List<ConfigurationProvider> getConfigurationProviderList() {
         return configurationProviderList;
     }

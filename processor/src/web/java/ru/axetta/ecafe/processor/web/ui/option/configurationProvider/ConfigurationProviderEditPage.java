@@ -16,12 +16,14 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,13 +40,16 @@ import java.util.Map;
 @Scope("session")
 public class ConfigurationProviderEditPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
-    @PersistenceContext
-    private EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationProviderCreatePage.class);
     private ConfigurationProvider currentConfigurationProvider;
     private String filter;
     private List<Long> idOfOrgList = new ArrayList<Long>();
-    private Long selectedIdOfConfigurationProvider;
+    @Autowired
+    private SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage;
+    @Autowired
+    private DAOService daoService;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -53,21 +58,30 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
             if (orgMap.isEmpty()) {
                 filter = "Не выбрано";
             } else {
-                filter = "";
+                StringBuilder stringBuilder = new StringBuilder();
                 for (Long idOfOrg : orgMap.keySet()) {
                     idOfOrgList.add(idOfOrg);
-                    filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+                    stringBuilder = stringBuilder.append(orgMap.get(idOfOrg) + "; ");
                 }
-                filter = filter.substring(0, filter.length() - 1);
+                filter = stringBuilder.substring(0, stringBuilder.length() - 2);
             }
         }
     }
 
     @Override
     public void onShow() throws Exception {
-        /* необходи нормально сделать без обращения к контексту */
-        RuntimeContext.getAppContext().getBean(SelectedConfigurationProviderGroupPage.class).show();
-        currentConfigurationProvider = entityManager.find(ConfigurationProvider.class,selectedIdOfConfigurationProvider);
+        selectedConfigurationProviderGroupPage.show();
+        currentConfigurationProvider = selectedConfigurationProviderGroupPage.getSelectConfigurationProvider();
+        StringBuilder stringBuilder = new StringBuilder();
+        TypedQuery<Org> query = entityManager.createQuery("from Org where configurationProvider=:configurationProvider",Org.class);
+        query.setParameter("configurationProvider",currentConfigurationProvider);
+        for(Org org: query.getResultList()){
+            idOfOrgList.add(org.getIdOfOrg());
+            stringBuilder = stringBuilder.append(org.getShortName() + "; ");
+        }
+        if(stringBuilder.length()>2){
+            filter = stringBuilder.substring(0, stringBuilder.length() - 2);
+        }
     }
 
     public Object save() {
@@ -95,19 +109,11 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
 
         if(!this.idOfOrgList.isEmpty()){
             for (Long idOfOrg: idOfOrgList){
-                DAOService.getInstance().setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
+                daoService.setConfigurationProviderInOrg(idOfOrg, currentConfigurationProvider);
             }
         }
 
         currentConfigurationProvider = new ConfigurationProvider();
-    }
-
-    public Long getSelectedIdOfConfigurationProvider() {
-        return selectedIdOfConfigurationProvider;
-    }
-
-    public void setSelectedIdOfConfigurationProvider(Long selectedIdOfConfigurationProvider) {
-        this.selectedIdOfConfigurationProvider = selectedIdOfConfigurationProvider;
     }
 
     public ConfigurationProvider getCurrentConfigurationProvider() {
@@ -132,25 +138,3 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
 
 
 }
-
-/*private Item item;
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void fill(Session persistenceSession, Long id) {
-        ConfigurationProvider cp = (ConfigurationProvider)DAOUtils.findConfigurationProvider(persistenceSession, id);
-        item = new Item(cp.getIdOfConfigurationProvider(), cp.getName(), cp.getProducts());
-    }
-
-    public void update(Session persistenceSession) {
-        ConfigurationProvider cp = new ConfigurationProvider();
-        cp.setIdOfConfigurationProvider(item.getIdOfConfigurationProvider());
-        cp.setName(item.getName());
-        persistenceSession.update(cp);
-    }
-
-    public String getPageTitle() {
-        return super.getPageTitle();
-    }*/

@@ -4,23 +4,31 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,73 +40,80 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ProductListPage extends BasicWorkspacePage {
+public class ProductListPage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
 
-    private static final Long ALL = -2L;
-    private static final Long NONE = -1L;
-
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductListPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductListPage.class);
     private List<Product> productList;
-
-    private Long currentIdOfConfigurationProvider=NONE;
-    private Long currentIdOfProductGroup=NONE;
-    private ConfigurationProviderMenu configurationProviderMenu = new ConfigurationProviderMenu();
-    private ProductGroupMenu productGroupMenu = new ProductGroupMenu();
-    private List<ConfigurationProvider> configurationProviderList;
-    private List<ProductGroup> productGroupList;
     private Boolean deletedStatusSelected = Boolean.FALSE;
-
+    private ConfigurationProvider selectedConfigurationProvider;
+    private ProductGroup selectedProductGroup;
 
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private ProductGroupItemsPanel productGroupItemsPanel;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
 
     @Override
-    public void onShow() {
-        try {
-            RuntimeContext.getAppContext().getBean(getClass()).reload();
-        } catch (Exception e) {
-            printError("Ошибка при загрузке списка групп.");
-        }
-    }
+    public void onShow() { }
 
-    public Object onChange() throws Exception{
+    public Object onSearch() throws Exception{
         reload();
         return null;
     }
 
+    public Object onClear() throws Exception{
+        selectedConfigurationProvider = null;
+        selectedProductGroup = null;
+        return null;
+    }
+
     @Transactional
-    private void reload() throws Exception{
-        configurationProviderList = DAOService.getInstance().getDistributedObjects(
-                ConfigurationProvider.class);
-        productGroupList = DAOService.getInstance().getDistributedObjects(ProductGroup.class);
-        if(getRendered()){
-            configurationProviderMenu.readAllItems(configurationProviderList);
-            productGroupMenu.readAllItems(productGroupList);
+    public void reload() throws Exception{
+        String where = "";
+        if(selectedConfigurationProvider!=null){
+            where = " idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
         }
-        String where="";
-        if(!currentIdOfConfigurationProvider.equals(ALL)){
-            where = where+ " idOfConfigurationProvider="+currentIdOfConfigurationProvider;
+        if(selectedProductGroup!=null){
+            where = (where.equals("")?"":where + " and ") + " productGroup=:productGroup";
         }
-        ProductGroup pg = null;
-        if(!currentIdOfProductGroup.equals(ALL)){
-            pg = DAOService.getInstance().findRefDistributedObject(ProductGroup.class,currentIdOfProductGroup);
-            if(pg!=null){
-                if(!where.equals("")) where = where + " and ";
-                where = where+ " productGroup=:productGroup";
-            }
+        where = (where.equals("")?"":" where ") + where;
+        TypedQuery<Product> query = entityManager.createQuery("from Product " + where, Product.class);
+        if(selectedProductGroup!=null){
+            query.setParameter("productGroup", selectedProductGroup);
         }
-        if(!deletedStatusSelected){
-            if(!where.equals("")) where = where + " and ";
-            where = where+" deletedState=FALSE";
-        }
-        if(!where.equals("")) where  =" where "+ where;
-        TypedQuery<Product> query = entityManager.createQuery("FROM Product "+where+" ORDER BY globalId",Product.class);
-        if(pg!=null) query.setParameter("productGroup", pg);
         productList = query.getResultList();
     }
 
-    public boolean getRendered(){
-        return !(configurationProviderList==null || configurationProviderList.isEmpty() || productGroupList==null || productGroupList.isEmpty());
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(selectedConfigurationProvider !=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        if(configurationProvider!=null){
+            selectedConfigurationProvider = configurationProvider;
+        }
+    }
+
+    public Object selectProductGroup() throws Exception{
+        productGroupItemsPanel.reload();
+        productGroupItemsPanel.setSelectProductGroup(selectedProductGroup);
+        productGroupItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ProductGroup productGroup) {
+        if(productGroup!=null){
+            selectedProductGroup = productGroup;
+        }
     }
 
     public String getPageTitle() {
@@ -125,35 +140,24 @@ public class ProductListPage extends BasicWorkspacePage {
         this.productList = productList;
     }
 
-    public ConfigurationProviderMenu getConfigurationProviderMenu() {
-        return configurationProviderMenu;
+    public Boolean getEmptyProductList(){
+        return  this.productList == null || this.productList.isEmpty();
     }
 
-    public void setConfigurationProviderMenu(ConfigurationProviderMenu configurationProviderMenu) {
-        this.configurationProviderMenu = configurationProviderMenu;
+    public ConfigurationProvider getSelectedConfigurationProvider() {
+        return selectedConfigurationProvider;
     }
 
-    public Long getCurrentIdOfConfigurationProvider() {
-        return currentIdOfConfigurationProvider;
+    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
+        this.selectedConfigurationProvider = selectedConfigurationProvider;
     }
 
-    public void setCurrentIdOfConfigurationProvider(Long currentIdOfConfigurationProvider) {
-        this.currentIdOfConfigurationProvider = currentIdOfConfigurationProvider;
+    public ProductGroup getSelectedProductGroup() {
+        return selectedProductGroup;
     }
 
-    public Long getCurrentIdOfProductGroup() {
-        return currentIdOfProductGroup;
+    public void setSelectedProductGroup(ProductGroup selectedProductGroup) {
+        this.selectedProductGroup = selectedProductGroup;
     }
 
-    public void setCurrentIdOfProductGroup(Long currentIdOfProductGroup) {
-        this.currentIdOfProductGroup = currentIdOfProductGroup;
-    }
-
-    public ProductGroupMenu getProductGroupMenu() {
-        return productGroupMenu;
-    }
-
-    public void setProductGroupMenu(ProductGroupMenu productGroupMenu) {
-        this.productGroupMenu = productGroupMenu;
-    }
 }

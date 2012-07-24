@@ -12,39 +12,60 @@
 <%-- Панель создания правила --%>
 <%--@elvariable id="technologicalMapListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapListPage"--%>
 <%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapEditPage"--%>
+<%--@elvariable id="technologicalMapViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapViewPage"--%>
+<%--@elvariable id="selectedTechnologicalMapGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.SelectedTechnologicalMapGroupPage"--%>
 <h:panelGrid id="technologicalMapListPage" binding="#{technologicalMapListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
     <h:column>
-        <fieldset>
-            <legend><h:outputText value="Фильтры" styleClass="output-text" escape="true"/></legend>
-            <h:panelGrid columns="2">
-                <h:outputText value="Производственная конфигурация" styleClass="output-text" escape="true"/>
-                <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapListPage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
-                    <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
-                    <f:selectItems value="#{technologicalMapListPage.configurationProviderMenu.items}" />
-                    <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
-                </h:selectOneMenu>
-                <h:outputText value="Группа технологических карт" styleClass="output-text" escape="true"/>
-                <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapListPage.currentIdOftechnologicalMapGroup}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
-                    <f:selectItem itemLabel="Выберите провайдера" itemValue="-1"/>
-                    <f:selectItems value="#{technologicalMapListPage.technologicalMapGroupMenu.items}" />
-                    <f:selectItem itemLabel="Выберать без учета провайдера" itemValue="-2"/>
-                </h:selectOneMenu>
+
+        <rich:simpleTogglePanel label="Фильтр" switchType="client"
+                                eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:outputText value="#{technologicalMapListPage.selectedConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+                    <a4j:commandButton value="..." action="#{technologicalMapListPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px; float: right;" />
+                </h:panelGroup>
+                <h:outputText escape="true" value="Группа" styleClass="output-text required-field" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:outputText value="#{technologicalMapListPage.selectedTechnologicalMapGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+                    <a4j:commandButton value="..." action="#{technologicalMapListPage.selectTechnologicalMapGroup}" reRender="technologicalMapGroupSelectModalPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapGroupSelectModalPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px; float: right;" />
+                </h:panelGroup>
                 <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectDeletedStatus" value="#{technologicalMapListPage.deletedStatusSelected}" styleClass="input-text long-field">
-                    <a4j:support event="onchange" action="#{technologicalMapListPage.onChange}" reRender="workspaceTogglePanel"/>
-                    <f:selectItem itemLabel="Показать" itemValue="true"/>
                     <f:selectItem itemLabel="Скрыть" itemValue="false"/>
+                    <f:selectItem itemLabel="Показать" itemValue="true"/>
                 </h:selectOneMenu>
+
             </h:panelGrid>
-        </fieldset>
+
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <a4j:commandButton value="Применить" action="#{technologicalMapListPage.onSearch}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+
+                <a4j:commandButton value="Очистить" action="#{technologicalMapListPage.onClear}"
+                                   reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
     </h:column>
 
+    <a4j:status id="sReportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="technologicalMapListTable" width="700" var="technologicalMap" value="#{technologicalMapListPage.technologicalMapList}"
-                    rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
+                    rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer"
+            rendered="#{!technologicalMapListPage.emptyTechnologicalMap}">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>
@@ -55,7 +76,9 @@
             <f:facet name="header">
                 <h:outputText value="Наименование технологическая карты" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{technologicalMap.nameOfTechnologicalMap}" />
+            <h:commandLink value="#{technologicalMap.nameOfTechnologicalMap}" action="#{technologicalMapViewPage.show}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{technologicalMap}" target="#{selectedTechnologicalMapGroupPage.currentTechnologicalMap}" />
+            </h:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -75,7 +98,7 @@
             </f:facet>
             <h:commandLink action="#{technologicalMapEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{technologicalMap}" target="#{technologicalMapEditPage.currTechnologicalMap}" />
+                <f:setPropertyActionListener value="#{technologicalMap}" target="#{selectedTechnologicalMapGroupPage.currentTechnologicalMap}" />
             </h:commandLink>
         </rich:column>
         <rich:column style="text-align:center">
@@ -85,7 +108,7 @@
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
                              oncomplete="#{rich:component('removedTechnologicalMapItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{technologicalMap}" target="#{technologicalMapEditPage.currTechnologicalMap}" />
+                <f:setPropertyActionListener value="#{technologicalMap}" target="#{technologicalMapEditPage.currentTechnologicalMap}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">

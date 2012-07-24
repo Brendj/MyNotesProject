@@ -13,7 +13,7 @@
 <h:panelGrid id="technologicalMapGroupCreatePanelGrid" binding="#{technologicalMapGroupCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
+        <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field" />
         <h:inputText value="#{technologicalMapGroupCreatePage.technologicalMapGroup.nameOfGroup}" maxlength="128" styleClass="input-text long-field" />
     </h:panelGrid>
 

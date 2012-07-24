@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,23 +31,29 @@ import java.util.UUID;
 public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapGroupCreatePage.class);
-    private TechnologicalMapGroup technologicalMapGroup = new TechnologicalMapGroup();
-    @PersistenceContext
-    private EntityManager entityManager;
+    private TechnologicalMapGroup technologicalMapGroup;
+    @Autowired
+    private DAOService daoService;
 
     @Override
-    public void onShow() throws Exception {}
+    public void onShow() throws Exception {
+        technologicalMapGroup = new TechnologicalMapGroup();
+    }
 
     public Object onSave(){
         try {
+            if(technologicalMapGroup.getNameOfGroup() == null || technologicalMapGroup.getNameOfGroup().equals("")){
+                printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
             technologicalMapGroup.setCreatedDate(new Date());
             technologicalMapGroup.setDeletedState(false);
             technologicalMapGroup.setGuid(UUID.randomUUID().toString());
-            technologicalMapGroup.setGlobalVersion(0L);
-            DAOService.getInstance().persistEntity(technologicalMapGroup);
-            printMessage("Группа технологических карт сохранена успешно.");
+            technologicalMapGroup.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapGroup.class));
+            daoService.persistEntity(technologicalMapGroup);
+            printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
-            printError("Ошибка при созданиии группы технологических карт.");
+            printError("Ошибка при созданиии группы.");
             logger.error("Error create Technological Map Group",e);
         }
         return null;

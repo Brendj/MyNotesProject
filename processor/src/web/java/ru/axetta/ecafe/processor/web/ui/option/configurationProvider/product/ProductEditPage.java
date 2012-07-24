@@ -52,12 +52,15 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private SelectedProductGroupPage selectedProductGroupPage;
 
     @Override
     public void onShow() throws Exception {
-        currentProduct = entityManager.merge(currentProduct);
-        if(currentConfigurationProvider.getIdOfConfigurationProvider()!=null){
-            currentConfigurationProvider = entityManager.find(ConfigurationProvider.class, currentConfigurationProvider.getIdOfConfigurationProvider());
+        selectedProductGroupPage.onShow();
+        currentProduct = selectedProductGroupPage.getCurrentProduct();
+        if(currentProduct.getIdOfConfigurationProvider()!=null){
+            currentConfigurationProvider = entityManager.find(ConfigurationProvider.class, currentProduct.getIdOfConfigurationProvider());
         }
         if(currentProduct.getProductGroup()!=null){
             currentProductGroup = currentProduct.getProductGroup();
