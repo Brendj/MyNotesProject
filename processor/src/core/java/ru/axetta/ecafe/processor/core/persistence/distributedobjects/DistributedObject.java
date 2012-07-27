@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectExc
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -69,7 +70,7 @@ public abstract class DistributedObject{
         /* Метод определения названия элемента */
     };
     /* метод парсинга элемента */
-    public DistributedObject build(Node node) throws ParseException {
+    public DistributedObject build(Node node) throws ParseException, IOException {
         /* Begin required params */
         String stringGUID = getStringAttributeValue(node,"Guid",36);
         if(stringGUID!=null) setGuid(stringGUID);
@@ -89,7 +90,7 @@ public abstract class DistributedObject{
 
     public void preProcess() throws DistributedObjectException {}
 
-    protected abstract DistributedObject parseAttributes(Node node) throws ParseException;
+    protected abstract DistributedObject parseAttributes(Node node) throws ParseException, IOException;
 
     public abstract void fill(DistributedObject distributedObject);
 

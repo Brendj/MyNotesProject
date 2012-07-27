@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
@@ -25,7 +26,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapCreatePage;
+import ru.axetta.ecafe.processor.web.ui.paging.AbstractViewPage;
 import ru.axetta.ecafe.processor.web.ui.report.productGuide.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -40,6 +41,10 @@ import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 import ru.axetta.ecafe.processor.web.ui.option.*;
+import ru.axetta.ecafe.processor.web.ui.test.TestListPage;
+import ru.axetta.ecafe.processor.web.ui.test.TestFilter;
+import ru.axetta.ecafe.processor.web.ui.test.TestItem;
+import ru.axetta.ecafe.processor.web.ui.test.TestViewPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -59,6 +64,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +205,7 @@ public class MainPage {
     // baybikov (07.10.2011)
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
     // baybikov (20.10.2011)
-    private final ClientReportPage clientReportPage =  new ClientReportPage();
+    private final ClientReportPage clientReportPage = new ClientReportPage();
 
     // kadyrov (20.12.2011)
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
@@ -315,6 +321,76 @@ public class MainPage {
     private final BasicWorkspacePage productGroupsGroupPage = new BasicWorkspacePage();
 
 
+    private TestListPage testTestListPage = null;
+    private TestViewPage testViewPage = null;
+    private long selectedTestId = 0;
+
+    public long getSelectedTestId() {
+        return selectedTestId;
+    }
+
+    public void setSelectedTestId(long selectedTestId) {
+        this.selectedTestId = selectedTestId;
+    }
+
+    public BasicWorkspacePage getTestTestListPage()
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (testTestListPage == null) {
+            testTestListPage = new TestListPage(TestItem.class, Contragent.class, TestFilter.class);
+        }
+        return testTestListPage;
+    }
+
+    public AbstractViewPage getTestViewPage()
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (testViewPage == null) {
+            testViewPage = new TestViewPage(TestItem.class, Contragent.class);
+        }
+        return testViewPage;
+    }
+
+    public BasicWorkspacePage showTestViewPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            getTestViewPage().fill(persistenceSession, selectedTestId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            testViewPage.showAndExpandMenuGroup();
+            currentWorkspacePage = testViewPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill org view page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра данных организации", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage showTestEditPage() {
+        return null;
+    }
+
+
+    public void updateTestPage() {
+        showTestPage();
+    }
+
+    public void clearTestListPageFilter()
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        testTestListPage.getFilter().clear();
+        showTestPage();
+    }
+
     public BasicWorkspacePage getProductGroupsGroupPage() {
         return productGroupsGroupPage;
     }
@@ -323,7 +399,7 @@ public class MainPage {
         return productGroupPage;
     }
 
-    public BasicWorkspacePage getTechnologicalMapGroupsGroupPage(){
+    public BasicWorkspacePage getTechnologicalMapGroupsGroupPage() {
         return technologicalMapGroupsGroupPage;
     }
 
@@ -360,11 +436,11 @@ public class MainPage {
     }
 
     public void setCurrentConfigurationProvider(String currentConfigurationProvider) {
-//        if (currentConfigurationProvider instanceof ConfigurationProvider) {
-//            this.currentConfigurationProvider = (ConfigurationProvider)currentConfigurationProvider;
+        //        if (currentConfigurationProvider instanceof ConfigurationProvider) {
+        //            this.currentConfigurationProvider = (ConfigurationProvider)currentConfigurationProvider;
         this.currentConfigurationProvider = currentConfigurationProvider;
         //updateProductGuideListPage();
-//        }
+        //        }
     }
 
     public SelectedConfigurationProviderGroupPage getSelectedConfigurationProviderGroupPage() {
@@ -560,6 +636,7 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
+
     //***//
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
@@ -705,7 +782,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -737,7 +814,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -771,7 +848,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -801,7 +878,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -832,7 +909,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -873,14 +950,14 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
     }
 
     /* обновление списка организаций */
-    public Object updateOrgListPage(){
+    public Object updateOrgListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -966,7 +1043,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -998,7 +1075,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1016,16 +1093,16 @@ public class MainPage {
         return "showMenuDataXML";
     }
 
-    public MenuExchangePage getMenuExchangePage(){
+    public MenuExchangePage getMenuExchangePage() {
         return menuExchangePage;
     }
 
-    public Object showMenuExchangePage(){
+    public Object showMenuExchangePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -1034,39 +1111,39 @@ public class MainPage {
             persistenceTransaction = null;
             selectedOrgGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = menuExchangePage;
-        }   catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to load menu exchange from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по мастера меню",
-                            null));
-        }   finally {
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по мастера меню", null));
+        } finally {
 
         }
         return null;
     }
-       /*
-    public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
-        this.selectedIdOfMenu = selectedIdOfMenu;
-    }
-         */
+
+    /*
+public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
+   this.selectedIdOfMenu = selectedIdOfMenu;
+}
+    */
     public void setSelectedIdOfMenu(String selectedIdOfMenu) {
         this.selectedIdOfMenu = Long.parseLong(selectedIdOfMenu);
     }
 
-    public String getSelectedIdOfMenu(){
+    public String getSelectedIdOfMenu() {
         return String.valueOf(selectedIdOfMenu);
     }
 
-    public MenuDetailsPage getMenuDetailsPage(){
-         return menuDetailsPage;
+    public MenuDetailsPage getMenuDetailsPage() {
+        return menuDetailsPage;
     }
 
-    public Object showMenuDetailsPage(){
+    public Object showMenuDetailsPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -1075,34 +1152,32 @@ public class MainPage {
             persistenceTransaction = null;
             selectedOrgGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = menuDetailsPage;
-        }   catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню",
-                            null));
-        }   finally {
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
     }
 
-    public MenuViewPage getMenuViewPage(){
+    public MenuViewPage getMenuViewPage() {
         return menuViewPage;
     }
 
-    public Object showMenuViewPage(){
+    public Object showMenuViewPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        try{
+        try {
             menuViewPage.setIdOfOrg(selectedIdOfOrg);
             currentWorkspacePage = menuViewPage;
-        }   catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню",
-                            null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
         }
         return null;
     }
@@ -1133,7 +1208,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1166,7 +1241,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -1196,7 +1271,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1222,12 +1297,12 @@ public class MainPage {
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Организация зарегистрирована успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to create org", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации организации: "+ e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при регистрации организации: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -1259,7 +1334,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1286,7 +1361,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1317,7 +1392,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1344,7 +1419,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1369,11 +1444,11 @@ public class MainPage {
         return clientGroupSelectPage;
     }
 
-    public Object showClientGroupSelectPage(){
+    public Object showClientGroupSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientGroupSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+            Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -1381,7 +1456,7 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if(params.get("idOfOrg") != null){
+                if (params.get("idOfOrg") != null) {
                     Long idOfOrg = Long.parseLong(params.get("idOfOrg"));
                     clientGroupSelectPage.fill(persistenceSession, idOfOrg);
                 } else {
@@ -1406,7 +1481,7 @@ public class MainPage {
 
     public Object updateClientGroupSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+        Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1414,7 +1489,7 @@ public class MainPage {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(params.get("idOfOrg") != null){
+            if (params.get("idOfOrg") != null) {
                 Long idOfOrg = Long.parseLong(params.get("idOfOrg"));
                 clientGroupSelectPage.fill(persistenceSession, idOfOrg);
             } else {
@@ -1486,7 +1561,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -1519,10 +1594,10 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if(orgFilterOfSelectOrgListSelectPage.length()==0){
+                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession);
                 } else {
-                    orgListSelectPage.fill(persistenceSession,orgFilterOfSelectOrgListSelectPage);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1535,7 +1610,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -1561,7 +1636,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1586,7 +1661,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1615,7 +1690,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1691,7 +1766,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1730,7 +1805,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1762,7 +1837,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1794,7 +1869,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1822,7 +1897,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1851,7 +1926,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1873,8 +1948,9 @@ public class MainPage {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Контрагент зарегистрирован успешно", null));
         } catch (ContragentCreatePage.ContragentWithClassExistsException e) {
             logger.error("Failed to create contragent", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации контрагента: для типов \"Оператор\", \"Бюждет\" и \"Клиент\" не может быть создано более одного контрагента", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации контрагента: для типов \"Оператор\", \"Бюждет\" и \"Клиент\" не может быть создано более одного контрагента",
+                    null));
         } catch (Exception e) {
             logger.error("Failed to create contragent", e);
             facesContext.addMessage(null,
@@ -1882,7 +1958,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1913,7 +1989,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1940,7 +2016,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -1963,8 +2039,8 @@ public class MainPage {
 
     public Object showContragentSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler ||
-            currentTopMostPage instanceof ContragentSelectPage) {
+        if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentSelectPage) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
@@ -1987,7 +2063,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -2041,7 +2117,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2093,7 +2169,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2119,7 +2195,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2145,7 +2221,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2183,7 +2259,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2215,7 +2291,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2247,7 +2323,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2275,12 +2351,12 @@ public class MainPage {
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные клиента обновлены успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to update client", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных клиента: "+e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при изменении данных клиента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -2310,7 +2386,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2341,7 +2417,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2372,7 +2448,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         updateSelectedMainMenu();
@@ -2407,7 +2483,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2433,7 +2509,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2445,7 +2521,7 @@ public class MainPage {
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (clientFileLoadPage.getOrg()==null || clientFileLoadPage.getOrg().getIdOfOrg()==null) {
+            if (clientFileLoadPage.getOrg() == null || clientFileLoadPage.getOrg().getIdOfOrg() == null) {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не указана организация", null));
                 return;
@@ -2464,9 +2540,8 @@ public class MainPage {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
             logger.error("Failed to load clients from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам: "+e,
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по клиентам: " + e, null));
         } finally {
             close(inputStream);
         }
@@ -2562,7 +2637,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -2588,7 +2663,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2617,7 +2692,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2643,7 +2718,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2673,7 +2748,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2701,7 +2776,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2734,7 +2809,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2760,7 +2835,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2787,7 +2862,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2813,7 +2888,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2842,7 +2917,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2869,7 +2944,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2893,7 +2968,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2918,7 +2993,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2943,7 +3018,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -2982,7 +3057,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3007,7 +3082,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3032,7 +3107,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3066,7 +3141,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3098,7 +3173,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3130,7 +3205,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3158,7 +3233,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3188,7 +3263,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3215,7 +3290,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3245,7 +3320,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3275,7 +3350,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3343,7 +3418,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3368,7 +3443,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3393,7 +3468,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3430,7 +3505,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3463,7 +3538,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3490,7 +3565,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3519,7 +3594,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3619,7 +3694,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3646,7 +3721,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3720,6 +3795,7 @@ public class MainPage {
         return null;
     }
 
+
     public Long getSelectedIdOfReportRule() {
         return selectedIdOfReportRule;
     }
@@ -3760,7 +3836,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3792,7 +3868,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3824,7 +3900,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3854,7 +3930,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3883,7 +3959,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3911,7 +3987,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -3950,7 +4026,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3980,7 +4056,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4025,7 +4101,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4057,7 +4133,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4089,7 +4165,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4118,7 +4194,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4147,7 +4223,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4175,7 +4251,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4205,7 +4281,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4231,7 +4307,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4260,7 +4336,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4286,7 +4362,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4316,7 +4392,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4330,7 +4406,8 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to remove order", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении покупки: "+e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении покупки: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -4369,7 +4446,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4427,7 +4504,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4460,7 +4537,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4492,7 +4569,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4517,7 +4594,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         } catch (Exception e) {
             logger.error("Failed to update report job", e);
@@ -4552,7 +4629,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4651,7 +4728,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4700,7 +4777,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4717,8 +4794,9 @@ public class MainPage {
             currentWorkspacePage = salesReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по продажам", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам",
+                            null));
         }
         updateSelectedMainMenu();
         return null;
@@ -4746,7 +4824,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4807,7 +4885,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4853,7 +4931,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4870,8 +4948,9 @@ public class MainPage {
             currentWorkspacePage = enterEventReportPage;
         } catch (Exception e) {
             logger.error(" Failed to set enter event report page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчет по турникетам", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по турникетам",
+                            null));
         }
         updateSelectedMainMenu();
         return null;
@@ -4899,7 +4978,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4921,8 +5000,9 @@ public class MainPage {
             currentWorkspacePage = clientReportPage;
         } catch (Exception e) {
             logger.error("Failed to set client report page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчет по учащимся", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся",
+                            null));
         }
         updateSelectedMainMenu();
         return null;
@@ -4950,7 +5030,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -4997,12 +5077,11 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to fill configuration page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы конфигурации",
-                            null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы конфигурации", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5028,8 +5107,8 @@ public class MainPage {
             configurationPage.save(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Конфигурация сохранена успешно. Для применения необходим перезапуск", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Конфигурация сохранена успешно. Для применения необходим перезапуск", null));
         } catch (Exception e) {
             logger.error("Failed to save configurations", e);
             facesContext.addMessage(null,
@@ -5037,7 +5116,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5045,11 +5124,11 @@ public class MainPage {
 
     private final JournalViewPage journalViewPage = new JournalViewPage();
 
-    public JournalViewPage getJournalViewPage(){
+    public JournalViewPage getJournalViewPage() {
         return journalViewPage;
     }
 
-    public Object showJournalViewPage(){
+    public Object showJournalViewPage() {
         currentWorkspacePage = journalViewPage;
         return null;
     }
@@ -5118,7 +5197,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5136,8 +5215,7 @@ public class MainPage {
             try {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                currentPositionData =
-                        currentPositionsReportPage.prepareCurrentPositionsData(persistenceSession);
+                currentPositionData = currentPositionsReportPage.prepareCurrentPositionsData(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -5146,9 +5224,10 @@ public class MainPage {
 
             }
             List<CurrentPositionsManager.CurrentPositionItem> curPositionList = new ArrayList<CurrentPositionsManager.CurrentPositionItem>();
-            CurrentPositionsManager currentPositionsManager = new CurrentPositionsManager(currentPositionData.isWithOperator(),
-                    currentPositionData.getOperatorContragent(), currentPositionData.getBudgetContragent(),
-                    currentPositionData.getClientContragent(), curPositionList);
+            CurrentPositionsManager currentPositionsManager = new CurrentPositionsManager(
+                    currentPositionData.isWithOperator(), currentPositionData.getOperatorContragent(),
+                    currentPositionData.getBudgetContragent(), currentPositionData.getClientContragent(),
+                    curPositionList);
 
             // Рассчитать текущие позиции
             currentPositionsReportPage.countCurrentPositions(currentPositionsManager, currentPositionData);
@@ -5169,14 +5248,12 @@ public class MainPage {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to count current positions", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при расчете текущих позиций", null));
-        }
-        finally {
-            
+        } finally {
+
         }
 
         return null;
@@ -5223,7 +5300,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5255,7 +5332,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5283,7 +5360,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5304,12 +5381,13 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке справочника точек продаж", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке справочника точек продаж",
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5345,12 +5423,12 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to remove POS", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении точки продажи", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении точки продажи", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5383,7 +5461,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5417,7 +5495,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5448,7 +5526,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5495,7 +5573,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5527,7 +5605,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5547,19 +5625,21 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Платеж между контрагентами зарегистрирован успешно", null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Платеж между контрагентами зарегистрирован успешно",
+                            null));
         } catch (SettlementCreatePage.WrongContragentsException e) {
             logger.error("Failed to create settlement", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Платеж между указанными контрагентами не может быть осуществлен", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Платеж между указанными контрагентами не может быть осуществлен", null));
         } catch (Exception e) {
             logger.error("Failed to create settlement", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами",
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5585,7 +5665,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5621,12 +5701,12 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to remove settlement", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5659,7 +5739,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5692,7 +5772,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5716,13 +5796,12 @@ public class MainPage {
             currentWorkspacePage = selectedSettlementGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected settlement group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы платежа между контрагентами",
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы платежа между контрагентами", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5769,7 +5848,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5801,7 +5880,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5821,19 +5900,21 @@ public class MainPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Платеж между контрагентами зарегистрирован успешно", null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Платеж между контрагентами зарегистрирован успешно",
+                            null));
         } catch (AddPaymentCreatePage.WrongContragentsException e) {
             logger.error("Failed to create addPayment", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Платеж между указанными контрагентами не может быть осуществлен", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Платеж между указанными контрагентами не может быть осуществлен", null));
         } catch (Exception e) {
             logger.error("Failed to create addPayment", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами",
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5859,7 +5940,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5895,12 +5976,12 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to remove addPayment", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5933,7 +6014,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5966,7 +6047,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -5990,13 +6071,12 @@ public class MainPage {
             currentWorkspacePage = selectedAddPaymentGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected addPayment group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы платежа между контрагентами",
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы платежа между контрагентами", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         updateSelectedMainMenu();
         return null;
@@ -6050,7 +6130,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -6076,10 +6156,11 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
+
     // Kadyrov (18.01.2012)
     public Object completeRuleListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -6097,6 +6178,7 @@ public class MainPage {
         }
         return null;
     }
+
     // Kadyrov (18.01.2012)
     public Object completeRuleListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -6116,7 +6198,7 @@ public class MainPage {
     }
 
 
-    public CategoryOrgListSelectPage getCategoryOrgListSelectPage(){
+    public CategoryOrgListSelectPage getCategoryOrgListSelectPage() {
         return categoryOrgListSelectPage;
     }
 
@@ -6131,7 +6213,7 @@ public class MainPage {
         this.categoryOrgFilterOfSelectCategoryOrgListSelectPage = categoryOrgFilterOfSelectCategoryOrgListSelectPage;
     }
 
-    public Object showCategoryOrgListSelectPage(){
+    public Object showCategoryOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategoryOrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -6142,19 +6224,21 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if(categoryOrgFilterOfSelectCategoryOrgListSelectPage.length()==0){
+                if (categoryOrgFilterOfSelectCategoryOrgListSelectPage.length() == 0) {
                     categoryOrgListSelectPage.fill(persistenceSession);
                 } else {
-                    categoryOrgListSelectPage.fill(persistenceSession, categoryOrgFilterOfSelectCategoryOrgListSelectPage);
+                    categoryOrgListSelectPage
+                            .fill(persistenceSession, categoryOrgFilterOfSelectCategoryOrgListSelectPage);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                categoryOrgListSelectPage.pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
+                categoryOrgListSelectPage
+                        .pushCompleteHandlerList((CategoryOrgListSelectPage.CompleteHandlerList) currentTopMostPage);
                 modalPages.push(categoryOrgListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to complete  categorydiscount org selection", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при обработке выбора категории организации", null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -6179,7 +6263,8 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to complete categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6200,7 +6285,8 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                            null));
         }
         return null;
     }
@@ -6217,7 +6303,8 @@ public class MainPage {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                            null));
         }
         return null;
     }
@@ -6232,7 +6319,7 @@ public class MainPage {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategoryListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+            Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -6240,14 +6327,15 @@ public class MainPage {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if(params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")){
+                if (params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")) {
                     categoryListSelectPage.fill(persistenceSession, false);
                 } else {
                     categoryListSelectPage.fill(persistenceSession, true);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                categoryListSelectPage.pushCompleteHandlerList((CategoryListSelectPage.CompleteHandlerList) currentTopMostPage);
+                categoryListSelectPage
+                        .pushCompleteHandlerList((CategoryListSelectPage.CompleteHandlerList) currentTopMostPage);
                 modalPages.push(categoryListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to complete  categorydiscount selection", e);
@@ -6256,7 +6344,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -6265,7 +6353,7 @@ public class MainPage {
     // Kadyrov (18.01.2012)
     public Object updateCategoryListSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Map<String,String> params = facesContext.getExternalContext().getRequestParameterMap();
+        Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -6273,7 +6361,7 @@ public class MainPage {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")){
+            if (params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")) {
                 categoryListSelectPage.fill(persistenceSession, false);
             } else {
                 categoryListSelectPage.fill(persistenceSession, true);
@@ -6287,10 +6375,11 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
+
     // Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -6308,6 +6397,7 @@ public class MainPage {
         }
         return null;
     }
+
     // Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -6334,8 +6424,8 @@ public class MainPage {
     // baybikov (06.12.2011)
     public Object showCategorySelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof CategorySelectPage.CompleteHandler ||
-            currentTopMostPage instanceof CategorySelectPage) {
+        if (currentTopMostPage instanceof CategorySelectPage.CompleteHandler
+                || currentTopMostPage instanceof CategorySelectPage) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
@@ -6353,12 +6443,13 @@ public class MainPage {
                 }
             } catch (Exception e) {
                 logger.error("Failed to fill categorydiscount selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора категории", null));
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора категории",
+                                null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         return null;
@@ -6389,7 +6480,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -6425,7 +6516,6 @@ public class MainPage {
     public void setSelectedIdOfRule(Long selectedIdOfRule) {
         this.selectedIdOfRule = selectedIdOfRule;
     }
-
 
 
     public String showCurrentPositionCSVList() {
@@ -6573,13 +6663,14 @@ public class MainPage {
     //
 
     User currentUser;
+
     public User getCurrentUser() throws Exception {
-        if (currentUser==null) {
+        if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
             String userName = context.getExternalContext().getRemoteUser();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
-            RuntimeContext runtimeContext=null;
+            RuntimeContext runtimeContext = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
@@ -6595,7 +6686,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-                
+
             }
         }
         /////
@@ -6604,7 +6695,7 @@ public class MainPage {
 
     public static MainPage getSessionInstance() throws Exception {
         FacesContext context = FacesContext.getCurrentInstance();
-        return (MainPage)context.getApplication().createValueBinding("#{mainPage}").getValue(context);
+        return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
     }
 
     public boolean isEligibleToViewOrgs() throws Exception {
@@ -6726,8 +6817,8 @@ public class MainPage {
         Transaction persistenceTransaction = null;
         try {
             if (!isEligibleToRemoveClients()) {
-                facesContext
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Нет прав на удаление клиента", null));
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Нет прав на удаление клиента", null));
                 return null;
             }
             runtimeContext = RuntimeContext.getInstance();
@@ -6736,18 +6827,19 @@ public class MainPage {
             clientEditPage.removeClient(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            setSelectedIdOfClient(null); selectedClientGroupPage.getMainMenuComponent().setRendered(false);
+            setSelectedIdOfClient(null);
+            selectedClientGroupPage.getMainMenuComponent().setRendered(false);
             showClientListPage();
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиент удален", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиент удален", null));
         } catch (Exception e) {
             logger.error("Failed to remove client", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении клиента: "+e.getMessage(), null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении клиента: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -6796,7 +6888,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-            
+
         }
         return null;
     }
@@ -6849,8 +6941,8 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new org", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6873,8 +6965,8 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита дневных трат", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита дневных трат", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6896,8 +6988,8 @@ public class MainPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении параметров уведомления", null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении параметров уведомления", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6919,325 +7011,326 @@ public class MainPage {
             reportTemplateManagerPage.removeTemplate(removedReportTemplate);
         } catch (Exception e) {
             logger.error("Error on deleting report template file.", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона.", null));
-        }
-        return null;
-    }
-                          /*
-    public Object removeProductGuideItem() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            productGuideListPage.remove(persistenceSession, currentConfigurationProvider, removedProductGuideItemId);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Error on deleting guide product item.", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении продукта из справочника продуктов.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return null;
-    }    
-
-    public ProductGuideListPage getProductGuideListPage() {
-        return productGuideListPage;
-    }
-
-
-    public Object showProductGuideListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            productGuideListPage.fillConfigurationProviderComboBox(persistenceSession);
-            productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = productGuideListPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill product guide list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона.", null));
         }
-        updateSelectedMainMenu();
-        return null;
-    }
-                           /*
-    public Object updateProductGuideListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
-        } catch (Exception e) {
-            logger.error("Failed to fill product guide list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
-        updateSelectedMainMenu();
         return null;
     }
 
-    public Object updateProducts() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            productGuideListPage.updateProducts(persistenceSession, getCurrentUser(),
-                    this.getCurrentConfigurationProvider());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранена успешно.", null));
-            this.editedProductGuideItemId = null;            
-        } catch (ProductGuideListPage.ProductGuideException ex) {
-            logger.error("Failed to fill product guide list page", ex);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(),
-                            null));
-        } catch (Exception e) {
-            logger.error("Failed to edit products", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при редактирования данных продуктов питания.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
+    /*
+public Object removeProductGuideItem() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+productGuideListPage.remove(persistenceSession, currentConfigurationProvider, removedProductGuideItemId);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+} catch (Exception e) {
+logger.error("Error on deleting guide product item.", e);
+facesContext
+        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении продукта из справочника продуктов.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+}
+return null;
+}
 
-    public Object createConfigurationProvider() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderCreatePage.create(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Создано успешно.", null));
-            currentWorkspacePage = configurationProviderCreatePage;
-        } catch (Exception e) {
-            logger.error("Failed to create configuration provider item", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при создании конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-                */
+public ProductGuideListPage getProductGuideListPage() {
+return productGuideListPage;
+}
+
+
+public Object showProductGuideListPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+productGuideListPage.fillConfigurationProviderComboBox(persistenceSession);
+productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
+persistenceTransaction.commit();
+persistenceTransaction = null;
+currentWorkspacePage = productGuideListPage;
+} catch (Exception e) {
+logger.error("Failed to fill product guide list page", e);
+facesContext.addMessage(null,
+        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
+                null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+
+}
+updateSelectedMainMenu();
+return null;
+}
+               /*
+public Object updateProductGuideListPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+productGuideListPage.fill(persistenceSession, this.getCurrentConfigurationProvider());
+persistenceTransaction.commit();
+persistenceTransaction = null;
+
+} catch (Exception e) {
+logger.error("Failed to fill product guide list page", e);
+facesContext.addMessage(null,
+        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
+                null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+
+}
+updateSelectedMainMenu();
+return null;
+}
+
+public Object updateProducts() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+productGuideListPage.updateProducts(persistenceSession, getCurrentUser(),
+        this.getCurrentConfigurationProvider());
+persistenceTransaction.commit();
+persistenceTransaction = null;
+facesContext.addMessage(null,
+        new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранена успешно.", null));
+this.editedProductGuideItemId = null;
+} catch (ProductGuideListPage.ProductGuideException ex) {
+logger.error("Failed to fill product guide list page", ex);
+facesContext.addMessage(null,
+        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(),
+                null));
+} catch (Exception e) {
+logger.error("Failed to edit products", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+        "Ошибка при редактирования данных продуктов питания.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+}
+updateSelectedMainMenu();
+return null;
+}
+
+public Object createConfigurationProvider() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderCreatePage.create(persistenceSession);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+facesContext.addMessage(null,
+        new FacesMessage(FacesMessage.SEVERITY_INFO, "Создано успешно.", null));
+currentWorkspacePage = configurationProviderCreatePage;
+} catch (Exception e) {
+logger.error("Failed to create configuration provider item", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+        "Ошибка при создании конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+}
+updateSelectedMainMenu();
+return null;
+}
+    */
     public Object showConfigurationProviderGroupPage() {
         currentWorkspacePage = configurationProviderGroupPage;
         updateSelectedMainMenu();
         return null;
     }
-                  /*
-    public Object removeСonfigurationProviderItem() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderListPage.remove(persistenceSession, removedConfigurationProviderItemId);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Error on deleting configuration provider item.", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-    public Object showConfigurationProviderEditPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderEditPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            //showSelectedConfigurationProviderGroupPage();
-            currentWorkspacePage = configurationProviderEditPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill configuration provider edit page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+    /*
+public Object removeСonfigurationProviderItem() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderListPage.remove(persistenceSession, removedConfigurationProviderItemId);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+} catch (Exception e) {
+logger.error("Error on deleting configuration provider item.", e);
+facesContext
+.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+}
+updateSelectedMainMenu();
+return null;
+}
+public Object showConfigurationProviderEditPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderEditPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+//showSelectedConfigurationProviderGroupPage();
+currentWorkspacePage = configurationProviderEditPage;
+} catch (Exception e) {
+logger.error("Failed to fill configuration provider edit page", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+"Ошибка при подготовке страницы редактирования данных конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
 
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
+}
+updateSelectedMainMenu();
+return null;
+}
 
-    public Object showСonfigurationProviderViewPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderViewPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            showSelectedConfigurationProviderGroupPage();
-            //selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = configurationProviderViewPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill configuration provider view page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+public Object showСonfigurationProviderViewPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderViewPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+showSelectedConfigurationProviderGroupPage();
+//selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
+currentWorkspacePage = configurationProviderViewPage;
+} catch (Exception e) {
+logger.error("Failed to fill configuration provider view page", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+"Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
 
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
+}
+updateSelectedMainMenu();
+return null;
+}
 
-    public Object showConfigurationProviderListPage() {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = configurationProviderListPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill configuration provider view page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
+public Object showConfigurationProviderListPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderListPage.fill(persistenceSession);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+currentWorkspacePage = configurationProviderListPage;
+} catch (Exception e) {
+logger.error("Failed to fill configuration provider view page", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+"Ошибка при подготовке страницы просмотра данных конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
+}
+updateSelectedMainMenu();
+return null;
+}
 
-    public Object showConfigurationProviderCreatePage() {
-        currentWorkspacePage = configurationProviderCreatePage;
-        updateSelectedMainMenu();
-        return null;
-    }
+public Object showConfigurationProviderCreatePage() {
+currentWorkspacePage = configurationProviderCreatePage;
+updateSelectedMainMenu();
+return null;
+}
 
-    public Object showSelectedConfigurationProviderGroupPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            selectedConfigurationProviderGroupPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = selectedConfigurationProviderGroupPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill configuration provider select page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы выбора данных конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+public Object showSelectedConfigurationProviderGroupPage() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+selectedConfigurationProviderGroupPage.fill(persistenceSession, selectedIdOfConfigurationProvider);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+selectedConfigurationProviderGroupPage.showAndExpandMenuGroup();
+currentWorkspacePage = selectedConfigurationProviderGroupPage;
+} catch (Exception e) {
+logger.error("Failed to fill configuration provider select page", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+"Ошибка при подготовке страницы выбора данных конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
 
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
+}
+updateSelectedMainMenu();
+return null;
+}
 
-    public Object updateConfigurationProvider() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            configurationProviderEditPage.update(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            //showSelectedConfigurationProviderGroupPage();
-            currentWorkspacePage = configurationProviderEditPage;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранено успешно.", null));
-        } catch (Exception e) {
-            logger.error("Failed on update configuration provider", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при сохранении конфигурации провайдера.", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+public Object updateConfigurationProvider() {
+FacesContext facesContext = FacesContext.getCurrentInstance();
+RuntimeContext runtimeContext = null;
+Session persistenceSession = null;
+Transaction persistenceTransaction = null;
+try {
+runtimeContext = RuntimeContext.getInstance();
+persistenceSession = runtimeContext.createPersistenceSession();
+persistenceTransaction = persistenceSession.beginTransaction();
+configurationProviderEditPage.update(persistenceSession);
+persistenceTransaction.commit();
+persistenceTransaction = null;
+//showSelectedConfigurationProviderGroupPage();
+currentWorkspacePage = configurationProviderEditPage;
+facesContext.addMessage(null,
+new FacesMessage(FacesMessage.SEVERITY_INFO, "Сохранено успешно.", null));
+} catch (Exception e) {
+logger.error("Failed on update configuration provider", e);
+facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+"Ошибка при сохранении конфигурации провайдера.", null));
+} finally {
+HibernateUtils.rollback(persistenceTransaction, logger);
+HibernateUtils.close(persistenceSession, logger);
 
-        }
-        updateSelectedMainMenu();
-        return null;
-    }                           */
+}
+updateSelectedMainMenu();
+return null;
+}                           */
 
     public void productGuideLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -7245,7 +7338,7 @@ public class MainPage {
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (currentConfigurationProvider==null) {
+            if (currentConfigurationProvider == null) {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не указана конфигурация поставщика.", null));
                 return;
@@ -7264,9 +7357,8 @@ public class MainPage {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
             logger.error("Failed to load product guide items from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных справочника продуктов: "+e,
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных справочника продуктов: " + e, null));
         } finally {
             close(inputStream);
         }
@@ -7288,9 +7380,8 @@ public class MainPage {
             currentWorkspacePage = productGuideLoadPage;
         } catch (Exception e) {
             logger.error("Failed to fill product guide list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы справочника продуктов",
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы справочника продуктов", null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7318,6 +7409,32 @@ public class MainPage {
 
     public Object showTechnologicalMapGroupsGroupPage() {
         currentWorkspacePage = technologicalMapGroupsGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showTestPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            testTestListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = testTestListPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill product guide list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке тестовой страницы", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
         updateSelectedMainMenu();
         return null;
     }

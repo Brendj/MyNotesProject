@@ -4,8 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import sun.misc.BASE64Decoder;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
+import ru.axetta.rusmarc.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,6 +27,13 @@ import org.w3c.dom.Node;
 public class Publication extends DistributedObject {
 
     //private Long idofpubl;
+
+    private static final int AUTHOR = 2;
+    private static final int TITLE = 0;
+    private static final int TITLE2 = 1;
+    private static final int PUBLISHER = 3;
+    private static final int PUBLICATION_DATE = 4;
+
     private String isbn;
     private String data;
     private String author;
@@ -28,42 +45,66 @@ public class Publication extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element,"isbn", isbn);
-        setAttribute(element,"data", data);
-        setAttribute(element,"author", author);
-        setAttribute(element,"title", title);
-        setAttribute(element,"title2", title2);
-        setAttribute(element,"publicationdate", publicationdate);
+        setAttribute(element, "isbn", isbn);
+        setAttribute(element, "data", data);
+        setAttribute(element, "author", author);
+        setAttribute(element, "title", title);
+        setAttribute(element, "title2", title2);
+        setAttribute(element, "publicationdate", publicationdate);
         setAttribute(element, "publisher", publisher);
         setAttribute(element, "guid", guid);
     }
 
     @Override
-    protected Publication parseAttributes(Node node) {
+    protected Publication parseAttributes(Node node) throws IOException {
+        String data = getStringAttributeValue(node, "data", 64565);
+        DataInputStream dataInputStream = new DataInputStream(
+                new ByteArrayInputStream(Base64AndZip.unzipAndDecode(data.getBytes())));
+        Record record = new Record(dataInputStream);
 
-        String stringIsbn = getStringAttributeValue(node,"isbn",32);
-        if(stringIsbn!=null) setIsbn(stringIsbn);
-        String stringData= getStringAttributeValue(node,"data",32);
-        if(stringData!=null) setData(stringData);
-        String stringAuthor= getStringAttributeValue(node,"author",128);
-        if(stringAuthor!=null) setAuthor(stringAuthor);
-        String stringTitle= getStringAttributeValue(node,"title",512);
-        if(stringTitle!=null) setTitle(stringTitle);
-        String stringTitle2= getStringAttributeValue(node,"title2",2048);
-        if(stringTitle2!=null) setTitle(stringTitle2);
-        String stringPublicationdate = getStringAttributeValue(node,"publicationdate", 512);
-        if(stringPublicationdate!=null) setPublicationdate(stringPublicationdate);
-        String stringPublisher = getStringAttributeValue(node, "publisher", 512);
-        if(stringPublisher!=null) setPublisher(stringPublisher);
+        setData(data);
+
+        String stringIsbn = record.getISBN();
+        if (stringIsbn != null) {
+            setIsbn(stringIsbn);
+        }
+
+        String stringHash = record.getStringForHash();
+        if (stringHash != null) {
+            setHash(stringHash);
+        }
+
+        String[] info = record.getInfo();
+
+        String stringAuthor = info[AUTHOR];
+        if (stringAuthor != null) {
+            setAuthor(stringAuthor);
+        }
+        String stringTitle = info[TITLE];
+        if (stringTitle != null) {
+            setTitle(stringTitle);
+        }
+        String stringTitle2 = info[TITLE2];
+        if (stringTitle2 != null) {
+            setTitle(stringTitle2);
+        }
+        String stringPublicationdate = info[PUBLICATION_DATE];
+        if (stringPublicationdate != null) {
+            setPublicationdate(stringPublicationdate);
+        }
+        String stringPublisher = info[PUBLISHER];
+        if (stringPublisher != null) {
+            setPublisher(stringPublisher);
+        }
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setIsbn( ((Publication) distributedObject).getIsbn());
-        setData (((Publication) distributedObject).getData());
-        setAuthor( ((Publication) distributedObject).getAuthor());
-        setTitle (((Publication) distributedObject).getTitle());
+        setIsbn(((Publication) distributedObject).getIsbn());
+        setData(((Publication) distributedObject).getData());
+        setAuthor(((Publication) distributedObject).getAuthor());
+        setTitle(((Publication) distributedObject).getTitle());
         setTitle2(((Publication) distributedObject).getTitle2());
         setPublicationdate(((Publication) distributedObject).getPublicationdate());
         setPublisher(((Publication) distributedObject).getPublisher());

@@ -87,6 +87,7 @@
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </h:commandLink>
         </rich:column>
+
         <f:facet name="footer">
             <rich:datascroller for="orgListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
