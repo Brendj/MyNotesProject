@@ -27,7 +27,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class OrgEditPage extends BasicWorkspacePage
-        implements OrgSelectPage.CompleteHandler,// OrgListSelectPage.CompleteHandlerList,
+        implements OrgSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
         CategoryOrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler,
         ConfigurationProviderSelect {
 
@@ -65,11 +65,16 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports2;
     private ConfigurationProvider configurationProvider;
     private String configurationProviderName;
+    private Set<Org> orgSet = new HashSet<Org>();
+    private String filterOrg;
+    private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
 
+    private List<Long> idOfOrgList;
+    private String filterOrgs = "Не выбрано";
 
     public static class ContragentItem {
-
         private final Long idOfContragent;
+
         private final String contragentName;
 
         public ContragentItem(Contragent contragent) {
@@ -85,12 +90,12 @@ public class OrgEditPage extends BasicWorkspacePage
         public Long getIdOfContragent() {
             return idOfContragent;
         }
-
         public String getContragentName() {
             return contragentName;
         }
-    }
 
+
+    }
 
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
@@ -140,6 +145,14 @@ public class OrgEditPage extends BasicWorkspacePage
                 org.getCategories().add((CategoryOrg) object);
             }
         }
+        if(idOfOrgList==null || idOfOrgList.isEmpty()){
+            org.setFriendlyOrg(null);
+        } else {
+            List friendlyOrgList = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
+            for (Object object: friendlyOrgList){
+                org.getFriendlyOrg().add((Org) object);
+            }
+        }
 
         if(this.configurationProvider!=null){
             ConfigurationProvider cp = (ConfigurationProvider) session.load(ConfigurationProvider.class, this.configurationProvider.getIdOfConfigurationProvider());
@@ -153,9 +166,10 @@ public class OrgEditPage extends BasicWorkspacePage
         fill(org);
         /////
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
-        // save configuration provader
-        //DAOService.getInstance().setConfigurationProviderInOrg(idOfOrg,CONFIGURATION_PROVIDER);
     }
+
+
+
 
     private void fill(Org org) throws Exception {
         this.idOfOrg = org.getIdOfOrg();
@@ -202,8 +216,32 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             this.configurationProviderName = "";
         }
+        if(!(org.getFriendlyOrg()==null || org.getFriendlyOrg().isEmpty())){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Org friendlyOrg: org.getFriendlyOrg()){
+                stringBuilder.append(friendlyOrg.getShortName());
+                stringBuilder.append("; ");
+            }
+            filterOrgs = stringBuilder.toString();
+        }
     }
 
+    /* interface implements methods */
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if(null != orgMap) {
+            idOfOrgList = new ArrayList<Long>();
+            StringBuilder stringBuilder = new StringBuilder();
+            if(!orgMap.isEmpty()){
+                for(Long idOfOrg: orgMap.keySet()){
+                    idOfOrgList.add(idOfOrg);
+                    stringBuilder.append(orgMap.get(idOfOrg));
+                    stringBuilder.append("; ");
+                }
+                filterOrgs = stringBuilder.toString();
+            }
+        }
+    }
 
     /*public void setMenuExchangeSourceOrg(Long menuExchangeSourceOrg) {
        this.menuExchangeSourceOrg = menuExchangeSourceOrg;
@@ -225,10 +263,6 @@ public class OrgEditPage extends BasicWorkspacePage
             menuExchangeSourceOrgName = org.getShortName();
         }
     }
-
-    /* interface implements methods */
-    private String filterOrg;
-    private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
 
     public String getIdOfCategoryOrgList() {
         return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
@@ -286,6 +320,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
     /* Getters and Setters */
+    public String getFilterOrgs() {
+        return filterOrgs;
+    }
+
+    public void setFilterOrgs(String filterOrgs) {
+        this.filterOrgs = filterOrgs;
+    }
+
     public String getConfigurationProviderName() {
         return configurationProviderName;
     }

@@ -109,6 +109,15 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Дружественные организации" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-div" columns="2">
+        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                styleClass="command-link" style="width: 25px;" />
+        <h:outputText value="{#{mainPage.orgEditPage.filterOrgs}}" styleClass="output-text"/>
+    </h:panelGrid>
+
+
     <h:outputText escape="true" value="Сменить пароль для единого входа" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeSsoPassword}" styleClass="output-text">
         <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />

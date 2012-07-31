@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

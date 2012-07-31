@@ -86,6 +86,11 @@
             <column name="idOfConfigurationProvider" />
         </many-to-one>
 
+        <set name="friendlyOrg" table="cf_friendly_organization" inverse="true" cascade="all">
+            <key column="currentOrg" />
+            <many-to-many column="friendlyOrg"  class="ru.axetta.ecafe.processor.core.persistence.Org" />
+        </set>
+
 
         <!-- Kadirov D (21.12.2011) -->
         <!--set name="enterEventsInternal" inverse="true" cascade="all">

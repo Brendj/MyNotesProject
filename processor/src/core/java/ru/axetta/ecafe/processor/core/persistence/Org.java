@@ -68,6 +68,15 @@ public class Org {
     private String mailingListReports1;
     private String mailingListReports2;
     private ConfigurationProvider configurationProvider;
+    private Set<Org> friendlyOrg;
+
+    public Set<Org> getFriendlyOrg() {
+        return friendlyOrg;
+    }
+
+    public void setFriendlyOrg(Set<Org> friendlyOrg) {
+        this.friendlyOrg = friendlyOrg;
+    }
 
     public ConfigurationProvider getConfigurationProvider() {
         return configurationProvider;

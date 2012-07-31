@@ -14,10 +14,7 @@ import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.Configurati
 
 import org.hibernate.Session;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,6 +53,12 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports2;
     private List<CategoryOrg> categoryOrg;
     private String configurationProviderName;
+    private List<Long> idOfOrgList;
+    private String filterOrgs = "Не выбрано";
+
+    public String getFilterOrgs() {
+        return filterOrgs;
+    }
 
     public String getConfigurationProviderName() {
         return configurationProviderName;
@@ -204,7 +207,7 @@ public class OrgViewPage extends BasicWorkspacePage {
                this.categoryOrg.add(co);
            }
         }
-        
+
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
         if (menuExchangeSourceOrgId == null) {
@@ -219,6 +222,15 @@ public class OrgViewPage extends BasicWorkspacePage {
             configurationProviderName = "";
         } else {
            configurationProviderName = configurationProvider.getName();
+        }
+        Set<Org> friendlyOrganisation = org.getFriendlyOrg();
+        if(!(friendlyOrganisation==null || friendlyOrganisation.isEmpty())){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Org friendlyOrg: org.getFriendlyOrg()){
+                stringBuilder.append(friendlyOrg.getShortName());
+                stringBuilder.append("; ");
+            }
+            filterOrgs = stringBuilder.toString();
         }
 
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
