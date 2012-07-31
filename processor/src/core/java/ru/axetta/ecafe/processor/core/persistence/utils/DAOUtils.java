@@ -563,6 +563,13 @@ public class DAOUtils {
         return (List<Org>)q.getResultList();
     }
 
+    public static List getOrgsByIdList(Session session, List<Long> idOfOrgList) {
+        if (idOfOrgList.isEmpty()) return new ArrayList(0);
+        String idOfOrgs=idOfOrgList.toString().replaceAll("[^0-9,]","");
+        Query query = session.createQuery("from Org where idOfOrg in ("+idOfOrgs+")");
+        return query.list();
+    }
+
     public static long getCategoryDiscountMaxId(EntityManager em) {
         javax.persistence.Query q = em.createQuery("select max(idOfCategoryDiscount) from CategoryDiscount");
         return (Long)(q.getSingleResult());
@@ -610,6 +617,26 @@ public class DAOUtils {
             if (id<minId) minId = id;
         }
         return minId-1;
+    }
+
+    public static ClientGroup createClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
+        ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(clientGroupName);
+        Long idOfClientGroup =null;
+        /* если группа предопредлелена */
+        if(predefined!=null){
+            idOfClientGroup = predefined.getValue();
+        } else {
+            /* иначе это класс */
+            Query q = persistenceSession.createQuery("select max(compositeIdOfClientGroup.idOfClientGroup) from ClientGroup where compositeIdOfClientGroup.idOfOrg=:idOfOrg and compositeIdOfClientGroup.idOfClientGroup<:idOfClientGroup");
+            q.setParameter("idOfOrg", idOfOrg);
+            q.setParameter("idOfClientGroup",1100000000L);
+            List l = q.list();
+            idOfClientGroup = (Long)l.get(0) + 1 ;
+        }
+        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
+        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
+        persistenceSession.save(clientGroup);
+        return clientGroup;
     }
 
     public static ClientGroup createNewClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
@@ -667,6 +694,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ConfigurationProvider.class);
         criteria.add(Restrictions.eq("name", name));
         return criteria.uniqueResult();
+    }
+
+    public static List getClientGroupsByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg",idOfOrg));
+        return criteria.list();
     }
 
 }
