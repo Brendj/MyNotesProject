@@ -12,6 +12,34 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public class Option {
+
+    /* TODO: Предпологается применить множество? */
+    public enum Options{
+        OPERATOR(2),
+        NOTIFY_BY_SMS_ABOUT_ENTER_EVENT(3),
+        CLEAN_MENU(4),
+        MENU_DAYS_FOR_DELETION(5),
+        JOURNAL_TRANSACTIONS(6),
+        SEND_JOURNAL_TRANSACTIONS_TO_NFP(7),
+        NFP_SERVICE_ADDRESS(8),
+        PASSWORD_RESTORE_SEED(9),
+        NOTIFICATION_TEXT(10),
+        CHRONOPAY_SECTION(1000),
+        CHRONOPAY_RATE(1001),
+        RBK_SECTION(1002),
+        RBK_RATE(1003);
+        private int value;
+
+        private Options(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+    }
+
     public final static int OPTION_WITH_OPERATOR=2,
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3, OPTION_CLEAN_MENU=4,
             OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_JOURNAL_TRANSACTIONS=6, OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP=7,
