@@ -813,20 +813,48 @@ public class Processor implements SyncProcessor,
 
     private void processSyncClientParamRegistry(Long idOfSync, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry) throws Exception {
-        Enumeration<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
-                .getPayments();
-        while (clientParamItems.hasMoreElements()) {
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.nextElement();
-            try {
-                processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem);
-            } catch (Exception e) {
-                logger.error(String.format("Failed to process clientParamItem == %s", clientParamItem), e);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try{
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
+                    .getPayments().iterator();
+
+            HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
+            List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, idOfOrg);
+            for(Object object: clientGroups){
+                ClientGroup clientGroup = (ClientGroup) object;
+                nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
             }
+            while (clientParamItems.hasNext()) {
+                SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
+                ClientGroup clientGroup = null;
+                clientGroup = nameIdGroupMap.get(clientParamItem.getGroupName());
+                /* если группы нет то создаем */
+                if(clientGroup == null){
+                    clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientParamItem.getGroupName());
+                    /* заносим в хэш - карту*/
+                    nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
+                }
+                try {
+                    processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, clientGroup);
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process clientParamItem == %s", clientParamItem), e);
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
+
     }
 
     private void processSyncClientParamRegistryItem(Long idOfSync, Long idOfOrg,
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem) throws Exception {
+            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, ClientGroup clientGroup) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -851,6 +879,13 @@ public class Processor implements SyncProcessor,
             if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
             if (clientParamItem.getNotifyViaEmail()!=null) client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
             if (clientParamItem.getNotifyViaSMS()!=null) client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            /* FAX клиента */
+            if (clientParamItem.getFax() != null) client.setFax(clientParamItem.getFax());
+
+            /* заносим клиента в группу */
+            if(clientGroup!=null){
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            }
 
             /* распарсим строку с категориями */
             if (clientParamItem.getCategoriesDiscounts() != null) {
@@ -938,7 +973,7 @@ public class Processor implements SyncProcessor,
 
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             // Ищем "лишние" группы
-            List<ClientGroup> superfluousClientGroups = new LinkedList<ClientGroup>();
+            List<ClientGroup> superfluousClientGroups = new ArrayList<ClientGroup>();
             for (ClientGroup clientGroup : organization.getClientGroups()) {
                 if (clientGroup.isTemporaryGroup()) {
                     // добавляем временную группу в список для удаления если она уже есть в постоянных
@@ -966,9 +1001,9 @@ public class Processor implements SyncProcessor,
                 persistenceSession.delete(clientGroup);
             }
             // Добавляем и обновляем группы согласно запроса
-            Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
-            while (reqGroups.hasMoreElements()) {
-                SyncRequest.OrgStructure.Group reqGroup = reqGroups.nextElement();
+            Iterator<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups().iterator();
+            while (reqGroups.hasNext()) {
+                SyncRequest.OrgStructure.Group reqGroup = reqGroups.next();
                 try {
                     processSyncOrgStructureGroup(persistenceSession, organization, reqGroup);
                 } catch (Exception e) {
@@ -988,9 +1023,9 @@ public class Processor implements SyncProcessor,
 
     private static boolean findClientGroupById(long idOfClientGroup, SyncRequest.OrgStructure reqStructure)
             throws Exception {
-        Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
-        while (reqGroups.hasMoreElements()) {
-            if (idOfClientGroup == reqGroups.nextElement().getIdOfGroup()) {
+        Iterator<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups().iterator();
+        while (reqGroups.hasNext()) {
+            if (idOfClientGroup == reqGroups.next().getIdOfGroup()) {
                 return true;
             }
         }
@@ -999,9 +1034,9 @@ public class Processor implements SyncProcessor,
 
     private static boolean findClientGroupByName(String groupName, SyncRequest.OrgStructure reqStructure)
             throws Exception {
-        Enumeration<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups();
-        while (reqGroups.hasMoreElements()) {
-            if (groupName.equals(reqGroups.nextElement().getName())) {
+        Iterator<SyncRequest.OrgStructure.Group> reqGroups = reqStructure.getGroups().iterator();
+        while (reqGroups.hasNext()) {
+            if (groupName.equals(reqGroups.next().getName())) {
                 return true;
             }
         }
@@ -1022,7 +1057,7 @@ public class Processor implements SyncProcessor,
         }
 
         // Ищем "лишних" клиентов
-        List<Client> superfluousClients = new LinkedList<Client>();
+        List<Client> superfluousClients = new ArrayList<Client>();
         for (Client client : clientGroup.getClients()) {
             if (!find(client, reqGroup)) {
                 superfluousClients.add(client);
@@ -1186,6 +1221,20 @@ public class Processor implements SyncProcessor,
             for (Object object : clients) {
                 Client client = (Client) object;
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
+            }
+
+            // friendly org clients process
+            Set<Org> friendlyOrganizationSet = organization.getFriendlyOrg();
+            for (Org friendlyOrganization :friendlyOrganizationSet){
+                if(friendlyOrganization.getIdOfOrg().equals(idOfOrg)) continue;
+                //Long friendlyOrganizationVersion = clientRegistryRequest.getIdOfFriendlyOrganization().get(friendlyOrganization.getIdOfOrg());
+                //if(friendlyOrganizationVersion==null) friendlyOrganizationVersion=0L;
+                List friendlyClients = DAOUtils
+                        .findNewerClients(persistenceSession, friendlyOrganization, clientRegistryRequest.getCurrentVersion());
+                for (Object object : friendlyClients) {
+                    Client client = (Client) object;
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
+                }
             }
 
             persistenceTransaction.commit();
