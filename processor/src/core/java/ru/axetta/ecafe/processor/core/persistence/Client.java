@@ -88,6 +88,15 @@ public class Client {
     //private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
+    private String fax;
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
 
     public Set<CategoryDiscount> getCategories(){
         return getCategoriesInternal();

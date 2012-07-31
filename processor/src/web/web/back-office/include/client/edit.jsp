@@ -104,6 +104,11 @@
     <h:outputText escape="true" value="Номер мобильного телефона" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.mobile}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
+
+    <h:outputText escape="true" value="Факс" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.fax}" maxlength="32" styleClass="input-text"
+                 converter="phoneConverter" />
+
     <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaSMS}" styleClass="output-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />

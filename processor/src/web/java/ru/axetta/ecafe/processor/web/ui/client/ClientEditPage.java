@@ -30,7 +30,15 @@ public class ClientEditPage extends BasicWorkspacePage
         implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList, ClientGroupSelectPage.CompleteHandler {
 
 
+    private String fax;
 
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
+
+    public String getFax() {
+        return fax;
+    }
 
     public static class OrgItem {
 
@@ -531,6 +539,7 @@ public class ClientEditPage extends BasicWorkspacePage
         client.setAddress(this.address);
         client.setPhone(this.phone);
         client.setMobile(mobile);
+        client.setFax(this.fax);
         client.setEmail(this.email);
         client.setNotifyViaEmail(this.notifyViaEmail);
         client.setNotifyViaSMS(this.notifyViaSMS);
@@ -603,6 +612,7 @@ public class ClientEditPage extends BasicWorkspacePage
         this.phone = client.getPhone();
         this.mobile = client.getMobile();
         this.email = client.getEmail();
+        this.fax = client.getFax();
         this.notifyViaEmail = client.isNotifyViaEmail();
         this.notifyViaSMS = client.isNotifyViaSMS();
         this.remarks = client.getRemarks();

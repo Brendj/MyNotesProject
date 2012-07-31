@@ -70,6 +70,11 @@
     <h:outputText escape="true" value="Номер мобильного телефона" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.mobile}" readonly="true" styleClass="input-text"
                  converter="phoneConverter" />
+
+    <h:outputText escape="true" value="Факс" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.fax}" readonly="true" styleClass="input-text"
+                 converter="phoneConverter" />
+
     <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text" />
     <h:selectBooleanCheckbox disabled="true" value="#{mainPage.clientViewPage.notifyViaSMS}" readonly="true"
                              styleClass="output-text" />

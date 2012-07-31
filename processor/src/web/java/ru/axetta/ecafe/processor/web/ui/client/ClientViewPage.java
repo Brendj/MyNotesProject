@@ -84,6 +84,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String address;
     private String phone;
     private String mobile;
+    private String fax;
     private String email;
     private Boolean notifyViaEmail;
     private Boolean notifyViaSMS;
@@ -191,6 +192,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         return mobile;
     }
 
+    public String getFax() {
+        return fax;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -259,6 +264,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.address = client.getAddress();
         this.phone = client.getPhone();
         this.mobile = client.getMobile();
+        this.fax = client.getFax();
         this.email = client.getEmail();
         this.notifyViaEmail = client.isNotifyViaEmail();
         this.notifyViaSMS = client.isNotifyViaSMS();

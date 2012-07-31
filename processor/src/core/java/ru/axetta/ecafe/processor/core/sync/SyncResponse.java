@@ -303,6 +303,7 @@ public class SyncResponse {
             private final String phone;
             private final String mobile;
             private final String email;
+            private final String fax;
             private final int contractState;
             private final long contractId;
             private final Integer freePayMaxCount;
@@ -310,6 +311,7 @@ public class SyncResponse {
             private final ClientGroup clientGroup;
             private final boolean notifyViaEmail;
             private final boolean notifyViaSMS;
+            private final String remarks;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -321,6 +323,7 @@ public class SyncResponse {
                 this.address = client.getAddress();
                 this.phone = client.getPhone();
                 this.mobile = client.getMobile();
+                this.fax = client.getFax();
                 this.email = client.getEmail();
                 this.contractState = client.getContractState();
                 this.contractId = client.getContractId();
@@ -329,6 +332,7 @@ public class SyncResponse {
                 this.clientGroup=client.getClientGroup();
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
+                this.remarks = client.getRemarks();
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
@@ -368,6 +372,10 @@ public class SyncResponse {
                 return mobile;
             }
 
+            public String getFax() {
+                return fax;
+            }
+
             public int getContractState() {
                 return contractState;
             }
@@ -392,8 +400,10 @@ public class SyncResponse {
                 element.setAttribute("Address", this.address);
                 element.setAttribute("Phone", this.phone);
                 element.setAttribute("Mobile", this.mobile);
+                element.setAttribute("Mobile", this.fax);
                 element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
+                element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
                 }

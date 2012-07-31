@@ -181,6 +181,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String phone;
     private String mobile;
     private String email;
+    private String fax;
     private Boolean notifyViaEmail = false;
     private Boolean notifyViaSMS = true;
     private String remarks;
@@ -197,6 +198,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String clientGUID;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
 
     /* Является ли данный тип льгот как "Льгота по категорям" если да то TRUE, False в противном случает */
     public Boolean getDiscountModeIsCategory(){
@@ -493,6 +502,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setPhone(this.phone);
         client.setMobile(this.mobile);
         client.setEmail(this.email);
+        client.setFax(this.fax);
         client.setRemarks(this.remarks);
         if (this.externalId==null || this.externalId==0) client.setExternalId(null);
         else client.setExternalId(this.externalId);

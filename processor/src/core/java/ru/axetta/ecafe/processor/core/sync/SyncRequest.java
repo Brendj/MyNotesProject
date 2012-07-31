@@ -399,6 +399,7 @@ public class SyncRequest {
                 public Builder() {
                 }
 
+                /* TODO: сделать поля необязательными для проверки и заполнения */
                 public ClientParamItem build(Node itemNode, LoadContext loadContext) throws Exception {
                     NamedNodeMap namedNodeMap = itemNode.getAttributes();
                     long idOfClient = getLongValue(namedNodeMap, "IdOfClient");
@@ -412,6 +413,7 @@ public class SyncRequest {
                     }
                     int discountMode = getIntValue(namedNodeMap, "DiscountMode");
                     /* pridet string with "1, 9, 94, .." key of Category Discount*/
+                    // Далее идут не обязательные поля
                     String categoriesDiscounts = getStringValueNullSafe(namedNodeMap, "CategoriesDiscounts");
                     ///
                     String name = getStringValueNullSafe(namedNodeMap, "Name");
@@ -425,11 +427,12 @@ public class SyncRequest {
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
                     String notifyViaEmail = getStringValueNullSafe(namedNodeMap, "NotifyViaEmail");
                     String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
+                    String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
 
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
                             discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
                             mobilePhone, fax, email, remarks, notifyViaEmail==null?null:notifyViaEmail.equals("1"),
-                            notifyViaSMS==null?null:notifyViaSMS.equals("1"));
+                            notifyViaSMS==null?null:notifyViaSMS.equals("1"), groupName);
                 }
 
             }
@@ -440,13 +443,14 @@ public class SyncRequest {
             private final int freePayMaxCount;
             private final Date lastFreePayTime;
             private final int discountMode;
+            private final String groupName;
             private final String categoriesDiscounts;
             private final Boolean notifyViaEmail, notifyViaSMS;
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String fax, String email, String remarks,
-                    Boolean notifyViaEmail, Boolean notifyViaSMS) {
+                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -464,6 +468,7 @@ public class SyncRequest {
                 this.remarks = remarks;
                 this.notifyViaEmail = notifyViaEmail;
                 this.notifyViaSMS = notifyViaSMS;
+                this.groupName = groupName;
             }
 
             public long getIdOfClient() {
@@ -534,6 +539,10 @@ public class SyncRequest {
                 return notifyViaSMS;
             }
 
+            public String getGroupName() {
+                return groupName;
+            }
+
             @Override
             public String toString() {
                 return "ClientParamItem{" + "idOfClient=" + idOfClient + ", name='" + name + '\'' + ", surname='"
@@ -581,8 +590,8 @@ public class SyncRequest {
             this.items = new LinkedList<ClientParamItem>();
         }
 
-        public Enumeration<ClientParamItem> getPayments() {
-            return Collections.enumeration(items);
+        public List<ClientParamItem> getPayments() {
+            return items;
         }
 
         @Override
@@ -668,8 +677,8 @@ public class SyncRequest {
             this.groups = groups;
         }
 
-        public Enumeration<Group> getGroups() {
-            return Collections.enumeration(groups);
+        public List<Group> getGroups() {
+            return groups;
         }
 
         @Override
@@ -1474,18 +1483,37 @@ public class SyncRequest {
             public ClientRegistryRequest build(Node clientRegistryRequestNode) throws Exception {
                 long currentVersion = Long.parseLong(
                         clientRegistryRequestNode.getAttributes().getNamedItem("CurrentVersion").getTextContent());
-                return new ClientRegistryRequest(currentVersion);
+                Node friendlyOrganizationNode = clientRegistryRequestNode.getAttributes().getNamedItem("friendlyOrganization");
+                Map<Long, Long> idOfFriendlyOrganization = new HashMap<Long, Long>();
+                if(friendlyOrganizationNode!=null){
+                    StrTokenizer tokenizer = new StrTokenizer(friendlyOrganizationNode.getTextContent(),";");
+                    tokenizer.getTokenList();
+                    for(Object obj: tokenizer.getTokenList()){
+                        String str = (String) obj;
+                        String[] arr= str.split("=");
+                        try{
+                            idOfFriendlyOrganization.put(Long.parseLong(arr[0]), Long.parseLong(arr[1]));
+                        } catch (Exception e){}
+                    }
+                }
+                return new ClientRegistryRequest(currentVersion, idOfFriendlyOrganization);
             }
         }
 
         private final long currentVersion;
+        private final Map<Long,Long> idOfFriendlyOrganization;
 
-        public ClientRegistryRequest(long currentVersion) {
+        public ClientRegistryRequest(long currentVersion, Map<Long, Long> idOfFriendlyOrganization) {
             this.currentVersion = currentVersion;
+            this.idOfFriendlyOrganization = idOfFriendlyOrganization;
         }
 
         public long getCurrentVersion() {
             return currentVersion;
+        }
+
+        public Map<Long, Long> getIdOfFriendlyOrganization() {
+            return idOfFriendlyOrganization;
         }
 
         @Override

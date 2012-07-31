@@ -255,4 +255,18 @@ CREATE TABLE cf_issuable
       REFERENCES cf_publs (idofpubl)
 );
 
+-- Табдица связи между дружественными организациями
+CREATE TABLE cf_friendly_organization
+(
+  idOfFriendlyOrg BigSerial NOT NULL,
+  currentOrg bigint NOT NULL,
+  friendlyOrg bigint NOT NULL,
+  CONSTRAINT cf_friendly_organization_pk PRIMARY KEY (idoffriendlyorg ),
+  CONSTRAINT cf_friendly_organization_current_idoforg_fk FOREIGN KEY (currentorg)
+      REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_friendly_organization_friend_idoforg_fk FOREIGN KEY (friendlyorg)
+      REFERENCES cf_orgs (idoforg)
+);
+/* Поле Факс клиентов организации*/
+ALTER TABLE cf_clients ADD COLUMN fax character varying(32);
 
