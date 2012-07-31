@@ -20,6 +20,54 @@ public class ClientGroup {
     public static final long PREDEFINED_ID_OF_GROUP_EMPLOYEES = 1100000000;
     public static final long TEMPORARY_GROUP_MAX_ID = -100000;
 
+    public enum Predefined{
+        CLIENT_EMPLOYEES (1100000000L,"Пед. состав"),
+        CLIENT_ADMINISTRATION (1100000010L,"Администрация"),
+        CLIENT_TECH_EMPLOYEES (1100000020L,"Тех. персонал"),
+        CLIENT_PARENTS (1100000030L,"Родители"),
+        CLIENT_VISITORS (1100000040L,"Посетители"),
+        CLIENT_OTHERS ( 1100000050L,"Другое"),
+        CLIENT_LEAVING ( 1100000060L,"Выбывшие");
+
+        private Long value;
+        private String nameOfGroup;
+
+        private Predefined(Long value, String nameOfGroup){
+            this.value = value;
+            this.nameOfGroup = nameOfGroup;
+        }
+
+        public static Predefined parse(Long value){
+            Predefined currentPredefined = null;
+            for (Predefined predefined: Predefined.values()){
+                if(predefined.value.equals(value)){
+                    currentPredefined = predefined;
+                    break;
+                }
+            }
+            return currentPredefined;
+        }
+
+        public static Predefined parse(String value){
+            Predefined currentPredefined = null;
+            for (Predefined predefined: Predefined.values()){
+                if(predefined.nameOfGroup.equals(value)){
+                    currentPredefined = predefined;
+                    break;
+                }
+            }
+            return currentPredefined;
+        }
+
+        public String getNameOfGroup() {
+            return nameOfGroup;
+        }
+
+        public Long getValue() {
+            return value;
+        }
+    }
+
     private CompositeIdOfClientGroup compositeIdOfClientGroup;
     private Org org;
     private String groupName;
