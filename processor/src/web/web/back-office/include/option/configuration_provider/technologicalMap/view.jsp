@@ -44,13 +44,13 @@
 
         <f:facet name="header">
             <rich:columnGroup>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
+                <rich:column rowspan="2" headerClass="center-aligned-column column-header" width="200px">
                     <h:outputText escape="true" value="Наименование продукта" />
                 </rich:column>
-                <rich:column colspan="2" headerClass="center-aligned-column column-header" width="200%">
+                <rich:column colspan="2" headerClass="center-aligned-column column-header">
                     <h:outputText value="Норма расхода продуктов на 1 порцию массой нетто 100 г" escape="true"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true" width="200%">
+                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true">
                     <h:outputText value="Масса брутто, г." escape="true"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column column-header" >

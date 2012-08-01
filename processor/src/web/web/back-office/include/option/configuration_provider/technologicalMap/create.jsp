@@ -33,7 +33,7 @@
 
         <f:facet name="header">
             <rich:columnGroup>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
+                <rich:column rowspan="2" headerClass="center-aligned-column column-header" width="200px">
                     <h:outputText escape="true" value="Наименование продукта" />
                 </rich:column>
                 <rich:column colspan="2" headerClass="center-aligned-column column-header">
