@@ -711,9 +711,6 @@
 
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="testGroupMenu" label="Тестовая страница" binding="#{mainPage.testTestListPage.mainMenuComponent}"
-                     rendered="#{mainPage.eligibleToEditOptions}">
-    <a4j:support event="onclick" action="#{mainPage.showTestPage}" reRender="workspaceForm" />
-</rich:panelMenuGroup>
+
 </rich:panelMenu>
 </a4j:form> <%-- Главное меню --%>
