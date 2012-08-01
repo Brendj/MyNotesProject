@@ -869,6 +869,31 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
+            /**/
+            if(clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY){
+                /* распарсим строку с категориями */
+                if (clientParamItem.getCategoriesDiscounts() != null) {
+                    String categories = clientParamItem.getCategoriesDiscounts();
+                    client.setCategoriesDiscounts(categories);
+                    if (!categories.equals("")) {
+                        String[] catArray = categories.split(",");
+                        List<Long> idOfCategoryDiscount = new ArrayList<Long>();
+                        for (String number : catArray) {
+                            idOfCategoryDiscount.add(Long.parseLong(number.trim()));
+                        }
+                        Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+                        categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscount));
+                        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+                        for (Object object : categoryDiscountCriteria.list()) {
+                            categoryDiscountSet.add((CategoryDiscount) object);
+                        }
+                        client.setCategories(categoryDiscountSet);
+                    }
+                }
+            }  else {
+                /* Льгота по категориями то ощищаем */
+                client.setCategories(new HashSet<CategoryDiscount>());
+            }
             if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
             if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
             if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
@@ -887,25 +912,7 @@ public class Processor implements SyncProcessor,
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
-            /* распарсим строку с категориями */
-            if (clientParamItem.getCategoriesDiscounts() != null) {
-                String categories = clientParamItem.getCategoriesDiscounts();
-                client.setCategoriesDiscounts(categories);
-                if (!categories.equals("")) {
-                    String[] catArray = categories.split(",");
-                    List<Long> idOfCategoryDiscount = new ArrayList<Long>();
-                    for (String number : catArray) {
-                        idOfCategoryDiscount.add(Long.parseLong(number.trim()));
-                    }
-                    Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
-                    categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscount));
-                    Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
-                    for (Object object : categoryDiscountCriteria.list()) {
-                        categoryDiscountSet.add((CategoryDiscount) object);
-                    }
-                    client.setCategories(categoryDiscountSet);
-                }
-            }
+
 
             persistenceSession.update(client);
 

@@ -509,7 +509,7 @@ public class ClientEditPage extends BasicWorkspacePage
 
     public Object changeClientCategory() {
         if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
-            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+            this.idOfCategoryList = new ArrayList<Long>(0);
             filter = "Не выбрано";
         }
         return null;
@@ -569,14 +569,24 @@ public class ClientEditPage extends BasicWorkspacePage
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         StringBuilder clientCategories = new StringBuilder();
         if (this.idOfCategoryList.size()!=0) {
-            Criteria categoryCrioteria = persistenceSession.createCriteria(CategoryDiscount.class);
-            categoryCrioteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
-            for (Object object: categoryCrioteria.list()){
+            Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+            categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
+            for (Object object: categoryCriteria.list()){
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
                 this.categoryDiscountSet.add(categoryDiscount);
             }
+        } else {
+            /* очистить список если он не пуст */
+            Set<CategoryDiscount> categories = client.getCategories();
+            for (CategoryDiscount categoryDiscount: categories){
+                categoryDiscount.getClients().remove(client);
+                persistenceSession.update(categoryDiscount);
+            }
+            client.setCategories(new HashSet<CategoryDiscount>(0));
+            //Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+            //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
         client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
