@@ -83,9 +83,7 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            selectedConfigurationProvider = configurationProvider;
-        }
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public String getPageFilename() {

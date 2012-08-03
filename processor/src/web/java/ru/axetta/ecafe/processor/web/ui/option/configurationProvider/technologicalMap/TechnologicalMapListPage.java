@@ -118,9 +118,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            selectedConfigurationProvider = configurationProvider;
-        }
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public Object selectTechnologicalMapGroup() throws Exception{
@@ -132,9 +130,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
 
     @Override
     public void select(TechnologicalMapGroup technologicalMapGroup) {
-        if(technologicalMapGroup!=null){
-            selectedTechnologicalMapGroup = technologicalMapGroup;
-        }
+        selectedTechnologicalMapGroup = technologicalMapGroup;
     }
 
     public String getPageFilename() {

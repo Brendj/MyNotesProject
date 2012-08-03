@@ -17,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +30,7 @@ import java.util.Stack;
 @Scope("session")
 public class TechnologicalMapGroupItemsPanel extends BasicPage {
 
-    private final Stack<TechnologicalMapGroupSelect> completeHandlerLists = new Stack<TechnologicalMapGroupSelect>();
+    private final Queue<TechnologicalMapGroupSelect> completeHandlerLists = new LinkedList<TechnologicalMapGroupSelect>();
 
     private List<TechnologicalMapGroup> technologicalMapGroupList;
     private TechnologicalMapGroup selectTechnologicalMapGroup;
@@ -42,14 +40,23 @@ public class TechnologicalMapGroupItemsPanel extends BasicPage {
     private EntityManager entityManager;
 
     public void pushCompleteHandler(TechnologicalMapGroupSelect handler) {
-        completeHandlerLists.push(handler);
+        completeHandlerLists.add(handler);
     }
 
     public Object addTechnologicalMapGroup(){
-        if (!completeHandlerLists.empty()) {
-            completeHandlerLists.peek().select(selectTechnologicalMapGroup);
-            completeHandlerLists.pop();
+        completeSelection(true);
+        return null;
+    }
+
+    private void completeSelection(boolean flag){
+        if (!completeHandlerLists.isEmpty()) {
+            completeHandlerLists.peek().select(flag?selectTechnologicalMapGroup:null);
+            completeHandlerLists.poll();
         }
+    }
+
+    public Object cancel(){
+        completeSelection(false);
         return null;
     }
 

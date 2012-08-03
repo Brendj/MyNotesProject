@@ -135,9 +135,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            currentConfigurationProvider = configurationProvider;
-        }
+        currentConfigurationProvider = configurationProvider;
     }
 
     public Object selectProductGroup() throws Exception{
@@ -149,9 +147,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
 
     @Override
     public void select(ProductGroup productGroup) {
-        if(productGroup!=null){
-            currentProductGroup = productGroup;
-        }
+        currentProductGroup = productGroup;
     }
 
     public String getPageFilename() {

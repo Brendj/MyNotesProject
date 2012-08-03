@@ -75,9 +75,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            currentConfigurationProvider = configurationProvider;
-        }
+        currentConfigurationProvider = configurationProvider;
     }
 
     public Object selectTechnologicalMapGroup() throws Exception{
@@ -89,9 +87,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
 
     @Override
     public void select(TechnologicalMapGroup technologicalMapGroup) {
-        if(technologicalMapGroup!=null){
-            currentTechnologicalMapGroup = technologicalMapGroup;
-        }
+        currentTechnologicalMapGroup = technologicalMapGroup;
     }
 
     @Override
@@ -105,16 +101,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
             currentTechnologicalMapGroup = currentTechnologicalMap.getTechnologicalMapGroup();
         }
         reload();
-        /*technologicalMapGroupList = DAOService.getInstance()
-                .getDistributedObjects(TechnologicalMapGroup.class);
-        configurationProviderList = DAOService.getInstance().getDistributedObjects(
-                ConfigurationProvider.class);
-        if(getRendered()){
-            configurationProviderMenu.readAllItems(configurationProviderList);
-            technologicalMapGroupMenu.readAllItems(technologicalMapGroupList);
-        } else {
-            printError("Отсутсвуют группы технологических карт.");
-        }*/
     }
 
     @Override
@@ -168,6 +154,22 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     @Transactional
     public void doSave() {
         try{
+            if(currentTechnologicalMap.getNameOfTechnologicalMap()==null || currentTechnologicalMap.getNameOfTechnologicalMap().equals("")){
+                printError("Введите имя технологической карты.");
+                return;
+            }
+            if(currentTechnologicalMap.getNumberOfTechnologicalMap()==null || currentTechnologicalMap.getNumberOfTechnologicalMap().equals("")){
+                printError("Введите номер технологической карты.");
+                return;
+            }
+            if(currentTechnologicalMapGroup==null){
+                printError("Введите группу для технологической карты.");
+                return;
+            }
+            if(currentConfigurationProvider==null){
+                printError("Введите конфигурацию для технологической карты.");
+                return;
+            }
             TechnologicalMap tm = em.find(TechnologicalMap.class, currentTechnologicalMap.getGlobalId());
 
             tm.fill(currentTechnologicalMap);
@@ -209,6 +211,9 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                     technologicalMapProduct.setGlobalId(null);
                     technologicalMapProduct.setLastUpdate(new Date());
                     technologicalMapProduct.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
+                    if(technologicalMapProduct.getGlobalVersion()==null){
+                        technologicalMapProduct.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class));
+                    }
                     technologicalMapProduct.setGlobalVersion(technologicalMapProduct.getGlobalVersion()+1);
                 }
                 daoService.persistEntity(technologicalMapProduct);
@@ -231,20 +236,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
         productItemsPanel.pushCompleteHandlerList(this);
         return null;
     }
-    //
-    //public Object addProducts() {
-    //    for (ProductItem productItem: productItems){
-    //        if(productItem.getChecked()){
-    //            TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-    //            technologicalMapProduct.setProduct(productItem.getProduct());
-    //            technologicalMapProduct.setDeletedState(false);
-    //            technologicalMapProduct.setTechnologicalMap(currentTechnologicalMap);
-    //            currentTechnologicalMap.addTechnologicalMapProduct(technologicalMapProduct);
-    //        }
-    //    }
-    //    technologicalMapProducts = currentTechnologicalMap.getTechnologicalMapProduct();
-    //    return null;
-    //}
 
     public String getPageFilename() {
         return "option/configuration_provider/technologicalMap/edit";

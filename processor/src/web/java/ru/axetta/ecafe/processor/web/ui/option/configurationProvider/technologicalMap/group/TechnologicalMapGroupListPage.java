@@ -82,9 +82,7 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage implements
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            selectedConfigurationProvider = configurationProvider;
-        }
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public String getPageFilename() {

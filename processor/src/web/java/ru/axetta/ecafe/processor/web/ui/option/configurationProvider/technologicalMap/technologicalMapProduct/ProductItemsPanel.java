@@ -12,11 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +25,7 @@ import java.util.Stack;
 @Scope("session")
 public class ProductItemsPanel extends BasicPage {
 
-    private final Stack<ProductSelect> completeHandlerLists = new Stack<ProductSelect>();
+    private final Queue<ProductSelect> completeHandlerLists = new LinkedList<ProductSelect>();
 
     private TechnologicalMap technologicalMap;
 
@@ -41,18 +37,29 @@ public class ProductItemsPanel extends BasicPage {
     private EntityManager entityManager;
 
     public void pushCompleteHandlerList(ProductSelect handlerList) {
-        completeHandlerLists.push(handlerList);
+        completeHandlerLists.add(handlerList);
     }
 
     public Object addProducts(){
+        completeSelection(true);
+        return null;
+    }
+
+    private void completeSelection(boolean flag){
         List<ProductItem> productItemList = new ArrayList<ProductItem>();
-        for (ProductItem productItem: productItems){
-            if(productItem.getChecked()) productItemList.add(productItem);
+        if(flag){
+            for (ProductItem productItem: productItems){
+                if(productItem.getChecked()) productItemList.add(productItem);
+            }
         }
-        if (!completeHandlerLists.empty()) {
+        if (!completeHandlerLists.isEmpty()) {
             completeHandlerLists.peek().select(productItemList);
-            completeHandlerLists.pop();
+            completeHandlerLists.poll();
         }
+    }
+
+    public Object cancel(){
+        completeSelection(false);
         return null;
     }
 

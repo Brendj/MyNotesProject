@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologic
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -51,14 +52,19 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     private List<ConfigurationProvider> configurationProviderList;
     private List<TechnologicalMapGroup> technologicalMapGroupList;
 
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    @Autowired
+    private ProductItemsPanel productItemsPanel;
+
     @Override
     public void onShow() throws Exception {
         technologicalMap=new TechnologicalMap();
         technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
-        technologicalMapGroupList = DAOService.getInstance()
-                .getDistributedObjects(TechnologicalMapGroup.class);
-        configurationProviderList = DAOService.getInstance().getDistributedObjects(
-                ConfigurationProvider.class);
+        technologicalMapGroupList = daoService.getDistributedObjects(TechnologicalMapGroup.class);
+        configurationProviderList = daoService.getDistributedObjects(ConfigurationProvider.class);
         if(getRendered()){
             configurationProviderMenu.readAllItems(configurationProviderList);
             technologicalMapGroupMenu.readAllItems(technologicalMapGroupList);
@@ -86,14 +92,12 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(null != configurationProvider){
-            technologicalMap.setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
-        }
+        technologicalMap.setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
     }
 
     public Object showConfigurationProviderSelection() throws Exception{
-        RuntimeContext.getAppContext().getBean(ConfigurationProviderItemsPanel.class).reload();
-        RuntimeContext.getAppContext().getBean(ConfigurationProviderItemsPanel.class).pushCompleteHandler(RuntimeContext.getAppContext().getBean(getClass()));
+        configurationProviderItemsPanel.reload();
+        configurationProviderItemsPanel.pushCompleteHandler(this);
         return null;
     }
 
@@ -103,28 +107,39 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
 
     public void createTechnologicalMap() {
         try{
+            if(technologicalMap.getNameOfTechnologicalMap()==null || technologicalMap.getNameOfTechnologicalMap().equals("")){
+                printError("Введите имя технологической карты.");
+                return;
+            }
+            if(technologicalMap.getNumberOfTechnologicalMap()==null || technologicalMap.getNumberOfTechnologicalMap().equals("")){
+                printError("Введите номер технологической карты.");
+                return;
+            }
+            /*if(technologicalMap.getTechnologicalMapGroup()==null){
+                printError("Введите группу для технологической карты.");
+                return;
+            }*/
             technologicalMap.setCreatedDate(new Date());
             technologicalMap.setDeletedState(false);
-            technologicalMap.setGlobalVersion(0L);
+            technologicalMap.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMap.class));
             UUID tmUUID = UUID.randomUUID();
             technologicalMap.setGuid(tmUUID.toString());
-
-            //technologicalMap.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
 
             MainPage mainPage = MainPage.getSessionInstance();
             technologicalMap.setUserCreate(mainPage.getCurrentUser());
 
-            technologicalMap.setTechnologicalMapGroup(DAOService.getInstance().findRefDistributedObject(TechnologicalMapGroup.class, currentIdOfTechnologicalMapGroup));
-            DAOService.getInstance().persistEntity(technologicalMap);
+            technologicalMap.setTechnologicalMapGroup(daoService.findRefDistributedObject(TechnologicalMapGroup.class, currentIdOfTechnologicalMapGroup));
+            daoService.persistEntity(technologicalMap);
 
-            DAOService.getInstance().setConfigurationProviderInDO(TechnologicalMapGroup.class,currentIdOfTechnologicalMapGroup, currentIdOfConfigurationProvider);
+            daoService.setConfigurationProviderInDO(TechnologicalMapGroup.class,currentIdOfTechnologicalMapGroup, currentIdOfConfigurationProvider);
 
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
                 technologicalMapProduct.setCreatedDate(new Date());
                 technologicalMapProduct.setGuid(UUID.randomUUID().toString());
                 technologicalMapProduct.setTechnologicalMap(technologicalMap);
                 technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
-                DAOService.getInstance().persistEntity(technologicalMapProduct);
+                technologicalMapProduct.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class));
+                daoService.persistEntity(technologicalMapProduct);
             }
 
 
@@ -144,8 +159,8 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     }
 
     public Object showProducts() throws Exception {
-        RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).reload(new LinkedList<TechnologicalMapProduct>());
-        RuntimeContext.getAppContext().getBean(ProductItemsPanel.class).pushCompleteHandlerList(RuntimeContext.getAppContext().getBean(getClass()));
+        productItemsPanel.reload(new LinkedList<TechnologicalMapProduct>());
+        productItemsPanel.pushCompleteHandlerList(this);
         return null;
     }
 
@@ -195,10 +210,6 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
 
     public void setTechnologicalMapProducts(List<TechnologicalMapProduct> technologicalMapProducts) {
         this.technologicalMapProducts = technologicalMapProducts;
-    }
-
-    public List<ProductItem> getProducts() {
-        return products;
     }
 
     public TechnologicalMapProduct getCurrTechnologicalMapProduct() {

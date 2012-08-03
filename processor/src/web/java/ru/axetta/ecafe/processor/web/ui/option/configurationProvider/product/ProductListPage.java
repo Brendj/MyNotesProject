@@ -97,9 +97,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            selectedConfigurationProvider = configurationProvider;
-        }
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public Object selectProductGroup() throws Exception{
@@ -111,9 +109,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
 
     @Override
     public void select(ProductGroup productGroup) {
-        if(productGroup!=null){
-            selectedProductGroup = productGroup;
-        }
+        selectedProductGroup = productGroup;
     }
 
     public String getPageTitle() {

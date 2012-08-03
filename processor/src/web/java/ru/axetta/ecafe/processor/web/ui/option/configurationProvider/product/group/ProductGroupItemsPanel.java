@@ -17,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +30,7 @@ import java.util.Stack;
 @Scope("session")
 public class ProductGroupItemsPanel extends BasicPage {
 
-    private final Stack<ProductGroupSelect> completeHandlerLists = new Stack<ProductGroupSelect>();
+    private final Queue<ProductGroupSelect> completeHandlerLists = new LinkedList<ProductGroupSelect>();
 
     private List<ProductGroup> productGroupList;
     private ProductGroup selectProductGroup;
@@ -42,14 +40,23 @@ public class ProductGroupItemsPanel extends BasicPage {
     private EntityManager entityManager;
 
     public void pushCompleteHandler(ProductGroupSelect handler) {
-        completeHandlerLists.push(handler);
+        completeHandlerLists.add(handler);
     }
 
     public Object addProductGroup(){
-        if (!completeHandlerLists.empty()) {
-            completeHandlerLists.peek().select(selectProductGroup);
-            completeHandlerLists.pop();
+        completeSelection(true);
+        return null;
+    }
+
+    private void completeSelection(boolean flag){
+        if (!completeHandlerLists.isEmpty()) {
+            completeHandlerLists.peek().select(flag?selectProductGroup:null);
+            completeHandlerLists.poll();
         }
+    }
+
+    public Object cancel(){
+        completeSelection(false);
         return null;
     }
 

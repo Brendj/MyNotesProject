@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +32,7 @@ import java.util.Stack;
 @Scope("session")
 public class ConfigurationProviderItemsPanel extends BasicPage {
 
-    private final Stack<ConfigurationProviderSelect> completeHandlerLists = new Stack<ConfigurationProviderSelect>();
+    private final Queue<ConfigurationProviderSelect> completeHandlerLists = new LinkedList<ConfigurationProviderSelect>();
 
     private List<ConfigurationProvider> configurationProviderList;
     private ConfigurationProvider selectConfigurationProvider;
@@ -45,14 +42,23 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
     private EntityManager entityManager;
 
     public void pushCompleteHandler(ConfigurationProviderSelect handler) {
-        completeHandlerLists.push(handler);
+        completeHandlerLists.add(handler);
     }
 
     public Object addConfigurationProvider(){
-        if (!completeHandlerLists.empty()) {
-            completeHandlerLists.peek().select(selectConfigurationProvider);
-            completeHandlerLists.pop();
+        completeSelection(true);
+        return null;
+    }
+
+    private void completeSelection(boolean flag){
+        if (!completeHandlerLists.isEmpty()) {
+            completeHandlerLists.peek().select(flag?selectConfigurationProvider:null);
+            completeHandlerLists.poll();
         }
+    }
+
+    public Object cancel(){
+        completeSelection(false);
         return null;
     }
 

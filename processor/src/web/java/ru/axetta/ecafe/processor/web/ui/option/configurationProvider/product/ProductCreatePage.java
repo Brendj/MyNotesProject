@@ -110,9 +110,7 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
-        if(configurationProvider!=null){
-            currentConfigurationProvider = configurationProvider;
-        }
+        currentConfigurationProvider = configurationProvider;
     }
 
     public Object selectProductGroup() throws Exception{
@@ -126,9 +124,7 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
 
     @Override
     public void select(ProductGroup productGroup) {
-        if(productGroup!=null){
-            currentProductGroup = productGroup;
-        }
+        currentProductGroup = productGroup;
     }
 
     public ProductGroup getCurrentProductGroup() {

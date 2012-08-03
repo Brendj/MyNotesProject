@@ -70,6 +70,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
 
     private List<Long> idOfOrgList;
+    private List<Long> currentIdOfOrgList;
     private String filterOrgs = "Не выбрано";
 
     public static class ContragentItem {
@@ -145,16 +146,35 @@ public class OrgEditPage extends BasicWorkspacePage
                 org.getCategories().add((CategoryOrg) object);
             }
         }
+
+
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            org.setFriendlyOrg(null);
-        } else {
-            List friendlyOrgList = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
-            for (Object object: friendlyOrgList){
-                org.getFriendlyOrg().add((Org) object);
+            org.setFriendlyOrg(new HashSet<Org>(0));
+        }
+        else{
+            /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/
+            /* принудительно внести в список и текущую организацию */
+            if(!idOfOrgList.contains(org.getIdOfOrg())){
+                idOfOrgList.add(org.getIdOfOrg());
+            }
+            Map<Long,Org> friendlyOrgMap = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
+            /* списки не совпали то добавляем */
+            Boolean containsOrg = currentIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(currentIdOfOrgList);
+            if (!containsOrg){
+                List result = DAOUtils.getClientsByOrgList(session, friendlyOrgMap.keySet());
+                for (Object object: result){
+                    Client client = (Client) object;
+                    long version = DAOUtils.updateClientRegistryVersion(session);
+                    client.setClientRegistryVersion(version);
+                    session.update(client);
+                }
+                org.getFriendlyOrg().addAll(friendlyOrgMap.values());
             }
         }
 
-        if(this.configurationProvider!=null){
+        if(this.configurationProvider==null){
+            org.setConfigurationProvider(null);
+        }else{
             ConfigurationProvider cp = (ConfigurationProvider) session.load(ConfigurationProvider.class, this.configurationProvider.getIdOfConfigurationProvider());
             if(cp!=null){
                 org.setConfigurationProvider(cp);
@@ -216,11 +236,13 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             this.configurationProviderName = "";
         }
+        currentIdOfOrgList = new ArrayList<Long>();
         if(!(org.getFriendlyOrg()==null || org.getFriendlyOrg().isEmpty())){
             StringBuilder stringBuilder = new StringBuilder();
             for (Org friendlyOrg: org.getFriendlyOrg()){
                 stringBuilder.append(friendlyOrg.getShortName());
                 stringBuilder.append("; ");
+                currentIdOfOrgList.add(friendlyOrg.getIdOfOrg());
             }
             filterOrgs = stringBuilder.toString();
         }
@@ -239,6 +261,8 @@ public class OrgEditPage extends BasicWorkspacePage
                     stringBuilder.append("; ");
                 }
                 filterOrgs = stringBuilder.toString();
+            } else {
+                filterOrgs = "Не выбрано.";
             }
         }
     }
@@ -297,8 +321,11 @@ public class OrgEditPage extends BasicWorkspacePage
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
+        this.configurationProvider = configurationProvider;
         if(null != configurationProvider){
-            this.configurationProvider = configurationProvider;
+            this.configurationProviderName = configurationProvider.getName();
+        } else {
+            this.configurationProviderName = "";
         }
     }
 
