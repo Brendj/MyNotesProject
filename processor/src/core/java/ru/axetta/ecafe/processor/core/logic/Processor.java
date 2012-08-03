@@ -821,24 +821,39 @@ public class Processor implements SyncProcessor,
             Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
                     .getPayments().iterator();
 
-            HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
-            List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, idOfOrg);
-            for(Object object: clientGroups){
-                ClientGroup clientGroup = (ClientGroup) object;
-                nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
+            Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
+            /* совместимость организаций котрое не имеют дружественных организаций */
+            if(orgSet==null || orgSet.isEmpty()){
+                orgSet = new TreeSet<Long>();
+                orgSet.add(idOfOrg);
+            }
+            for (Long id: orgSet){
+                List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, id);
+                HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
+                for(Object object: clientGroups){
+                    ClientGroup clientGroup = (ClientGroup) object;
+                    nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
+                    orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(),nameIdGroupMap);
+                }
+                orgMap.put(id, nameIdGroupMap);
+            }
+            Long version=null;
+            if(clientParamItems.hasNext()){
+                version=DAOUtils.updateClientRegistryVersion(persistenceSession);
             }
             while (clientParamItems.hasNext()) {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
-                ClientGroup clientGroup = null;
-                clientGroup = nameIdGroupMap.get(clientParamItem.getGroupName());
-                /* если группы нет то создаем */
+                /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
+                *//* если группы нет то создаем *//*
                 if(clientGroup == null){
                     clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientParamItem.getGroupName());
-                    /* заносим в хэш - карту*/
+                    *//* заносим в хэш - карту*//*
                     nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
-                }
+                }*/
                 try {
-                    processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, clientGroup);
+                    //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
+                    processSyncClientParamRegistryItem(idOfSync, clientParamItem, orgMap, version);
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process clientParamItem == %s", clientParamItem), e);
                 }
@@ -853,8 +868,8 @@ public class Processor implements SyncProcessor,
 
     }
 
-    private void processSyncClientParamRegistryItem(Long idOfSync, Long idOfOrg,
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, ClientGroup clientGroup) throws Exception {
+    private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
+            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -862,9 +877,12 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
-            if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
+            if(!orgMap.keySet().contains(client.getOrg().getIdOfOrg())){
                 throw new IllegalArgumentException("Client from another organization");
             }
+            /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
+                throw new IllegalArgumentException("Client from another organization");
+            }*/
             client.setFreePayCount(clientParamItem.getFreePayCount());
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
@@ -908,11 +926,20 @@ public class Processor implements SyncProcessor,
             if (clientParamItem.getFax() != null) client.setFax(clientParamItem.getFax());
 
             /* заносим клиента в группу */
+
+            ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
+            //если группы нет то создаем
+            if(clientGroup == null){
+                clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
+                // заносим в хэш - карту
+                orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(),clientGroup);
+            }
+
             if(clientGroup!=null){
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
-
+            client.setClientRegistryVersion(version);
 
             persistenceSession.update(client);
 
@@ -1223,25 +1250,18 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            List clients = DAOUtils
-                    .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
+            List clients;
+            if(organization.getFriendlyOrg()==null || organization.getFriendlyOrg().isEmpty()){
+                clients = DAOUtils
+                        .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
+            } else {
+                clients = DAOUtils
+                        .findNewerClients(persistenceSession, organization.getFriendlyOrg(), clientRegistryRequest.getCurrentVersion());
+            }
+
             for (Object object : clients) {
                 Client client = (Client) object;
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
-            }
-
-            // friendly org clients process
-            Set<Org> friendlyOrganizationSet = organization.getFriendlyOrg();
-            for (Org friendlyOrganization :friendlyOrganizationSet){
-                if(friendlyOrganization.getIdOfOrg().equals(idOfOrg)) continue;
-                //Long friendlyOrganizationVersion = clientRegistryRequest.getIdOfFriendlyOrganization().get(friendlyOrganization.getIdOfOrg());
-                //if(friendlyOrganizationVersion==null) friendlyOrganizationVersion=0L;
-                List friendlyClients = DAOUtils
-                        .findNewerClients(persistenceSession, friendlyOrganization, clientRegistryRequest.getCurrentVersion());
-                for (Object object : friendlyClients) {
-                    Client client = (Client) object;
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
-                }
             }
 
             persistenceTransaction.commit();

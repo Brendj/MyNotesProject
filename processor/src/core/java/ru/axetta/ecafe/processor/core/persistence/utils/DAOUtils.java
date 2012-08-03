@@ -56,6 +56,14 @@ public class DAOUtils {
         return (Client) clientWithSameContractCriteria.uniqueResult();
     }
 
+    public static List findNewerClients(Session persistenceSession, Set<Org> organizations, long clientRegistryVersion)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.in("org", organizations));
+        criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+        return criteria.list();
+    }
+
     public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -399,6 +407,12 @@ public class DAOUtils {
         return (List<AccountTransaction>)query.list();
     }
 
+    public static List getClientsByOrgList(Session session, Set<Long> orgSet){
+        String idOfOrgs = orgSet.toString().replaceAll("[^0-9,]","");
+        Query query = session.createQuery("from Client cl where cl.org.idOfOrg in ("+idOfOrgs+")");
+        return query.list();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrg(Session persistenceSession, Long idOfOrg) {
         Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg=:idOfOrg");
@@ -563,11 +577,16 @@ public class DAOUtils {
         return (List<Org>)q.getResultList();
     }
 
-    public static List getOrgsByIdList(Session session, List<Long> idOfOrgList) {
-        if (idOfOrgList.isEmpty()) return new ArrayList(0);
+    public static Map<Long, Org> getOrgsByIdList(Session session, List<Long> idOfOrgList) {
+        Map<Long, Org> orgMap = new HashMap<Long, Org>(0);
+        if (idOfOrgList.isEmpty()) return orgMap;
         String idOfOrgs=idOfOrgList.toString().replaceAll("[^0-9,]","");
         Query query = session.createQuery("from Org where idOfOrg in ("+idOfOrgs+")");
-        return query.list();
+        for(Object entity: query.list()){
+            Org org = (Org) entity;
+            orgMap.put(org.getIdOfOrg(),org);
+        }
+        return orgMap;
     }
 
     public static long getCategoryDiscountMaxId(EntityManager em) {
@@ -631,7 +650,13 @@ public class DAOUtils {
             q.setParameter("idOfOrg", idOfOrg);
             q.setParameter("idOfClientGroup",1100000000L);
             List l = q.list();
-            idOfClientGroup = (Long)l.get(0) + 1 ;
+            Long compositeIdOfClientGroup;
+            if(l==null || l.isEmpty() || l.get(0)==null){
+                compositeIdOfClientGroup = ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
+            } else {
+                compositeIdOfClientGroup =  (Long)l.get(0);
+            }
+            idOfClientGroup = compositeIdOfClientGroup + 1 ;
         }
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
         ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
@@ -698,8 +723,19 @@ public class DAOUtils {
 
     public static List getClientGroupsByIdOfOrg(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(ClientGroup.class);
-        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg",idOfOrg));
+        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+
         return criteria.list();
     }
 
+    public static Set<Long> getFriendlyOrg(Session persistenceSession, Long idOfOrg) {
+        Query query = persistenceSession.createQuery("select org.friendlyOrg from Org org where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        List forg = query.list();
+        Set<Long> result = new HashSet<Long>(forg.size());
+        for (Object object: forg){
+            result.add(((Org) object).getIdOfOrg());
+        }
+        return result;
+    }
 }
