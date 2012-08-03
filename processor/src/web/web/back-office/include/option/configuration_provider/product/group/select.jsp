@@ -83,8 +83,10 @@
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
 
-                        <a4j:commandButton value="Отмена" styleClass="command-button" style="width: 80px; float: right;"
-                                           onclick="#{rich:component('productGroupSelectModalPanel')}.hide();return false;" />
+                        <a4j:commandButton value="Отмена" action="#{productGroupItemsPanel.cancel}"
+                                           styleClass="command-button" style="width: 80px; float: right;"
+                                           reRender="workspaceTogglePanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.hide();" />
                     </h:panelGrid>
                 </td>
             </tr>

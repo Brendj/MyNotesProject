@@ -190,7 +190,7 @@
     </h:panelGrid>
 
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>
-    <h:inputTextarea value="#{technologicalMapEditPage.currentTechnologicalMap.technologyOfPreparation}" rows="3" />
+    <h:inputTextarea value="#{technologicalMapEditPage.currentTechnologicalMap.technologyOfPreparation}" rows="10" cols="50" />
 
 </h:panelGrid>
 

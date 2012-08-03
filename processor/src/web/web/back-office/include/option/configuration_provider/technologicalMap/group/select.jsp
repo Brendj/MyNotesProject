@@ -84,7 +84,9 @@
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
 
                         <a4j:commandButton value="Отмена" styleClass="command-button" style="width: 80px; float: right;"
-                                           onclick="#{rich:component('technologicalMapGroupSelectModalPanel')}.hide();return false;" />
+                                           action="#{technologicalMapGroupItemsPanel.cancel}"
+                                           reRender="workspaceTogglePanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapGroupSelectModalPanel')}.hide();" />
                     </h:panelGrid>
                 </td>
             </tr>

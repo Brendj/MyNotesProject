@@ -15,15 +15,15 @@
 
 
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
         <h:selectOneMenu id="selectCurrentConfigurationProvider" value="#{technologicalMapCreatePage.currentIdOfConfigurationProvider}" styleClass="input-text long-field" >
             <f:selectItems value="#{technologicalMapCreatePage.configurationProviderMenu.items}" />
         </h:selectOneMenu>
-        <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text required-field" />
         <h:inputText value="#{technologicalMapCreatePage.technologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text required-field" />
         <h:inputText value="#{technologicalMapCreatePage.technologicalMap.numberOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text required-field" />
         <h:selectOneMenu id="selectCurrentProductGroup" value="#{technologicalMapCreatePage.currentIdOfTechnologicalMapGroup}" styleClass="input-text long-field">
             <f:selectItems value="#{technologicalMapCreatePage.technologicalMapGroupMenu.items}" />
         </h:selectOneMenu>
@@ -173,7 +173,7 @@
     </h:panelGrid>
 
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>
-    <h:inputTextarea value="#{technologicalMapCreatePage.technologicalMap.technologyOfPreparation}" rows="3" />
+    <h:inputTextarea value="#{technologicalMapCreatePage.technologicalMap.technologyOfPreparation}" rows="10" cols="50"/>
 
 </h:panelGrid>
 

@@ -70,7 +70,7 @@
                                            reRender="workspaceTogglePanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-                        <a4j:commandButton value="Отмена"
+                        <a4j:commandButton value="Отмена" action="#{productItemsPanel.cancel}"
                                            reRender="#{productItemsPanel.pageComponent.id}"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px;">

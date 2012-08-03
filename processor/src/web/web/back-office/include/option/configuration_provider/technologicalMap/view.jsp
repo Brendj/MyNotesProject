@@ -144,7 +144,7 @@
     </h:panelGrid>
 
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>
-    <h:inputTextarea value="#{technologicalMapViewPage.currentTechnologicalMap.technologyOfPreparation}" rows="3" readonly="true"/>
+    <h:inputTextarea value="#{technologicalMapViewPage.currentTechnologicalMap.technologyOfPreparation}" rows="10" cols="50" readonly="true"/>
 
 </h:panelGrid>
 

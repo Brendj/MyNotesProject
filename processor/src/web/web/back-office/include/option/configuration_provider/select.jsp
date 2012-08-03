@@ -83,8 +83,9 @@
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
 
-                        <a4j:commandButton value="Отмена" styleClass="command-button" style="width: 80px;"
-                                           onclick="#{rich:component('configurationProviderSelectModalPanel')}.hide();return false;" />
+                        <a4j:commandButton value="Отмена" action="#{configurationProviderItemsPanel.cancel}"
+                                           reRender="workspaceTogglePanel" styleClass="command-button" style="width: 80px;"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.hide();" />
                     </h:panelGrid>
                 </td>
             </tr>
