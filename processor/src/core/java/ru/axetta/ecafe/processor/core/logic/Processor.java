@@ -199,8 +199,19 @@ public class Processor implements SyncProcessor,
                 idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime);
 
                 // Process paymentRegistry
-                resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
-                        request.getPaymentRegistry());
+                try {
+                    if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+                        if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                            throw new Exception("no license slots available");
+                        }
+                    }
+                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
+                            request.getPaymentRegistry());
+                } catch (Exception e){
+                    logger.error(
+                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
+                }
 
                 // Process ClientParamRegistry
                 try {
@@ -269,6 +280,11 @@ public class Processor implements SyncProcessor,
                 // Process enterEvents
                 try {
                     if (request.getEnterEvents() != null) {
+                        if (request.getEnterEvents().getEvents().size()>0) {
+                            if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
+                                throw new Exception("no license slots available");
+                            }
+                        }
                         resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
                     }
                 } catch (Exception e) {
@@ -278,7 +294,11 @@ public class Processor implements SyncProcessor,
 
                 // Process library data
                 /*try {
-                    if (request.getEnterEvents() != null) {
+                    if (request.getLibraryData() != null) {
+                        if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_B)) {
+                            throw new Exception("no license slots available");
+                        }
+                        
                         resLibraryData = processSyncLibraryData(request.getLibraryData());
                     }
                 } catch (Exception e) {
@@ -287,7 +307,11 @@ public class Processor implements SyncProcessor,
                 }
 
                 try {
-                    if (request.getEnterEvents() != null) {
+                    if (request.getLibraryData2() != null) {
+                        if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_B)) {
+                            throw new Exception("no license slots available");
+                        }
+
                         resLibraryData2 = processSyncLibraryData2(request.getLibraryData2());
                     }
                 } catch (Exception e) {
@@ -508,6 +532,7 @@ public class Processor implements SyncProcessor,
                 RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
             }
         }
+
 
         return distributionManager;
     }
@@ -866,7 +891,7 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
 
-    }
+}
 
     private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
             SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {

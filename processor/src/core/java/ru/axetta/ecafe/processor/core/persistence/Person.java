@@ -187,6 +187,15 @@ public class Person {
         return 1 == contragents.size() && contragents.contains(contragent);
     }
 
+    public String getFullName() {
+        String fullName="";
+        if (getSurname()!=null && getSurname().length()>0) fullName+=getSurname();
+        if (getFirstName()!=null && getFirstName().length()>0) fullName+=" "+getFirstName();
+        if (getSecondName()!=null && getSecondName().length()>0) fullName+=" "+getSecondName();
+        if (fullName.startsWith(" ")) fullName=fullName.substring(1);
+        return fullName;
+    }
+
     public String getSurnameAndFirstLetters() {
         String n = getSurname();
         String fn = getFirstName();
@@ -219,4 +228,5 @@ public class Person {
         return "Person{" + "idOfPerson=" + idOfPerson + ", firstName='" + firstName + '\'' + ", surname='" + surname
                 + '\'' + ", secondName='" + secondName + '\'' + ", idDocument='" + idDocument + '\'' + '}';
     }
+
 }

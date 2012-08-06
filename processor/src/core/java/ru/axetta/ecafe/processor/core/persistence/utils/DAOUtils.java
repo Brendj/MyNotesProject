@@ -14,11 +14,12 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
+import org.hibernate.Query;
 import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -54,6 +55,22 @@ public class DAOUtils {
         Criteria clientWithSameContractCriteria = persistenceSession.createCriteria(Client.class);
         clientWithSameContractCriteria.add(Restrictions.eq("contractId", contractId));
         return (Client) clientWithSameContractCriteria.uniqueResult();
+    }
+
+    public static Client findClientByGuid(EntityManager em, String guid) {
+        javax.persistence.Query q = em.createQuery("from Client where clientGUID=:guid");
+        q.setParameter("guid", guid);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Client)l.get(0));
+    }
+
+    public static Long getClientIdByGuid(EntityManager em, String guid) {
+        javax.persistence.Query q = em.createQuery("select idOfClient from Client where clientGUID=:guid");
+        q.setParameter("guid", guid);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Long)l.get(0));
     }
 
     public static List findNewerClients(Session persistenceSession, Set<Org> organizations, long clientRegistryVersion)
@@ -268,6 +285,21 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
+    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName)
+            throws Exception {
+        javax.persistence.Query query = em.createQuery(
+                "select idOfClient from Client client where (client.org = :org) and (upper(client.person.surname) = :surname) and"
+                        + "(upper(client.person.firstName) = :firstName) and (upper(client.person.secondName) = :secondName)");
+        query.setParameter("org", organization);
+        query.setParameter("surname", StringUtils.upperCase(surname));
+        query.setParameter("firstName", StringUtils.upperCase(firstName));
+        query.setParameter("secondName", StringUtils.upperCase(secondName));
+        query.setMaxResults(2);
+        if (query.getResultList().isEmpty()) return null;
+        if (query.getResultList().size()==2) return -1L;
+        return (Long)query.getResultList().get(0);
+    }
+
     public static boolean existCard(Session persistenceSession, long cardPrintedNo) throws Exception {
         Query query = persistenceSession.createQuery("select 1 from Card card where card.cardPrintedNo = ?");
         query.setParameter(0, cardPrintedNo);
@@ -323,7 +355,8 @@ public class DAOUtils {
     }
 
     public static void updateMenuExchangeLink(Session persistenceSession, Long idOfSourceOrg, Long idOfDestOrg) {
-        Query query = persistenceSession.createQuery("delete from MenuExchangeRule discountrule where discountrule.idOfDestOrg=?");
+        Query query = persistenceSession.createQuery(
+                "delete from MenuExchangeRule discountrule where discountrule.idOfDestOrg=?");
         query.setParameter(0, idOfDestOrg);
         query.executeUpdate();
         ////
@@ -612,7 +645,7 @@ public class DAOUtils {
     }
 
     public static List getCategoryOrgWithIds(Session session, List<Long> idOfCategoryOrgList) {
-        String idOfCategoryOrgs=idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+        String idOfCategoryOrgs=idOfCategoryOrgList.toString().replaceAll("[^0-9,]", "");
         Query query = session.createQuery("from CategoryOrg where idOfCategoryOrg in ("+idOfCategoryOrgs+")");
         return query.list();
     }
@@ -681,7 +714,8 @@ public class DAOUtils {
 
     public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)
             throws Exception {
-        org.hibernate.Query q = session.createQuery("update Client set notifyViaSMS = :notifyViaSMS, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
+        org.hibernate.Query q = session.createQuery(
+                "update Client set notifyViaSMS = :notifyViaSMS, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
         q.setLong("clientRegistryVersion", clientRegistryVersion);
         q.setBoolean("notifyViaSMS", notifyViaSMS);
@@ -738,4 +772,11 @@ public class DAOUtils {
         }
         return result;
     }
+
+    @SuppressWarnings("unchecked")
+    public static List<Org> getAllOrgWithGuid(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("from Org where guid is not null");
+        return (List<Org>)q.getResultList();
+    }
+
 }

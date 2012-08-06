@@ -70,6 +70,7 @@ public class Org {
     private ConfigurationProvider configurationProvider;
     private Set<Org> friendlyOrg;
     private Org thisOrg;
+    private String guid;
 
     public Org getThisOrg() {
         return thisOrg;
@@ -522,6 +523,14 @@ public class Org {
 
     public void setMailingListReports2(String mailingListReports2) {
         this.mailingListReports2 = mailingListReports2;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     @Override

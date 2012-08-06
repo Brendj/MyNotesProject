@@ -46,32 +46,30 @@ public class Option {
             OPTION_NFP_SERVICE_ADDRESS=8,
             OPTION_PASSWORD_RESTORE_SEED =9,
             OPTION_NOTIFICATION_TEXT = 10,
-            OPTION_MAX=1003,
+            OPTION_DEFAULT_OVERDRAFT_LIMIT=11,
+            OPTION_DEFAULT_EXPENDITURE_LIMIT=12,
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
             OPTION_RBK_SECTION=1002,
-            OPTION_RBK_RATE=1003;
-
-
-
-    public static String getDefaultValue(int nOption) {
-        switch (nOption) {
-            case OPTION_WITH_OPERATOR: return "0";
-            case OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT: return "0";
-            case OPTION_CLEAN_MENU: return "1";
-            case OPTION_MENU_DAYS_FOR_DELETION: return "30";
-            case OPTION_JOURNAL_TRANSACTIONS: return "0";
-            case OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP: return "1";
-            case OPTION_NFP_SERVICE_ADDRESS: return "http://193.47.154.34:7002/uec-service-war/TransactionService";
-            case OPTION_NOTIFICATION_TEXT: return "";
-            case OPTION_CHRONOPAY_SECTION: return "1";
-            case OPTION_RBK_SECTION: return "1";
-            case OPTION_CHRONOPAY_RATE: return "3.3";
-            case OPTION_RBK_RATE: return  "3";
-        }
-        return null;
-    }
-
+            OPTION_RBK_RATE=1003,
+            OPTION_NSI_LAST_SYNC_TIME=10001;
+    public final static Object[] OPTIONS_INITIALIZER = new Object[]{
+            OPTION_WITH_OPERATOR, "0",
+            OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, "0",
+            OPTION_CLEAN_MENU, "1", 
+            OPTION_MENU_DAYS_FOR_DELETION, "30", 
+            OPTION_JOURNAL_TRANSACTIONS, "0", 
+            OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, "1", 
+            OPTION_NFP_SERVICE_ADDRESS, "http://193.47.154.34:7002/uec-service-war/TransactionService", 
+            OPTION_NOTIFICATION_TEXT, "",
+            OPTION_DEFAULT_OVERDRAFT_LIMIT, "0",
+            OPTION_DEFAULT_EXPENDITURE_LIMIT, "20000",
+            OPTION_CHRONOPAY_SECTION, "1", 
+            OPTION_RBK_SECTION, "1", 
+            OPTION_CHRONOPAY_RATE, "3.3", 
+            OPTION_RBK_RATE, "3",
+            OPTION_NSI_LAST_SYNC_TIME, null,
+    };
 
     private Long idOfOption;
     private String optionText;

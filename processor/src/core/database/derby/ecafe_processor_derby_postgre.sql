@@ -80,6 +80,7 @@ CREATE TABLE CF_Orgs (
   mailingListReportsOnVisits character varying(1024),
   mailingListReports1 character varying(1024),
   mailingListReports2 character varying(1024),
+  guid varchar(40),
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),

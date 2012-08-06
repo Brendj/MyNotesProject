@@ -267,6 +267,8 @@ CREATE TABLE cf_friendly_organization
   CONSTRAINT cf_friendly_organization_friend_idoforg_fk FOREIGN KEY (friendlyorg)
       REFERENCES cf_orgs (idoforg)
 );
-/* Поле Факс клиентов организации*/
+-- Поле Факс клиентов организации
 ALTER TABLE cf_clients ADD COLUMN fax character varying(32);
 
+-- Поле GUID организации
+ALTER TABLE cf_orgs ADD COLUMN guid varchar(40);

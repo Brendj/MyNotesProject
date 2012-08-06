@@ -75,11 +75,11 @@ public class ClientManager {
             new FieldProcessor.Def(16, false, false, "Платный SMS", "0", FieldId.PAY_FOR_SMS, true),
             new FieldProcessor.Def(17, false, false, "Уведомление по SMS", "0", FieldId.NOTIFY_BY_SMS, true),
             new FieldProcessor.Def(18, false, false, "Уведомление по e-mail", "0", FieldId.NOTIFY_BY_EMAIL, true),
-            new FieldProcessor.Def(19, false, false, "Овердрафт", "0", FieldId.OVERDRAFT, true),
+            new FieldProcessor.Def(19, false, false, "Овердрафт", null, FieldId.OVERDRAFT, true),
             new FieldProcessor.Def(20, false, false, "Комментарии", null, FieldId.COMMENTS, true),
             new FieldProcessor.Def(21, false, false, "Группа", null, FieldId.GROUP, true),
             new FieldProcessor.Def(22, false, false, "СНИЛС", null, FieldId.SAN, true),
-            new FieldProcessor.Def(23, false, false, "Дневной лимит", "0", FieldId.EXPENDITURE_LIMIT, true),
+            new FieldProcessor.Def(23, false, false, "Дневной лимит", null, FieldId.EXPENDITURE_LIMIT, true),
             new FieldProcessor.Def(24, false, false, "Карта-ид", null, FieldId.CARD_ID, false),
             new FieldProcessor.Def(25, false, false, "Карта-номер", null, FieldId.CARD_PRINTED_NUM, false),
             new FieldProcessor.Def(26, false, false, "Карта-тип", null, FieldId.CARD_TYPE, false),
@@ -260,7 +260,7 @@ public class ClientManager {
             if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID)!=null) {
                 String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
                 if (clientGUID.isEmpty()) client.setClientGUID(null);
-                else client.setClientGUID(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+                else client.setClientGUID(clientGUID);
             }
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -322,6 +322,7 @@ public class ClientManager {
             persistenceSession.save(person);
 
             long limit = organization.getCardLimit();
+            if (limit==0) limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
             if (fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT)!=null) {
             //if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
                 limit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));//tokens[19]);
@@ -334,7 +335,8 @@ public class ClientManager {
             Date contractDate = fieldConfig.getValueDate(ClientManager.FieldId.CONTRACT_DATE);//dateFormat.parse(tokens[3]);
             int contractState = fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE);
             int payForSms = fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS);
-            long expenditureLimit = 0;
+            long expenditureLimit = RuntimeContext.getInstance().getOptionValueLong(
+                    Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
             if (fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT)!=null) {
                 expenditureLimit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
             }
@@ -369,6 +371,12 @@ public class ClientManager {
                 }
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
+            if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID)!=null) {
+                String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+                if (clientGUID.isEmpty()) client.setClientGUID(null);
+                else client.setClientGUID(clientGUID);
+            }
+
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
             ///
@@ -391,7 +399,7 @@ public class ClientManager {
     }
 
 
-    private static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
+    public static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
             String secondName) throws Exception {
         if (StringUtils.isEmpty(secondName)) {
             return DAOUtils.existClient(persistenceSession, organization, firstName, surname);
@@ -425,5 +433,4 @@ public class ClientManager {
         }
 
     }
-
 }

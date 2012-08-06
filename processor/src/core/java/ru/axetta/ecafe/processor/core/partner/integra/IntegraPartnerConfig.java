@@ -23,7 +23,7 @@ public class IntegraPartnerConfig {
     private static final String PARAM_PASSWORD= ".password";
 
     public static final int AUTH_TYPE_NONE=0, AUTH_TYPE_CLIENT_CERT=2, AUTH_TYPE_BASIC =3;
-    public static final int PERMISSION_TYPE_ALL=0, PERMISSION_TYPE_CLIENT_AUTH=1;
+    public static final int PERMISSION_TYPE_ALL=0, PERMISSION_TYPE_CLIENT_AUTH=1, PERMISSION_TYPE_CLIENT_AUTH_BY_NAME=2;
 
     private static final Logger logger = LoggerFactory.getLogger(IntegraPartnerConfig.class);
 
@@ -89,6 +89,7 @@ public class IntegraPartnerConfig {
             String permissionType = getRequiredParam(permissionTypeParam, properties);
             if (0==permissionType.compareToIgnoreCase("all")) linkConfig.permissionType = PERMISSION_TYPE_ALL;
             else if (0==permissionType.compareToIgnoreCase("client_auth")) linkConfig.permissionType = PERMISSION_TYPE_CLIENT_AUTH;
+            else if (0==permissionType.compareToIgnoreCase("client_auth_by_name")) linkConfig.permissionType = PERMISSION_TYPE_CLIENT_AUTH_BY_NAME;
             else throw new Exception("Invalid permissionType: "+permissionType);
             
             linkConfigs.add(linkConfig);

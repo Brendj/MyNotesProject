@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.NSISyncService;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -37,6 +39,8 @@ import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.updater.DBUpdater;
+import ru.axetta.ecafe.processor.core.utils.Base64;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CxfContextCapture;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -63,9 +67,9 @@ import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.*;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.StringReader;
+import java.io.*;
 import java.security.PrivateKey;
+import java.security.cert.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -157,9 +161,14 @@ public class RuntimeContext implements ApplicationContextAware {
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
+    private MskNSIService.Config nsiServiceConfig;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
+    }
+
+    public MskNSIService.Config getNsiServiceConfig() {
+        return nsiServiceConfig;
     }
 
     public SBRTConfig getPartnerSBRTConfig() {
@@ -341,6 +350,8 @@ public class RuntimeContext implements ApplicationContextAware {
         //logger.info("sf = "+sessionFactory);
         try {
 
+            loadDataFiles();
+
             executorService = createExecutorService(properties);
             this.executorService = executorService;
 
@@ -372,6 +383,15 @@ public class RuntimeContext implements ApplicationContextAware {
                 this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
                 logger.error("Failed to load partner config: "+e);
+                criticalErrors = true;
+            }
+            try {
+                this.nsiServiceConfig = new MskNSIService.Config(properties, PROCESSOR_PARAM_BASE);
+                if (this.nsiServiceConfig.syncEnabled) {
+                    getAppContext().getBean(NSISyncService.class).scheduleSync();
+                }
+            } catch (Exception e) {
+                logger.error("Failed to init NSI services", e);
                 criticalErrors = true;
             }
 
@@ -969,8 +989,9 @@ if (logger.isDebugEnabled()) {
 
     public void loadOptionValues() {
         optionsValues = new HashMap<Integer, String>();
-        for (int nOption=2;nOption<=Option.OPTION_MAX;nOption++) {
-            String v = DAOUtils.getOptionValue(em, nOption, Option.getDefaultValue(nOption));
+        for (int n=0;n<Option.OPTIONS_INITIALIZER.length;n+=2) {
+            Integer nOption = (Integer)Option.OPTIONS_INITIALIZER[n];
+            String v = DAOUtils.getOptionValue(em, nOption, (String)Option.OPTIONS_INITIALIZER[n+1]);
             optionsValues.put(nOption, v);
         }
     }
@@ -981,6 +1002,10 @@ if (logger.isDebugEnabled()) {
 
     public int getOptionValueInt(int optionId) {
         return Integer.parseInt(getOptionValueString(optionId));
+    }
+
+    public long getOptionValueLong(int optionId) {
+        return Long.parseLong(getOptionValueString(optionId));
     }
 
     public double getOptionValueDouble(int optionId) {
@@ -1000,6 +1025,16 @@ if (logger.isDebugEnabled()) {
     public void setOptionValue(int optionId, int value) {
         setOptionValue(optionId, value+"");
     }
+    public void setOptionValue(int optionId, long value) {
+        setOptionValue(optionId, value+"");
+    }
+    @Transactional
+    public void setOptionValueWithSave(int optionId, Object value) {
+        setOptionValue(optionId, value+"");
+        Option o = new Option((long)optionId, value+"");
+        o = em.merge(o);
+        em.persist(o);
+    }
 
     public void setOptionValue(int optionId, double value) {
         setOptionValue(optionId, value+"");
@@ -1018,5 +1053,174 @@ if (logger.isDebugEnabled()) {
         return criticalErrors;
     }
 
+    public final static int TYPE_S=0, TYPE_P=1, TYPE_B=2;
+    public static int permittedCountS, permittedCountP, permittedCountB;
+    public static HashSet<Long> orgS = new HashSet<Long>(), orgP = new HashSet<Long>(), orgB = new HashSet<Long>();
+    public boolean isPermitted(long orgId, int type) {
+        if (type==TYPE_S) {
+            orgS.add(orgId);
+            return orgS.size()<=1 || orgS.size()<=permittedCountS;
+        }
+        if (type==TYPE_P) {
+            orgP.add(orgId);
+            return orgP.size()<=1 || orgP.size()<=permittedCountP;
+        }
+        if (type==TYPE_B) {
+            orgB.add(orgId);
+            return orgB.size()<=1 || orgB.size()<=permittedCountB;
+        }
+        return false;
+    }
+    
+    public void loadDataFiles() {
+        String dir = System.getProperty("lacinsidar".replaceAll("i", "e").replaceAll("a", "i"), "");
+        if (dir!=null && !dir.isEmpty()) {
+            File[] files = new File(dir).listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return (name.endsWith(".lic"));
+                }
+            });
+            for (File f : files) {
+                processDataFile(f);
+            }
+        }
+    }
+
+    private static String base64crt="MIICMTCCAZqgAwIBAgIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQFADAi\n"
+            + "MSAwHgYDVQQDExdsaWNlbnNlLm5vdmF5YXNoa29sYS5ydTAeFw0xMjA4MDMwNjAz\n"
+            + "MDBaFw0zNTEyMzEyMDAwMDBaMCIxIDAeBgNVBAMTF2xpY2Vuc2Uubm92YXlhc2hr\n"
+            + "b2xhLnJ1MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9pdRyozu+dRELgRpb\n"
+            + "kDrIc9RHRiNAj4LS1HQjZmGPbtjdRyC8AcdaeO3M1fGUe+iiON/9ldZLwsCB6hTh\n"
+            + "VkJijZ+6gsqLEiMxN/Wo5THFXYGDSYvq6t1dlgt/K5/ctXR86carj1beZ3eCPE5G\n"
+            + "rZ6eUbIaDHU0NgMd8p8L4H0aRQIDAQABo2gwZjAPBgNVHRMBAf8EBTADAQH/MFMG\n"
+            + "A1UdAQRMMEqAEJvi89wDT2YruumkBLTUaaehJDAiMSAwHgYDVQQDExdsaWNlbnNl\n"
+            + "Lm5vdmF5YXNoa29sYS5ydYIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQF\n"
+            + "AAOBgQBJxDdetDvHdUrzztZoHhfJwDOGYx/bp1zNtd75RVfvM/+Gwu4AiW6CQfLB\n"
+            + "qc085KjxxnQZ2Si7FoDhwJ3gCEEERs5YrA/O/Lde+kdUPT15GlZcguJHB5Jk83Ir\n"
+            + "GmtI6Yxjlvzt1zcqpq4MZM3HTLdz4gibDBPGG3cd692TYkHeFg==";
+    private static X509Certificate rtCert = null; // корневой сертификат
+
+    private static X509Certificate getRootCert() throws Exception {
+        if (rtCert ==null) {
+            byte bytes[] = Base64.decode(base64crt);
+            CertificateFactory cf = CertificateFactory.getInstance("X509");
+            rtCert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
+        }
+        return rtCert;
+    }
+
+    private static Set<TrustAnchor> getTrustStore() throws Exception {
+        Set<TrustAnchor> resultSet = new HashSet(1);
+        resultSet.add(new TrustAnchor(getRootCert(), null));
+        return resultSet;
+    }
+    
+    public static class DataInfo {
+        public String org;
+        public String dn;
+        public int sCount, pCount, bCount;
+        public String id, location;
+        public Date validTo, issued;
+        public boolean valid;
+
+        public String getOrg() {
+            return org;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+        
+        public String getInfo() {
+            return sCount+"/"+pCount+"/"+bCount;
+        }
+        public String getExpiryDate() {
+            return CalendarUtils.dateToString(validTo);
+        }
+        public String getIssuedDate() {
+            return CalendarUtils.dateToString(issued);
+        }
+        public String getValidInfo() {
+            return valid?"Валидна":"Невалидна";
+        }
+    }
+    public LinkedList<DataInfo> dataInfos = new LinkedList<DataInfo>();
+
+    public void processDataFile(File file) {
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X509");
+            FileInputStream fis = new FileInputStream(file);
+            X509Certificate cert = (X509Certificate) cf.generateCertificate(fis);
+            fis.close();
+            Date currentDate = new Date();
+            boolean isValid = true;
+            if (currentDate.after(cert.getNotAfter())) isValid = false;
+            if (currentDate.before(cert.getNotBefore())) isValid = false;
+            List<X509Certificate> mylist = new ArrayList<X509Certificate>();
+            mylist.add(cert);
+            CertPath cp = cf.generateCertPath(mylist);
+            PKIXParameters pkiXParameters = new PKIXParameters(getTrustStore());
+            pkiXParameters.setRevocationEnabled(false);
+            CertPathValidator cpv = CertPathValidator.getInstance(CertPathValidator.getDefaultType());
+            PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) cpv.validate(cp, pkiXParameters);
+            isValid = getRootCert().equals(pkixCertPathValidatorResult.getTrustAnchor().getTrustedCert());
+            DataInfo dataInfo = new DataInfo();
+            // проверили сертификат
+            String dn = cert.getSubjectDN().getName();
+            dataInfo.dn = dn;
+            dataInfo.org = getDNField(dn, "O");
+            for (DataInfo di : dataInfos) {
+                // проверяем не был ли сертификат уже загружен
+                if (di.dn.equals(dn)) return;
+                // проверяем чтобы была одинаковая организация и локация
+                if (!di.org.equals(dataInfo.org)) return;
+                if (!di.location.equals(dataInfo.location)) return;
+            }
+            dataInfo.id = getDNField(dn, "OU");
+            dataInfo.location = getDNField(dn, "L");
+            dataInfo.issued = cert.getNotBefore();
+            dataInfo.validTo = cert.getNotAfter();
+            dataInfo.valid = isValid;
+            if (isValid) {
+                String cn=getDNField(dn, "CN");
+                String words[]=cn.split("-");
+                for (String w : words) {
+                    if (w.isEmpty()) continue;
+                    int pos = w.indexOf('_');
+                    if (pos==-1) continue;
+                    String count = w.substring(0, pos), type=w.substring(pos+1);
+                    int lcount = Integer.parseInt(count);
+                    if (type.equals("STD".replaceAll("T", "K"))) permittedCountS+=(dataInfo.sCount=lcount);
+                    else if (type.equals("PXT".replaceAll("X", "I"))) permittedCountP+=(dataInfo.pCount=lcount);
+                    else if (type.equals("BOB".replaceAll("O", "I"))) permittedCountB+=(dataInfo.bCount=lcount);
+                }
+            }
+            dataInfos.add(dataInfo);
+        } catch (Exception e) {
+            if (!System.getProperty("lacinsierror".replaceAll("i", "e").replaceAll("a", "i"), "").equals("")) {
+                logger.error("Error loading file: "+file.getAbsolutePath(), e);
+            }
+        }
+    }
+
+    private String getDNField(String dn, String field) {
+        int cnPos= dn.indexOf(field);
+        if (cnPos!=-1) {
+            int cnEqPos = dn.indexOf("=", cnPos);
+            int cnEndPos = dn.indexOf(",", cnPos);
+            if (cnEndPos==-1) cnEndPos=dn.length();
+            return dn.substring(cnEqPos+1, cnEndPos);
+        }
+        return "";
+    }
+
+    public LinkedList<DataInfo> getDataInfos() {
+        return dataInfos;
+    }
 }
 

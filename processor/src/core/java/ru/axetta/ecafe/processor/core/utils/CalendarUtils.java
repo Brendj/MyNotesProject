@@ -50,6 +50,10 @@ public class CalendarUtils {
         return dateFormat.parse(validTime);
     }
 
+    public static String dateToString(Date date) {
+        return dateFormat.format(date);
+    }
+
     public static long getTimeFirstDayOfMonth(long time) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
