@@ -392,7 +392,7 @@ public interface ClientRoomController {
 
     /**
      * 
-     * @param base64PasswordHash
+     * @param token
      * @param contractId
      * @return
      *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.Result
@@ -404,8 +404,8 @@ public interface ClientRoomController {
     public Result authorizeClient(
         @WebParam(name = "contractId", targetNamespace = "")
         Long contractId,
-        @WebParam(name = "base64passwordHash", targetNamespace = "")
-        String base64PasswordHash);
+        @WebParam(name = "token", targetNamespace = "")
+        String token);
 
     /**
      * 

@@ -93,195 +93,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetPurchaseListBySanResponse }
+     * Create an instance of {@link GetSummaryBySanResponse }
      * 
      */
-    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
-        return new GetPurchaseListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySan }
-     * 
-     */
-    public AttachGuardSanBySan createAttachGuardSanBySan() {
-        return new AttachGuardSanBySan();
-    }
-
-    /**
-     * Create an instance of {@link GetContractIdByCardNo }
-     * 
-     */
-    public GetContractIdByCardNo createGetContractIdByCardNo() {
-        return new GetContractIdByCardNo();
-    }
-
-    /**
-     * Create an instance of {@link GetGroupListByOrgResponse }
-     * 
-     */
-    public GetGroupListByOrgResponse createGetGroupListByOrgResponse() {
-        return new GetGroupListByOrgResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseListResult }
-     * 
-     */
-    public PurchaseListResult createPurchaseListResult() {
-        return new PurchaseListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySan }
-     * 
-     */
-    public GetEnterEventListBySan createGetEnterEventListBySan() {
-        return new GetEnterEventListBySan();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySan }
-     * 
-     */
-    public GetSummaryBySan createGetSummaryBySan() {
-        return new GetSummaryBySan();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationByEmail }
-     * 
-     */
-    public EnableNotificationByEmail createEnableNotificationByEmail() {
-        return new EnableNotificationByEmail();
-    }
-
-    /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroup }
-     * 
-     */
-    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
-        return new GetStudentListByIdOfClientGroup();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySanResponse }
-     * 
-     */
-    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
-        return new AttachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseList }
-     * 
-     */
-    public PurchaseList createPurchaseList() {
-        return new PurchaseList();
-    }
-
-    /**
-     * Create an instance of {@link ClientsData }
-     * 
-     */
-    public ClientsData createClientsData() {
-        return new ClientsData();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryResponse }
-     * 
-     */
-    public GetSummaryResponse createGetSummaryResponse() {
-        return new GetSummaryResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySanResponse }
-     * 
-     */
-    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
-        return new GetEnterEventListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChangeEmail }
-     * 
-     */
-    public ChangeEmail createChangeEmail() {
-        return new ChangeEmail();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListResponse }
-     * 
-     */
-    public GetEnterEventListResponse createGetEnterEventListResponse() {
-        return new GetEnterEventListResponse();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationByEmailResponse }
-     * 
-     */
-    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
-        return new EnableNotificationByEmailResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseListExt }
-     * 
-     */
-    public PurchaseListExt createPurchaseListExt() {
-        return new PurchaseListExt();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedIdResponse }
-     * 
-     */
-    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
-        return new GetSummaryByTypedIdResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSanResponse }
-     * 
-     */
-    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
-        return new GetClientsByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseElement }
-     * 
-     */
-    public PurchaseElement createPurchaseElement() {
-        return new PurchaseElement();
-    }
-
-    /**
-     * Create an instance of {@link ClassStudentListResult }
-     * 
-     */
-    public ClassStudentListResult createClassStudentListResult() {
-        return new ClassStudentListResult();
-    }
-
-    /**
-     * Create an instance of {@link ClientItem }
-     * 
-     */
-    public ClientItem createClientItem() {
-        return new ClientItem();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupItem }
-     * 
-     */
-    public ClientGroupItem createClientGroupItem() {
-        return new ClientGroupItem();
+    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
+        return new GetSummaryBySanResponse();
     }
 
     /**
@@ -293,99 +109,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetPurchaseList }
+     * Create an instance of {@link DetachGuardSanResponse }
      * 
      */
-    public GetPurchaseList createGetPurchaseList() {
-        return new GetPurchaseList();
+    public DetachGuardSanResponse createDetachGuardSanResponse() {
+        return new DetachGuardSanResponse();
     }
 
     /**
-     * Create an instance of {@link GetPaymentListResponse }
+     * Create an instance of {@link MenuListResult }
      * 
      */
-    public GetPaymentListResponse createGetPaymentListResponse() {
-        return new GetPaymentListResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSan }
-     * 
-     */
-    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
-        return new GetSummaryByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventItem }
-     * 
-     */
-    public EnterEventItem createEnterEventItem() {
-        return new EnterEventItem();
-    }
-
-    /**
-     * Create an instance of {@link MenuList }
-     * 
-     */
-    public MenuList createMenuList() {
-        return new MenuList();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanResult }
-     * 
-     */
-    public AttachGuardSanResult createAttachGuardSanResult() {
-        return new AttachGuardSanResult();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSan }
-     * 
-     */
-    public AttachGuardSan createAttachGuardSan() {
-        return new AttachGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentList }
-     * 
-     */
-    public GetPaymentList createGetPaymentList() {
-        return new GetPaymentList();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanResult }
-     * 
-     */
-    public DetachGuardSanResult createDetachGuardSanResult() {
-        return new DetachGuardSanResult();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSanResponse }
-     * 
-     */
-    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
-        return new GetSummaryByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedId }
-     * 
-     */
-    public GetSummaryByTypedId createGetSummaryByTypedId() {
-        return new GetSummaryByTypedId();
-    }
-
-    /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
-     * 
-     */
-    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
-        return new GetStudentListByIdOfClientGroupResponse();
+    public MenuListResult createMenuListResult() {
+        return new MenuListResult();
     }
 
     /**
@@ -397,131 +133,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnterEventList }
+     * Create an instance of {@link GetPaymentListBySanResponse }
      * 
      */
-    public EnterEventList createEnterEventList() {
-        return new EnterEventList();
+    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
+        return new GetPaymentListBySanResponse();
     }
 
     /**
-     * Create an instance of {@link GetCirculationListResponse }
+     * Create an instance of {@link PurchaseElementExt }
      * 
      */
-    public GetCirculationListResponse createGetCirculationListResponse() {
-        return new GetCirculationListResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListBySanResponse }
-     * 
-     */
-    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
-        return new GetMenuListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link MenuItem }
-     * 
-     */
-    public MenuItem createMenuItem() {
-        return new MenuItem();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListBySan }
-     * 
-     */
-    public GetPurchaseListBySan createGetPurchaseListBySan() {
-        return new GetPurchaseListBySan();
-    }
-
-    /**
-     * Create an instance of {@link Result }
-     * 
-     */
-    public Result createResult() {
-        return new Result();
-    }
-
-    /**
-     * Create an instance of {@link GetCirculationList }
-     * 
-     */
-    public GetCirculationList createGetCirculationList() {
-        return new GetCirculationList();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanBySan }
-     * 
-     */
-    public DetachGuardSanBySan createDetachGuardSanBySan() {
-        return new DetachGuardSanBySan();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummaryResult }
-     * 
-     */
-    public ClientSummaryResult createClientSummaryResult() {
-        return new ClientSummaryResult();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListByOrgResponse }
-     * 
-     */
-    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
-        return new GetMenuListByOrgResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuList }
-     * 
-     */
-    public GetMenuList createGetMenuList() {
-        return new GetMenuList();
-    }
-
-    /**
-     * Create an instance of {@link MenuDateItem }
-     * 
-     */
-    public MenuDateItem createMenuDateItem() {
-        return new MenuDateItem();
-    }
-
-    /**
-     * Create an instance of {@link GetCardList }
-     * 
-     */
-    public GetCardList createGetCardList() {
-        return new GetCardList();
-    }
-
-    /**
-     * Create an instance of {@link GetContractIdByCardNoResponse }
-     * 
-     */
-    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
-        return new GetContractIdByCardNoResponse();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationBySMS }
-     * 
-     */
-    public EnableNotificationBySMS createEnableNotificationBySMS() {
-        return new EnableNotificationBySMS();
-    }
-
-    /**
-     * Create an instance of {@link Purchase }
-     * 
-     */
-    public Purchase createPurchase() {
-        return new Purchase();
+    public PurchaseElementExt createPurchaseElementExt() {
+        return new PurchaseElementExt();
     }
 
     /**
@@ -533,11 +157,35 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetPaymentListBySanResponse }
+     * Create an instance of {@link CirculationListResult }
      * 
      */
-    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
-        return new GetPaymentListBySanResponse();
+    public CirculationListResult createCirculationListResult() {
+        return new CirculationListResult();
+    }
+
+    /**
+     * Create an instance of {@link ClassStudentList }
+     * 
+     */
+    public ClassStudentList createClassStudentList() {
+        return new ClassStudentList();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListExt }
+     * 
+     */
+    public PurchaseListExt createPurchaseListExt() {
+        return new PurchaseListExt();
+    }
+
+    /**
+     * Create an instance of {@link PaymentList }
+     * 
+     */
+    public PaymentList createPaymentList() {
+        return new PaymentList();
     }
 
     /**
@@ -549,19 +197,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Payment }
+     * Create an instance of {@link GetPurchaseListBySan }
      * 
      */
-    public Payment createPayment() {
-        return new Payment();
+    public GetPurchaseListBySan createGetPurchaseListBySan() {
+        return new GetPurchaseListBySan();
     }
 
     /**
-     * Create an instance of {@link EnableNotificationBySMSResponse }
+     * Create an instance of {@link GetEnterEventListBySan }
      * 
      */
-    public EnableNotificationBySMSResponse createEnableNotificationBySMSResponse() {
-        return new EnableNotificationBySMSResponse();
+    public GetEnterEventListBySan createGetEnterEventListBySan() {
+        return new GetEnterEventListBySan();
+    }
+
+    /**
+     * Create an instance of {@link CardItem }
+     * 
+     */
+    public CardItem createCardItem() {
+        return new CardItem();
     }
 
     /**
@@ -581,70 +237,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetCardListBySan }
-     * 
-     */
-    public GetCardListBySan createGetCardListBySan() {
-        return new GetCardListBySan();
-    }
-
-    /**
-     * Create an instance of {@link ClassStudentList }
-     * 
-     */
-    public ClassStudentList createClassStudentList() {
-        return new ClassStudentList();
-    }
-
-    /**
-     * Create an instance of {@link CirculationListResult }
-     * 
-     */
-    public CirculationListResult createCirculationListResult() {
-        return new CirculationListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListByOrg }
-     * 
-     */
-    public GetMenuListByOrg createGetMenuListByOrg() {
-        return new GetMenuListByOrg();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanBySanResponse }
-     * 
-     */
-    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
-        return new DetachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link AuthorizeClientResponse }
-     * 
-     */
-    public AuthorizeClientResponse createAuthorizeClientResponse() {
-        return new AuthorizeClientResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseElementExt }
-     * 
-     */
-    public PurchaseElementExt createPurchaseElementExt() {
-        return new PurchaseElementExt();
-    }
-
-    /**
-     * Create an instance of {@link ChangeExpenditureLimitResponse }
-     * 
-     */
-    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
-        return new ChangeExpenditureLimitResponse();
-    }
-
-    /**
      * Create an instance of {@link MenuDateItemExt }
      * 
      */
@@ -653,75 +245,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClientSummary }
+     * Create an instance of {@link Data }
      * 
      */
-    public ClientSummary createClientSummary() {
-        return new ClientSummary();
+    public Data createData() {
+        return new Data();
     }
 
     /**
-     * Create an instance of {@link CardItem }
+     * Create an instance of {@link ClientGroupItem }
      * 
      */
-    public CardItem createCardItem() {
-        return new CardItem();
+    public ClientGroupItem createClientGroupItem() {
+        return new ClientGroupItem();
     }
 
     /**
-     * Create an instance of {@link AttachGuardSanResponse }
+     * Create an instance of {@link EnterEventItem }
      * 
      */
-    public AttachGuardSanResponse createAttachGuardSanResponse() {
-        return new AttachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientList }
-     * 
-     */
-    public ClientList createClientList() {
-        return new ClientList();
-    }
-
-    /**
-     * Create an instance of {@link GetGroupListByOrg }
-     * 
-     */
-    public GetGroupListByOrg createGetGroupListByOrg() {
-        return new GetGroupListByOrg();
-    }
-
-    /**
-     * Create an instance of {@link PaymentListResult }
-     * 
-     */
-    public PaymentListResult createPaymentListResult() {
-        return new PaymentListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSan }
-     * 
-     */
-    public GetClientsByGuardSan createGetClientsByGuardSan() {
-        return new GetClientsByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link MenuListExt }
-     * 
-     */
-    public MenuListExt createMenuListExt() {
-        return new MenuListExt();
-    }
-
-    /**
-     * Create an instance of {@link CardListResult }
-     * 
-     */
-    public CardListResult createCardListResult() {
-        return new CardListResult();
+    public EnterEventItem createEnterEventItem() {
+        return new EnterEventItem();
     }
 
     /**
@@ -741,99 +285,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClientGroupListResult }
+     * Create an instance of {@link ChangeMobilePhoneResponse }
      * 
      */
-    public ClientGroupListResult createClientGroupListResult() {
-        return new ClientGroupListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetSummary }
-     * 
-     */
-    public GetSummary createGetSummary() {
-        return new GetSummary();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItemList }
-     * 
-     */
-    public CirculationItemList createCirculationItemList() {
-        return new CirculationItemList();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySanResponse }
-     * 
-     */
-    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
-        return new GetSummaryBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link Data }
-     * 
-     */
-    public Data createData() {
-        return new Data();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanResponse }
-     * 
-     */
-    public DetachGuardSanResponse createDetachGuardSanResponse() {
-        return new DetachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupList }
-     * 
-     */
-    public ClientGroupList createClientGroupList() {
-        return new ClientGroupList();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItem }
-     * 
-     */
-    public CirculationItem createCirculationItem() {
-        return new CirculationItem();
-    }
-
-    /**
-     * Create an instance of {@link MenuListResult }
-     * 
-     */
-    public MenuListResult createMenuListResult() {
-        return new MenuListResult();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummaryExt }
-     * 
-     */
-    public ClientSummaryExt createClientSummaryExt() {
-        return new ClientSummaryExt();
-    }
-
-    /**
-     * Create an instance of {@link PaymentList }
-     * 
-     */
-    public PaymentList createPaymentList() {
-        return new PaymentList();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseExt }
-     * 
-     */
-    public PurchaseExt createPurchaseExt() {
-        return new PurchaseExt();
+    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
+        return new ChangeMobilePhoneResponse();
     }
 
     /**
@@ -845,43 +301,67 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetMenuListResponse }
+     * Create an instance of {@link ClientSummaryExt }
      * 
      */
-    public GetMenuListResponse createGetMenuListResponse() {
-        return new GetMenuListResponse();
+    public ClientSummaryExt createClientSummaryExt() {
+        return new ClientSummaryExt();
     }
 
     /**
-     * Create an instance of {@link MenuItemExt }
+     * Create an instance of {@link ClientGroupList }
      * 
      */
-    public MenuItemExt createMenuItemExt() {
-        return new MenuItemExt();
+    public ClientGroupList createClientGroupList() {
+        return new ClientGroupList();
     }
 
     /**
-     * Create an instance of {@link PublicationItem }
+     * Create an instance of {@link AttachGuardSanResult }
      * 
      */
-    public PublicationItem createPublicationItem() {
-        return new PublicationItem();
+    public AttachGuardSanResult createAttachGuardSanResult() {
+        return new AttachGuardSanResult();
     }
 
     /**
-     * Create an instance of {@link GetCardListResponse }
+     * Create an instance of {@link GetSummaryByTypedIdResponse }
      * 
      */
-    public GetCardListResponse createGetCardListResponse() {
-        return new GetCardListResponse();
+    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
+        return new GetSummaryByTypedIdResponse();
     }
 
     /**
-     * Create an instance of {@link ChangeMobilePhoneResponse }
+     * Create an instance of {@link DetachGuardSanBySan }
      * 
      */
-    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
-        return new ChangeMobilePhoneResponse();
+    public DetachGuardSanBySan createDetachGuardSanBySan() {
+        return new DetachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetCardList }
+     * 
+     */
+    public GetCardList createGetCardList() {
+        return new GetCardList();
+    }
+
+    /**
+     * Create an instance of {@link MenuListExt }
+     * 
+     */
+    public MenuListExt createMenuListExt() {
+        return new MenuListExt();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSan }
+     * 
+     */
+    public AttachGuardSan createAttachGuardSan() {
+        return new AttachGuardSan();
     }
 
     /**
@@ -893,11 +373,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChangeMobilePhone }
+     * Create an instance of {@link GetEnterEventListBySanResponse }
      * 
      */
-    public ChangeMobilePhone createChangeMobilePhone() {
-        return new ChangeMobilePhone();
+    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
+        return new GetEnterEventListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanBySanResponse }
+     * 
+     */
+    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
+        return new AttachGuardSanBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanBySan }
+     * 
+     */
+    public AttachGuardSanBySan createAttachGuardSanBySan() {
+        return new AttachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link AuthorizeClientResponse }
+     * 
+     */
+    public AuthorizeClientResponse createAuthorizeClientResponse() {
+        return new AuthorizeClientResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientItem }
+     * 
+     */
+    public ClientItem createClientItem() {
+        return new ClientItem();
+    }
+
+    /**
+     * Create an instance of {@link MenuItemExt }
+     * 
+     */
+    public MenuItemExt createMenuItemExt() {
+        return new MenuItemExt();
     }
 
     /**
@@ -906,6 +426,486 @@ public class ObjectFactory {
      */
     public GetMenuListBySan createGetMenuListBySan() {
         return new GetMenuListBySan();
+    }
+
+    /**
+     * Create an instance of {@link Result }
+     * 
+     */
+    public Result createResult() {
+        return new Result();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanResult }
+     * 
+     */
+    public DetachGuardSanResult createDetachGuardSanResult() {
+        return new DetachGuardSanResult();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListResponse }
+     * 
+     */
+    public GetPaymentListResponse createGetPaymentListResponse() {
+        return new GetPaymentListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListResponse }
+     * 
+     */
+    public GetEnterEventListResponse createGetEnterEventListResponse() {
+        return new GetEnterEventListResponse();
+    }
+
+    /**
+     * Create an instance of {@link PublicationItem }
+     * 
+     */
+    public PublicationItem createPublicationItem() {
+        return new PublicationItem();
+    }
+
+    /**
+     * Create an instance of {@link GetContractIdByCardNoResponse }
+     * 
+     */
+    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
+        return new GetContractIdByCardNoResponse();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseList }
+     * 
+     */
+    public PurchaseList createPurchaseList() {
+        return new PurchaseList();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByTypedId }
+     * 
+     */
+    public GetSummaryByTypedId createGetSummaryByTypedId() {
+        return new GetSummaryByTypedId();
+    }
+
+    /**
+     * Create an instance of {@link MenuList }
+     * 
+     */
+    public MenuList createMenuList() {
+        return new MenuList();
+    }
+
+    /**
+     * Create an instance of {@link ChangeExpenditureLimitResponse }
+     * 
+     */
+    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
+        return new ChangeExpenditureLimitResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientsData }
+     * 
+     */
+    public ClientsData createClientsData() {
+        return new ClientsData();
+    }
+
+    /**
+     * Create an instance of {@link GetSummary }
+     * 
+     */
+    public GetSummary createGetSummary() {
+        return new GetSummary();
+    }
+
+    /**
+     * Create an instance of {@link GetCirculationList }
+     * 
+     */
+    public GetCirculationList createGetCirculationList() {
+        return new GetCirculationList();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationBySMS }
+     * 
+     */
+    public EnableNotificationBySMS createEnableNotificationBySMS() {
+        return new EnableNotificationBySMS();
+    }
+
+    /**
+     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
+     * 
+     */
+    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
+        return new GetStudentListByIdOfClientGroupResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetContractIdByCardNo }
+     * 
+     */
+    public GetContractIdByCardNo createGetContractIdByCardNo() {
+        return new GetContractIdByCardNo();
+    }
+
+    /**
+     * Create an instance of {@link GetGroupListByOrg }
+     * 
+     */
+    public GetGroupListByOrg createGetGroupListByOrg() {
+        return new GetGroupListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseElement }
+     * 
+     */
+    public PurchaseElement createPurchaseElement() {
+        return new PurchaseElement();
+    }
+
+    /**
+     * Create an instance of {@link ChangeMobilePhone }
+     * 
+     */
+    public ChangeMobilePhone createChangeMobilePhone() {
+        return new ChangeMobilePhone();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationByEmailResponse }
+     * 
+     */
+    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
+        return new EnableNotificationByEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetGroupListByOrgResponse }
+     * 
+     */
+    public GetGroupListByOrgResponse createGetGroupListByOrgResponse() {
+        return new GetGroupListByOrgResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeEmail }
+     * 
+     */
+    public ChangeEmail createChangeEmail() {
+        return new ChangeEmail();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseExt }
+     * 
+     */
+    public PurchaseExt createPurchaseExt() {
+        return new PurchaseExt();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanBySanResponse }
+     * 
+     */
+    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
+        return new DetachGuardSanBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClassStudentListResult }
+     * 
+     */
+    public ClassStudentListResult createClassStudentListResult() {
+        return new ClassStudentListResult();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationByEmail }
+     * 
+     */
+    public EnableNotificationByEmail createEnableNotificationByEmail() {
+        return new EnableNotificationByEmail();
+    }
+
+    /**
+     * Create an instance of {@link Payment }
+     * 
+     */
+    public Payment createPayment() {
+        return new Payment();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListByOrgResponse }
+     * 
+     */
+    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
+        return new GetMenuListByOrgResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSanResponse }
+     * 
+     */
+    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
+        return new GetClientsByGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link CardListResult }
+     * 
+     */
+    public CardListResult createCardListResult() {
+        return new CardListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryResponse }
+     * 
+     */
+    public GetSummaryResponse createGetSummaryResponse() {
+        return new GetSummaryResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuDateItem }
+     * 
+     */
+    public MenuDateItem createMenuDateItem() {
+        return new MenuDateItem();
+    }
+
+    /**
+     * Create an instance of {@link GetCirculationListResponse }
+     * 
+     */
+    public GetCirculationListResponse createGetCirculationListResponse() {
+        return new GetCirculationListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetStudentListByIdOfClientGroup }
+     * 
+     */
+    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
+        return new GetStudentListByIdOfClientGroup();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByGuardSan }
+     * 
+     */
+    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
+        return new GetSummaryByGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link PaymentListResult }
+     * 
+     */
+    public PaymentListResult createPaymentListResult() {
+        return new PaymentListResult();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanResponse }
+     * 
+     */
+    public AttachGuardSanResponse createAttachGuardSanResponse() {
+        return new AttachGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientGroupListResult }
+     * 
+     */
+    public ClientGroupListResult createClientGroupListResult() {
+        return new ClientGroupListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryBySan }
+     * 
+     */
+    public GetSummaryBySan createGetSummaryBySan() {
+        return new GetSummaryBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByGuardSanResponse }
+     * 
+     */
+    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
+        return new GetSummaryByGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventList }
+     * 
+     */
+    public EnterEventList createEnterEventList() {
+        return new EnterEventList();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummaryResult }
+     * 
+     */
+    public ClientSummaryResult createClientSummaryResult() {
+        return new ClientSummaryResult();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationBySMSResponse }
+     * 
+     */
+    public EnableNotificationBySMSResponse createEnableNotificationBySMSResponse() {
+        return new EnableNotificationBySMSResponse();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListResult }
+     * 
+     */
+    public PurchaseListResult createPurchaseListResult() {
+        return new PurchaseListResult();
+    }
+
+    /**
+     * Create an instance of {@link MenuItem }
+     * 
+     */
+    public MenuItem createMenuItem() {
+        return new MenuItem();
+    }
+
+    /**
+     * Create an instance of {@link Purchase }
+     * 
+     */
+    public Purchase createPurchase() {
+        return new Purchase();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListBySan }
+     * 
+     */
+    public GetCardListBySan createGetCardListBySan() {
+        return new GetCardListBySan();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItem }
+     * 
+     */
+    public CirculationItem createCirculationItem() {
+        return new CirculationItem();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummary }
+     * 
+     */
+    public ClientSummary createClientSummary() {
+        return new ClientSummary();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListByOrg }
+     * 
+     */
+    public GetMenuListByOrg createGetMenuListByOrg() {
+        return new GetMenuListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentList }
+     * 
+     */
+    public GetPaymentList createGetPaymentList() {
+        return new GetPaymentList();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuList }
+     * 
+     */
+    public GetMenuList createGetMenuList() {
+        return new GetMenuList();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListBySanResponse }
+     * 
+     */
+    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
+        return new GetMenuListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSan }
+     * 
+     */
+    public GetClientsByGuardSan createGetClientsByGuardSan() {
+        return new GetClientsByGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItemList }
+     * 
+     */
+    public CirculationItemList createCirculationItemList() {
+        return new CirculationItemList();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListResponse }
+     * 
+     */
+    public GetCardListResponse createGetCardListResponse() {
+        return new GetCardListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListResponse }
+     * 
+     */
+    public GetMenuListResponse createGetMenuListResponse() {
+        return new GetMenuListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseList }
+     * 
+     */
+    public GetPurchaseList createGetPurchaseList() {
+        return new GetPurchaseList();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListBySanResponse }
+     * 
+     */
+    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
+        return new GetPurchaseListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientList }
+     * 
+     */
+    public ClientList createClientList() {
+        return new ClientList();
     }
 
     /**

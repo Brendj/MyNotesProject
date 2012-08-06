@@ -198,6 +198,8 @@ public class MainPage {
     // baybikov 23.11.2011
     private final BasicWorkspacePage complexGroupPage = new BasicWorkspacePage();
 
+    private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
+
     // baybikov (06.10.2011)
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
@@ -637,7 +639,7 @@ public class MainPage {
         return null;
     }
 
-    //***//
+//***//
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
     }
@@ -783,6 +785,7 @@ public class MainPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -814,6 +817,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -849,6 +853,7 @@ public class MainPage {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -878,6 +883,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -909,6 +915,7 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         }
@@ -950,6 +957,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -1044,6 +1052,7 @@ public class MainPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1075,6 +1084,7 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -1160,6 +1170,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1209,6 +1220,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1242,6 +1254,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -1271,6 +1284,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -1302,6 +1316,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         }
@@ -1335,6 +1350,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1361,6 +1377,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -1393,6 +1410,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1419,6 +1437,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -1562,6 +1581,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -1611,6 +1631,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -1637,6 +1658,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -1661,6 +1683,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -1690,6 +1713,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -1767,6 +1791,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1806,6 +1831,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1837,6 +1863,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -1870,6 +1897,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -1897,6 +1925,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -1926,6 +1955,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -1959,6 +1989,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -1990,6 +2021,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2016,6 +2048,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2063,6 +2096,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         }
@@ -2118,6 +2152,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -2170,6 +2205,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2196,6 +2232,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -2221,6 +2258,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2260,6 +2298,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2292,6 +2331,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2323,6 +2363,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -2357,6 +2398,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -2386,6 +2428,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -2418,6 +2461,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2448,6 +2492,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         }
@@ -2484,6 +2529,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2509,6 +2555,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -2638,6 +2685,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -2663,6 +2711,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2693,6 +2742,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -2718,6 +2768,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2749,6 +2800,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2776,6 +2828,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2810,6 +2863,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2835,6 +2889,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -2863,6 +2918,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -2888,6 +2944,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2918,6 +2975,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -2945,6 +3003,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -2968,6 +3027,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -2994,6 +3054,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -3018,6 +3079,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3058,6 +3120,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3083,6 +3146,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -3107,6 +3171,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3142,6 +3207,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3173,6 +3239,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -3206,6 +3273,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3233,6 +3301,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3264,6 +3333,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3290,6 +3360,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -3321,6 +3392,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3350,6 +3422,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -3419,6 +3492,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3444,6 +3518,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -3468,6 +3543,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3506,6 +3582,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -3539,6 +3616,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3565,6 +3643,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3594,6 +3673,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -3695,6 +3775,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3721,6 +3802,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -3796,7 +3878,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
     }
 
 
-    public Long getSelectedIdOfReportRule() {
+public Long getSelectedIdOfReportRule() {
         return selectedIdOfReportRule;
     }
 
@@ -3837,6 +3919,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3868,6 +3951,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -3901,6 +3985,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3931,6 +4016,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -3960,6 +4046,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -3987,6 +4074,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4027,6 +4115,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4056,6 +4145,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4102,6 +4192,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4133,6 +4224,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -4166,6 +4258,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4194,6 +4287,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4224,6 +4318,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4251,6 +4346,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4282,6 +4378,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4307,6 +4404,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4337,6 +4435,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4362,6 +4461,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4392,6 +4492,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -4446,6 +4547,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -4505,6 +4607,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4538,6 +4641,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4570,6 +4674,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4594,6 +4699,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         } catch (Exception e) {
@@ -4630,6 +4736,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -4665,9 +4772,20 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return complexGroupPage;
     }
 
+    public BasicWorkspacePage getNsiGroupPage() {
+        return nsiGroupPage;
+    }
+
     // baybikov (22.11.2011)
     public Object showComplexGroupPage() {
         currentWorkspacePage = complexGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    // baybikov (22.11.2011)
+    public Object showNSIGroupPage() {
+        currentWorkspacePage = nsiGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -4729,6 +4847,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -4778,6 +4897,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -4824,6 +4944,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4886,6 +5007,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -4931,6 +5053,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -4978,6 +5101,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5031,6 +5155,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5082,6 +5207,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5116,6 +5242,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5197,6 +5324,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5301,6 +5429,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5333,6 +5462,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5361,6 +5491,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5387,6 +5518,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5429,6 +5561,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5461,6 +5594,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5496,6 +5630,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5526,6 +5661,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5574,6 +5710,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5605,6 +5742,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5640,6 +5778,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5665,6 +5804,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5707,6 +5847,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5739,6 +5880,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5773,6 +5915,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5801,6 +5944,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5849,6 +5993,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         updateSelectedMainMenu();
         return null;
@@ -5880,6 +6025,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -5915,6 +6061,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -5940,6 +6087,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -5982,6 +6130,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -6014,6 +6163,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -6048,6 +6198,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -6076,6 +6227,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -6131,6 +6283,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -6157,11 +6310,12 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
 
-    // Kadyrov (18.01.2012)
+// Kadyrov (18.01.2012)
     public Object completeRuleListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6179,7 +6333,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    // Kadyrov (18.01.2012)
+// Kadyrov (18.01.2012)
     public Object completeRuleListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6345,6 +6499,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -6376,11 +6531,12 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
 
-    // Kadyrov (18.01.2012)
+// Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6398,7 +6554,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    // Kadyrov (18.01.2012)
+// Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6450,6 +6606,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
 
+
             }
         }
         return null;
@@ -6480,6 +6637,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;
@@ -6664,7 +6822,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     User currentUser;
 
-    public User getCurrentUser() throws Exception {
+public User getCurrentUser() throws Exception {
         if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
             String userName = context.getExternalContext().getRemoteUser();
@@ -6686,6 +6844,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+
 
             }
         }
@@ -6840,6 +6999,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
+
         }
         return null;
     }
@@ -6888,6 +7048,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+
 
         }
         return null;

@@ -63,6 +63,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReportsOnVisits;
     private String mailingListReports1;
     private String mailingListReports2;
+    private String guid;
     private ConfigurationProvider configurationProvider;
     private String configurationProviderName;
     private Set<Org> orgSet = new HashSet<Org>();
@@ -138,6 +139,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReportsOnVisits(mailingListReportsOnVisits);
         org.setMailingListReports1(mailingListReports1);
         org.setMailingListReports2(mailingListReports2);
+        org.setGuid(guid);
         org.setCategoriesInternal(new HashSet<CategoryOrg>());
         if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
         else {
@@ -219,6 +221,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
+        this.guid = org.getGuid();
         idOfCategoryOrgList.clear();
         this.filterOrg ="";
         if(org.getCategories()!=null && !org.getCategories().isEmpty()){
@@ -593,5 +596,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setMailingListReports2(String mailingListReports2) {
         this.mailingListReports2 = mailingListReports2;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

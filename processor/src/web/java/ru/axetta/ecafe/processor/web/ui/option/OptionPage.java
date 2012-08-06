@@ -37,6 +37,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean rbkSection;
     private Double chronopayRate;
     private Double rbkRate;
+    private Long defaultOverdraftLimit, defaultExpenditureLimit;
 
     public Double getRbkRate() {
         return rbkRate;
@@ -126,6 +127,22 @@ public class OptionPage extends BasicWorkspacePage {
         this.menuDaysForDeletion = menuDaysForDeletion;
     }
 
+    public Long getDefaultExpenditureLimit() {
+        return defaultExpenditureLimit;
+    }
+
+    public void setDefaultExpenditureLimit(Long defaultExpenditureLimit) {
+        this.defaultExpenditureLimit = defaultExpenditureLimit;
+    }
+
+    public Long getDefaultOverdraftLimit() {
+        return defaultOverdraftLimit;
+    }
+
+    public void setDefaultOverdraftLimit(Long defaultOverdraftLimit) {
+        this.defaultOverdraftLimit = defaultOverdraftLimit;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -146,6 +163,8 @@ public class OptionPage extends BasicWorkspacePage {
         rbkSection=runtimeContext.getOptionValueBool(Option.OPTION_RBK_SECTION);
         rbkRate=runtimeContext.getOptionValueDouble(Option.OPTION_RBK_RATE);
         chronopayRate=runtimeContext.getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE);
+        defaultOverdraftLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
+        defaultExpenditureLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
     }
 
     public Object save() {
@@ -161,6 +180,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_RBK_SECTION, rbkSection);
             runtimeContext.setOptionValue(Option.OPTION_RBK_RATE, rbkRate);
             runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_RATE, chronopayRate);
+            runtimeContext.setOptionValue(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT, defaultOverdraftLimit);
+            runtimeContext.setOptionValue(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT, defaultExpenditureLimit);
             runtimeContext.getPartnerChronopayConfig().setRate(chronopayRate);
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

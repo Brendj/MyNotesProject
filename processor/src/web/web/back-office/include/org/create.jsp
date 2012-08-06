@@ -14,6 +14,8 @@
 <%-- Панель создания организации --%>
 <h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid"
              columns="2">
+    <h:outputText escape="true" value="GUID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text required-field" />
     <h:inputText value="#{mainPage.orgCreatePage.shortName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />

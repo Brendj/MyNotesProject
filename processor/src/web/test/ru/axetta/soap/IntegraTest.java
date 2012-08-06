@@ -26,19 +26,22 @@ public class IntegraTest extends TestCase {
     }
 
     public void testGetSummary() throws Exception {
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
         ClientRoomControllerWSService service = new ClientRoomControllerWSService();
         ClientRoomController port
                 = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://localhost:8443/processor/soap/client");
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://78.46.34.200:8443/processor/soap/client");
         ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new PaymentWSTest.TestHostnameVerifier());
         Map context = ((BindingProvider) port).getRequestContext();
         context.put(BindingProvider.USERNAME_PROPERTY, "testuser");
         context.put(BindingProvider.PASSWORD_PROPERTY, "testpass");
 
-        String password = Client.encryptPassword("7613912");
-        Result ra = port.authorizeClient(7613912L, password);
+        //String password = Client.encryptPassword("7613912");
+        long clientId=200485L;//7613912L
+        //Result ra = port.authorizeClient(, "Абазов Амир Аниуарович");
+        Result ra = port.authorizeClient(clientId, "Петров Петр Иванович");
         System.out.println("AUTH CLIENT: " + ra.getResultCode()+":"+ra.getDescription());
-        ClientSummaryResult r = port.getSummary(7613912L);
+        ClientSummaryResult r = port.getSummary(clientId);
         System.out.println("CLIENT: " + r.getClientSummary().getFirstName());
     }
 }

@@ -23,6 +23,12 @@
                 <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
                 <h:inputText value="#{optionPage.menuDaysForDeletion}" styleClass="input-text" size="3"/>
             </h:panelGroup>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Лимит овердрафта по-умолчанию для новых клиентов" styleClass="output-text" />
+                <h:inputText value="#{optionPage.defaultOverdraftLimit}" styleClass="input-text" size="5"/>
+                <h:outputText escape="true" value="Лимит дневных трат по-умолчанию для новых клиентов" styleClass="output-text" />
+                <h:inputText value="#{optionPage.defaultExpenditureLimit}" styleClass="input-text" size="5"/>
+            </h:panelGrid>
         </rich:tab>
         <rich:tab label="Взаимодействие">
             <h:panelGrid styleClass="borderless-grid" columns="2">

@@ -86,5 +86,5 @@ public interface ClientRoomController {
     public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, @WebParam(name="state") int state);
 
     @WebMethod
-    public Result authorizeClient(@WebParam(name="contractId") Long contractId, @WebParam(name="base64passwordHash") String base64passwordHash);
+    public Result authorizeClient(@WebParam(name="contractId") Long contractId, @WebParam(name="token") String token);
 }

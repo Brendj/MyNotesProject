@@ -1173,7 +1173,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result authorizeClient(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "base64passwordHash") String base64passwordHash) {
+            @WebParam(name = "token") String token) {
         IntegraPartnerConfig.LinkConfig partnerLinkConfig = null;
         partnerLinkConfig = authenticateRequest(null);
         try {
@@ -1181,11 +1181,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             DAOService daoService = DAOService.getInstance();
             Client client = daoService.getClientByContractId(contractId);
             if (client==null) return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-    
-            if (client.hasEncryptedPassword(base64passwordHash)) {
-                if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+
+            boolean authorized=false;
+            if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
+                if (client.getPerson().getFullName().replaceAll("\\s", "").compareToIgnoreCase(token.replaceAll("\\s", ""))==0) {
+                    authorized = true;
+                    if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+                        daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
+                    }
+                }
+            }
+            if (client.hasEncryptedPassword(token)) {
+                authorized = true;
+                if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                     daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
                 }
+            }
+            if (authorized) {
                 return new Result(RC_OK, RC_OK_DESC);
             } else {
                 return new Result(RC_CLIENT_AUTHORIZATION_FAILED, RC_CLIENT_AUTHORIZATION_FAILED_DESC);

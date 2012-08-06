@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -448,6 +445,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
         }
         this.discountMode = Client.DISCOUNT_MODE_NONE;
+        this.limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
         // Категории скидок
         /*
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
@@ -465,7 +463,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
             this.org = new OrgItem(org);
-            if (null == this.limit || this.limit == 0L) {
+            if (org.getCardLimit()!=null && org.getCardLimit()!=0) {
                 this.limit = org.getCardLimit();
             }
         }
@@ -496,7 +494,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS,
                 this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
-                clientRegistryVersion, this.limit, 20000, "");
+                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
         client.setAddress(this.address);
         client.setPhone(this.phone);

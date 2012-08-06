@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "ClientRoomControllerWSService", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", wsdlLocation = "http://localhost:8080/processor/soap/client?wsdl")
+@WebServiceClient(name = "ClientRoomControllerWSService", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", wsdlLocation = "http://78.46.34.200:8080/processor/soap/client?wsdl")
 public class ClientRoomControllerWSService
     extends Service
 {
@@ -30,9 +30,9 @@ public class ClientRoomControllerWSService
         try {
             URL baseUrl;
             baseUrl = ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.ClientRoomControllerWSService.class.getResource(".");
-            url = new URL(baseUrl, "http://localhost:8080/processor/soap/client?wsdl");
+            url = new URL(baseUrl, "http://78.46.34.200:8080/processor/soap/client?wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://localhost:8080/processor/soap/client?wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'http://78.46.34.200:8080/processor/soap/client?wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         CLIENTROOMCONTROLLERWSSERVICE_WSDL_LOCATION = url;

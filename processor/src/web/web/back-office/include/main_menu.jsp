@@ -279,6 +279,15 @@
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         reRender="workspaceForm" />
 
+    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}"
+                         label="Реестры">
+        <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="nsiOrgCatalogFind" binding="#{orgCatalogFindPage.mainMenuComponent}"
+                            label="Поиск организаций" action="#{orgCatalogFindPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
+                            label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
     <%--reRender="mainMenu, workspaceForm" />
     --%>
@@ -392,7 +401,10 @@
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}"
                         label="Конфигурация" action="#{mainPage.showConfigurationPage}" reRender="workspaceForm" />
 
-</rich:panelMenuGroup>
+        <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
+                            action="#{licInfoPage.show}" reRender="workspaceForm"/>
+
+    </rich:panelMenuGroup>
 
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
@@ -610,7 +622,7 @@
                                 binding="#{productEditPage.mainMenuComponent}" action="#{productEditPage.show}"
                                 reRender="workspaceForm" />
 
-        </rich:panelMenuGroup>
+</rich:panelMenuGroup>
 
         <rich:panelMenuItem id="productCreateMenuItem" label="Регистрация"
                             binding="#{productCreatePage.mainMenuComponent}" action="#{productCreatePage.show}"
