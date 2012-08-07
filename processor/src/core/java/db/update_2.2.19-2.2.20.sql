@@ -272,3 +272,5 @@ ALTER TABLE cf_clients ADD COLUMN fax character varying(32);
 
 -- Поле GUID организации
 ALTER TABLE cf_orgs ADD COLUMN guid varchar(40);
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 070812) НЕ МЕНЯТЬ
