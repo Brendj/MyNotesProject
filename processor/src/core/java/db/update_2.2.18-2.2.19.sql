@@ -66,4 +66,5 @@ CREATE TABLE cf_technologicalmap
 )
 WITH (
   OIDS=FALSE
-);  
+);
+--! ФИНАЛИЗИРОВАН (Кадыров, 060812) НЕ МЕНЯТЬ
