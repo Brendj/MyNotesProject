@@ -18,6 +18,9 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
@@ -42,7 +45,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -1184,7 +1192,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             boolean authorized=false;
             if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
-                if (client.getPerson().getFullName().replaceAll("\\s", "").compareToIgnoreCase(token.replaceAll("\\s", ""))==0) {
+
+                String fullNameUpCase = client.getPerson().getFullName().replaceAll("\\s", "").toUpperCase();
+
+                final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+                ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(fullNameUpCase.getBytes(CharEncoding.UTF_8));
+                DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, messageDigest);
+                ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+                IOUtils.copy(digestInputStream, arrayOutputStream);
+                String md5HashString = new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.UTF_8);
+
+                if (md5HashString.compareToIgnoreCase(token)==0) {
                     authorized = true;
                     if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                         daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
