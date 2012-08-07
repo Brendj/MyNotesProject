@@ -58,11 +58,13 @@ public class DBUpdater {
         }
 
         try {
+            // Ниже скрипт может не стработать если стоит защита на внутренние таблицы базданных
             String SQL_CHECK_TEXT_COLUMN = "SELECT attname FROM pg_attribute, pg_type WHERE typname = 'cf_schema_version_info' AND attname = 'committext'";
             List list = em.createNativeQuery(SQL_CHECK_TEXT_COLUMN).getResultList();
             if(list!=null && list.isEmpty()){
                 em.createNativeQuery("ALTER TABLE cf_schema_version_info ADD COLUMN committext text").executeUpdate();
             }
+            // Выше скрипт может не стработать если стоит защита на внутренние таблицы базданных
             String SQL_GET_SCHEMAS="from SchemaVersionInfo order by majorVersionNum desc, middleVersionNum desc, minorVersionNum desc";
             List schemas = em.createQuery(SQL_GET_SCHEMAS).getResultList();
             SchemaVersionInfo curSchemaVer = (SchemaVersionInfo)(schemas.size()==0?null:schemas.get(0));
@@ -101,6 +103,7 @@ public class DBUpdater {
                         if (l==null) break;
                         l = l.trim();
                         if (l.length()==0) continue;
+                        if (l.startsWith("--!")) continue;
                         if (l.startsWith("--")){
                             commitText.append(l.substring(2,l.length()));
                             commitText.append("\n");
