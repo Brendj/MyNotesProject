@@ -1183,26 +1183,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result authorizeClient(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "token") String token) {
         IntegraPartnerConfig.LinkConfig partnerLinkConfig = null;
+        logger.info("init authorizeClient");
         partnerLinkConfig = authenticateRequest(null);
+        logger.info("begin authorizeClient");
         try {
 
             DAOService daoService = DAOService.getInstance();
+            logger.info("begin get Client");
             Client client = daoService.getClientByContractId(contractId);
-            if (client==null) return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-
+            logger.info("find client");
+            if (client==null){
+                logger.info("find client == null");
+                return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+            logger.info("find client != null");
             boolean authorized=false;
             if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
-
+                logger.info("MD5");
                 String fullNameUpCase = client.getPerson().getFullName().replaceAll("\\s", "").toUpperCase();
+                fullNameUpCase= fullNameUpCase+"Nb37wwZWufB";
+                byte[] bytesOfMessage = fullNameUpCase.getBytes("UTF-8");
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] hash = md.digest(bytesOfMessage);
+                BigInteger bigInt = new BigInteger(1, hash);
+                String md5HashString = bigInt.toString(16);
 
-                final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-                ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(fullNameUpCase.getBytes(CharEncoding.UTF_8));
-                DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, messageDigest);
-                ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-                IOUtils.copy(digestInputStream, arrayOutputStream);
-                String md5HashString = new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.UTF_8);
+                logger.info("token    md5: "+token.toUpperCase());
+                logger.info("generate md5: "+md5HashString.toUpperCase());
 
-                if (md5HashString.compareToIgnoreCase(token)==0) {
+                if (md5HashString.toUpperCase().compareTo(token.toUpperCase())==0) {
                     authorized = true;
                     if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                         daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
@@ -1210,11 +1219,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
             if (client.hasEncryptedPassword(token)) {
+                logger.info("hasEncryptedPassword");
                 authorized = true;
                 if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                     daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
                 }
             }
+            logger.info("authorized"+String.valueOf(authorized));
             if (authorized) {
                 return new Result(RC_OK, RC_OK_DESC);
             } else {
