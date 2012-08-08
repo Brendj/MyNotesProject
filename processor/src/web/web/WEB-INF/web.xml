@@ -152,6 +152,14 @@
         <servlet-name>FrontControllerWS</servlet-name>
         <url-pattern>/soap/front</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>DashboardServiceWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.dashboard.DashboardServiceWS</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DashboardServiceWS</servlet-name>
+        <url-pattern>/soap/dashboard</url-pattern>
+    </servlet-mapping>
 
     <filter-mapping>
         <filter-name>RichfacesFilter</filter-name>

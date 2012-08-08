@@ -90,6 +90,7 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
+            <element id="file-copy" path="$PROJECT_DIR$/../lib/rusmarc.jar" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -109,6 +110,13 @@
       <output-path>$PROJECT_DIR$/../../target/out/artifacts/ecafe_proccesor.war</output-path>
       <root id="archive" name="ecafe_processor.war">
         <element id="artifact" artifact-name="web:web exploded" />
+      </root>
+    </artifact>
+    <artifact type="exploded-ejb" name="dashboard:ejb exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/dashboard_ejb_exploded</output-path>
+      <root id="root">
+        <element id="javaee-facet-resources" facet="dashboard/ejb/EJB" />
+        <element id="module-output" name="dashboard" />
       </root>
     </artifact>
   </component>
@@ -862,6 +870,7 @@
       <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/util.iml" filepath="$PROJECT_DIR$/util.iml" />
       <module fileurl="file://$PROJECT_DIR$/web.iml" filepath="$PROJECT_DIR$/web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ws-test-client.iml" filepath="$PROJECT_DIR$/ws-test-client.iml" />
     </modules>
   </component>
   <component name="ProjectResources">
@@ -1035,6 +1044,28 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
+    <library name="Java EE 5-Java EE 5">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/javaee.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="Java EE 6-3.1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.annotation.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.ejb.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.jms.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.persistence.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.transaction.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.resource.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.servlet.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.servlet.jsp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../src/dashboard/lib/javax.servlet.jsp.jstl.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="javamelody-monitoring">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />

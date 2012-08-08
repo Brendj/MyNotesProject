@@ -8,9 +8,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +56,34 @@ public class Base64AndZip {
         return byteArrayOutputStream.toByteArray();
     }
 
+    public static byte[] gzip(byte[] data) throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+        gzipOutputStream.write(data);
+        gzipOutputStream.flush();
+        gzipOutputStream.close();
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public static byte[] ungzip(byte[] data) throws IOException {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            InputStream in = new GZIPInputStream(new ByteArrayInputStream(data));
+            byte[] buffer = new byte[65536];
+            int noRead;
+            while ((noRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, noRead);
+            }
+        } finally {
+            out.close();
+        }
+
+        return out.toByteArray();
+    }
+
     public static byte[] encode(byte[] data) {
         BASE64Encoder base64Encoder = new BASE64Encoder();
         String result = base64Encoder.encode(data);
@@ -71,6 +97,14 @@ public class Base64AndZip {
 
     public static byte[] unzipAndDecode(byte[] data) throws IOException {
         return decode(unzip(data));
+    }
+
+    public static byte[] decodeAndUnzip(byte[] data) throws IOException {
+        return unzip(decode(data));
+    }
+
+    public static byte[] decodeAndUngzip(byte[] data) throws IOException {
+        return ungzip(decode(data));
     }
 
     public static byte[] encodeAndZip(byte[] data) throws IOException {

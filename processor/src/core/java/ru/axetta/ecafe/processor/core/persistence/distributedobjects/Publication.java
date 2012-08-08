@@ -57,9 +57,10 @@ public class Publication extends DistributedObject {
 
     @Override
     protected Publication parseAttributes(Node node) throws IOException {
-        String data = getStringAttributeValue(node, "data", 64565);
+        String data = getStringAttributeValue(node, "data", 65536);
+        String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
         DataInputStream dataInputStream = new DataInputStream(
-                new ByteArrayInputStream(Base64AndZip.unzipAndDecode(data.getBytes())));
+                new ByteArrayInputStream(Base64AndZip.decodeAndUngzip(data.getBytes())));
         Record record = new Record(dataInputStream);
 
         setData(data);

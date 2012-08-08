@@ -17,7 +17,7 @@
         <property name="eventCode" column="EventCode" type="integer" not-null="true"/>
         <property name="idOfCard" column="IdOfCard" type="long" not-null="false"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
-                     not-null="true" update="false" insert="false"/>
+                     not-null="true" update="false" insert="false" />
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="false" update="false" />
         <property name="idOfTempCard" column="IdOfTempCard" type="long" not-null="false"/>
