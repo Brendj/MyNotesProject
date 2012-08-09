@@ -71,7 +71,15 @@ public class Org {
     private Set<Org> friendlyOrg;
     private Org thisOrg;
     private String guid;
-    private Set<EnterEvent> enterEvents;
+    private Contract contract = new Contract();
+
+    public Contract getContract() {
+        return contract;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract = contract;
+    }
 
     public Org getThisOrg() {
         return thisOrg;
@@ -98,7 +106,7 @@ public class Org {
     }
 
 
-    public Set<CategoryOrg> getCategories() {
+    public Set<CategoryOrg> getCategories(){
         return getCategoriesInternal();
         //return Collections.unmodifiableSet(getCategoriesInternal());
     }
@@ -142,9 +150,8 @@ public class Org {
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, int state, long cardLimit, String publicKey, Long priceOfSms,
-            Long subscriptionPrice, Contragent defaultSupplier, String INN, String ORGN,
-            String mailingListReportsOnNutrition, String mailingListReportsOnVisits, String mailingListReports1,
-            String mailingListReports2) throws Exception {
+            Long subscriptionPrice, Contragent defaultSupplier, String INN, String ORGN, String mailingListReportsOnNutrition,
+            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
         this.shortName = shortName;
         this.officialName = officialName;
         this.address = address;
@@ -160,8 +167,8 @@ public class Org {
         this.priceOfSms = priceOfSms;
         this.subscriptionPrice = subscriptionPrice;
         this.defaultSupplier = defaultSupplier;
-        this.OGRN = ORGN;
-        this.INN = INN;
+        this.OGRN=ORGN;
+        this.INN=INN;
         this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
         this.mailingListReportsOnVisits = mailingListReportsOnVisits;
         this.mailingListReports1 = mailingListReports1;
@@ -326,10 +333,6 @@ public class Org {
         return Collections.unmodifiableSet(getClientsInternal());
     }
 
-    protected void setClients(Set<Client> clients) {
-        setClientsInternal(clients);
-    }
-
     private Set<ClientGroup> getClientGroupsInternal() {
         // For Hibernate only
         return clientGroups;
@@ -402,16 +405,6 @@ public class Org {
     public Set<SyncHistory> getSyncHistories() {
         return Collections.unmodifiableSet(getSyncHistoriesInternal());
     }
-
-    private void setSyncHistories(Set<SyncHistory> syncHistories) {
-        setSyncHistoriesInternal(syncHistories);
-    }
-
-    /*public List<SyncHistory> getSyncHistories() {
-       List<SyncHistory> syncHistoryList = new LinkedList<SyncHistory>();
-       syncHistoryList.addAll(getSyncHistoriesInternal());
-       return syncHistoryList;
-   } */
 
     private Set<Order> getOrdersInternal() {
         // For Hibernate only
@@ -549,14 +542,6 @@ public class Org {
         this.guid = guid;
     }
 
-    public Set<EnterEvent> getEnterEvents() {
-        return enterEvents;
-    }
-
-    public void setEnterEvents(Set<EnterEvent> enterEvents) {
-        this.enterEvents = enterEvents;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -583,7 +568,7 @@ public class Org {
                 + ", cardLimit=" + cardLimit + ", publicKey='" + publicKey + '\'' + ", idOfPacket=" + idOfPacket
                 + ", lastClientContractId=" + lastClientContractId + ", cypheredSsoPassword='" + cypheredSsoPassword
                 + '\'' + ", smsSender='" + smsSender + '\'' + ", priceOfSms=" + priceOfSms + ", subscriptionPrice="
-                + subscriptionPrice + ", defaultSupplier=" + defaultSupplier + '}';
+                + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +'}';
     }
 
     private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
