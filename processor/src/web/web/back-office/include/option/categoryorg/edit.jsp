@@ -8,6 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<%--@elvariable id="categoryOrgEditPage" type="ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgEditPage"--%>
 <h:panelGrid id="categoryOrgEditTable" binding="#{categoryOrgEditPage.pageComponent}"
              styleClass="borderless-grid" columns="2">
 
