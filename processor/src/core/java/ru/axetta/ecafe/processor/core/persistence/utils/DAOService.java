@@ -113,17 +113,16 @@ public class DAOService {
         List list = Arrays.asList(clazz.getInterfaces());
         ConfigurationProvider configurationProvider = null;
         if(list.contains(IConfigProvider.class)){
-            TypedQuery<ConfigurationProvider> configurationProviderQuery = em.createQuery("select configurationProvider from Org where idOfOrg=:idOfOrg", ConfigurationProvider.class);
-            configurationProviderQuery.setParameter("idOfOrg",orgOwner);
-            List<ConfigurationProvider> configurationProviders = configurationProviderQuery.getResultList();
+            TypedQuery<ConfigurationProvider> configurationProviderQuery = null; //= em.createQuery("select configurationProvider from Org where idOfOrg=:idOfOrg", ConfigurationProvider.class);
+            //configurationProviderQuery.setParameter("idOfOrg",orgOwner);
+            Org org = em.find(Org.class, orgOwner);
+            configurationProvider = org.getConfigurationProvider();
             /* Если есть конфигурация синхронизируемой организации */
-            if(configurationProviders==null || configurationProviders.isEmpty()){
+            if(configurationProvider==null){
                 configurationProviderQuery = em.createQuery("select configurationProvider from Org where idOfOrg=(Select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg)", ConfigurationProvider.class);
                 configurationProviderQuery.setParameter("idOfOrg",orgOwner);
-                configurationProviders = configurationProviderQuery.getResultList();
+                List<ConfigurationProvider> configurationProviders = configurationProviderQuery.getResultList();
                 if(!(configurationProviders==null || configurationProviders.isEmpty())) configurationProvider = configurationProviders.get(0);
-            } else {
-                configurationProvider = configurationProviders.get(0);
             }
             if(configurationProvider == null) {
                 //return new ArrayList<DistributedObject>(0);
@@ -150,7 +149,16 @@ public class DAOService {
 
         }
         if(currentMaxVersion != null){
-            where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
+            TypedQuery<DOVersion> queryVersion = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+            queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
+            List<DOVersion> doVersionList = queryVersion.getResultList();
+            Long doVersion = null;
+            if(doVersionList.size()==0) {
+                doVersion = 0L;
+            } else {
+                doVersion = doVersionList.get(0).getCurrentVersion();
+            }
+            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
         }
         String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
         query = em.createQuery(select, DistributedObject.class);
@@ -354,5 +362,10 @@ public class DAOService {
     @Transactional
     public Client findClientById(long idOfClient) {
         return em.find(Client.class, idOfClient);
+    }
+
+    @Transactional
+    public <T> T saveEntity(T entity) {
+        return em.merge(entity);
     }
 }
