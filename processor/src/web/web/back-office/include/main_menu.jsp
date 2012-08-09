@@ -55,6 +55,35 @@
 
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
+
+    <%--@elvariable id="contractGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractGroupPage"--%>
+    <rich:panelMenuGroup id="contractGroupMenu" label="Контракты" binding="#{contractGroupPage.mainMenuComponent}">
+        <a4j:support event="onclick" action="#{contractGroupPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage"--%>
+        <rich:panelMenuItem id="contractListPageMenuItem" label="Список"
+                            binding="#{contractListPage.mainMenuComponent}"
+                            action="#{contractListPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="selectedContractGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.SelectedContractGroupPage"--%>
+        <rich:panelMenuGroup id="selectedContractGroupMenu" label="#{selectedContractGroupPage.title}"
+                             binding="#{selectedContractGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{selectedContractGroupPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
+            <rich:panelMenuItem id="viewContractMenuItem" binding="#{contractViewPage.mainMenuComponent}" label="Просмотр"
+                                action="#{contractViewPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
+            <rich:panelMenuItem id="editContractMenuItem" binding="#{contractEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{contractEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+            <%--@elvariable id="contractCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractCreatePage"--%>
+        <rich:panelMenuItem id="createContractMenuItem" binding="#{contractCreatePage.mainMenuComponent}" label="Регистрация"
+                            action="#{contractCreatePage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="contragentGroupMenu" label="Контрагенты"
@@ -622,7 +651,7 @@
                                 binding="#{productEditPage.mainMenuComponent}" action="#{productEditPage.show}"
                                 reRender="workspaceForm" />
 
-</rich:panelMenuGroup>
+        </rich:panelMenuGroup>
 
         <rich:panelMenuItem id="productCreateMenuItem" label="Регистрация"
                             binding="#{productCreatePage.mainMenuComponent}" action="#{productCreatePage.show}"
@@ -718,11 +747,36 @@
                             binding="#{configurationProviderEditPage.mainMenuComponent}" label="Редактирование"
                             action="#{configurationProviderEditPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+
+
+
 </rich:panelMenuGroup>
 
-
 </rich:panelMenuGroup>
 
+<%--@elvariable id="springTestGroupPage" type="ru.axetta.ecafe.processor.web.ui.test.SpringTestGroupPage"--%>
+<rich:panelMenuGroup id="springTestGroupMenu" label="Организации test" binding="#{springTestGroupPage.mainMenuComponent}">
+    <a4j:support event="onclick" action="#{springTestGroupPage.show}" reRender="workspaceForm" />
+
+    <%--@elvariable id="springTestListPage" type="ru.axetta.ecafe.processor.web.ui.test.SpringTestListPage"--%>
+    <rich:panelMenuItem id="springTestListPageMenuItem" label="springTestListPage"
+                        binding="#{springTestListPage.mainMenuComponent}"
+                        action="#{springTestListPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="selectedSpringTestGroupPage" type="ru.axetta.ecafe.processor.web.ui.test.SelectedSpringTestGroupPage"--%>
+    <rich:panelMenuGroup id="selectedSpringTestGroupMenu" label="#{selectedSpringTestGroupPage.title}"
+                         binding="#{selectedSpringTestGroupPage.mainMenuComponent}" rendered="false">
+
+        <a4j:support event="onclick" action="#{selectedSpringTestGroupPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="springTestViewPage" type="ru.axetta.ecafe.processor.web.ui.test.SpringTestViewPage"--%>
+        <rich:panelMenuItem id="viewSpringTestMenuItem" binding="#{springTestViewPage.mainMenuComponent}" label="Просмотр"
+                            action="#{springTestViewPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="editSpringTestMenuItem" binding="#{springTestEditPage.mainMenuComponent}" label="Редактирование"
+                            action="#{springTestEditPage.show}" reRender="workspaceForm" />
+
+
+    </rich:panelMenuGroup>
+</rich:panelMenuGroup>
 
 </rich:panelMenu>
 </a4j:form> <%-- Главное меню --%>

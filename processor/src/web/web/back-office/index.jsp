@@ -28,6 +28,10 @@
 
     <rich:calendar rendered="false" />
 
+    <f:subview id="contractConfirmDeletePageSubView">
+        <c:import url="include/org/contract/confirm_delete.jsp" />
+    </f:subview>
+
     <f:subview id="technologicalMapGroupSelectSubView">
         <c:import url="include/option/configuration_provider/technologicalMap/group/select.jsp" />
     </f:subview>
