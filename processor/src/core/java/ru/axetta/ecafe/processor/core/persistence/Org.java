@@ -72,6 +72,8 @@ public class Org {
     private Org thisOrg;
     private String guid;
     private Contract contract = new Contract();
+    private Date lastSuccessfulBalanceSync;
+    private Date lastUnSuccessfulBalanceSync;
 
     public Contract getContract() {
         return contract;
@@ -390,6 +392,22 @@ public class Org {
 
     public void setPriceOfSms(Long priceOfSms) {
         this.priceOfSms = priceOfSms;
+    }
+
+    public Date getLastSuccessfulBalanceSync() {
+        return lastSuccessfulBalanceSync;
+    }
+
+    public void setLastSuccessfulBalanceSync(Date lastSuccessfulBalanceSync) {
+        this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
+    }
+
+    public Date getLastUnSuccessfulBalanceSync() {
+        return lastUnSuccessfulBalanceSync;
+    }
+
+    public void setLastUnSuccessfulBalanceSync(Date lastUnSuccessfulBalanceSync) {
+        this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
     }
 
     private Set<SyncHistory> getSyncHistoriesInternal() {

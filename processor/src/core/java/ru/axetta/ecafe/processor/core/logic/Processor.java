@@ -16,9 +16,6 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -26,12 +23,21 @@ import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -99,7 +105,8 @@ public class Processor implements SyncProcessor,
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client, addIdOfPayment);
+                            .createClientPaymentWithOrder(contragentSum, persistenceSession, clientPaymentOrder, client,
+                                    addIdOfPayment);
                 }
             }
 
@@ -175,6 +182,7 @@ public class Processor implements SyncProcessor,
     public SyncResponse processSyncRequest(SyncRequest request) throws Exception {
         Date syncStartTime = new Date();
         int syncResult = 0;
+        int balanceSyncResult = 0;
 
         Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
 
@@ -207,10 +215,9 @@ public class Processor implements SyncProcessor,
                     }
                     resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
                             request.getPaymentRegistry());
-                } catch (Exception e){
+                } catch (Exception e) {
                     logger.error(
-                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
+                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
                 }
 
                 // Process ClientParamRegistry
@@ -280,8 +287,9 @@ public class Processor implements SyncProcessor,
                 // Process enterEvents
                 try {
                     if (request.getEnterEvents() != null) {
-                        if (request.getEnterEvents().getEvents().size()>0) {
-                            if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
+                        if (request.getEnterEvents().getEvents().size() > 0) {
+                            if (!RuntimeContext.getInstance()
+                                    .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
                                 throw new Exception("no license slots available");
                             }
                         }
@@ -338,11 +346,11 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
-                    distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
+                    distributionManager = processDistributionManager(request.getDistributionManager(),
+                            request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(
-                            String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
+                    logger.error(String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
                 }
 
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
@@ -376,6 +384,8 @@ public class Processor implements SyncProcessor,
         if (request.getType() == SyncRequest.TYPE_FULL) {
             // Update sync history - store sync end time and sync result
             updateSyncHistory(idOfSync, syncResult, syncEndTime);
+        } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
+            updateBalanceSyncHistory(request.getIdOfOrg(), balanceSyncResult, new Date());
         }
 
         // Build and return response
@@ -519,17 +529,22 @@ public class Processor implements SyncProcessor,
     }
 
     /* TODO: логика обработки менеджера глобальных объектов */
-    private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
-        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
+    private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg)
+            throws Exception {
+        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager
+                .getDistributedObjectsListMap();
         DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-        Arrays.sort(array,distributedObjectsEnumComparator);
+        Arrays.sort(array, distributedObjectsEnumComparator);
 
-        RuntimeContext.getAppContext().getBean(DistributionManager.class).clearConfirmTable(distributionManager.getConfirmDistributedObject());
+        RuntimeContext.getAppContext().getBean(DistributionManager.class)
+                .clearConfirmTable(distributionManager.getConfirmDistributedObject());
 
-        for (int i=0; i<array.length; i++){
-            if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
-                RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
+        for (int i = 0; i < array.length; i++) {
+            if (!(distributedObjectsListMap.get(array[i]) == null || distributedObjectsListMap.get(array[i])
+                    .isEmpty())) {
+                RuntimeContext.getAppContext().getBean(DistributionManager.class)
+                        .process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
             }
         }
 
@@ -693,7 +708,7 @@ public class Processor implements SyncProcessor,
                         purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getRPrice(),
                         purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
                         purchase.getMenuOutput(), purchase.getType());
-                if(purchase.getItemCode() != null){
+                if (purchase.getItemCode() != null) {
                     orderDetail.setItemCode(purchase.getItemCode());
                 }
                 persistenceSession.save(orderDetail);
@@ -778,20 +793,21 @@ public class Processor implements SyncProcessor,
                                 payment.getContractId(), payment.getClientId()), null);
             }
             Long idOfClient = client.getIdOfClient();
-            Long paymentTspContragentId=null;
+            Long paymentTspContragentId = null;
             HashMap<String, String> payAddInfo = new HashMap<String, String>();
             Contragent defaultTsp = client.getOrg().getDefaultSupplier();
-            if (payment.getTspContragentId()!=null) {
+            if (payment.getTspContragentId() != null) {
                 // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
-                if (defaultTsp==null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
+                if (defaultTsp == null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
                     return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                             PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
                             String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
-                                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(), payment.getTspContragentId(),
-                                    payment.getContractId(), payment.getClientId()), null);
+                                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(),
+                                    payment.getTspContragentId(), payment.getContractId(), payment.getClientId()),
+                            null);
                 }
             }
-            if (defaultTsp!=null) {
+            if (defaultTsp != null) {
                 paymentTspContragentId = defaultTsp.getIdOfContragent();
                 processContragentAddInfo(defaultTsp, payAddInfo);
             }
@@ -818,8 +834,9 @@ public class Processor implements SyncProcessor,
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(), PaymentProcessResult.OK.getCode(),
-                    PaymentProcessResult.OK.getDescription(), client, null, payAddInfo);
+                    idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(),
+                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, null,
+                    payAddInfo);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -831,7 +848,7 @@ public class Processor implements SyncProcessor,
     }
 
     private void processContragentAddInfo(Contragent contragent, HashMap<String, String> payAddInfo) {
-        if (contragent.getRemarks()!=null && contragent.getRemarks().length()>0) {
+        if (contragent.getRemarks() != null && contragent.getRemarks().length() > 0) {
             ParameterStringUtils.extractParameters("TSP.", contragent.getRemarks(), payAddInfo);
         }
     }
@@ -840,7 +857,7 @@ public class Processor implements SyncProcessor,
             SyncRequest.ClientParamRegistry clientParamRegistry) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
@@ -849,23 +866,23 @@ public class Processor implements SyncProcessor,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
             Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
             /* совместимость организаций котрое не имеют дружественных организаций */
-            if(orgSet==null || orgSet.isEmpty()){
+            if (orgSet == null || orgSet.isEmpty()) {
                 orgSet = new TreeSet<Long>();
                 orgSet.add(idOfOrg);
             }
-            for (Long id: orgSet){
+            for (Long id : orgSet) {
                 List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, id);
                 HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
-                for(Object object: clientGroups){
+                for (Object object : clientGroups) {
                     ClientGroup clientGroup = (ClientGroup) object;
-                    nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
-                    orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(),nameIdGroupMap);
+                    nameIdGroupMap.put(clientGroup.getGroupName(), clientGroup);
+                    orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(), nameIdGroupMap);
                 }
                 orgMap.put(id, nameIdGroupMap);
             }
-            Long version=null;
-            if(clientParamItems.hasNext()){
-                version=DAOUtils.updateClientRegistryVersion(persistenceSession);
+            Long version = null;
+            if (clientParamItems.hasNext()) {
+                version = DAOUtils.updateClientRegistryVersion(persistenceSession);
             }
             while (clientParamItems.hasNext()) {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
@@ -891,10 +908,11 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
 
-}
+    }
 
     private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
+            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -902,7 +920,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
-            if(!orgMap.keySet().contains(client.getOrg().getIdOfOrg())){
+            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 throw new IllegalArgumentException("Client from another organization");
             }
             /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
@@ -913,7 +931,7 @@ public class Processor implements SyncProcessor,
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
             /**/
-            if(clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY){
+            if (clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY) {
                 /* распарсим строку с категориями */
                 if (clientParamItem.getCategoriesDiscounts() != null) {
                     String categories = clientParamItem.getCategoriesDiscounts();
@@ -933,34 +951,57 @@ public class Processor implements SyncProcessor,
                         client.setCategories(categoryDiscountSet);
                     }
                 }
-            }  else {
+            } else {
                 /* Льгота по категориями то ощищаем */
                 client.setCategories(new HashSet<CategoryDiscount>());
             }
-            if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
-            if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
-            if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
-            if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
-            if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
-            if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
-            if (clientParamItem.getSurname()!=null) client.getPerson().setSurname(clientParamItem.getSurname());
-            if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
-            if (clientParamItem.getNotifyViaEmail()!=null) client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
-            if (clientParamItem.getNotifyViaSMS()!=null) client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            if (clientParamItem.getAddress() != null) {
+                client.setAddress(clientParamItem.getAddress());
+            }
+            if (clientParamItem.getEmail() != null) {
+                client.setEmail(clientParamItem.getEmail());
+            }
+            if (clientParamItem.getMobilePhone() != null) {
+                client.setMobile(clientParamItem.getMobilePhone());
+            }
+            if (clientParamItem.getName() != null) {
+                client.getPerson().setFirstName(clientParamItem.getName());
+            }
+            if (clientParamItem.getPhone() != null) {
+                client.setPhone(clientParamItem.getPhone());
+            }
+            if (clientParamItem.getSecondName() != null) {
+                client.getPerson().setSecondName(clientParamItem.getSecondName());
+            }
+            if (clientParamItem.getSurname() != null) {
+                client.getPerson().setSurname(clientParamItem.getSurname());
+            }
+            if (clientParamItem.getRemarks() != null) {
+                client.setRemarks(clientParamItem.getRemarks());
+            }
+            if (clientParamItem.getNotifyViaEmail() != null) {
+                client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
+            }
+            if (clientParamItem.getNotifyViaSMS() != null) {
+                client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            }
             /* FAX клиента */
-            if (clientParamItem.getFax() != null) client.setFax(clientParamItem.getFax());
+            if (clientParamItem.getFax() != null) {
+                client.setFax(clientParamItem.getFax());
+            }
 
             /* заносим клиента в группу */
 
             ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
             //если группы нет то создаем
-            if(clientGroup == null){
-                clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                        clientParamItem.getGroupName());
                 // заносим в хэш - карту
-                orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(),clientGroup);
+                orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
             }
 
-            if(clientGroup!=null){
+            if (clientGroup != null) {
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
@@ -1208,6 +1249,31 @@ public class Processor implements SyncProcessor,
         }
     }
 
+    private void updateBalanceSyncHistory(Long idOfOrg, int balanceSyncResult, Date syncDate) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession
+                    .load(Org.class, idOfOrg);//DAOUtils.getSyncHistoryReference(persistenceSession, idOfSync);
+            if (balanceSyncResult == 0) {
+                org.setLastSuccessfulBalanceSync(syncDate);
+            } else {
+                org.setLastUnSuccessfulBalanceSync(syncDate);
+            }
+            persistenceSession.update(org);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     private SyncResponse.AccRegistry getAccRegistry(Long idOfOrg) throws Exception {
         SyncResponse.AccRegistry accRegistry = new SyncResponse.AccRegistry();
         Session persistenceSession = null;
@@ -1257,6 +1323,8 @@ public class Processor implements SyncProcessor,
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        } catch (Exception e) {
+
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1276,12 +1344,12 @@ public class Processor implements SyncProcessor,
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
             List clients;
-            if(organization.getFriendlyOrg()==null || organization.getFriendlyOrg().isEmpty()){
+            if (organization.getFriendlyOrg() == null || organization.getFriendlyOrg().isEmpty()) {
                 clients = DAOUtils
                         .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             } else {
-                clients = DAOUtils
-                        .findNewerClients(persistenceSession, organization.getFriendlyOrg(), clientRegistryRequest.getCurrentVersion());
+                clients = DAOUtils.findNewerClients(persistenceSession, organization.getFriendlyOrg(),
+                        clientRegistryRequest.getCurrentVersion());
             }
 
             for (Object object : clients) {
@@ -1415,7 +1483,7 @@ public class Processor implements SyncProcessor,
                 menuDetail.setMinMg(reqMenuDetail.getMinMg());
                 menuDetail.setMinFe(reqMenuDetail.getMinFe());
 
-persistenceSession.save(menuDetail);
+                persistenceSession.save(menuDetail);
                 menu.addMenuDetail(menuDetail);
             }
         }
@@ -1719,13 +1787,10 @@ persistenceSession.save(menuDetail);
     }
 
 
-
-
-
-   /* private static String createKey(String author, String title, String title2, String publisher)
-            throws NoSuchAlgorithmException {
-        return CryptoUtils.MD5(author + title + title2 + publisher);
-    } */
+    /* private static String createKey(String author, String title, String title2, String publisher)
+           throws NoSuchAlgorithmException {
+       return CryptoUtils.MD5(author + title + title2 + publisher);
+   } */
 
     private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
         Session persistenceSession = null;
@@ -2028,7 +2093,8 @@ persistenceSession.save(menuDetail);
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client);
+                            .createClientPaymentWithOrder(contragentSum, persistenceSession, clientPaymentOrder,
+                                    client);
                 }
             }
 

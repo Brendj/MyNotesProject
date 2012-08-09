@@ -41,6 +41,10 @@
         <property name="mailingListReports1" column="mailingListReports1" type="string" length="1024" />
         <property name="mailingListReports2" column="mailingListReports2" type="string" length="1024" />
         <property name="guid" column="guid" type="string" length="40" unique="true" not-null="false"/>
+        <property name="lastSuccessfulBalanceSync" column="lastSucBalanceSync" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" />
+        <property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" />
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>

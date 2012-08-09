@@ -20,9 +20,11 @@ public class DashboardResponse {
 
     public static class EduInstItemInfo {
 
+        long idOfOrg;
         Date lastFullSyncTime;
         Date firstFullSyncTime;
-        Date lastBalanceSyncTime;
+        Date lastSuccessfulBalanceSyncTime;
+        Date lastUnSuccessfulBalanceSyncTime;
         List<String> lastSyncErrors;
         Map<String, Date> lastOperationTimePerPaymentSystem;
 
@@ -34,6 +36,16 @@ public class DashboardResponse {
 
         double numberOfReducedPriceMealsPerNumOfStaff;
         double numberOfReducedPriceMealsPerNumOfStudents;
+
+        String error;
+
+        public long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
 
         public Date getLastFullSyncTime() {
             return lastFullSyncTime;
@@ -51,12 +63,20 @@ public class DashboardResponse {
             this.firstFullSyncTime = firstFullSyncTime;
         }
 
-        public Date getLastBalanceSyncTime() {
-            return lastBalanceSyncTime;
+        public Date getLastSuccessfulBalanceSyncTime() {
+            return lastSuccessfulBalanceSyncTime;
         }
 
-        public void setLastBalanceSyncTime(Date lastBalanceSyncTime) {
-            this.lastBalanceSyncTime = lastBalanceSyncTime;
+        public void setLastSuccessfulBalanceSyncTime(Date lastSuccessfulBalanceSyncTime) {
+            this.lastSuccessfulBalanceSyncTime = lastSuccessfulBalanceSyncTime;
+        }
+
+        public Date getLastUnSuccessfulBalanceSyncTime() {
+            return lastUnSuccessfulBalanceSyncTime;
+        }
+
+        public void setLastUnSuccessfulBalanceSyncTime(Date lastUnSuccessfulBalanceSyncTime) {
+            this.lastUnSuccessfulBalanceSyncTime = lastUnSuccessfulBalanceSyncTime;
         }
 
         public List<String> getLastSyncErrors() {
@@ -121,6 +141,14 @@ public class DashboardResponse {
 
         public void setNumberOfReducedPriceMealsPerNumOfStudents(double numberOfReducedPriceMealsPerNumOfStudents) {
             this.numberOfReducedPriceMealsPerNumOfStudents = numberOfReducedPriceMealsPerNumOfStudents;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
         }
     }
 
