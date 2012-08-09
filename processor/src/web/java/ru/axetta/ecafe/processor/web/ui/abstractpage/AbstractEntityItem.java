@@ -23,4 +23,13 @@ public abstract class AbstractEntityItem<E> {
     public AbstractEntityItem(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
+
+    /* обновить поля */
+    public void update(){}
+
+    /* Создать сущность */
+    public E create(E entity){return  null;};
+
+    /* вернуть сущность */
+    public E refreshEntity(){return null;};
 }

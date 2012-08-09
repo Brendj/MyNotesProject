@@ -17,14 +17,14 @@ import java.util.List;
  * Time: 14:45
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractListPage<T> extends BasicWorkspacePage {
+public abstract class AbstractListPage<E> extends BasicWorkspacePage {
 
     protected abstract EntityManager getEntityManager();
     protected abstract String getPageFileName();
-    protected abstract Class<T> getEntityClass();
+    protected abstract Class<E> getEntityClass();
     protected abstract String getFilter();
 
-    protected List<T> entityList;
+    protected List<E> entityList;
 
     @Override
     public String getPageFilename() {
@@ -33,7 +33,7 @@ public abstract class AbstractListPage<T> extends BasicWorkspacePage {
 
     @Override
     public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", entityList.size());
+        return String.format("%s (%d)",super.getPageTitle(), entityList.size());
     }
 
     @Override
@@ -41,16 +41,16 @@ public abstract class AbstractListPage<T> extends BasicWorkspacePage {
          fill();
     }
 
-    private void fill() throws IllegalAccessException, InstantiationException {
-        String query = "from "+getEntityClass().getSimpleName()+" "+ getFilter() +" order by id";
+    private void fill(){
+        String query = String.format("from %s %s order by id",getEntityClass().getSimpleName(), getFilter());
         entityList = getEntityManager().createQuery(query,getEntityClass()).getResultList();
     }
 
-    public List<T> getEntityList() {
+    public List<E> getEntityList() {
         return entityList;
     }
 
-    public void setEntityList(List<T> entityList) {
+    public void setEntityList(List<E> entityList) {
         this.entityList = entityList;
     }
 }
