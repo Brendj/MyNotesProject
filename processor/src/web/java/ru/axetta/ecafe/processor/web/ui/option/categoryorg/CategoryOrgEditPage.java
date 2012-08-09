@@ -12,11 +12,13 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.HibernateException;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.*;
 
 /**
@@ -27,12 +29,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
-    private Long selectedIdOfCategoryOrg;
     private CategoryOrg entity;
     private String filter = "Не выбрано";
-    private List<Long> idOfOrgList = Collections.emptyList();
+    private List<Long> idOfOrgList = new ArrayList<Long>(0);
 
     @PersistenceContext
     EntityManager entityManager;
@@ -52,7 +54,8 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
 
     @Override
     public void onShow() throws Exception {
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
+        reload();
+        //RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
 
     @Transactional
@@ -87,14 +90,6 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
 
     public String getIdOfOrgList() {
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
-    }
-
-    public Long getSelectedIdOfCategoryOrg() {
-        return selectedIdOfCategoryOrg;
-    }
-
-    public void setSelectedIdOfCategoryOrg(Long selectedIdOfCategoryOrg) {
-        this.selectedIdOfCategoryOrg = selectedIdOfCategoryOrg;
     }
 
     public CategoryOrg getEntity() {

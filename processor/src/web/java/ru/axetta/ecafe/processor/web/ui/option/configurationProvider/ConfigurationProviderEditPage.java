@@ -43,7 +43,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationProviderCreatePage.class);
     private ConfigurationProvider currentConfigurationProvider;
     private String filter;
-    private List<Long> idOfOrgList = new ArrayList<Long>();
+    private List<Long> idOfOrgList = new ArrayList<Long>(0);
     @Autowired
     private SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage;
     @Autowired
@@ -137,4 +137,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     }
 
 
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }

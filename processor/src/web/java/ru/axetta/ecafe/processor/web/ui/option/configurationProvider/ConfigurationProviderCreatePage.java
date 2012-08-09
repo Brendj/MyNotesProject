@@ -17,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,9 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     private String filter;
     private List<Long> idOfOrgList = new ArrayList<Long>();
 
+    @Autowired
+    private DAOService daoService;
+
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
@@ -74,9 +78,8 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
         } catch (Exception e) {
             printError("Ошибка при созданиии производственной конфигурации.");
             logger.error("Error create configuration provider",e);
-        } finally {
-            return null;
         }
+        return null;
     }
 
     @Transactional
@@ -96,10 +99,9 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
 
         if(!this.idOfOrgList.isEmpty()){
             for (Long idOfOrg: idOfOrgList){
-                DAOService.getInstance().setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
+                daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
             }
         }
-
         idOfOrgList.clear();
         filter = "";
         currentConfigurationProvider = new ConfigurationProvider();
@@ -127,20 +129,3 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     }
 
 }
-
-/*private Item item = new Item();
-
-    public Item getItem() {
-        return item;
-    }
-
-    public String getPageTitle() {
-        return super.getPageTitle();
-    }
-
-    public void create(Session persistenceSession) {
-        ConfigurationProvider cp = new ConfigurationProvider();
-        cp.setName(item.getName());
-        persistenceSession.save(cp);
-    }
-    */
