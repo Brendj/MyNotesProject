@@ -169,6 +169,9 @@ public class DistributionManager {
             elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
 
+        /* очистим список ошибок */
+        DistributedObjectsEnumComparator.setErrorObjectList(new ArrayList<ErrorObject>(0));
+
         return elementRO;
     }
 
