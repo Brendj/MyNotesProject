@@ -24,11 +24,13 @@ public class Contragent {
     public static final int BUDGET = 4;
     public static final int CLIENT = 5;
 
-    public static final String[] CLASS_NAMES = {"Неизвестный", "Агент по приему платежей",
-                                                "ТСП", "Оператор", "Бюджет", "Клиенты"};
+    public static final String[] CLASS_NAMES = {
+            "Неизвестный", "Агент по приему платежей", "ТСП", "Оператор", "Бюджет", "Клиенты"};
 
     public static String getClassAsString(Integer classId) {
-        if (classId>=0 && classId<CLASS_NAMES.length) return CLASS_NAMES[classId];
+        if (classId >= 0 && classId < CLASS_NAMES.length) {
+            return CLASS_NAMES[classId];
+        }
         return CLASS_NAMES[0];
     }
 
@@ -310,6 +312,10 @@ public class Contragent {
 
     public Set<ClientPayment> getClientPayments() {
         return Collections.unmodifiableSet(getClientPaymentsInternal());
+    }
+
+    public void setClientPayments(Set<ClientPayment> clientPayments) {
+        setClientPaymentsInternal(clientPayments);
     }
 
     private Set<ClientPaymentOrder> getClientPaymentOrdersInternal() {

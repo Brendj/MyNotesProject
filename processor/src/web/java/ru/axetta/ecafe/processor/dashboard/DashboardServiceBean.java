@@ -33,9 +33,15 @@ public class DashboardServiceBean {
     @PersistenceUnit(unitName = "processor")
     EntityManagerFactory entityManagerFactory;
 
-    public DashboardResponse getInfoForDashboard() throws SystemException {
-
+    private DashboardResponse prepareDashboardResponse() {
         DashboardResponse dashboardResponse = new DashboardResponse();
+        dashboardResponse.setEduInstItemInfoList(new LinkedList<DashboardResponse.EduInstItemInfo>());
+        dashboardResponse.setPaymentSystemItemInfoList(new LinkedList<DashboardResponse.PaymentSystemItemInfo>());
+        return dashboardResponse;
+    }
+
+    private DashboardResponse getOrgInfo(DashboardResponse dashboardResponse) throws SystemException {
+
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
@@ -78,7 +84,7 @@ public class DashboardServiceBean {
             query.setParameter("dayEnd", dayEndDate);
 
             List queryResult = query.getResultList();
-            List<DashboardResponse.EduInstItemInfo> eduInstItemInfoList = new LinkedList<DashboardResponse.EduInstItemInfo>();
+            List<DashboardResponse.EduInstItemInfo> eduInstItemInfoList = dashboardResponse.getEduInstItemInfoList();
             for (Object object : queryResult) {
                 DashboardResponse.EduInstItemInfo eduInstItemInfo = new DashboardResponse.EduInstItemInfo();
                 try {
@@ -93,6 +99,7 @@ public class DashboardServiceBean {
                     if (syncHistory != null) {
                         eduInstItemInfo.setLastFullSyncTime(syncHistory.getSyncStartTime());
                     }
+                    eduInstItemInfo.setLastSyncErrors(syncHistory.getSyncResult() != 0);
 
                     long numOfStudents = (Long) result[5];
                     long numOfStaff = (Long) result[6];
@@ -124,12 +131,88 @@ public class DashboardServiceBean {
                     eduInstItemInfoList.add(eduInstItemInfo);
                 }
             }
-            dashboardResponse.setEduInstItemInfoList(eduInstItemInfoList);
             entityTransaction.commit();
         } catch (Exception e) {
             entityTransaction.rollback();
         }
 
         return dashboardResponse;
+    }
+
+    private Date getCurrentDayStartTime(Calendar currentTimeStamp) {
+        int month = currentTimeStamp.get(Calendar.MONTH);
+        int year = currentTimeStamp.get(Calendar.YEAR);
+        int dom = currentTimeStamp.get(Calendar.DAY_OF_MONTH);
+
+        Calendar dayStart = Calendar.getInstance();
+        dayStart.set(year, month, dom, 0, 0, 0);
+
+        Date dayStartDate = dayStart.getTime();        
+        return dayStartDate;
+    }
+    
+    private Date getCurrentDayEndTime(Calendar currentTimeStamp) {
+        int month = currentTimeStamp.get(Calendar.MONTH);
+        int year = currentTimeStamp.get(Calendar.YEAR);
+        int dom = currentTimeStamp.get(Calendar.DAY_OF_MONTH);
+
+        Calendar dayEnd = Calendar.getInstance();
+        dayEnd.set(year, month, dom + 1, 0, 0, 0);
+
+        Date dayEndDate = dayEnd.getTime();
+        return dayEndDate;
+    }
+
+    private DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse) throws SystemException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+
+        try {
+            entityTransaction.begin();
+            Query query = entityManager.createQuery(
+                    "SELECT DISTINCT contragent.idOfContragent, " + "max(clientPayment.createTime), "
+                            + "(SELECT count(clientPayment) FROM clientPayment WHERE clientPayment.createTime BETWEEN :dayStart AND :dayEnd) "
+                            + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPayments clientPayment GROUP BY contragent.idOfContragent");
+
+            
+            Calendar currentTimeStamp = Calendar.getInstance();
+            Date dayStart = getCurrentDayStartTime(currentTimeStamp);
+            Date dayEnd = getCurrentDayEndTime(currentTimeStamp);
+
+            query.setParameter("dayStart", dayStart);
+            query.setParameter("dayEnd", dayEnd);
+
+            List queryResult = query.getResultList();
+            List<DashboardResponse.PaymentSystemItemInfo> paymentSystemItemInfoList = dashboardResponse
+                    .getPaymentSystemItemInfoList();
+            for (Object object : queryResult) {
+                DashboardResponse.PaymentSystemItemInfo paymentSystemItemInfo = new DashboardResponse.PaymentSystemItemInfo();
+                try {
+                    Object[] result = (Object[]) object;
+                    paymentSystemItemInfo.setIdOfContragent((Long) result[0]);
+                    paymentSystemItemInfo.setLastOperationTime((Date) result[1]);
+                    paymentSystemItemInfo.setNumOfOperations((Long) result[2]);
+                } catch (Exception e) {
+                    paymentSystemItemInfo.setError(e.getMessage());
+                } finally {
+                    paymentSystemItemInfoList.add(paymentSystemItemInfo);
+                }
+            }
+
+            entityTransaction.commit();
+        } catch (Exception e) {
+            entityTransaction.rollback();
+        }
+
+        return dashboardResponse;
+    }
+
+    public DashboardResponse getInfoForDashboard() throws SystemException {
+
+        DashboardResponse dashboardResponse = prepareDashboardResponse();
+        dashboardResponse = getOrgInfo(dashboardResponse);
+        dashboardResponse = getPaymentSystemInfo(dashboardResponse);
+        return dashboardResponse;
+
     }
 }

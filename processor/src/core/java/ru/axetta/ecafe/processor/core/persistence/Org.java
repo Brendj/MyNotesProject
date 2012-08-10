@@ -423,6 +423,10 @@ public class Org {
     public Set<SyncHistory> getSyncHistories() {
         return Collections.unmodifiableSet(getSyncHistoriesInternal());
     }
+    
+    public void setSyncHistories(Set<SyncHistory> syncHistories) {
+        setSyncHistoriesInternal(syncHistories);
+    }
 
     private Set<Order> getOrdersInternal() {
         // For Hibernate only

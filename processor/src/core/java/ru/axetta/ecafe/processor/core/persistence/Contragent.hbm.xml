@@ -53,6 +53,12 @@
             <key column="IdOfContragent"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientPayment"/>
         </set>
+
+        <set name="clientPayments" inverse="true" cascade="all">
+            <key column="IdOfContragent"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientPayment"/>
+        </set>
+
         <set name="clientPaymentOrdersInternal" inverse="true" cascade="all">
             <key column="IdOfContragent"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder"/>

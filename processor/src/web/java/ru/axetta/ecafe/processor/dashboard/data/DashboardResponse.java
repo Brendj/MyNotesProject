@@ -25,8 +25,8 @@ public class DashboardResponse {
         Date firstFullSyncTime;
         Date lastSuccessfulBalanceSyncTime;
         Date lastUnSuccessfulBalanceSyncTime;
-        List<String> lastSyncErrors;
-        Map<String, Date> lastOperationTimePerPaymentSystem;
+        boolean lastSyncErrors;
+
 
         double numberOfPassagesPerNumOfStaff;
         double numberOfPassagesPerNumOfStudents;
@@ -79,20 +79,12 @@ public class DashboardResponse {
             this.lastUnSuccessfulBalanceSyncTime = lastUnSuccessfulBalanceSyncTime;
         }
 
-        public List<String> getLastSyncErrors() {
+        public boolean isLastSyncErrors() {
             return lastSyncErrors;
         }
 
-        public void setLastSyncErrors(List<String> lastSyncErrors) {
+        public void setLastSyncErrors(boolean lastSyncErrors) {
             this.lastSyncErrors = lastSyncErrors;
-        }
-
-        public Map<String, Date> getLastOperationTimePerPaymentSystem() {
-            return lastOperationTimePerPaymentSystem;
-        }
-
-        public void setLastOperationTimePerPaymentSystem(Map<String, Date> lastOperationTimePerPaymentSystem) {
-            this.lastOperationTimePerPaymentSystem = lastOperationTimePerPaymentSystem;
         }
 
         public double getNumberOfPassagesPerNumOfStaff() {
@@ -152,7 +144,51 @@ public class DashboardResponse {
         }
     }
 
+    public static class PaymentSystemItemInfo {
+
+        long idOfContragent;
+        Date lastOperationTime;
+        long numOfOperations;
+        
+        String error;
+
+        public long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public void setIdOfContragent(long idOfContragent) {
+            this.idOfContragent = idOfContragent;
+        }
+
+        public Date getLastOperationTime() {
+            return lastOperationTime;
+        }
+
+        public void setLastOperationTime(Date lastOperationTime) {
+            this.lastOperationTime = lastOperationTime;
+        }
+
+        public long getNumOfOperations() {
+            return numOfOperations;
+        }
+
+        public void setNumOfOperations(long numOfOperations) {
+            this.numOfOperations = numOfOperations;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+    }
+
     private List<EduInstItemInfo> eduInstItemInfoList = new LinkedList<EduInstItemInfo>();
+
+    private List<PaymentSystemItemInfo> paymentSystemItemInfoList = new LinkedList<PaymentSystemItemInfo>();
+
 
     public List<EduInstItemInfo> getEduInstItemInfoList() {
         return eduInstItemInfoList;
@@ -160,5 +196,13 @@ public class DashboardResponse {
 
     public void setEduInstItemInfoList(List<EduInstItemInfo> eduInstItemInfoList) {
         this.eduInstItemInfoList = eduInstItemInfoList;
+    }
+
+    public List<PaymentSystemItemInfo> getPaymentSystemItemInfoList() {
+        return paymentSystemItemInfoList;
+    }
+
+    public void setPaymentSystemItemInfoList(List<PaymentSystemItemInfo> paymentSystemItemInfoList) {
+        this.paymentSystemItemInfoList = paymentSystemItemInfoList;
     }
 }

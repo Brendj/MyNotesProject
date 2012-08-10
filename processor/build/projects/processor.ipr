@@ -864,13 +864,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/core.iml" filepath="$PROJECT_DIR$/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dashboard-ws-client.iml" filepath="$PROJECT_DIR$/dashboard-ws-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/j2ee.iml" filepath="$PROJECT_DIR$/j2ee.iml" />
       <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
       <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/util.iml" filepath="$PROJECT_DIR$/util.iml" />
       <module fileurl="file://$PROJECT_DIR$/web.iml" filepath="$PROJECT_DIR$/web.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ws-test-client.iml" filepath="$PROJECT_DIR$/ws-test-client.iml" />
     </modules>
   </component>
   <component name="ProjectResources">
