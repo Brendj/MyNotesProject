@@ -352,6 +352,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Java EE 5-Java EE 5 (2)" level="project" />
   </component>
 </module>
 
