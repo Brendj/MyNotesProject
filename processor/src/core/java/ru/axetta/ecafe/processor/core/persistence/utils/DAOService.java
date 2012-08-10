@@ -158,7 +158,7 @@ public class DAOService {
             } else {
                 doVersion = doVersionList.get(0).getCurrentVersion();
             }
-            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
+            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+(doVersion+1)+")";
         }
         String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
         query = em.createQuery(select, DistributedObject.class);
@@ -170,7 +170,7 @@ public class DAOService {
         TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
         query.setParameter("distributedObjectClassName", clazz.getSimpleName().toUpperCase());
         List<DOVersion> doVersionList = query.getResultList();
-        Long version = new Long(1);
+        Long version = (long) 1;
         if(!doVersionList.isEmpty()){
             version = version + doVersionList.get(0).getCurrentVersion();
         }
@@ -179,20 +179,24 @@ public class DAOService {
 
 
     @Transactional
-    public DOVersion updateVersionByDistributedObjects(String name) {
+    public Long updateVersionByDistributedObjects(String name) {
         TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
         query.setParameter("distributedObjectClassName",name.toUpperCase());
         List<DOVersion> doVersionList = query.getResultList();
         DOVersion doVersion = null;
+        Long version = null;
         if(doVersionList.size()==0) {
             doVersion = new DOVersion();
             doVersion.setCurrentVersion(0L);
+            version = 0L;
         } else {
             doVersion = doVersionList.get(0);
             doVersion.setCurrentVersion(doVersionList.get(0).getCurrentVersion()+1);
+            version = doVersionList.get(0).getCurrentVersion()+1;
         }
         doVersion.setDistributedObjectClassName(name);
-        return em.merge(doVersion);
+        doVersion = em.merge(doVersion);
+        return version;
     }
 
     @Transactional

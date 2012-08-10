@@ -180,8 +180,9 @@ public class DistributionManager {
             throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         try {
-            DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
-            long currentMaxVersion = doVersion.getCurrentVersion();
+            //DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
+            //long currentMaxVersion = doVersion.getCurrentVersion();
+            Long currentMaxVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
 
             DistributedObjectProcessor distributedObjectProcessor = DistributedObjectProcessor.getInstance();

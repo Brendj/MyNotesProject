@@ -57,9 +57,11 @@ public class DistributedObjectProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg, Document document) {
         try {
-            ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg, distributedObject.getClass());
             distributedObject.preProcess();
-            if(distributedObject instanceof IConfigProvider) ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+            if(distributedObject instanceof IConfigProvider){
+                ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg, distributedObject.getClass());
+                ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+            }
             processDistributedObject(distributedObject, currentMaxVersion, idOfOrg, document);
         } catch (Exception e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
@@ -93,12 +95,12 @@ public class DistributedObjectProcessor {
             }
             if (distributedObject.getTagName().equals("M")) {
                 long objectVersion = distributedObject.getGlobalVersion();
-                Long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
+                Long currentVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
                 if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-                if (objectVersion != currentVersion.longValue()) {
+                if (objectVersion != (currentVersion-1)) {
                     createConflict(distributedObject, idOfOrg, document);
                 }
-                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, objectVersion);
+                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentVersion-1);
                 distributedObject.setTagName("M");
             }
         }
