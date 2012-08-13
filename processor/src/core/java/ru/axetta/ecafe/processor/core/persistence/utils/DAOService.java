@@ -161,7 +161,7 @@ public class DAOService {
             } else {
                 doVersion = doVersionList.get(0).getCurrentVersion();
             }
-            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+(doVersion+1)+")";
+            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
         }
         String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
         query = em.createQuery(select, DistributedObject.class);
@@ -173,7 +173,7 @@ public class DAOService {
         TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
         query.setParameter("distributedObjectClassName", clazz.getSimpleName().toUpperCase());
         List<DOVersion> doVersionList = query.getResultList();
-        Long version = (long) 1;
+        Long version = (long) 0;
         if(!doVersionList.isEmpty()){
             version = version + doVersionList.get(0).getCurrentVersion();
         }
@@ -194,8 +194,8 @@ public class DAOService {
             version = 0L;
         } else {
             doVersion = doVersionList.get(0);
-            doVersion.setCurrentVersion(doVersionList.get(0).getCurrentVersion()+1);
             version = doVersionList.get(0).getCurrentVersion()+1;
+            doVersion.setCurrentVersion(version);
         }
         doVersion.setDistributedObjectClassName(name);
         doVersion = em.merge(doVersion);

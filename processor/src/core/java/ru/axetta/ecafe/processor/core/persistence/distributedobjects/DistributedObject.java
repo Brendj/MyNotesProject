@@ -107,9 +107,9 @@ public abstract class DistributedObject{
 
     protected String getStringAttributeValue(Node node, String attributeName,Integer length){
         if(getAttributeValue(node, attributeName)==null) return null;
-        StringBuilder result = new StringBuilder(getAttributeValue(node, attributeName));
+        String result = getAttributeValue(node, attributeName);
         if(result.length()>length) return result.substring(0, length);
-        return result.toString();
+        return result;
     }
 
     protected Float getFloatAttributeValue(Node node, String attributeName){

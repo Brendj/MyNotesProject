@@ -99,8 +99,6 @@ public class DistributionManager {
                 }
                 Element element = document.createElement(distributedObject.getTagName());
                 if (!(DistributedObjectsEnumComparator.isEmptyOrNull())) {
-                    /*int index = DistributedObjectsEnumComparator.getErrorObjectList().indexOf(
-                            new ErrorObject(distributedObject.getClass(), distributedObject.getGuid()));*/
                     ErrorObject errorObject = new ErrorObject(distributedObject.getClass(),
                             distributedObject.getGuid());
                     int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
@@ -234,12 +232,7 @@ public class DistributionManager {
             } else {
                 DistributedObjectsEnum currentObject = null;
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-                String attrValue = getAttributeValue(node, "V");
                 currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
-                // Здесь не стоит лезть в БД. Все доступы к бд должны быть внутри транзакции.
-                /*if(node.getFirstChild()!=null){
-                    DAOService.getInstance().updateVersionByDistributedObjects(currentObject.name());
-                }*/
                 node = node.getFirstChild();
                 while (node != null) {
                     if (Node.ELEMENT_NODE == node.getNodeType()) {

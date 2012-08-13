@@ -95,12 +95,12 @@ public class DistributedObjectProcessor {
             }
             if (distributedObject.getTagName().equals("M")) {
                 long objectVersion = distributedObject.getGlobalVersion();
-                Long currentVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
+                Long currentVersion = DAOService.getInstance().getVersionByDistributedObjects(distributedObject.getClass());
                 if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-                if (objectVersion != (currentVersion-1)) {
+                if (objectVersion != currentVersion) {
                     createConflict(distributedObject, idOfOrg, document);
                 }
-                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentVersion-1);
+                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentVersion);
                 distributedObject.setTagName("M");
             }
         }
