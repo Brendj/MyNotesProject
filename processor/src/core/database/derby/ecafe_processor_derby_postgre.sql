@@ -317,6 +317,7 @@ CREATE TABLE CF_Orders (
   IdOfCashier     BIGINT        NOT NULL,
   IdOfPos         BIGINT,
   IdOfContragent  BIGINT        NOT NULL,
+  RSum            BIGINT        NOT NULL,
   SocDiscount     BIGINT        NOT NULL DEFAULT 0,
   TrdDiscount     BIGINT        NOT NULL DEFAULT 0,
   GrantSum        BIGINT        NOT NULL,
