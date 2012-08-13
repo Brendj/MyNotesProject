@@ -427,4 +427,11 @@ public class DAOService {
         }
         return false;
     }
+
+    @Transactional
+    public List<Client> findClientsByMobilePhone(String mobilePhone) {
+        TypedQuery<Client> query = em.createQuery("from Client where mobile=:mobile", Client.class);
+        query.setParameter("mobile", mobilePhone);
+        return query.getResultList();
+    }
 }

@@ -91,7 +91,9 @@ public interface ClientRoomController {
     @WebMethod
     public ActivateLinkingTokenResult activateLinkingToken(@WebParam(name = "linkingToken") String linkingToken);
     @WebMethod
-    public Result sendLinkingToken(@WebParam(name="contractId") Long contractId);
+    public Result sendLinkingTokenByContractId(@WebParam(name="contractId") Long contractId);
+    @WebMethod
+    public Result sendLinkingTokenByMobile(@WebParam(name="mobilePhone") String mobilePhone);
     @WebMethod
     public GenerateLinkingTokenResult generateLinkingToken(@WebParam(name="contractId") Long contractId);
 }

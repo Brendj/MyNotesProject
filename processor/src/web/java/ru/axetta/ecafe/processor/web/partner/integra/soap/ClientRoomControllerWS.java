@@ -1287,7 +1287,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result sendLinkingToken(@WebParam(name = "contractId") Long contractId) {
+    public Result sendLinkingTokenByContractId(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(contractId);
 
         try {
@@ -1321,6 +1321,42 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
+    @Override
+    public Result sendLinkingTokenByMobile(@WebParam(name = "mobilePhone") String mobilePhone) {
+        authenticateRequest(null);
+        Result result = new Result();
+
+        try {
+            mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+            if (mobilePhone==null) {
+                result.resultCode=RC_INVALID_DATA;
+                result.description="Неверный формат телефона";
+                return result;
+            }
+
+            DAOService daoService = DAOService.getInstance();
+            List<Client> clientList = daoService.findClientsByMobilePhone(mobilePhone);
+            if (clientList.size()==0) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            String codes="";
+            for (Client cl : clientList) {
+                LinkingToken linkingToken = daoService.generateLinkingToken(cl);
+                if (codes.length()>0) codes+=", ";
+                codes+=linkingToken.getToken();
+            }
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendMessageAsync(clientList.get(0), EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, new String[]{"linkingToken", codes});
+            result.resultCode = RC_OK;
+            result.description = "Код активации отправлен по SMS для "+clientList.size()+" л/с";
+            return result;
+        } catch (Exception e) {
+            logger.error("Failed to send linking token", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        }
+    }
+    
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
         MessageContext jaxwsContext = context.getMessageContext();
         HttpServletRequest request = (HttpServletRequest)jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
