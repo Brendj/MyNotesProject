@@ -68,7 +68,8 @@ public abstract class DistributedObject{
         element.setAttribute("V", String.valueOf(getGlobalVersion()));
         return element;
         /* Метод определения названия элемента */
-    };
+    }
+
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException, IOException {
         /* Begin required params */
