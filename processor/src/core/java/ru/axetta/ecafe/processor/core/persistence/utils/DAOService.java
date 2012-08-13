@@ -48,6 +48,25 @@ public class DAOService {
     }
 
     @Transactional
+    public void updateDeleteState(DistributedObject distributedObject) throws Exception{
+        /*StringBuilder stringQuery = new StringBuilder("update ");
+        stringQuery.append(distributedObject.getClass().getSimpleName());
+        stringQuery.append(" set deletedState=:deletedState where guid='");
+        stringQuery.append(distributedObject.getGuid());
+        stringQuery.append("'");
+        Query q = em.createQuery(stringQuery.toString());
+        q.setParameter("deletedState", true);
+        return (q.executeUpdate() != 0);*/
+        List list = em.createQuery("from "+distributedObject.getClass().getSimpleName() + " where guid='"+distributedObject.getGuid()+"'").getResultList();
+        if(!list.isEmpty()){
+            DistributedObject object = (DistributedObject) list.get(0);
+            object.setDeletedState(true);
+            object.setDeleteDate(new Date());
+            em.persist(object);
+        }
+    }
+
+    @Transactional
     public void setConfigurationProviderInOrg(Long idOfOrg, ConfigurationProvider configurationProvider){
         Org org = em.find(Org.class, idOfOrg);
         if(org!=null){
@@ -156,8 +175,8 @@ public class DAOService {
             queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
             List<DOVersion> doVersionList = queryVersion.getResultList();
             Long doVersion = null;
-            if(doVersionList.size()==0) {
-                doVersion = 0L;
+            if(doVersionList.isEmpty()) {
+                doVersion = -1L;
             } else {
                 doVersion = doVersionList.get(0).getCurrentVersion();
             }
@@ -166,6 +185,18 @@ public class DAOService {
         String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
         query = em.createQuery(select, DistributedObject.class);
         return  query.getResultList();
+    }
+
+    @Transactional
+    public Long getDOVersionByGUID(DistributedObject distributedObject) {
+        String stringQuery = String.format("select globalVersion from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
+        Query query = em.createQuery(stringQuery);
+        List list = query.getResultList();
+        long version = 0L;
+        if(!list.isEmpty()){
+            version = (Long) list.get(0);
+        }
+        return version;
     }
 
     @Transactional
@@ -194,11 +225,11 @@ public class DAOService {
             version = 0L;
         } else {
             doVersion = doVersionList.get(0);
-            version = doVersionList.get(0).getCurrentVersion()+1;
+            version = doVersion.getCurrentVersion()+1;
             doVersion.setCurrentVersion(version);
         }
         doVersion.setDistributedObjectClassName(name);
-        doVersion = em.merge(doVersion);
+        em.persist(doVersion);
         return version;
     }
 
@@ -226,6 +257,15 @@ public class DAOService {
         return em.merge(distributedObject);
     }
 
+    public DistributedObject findDistributedObject(DistributedObject distributedObject){
+        TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
+        List<DistributedObject> distributedObjectList = query.getResultList();
+        if (distributedObjectList.isEmpty()) {
+            return null;
+        }
+        return em.find(distributedObject.getClass(),distributedObjectList.get(0).getGlobalId());
+    }
+
     @Transactional
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion){
         TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
@@ -238,7 +278,8 @@ public class DAOService {
         d.setGlobalVersion(globalVersion);
         d.setDeletedState(distributedObject.getDeletedState());
         d.setLastUpdate(new Date());
-        return em.merge(d);
+        em.persist(d);
+        return em.find(distributedObject.getClass(),distributedObjectList.get(0).getGlobalId());
     }
 
     @Transactional
@@ -434,4 +475,5 @@ public class DAOService {
         query.setParameter("mobile", mobilePhone);
         return query.getResultList();
     }
+
 }
