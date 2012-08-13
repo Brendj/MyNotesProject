@@ -779,4 +779,15 @@ public class DAOUtils {
         return (List<Org>)q.getResultList();
     }
 
+    public static List<Org> findOrgsWithContract(EntityManager entityManager, Contract contract) {
+        TypedQuery<Org> query = entityManager.createQuery("from Org where contract=:contract", Org.class);
+        query.setParameter("contract", contract);
+        return query.getResultList();
+    }
+
+    public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
+        javax.persistence.Query q = entityManager.createQuery("update Org set contract=null where contract=:contract");
+        q.setParameter("contract", entity);
+        q.executeUpdate();
+    }
 }

@@ -687,4 +687,12 @@ public class Client {
             setRemarks(r);
         }
     }
+
+    public boolean hasMobile() {
+        return mobile!=null && mobile.length()>0;
+    }
+
+    public boolean hasEmail() {
+        return email!=null && email.length()>0;
+    }
 }

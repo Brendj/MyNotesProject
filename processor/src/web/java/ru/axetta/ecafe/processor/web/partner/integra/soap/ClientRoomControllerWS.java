@@ -12,15 +12,13 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
@@ -45,11 +43,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -72,6 +66,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
+    private static final Long RC_NO_CONTACT_DATA = 160L;
     private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
     private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
     
@@ -82,6 +77,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    private static final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
 
     @Resource
     private WebServiceContext context;
@@ -1183,23 +1179,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result authorizeClient(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "token") String token) {
         IntegraPartnerConfig.LinkConfig partnerLinkConfig = null;
-        logger.info("init authorizeClient");
+        //logger.info("init authorizeClient");
         partnerLinkConfig = authenticateRequest(null);
-        logger.info("begin authorizeClient");
+        //logger.info("begin authorizeClient");
         try {
 
             DAOService daoService = DAOService.getInstance();
-            logger.info("begin get Client");
+            //logger.info("begin get Client");
             Client client = daoService.getClientByContractId(contractId);
-            logger.info("find client");
+            //logger.info("find client");
             if (client==null){
-                logger.info("find client == null");
+                //logger.info("find client == null");
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
-            logger.info("find client != null");
+            //logger.info("find client != null");
             boolean authorized=false;
             if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
-                logger.info("MD5");
+                //logger.info("MD5");
                 String fullNameUpCase = client.getPerson().getFullName().replaceAll("\\s", "").toUpperCase();
                 fullNameUpCase= fullNameUpCase+"Nb37wwZWufB";
                 byte[] bytesOfMessage = fullNameUpCase.getBytes("UTF-8");
@@ -1208,8 +1204,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 BigInteger bigInt = new BigInteger(1, hash);
                 String md5HashString = bigInt.toString(16);
 
-                logger.info("token    md5: "+token.toUpperCase());
-                logger.info("generate md5: "+md5HashString.toUpperCase());
+                //logger.info("token    md5: "+token.toUpperCase());
+                //logger.info("generate md5: "+md5HashString.toUpperCase());
 
                 if (md5HashString.toUpperCase().compareTo(token.toUpperCase())==0) {
                     authorized = true;
@@ -1219,13 +1215,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
             if (client.hasEncryptedPassword(token)) {
-                logger.info("hasEncryptedPassword");
+                //logger.info("hasEncryptedPassword");
                 authorized = true;
                 if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                     daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
                 }
             }
-            logger.info("authorized"+String.valueOf(authorized));
+            //logger.info("authorized"+String.valueOf(authorized));
             if (authorized) {
                 return new Result(RC_OK, RC_OK_DESC);
             } else {
@@ -1233,6 +1229,94 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         } catch (Exception e) {
             logger.error("Failed to authorized client", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        }
+    }
+
+    @Override
+    public ActivateLinkingTokenResult activateLinkingToken(
+            String linkingToken) {
+        authenticateRequest(null);
+
+        ActivateLinkingTokenResult result = new ActivateLinkingTokenResult();
+        try {
+                
+            DAOService daoService = DAOService.getInstance();
+            
+            Client client = daoService.findAndDeleteLinkingToken(linkingToken);
+            if (client==null) {
+                result.resultCode = RC_INVALID_DATA;
+                result.description = "Код активации не найден";
+            } else {
+                result.contractId = client.getContractId();
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to activate linking token: "+linkingToken, e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public GenerateLinkingTokenResult generateLinkingToken(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+
+        GenerateLinkingTokenResult result = new GenerateLinkingTokenResult();
+        try {
+            DAOService daoService = DAOService.getInstance();
+            Client client = daoService.getClientByContractId(contractId);
+            if (client==null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            LinkingToken linkingToken = daoService.generateLinkingToken(client);
+            result.linkingToken = linkingToken.getToken();
+            result.contractId = contractId;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Failed to generate linking token", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public Result sendLinkingToken(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+
+        try {
+            Result result = new Result();
+            DAOService daoService = DAOService.getInstance();
+            Client client = daoService.getClientByContractId(contractId);
+            if (client==null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            LinkingToken linkingToken = daoService.generateLinkingToken(client);
+            String info="";
+            if (client.hasEmail()) info+="e-mail";
+            if (client.hasMobile()) {
+                if (info.length()>0) info+=", ";
+                info+="SMS";
+            }
+            if (info.length()==0) {
+                result.resultCode = RC_NO_CONTACT_DATA;
+                result.description = RC_NO_CONTACT_DATA_DESC;
+            } else {
+                RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, new String[]{"linkingToken", linkingToken.getToken()});
+                result.resultCode = RC_OK;
+                result.description = "Код активации отправлен по "+info;
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Failed to send linking token", e);
             return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
     }
@@ -1292,4 +1376,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return linkConfig;
     }
+
+
 }

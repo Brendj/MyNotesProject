@@ -20,13 +20,6 @@
         <property name="dateOfConclusion" column="DateOfConclusion" type="timestamp"/>
         <property name="dateOfClosing" column="DateOfClosing" type="timestamp"/>
 
-        <set name="organizationInternal" lazy="false" cascade="all">
-            <key>
-                <column name="IdOfContract"/>
-            </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
-        </set>
-
     </class>
 </hibernate-mapping>
 

@@ -13,11 +13,28 @@
 <%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage"--%>
 <%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
 <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
-<%--@elvariable id="contractDeletePage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractDeletePage"--%>
-<%--@elvariable id="selectedContractGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.SelectedContractGroupPage"--%>
 <h:panelGrid id="contractListPanelGrid" binding="#{contractListPage.pageComponent}" styleClass="borderless-grid">
+    <rich:simpleTogglePanel label="Фильтр (#{contractListPage.filter.status})" switchType="client"
+                            opened="false" headerClass="filter-panel-header">
 
-    <rich:dataTable id="contractListTable" value="#{contractListPage.entityList}"
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Номер" styleClass="output-text" />
+                <h:inputText value="#{contractListPage.filter.contractNum}" styleClass="input-text" />
+                <h:outputText escape="true" value="Исполнитель" styleClass="output-text" />
+                <h:inputText value="#{contractListPage.filter.performer}" styleClass="input-text" />
+                <h:outputText escape="true" value="Заказчик" styleClass="output-text" />
+                <h:inputText value="#{contractListPage.filter.customer}" styleClass="input-text" />
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <a4j:commandButton value="Применить" action="#{contractListPage.reload}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{contractListPage.resetFilter}"
+                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
+
+    <rich:dataTable id="contractListTable" value="#{contractListPage.itemList}"
                     var="item" rows="20" footerClass="data-table-footer"
                     columnClasses="center-aligned-column">
         <rich:column headerClass="column-header">
@@ -30,9 +47,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер" />
             </f:facet>
-            <h:commandLink value="#{item.contractNumber}" action="#{contractViewPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{item.idOfContract}" target="#{selectedContractGroupPage.currentEntityId}" />
-            </h:commandLink>
+            <a4j:commandLink value="#{item.contractNumber}" action="#{contractViewPage.show}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm">
+                <f:setPropertyActionListener value="#{item}" target="#{contractEditPage.selectedEntityGroupPage.currentEntityItem}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -50,15 +68,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Статус" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.contractState}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Срок действия" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.dateOfClosing}" styleClass="output-text" >
-                <f:convertDateTime pattern="dd.MM.yyyy"/>
-            </h:outputText>
+            <h:outputText escape="true" value="#{item.contractStateAsString}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -68,25 +78,36 @@
                 <f:convertDateTime pattern="dd.MM.yyyy"/>
             </h:outputText>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Срок действия" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.dateOfClosing}" styleClass="output-text" >
+                <f:convertDateTime pattern="dd.MM.yyyy"/>
+            </h:outputText>
+        </rich:column>
 
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <h:commandLink action="#{contractEditPage.show}" styleClass="command-link">
+            <a4j:commandLink ajaxSingle="true" action="#{contractEditPage.show}" styleClass="command-link"
+                    reRender="mainMenu, workspaceForm">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.idOfContract}" target="#{selectedContractGroupPage.currentEntityId}" />
-            </h:commandLink>
+                <f:setPropertyActionListener value="#{item}" target="#{contractEditPage.selectedEntityGroupPage.currentEntityItem}" />
+            </a4j:commandLink>
         </rich:column>
 
         <rich:column style="text-align:center">
             <f:facet name="header">
-                <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
+                <h:outputText value="Удалить" escape="true"/>
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                             oncomplete="#{rich:component('removedContractItemDeletePanel')}.show()">
+                             reRender="uvDeleteConfirmPanel"
+                             action="#{uvDeletePage.show}"
+                             oncomplete="#{rich:component('uvDeleteConfirmPanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item}" target="#{contractDeletePage.currentEntity}" />
+                <f:setPropertyActionListener value="#{item}" target="#{uvDeletePage.currentEntityItem}" />
             </a4j:commandLink>
         </rich:column>
 

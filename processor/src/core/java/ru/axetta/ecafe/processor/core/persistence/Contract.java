@@ -22,29 +22,6 @@ public class Contract {
     private Date dateOfConclusion;
     private Date dateOfClosing;
     private boolean contractState;
-    private Set<Org> organizationInternal = new HashSet<Org>();
-
-    public List<Org> getOrganizationList(){
-        return new ArrayList<Org>(getOrganizationInternal());
-    }
-
-    public void addOrganization(Org org){
-        if(!getOrganizationInternal().contains(org)){
-            getOrganizationInternal().add(org);
-        }
-    }
-
-    public void removeOrganization(Org org){
-        getOrganizationInternal().remove(org);
-    }
-
-    private Set<Org> getOrganizationInternal() {
-        return organizationInternal;
-    }
-
-    private void setOrganizationInternal(Set<Org> organizationInternal) {
-        this.organizationInternal = organizationInternal;
-    }
 
     public boolean getContractState() {
         return contractState;
@@ -101,4 +78,5 @@ public class Contract {
     public void setIdOfContract(long idOfContract) {
         this.idOfContract = idOfContract;
     }
+
 }

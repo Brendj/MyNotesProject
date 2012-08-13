@@ -25,7 +25,7 @@ import java.util.Set;
 public class EventNotificationService {
     Logger logger = LoggerFactory.getLogger(MaintananceService.class);
 
-    public static String NOTIFICATION_ENTER_EVENT="enterEvent", NOTIFICATION_BALANCE_TOPUP="balanceTopup", MESSAGE_RESTORE_PASSWORD ="restorePassword";
+    public static String NOTIFICATION_ENTER_EVENT="enterEvent", NOTIFICATION_BALANCE_TOPUP="balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED="linkingToken", MESSAGE_RESTORE_PASSWORD ="restorePassword";
     public static String TYPE_SMS="sms", TYPE_EMAIL_TEXT="email.text", TYPE_EMAIL_SUBJECT="email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -52,7 +52,15 @@ public class EventNotificationService {
                     + "</body>\n" + "</html>",
         NOTIFICATION_BALANCE_TOPUP+"."+TYPE_EMAIL_SUBJECT, "Уведомление о пополнении баланса",
         MESSAGE_RESTORE_PASSWORD +"."+TYPE_EMAIL_TEXT, "Если Вы не запрашивали восстановление пароля, пожалуйста, удалите данное письмо. Для восстановления пароля перейдите по ссылке [url]",
-        MESSAGE_RESTORE_PASSWORD +"."+TYPE_EMAIL_SUBJECT, "Восстановление пароля"
+        MESSAGE_RESTORE_PASSWORD +"."+TYPE_EMAIL_SUBJECT, "Восстановление пароля",
+        /////
+        MESSAGE_LINKING_TOKEN_GENERATED+"."+TYPE_SMS, "Код активации: [linkingToken]",
+        MESSAGE_LINKING_TOKEN_GENERATED+"."+TYPE_EMAIL_TEXT, "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n" + "\n"
+                    + "Код активации личного кабинета: [linkingToken]. <br/>\n"
+                    + "Если Вы не запрашивали код активации, пожалуйста, удалите данное письмо. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"
+                    + "Служба поддержки клиентов\n"
+                    + "</body>\n" + "</html>",
+        MESSAGE_LINKING_TOKEN_GENERATED+"."+TYPE_EMAIL_SUBJECT, "Код активации личного кабинета",
     };
 
     String getDefaultText(String name) {
@@ -103,6 +111,10 @@ public class EventNotificationService {
     public void sendNotificationAsync(Client client, String type, String[] values) {
         sendNotification(client, type, values);
     }
+    @Async
+    public void sendMessageAsync(Client client, String type, String[] values) {
+        sendMessage(client, type, values);
+    }
 
     public void sendNotification(Client client, String type, String[] values) {
         if (client.isNotifyViaSMS()) {
@@ -113,6 +125,16 @@ public class EventNotificationService {
         if(client.isNotifyViaEmail()){
             sendEmail(client, type, values);
         }
+    }
+    public boolean sendMessage(Client client, String type, String[] values) {
+        boolean bSend=false;
+        if (client.hasMobile()) {
+            bSend|=sendSMS(client, type, values);
+        }
+        if (client.hasEmail()) {
+            bSend|=sendEmail(client, type, values);
+        }
+        return bSend;
     }
 
     public boolean sendSMS(Client client, String type, String[] values) {
@@ -128,6 +150,7 @@ public class EventNotificationService {
             int clientSMSType;
             if (type.equals(NOTIFICATION_ENTER_EVENT)) clientSMSType = ClientSms.TYPE_ENTER_EVENT_NOTIFY;
             else if (type.equals(NOTIFICATION_BALANCE_TOPUP)) clientSMSType = ClientSms.TYPE_PAYMENT_REGISTERED;
+            else if (type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) clientSMSType = ClientSms.TYPE_LINKING_TOKEN;
             else throw new Exception("No client SMS type defined for notification "+type);
             smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
         } catch (Exception e) {

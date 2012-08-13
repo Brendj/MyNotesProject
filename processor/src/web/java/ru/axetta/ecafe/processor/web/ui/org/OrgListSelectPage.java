@@ -19,7 +19,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.context.FacesContext;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -85,11 +87,14 @@ public class OrgListSelectPage extends BasicPage {
     public void completeOrgListSelection(boolean ok) throws Exception {
         Map<Long, String> orgMap = null;
         if (ok) {
+            updateSelectedOrgs();
             orgMap = new HashMap<Long, String>();
-            for (Item item : items)
+            orgMap.putAll(selectedOrgs);
+            /*for (Item item : items) {
                 if (item.getSelected()) {
                     orgMap.put(item.getIdOfOrg(), item.getShortName());
                 }
+            }*/
         }
         if (!completeHandlerLists.empty()) {
             completeHandlerLists.peek().completeOrgListSelection(orgMap);
@@ -110,27 +115,57 @@ public class OrgListSelectPage extends BasicPage {
     }
 
     public void fill(Session session, String orgFilter) throws Exception {
-        List<Item> items = new LinkedList<Item>();
-        List orgs = retrieveOrgs(session);
+        updateSelectedOrgs();
         String[] idOfOrgs = orgFilter.split(",");
         Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+        ///
+        for (String sId : longSet) {
+            Long id = Long.parseLong(sId.trim());
+            if (selectedOrgs.containsKey(id)) continue;
+            Org org = (Org)session.get(Org.class, id);
+            selectedOrgs.put(id, org.getShortName());
+        }
+        ///
+        List<Item> items = new LinkedList<Item>();
+        List orgs = retrieveOrgs(session);
         for (Object object : orgs) {
             Org org = (Org) object;
             Item item = new Item(org);
-            if(longSet.contains(String.valueOf(org.getIdOfOrg()).trim())) item.setSelected(true);
+            if (selectedOrgs.containsKey(org.getIdOfOrg())) item.setSelected(true);
             items.add(item);
         }
         this.items = items;
     }
 
+    HashMap<Long, String> selectedOrgs;
+    
+    public void onShow() {
+        selectedOrgs = new HashMap<Long, String>();
+        this.items = new LinkedList<Item>();
+    }
+    
     public void fill(Session session) throws Exception {
+        updateSelectedOrgs();
+        ////
         List<Item> items = new LinkedList<Item>();
         List orgs = retrieveOrgs(session);
         for (Object object : orgs) {
             Org org = (Org) object;
-            items.add(new Item(org));
+            Item i = new Item(org);
+            if (selectedOrgs.containsKey(i.getIdOfOrg())) i.setSelected(Boolean.TRUE);
+            items.add(i);
         }
         this.items = items;
+    }
+
+    private void updateSelectedOrgs() {
+        for (Item i : this.items) {
+            if (i.getSelected()) {
+                selectedOrgs.put(i.getIdOfOrg(), i.getShortName());
+            } else {
+                selectedOrgs.remove(i.getIdOfOrg());
+            }
+        }
     }
 
     private List retrieveOrgs(Session session) throws HibernateException {

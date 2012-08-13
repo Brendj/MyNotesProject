@@ -15,9 +15,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("singleton")
@@ -371,5 +374,57 @@ public class DAOService {
     @Transactional
     public <T> T saveEntity(T entity) {
         return em.merge(entity);
+    }
+
+    @Transactional
+    public Client findAndDeleteLinkingToken(String linkingToken) {
+        Query query = em.createQuery("from LinkingToken where token=:token");
+        query.setParameter("token", linkingToken);
+        try {
+            LinkingToken token = (LinkingToken)query.getSingleResult();
+            em.remove(token);
+            return em.find(Client.class, token.getIdOfClient());
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    
+
+    @Transactional
+    public LinkingToken generateLinkingToken(Client client) {
+        Query query = em.createQuery("delete from LinkingToken where idOfClient=:idOfClient");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.executeUpdate();
+        ////
+        SecureRandom secureRandom = new SecureRandom();
+        String randomToken;
+        int nSize=9;
+        for (int nCycle=0;;nCycle++) {
+            if (nCycle==10) { nSize++; nCycle=0; }
+            randomToken = new BigInteger(nSize*5, secureRandom).toString(32);
+            query = em.createQuery("from LinkingToken where token=:token");
+            query.setParameter("token", randomToken);
+            List l = query.getResultList();
+            if (l.size()==0) break;
+        }
+        LinkingToken token = new LinkingToken();
+        token.setIdOfClient(client.getIdOfClient());
+        token.setToken(randomToken);
+        em.persist(token);
+        return token;
+    }
+
+    @Transactional
+    public boolean doesClientBelongToFriendlyOrgs(Long orgId, Long idOfClient) throws Exception {
+        Org org = em.find(Org.class, orgId);
+        if (org==null) throw new Exception("Организация не найдена: "+orgId);
+        Client cl = em.find(Client.class, idOfClient);
+        if (cl==null) throw new Exception("Клиент не найден: "+idOfClient);
+        if (cl.getOrg().getIdOfOrg()==orgId) return true;
+        Set<Org> friendlyOrgs = org.getFriendlyOrg();
+        for (Org o :friendlyOrgs) {
+            if (cl.getOrg().getIdOfOrg()==o.getIdOfOrg()) return true;
+        }
+        return false;
     }
 }

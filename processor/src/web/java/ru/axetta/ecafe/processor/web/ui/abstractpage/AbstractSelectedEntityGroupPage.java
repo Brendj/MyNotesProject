@@ -4,53 +4,42 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
+import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.org.contract.ContractItem;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
-/**
- * Created with IntelliJ IDEA.
- * User: damir
- * Date: 06.08.12
- * Time: 15:59
- * To change this template use File | Settings | File Templates.
- */
-public abstract class AbstractSelectedEntityGroupPage<I extends AbstractEntityItem> extends BasicWorkspacePage {
+public class AbstractSelectedEntityGroupPage extends BasicWorkspacePage {
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    protected abstract String buildTitle();
-
-    private String title;
-    private I currentEntity;
-    private Long currentEntityId;
-    public abstract I getEntity();
-
-    @Override
-    public void onShow() throws Exception {
-        if (null == currentEntityId) {
-            this.title = null;
-        } else {
-            this.currentEntity = getEntity();
-            this.title = buildTitle();
-        }
+    public String buildTitle() {
+        if (currentEntityItem==null) return "Нет выбранного объекта";
+        return currentEntityItem.toString();
     }
+
+    private Object currentEntityItem;
+    private Long currentEntityItemId;
 
     public String getTitle() {
-        return title;
+        return buildTitle();
     }
 
-    public I getCurrentEntity() {
-        return currentEntity;
+    public Object getCurrentEntityItem() {
+        return currentEntityItem;
     }
 
-    public void setCurrentEntity(I currentEntity) {
-        this.currentEntity = currentEntity;
+    public void setCurrentEntityItem(Object currentEntityItem) {
+        this.currentEntityItem = currentEntityItem;
     }
 
-    public Long getCurrentEntityId() {
-        return currentEntityId;
+    public Long getCurrentEntityItemId() {
+        return currentEntityItemId;
     }
 
-    public void setCurrentEntityId(Long currentEntityId) {
-        this.currentEntityId = currentEntityId;
+    public void setCurrentEntityItemId(Long currentEntityItemId) {
+        this.currentEntityItemId = currentEntityItemId;
     }
 }

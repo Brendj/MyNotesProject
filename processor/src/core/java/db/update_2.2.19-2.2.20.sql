@@ -204,7 +204,7 @@ CREATE TABLE cf_publs
 CREATE INDEX cf_publ_idx
   ON cf_publs
   USING btree
-  (author COLLATE pg_catalog."default" , title COLLATE pg_catalog."default" , title2 COLLATE pg_catalog."default" , publicationdate COLLATE pg_catalog."default" , publisher COLLATE pg_catalog."default" );
+  (author, title, title2, publicationdate, publisher);
 
 CREATE TABLE cf_circuls
 (

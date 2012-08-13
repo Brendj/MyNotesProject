@@ -80,11 +80,16 @@ CREATE TABLE CF_Orgs (
   mailingListReportsOnVisits character varying(1024),
   mailingListReports1 character varying(1024),
   mailingListReports2 character varying(1024),
-  guid varchar(40),
+  IdOfConfigurationProvider bigint, --v20
+  guid varchar(40), --v20
+  idofcontract bigint, --v21,
+  lastSucBalanceSync BIGINT, --v21
+  lastUnsucBalanceSync BIGINT, --v21
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),
-  CONSTRAINT CF_Orgs_DefaultSupplier_fk FOREIGN KEY (DefaultSupplier) REFERENCES CF_Contragents (IdOfContragent)
+  CONSTRAINT CF_Orgs_DefaultSupplier_fk FOREIGN KEY (DefaultSupplier) REFERENCES CF_Contragents (IdOfContragent),
+  CONSTRAINT cf_orgs_contract FOREIGN KEY (idofcontract) REFERENCES cf_contracts (idofcontract) --v21
 );
 
 CREATE TABLE CF_ClientGroups (
@@ -108,6 +113,7 @@ CREATE TABLE CF_Clients (
   Phone                   VARCHAR(32),
   Mobile                  VARCHAR(32),
   Email                   VARCHAR(128),
+  fax character varying(32), --v20
   NotifyViaEmail          INTEGER           NOT NULL,
   NotifyViaSMS            INTEGER           NOT NULL,
   Image                   OID,
@@ -128,8 +134,8 @@ CREATE TABLE CF_Clients (
   CategoriesDiscounts     VARCHAR(60)       NOT NULL DEFAULT '',
   San                     VARCHAR(11),
   GuardSan                VARCHAR(64),
-  ExternalId              BIGINT,
-  ClientGUID              VARCHAR(40),
+  ExternalId              BIGINT, --v17
+  ClientGUID              VARCHAR(40), --v17
   CONSTRAINT CF_Clients_pk PRIMARY KEY (IdOfClient),
   CONSTRAINT CF_Clients_ContractId UNIQUE (ContractId),
   CONSTRAINT CF_Clients_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
@@ -191,6 +197,7 @@ CREATE TABLE CF_Users (
   LastChange              BIGINT            NOT NULL,
   Phone                   VARCHAR(32)       NOT NULL,
   IdOfContragent          BIGINT,
+  email character varying(128), --v14
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
   CONSTRAINT CF_Users_ShortName UNIQUE (UserName),
   CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
@@ -278,8 +285,8 @@ CREATE TABLE CF_Assortment (
   IdOfAst                 BIGINT            NOT NULL,  -- surrogate key
   IdOfOrg                 BIGINT            NOT NULL,
   BeginDate               BIGINT            NOT NULL,
-  ShortName               VARCHAR(128)      NOT NULL,
-  FullName                VARCHAR(128)      NOT NULL,
+  ShortName               VARCHAR(128)      NOT NULL, --v16
+  FullName                VARCHAR(128)      NOT NULL, --v16
   GroupName               VARCHAR(60)       NOT NULL,
   MenuOrigin              INT               NOT NULL,
   MenuOutput              VARCHAR(32)       NOT NULL,
@@ -903,65 +910,105 @@ CREATE TABLE CF_Clients_CategoryDiscounts
   REFERENCES CF_Clients (idofclient)
 );
 
+--v20
 
-CREATE TABLE cf_product_guide
+CREATE TABLE cf_do_versions
 (
-  IdOfProductGuide bigint NOT NULL,
-  code character varying(16) NOT NULL,
-  full_name character varying(1024),
-  product_name character varying(512),
-  okp_code character varying(32),
-  "version" bigint,
-  create_date bigint,
-  edit_date bigint,
-  delete_date bigint,
+  idofdoobject bigserial,
+  distributedobjectclassname character varying(64),
+  currentversion bigint,
+  CONSTRAINT cf_do_version_pk PRIMARY KEY (idofdoobject )
+);
+-- Добавлена таблица конфликтов для распределенных объектов
+CREATE TABLE cf_do_conflicts
+(
+  idofdoconflict bigserial,
+  idoforg bigint,
+  distributedobjectclassname character varying(64),
+  createconflictdate bigint,
+  gversion_inc bigint,
+  gversion_cur bigint,
+  val_inc character varying(16548),
+  val_cur character varying(16548),
+  CONSTRAINT cf_do_conflicts_pk PRIMARY KEY (idofdoconflict )
+);
+
+CREATE TABLE cf_do_confirms
+(
+  idofdoconfirm bigserial,
+  distributedobjectclassname character varying(64) NOT NULL,
+  GUID character varying(36) NOT NULL,
+  OrgOwner BIGINT DEFAULT NULL,
+  CONSTRAINT cf_do_confirm_pk PRIMARY KEY (idofdoconfirm )
+);
+
+CREATE TABLE cf_product_groups
+(
+   IdOfProductGroups BigSerial,
+   NameOfGroup character varying(512) NOT NULL,
+   GUID character varying(36) NOT NULL UNIQUE,
+   GlobalVersion BIGINT DEFAULT NULL,
+   DeletedState boolean NOT NULL DEFAULT false,
+   ClassificationCode character varying(32) DEFAULT NULL,
+   IdOfConfigurationProvider bigint,
+   OrgOwner BIGINT DEFAULT NULL,
+   CreatedDate bigint NOT NULL,
+   LastUpdate bigint,
+   DeleteDate bigint,
+   CONSTRAINT cf_product_groups_pk PRIMARY KEY (IdOfProductGroups )
+);
+
+-- Добавлена таблица справочника продуктов
+CREATE TABLE cf_products
+(
+  IdOfProducts BigSerial,
+  IdOfProductGroups BigINT NOT NULL,
+  Code character varying(16) NOT NULL,
+  FullName character varying(1024),
+  ProductName character varying(512),
+  OkpCode character varying(128),
+  ClassificationCode character varying(32) DEFAULT NULL,
+  GUID character varying(36) NOT NULL UNIQUE,
+  GlobalVersion BIGINT DEFAULT NULL,
+  OrgOwner BIGINT DEFAULT NULL,
+  DeletedState boolean NOT NULL DEFAULT false,
   IdOfUserCreate bigint,
   IdOfUserEdit bigint,
   IdOfUserDelete bigint,
-  deleted boolean NOT NULL DEFAULT false,
+  CreatedDate bigint NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
   IdOfConfigurationProvider bigint,
-  CONSTRAINT fk_product_guide PRIMARY KEY (IdOfProductGuide)
-);
-ALTER TABLE cf_product_guide OWNER TO postgres;
-
-CREATE TABLE cf_provider_configurations
-(
-  idOfConfigurationProvider bigint NOT NULL DEFAULT 0,
-  "name" character varying(64) NOT NULL,
-  CONSTRAINT pk_configuration_provider PRIMARY KEY (idOfConfigurationProvider),
-  CONSTRAINT cf_provider_configurations_name_key UNIQUE (name)
-);
-ALTER TABLE cf_provider_configurations OWNER TO postgres;
-
--- Таблица версий распределенных объектов
-CREATE TABLE cf_do_version
-(
-  IdOfDOObject bigserial,
-  DistributedObjectClassName character varying(64),
-  CurrentVersion bigint
-);
--- Таблица конфликтов для распределенных объектов
-CREATE TABLE cf_do_conflicts
-(
-  idOfDOConflict bigserial,
-  DistributedObjectClassName character varying(64),
-  createConflictDate bigint,
-  gVersion_inc bigint,
-  gVersion_cur bigint,
-  val_inc character varying(16548),
-  val_cur character varying(16548)
+  CONSTRAINT cf_products_pk PRIMARY KEY (idOfProducts ),
+  CONSTRAINT cf_products_product_groups_fk FOREIGN KEY (IdOfProductGroups)
+      REFERENCES cf_product_groups (IdOfProductGroups)
 );
 
--- Таблица (справочник) технологических карт
+-- Добавлена таблица групп технологических карт
+CREATE TABLE cf_technological_map_groups
+(
+   IdOfTechMapGroups BigSerial,
+   NameOfGroup character varying(128) NOT NULL,
+   GUID character varying(36) NOT NULL UNIQUE,
+   GlobalVersion BIGINT DEFAULT NULL,
+   DeletedState boolean NOT NULL DEFAULT false,
+   OrgOwner BIGINT DEFAULT NULL,
+   CreatedDate bigint NOT NULL,
+   IdOfConfigurationProvider bigint,
+   LastUpdate bigint,
+   DeleteDate bigint,
+   CONSTRAINT cf_technological_map_groups_pk PRIMARY KEY (IdOfTechMapGroups )
+);
+
+-- Добавлена таблица (справочник) технологических карт
 CREATE TABLE  cf_technological_map(
-  IdOfTechnoMap bigserial,
-
+  IdOfTechnologicalMaps BigSerial,
+  IdOfTechMapGroups bigint NOT NULL,
   NameOfTechnologicalMap character varying(128) NOT NULL,
   NumberOfTechnologicalMap BIGINT NOT NULL,
   TechnologyOfPreparation character varying(4096) NOT NULL,
   TermOfRealization character varying(128) DEFAULT NULL,
   TempOfPreparation character varying(32) DEFAULT NULL,
-
   EnergyValue FLOAT DEFAULT NULL,
   Proteins FLOAT DEFAULT NULL,
   Carbohydrates FLOAT DEFAULT NULL,
@@ -976,38 +1023,180 @@ CREATE TABLE  cf_technological_map(
   VitaminPp FLOAT DEFAULT NULL,
   VitaminC FLOAT DEFAULT NULL,
   VitaminE FLOAT DEFAULT NULL,
-
+  GUID character varying(36) NOT NULL UNIQUE,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner BIGINT DEFAULT NULL,
-  DeletedState boolean NOT NULL DEFAULT false,
-
-  CreatedDate bigint,
-  LastUpdate bigint,
-  DeleteDate bigint,
-  CONSTRAINT cf_technological_map_pk PRIMARY KEY (idoftechnomap )
-);
-
-CREATE TABLE cf_technological_map_products
-(
-  IdOfTechnoMapProducts bigserial NOT NULL,
-  IdOfTechnoMap bigint NOT NULL,
-  IdOfProductGuide bigint NOT NULL,
-  NetWeight double precision NOT NULL DEFAULT 0,
-  GrossWeight double precision NOT NULL DEFAULT 0,
-  GlobalVersion bigint,
-  OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,
   CreatedDate bigint NOT NULL,
   LastUpdate bigint,
   DeleteDate bigint,
-  CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
-  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnoMap) REFERENCES cf_technological_map (IdOfTechnoMap),
-  CONSTRAINT cf_technological_map_products_product_guide_fk FOREIGN KEY (IdOfProductGuide) REFERENCES cf_product_guide (IdOfProductGuide)
+  IdOfUserCreate bigint,
+  IdOfUserEdit bigint,
+  IdOfUserDelete bigint,
+  IdOfConfigurationProvider bigint,
+  CONSTRAINT cf_technological_map_pk PRIMARY KEY (IdOfTechnologicalMaps ),
+  CONSTRAINT cf_technological_map_technological_map_groups_fk FOREIGN KEY (IdOfTechMapGroups)
+      REFERENCES cf_technological_map_groups (IdOfTechMapGroups)
 );
+
+-- Добавлена таблица продукты технологических карт
+CREATE TABLE cf_technological_map_products
+(
+  IdOfTechnoMapProducts BigSerial NOT NULL,
+  IdOfTechnologicalMaps bigint NOT NULL,
+  IdOfProducts bigint NOT NULL,
+  NetWeight double precision NOT NULL DEFAULT 0,
+  GrossWeight double precision NOT NULL DEFAULT 0,
+  GUID character varying(36) NOT NULL UNIQUE,
+  GlobalVersion bigint,
+  OrgOwner bigint,
+  DeletedState boolean NOT NULL DEFAULT false,
+  CreatedDate bigint NOT NULL,
+  LastUpDate bigint,
+  DeleteDate bigint,
+  NameOfProduct character varying(256),
+  IdOfConfigurationProvider bigint,
+  CONSTRAINT cf_technological_map_products_pk PRIMARY KEY (IdOfTechnoMapProducts ),
+  CONSTRAINT cf_technological_map_products_product FOREIGN KEY (IdOfProducts)
+      REFERENCES cf_products (IdOfProducts),
+  CONSTRAINT cf_technological_map_products_technological_map_fk FOREIGN KEY (IdOfTechnologicalMaps)
+      REFERENCES cf_technological_map (IdOfTechnologicalMaps)
+);
+--Добавлена таблица производственную конфигурацию
+CREATE TABLE cf_provider_configurations
+(
+  IdOfConfigurationProvider BigSerial NOT NULL,
+  nameOfConfigurationProvider character varying(64) NOT NULL,
+  IdOfUserCreate bigint,
+  IdOfUserEdit bigint,
+  IdOfUserDelete bigint,
+  CreatedDate bigint NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
+  CONSTRAINT pk_configuration_provider PRIMARY KEY (IdOfConfigurationProvider ),
+  CONSTRAINT cf_provider_configurations_name_key UNIQUE (nameOfConfigurationProvider )
+);
+
+CREATE TABLE cf_publs
+(
+  idofpubl BigSerial NOT NULL,
+  data text,
+  author character varying(255),
+  title character varying(512),
+  title2 character varying(255),
+  publicationdate character varying(15),
+  publisher character varying(255),
+  version bigint NOT NULL,
+  isbn character varying(32), --v21
+  hash character varying(128), --v21
+  globalversion bigint,
+  orgowner bigint,
+  deletedstate boolean NOT NULL DEFAULT false,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  CONSTRAINT cf_publ_pk PRIMARY KEY (idofpubl ),
+  CONSTRAINT cf_publ_uk UNIQUE (author , title , title2 , publicationdate , publisher ),
+  CONSTRAINT cf_publs_guid_key UNIQUE (guid )
+);
+
+CREATE INDEX cf_publ_idx
+  ON cf_publs
+  USING btree
+  (author, title, title2, publicationdate, publisher);
+
+CREATE TABLE cf_circuls
+(
+  idofcircul BigSerial NOT NULL,
+  idofclient bigint NOT NULL,
+  idofpubl bigint NOT NULL,
+  idoforg bigint NOT NULL,
+  idofissuable bigint NOT NULL,
+  issuancedate bigint NOT NULL DEFAULT 0,
+  refunddate bigint NOT NULL DEFAULT 0,
+  realrefunddate bigint,
+  status integer NOT NULL DEFAULT 0,
+  version bigint NOT NULL DEFAULT 0,
+  quantity integer NOT NULL DEFAULT 0,
+  globalversion bigint,
+  orgowner bigint,
+  deletedstate boolean NOT NULL DEFAULT false,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  CONSTRAINT cf_circul_pk PRIMARY KEY (idofcircul ),
+  CONSTRAINT cf_circul_idofclient_fk FOREIGN KEY (idofclient)
+      REFERENCES cf_clients (idofclient),
+  CONSTRAINT cf_circul_idoforg_fk FOREIGN KEY (idoforg)
+      REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_circul_idofpubl_fk FOREIGN KEY (idofpubl)
+      REFERENCES cf_publs (idofpubl),
+  CONSTRAINT cf_circul_unq UNIQUE (idofclient , idofpubl , idoforg ),
+  CONSTRAINT cf_circuls_guid_key UNIQUE (guid )
+);
+
+CREATE TABLE cf_issuable
+(
+  idofissuable BigSerial NOT NULL,
+  barcode bigint,
+  type character(1) NOT NULL DEFAULT 'i',
+  idofpubl bigint NOT NULL,
+  globalversion bigint,
+  orgowner bigint,
+  deletedstate boolean NOT NULL DEFAULT false,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  CONSTRAINT cf_iissuable_pk PRIMARY KEY (idofissuable ),
+  CONSTRAINT cf_issuable_idofpubl_fkey FOREIGN KEY (idofpubl)
+      REFERENCES cf_publs (idofpubl)
+);
+
+-- Табдица связи между дружественными организациями
+CREATE TABLE cf_friendly_organization
+(
+  idOfFriendlyOrg BigSerial NOT NULL,
+  currentOrg bigint NOT NULL,
+  friendlyOrg bigint NOT NULL,
+  CONSTRAINT cf_friendly_organization_pk PRIMARY KEY (idoffriendlyorg ),
+  CONSTRAINT cf_friendly_organization_current_idoforg_fk FOREIGN KEY (currentorg)
+      REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_friendly_organization_friend_idoforg_fk FOREIGN KEY (friendlyorg)
+      REFERENCES cf_orgs (idoforg)
+);
+
+
+--v21
+-- Контракты оррганизаций
+CREATE TABLE cf_contracts
+(
+  idofcontract bigserial NOT NULL,
+  contractnumber character varying(50),
+  performer character varying(128),
+  customer character varying(128),
+  dateofconclusion timestamp with time zone,
+  dateofclosing timestamp with time zone,
+  contractstate integer NOT NULL DEFAULT 0,
+  CONSTRAINT cf_contracts_pk PRIMARY KEY (idofcontract )
+);
+
+CREATE TABLE cf_linking_tokens
+(
+  IdOfLinkingToken   BIGSERIAL    NOT NULL,
+  IdOfClient         BIGINT       UNIQUE NOT NULL,
+  Token              VARCHAR(20)  UNIQUE NOT NULL,
+  CONSTRAINT cf_linking_tokens_pk PRIMARY KEY (IdOfLinkingToken)
+);
+CREATE index "cf_tokens_idofclient_idx" ON cf_linking_tokens (IdOfClient);
+CREATE index "cf_tokens_token_idx" ON cf_linking_tokens (Token);
+ALTER TABLE cf_linking_tokens ADD CONSTRAINT cf_linking_tokens_idofclient FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient);
 
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 18, 120524, 0);
+VALUES(2, 2, 21, 120812, 0);
 
 

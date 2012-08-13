@@ -40,20 +40,20 @@ public class IntegraTest extends TestCase {
         ClientRoomControllerWSService service = new ClientRoomControllerWSService();
         ClientRoomController port
                 = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://78.46.34.200:8443/processor/soap/client");
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://kgd.novayashkola.ru:18443/processor/soap/client");
         //((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://127.0.0.1:8443/processor/soap/client");
         ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new PaymentWSTest.TestHostnameVerifier());
         Map context = ((BindingProvider) port).getRequestContext();
-        context.put(BindingProvider.USERNAME_PROPERTY, "testuser");
-        context.put(BindingProvider.PASSWORD_PROPERTY, "testpass");
+        context.put(BindingProvider.USERNAME_PROPERTY, "dnevnik.ru");
+        context.put(BindingProvider.PASSWORD_PROPERTY, "D4inxdo3inid");
 
         //String password = Client.encryptPassword("7613912");
-        long clientId=200204L;//200485L;//7613912L
+        long clientId=18L;//200485L;//7613912L
         //Result ra = port.authorizeClient(, "Абазов Амир Аниуарович");
 
         //String fullNameUpCase = "Петров Петр Иванович".replaceAll("\\s", "").toUpperCase();
         //fullNameUpCase= fullNameUpCase+"Nb37wwZWufB";
-        String fullNameUpCase = "Гарипов Инсаф Фанисович".replaceAll("\\s", "").toUpperCase();
+        String fullNameUpCase = "Тестеров Тест Тестович".replaceAll("\\s", "").toUpperCase();
         fullNameUpCase= fullNameUpCase+"Nb37wwZWufB";
         //final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
 

@@ -101,7 +101,7 @@
             <column name="idOfConfigurationProvider"/>
         </many-to-one>
 
-        <many-to-one name="contract" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contract">
+        <many-to-one name="contract" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contract" cascade="delete">
             <column name="idOfContract"/>
         </many-to-one>
 

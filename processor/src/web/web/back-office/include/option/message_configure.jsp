@@ -42,6 +42,16 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="SMS уведомление с кодом активации" id="linkingToken-SMS">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.linkingTokenSMSMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[linkingToken] - код активации" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
         <rich:tab label="E-mail уведомления о пополнении баланса" id="balance-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
@@ -72,6 +82,18 @@
                     <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
                     <h:outputText value="[eventName] - название события" styleClass="output-text" />
                     <h:outputText value="[eventTime] - время события" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
+        <rich:tab label="E-mail уведомления с кодом активации" id="linkingToken-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.linkingTokenEmailSubject}" size="80" maxlength="128" styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea id="linkingToken-Email-text" rows="15" cols="80" value="#{messageConfigurePage.linkingTokenEmailMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[linkingToken] - код активации" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

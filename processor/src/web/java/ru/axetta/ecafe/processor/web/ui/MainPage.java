@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountCreatePage;
@@ -26,7 +27,6 @@ import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.paging.AbstractViewPage;
 import ru.axetta.ecafe.processor.web.ui.report.productGuide.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -41,10 +41,6 @@ import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 import ru.axetta.ecafe.processor.web.ui.option.*;
-import ru.axetta.ecafe.processor.web.ui.test.TestListPage;
-import ru.axetta.ecafe.processor.web.ui.test.TestFilter;
-import ru.axetta.ecafe.processor.web.ui.test.TestItem;
-import ru.axetta.ecafe.processor.web.ui.test.TestViewPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -322,76 +318,6 @@ public class MainPage {
     private final BasicWorkspacePage productGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupsGroupPage = new BasicWorkspacePage();
 
-
-    private TestListPage testTestListPage = null;
-    private TestViewPage testViewPage = null;
-    private long selectedTestId = 0;
-
-    public long getSelectedTestId() {
-        return selectedTestId;
-    }
-
-    public void setSelectedTestId(long selectedTestId) {
-        this.selectedTestId = selectedTestId;
-    }
-
-    public BasicWorkspacePage getTestTestListPage()
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (testTestListPage == null) {
-            testTestListPage = new TestListPage(TestItem.class, Contragent.class, TestFilter.class);
-        }
-        return testTestListPage;
-    }
-
-    public AbstractViewPage getTestViewPage()
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (testViewPage == null) {
-            testViewPage = new TestViewPage(TestItem.class, Contragent.class);
-        }
-        return testViewPage;
-    }
-
-    public BasicWorkspacePage showTestViewPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            getTestViewPage().fill(persistenceSession, selectedTestId);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            testViewPage.showAndExpandMenuGroup();
-            currentWorkspacePage = testViewPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill org view page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных организации", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public BasicWorkspacePage showTestEditPage() {
-        return null;
-    }
-
-
-    public void updateTestPage() {
-        showTestPage();
-    }
-
-    public void clearTestListPageFilter()
-            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        testTestListPage.getFilter().clear();
-        showTestPage();
-    }
 
     public BasicWorkspacePage getProductGroupsGroupPage() {
         return productGroupsGroupPage;
@@ -1614,6 +1540,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgListSelectPage.onShow();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession);
                 } else {
@@ -6852,7 +6779,7 @@ public User getCurrentUser() throws Exception {
         return currentUser;
     }
 
-    public static MainPage getSessionInstance() throws Exception {
+    public static MainPage getSessionInstance() {
         FacesContext context = FacesContext.getCurrentInstance();
         return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
     }
@@ -7574,29 +7501,14 @@ return null;
         return null;
     }
 
-    public Object showTestPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            testTestListPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = testTestListPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill product guide list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке тестовой страницы", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+    public void registerModalPageShow(BasicPage modalPage) {
+        modalPages.push(modalPage);
+    }
+    public void registerModalPageHide(BasicPage modalPage) {
+        if (modalPages.peek().equals(modalPage)) modalPages.pop();
+    }
 
-        }
-        updateSelectedMainMenu();
-        return null;
+    public UvDeletePage getOpenedDeletePage() {
+        return (UvDeletePage)modalPages.peek();
     }
 }

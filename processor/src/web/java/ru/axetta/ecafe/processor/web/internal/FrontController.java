@@ -7,8 +7,11 @@ package ru.axetta.ecafe.processor.web.internal;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.LinkingToken;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.GenerateLinkingTokenResult;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -169,4 +172,22 @@ public class FrontController extends HttpServlet {
         }
         if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException("Ключ сертификата невалиден: "+orgId);
     }
+    
+    @WebMethod(operationName = "generateLinkingToken")
+    public String generateLinkingToken(@WebParam(name = "orgId") Long orgId, @WebParam(name = "idOfClient") Long idOfClient)
+            throws Exception {
+        checkRequestValidity(orgId);
+
+        DAOService daoService = DAOService.getInstance();
+        Client client = daoService.findClientById(idOfClient);
+        if (client==null) {
+            throw new FrontControllerException("Клиент не найден: "+idOfClient);
+        }
+        if (!daoService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
+            throw new FrontControllerException("Клиент "+idOfClient+" не принадлежит организации");
+        }
+        LinkingToken linkingToken = daoService.generateLinkingToken(client);
+        return linkingToken.getToken();
+    }
+    
 }

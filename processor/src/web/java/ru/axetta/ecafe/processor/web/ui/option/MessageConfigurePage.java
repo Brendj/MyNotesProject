@@ -35,6 +35,10 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String passwordRestoreEmailSubject;
     private String passwordRestoreEmailMessageText;
 
+    private String linkingTokenEmailSubject;
+    private String linkingTokenEmailMessageText;
+    private String linkingTokenSMSMessageText;
+
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -58,23 +62,42 @@ public class MessageConfigurePage extends BasicWorkspacePage {
         enterEventSMSMessageText = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_SMS);
         passwordRestoreEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_TEXT);
         passwordRestoreEmailSubject = eventNotificationService.getNotificationText(EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        linkingTokenEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_TEXT)
+                .replaceAll("\\[br\\]","\n");
+        linkingTokenEmailSubject = eventNotificationService.getNotificationText(
+                EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        linkingTokenSMSMessageText = eventNotificationService.getNotificationText(
+                EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_SMS);
     }
 
     public Object save() throws Exception {
         try {
             eventNotificationService.updateMessageTemplates(new String[]{
                     EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_EMAIL_TEXT,
-                    enterEventEmailMessageText, EventNotificationService.NOTIFICATION_ENTER_EVENT,
-                    EventNotificationService.TYPE_EMAIL_SUBJECT, enterEventEmailSubject,
+                    enterEventEmailMessageText,
+                    EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    enterEventEmailSubject,
                     EventNotificationService.NOTIFICATION_ENTER_EVENT, EventNotificationService.TYPE_SMS,
-                    enterEventSMSMessageText, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
-                    EventNotificationService.TYPE_EMAIL_TEXT, balanceEmailMessageText,
+                    enterEventSMSMessageText,
+                    ////
+                    EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_EMAIL_TEXT,
+                    balanceEmailMessageText,
                     EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_EMAIL_SUBJECT,
-                    balanceEmailSubject, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
-                    EventNotificationService.TYPE_SMS, balanceSMSMessageText,
+                    balanceEmailSubject,
+                    EventNotificationService.NOTIFICATION_BALANCE_TOPUP, EventNotificationService.TYPE_SMS,
+                    balanceSMSMessageText,
+                    /////
                     EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_TEXT,
-                    passwordRestoreEmailMessageText, EventNotificationService.MESSAGE_RESTORE_PASSWORD,
-                    EventNotificationService.TYPE_EMAIL_SUBJECT, passwordRestoreEmailSubject});
+                    passwordRestoreEmailMessageText,
+                    EventNotificationService.MESSAGE_RESTORE_PASSWORD, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    passwordRestoreEmailSubject,
+                    ////
+                    EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_TEXT,
+                    linkingTokenEmailMessageText,
+                    EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    linkingTokenEmailSubject,
+                    EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_SMS,
+                    linkingTokenSMSMessageText});
 
             printMessage("Настройки сохранены.");
         } catch (Exception e) {
@@ -152,5 +175,29 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setPasswordRestoreEmailMessageText(String passwordRestoreEmailMessageText) {
         this.passwordRestoreEmailMessageText = passwordRestoreEmailMessageText;
+    }
+
+    public String getLinkingTokenEmailSubject() {
+        return linkingTokenEmailSubject;
+    }
+
+    public void setLinkingTokenEmailSubject(String linkingTokenEmailSubject) {
+        this.linkingTokenEmailSubject = linkingTokenEmailSubject;
+    }
+
+    public String getLinkingTokenEmailMessageText() {
+        return linkingTokenEmailMessageText;
+    }
+
+    public void setLinkingTokenEmailMessageText(String linkingTokenEmailMessageText) {
+        this.linkingTokenEmailMessageText = linkingTokenEmailMessageText;
+    }
+
+    public String getLinkingTokenSMSMessageText() {
+        return linkingTokenSMSMessageText;
+    }
+
+    public void setLinkingTokenSMSMessageText(String linkingTokenSMSMessageText) {
+        this.linkingTokenSMSMessageText = linkingTokenSMSMessageText;
     }
 }

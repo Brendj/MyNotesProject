@@ -11,32 +11,15 @@ import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.List;
-
-/**
- * Created with IntelliJ IDEA.
- * User: damir
- * Date: 06.08.12
- * Time: 14:45
- * To change this template use File | Settings | File Templates.
- */
 @Component
 @Scope("session")
-public class ContractListPage extends AbstractListPage<Contract> {
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return entityManager;
-    }
+public class ContractListPage extends AbstractListPage<Contract, ContractItem> {
+    BasicWorkspacePage groupPage = new BasicWorkspacePage();
+    ContractItem.Filter filter = new ContractItem.Filter();
 
     @Override
     protected String getPageFileName() {
-        return "org/contract/list";
+        return "contragent/contract/list";
     }
 
     @Override
@@ -45,7 +28,21 @@ public class ContractListPage extends AbstractListPage<Contract> {
     }
 
     @Override
-    protected String getFilter() {
-        return "";
+    protected ContractItem createItem() {
+        return new ContractItem();
+    }
+
+    @Override
+    protected String getSortField() {
+        return "contractNumber";
+    }
+
+    public BasicWorkspacePage getGroupPage() {
+        return groupPage;
+    }
+
+    @Override
+    public ContractItem.Filter getFilter() {
+        return filter;
     }
 }

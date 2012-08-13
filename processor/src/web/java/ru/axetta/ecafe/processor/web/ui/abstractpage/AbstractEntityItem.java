@@ -4,32 +4,47 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
+import ru.axetta.ecafe.processor.core.persistence.Contract;
+
 import javax.persistence.EntityManager;
 
-/**
- * Created with IntelliJ IDEA.
- * User: damir
- * Date: 07.08.12
- * Time: 10:47
- * To change this template use File | Settings | File Templates.
- */
 public abstract class AbstractEntityItem<E> {
 
-    protected EntityManager entityManager;
-
-    public abstract void fill(E entity);
-    public abstract Class<E> getEntity();
-
-    public AbstractEntityItem(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public abstract void fillForList(EntityManager entityManager, E entity);
+    protected abstract void fill(EntityManager entityManager, E entity);
+    protected abstract void saveTo(EntityManager entityManager, E entity);
+    public abstract E getEntity(EntityManager entityManager);
+    protected abstract E createEmptyEntity();
+    
+    public AbstractEntityItem() {
     }
 
-    /* обновить поля */
-    public void update(){}
+    public void updateEntity(EntityManager entityManager) {
+        E e = getEntity(entityManager);
+        saveTo(entityManager, e);
+        entityManager.persist(e);
+        //fill(entityManager, e);
+    }
 
-    /* Создать сущность */
-    public E create(E entity){return  null;};
+    public void createEntity(EntityManager entityManager) {
+        E e = createEmptyEntity();
+        saveTo(entityManager, e);
+        entityManager.persist(e);
+        //fill(entityManager, e);
+    }
 
-    /* вернуть сущность */
-    public E refreshEntity(){return null;};
+    public void refreshEntity(EntityManager entityManager) {
+        fill(entityManager, getEntity(entityManager));
+    }
+
+    public void removeEntity(EntityManager entityManager) throws Exception {
+        E entity = getEntity(entityManager);
+        if (entity==null) throw new Exception("Объект не найден");
+        prepareForEntityRemove(entityManager, entity);
+        entityManager.remove(entity);
+    }
+
+    protected void prepareForEntityRemove(EntityManager entityManager, E entity) {
+
+    }
 }
