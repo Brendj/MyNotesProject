@@ -83,22 +83,24 @@ public class DistributedObjectProcessor {
     protected void processDistributedObject(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
             Document document) throws Exception {
         if (distributedObject.getDeletedState()) {
-            if (updateDeleteState(distributedObject)) {
+            /*if (DAOService.getInstance().updateDeleteState(distributedObject)) {
                 throw new Exception(
                         "Error by set Delete State by " + distributedObject.getClass().getSimpleName() + " guid="
                                 + distributedObject.getGuid());
-            }
+            }*/
+            distributedObject.setGlobalVersion(currentMaxVersion);
+            DAOService.getInstance().updateDeleteState(distributedObject);
         } else {
             if (distributedObject.getTagName().equals("C")) {
                 distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
                 distributedObject.setTagName("C");
             }
             if (distributedObject.getTagName().equals("M")) {
-                long objectVersion = distributedObject.getGlobalVersion();
-                Long currentVersion = DAOService.getInstance().getVersionByDistributedObjects(distributedObject.getClass());
+                long version = distributedObject.getGlobalVersion();
+                Long currentVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
                 if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-                if (objectVersion != currentVersion) {
-                    createConflict(distributedObject, idOfOrg, document);
+                if (version != currentVersion) {
+                    createConflict(distributedObject, idOfOrg, document, currentVersion);
                 }
                 distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentVersion);
                 distributedObject.setTagName("M");
@@ -129,18 +131,8 @@ public class DistributedObjectProcessor {
         }
     }
 
-    private boolean updateDeleteState(DistributedObject distributedObject) {
-        StringBuilder stringQuery = new StringBuilder("update ");
-        stringQuery.append(distributedObject.getClass().getSimpleName());
-        stringQuery.append(" set deletedState=:deletedState where guid='");
-        stringQuery.append(distributedObject.getGuid());
-        stringQuery.append("'");
-        Query q = entityManager.createQuery(stringQuery.toString());
-        q.setParameter("deletedState", true);
-        return (q.executeUpdate() != 0);
-    }
-
-    private void createConflict(DistributedObject distributedObject, Long idOfOrg, Document document) throws Exception {
+    private void createConflict(DistributedObject distributedObject, Long idOfOrg, Document document,
+            Long currentVersion) throws Exception {
         DOConflict conflict = new DOConflict();
         conflict.setValueInc(createStringElement(document, distributedObject));
         conflict.setgVersionInc(distributedObject.getGlobalVersion());
@@ -151,6 +143,7 @@ public class DistributedObjectProcessor {
                         + "'", DistributedObject.class);
         DistributedObject currDistributedObject = query.getSingleResult();
         conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
+        conflict.setgVersionResult(currentVersion);
         conflict.setValueCur(createStringElement(document, currDistributedObject));
         conflict.setCreateConflictDate(new Date());
         entityManager.persist(conflict);

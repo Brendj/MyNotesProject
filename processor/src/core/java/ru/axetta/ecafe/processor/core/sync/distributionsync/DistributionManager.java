@@ -106,6 +106,8 @@ public class DistributionManager {
                         element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
                     }
                 }
+                Long version = DAOService.getInstance().getDOVersionByGUID(distributedObject);
+                distributedObject.setGlobalVersion(version);
                 elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
             }
             elementRO.appendChild(confirmElement);
