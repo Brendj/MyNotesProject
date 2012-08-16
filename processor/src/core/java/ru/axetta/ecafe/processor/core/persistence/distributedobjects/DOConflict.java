@@ -25,15 +25,6 @@ public class DOConflict {
     private String valueInc;
     private String valueCur;
     private long idOfOrg;
-    private long gVersionResult;
-
-    public long getgVersionResult() {
-        return gVersionResult;
-    }
-
-    public void setgVersionResult(long gVersionResult) {
-        this.gVersionResult = gVersionResult;
-    }
 
     public long getIdOfOrg() {
         return idOfOrg;

@@ -508,6 +508,22 @@ public class Client {
         return StringUtils.equals(this.cypheredPassword, encryptedPassword);
     }
 
+    public boolean hasPasswordSHA1(String plainPassword) throws Exception {
+        return StringUtils.equals(this.cypheredPassword, encryptPasswordSHA1(plainPassword));
+    }
+
+    public boolean hasEncryptedPasswordSHA1(String encryptedPassword) throws Exception {
+        String plainPassword = new String(Base64.decodeBase64(this.cypheredPassword.getBytes()), CharEncoding.US_ASCII);
+        String cypheredPlainPassword = encryptPasswordSHA1(plainPassword);
+        return StringUtils.equals(cypheredPlainPassword, encryptedPassword);
+    }
+
+    public static String encryptPasswordSHA1(String plainPassword) throws NoSuchAlgorithmException, IOException {
+        final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+        final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+        return new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
+    }
+
     private Set<DiaryValue> getDiaryValuesInternal() {
         // For Hibernate only
         return diaryValues;
