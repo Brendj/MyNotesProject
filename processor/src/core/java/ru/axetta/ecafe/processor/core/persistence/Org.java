@@ -71,7 +71,7 @@ public class Org {
     private Set<Org> friendlyOrg;
     private Org thisOrg;
     private String guid;
-    private Contract contract = new Contract();
+    private Contract contract;
     private Date lastSuccessfulBalanceSync;
     private Date lastUnSuccessfulBalanceSync;
 
