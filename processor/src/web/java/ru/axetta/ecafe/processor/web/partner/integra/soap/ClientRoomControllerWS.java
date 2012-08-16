@@ -1214,7 +1214,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 }
             }
-            if (client.hasEncryptedPassword(token)) {
+            if (client.hasEncryptedPasswordSHA1(token)) {
                 //logger.info("hasEncryptedPassword");
                 authorized = true;
                 if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
