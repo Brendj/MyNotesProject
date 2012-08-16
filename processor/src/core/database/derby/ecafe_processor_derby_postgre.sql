@@ -825,6 +825,7 @@ create table CF_Schema_version_info (
     MinorVersionNum         int                      not null,
     BuildVersionNum         int                      not null,
     UpdateTime              BIGINT                   not null,
+    CommitText              text,
     constraint "CF_schema_version_info_pk" primary key (SchemaVersionInfoId)
 );
 
@@ -1198,6 +1199,6 @@ ALTER TABLE cf_linking_tokens ADD CONSTRAINT cf_linking_tokens_idofclient FOREIG
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 21, 120812, 0);
+VALUES(2, 2, 21, 120812, 0, "");
 
 
