@@ -16,6 +16,7 @@
         <property name="createConflictDate" column="CreateConflictDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="gVersionInc" column="gVersion_inc" type="long"/>
         <property name="gVersionCur" column="gVersion_cur" type="long"/>
+        <!--<property name="gVersionResult" column="gVersion_result" type="long"/>-->
         <property name="valueInc" column="val_inc" type="string" length="16548"/>
         <property name="valueCur" column="val_cur" type="string" length="16548"/>
        <!-- <property name="editTime" column="edit_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>-->

@@ -83,26 +83,24 @@ public class DistributedObjectProcessor {
     protected void processDistributedObject(DistributedObject distributedObject, long currentMaxVersion, Long idOfOrg,
             Document document) throws Exception {
         if (distributedObject.getDeletedState()) {
-            /*if (DAOService.getInstance().updateDeleteState(distributedObject)) {
-                throw new Exception(
-                        "Error by set Delete State by " + distributedObject.getClass().getSimpleName() + " guid="
-                                + distributedObject.getGuid());
-            }*/
-            distributedObject.setGlobalVersion(currentMaxVersion);
+            Long currentUpdateVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
+            distributedObject.setGlobalVersion(currentUpdateVersion);
             DAOService.getInstance().updateDeleteState(distributedObject);
         } else {
             if (distributedObject.getTagName().equals("C")) {
-                distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
+                Long currentUpdateVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
+                distributedObject = createDistributedObject(distributedObject, currentUpdateVersion);
                 distributedObject.setTagName("C");
             }
             if (distributedObject.getTagName().equals("M")) {
                 long version = distributedObject.getGlobalVersion();
-                Long currentVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
+                Long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
                 if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+                Long currentUpdateVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
                 if (version != currentVersion) {
-                    createConflict(distributedObject, idOfOrg, document, currentVersion);
+                    createConflict(distributedObject, idOfOrg, document, currentUpdateVersion);
                 }
-                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentVersion);
+                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentUpdateVersion);
                 distributedObject.setTagName("M");
             }
         }
@@ -143,6 +141,8 @@ public class DistributedObjectProcessor {
                         + "'", DistributedObject.class);
         DistributedObject currDistributedObject = query.getSingleResult();
         conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
+        // выйдет в 22 версии
+        //conflict.setgVersionResult(currentVersion);
         conflict.setValueCur(createStringElement(document, currDistributedObject));
         conflict.setCreateConflictDate(new Date());
         entityManager.persist(conflict);
