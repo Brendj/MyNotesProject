@@ -129,6 +129,51 @@ public class ClientPasswordRecover {
     }
 
 
+    public int sendPasswordRecoverURLFromEmail(Long contractId, RequestWebParam request) throws Exception {
+        int succeeded = -1;
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            transaction = session.beginTransaction();
+            Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
+            clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
+            Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
+            succeeded = (null != currClient ? 0 : -1);
+            if (null != currClient) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Client with contractId: %s is exist", contractId));
+                }
+                String clientEmail = currClient.getEmail();
+                if (clientEmail == null || clientEmail.isEmpty() || clientEmail.equalsIgnoreCase("")) {
+                    succeeded = CONTRACT_HAS_NOT_EMAIL;
+                } else {
+                    URI url = new URI(request.url);
+                    url = UriUtils.putParam(url, "page", "recover");
+                    String sDate = String.valueOf(System.currentTimeMillis());
+                    url = UriUtils.putParam(url, DATE_PARAM, sDate);
+                    String sContractId = String.valueOf(currClient.getContractId());
+                    url = UriUtils.putParam(url, CONTRACT_ID_PARAM, sContractId);
+                    String hash = encryptURL(getPasswordSeed(session) + sDate + sContractId);
+                    String strURL = UriUtils.putParam(url, PASS_PARAM, hash).toString();
+
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendEmail(currClient,
+                            EventNotificationService.MESSAGE_RESTORE_PASSWORD, new String[]{"url", strURL});
+                    logger.info("Sent recover password URL to '" + clientEmail + "'");
+                }
+            } else {
+                succeeded = NOT_FOUND_CONTRACT_BY_ID;
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return succeeded;
+    }
+
+
     public boolean checkPasswordRestoreRequest(HttpServletRequest request) throws Exception {
         boolean succeeded = false;
         String sContractId = request.getParameter("contractId");
@@ -161,6 +206,41 @@ public class ClientPasswordRecover {
         }
         return succeeded;
     }
+
+
+    public boolean checkPasswordRestoreRequest(RequestWebParam request) throws Exception {
+        boolean succeeded = false;
+        String sContractId = request.contractIdParam;
+        String sDate = request.dateParam;
+        String pass = request.pParam;
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            transaction = session.beginTransaction();
+            sContractId = sContractId.replaceAll("[^0-9]", "");
+            sDate = sDate.replaceAll("[^0-9]", "");
+            Long contractId = Long.parseLong(sContractId);
+            Long currDate = System.currentTimeMillis();
+            Long urlDate = Long.parseLong(sDate);
+            /* Проверка жизни ссылки */
+            if (currDate - urlDate <= LIFETIME_OF_URL) {
+                Criteria clientWithSameContractIdCriteria = session.createCriteria(Client.class);
+                clientWithSameContractIdCriteria.add(Restrictions.eq("contractId", contractId));
+                Client currClient = (Client) clientWithSameContractIdCriteria.uniqueResult();
+                String checkPass = encryptURL(getPasswordSeed(session) + sDate + sContractId);
+                int l = checkPass.length()-2; // убираем последние два т.к. могут быть = - они могут неправильно декодироваться
+                succeeded = (null != currClient && pass.length()>=l && StringUtils.equals(pass.substring(0, l), checkPass.substring(0, l)));
+            }
+        } catch (Exception e) {
+            succeeded = false;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return succeeded;
+    }
+
 
     public boolean changePassword(Long contractId, String newPassword) throws Exception {
         boolean succeeded = false;
