@@ -277,6 +277,12 @@ public class RuntimeContext implements ApplicationContextAware {
         return partnerRbkMoneyConfig;
     }
 
+    ///////////////////////////////////////////////////////////
+
+
+
+
+
     public String getInstanceName() {
         return instanceName;
     }
@@ -285,6 +291,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     ///////////////////////////////////////////////////////////
+
 
     public ChronopayConfig getPartnerChronopayConfig() {
         return partnerChronopayConfig;
@@ -333,7 +340,7 @@ public class RuntimeContext implements ApplicationContextAware {
         RuntimeContext.sessionFactory = sessionFactory;
     }
 
-    
+
     boolean criticalErrors;
 
     Properties configProperties;
@@ -379,9 +386,9 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = createSmsService(properties);
             this.smsService = smsService;
 
-            this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE);
+            this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_RBK_RATE),getOptionValueBool(Option.OPTION_RBK_SECTION));
             //////////////////////////////////////////////////////////////////////////////////////////////
-            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE));
+            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE),getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION));
             /////////////////////////////////////////////////////////////////////////////////////////////
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
@@ -480,7 +487,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     @PersistenceContext
     EntityManager em;
-    
+
     @Transactional
     public void initDB() throws Exception {
         // Configure runtime context
@@ -520,20 +527,20 @@ public class RuntimeContext implements ApplicationContextAware {
                 createContragent("Клиент", 5);
 
             HashMap<Long, String> initCategory = new HashMap<Long, String>();
-                initCategory.put(-90L,"Начальные классы");
-                initCategory.put(-91L,"Средние классы");
-                initCategory.put(-92L,"Старшие классы");
-                initCategory.put(-101L,"1 класс");
-                initCategory.put(-102L,"2 класс");
-                initCategory.put(-103L,"3 класс");
-                initCategory.put(-104L,"4 класс");
-                initCategory.put(-105L,"5 класс");
-                initCategory.put(-106L,"6 класс");
-                initCategory.put(-107L,"7 класс");
-                initCategory.put(-108L,"8 класс");
-                initCategory.put(-109L,"9 класс");
-                initCategory.put(-110L,"10 класс");
-                initCategory.put(-111L,"11 класс");
+            initCategory.put(-90L,"Начальные классы");
+            initCategory.put(-91L,"Средние классы");
+            initCategory.put(-92L,"Старшие классы");
+            initCategory.put(-101L,"1 класс");
+            initCategory.put(-102L,"2 класс");
+            initCategory.put(-103L,"3 класс");
+            initCategory.put(-104L,"4 класс");
+            initCategory.put(-105L,"5 класс");
+            initCategory.put(-106L,"6 класс");
+            initCategory.put(-107L,"7 класс");
+            initCategory.put(-108L,"8 класс");
+            initCategory.put(-109L,"9 класс");
+            initCategory.put(-110L,"10 класс");
+            initCategory.put(-111L,"11 класс");
                 /* дополнитеьный категории */
                 initCategory.put(-200L,"Сотрудник");
                 initCategory.put(-201L,"Ученик");
@@ -880,7 +887,7 @@ public class RuntimeContext implements ApplicationContextAware {
             throw new Exception("Invalid SMS service type: "+serviceType);
         }
 
-if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("SMS service created.");
         }
         return smsService;
