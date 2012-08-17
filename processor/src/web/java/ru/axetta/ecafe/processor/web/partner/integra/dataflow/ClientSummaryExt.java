@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Date;
 
 
 /**
@@ -89,7 +90,24 @@ public class ClientSummaryExt {
     @XmlAttribute(name = "DefaultMerchantInfo")
     protected String defaultMerchantInfo;
 
+
+    @XmlAttribute(name = "Address")
+    protected String address;
+    @XmlAttribute(name = "Phone")
+    protected String phone;
+    @XmlAttribute(name = "FreePayMaxCount")
+    protected Integer freePayMaxCount;
+    @XmlAttribute(name = "FreePayCount")
+    protected Integer freePayCount;
+    @XmlAttribute(name = "LastFreePayTime")
+    @XmlSchemaType(name = "date")
+    protected XMLGregorianCalendar lastFreePayTime;
+    @XmlAttribute(name = "DiscountMode")
+    protected Integer discountMode;
+    @XmlAttribute(name = "Limit")
+    protected Long limit;
     /**
+     *
      * Gets the value of the contractId property.
      * 
      * @return
@@ -545,4 +563,59 @@ public class ClientSummaryExt {
         this.defaultMerchantInfo = value;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Integer getFreePayMaxCount() {
+        return freePayMaxCount;
+    }
+
+    public void setFreePayMaxCount(Integer freePayMaxCount) {
+        this.freePayMaxCount = freePayMaxCount;
+    }
+
+    public Integer getFreePayCount() {
+        return freePayCount;
+    }
+
+    public void setFreePayCount(Integer freePayCount) {
+        this.freePayCount = freePayCount;
+    }
+
+    public XMLGregorianCalendar getLastFreePayTime() {
+        return lastFreePayTime;
+    }
+
+    public void setLastFreePayTime(XMLGregorianCalendar lastFreePayTime) {
+        this.lastFreePayTime = lastFreePayTime;
+    }
+
+    public Integer getDiscountMode() {
+        return discountMode;
+    }
+
+    public void setDiscountMode(Integer discountMode) {
+        this.discountMode = discountMode;
+    }
+
+    public Long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Long limit) {
+        this.limit = limit;
+    }
 }
