@@ -116,12 +116,14 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";
     private static final String CLIENT_SMS_PARAM_BASE = PROCESSOR_PARAM_BASE + ".client.sms";
     private static final String WS_CRYPTO_BASE=PROCESSOR_PARAM_BASE+".ws.crypto";
+    private static final String INSTANCE_NAME=PROCESSOR_PARAM_BASE+".instance";
 
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
     // Lock for global instance anchor
     private static final Object INSTANCE_LOCK = new Object();
 
+    private String instanceName;
     // Application wide executor service
     private ExecutorService executorService;
     // Application wide job scheduler
@@ -274,7 +276,15 @@ public class RuntimeContext implements ApplicationContextAware {
     public RBKMoneyConfig getPartnerRbkMoneyConfig() {
         return partnerRbkMoneyConfig;
     }
-     ///////////////////////////////////////////////////////////
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+    public String getInstanceNameDecorated() {
+        return StringUtils.isEmpty(instanceName)?"":(" ("+instanceName+")");
+    }
+
+    ///////////////////////////////////////////////////////////
 
     public ChronopayConfig getPartnerChronopayConfig() {
         return partnerChronopayConfig;
@@ -351,6 +361,8 @@ public class RuntimeContext implements ApplicationContextAware {
         try {
 
             loadDataFiles();
+            
+            instanceName = properties.getProperty(INSTANCE_NAME);
 
             executorService = createExecutorService(properties);
             this.executorService = executorService;
