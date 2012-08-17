@@ -53,6 +53,22 @@ CREATE TABLE CF_POS (
   CONSTRAINT CF_POS_IdOfContragentReceiver_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
+
+--v21
+-- Контракты оррганизаций
+CREATE TABLE cf_contracts
+(
+  idofcontract bigserial NOT NULL,
+  contractnumber character varying(50),
+  performer character varying(128),
+  customer character varying(128),
+  dateofconclusion timestamp with time zone,
+  dateofclosing timestamp with time zone,
+  contractstate integer NOT NULL DEFAULT 0,
+  CONSTRAINT cf_contracts_pk PRIMARY KEY (idofcontract )
+);
+--
+
 CREATE TABLE CF_Orgs (
   IdOfOrg                 BIGINT            NOT NULL,
   Version                 BIGINT            NOT NULL,
@@ -1172,19 +1188,6 @@ CREATE TABLE cf_friendly_organization
 
 
 --v21
--- Контракты оррганизаций
-CREATE TABLE cf_contracts
-(
-  idofcontract bigserial NOT NULL,
-  contractnumber character varying(50),
-  performer character varying(128),
-  customer character varying(128),
-  dateofconclusion timestamp with time zone,
-  dateofclosing timestamp with time zone,
-  contractstate integer NOT NULL DEFAULT 0,
-  CONSTRAINT cf_contracts_pk PRIMARY KEY (idofcontract )
-);
-
 CREATE TABLE cf_linking_tokens
 (
   IdOfLinkingToken   BIGSERIAL    NOT NULL,
