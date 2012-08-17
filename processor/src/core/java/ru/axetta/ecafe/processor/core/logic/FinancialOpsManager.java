@@ -184,40 +184,40 @@ public class FinancialOpsManager {
                 idOfPayment, contragent, addPaymentMethod, addIdOfPayment);
         registerClientPayment(session, clientPayment, client);
     }
-    public void createClientPaymentWithOrder(Long contragentSum,Session session,
+    public void createClientPaymentWithOrder(Session session,
             ClientPaymentOrder clientPaymentOrder,
             Client client,String addIdOfPayment) throws Exception {
         // регистрируем транзакцию и проводим по балансу
-       /// AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-              //  null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
-              //  AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, contragentSum, clientPaymentOrder.getIdOfPayment(),
+                null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
                 AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+
+        //AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+            //    null, contragentSum, clientPaymentOrder.getIdOfPayment(),
+            //    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
 
 
         // регистрируем платеж клиента
-        ClientPayment clientPayment= new ClientPayment(contragentSum,accountTransaction, clientPaymentOrder,new Date(),addIdOfPayment);
+        ClientPayment clientPayment= new ClientPayment(accountTransaction, clientPaymentOrder,new Date(),addIdOfPayment);
 
         registerClientPayment(session, clientPayment, client);
     }
 
-    public void createClientPaymentWithOrder(Long contragentSum,Session session,
+    public void createClientPaymentWithOrder(Session session,
             ClientPaymentOrder clientPaymentOrder,
             Client client) throws Exception {
         // регистрируем транзакцию и проводим по балансу
-        /// AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-        //  null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
-        //  AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+          null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
+          AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
 
-        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, contragentSum, clientPaymentOrder.getIdOfPayment(),
-                AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+        //AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+           //     null, contragentSum, clientPaymentOrder.getIdOfPayment(),
+             //   AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
 
 
         // регистрируем платеж клиента
-        ClientPayment clientPayment= new ClientPayment(contragentSum,accountTransaction, clientPaymentOrder,
+        ClientPayment clientPayment= new ClientPayment(accountTransaction, clientPaymentOrder,
                     new Date());
 
         registerClientPayment(session, clientPayment, client);

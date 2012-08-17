@@ -78,7 +78,7 @@ public class Processor implements SyncProcessor,
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
                         idOfContragent, clientPaymentOrder));
             }
-            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
+            if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
                 logger.warn(
                         String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
                 //throw new IllegalArgumentException(
@@ -99,7 +99,7 @@ public class Processor implements SyncProcessor,
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client, addIdOfPayment);
+                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client, addIdOfPayment);
                 }
             }
 
@@ -2010,7 +2010,7 @@ persistenceSession.save(menuDetail);
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
                         idOfContragent, clientPaymentOrder));
             }
-            if (!contragentSum.equals(clientPaymentOrder.getPaySum())) {
+            if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
                 logger.warn(
                         String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
                 //throw new IllegalArgumentException(
@@ -2031,7 +2031,7 @@ persistenceSession.save(menuDetail);
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(contragentSum,persistenceSession, clientPaymentOrder, client);
+                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client);
                 }
             }
 

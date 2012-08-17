@@ -77,10 +77,10 @@ public class ClientPayment {
         this.clientPaymentOrder = clientPaymentOrder;
     }
 
-    public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime, String addIdOfPayment) {
+    public ClientPayment( AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime, String addIdOfPayment) {
         this.transaction = transaction;
         this.paymentMethod = clientPaymentOrder.getPaymentMethod();
-        this.paySum = contragentSum;
+        this.paySum = clientPaymentOrder.getPaySum();
         this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
         this.createTime = createTime;
         this.idOfPayment = clientPaymentOrder.getIdOfPayment();
