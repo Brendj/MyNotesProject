@@ -127,21 +127,23 @@ public class DistributionManager {
             try{
                 distributedObjectList = DAOService.getInstance()
                         .getDistributedObjects(array[i].getValue(), currentMaxVersions.get(name), idOfOrg);
-            } catch (DistributedObjectException e){
-                Element element = document.createElement(array[i].name());
-                element.setAttribute("errorType",String.valueOf(e.getType()));
-                elementRO.appendChild(element);
+            } catch (Exception e){
+                if (e instanceof DistributedObjectException) {
+                    Element element = document.createElement(array[i].name());
+                    element.setAttribute("errorType",String.valueOf(((DistributedObjectException) e).getType()));
+                    elementRO.appendChild(element);
+                }
                 continue;
             }
-            if (!distributedObjectList.isEmpty()) {
+            if (!(distributedObjectList==null || distributedObjectList.isEmpty())) {
                 distributedObjects.addAll(distributedObjectList);
-            }
-            for (DistributedObject distributedObject: distributedObjectList) {
-                DOConfirm confirm = new DOConfirm();
-                confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-                confirm.setGuid(distributedObject.getGuid());
-                confirm.setOrgOwner(idOfOrg);
-                DAOService.getInstance().persistEntity(confirm);
+                for (DistributedObject distributedObject: distributedObjectList) {
+                    DOConfirm confirm = new DOConfirm();
+                    confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+                    confirm.setGuid(distributedObject.getGuid());
+                    confirm.setOrgOwner(idOfOrg);
+                    DAOService.getInstance().persistEntity(confirm);
+                }
             }
 
             List<String> guidList = DAOService.getInstance().getGUIDsInConfirms(name, idOfOrg);
@@ -183,11 +185,8 @@ public class DistributionManager {
             throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         try {
-            //DOVersion doVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
-            //long currentMaxVersion = doVersion.getCurrentVersion();
             Long currentMaxVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
-
             DistributedObjectProcessor distributedObjectProcessor = DistributedObjectProcessor.getInstance();
             for (DistributedObject distributedObject : distributedObjects) {
                 distributedObjectProcessor.process(distributedObject, currentMaxVersion, idOfOrg, getSimpleDocument());

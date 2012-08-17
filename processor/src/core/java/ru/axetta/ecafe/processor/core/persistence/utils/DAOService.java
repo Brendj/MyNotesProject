@@ -131,10 +131,9 @@ public class DAOService {
             if(configurationProvider==null){
                 TypedQuery<MenuExchangeRule> queryMER = em.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg",MenuExchangeRule.class);
                 queryMER.setParameter("idOfOrg",orgOwner);
-                queryMER.setMaxResults(1);
-                MenuExchangeRule menuExchangeRule = queryMER.getSingleResult();
-                if(menuExchangeRule != null){
-                    Org sourceOrg = em.find(Org.class, menuExchangeRule.getIdOfSourceOrg());
+                List<MenuExchangeRule> menuExchangeRule = queryMER.getResultList();
+                if(!(menuExchangeRule == null || menuExchangeRule.isEmpty() || menuExchangeRule.get(0)==null)){
+                    Org sourceOrg = em.find(Org.class, menuExchangeRule.get(0).getIdOfSourceOrg());
                     if(sourceOrg != null){
                         configurationProvider = sourceOrg.getConfigurationProvider();
                     }

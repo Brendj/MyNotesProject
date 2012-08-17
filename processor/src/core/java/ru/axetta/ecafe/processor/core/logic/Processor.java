@@ -340,7 +340,9 @@ public class Processor implements SyncProcessor,
 
                 // Process Distribution Manager
                 try {
-                    distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
+                    if(request.getDistributionManager() != null){
+                        distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
+                    }
                 } catch (Exception e) {
                     logger.error(
                             String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
