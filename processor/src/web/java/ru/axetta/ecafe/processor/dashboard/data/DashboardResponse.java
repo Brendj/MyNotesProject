@@ -38,6 +38,7 @@ public class DashboardResponse {
         double numberOfReducedPriceMealsPerNumOfStudents;
 
         String error;
+        Date timestamp;
 
         public long getIdOfOrg() {
             return idOfOrg;
@@ -141,6 +142,14 @@ public class DashboardResponse {
 
         public void setError(String error) {
             this.error = error;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
         }
     }
 

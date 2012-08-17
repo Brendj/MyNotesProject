@@ -420,12 +420,12 @@ public class Org {
         this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
     }
 
-    private Set<SyncHistory> getSyncHistoriesInternal() {
+    public Set<SyncHistory> getSyncHistoriesInternal() {
         // For Hibernate only
         return syncHistories;
     }
 
-    private void setSyncHistoriesInternal(Set<SyncHistory> syncHistories) {
+    public void setSyncHistoriesInternal(Set<SyncHistory> syncHistories) {
         // For Hibernate only
         this.syncHistories = syncHistories;
     }

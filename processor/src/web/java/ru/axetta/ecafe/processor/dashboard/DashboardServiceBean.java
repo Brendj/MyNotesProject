@@ -59,7 +59,7 @@ public class DashboardServiceBean {
                             + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
                             + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
                             + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
-                            + "FROM Org org LEFT OUTER JOIN org.syncHistories sh GROUP BY org");
+                            + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh GROUP BY org");
 
             query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
             query.setParameter("studentsMinValue", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
@@ -84,10 +84,13 @@ public class DashboardServiceBean {
             query.setParameter("dayEnd", dayEndDate);
 
             List queryResult = query.getResultList();
+            Date timestamp = new Date();
+
             List<DashboardResponse.EduInstItemInfo> eduInstItemInfoList = dashboardResponse.getEduInstItemInfoList();
             for (Object object : queryResult) {
                 DashboardResponse.EduInstItemInfo eduInstItemInfo = new DashboardResponse.EduInstItemInfo();
                 try {
+                    eduInstItemInfo.setTimestamp(timestamp);
                     Object[] result = (Object[]) object;
 
                     eduInstItemInfo.setIdOfOrg((Long) result[0]);
@@ -147,10 +150,10 @@ public class DashboardServiceBean {
         Calendar dayStart = Calendar.getInstance();
         dayStart.set(year, month, dom, 0, 0, 0);
 
-        Date dayStartDate = dayStart.getTime();        
+        Date dayStartDate = dayStart.getTime();
         return dayStartDate;
     }
-    
+
     private Date getCurrentDayEndTime(Calendar currentTimeStamp) {
         int month = currentTimeStamp.get(Calendar.MONTH);
         int year = currentTimeStamp.get(Calendar.YEAR);
@@ -174,7 +177,7 @@ public class DashboardServiceBean {
                             + "(SELECT count(clientPayment) FROM clientPayment WHERE clientPayment.createTime BETWEEN :dayStart AND :dayEnd) "
                             + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPayments clientPayment GROUP BY contragent.idOfContragent");
 
-            
+
             Calendar currentTimeStamp = Calendar.getInstance();
             Date dayStart = getCurrentDayStartTime(currentTimeStamp);
             Date dayEnd = getCurrentDayEndTime(currentTimeStamp);
