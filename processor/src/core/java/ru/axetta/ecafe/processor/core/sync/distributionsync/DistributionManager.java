@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +82,7 @@ public class DistributionManager {
      * @param document выходной xml документ
      * @return элемент <RO> выходного xml документа
      */
-    public Element toElement(Document document, Long idOfOrg) throws Exception {
+    public Element toElement(Document document, Long idOfOrg, DateFormat dateFormat,DateFormat timeFormat) throws Exception {
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
@@ -168,6 +169,8 @@ public class DistributionManager {
                 elementMap.put(tagName, distributedObjectElement);
             }
             Element element = document.createElement("O");
+            distributedObject.setDateFormat(dateFormat);
+            distributedObject.setTimeFormat(timeFormat);
             elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
 
@@ -222,7 +225,7 @@ public class DistributionManager {
      * @param node Элемент <Pr>
      * @throws Exception
      */
-    public void build(Node node, Long idOfOrg) throws Exception {
+    public void build(Node node, Long idOfOrg, DateFormat dateFormat,DateFormat timeFormat) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             if(node.getNodeName().equals("Confirm")){
                 Node childNode = node.getFirstChild();
@@ -240,7 +243,8 @@ public class DistributionManager {
                         DistributedObject distributedObject = createDistributedObject(currentObject);
                         distributedObject = distributedObject.build(node);
                         distributedObject.setOrgOwner(idOfOrg);
-
+                        distributedObject.setDateFormat(dateFormat);
+                        distributedObject.setTimeFormat(timeFormat);
                         if (!distributedObjectsListMap.containsKey(currentObject)) {
                             distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
                         }

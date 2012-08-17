@@ -6,11 +6,12 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" table="cf_technological_map_products">
-        <id name="globalId" column="IdOfTechnoMapProducts" type="long">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" table="cf_technological_map">
+        <id name="globalId" column="idOfTechnologicalMaps" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
+
         <property name="globalVersion" column="GlobalVersion" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
@@ -22,18 +23,47 @@
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <!-- End Global params -->
+        <!--   <property name="groupName" column="GroupName" type="string" length="512"/>-->
 
-        <property name="grossWeight" column="GrossWeight" type="integer" />
-        <property name="netWeight" column="NetWeight" type="integer" />
+        <property name="nameOfTechnologicalMap" column="NameOfTechnologicalMap" type="string" length="128" />
+        <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="long"/>
+        <property name="technologyOfPreparation" column="TechnologyOfPreparation" type="string" length="4096" />
+        <property name="tempOfPreparation" column="TempOfPreparation" type="string" length="128" />
+
+
+        <property name="energyValue" column="EnergyValue" type="float" />
+        <property name="proteins" column="Proteins" type="float" />
+        <property name="carbohydrates" column="Carbohydrates" type="float" />
+        <property name="fats" column="Fats" type="float" />
+
+        <property name="microElCa" column="MicroElCa" type="float" />
+        <property name="microElMg" column="MicroElMg" type="float" />
+        <property name="microElP" column="MicroElP" type="float" />
+        <property name="microElFe" column="MicroElFe" type="float" />
+
+        <property name="vitaminA" column="VitaminA" type="float" />
+        <property name="vitaminB1" column="VitaminB1" type="float" />
+        <property name="vitaminB2" column="VitaminB2" type="float" />
+        <property name="vitaminPp" column="VitaminPp" type="float" />
+        <property name="vitaminC" column="VitaminC" type="float" />
+        <property name="vitaminE" column="VitaminE" type="float" />
 
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select" lazy="false">
-            <column name="idOfTechnologicalMaps" not-null="true" />
+        <many-to-one name="technologicalMapGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup" fetch="select" lazy="false">
+            <column name="IdOfTechMapGroups" not-null="true" />
         </many-to-one>
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" fetch="select" unique="true" lazy="false">
-            <column name="idOfProducts" not-null="true" />
-        </many-to-one>
+
+        <set name="technologicalMapProductInternal" cascade="delete">
+            <key>
+                <column name="idOfTechnologicalMaps"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" />
+        </set>
+
+        <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
+        <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
 
     </class>
 </hibernate-mapping>

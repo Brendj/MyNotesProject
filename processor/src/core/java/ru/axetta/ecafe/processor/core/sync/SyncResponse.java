@@ -1883,8 +1883,6 @@ public class SyncResponse {
         return distributionManager;
     }
 
-    public OrgOwnerData
-
     @Override
     public String toString() {
         return "SyncResponse{" + "idOfOrg=" + idOfOrg + ", idOfPacket=" + idOfPacket + ", protoVersion=" + protoVersion
