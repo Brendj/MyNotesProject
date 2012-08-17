@@ -5,7 +5,15 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+
+import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
+import ru.axetta.ecafe.processor.core.client.RequestWebParam;
+import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
+
+
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
+import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
+import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation;
@@ -370,6 +378,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
         /* Официальное наименование Учебного учереждения */
         clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
+       // Новые параметры:
+        String phone=client.getPhone();
+        if(phone!=null){
+        clientSummaryExt.setPhone(phone);   }
+
+        String address=client.getAddress();
+        if(address!=null){
+        clientSummaryExt.setAddress(address); }
+
+
+
+        clientSummaryExt.setLimit(client.getLimit());
+
+        Integer freePayCount =client.getFreePayCount();
+        if(freePayCount!=null){
+        clientSummaryExt.setFreePayCount(client.getFreePayCount());  }
+
+         Integer freePayMaxCount=client.getFreePayMaxCount();
+        if(freePayMaxCount!=null){
+        clientSummaryExt.setFreePayMaxCount(client.getFreePayMaxCount());  }
+
+         Date lastFreePayTime=client.getLastFreePayTime();
+
+        if(lastFreePayTime!=null){
+        GregorianCalendar greLastFreePayTime = new GregorianCalendar();
+        greLastFreePayTime.setTime(lastFreePayTime);
+        XMLGregorianCalendar xmlLastFreePayTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greLastFreePayTime);
+
+        clientSummaryExt.setLastFreePayTime(xmlLastFreePayTime); }
+
+
+        clientSummaryExt.setDiscountMode(client.getDiscountMode());
+
+
         data.setClientSummaryExt(clientSummaryExt);
     }
 
@@ -435,7 +477,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (order.getCard() == null)
                 purchaseExt.setIdOfCard(null);
             else
-                purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
+                purchaseExt.setIdOfCard(order.getCard().getIdOfCard());
+            //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
             purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
 
             Set<OrderDetail> orderDetailSet=((Order) o).getOrderDetails();
@@ -683,6 +726,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cardItem.setIdOfCard(card.getIdOfCard());
             cardItem.setLifeState(card.getLifeState());
             cardItem.setExpiryDate(toXmlDateTime(card.getValidTime()));
+
             cardList.getC().add(cardItem);
         }
         data.setCardList(cardList);
@@ -1121,6 +1165,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
+
+
     @Override
     public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, int state) {
         authenticateRequest(contractId);
@@ -1412,6 +1458,432 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return linkConfig;
     }
+
+    @Override
+    public Result changePassword(@WebParam(name = "contractId") Long contractId, @WebParam(name="base64passwordHash")  String base64passwordHash) {
+
+        authenticateRequest(contractId);
+
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        if (!DAOService.getInstance().setClientPassword(contractId, base64passwordHash)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+      @Override
+    public SendResult sendPasswordRecoverURLFromEmail(@WebParam(name="contractId") Long contractId,@WebParam(name="request")RequestWebParam request){
+          ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
+           SendResult sr=new SendResult();
+          sr.resultCode=RC_OK;
+          sr.description=RC_OK_DESC;
+          try{
+          int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,request);
+                 sr.recoverStatus=succeeded;
+
+          }catch(Exception e){
+              logger.error(e.getMessage(),e);
+              sr.resultCode=RC_INTERNAL_ERROR;
+              sr.description=RC_INTERNAL_ERROR_DESC;
+
+
+          }
+           return sr;
+      }
+
+    @Override
+    public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name="request")RequestWebParam request){
+        ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
+        CheckPasswordResult cpr=new CheckPasswordResult();
+        cpr.resultCode=RC_OK;
+        cpr.description=RC_OK_DESC;
+           try{
+          boolean succeeded=clientPasswordRecover.checkPasswordRestoreRequest(request);
+               cpr.succeeded=succeeded;
+           }catch (Exception e){
+               logger.error(e.getMessage(),e);
+               cpr.resultCode=RC_INTERNAL_ERROR;
+               cpr.description=RC_INTERNAL_ERROR_DESC;
+
+           }
+        return cpr;
+    }
+     @Override
+    public IdResult getIdOfClient(@WebParam(name="contractId")Long contractId){
+         Long idOfClient = null;
+
+
+         Session persistenceSession = null;
+         org.hibernate.Transaction persistenceTransaction = null;
+
+         IdResult r=new IdResult();
+         r.resultCode=RC_OK;
+         r.description=RC_OK_DESC;
+
+
+         try {
+             RuntimeContext runtimeContext = null;
+
+             runtimeContext = RuntimeContext.getInstance();
+
+             persistenceSession = runtimeContext.createPersistenceSession();
+             persistenceTransaction = persistenceSession.beginTransaction();
+
+             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+             clientCriteria.add(Restrictions.eq("contractId", contractId));
+             Client client = (Client) clientCriteria.uniqueResult();
+             idOfClient = client.getIdOfClient();
+
+
+              r.id=idOfClient;
+             persistenceSession.flush();
+             persistenceTransaction.commit();
+             persistenceTransaction = null;
+         } catch (Exception e) {
+             logger.error(e.getMessage(),e);
+             r.resultCode=RC_INTERNAL_ERROR;
+             r.description=RC_INTERNAL_ERROR_DESC;
+         } finally {
+             HibernateUtils.rollback(persistenceTransaction, logger);
+             HibernateUtils.close(persistenceSession, logger);
+         }
+        return r;
+
+     }
+
+    public IdResult getIdOfContragent(@WebParam(name="contragentName")String contragentName){
+
+
+        Long idOfContragent = null;
+
+        Session persistenceSession = null;
+        org.hibernate.Transaction persistenceTransaction = null;
+
+        IdResult r=new IdResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+
+        try {
+            RuntimeContext runtimeContext = null;
+
+            runtimeContext = RuntimeContext.getInstance();
+
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+
+
+            Criteria contragentCriteria = persistenceSession.createCriteria(Contragent.class);
+            contragentCriteria.add(Restrictions.eq("contragentName", contragentName));
+            Contragent contragent = (Contragent) contragentCriteria.uniqueResult();
+            idOfContragent = contragent.getIdOfContragent();
+
+            r.id=idOfContragent;
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            r.resultCode=RC_INTERNAL_ERROR;
+            r.description=RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return r;
+    }
+    @Override
+    public IdResult createPaymentOrder(@WebParam(name="idOfClient")Long idOfClient,
+            @WebParam(name="idOfContragent")Long idOfContragent,
+            @WebParam(name="paymentMethod")int paymentMethod,
+            @WebParam(name="copecksAmount")Long copecksAmount,
+            @WebParam(name="contragentSum")Long contragentSum){
+        IdResult r=new IdResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+
+
+        try{
+        RuntimeContext runtimeContext = null;
+
+        runtimeContext = RuntimeContext.getInstance();
+        Long idOfClientPaymentOrder = runtimeContext.getClientPaymentOrderProcessor()
+                .createPaymentOrder(idOfClient, idOfContragent, paymentMethod, copecksAmount, contragentSum);
+         r.id=idOfClientPaymentOrder;
+
+        }catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            r.resultCode=RC_INTERNAL_ERROR;
+            r.description=RC_INTERNAL_ERROR_DESC;
+
+        }
+       return r;
+    }
+
+
+    @Override
+    public Result changePaymentOrderStatus(@WebParam(name="idOfClient")Long idOfClient,
+            @WebParam(name="idOfClientPaymentOrder")Long idOfClientPaymentOrder,
+            @WebParam(name="orderStatus") int orderStatus){
+
+        Result r = new Result();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        RuntimeContext runtimeContext = null;
+
+        runtimeContext = RuntimeContext.getInstance();
+        ClientPaymentOrderProcessor clientPaymentOrderProcessor = runtimeContext.getClientPaymentOrderProcessor();
+        try {
+            clientPaymentOrderProcessor.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder,
+                    ClientPaymentOrder.ORDER_STATUS_CANCELLED);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            r.resultCode=RC_INTERNAL_ERROR;
+            r.description=RC_INTERNAL_ERROR_DESC;
+    }
+    return r;
+
+}
+    @Override
+    public RBKMoneyConfigResult getRBKMoneyConfig(){
+        RuntimeContext runtimeContext = null;
+        RBKMoneyConfigResult r=new RBKMoneyConfigResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        runtimeContext = RuntimeContext.getInstance();
+        RBKMoneyConfig rbkMoneyConfig = runtimeContext.getPartnerRbkMoneyConfig();
+        RBKMoneyConfigExt rbkMoneyConfigExt=new RBKMoneyConfigExt();
+        rbkMoneyConfigExt.setContragentName(rbkMoneyConfig.getContragentName());
+        rbkMoneyConfigExt.setEshopId(rbkMoneyConfig.getEshopId());
+        rbkMoneyConfigExt.setPurchaseUri(rbkMoneyConfig.getPurchaseUri().toString());
+        rbkMoneyConfigExt.setRate(rbkMoneyConfig.getRate());
+        rbkMoneyConfigExt.setSecretKey(rbkMoneyConfig.getSecretKey());
+        rbkMoneyConfigExt.setServiceName(rbkMoneyConfig.getServiceName());
+        rbkMoneyConfigExt.setShow(rbkMoneyConfig.getShow());
+        r.rbkConfig=rbkMoneyConfigExt;
+        return r;
+
+    }
+
+    @Override
+    public ChronopayConfigResult getChronopayConfig(){
+        RuntimeContext runtimeContext = null;
+        ChronopayConfigResult r=new ChronopayConfigResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        runtimeContext = RuntimeContext.getInstance();
+        ChronopayConfig chronopayConfig = runtimeContext.getPartnerChronopayConfig();
+        ChronopayConfigExt chronopayConfigExt=new ChronopayConfigExt();
+        chronopayConfigExt.setCallbackUrl(chronopayConfig.getCallbackUrl());
+        chronopayConfigExt.setContragentName(chronopayConfig.getContragentName());
+        chronopayConfigExt.setIp(chronopayConfig.getIp());
+        chronopayConfigExt.setPurchaseUri(chronopayConfig.getPurchaseUri());
+        chronopayConfigExt.setRate(chronopayConfig.getRate());
+        chronopayConfigExt.setSharedSec(chronopayConfig.getSharedSec());
+        chronopayConfigExt.setShow(chronopayConfig.getShow());
+
+        r.chronopayConfig=chronopayConfigExt;
+        return r;
+
+    }
+    @Override
+   public  ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate){
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        org.hibernate.Transaction persistenceTransaction = null;
+
+         ClientSmsListResult r=new ClientSmsListResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+
+            Date nextToEndDate = DateUtils.addDays(endDate, 1);
+
+
+            Criteria clientSmsCriteria = persistenceSession.createCriteria(ClientSms.class);
+            clientSmsCriteria.add(Restrictions.ge("serviceSendTime", startDate));
+            clientSmsCriteria.add(Restrictions.lt("serviceSendTime", nextToEndDate));
+            clientSmsCriteria.add(Restrictions.eq("client", client));
+            List clientSmsList = clientSmsCriteria.list();
+               ClientSmsList clientSmsListR=new ClientSmsList();
+
+               for(Object clientSmsObject:clientSmsList){
+                   ClientSms clientSms=(ClientSms)clientSmsObject;
+                   AccountTransaction accountTransaction = clientSms.getTransaction();
+
+                   Sms sms=new Sms();
+
+                   sms.setDeliveryStatus(clientSms.getDeliveryStatus());
+                   sms.setPrice(clientSms.getPrice());
+
+                   sms.setContentsType(clientSms.getContentsType());
+
+                   GregorianCalendar greSendTime = new GregorianCalendar();
+                   greSendTime.setTime(clientSms.getServiceSendTime());
+                   XMLGregorianCalendar xmlSendTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greSendTime);
+
+                   sms.setServiceSendTime(xmlSendTime);
+
+                   Long transactionSum = 0L;
+                   if (null != accountTransaction) {
+                       transactionSum = accountTransaction.getTransactionSum();
+                   }
+
+                   sms.setTransactionSum(transactionSum);
+
+                   if (null != accountTransaction) {
+                       Card card = accountTransaction.getCard();
+                       if (null != card) {
+
+                      sms.setCardNo(card.getCardNo());
+                       }
+                   }
+                  clientSmsListR.getS().add(sms);
+
+
+               }   r.clientSmsList=clientSmsListR;
+
+        }catch(Exception e){
+            logger.error(e.getMessage(),e);
+            r.resultCode=RC_INTERNAL_ERROR;
+            r.description=RC_INTERNAL_ERROR_DESC;
+
+        }
+
+
+         return r;
+        }
+
+
+      @Override
+    public BanksData getBanks(){
+
+          BanksData bd=new BanksData();
+         bd.resultCode=RC_OK;
+         bd.description=RC_OK_DESC;
+          RuntimeContext runtimeContext = RuntimeContext.getInstance();
+          Session persistenceSession = null;
+          Transaction persistenceTransaction = null;
+
+            BanksList bankItemList =new BanksList();
+          try {
+              persistenceSession = runtimeContext.createPersistenceSession();
+              persistenceTransaction = persistenceSession.beginTransaction();
+              Criteria banksCriteria = persistenceSession.createCriteria(Bank.class);
+
+              List<Bank> banksList=(List<Bank>)banksCriteria.list();
+              //List<BankItem>banks=new ArrayList<BankItem>();
+              for(Bank bank:banksList){
+                  BankItem bankItem =new BankItem();
+                  bankItem.setEnrollmentType(bank.getEnrollmentType());
+                  bankItem.setLogoUrl(bank.getLogoUrl());
+                  bankItem.setMinRate(bank.getMinRate());
+                  bankItem.setName(bank.getName());
+                  bankItem.setTerminalsUrl(bank.getTerminalsUrl());
+                  bankItem.setRate(bank.getRate());
+                  bankItem.setIdOfBank(bank.getIdOfBank());
+
+                  bankItemList.getBanks().add(bankItem);
+              }
+
+               bd.banksList=bankItemList;
+
+              persistenceSession.flush();
+              persistenceTransaction.commit();
+              persistenceTransaction = null;
+
+
+
+
+          }catch(Exception e){
+           bd.resultCode=RC_INTERNAL_ERROR;
+           bd.description=RC_INTERNAL_ERROR_DESC;
+
+
+              logger.error(e.getMessage(),e);
+          }  finally {
+              HibernateUtils.rollback(persistenceTransaction, logger);
+              HibernateUtils.close(persistenceSession, logger);
+          }
+
+        return bd;
+
+      }
+
+    @Override
+    public Result changePersonalInfo(@WebParam(name="contractId") Long contractId,@WebParam(name="limit") Long limit,
+            @WebParam(name="address") String address,@WebParam(name="phone") String phone,@WebParam(name="mobilePhone") String mobilePhone,
+            @WebParam(name="email") String email,@WebParam(name="smsNotificationState") boolean smsNotificationState){
+
+        authenticateRequest(contractId);
+
+        Result r = new Result(RC_OK, RC_OK_DESC);
+
+        try{
+        DAOService daoService=DAOService.getInstance();
+
+
+         //change limit
+        if (limit<0) {
+            r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
+            return r;
+        }
+        if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+        }
+
+        //change email
+        if (!daoService.setClientEmail(contractId, email)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+
+        //change mobile phone
+        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+        if (mobilePhone==null) {
+            r.resultCode=RC_INVALID_DATA;
+            r.description="Неверный формат телефона";
+            return r;
+        }
+        if (!daoService.setClientMobilePhone(contractId, mobilePhone)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+
+        //enableNotificationBySms
+        if (!daoService.enableClientNotificationByEmail(contractId, smsNotificationState)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+       //change phone
+        if (!daoService.setClientPhone(contractId, phone)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+
+       //change address
+        if (!daoService.setClientAddress(contractId, address)) {
+            r.resultCode=RC_CLIENT_NOT_FOUND;
+            r.description=RC_CLIENT_NOT_FOUND_DESC;
+        }
+
+        }catch(Exception e){logger.error("error in changePersonalInfo: ",e);}
+        return r;
+    }
+
+
 
 
 }

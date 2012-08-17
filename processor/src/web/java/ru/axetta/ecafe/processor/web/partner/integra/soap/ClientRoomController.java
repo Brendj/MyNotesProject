@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 
 import javax.jws.WebMethod;
@@ -43,6 +44,10 @@ public interface ClientRoomController {
     PaymentListResult getPaymentList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPaymentListBySan")
     PaymentListResult getPaymentList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+
+     @WebMethod(operationName="getClientSmsList")
+    ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate);
+
     @WebMethod (operationName = "getMenuList")
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getMenuListBySan")
@@ -81,7 +86,8 @@ public interface ClientRoomController {
     public Result changeEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="email") String email);
     @WebMethod
     public Result changeExpenditureLimit(@WebParam(name="contractId") Long contractId, @WebParam(name="limit") long limit);
-
+    @WebMethod
+    public Result changePassword(@WebParam(name="contractId") Long contractId, @WebParam(name="base64passwordHash")  String base64passwordHash);
     @WebMethod
     public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, @WebParam(name="state") int state);
 
@@ -96,4 +102,40 @@ public interface ClientRoomController {
     public Result sendLinkingTokenByMobile(@WebParam(name="mobilePhone") String mobilePhone);
     @WebMethod
     public GenerateLinkingTokenResult generateLinkingToken(@WebParam(name="contractId") Long contractId);
+
+    @WebMethod
+    public SendResult sendPasswordRecoverURLFromEmail(@WebParam(name="contractId") Long contractId,@WebParam(name="request")RequestWebParam request);
+    @WebMethod
+    public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name="request")RequestWebParam request);
+     @WebMethod
+    public IdResult getIdOfClient(@WebParam(name="contractId")Long contractId);
+     @WebMethod
+    public IdResult getIdOfContragent(@WebParam(name="contragentName")String contragentName);
+      @WebMethod
+    public IdResult createPaymentOrder(@WebParam(name="idOfClient")Long idOfClient,
+              @WebParam(name="idOfContragent")Long idOfContragent,
+              @WebParam(name="paymentMethod")int paymentMethod,
+              @WebParam(name="copecksAmount")Long copecksAmount,
+              @WebParam(name="contragentSum")Long contragentSum);
+
+    @WebMethod
+    public Result changePaymentOrderStatus(@WebParam(name="idOfClient")Long idOfClient,
+            @WebParam(name="idOfClientPaymentOrder")Long idOfClientPaymentOrder,
+             @WebParam(name="orderStatus") int orderStatus);
+     @WebMethod
+    public RBKMoneyConfigResult getRBKMoneyConfig();
+
+    @WebMethod
+    public ChronopayConfigResult getChronopayConfig();
+
+     @WebMethod
+    public BanksData getBanks();
+
+    @WebMethod (operationName = "changePersonalInfo")
+    public Result changePersonalInfo(@WebParam(name="contractId") Long contractId,@WebParam(name="limit") Long limit,
+           @WebParam(name="address") String address,@WebParam(name="phone") String phone,@WebParam(name="mobilePhone") String mobilePhone,
+           @WebParam(name="email") String email,@WebParam(name="smsNotificationState") boolean smsNotificationState);
+
+
+
 }
