@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.banks;
 
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,31 +26,29 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class BankListPage extends AbstractListPage<Bank> {
+public class BankListPage extends BasicWorkspacePage{
 
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return entityManager;
+    protected List<Bank> entityList;
+
+    public void onShow() throws Exception {
+        fill();
     }
 
-    @Override
-    protected String getPageFileName() {
-        return "";
+    private void fill(){
+        entityList = entityManager.createQuery("from Bank order by id",Bank.class).getResultList();
     }
 
-    @Override
-    protected Class<Bank> getEntityClass() {
-        return Bank.class;
+    public List<Bank> getEntityList() {
+        return entityList;
     }
 
-    @Override
-    protected String getFilter() {
-        return "";
+    public void setEntityList(List<Bank> entityList) {
+        this.entityList = entityList;
     }
 
     @Transactional
