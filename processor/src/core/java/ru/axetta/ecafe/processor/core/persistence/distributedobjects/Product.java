@@ -30,9 +30,9 @@ public class Product extends DistributedObject implements IConfigProvider {
     private User userDelete;
     private Long idOfConfigurationProvider;
     private ProductGroup productGroup;
-    
     private String guidOfPG;
     private String classificationCode;
+    private float density;
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.
@@ -46,6 +46,7 @@ public class Product extends DistributedObject implements IConfigProvider {
         setAttribute(element,"Code", code);
         setAttribute(element,"OkpCode", okpCode);
         setAttribute(element,"OrgOwner", orgOwner);
+        setAttribute(element,"Density", density);
         //setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
         setAttribute(element,"ClassificationCode", classificationCode);
         setAttribute(element,"GuidOfPG", productGroup.getGuid());
@@ -64,6 +65,8 @@ public class Product extends DistributedObject implements IConfigProvider {
         if(stringProductName!=null) setProductName(stringProductName);
         String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
         if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
+        Float floatDensity = getFloatAttributeValue(node,"Density");
+        if(floatDensity!=null) setDensity(floatDensity);
         /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
         if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
         guidOfPG = getStringAttributeValue(node,"GuidOfPG",36);
@@ -85,16 +88,16 @@ public class Product extends DistributedObject implements IConfigProvider {
         setOkpCode (((Product) distributedObject).getOkpCode());
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
         setClassificationCode(((Product) distributedObject).getClassificationCode());
-
+        setDensity(((Product) distributedObject).getDensity());
     }
 
     public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
     }
+
     public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
         this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
-
     public String getCode() {
         return code;
     }
@@ -167,20 +170,27 @@ public class Product extends DistributedObject implements IConfigProvider {
         this.classificationCode = classificationCode;
     }
 
+    public float getDensity() {
+        return density;
+    }
+
+    public void setDensity(float density) {
+        this.density = density;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Product");
-        sb.append("{productName ='").append(productName).append('\'');
-        sb.append(", code ='").append(code).append('\'');
-        sb.append(", fullName ='").append(fullName).append('\'');
-        sb.append(", idOfConfigurationProvider =").append(idOfConfigurationProvider);
-        sb.append(", okpCode ='").append(okpCode).append('\'');
-        sb.append(", globalId ='").append(globalId).append('\'');
-        sb.append(", globalVersion ='").append(globalVersion).append('\'');
-        sb.append(", deletedState ='").append(deletedState).append('\'');
+        sb.append("{code='").append(code).append('\'');
+        sb.append(", fullName='").append(fullName).append('\'');
+        sb.append(", productName='").append(productName).append('\'');
+        sb.append(", okpCode='").append(okpCode).append('\'');
+        sb.append(", idOfConfigurationProvider=").append(idOfConfigurationProvider);
+        sb.append(", guidOfPG='").append(guidOfPG).append('\'');
+        sb.append(", classificationCode='").append(classificationCode).append('\'');
+        sb.append(", density=").append(density);
         sb.append('}');
         return sb.toString();
     }
-
 }

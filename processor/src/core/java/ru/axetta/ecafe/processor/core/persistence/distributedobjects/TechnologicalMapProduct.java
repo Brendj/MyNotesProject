@@ -19,40 +19,19 @@ import org.w3c.dom.Node;
  */
 public class TechnologicalMapProduct extends DistributedObject implements IConfigProvider {
 
-    //Масса брутто, г
-    private double grossWeight;
-
-    //Масса нетто, г
-    private double netWeight;
-
-    private TechnologicalMap technologicalMap;
-
-    private Product product;
-
-    private String guidOfP;
-    private String guidOfTM;
-    private Long idOfConfigurationProvider;
-
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
-    //Наименование продукта вытягивается из таблицы продуктов
-    //private String nameOfProduct;
-
     @Override
     public void fill(DistributedObject distributedObject) {
+        //setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
         setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
     }
 
+
     @Override
     protected void appendAttributes(Element element) {
+        //setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GWeight", grossWeight);
         setAttribute(element, "NWeight", netWeight);
         setAttribute(element, "GuidOfP", product.getGuid());
@@ -61,15 +40,16 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     protected TechnologicalMapProduct parseAttributes(Node node) {
-
-        Float floatGrossMass = getFloatAttributeValue(node, "GWeight");
-        if (floatGrossMass != null) {
-            setGrossWeight(floatGrossMass);
+        //Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        //if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        Integer integerGrossMass = getIntegerAttributeValue(node, "GWeight");
+        if (integerGrossMass != null) {
+            setGrossWeight(integerGrossMass);
         }
 
-        Float floatNetMass = getFloatAttributeValue(node, "NWeight");
-        if (floatNetMass != null) {
-            setNetWeight(floatNetMass);
+        Integer integerNetMass = getIntegerAttributeValue(node, "NWeight");
+        if (integerNetMass != null) {
+            setNetWeight(integerNetMass);
         }
 
         guidOfP = getStringAttributeValue(node, "GuidOfP", 36);
@@ -86,6 +66,21 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         setTechnologicalMap(tm);
     }
 
+    //Масса брутто, г
+    private Integer grossWeight;
+
+    //Масса нетто, г
+    private Integer netWeight;
+
+    private TechnologicalMap technologicalMap;
+
+    private Product product;
+
+    private String guidOfP;
+    private String guidOfTM;
+    private Long idOfConfigurationProvider;
+
+
     public Product getProduct() {
         return product;
     }
@@ -101,29 +96,29 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     public void setTechnologicalMap(TechnologicalMap technologicalMap) {
         this.technologicalMap = technologicalMap;
     }
-    /*
-    public String getNameOfProduct() {
-        return nameOfProduct;
-    }
 
-    public void setNameOfProduct(String nameOfProduct) {
-        this.nameOfProduct = nameOfProduct;
-    }*/
-
-    public double getNetWeight() {
+    public Integer getNetWeight() {
         return netWeight;
     }
 
-    public void setNetWeight(double netWeight) {
+    public void setNetWeight(Integer netWeight) {
         this.netWeight = netWeight;
     }
 
-    public double getGrossWeight() {
+    public Integer getGrossWeight() {
         return grossWeight;
     }
 
-    public void setGrossWeight(double grossWeight) {
+    public void setGrossWeight(Integer grossWeight) {
         this.grossWeight = grossWeight;
+    }
+
+    public Long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
 }

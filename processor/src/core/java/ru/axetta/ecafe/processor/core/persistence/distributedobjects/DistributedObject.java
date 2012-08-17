@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -27,8 +28,6 @@ public abstract class DistributedObject{
     protected Long globalId;
     /* версия объекта */
     protected Long globalVersion;
-    /* Идентификатор организации */
-    protected Long orgOwner;
      /* дата создания объекта */
     protected Date createdDate;
     /* дата мзминения объекта */
@@ -41,7 +40,11 @@ public abstract class DistributedObject{
     protected String tagName;
     /* GUID объекта */
     protected String guid;
-    
+    /* Идентификатор организации */
+    protected Long orgOwner;
+
+    private DateFormat dateFormat;
+    private DateFormat timeFormat;
     /* Node для последующего разбора */
     private Node node;
 
@@ -106,6 +109,11 @@ public abstract class DistributedObject{
         }
     }
 
+    protected Date getDateAttributeValue(Node node, String attributeName)  throws ParseException{
+        if(getAttributeValue(node, attributeName)==null) return null;
+        return dateFormat.parse(getAttributeValue(node,attributeName));
+    }
+
     protected String getStringAttributeValue(Node node, String attributeName,Integer length){
         if(getAttributeValue(node, attributeName)==null) return null;
         String result = getAttributeValue(node, attributeName);
@@ -158,6 +166,13 @@ public abstract class DistributedObject{
     }
 
     /* Getters and Setters */
+    public Long getOrgOwner() {
+        return orgOwner;
+    }
+
+    public void setOrgOwner(Long orgOwner) {
+        this.orgOwner = orgOwner;
+    }
     public String getTagName() {
         return tagName;
     }
@@ -190,14 +205,6 @@ public abstract class DistributedObject{
         this.globalVersion = globalVersion;
     }
 
-    public Long getOrgOwner() {
-        return orgOwner;
-    }
-
-    public void setOrgOwner(Long orgOwner) {
-        this.orgOwner = orgOwner;
-    }
-
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -228,6 +235,22 @@ public abstract class DistributedObject{
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public DateFormat getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(DateFormat dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public DateFormat getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(DateFormat timeFormat) {
+        this.timeFormat = timeFormat;
     }
 
     @Override

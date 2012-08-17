@@ -34,9 +34,6 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     // Температура приготовления
     private String tempOfPreparation;
 
-    //Срок реализации в часах
-    private String termOfRealization;
-
     // В 100 граммах данного блюда содержится:
     //Пищевые вещества, г
     private Float proteins;
@@ -70,6 +67,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     private User userEdit;
 
     private String guidOfTMG;
+    private int lifeTime;
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -78,7 +76,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         setNumberOfTechnologicalMap(((TechnologicalMap) distributedObject).getNumberOfTechnologicalMap());
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
         setTempOfPreparation(((TechnologicalMap) distributedObject).getTempOfPreparation());
-        setTermOfRealization(((TechnologicalMap) distributedObject).getTermOfRealization());
+        setLifeTime(((TechnologicalMap) distributedObject).getLifeTime());
 
         setEnergyValue(((TechnologicalMap) distributedObject).getEnergyValue());
         setProteins(((TechnologicalMap) distributedObject).getProteins());
@@ -104,8 +102,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         setAttribute(element, "Number", numberOfTechnologicalMap);
         setAttribute(element, "Technology", technologyOfPreparation);
         setAttribute(element, "TempPreparation", tempOfPreparation);
-        setAttribute(element, "TermRealization", termOfRealization);
-
+        setAttribute(element, "LifeTime", lifeTime);
         /* setAttribute(element,"GroupName", groupName);*/
 
         setAttribute(element, "Energy", energyValue);
@@ -153,6 +150,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
             setNumberOfTechnologicalMap(numberOfTechnologicalMap);
         }
 
+
         String stringTechnologyOfPreparation = getStringAttributeValue(node, "Technology", 4096);
         if (stringTechnologyOfPreparation != null) {
             setTechnologyOfPreparation(stringTechnologyOfPreparation);
@@ -163,9 +161,9 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
             setTempOfPreparation(stringTempOfPreparation);
         }
 
-        String stringTermOfRealization = getStringAttributeValue(node, "TermOfRealization", 128);
-        if (stringTermOfRealization != null) {
-            setTermOfRealization(stringTermOfRealization);
+        Integer integerLifeTime = getIntegerAttributeValue(node, "LifeTime");
+        if (integerLifeTime != null) {
+            setLifeTime(integerLifeTime);
         }
 
         Float floatEnergyValue = getFloatAttributeValue(node, "Energy");
@@ -319,14 +317,6 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     public void setTimeOfRealization(String timeOfRealization) {
         this.timeOfRealization = timeOfRealization;
-    }
-
-    public String getTermOfRealization() {
-        return termOfRealization;
-    }
-
-    public void setTermOfRealization(String termOfRealization) {
-        this.termOfRealization = termOfRealization;
     }
 
     public Float getProteins() {
@@ -488,18 +478,25 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         this.technologicalMapGroup = technologicalMapGroup;
     }
 
+    public int getLifeTime() {
+        return lifeTime;
+    }
+
+    public void setLifeTime(int lifeTime) {
+        this.lifeTime = lifeTime;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("TechnologicalMap");
-        sb.append("{carbohydrates=").append(carbohydrates);
-        sb.append(", nameOfTechnologicalMap='").append(nameOfTechnologicalMap).append('\'');
+        sb.append("{nameOfTechnologicalMap='").append(nameOfTechnologicalMap).append('\'');
         sb.append(", numberOfTechnologicalMap=").append(numberOfTechnologicalMap);
         sb.append(", technologyOfPreparation='").append(technologyOfPreparation).append('\'');
         sb.append(", timeOfRealization='").append(timeOfRealization).append('\'');
         sb.append(", tempOfPreparation='").append(tempOfPreparation).append('\'');
-        sb.append(", termOfRealization='").append(termOfRealization).append('\'');
         sb.append(", proteins=").append(proteins);
+        sb.append(", carbohydrates=").append(carbohydrates);
         sb.append(", fats=").append(fats);
         sb.append(", microElCa=").append(microElCa);
         sb.append(", microElMg=").append(microElMg);
@@ -512,11 +509,15 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         sb.append(", vitaminPp=").append(vitaminPp);
         sb.append(", vitaminC=").append(vitaminC);
         sb.append(", vitaminE=").append(vitaminE);
-        sb.append(", globalId ='").append(globalId).append('\'');
-        sb.append(", globalVersion ='").append(globalVersion).append('\'');
-        sb.append(", deletedState ='").append(deletedState).append('\'');
+        sb.append(", technologicalMapGroup=").append(technologicalMapGroup);
+        sb.append(", idOfConfigurationProvider=").append(idOfConfigurationProvider);
+        sb.append(", technologicalMapProductInternal=").append(technologicalMapProductInternal);
+        sb.append(", userCreate=").append(userCreate);
+        sb.append(", userDelete=").append(userDelete);
+        sb.append(", userEdit=").append(userEdit);
+        sb.append(", guidOfTMG='").append(guidOfTMG).append('\'');
+        sb.append(", lifeTime=").append(lifeTime);
         sb.append('}');
         return sb.toString();
     }
-
 }

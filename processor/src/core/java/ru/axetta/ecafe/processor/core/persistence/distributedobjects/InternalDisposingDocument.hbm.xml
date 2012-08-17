@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   -->
+
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct" table="cf_technological_map_products">
-        <id name="globalId" column="IdOfTechnoMapProducts" type="long">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.InternalDisposingDocument" table="cf_internal_disposing_documents">
+        <id name="globalId" column="IdOfInternalDisposingDocument" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
         <property name="globalVersion" column="GlobalVersion" type="long"/>
-        <!--<property name="orgOwner" column="OrgOwner" type="long"/>-->
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
         <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
@@ -19,19 +20,20 @@
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+        not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <property name="grossWeight" column="GrossWeight" type="integer" />
-        <property name="netWeight" column="NetWeight" type="integer" />
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="type" column="TypeOfInternalDisposingDocument" type="integer" not-null="true"/>
+        <property name="date" column="DateOfInternalDisposingDocument" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="state" column="State" type="integer" not-null="true"/>
 
-        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
-
-        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap" fetch="select" lazy="false">
-            <column name="idOfTechnologicalMaps" not-null="true" />
+        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Staff" fetch="select" lazy="false">
+            <column name="IdOfStaff" not-null="true" />
         </many-to-one>
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product" fetch="select" unique="true" lazy="false">
-            <column name="idOfProducts" not-null="true" />
+
+        <many-to-one name="actOfInventarization" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ActOfInventarization" fetch="select" lazy="false">
+            <column name="IdOfActOfInventarization" not-null="true" />
         </many-to-one>
 
     </class>
