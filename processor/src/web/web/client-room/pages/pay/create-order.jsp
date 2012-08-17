@@ -56,7 +56,7 @@
        	        // возвращаем MD5-хеш
                 return sb.append(s2).toString();
             }%>
-<%
+<%   try{
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.pay.create-order_jsp");
 
     final String STAGE_PARAM = "stage";
@@ -86,7 +86,7 @@
 
 
     RuntimeContext runtimeContext = null;
-    try {
+
         runtimeContext = RuntimeContext.getInstance();
 
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -140,8 +140,10 @@
         RBKMoneyConfig rbkMoneyConfig = runtimeContext.getPartnerRbkMoneyConfig();
         ChronopayConfig chronopayConfig=runtimeContext.getPartnerChronopayConfig();
 
-        chronopaySection=runtimeContext.getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION);
-        rbkSection=runtimeContext.getOptionValueBool(Option.OPTION_RBK_SECTION);
+        chronopaySection=chronopayConfig.getShow();
+        rbkSection=rbkMoneyConfig.getShow();
+        Double rbkFirstCommisssion=rbkMoneyConfig.getRate();
+        Double rbkSecondCommission=Math.round((rbkFirstCommisssion+rbkFirstCommisssion/0.97)*100)/100.0;
 
         if (!haveDataToProcess || !dataToProcessVerified) { %>
 
@@ -248,7 +250,7 @@
                     </td>
                     <td>
                         <div class="output-text">
-                            6,09%
+                            <%=StringEscapeUtils.escapeHtml(rbkSecondCommission.toString())%> %
                         </div>
                     </td>
                 </tr>
@@ -260,7 +262,7 @@
                     </td>
                     <td>
                         <div class="output-text">
-                            3%
+                            <%=StringEscapeUtils.escapeHtml(rbkFirstCommisssion.toString())%> %
                         </div>
                     </td>
                 </tr>
@@ -272,7 +274,7 @@
                     </td>
                     <td>
                         <div class="output-text">
-                            от 3% до 6,09%
+                            от <%=StringEscapeUtils.escapeHtml(rbkFirstCommisssion.toString())%>% до <%=StringEscapeUtils.escapeHtml(rbkSecondCommission.toString())%>%
                         </div>
                     </td>
                 </tr>
