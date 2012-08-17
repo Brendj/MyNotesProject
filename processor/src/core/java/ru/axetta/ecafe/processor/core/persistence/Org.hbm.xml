@@ -45,25 +45,26 @@
         <property name="lastSuccessfulBalanceSync" column="lastSucBalanceSync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
+
         <property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
+
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>
+
         <set name="clientsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>
         </set>
+
         <set name="clientGroupsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientGroup"/>
         </set>
+
         <set name="syncHistoriesInternal" inverse="true" cascade="all">
-            <key column="IdOfOrg"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SyncHistory"/>
-        </set>
-        <set name="syncHistories" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SyncHistory"/>
         </set>
@@ -76,14 +77,17 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrderDetail"/>
         </set>
+
         <set name="diaryTimesheetsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
         </set>
+
         <set name="diaryClassesInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryClass"/>
         </set>
+
         <set name="diaryValuesInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryValue"/>
@@ -95,9 +99,7 @@
         </set>
 
         <!-- Производственая конфигурация -->
-        <many-to-one name="configurationProvider"
-                     class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" fetch="select"
-                     lazy="false" cascade="all">
+        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" lazy="false">
             <column name="idOfConfigurationProvider"/>
         </many-to-one>
 
@@ -105,13 +107,7 @@
             <column name="idOfContract"/>
         </many-to-one>
 
-
-        <!--<set name="friendlyOrg" table="cf_friendly_organization" inverse="true" cascade="all">
-            <key column="currentOrg" />
-            <many-to-many column="friendlyOrg"  class="ru.axetta.ecafe.processor.core.persistence.Org" />
-        </set>-->
-
-        <set name="friendlyOrg" table="cf_friendly_organization">
+        <set name="friendlyOrgInternal" table="cf_friendly_organization">
             <key column="currentOrg"/>
             <many-to-many column="friendlyOrg" entity-name="ru.axetta.ecafe.processor.core.persistence.Org"/>
         </set>
@@ -121,18 +117,6 @@
             <many-to-one name="thisOrg" column="currentOrg"/>
         </join>
 
-
-        <!--<join table="cf_contract_orgs" inverse="true">-->
-        <!--<key column="idoforg" />-->
-        <!--<many-to-one name="contract" column = "idofcontract" />-->
-        <!--</join>-->
-
-
-        <!-- Kadirov D (21.12.2011) -->
-        <!--set name="enterEventsInternal" inverse="true" cascade="all">
-            <key column="IdOfOrg"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
-        </set-->
     </class>
 </hibernate-mapping>
 

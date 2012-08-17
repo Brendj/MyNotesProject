@@ -68,12 +68,28 @@ public class Org {
     private String mailingListReports1;
     private String mailingListReports2;
     private ConfigurationProvider configurationProvider;
-    private Set<Org> friendlyOrg;
     private Org thisOrg;
     private String guid;
     private Contract contract;
     private Date lastSuccessfulBalanceSync;
     private Date lastUnSuccessfulBalanceSync;
+    private Set<Org> friendlyOrgInternal;
+
+    private Set<Org> getFriendlyOrgInternal() {
+        return friendlyOrgInternal;
+    }
+
+    private void setFriendlyOrgInternal(Set<Org> friendlyOrgInternal) {
+        this.friendlyOrgInternal = friendlyOrgInternal;
+    }
+
+    public Set<Org> getFriendlyOrg() {
+        return getFriendlyOrgInternal();
+    }
+
+    public void addFriendlyOrg(Org friendlyOrg) {
+        this.friendlyOrgInternal.add(friendlyOrg);
+    }
 
     public Contract getContract() {
         return contract;
@@ -91,13 +107,7 @@ public class Org {
         this.thisOrg = thisOrg;
     }
 
-    public Set<Org> getFriendlyOrg() {
-        return friendlyOrg;
-    }
 
-    public void setFriendlyOrg(Set<Org> friendlyOrg) {
-        this.friendlyOrg = friendlyOrg;
-    }
 
     public ConfigurationProvider getConfigurationProvider() {
         return configurationProvider;
@@ -418,14 +428,6 @@ public class Org {
     private void setSyncHistoriesInternal(Set<SyncHistory> syncHistories) {
         // For Hibernate only
         this.syncHistories = syncHistories;
-    }
-
-    public Set<SyncHistory> getSyncHistories() {
-        return Collections.unmodifiableSet(getSyncHistoriesInternal());
-    }
-    
-    public void setSyncHistories(Set<SyncHistory> syncHistories) {
-        setSyncHistoriesInternal(syncHistories);
     }
 
     private Set<Order> getOrdersInternal() {

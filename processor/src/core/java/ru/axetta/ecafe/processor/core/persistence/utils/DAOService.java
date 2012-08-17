@@ -10,8 +10,11 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
@@ -25,6 +28,8 @@ import java.util.Set;
 @Component
 @Scope("singleton")
 public class DAOService {
+
+    private final static Logger logger = LoggerFactory.getLogger(DAOService.class);
 
     @PersistenceContext
     EntityManager em;
@@ -43,20 +48,12 @@ public class DAOService {
         IConfigProvider distributedObject = em.find(clazz, id);
         if(distributedObject!=null){
             distributedObject.setIdOfConfigurationProvider(idOfConfigurationProvider);
-            distributedObject = em.merge(distributedObject);
+            em.persist(distributedObject);
         }
     }
 
     @Transactional
     public void updateDeleteState(DistributedObject distributedObject) throws Exception{
-        /*StringBuilder stringQuery = new StringBuilder("update ");
-        stringQuery.append(distributedObject.getClass().getSimpleName());
-        stringQuery.append(" set deletedState=:deletedState where guid='");
-        stringQuery.append(distributedObject.getGuid());
-        stringQuery.append("'");
-        Query q = em.createQuery(stringQuery.toString());
-        q.setParameter("deletedState", true);
-        return (q.executeUpdate() != 0);*/
         List list = em.createQuery("from "+distributedObject.getClass().getSimpleName() + " where guid='"+distributedObject.getGuid()+"'").getResultList();
         if(!list.isEmpty()){
             DistributedObject object = (DistributedObject) list.get(0);
@@ -71,7 +68,7 @@ public class DAOService {
         Org org = em.find(Org.class, idOfOrg);
         if(org!=null){
             org.setConfigurationProvider(configurationProvider);
-            org = em.merge(org);
+            em.persist(org);
         }
     }
 
@@ -84,7 +81,7 @@ public class DAOService {
     public void setDeletedState(DistributedObject distributedObject){
         distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
         distributedObject.setDeletedState(true);
-        distributedObject = em.merge(distributedObject);
+        em.persist(distributedObject);
     }
 
     public <T> T findDistributedObjectByRefGUID(Class<T> clazz, String guid){
@@ -100,15 +97,6 @@ public class DAOService {
         TypedQuery<DistributedObject> query = em.createQuery("from "+name+" where guid in (:guids)",DistributedObject.class);
         query.setParameter("guids",guids);
         return query.getResultList();
-    }
-
-    public Product findProductByGUID(Class<Product> productClass, String stringRefGUID) {
-        TypedQuery<Product> query = em.createQuery("from Product where guid='"+stringRefGUID+"'", Product.class);
-        List<Product> productList = query.getResultList();
-        if (productList.isEmpty()) {
-            return null;
-        }
-        return productList.get(0);
     }
 
     @Transactional
@@ -130,7 +118,6 @@ public class DAOService {
         return  query.getResultList();
     }
 
-    @Transactional
     public ConfigurationProvider getConfigurationProvider(Long orgOwner, Class<? extends DistributedObject> clazz) throws Exception{
         List list = Arrays.asList(clazz.getInterfaces());
         ConfigurationProvider configurationProvider = null;
@@ -141,10 +128,16 @@ public class DAOService {
             configurationProvider = org.getConfigurationProvider();
             /* Если есть конфигурация синхронизируемой организации */
             if(configurationProvider==null){
-                configurationProviderQuery = em.createQuery("select configurationProvider from Org where idOfOrg=(Select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg)", ConfigurationProvider.class);
-                configurationProviderQuery.setParameter("idOfOrg",orgOwner);
-                List<ConfigurationProvider> configurationProviders = configurationProviderQuery.getResultList();
-                if(!(configurationProviders==null || configurationProviders.isEmpty())) configurationProvider = configurationProviders.get(0);
+                TypedQuery<MenuExchangeRule> queryMER = em.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg",MenuExchangeRule.class);
+                queryMER.setParameter("idOfOrg",orgOwner);
+                queryMER.setMaxResults(1);
+                MenuExchangeRule menuExchangeRule = queryMER.getSingleResult();
+                if(menuExchangeRule != null){
+                    Org sourceOrg = em.find(Org.class, menuExchangeRule.getIdOfSourceOrg());
+                    if(sourceOrg != null){
+                        configurationProvider = sourceOrg.getConfigurationProvider();
+                    }
+                }
             }
             if(configurationProvider == null) {
                 //return new ArrayList<DistributedObject>(0);
@@ -155,36 +148,42 @@ public class DAOService {
         return configurationProvider;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<DistributedObject> getDistributedObjects(Class<? extends DistributedObject> clazz, Long currentMaxVersion,Long orgOwner) throws Exception{
-        TypedQuery<DistributedObject> query ;
-        String where = "";
+        List<DistributedObject> result = null;
+        try{
+            TypedQuery<DistributedObject> query ;
+            String where = "";
+            if(orgOwner != null){
+                List list = Arrays.asList(clazz.getInterfaces());
+                if(list.contains(IConfigProvider.class)){
+                    ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
+                    where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+                }  else {
+                    where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
+                }
 
-        if(orgOwner != null){
-            List list = Arrays.asList(clazz.getInterfaces());
-            if(list.contains(IConfigProvider.class)){
-                ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
-                where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
-            }  else {
-                where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
             }
-
-        }
-        if(currentMaxVersion != null){
-            TypedQuery<DOVersion> queryVersion = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
-            queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
-            List<DOVersion> doVersionList = queryVersion.getResultList();
-            Long doVersion = null;
-            if(doVersionList.isEmpty()) {
-                doVersion = -1L;
-            } else {
-                doVersion = doVersionList.get(0).getCurrentVersion();
+            if(currentMaxVersion != null){
+                TypedQuery<DOVersion> queryVersion = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+                queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
+                List<DOVersion> doVersionList = queryVersion.getResultList();
+                Long doVersion = null;
+                if(doVersionList.isEmpty()) {
+                    doVersion = -1L;
+                } else {
+                    doVersion = doVersionList.get(0).getCurrentVersion();
+                }
+                where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
             }
-            where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
+            String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
+            query = em.createQuery(select, DistributedObject.class);
+            result = query.getResultList();
+            em.flush();
+        } catch (Exception e){
+            logger.error("Error getDistributedObjects: ",e);
         }
-        String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
-        query = em.createQuery(select, DistributedObject.class);
-        return  query.getResultList();
+        return result;
     }
 
     @Transactional
@@ -446,7 +445,9 @@ public class DAOService {
             query = em.createQuery("from LinkingToken where token=:token");
             query.setParameter("token", randomToken);
             List l = query.getResultList();
-            if (l.size()==0) break;
+            if (l.size() == 0) {
+                break;
+            }
         }
         LinkingToken token = new LinkingToken();
         token.setIdOfClient(client.getIdOfClient());
@@ -458,13 +459,21 @@ public class DAOService {
     @Transactional
     public boolean doesClientBelongToFriendlyOrgs(Long orgId, Long idOfClient) throws Exception {
         Org org = em.find(Org.class, orgId);
-        if (org==null) throw new Exception("Организация не найдена: "+orgId);
+        if (org == null) {
+            throw new Exception("Организация не найдена: " + orgId);
+        }
         Client cl = em.find(Client.class, idOfClient);
-        if (cl==null) throw new Exception("Клиент не найден: "+idOfClient);
-        if (cl.getOrg().getIdOfOrg()==orgId) return true;
+        if (cl == null) {
+            throw new Exception("Клиент не найден: " + idOfClient);
+        }
+        if (cl.getOrg().getIdOfOrg() == orgId) {
+            return true;
+        }
         Set<Org> friendlyOrgs = org.getFriendlyOrg();
         for (Org o :friendlyOrgs) {
-            if (cl.getOrg().getIdOfOrg()==o.getIdOfOrg()) return true;
+            if (cl.getOrg().getIdOfOrg() == o.getIdOfOrg()) {
+                return true;
+            }
         }
         return false;
     }

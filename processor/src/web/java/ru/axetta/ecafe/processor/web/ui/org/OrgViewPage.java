@@ -56,6 +56,15 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String configurationProviderName;
     private List<Long> idOfOrgList;
     private String filterOrgs = "Не выбрано";
+    private String friendlyFilterOrgs = "Не выбрано";
+
+    public String getFriendlyFilterOrgs() {
+        return friendlyFilterOrgs;
+    }
+
+    public void setFriendlyFilterOrgs(String friendlyFilterOrgs) {
+        this.friendlyFilterOrgs = friendlyFilterOrgs;
+    }
 
     public String getFilterOrgs() {
         return filterOrgs;
@@ -232,7 +241,7 @@ public class OrgViewPage extends BasicWorkspacePage {
                 stringBuilder.append(friendlyOrg.getShortName());
                 stringBuilder.append("; ");
             }
-            filterOrgs = stringBuilder.toString();
+            friendlyFilterOrgs = stringBuilder.toString();
         }
 
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
@@ -241,6 +250,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.mailingListReports2 = org.getMailingListReports2();
 
     }
+
+
 
     public String getMailingListReportsOnNutrition() {
         return mailingListReportsOnNutrition;

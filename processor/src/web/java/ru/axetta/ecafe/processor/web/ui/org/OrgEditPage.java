@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
@@ -67,12 +65,12 @@ public class OrgEditPage extends BasicWorkspacePage
     private ConfigurationProvider configurationProvider;
     private String configurationProviderName;
     private Set<Org> orgSet = new HashSet<Org>();
-    private String filterOrg;
-    private List<Long> idOfCategoryOrgList = new LinkedList<Long>();
-
     private List<Long> idOfOrgList;
-    private List<Long> currentIdOfOrgList;
-    private String filterOrgs = "Не выбрано";
+
+    private String filterCategoryOrg;
+    private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
+    private List<Long> friendlyIdOfOrgList = new ArrayList<Long>();
+    private String filterFriendlyOrgs = "Не выбрано";
 
     public static class ContragentItem {
         private final Long idOfContragent;
@@ -151,7 +149,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            org.setFriendlyOrg(new HashSet<Org>(0));
+           // org.setFriendlyOrg(new HashSet<Org>(0));
         }
         else{
             /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/
@@ -161,7 +159,8 @@ public class OrgEditPage extends BasicWorkspacePage
             }
             Map<Long,Org> friendlyOrgMap = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
             /* списки не совпали то добавляем */
-            Boolean containsOrg = currentIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(currentIdOfOrgList);
+            Boolean containsOrg = friendlyIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(
+                    friendlyIdOfOrgList);
             if (!containsOrg){
                 List result = DAOUtils.getClientsByOrgList(session, friendlyOrgMap.keySet());
                 for (Object object: result){
@@ -223,7 +222,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
         idOfCategoryOrgList.clear();
-        this.filterOrg ="";
+        this.filterCategoryOrg ="Не выбрано";
         if(org.getCategories()!=null && !org.getCategories().isEmpty()){
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg: org.getCategories()){
@@ -231,7 +230,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 stringBuilder.append("; ");
                 idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
-            this.filterOrg = stringBuilder.substring(0,stringBuilder.length()-2);
+            this.filterCategoryOrg = stringBuilder.substring(0,stringBuilder.length()-2);
         }
 
         if(org.getConfigurationProvider()!=null){
@@ -239,15 +238,16 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             this.configurationProviderName = "";
         }
-        currentIdOfOrgList = new ArrayList<Long>();
+        friendlyIdOfOrgList.clear();
+        filterFriendlyOrgs = "Не выбрано";
         if(!(org.getFriendlyOrg()==null || org.getFriendlyOrg().isEmpty())){
             StringBuilder stringBuilder = new StringBuilder();
             for (Org friendlyOrg: org.getFriendlyOrg()){
                 stringBuilder.append(friendlyOrg.getShortName());
                 stringBuilder.append("; ");
-                currentIdOfOrgList.add(friendlyOrg.getIdOfOrg());
+                friendlyIdOfOrgList.add(friendlyOrg.getIdOfOrg());
             }
-            filterOrgs = stringBuilder.toString();
+            filterFriendlyOrgs = stringBuilder.toString();
         }
     }
 
@@ -263,9 +263,9 @@ public class OrgEditPage extends BasicWorkspacePage
                     stringBuilder.append(orgMap.get(idOfOrg));
                     stringBuilder.append("; ");
                 }
-                filterOrgs = stringBuilder.toString();
+                filterFriendlyOrgs = stringBuilder.toString();
             } else {
-                filterOrgs = "Не выбрано.";
+                filterFriendlyOrgs = "Не выбрано.";
             }
         }
     }
@@ -295,9 +295,13 @@ public class OrgEditPage extends BasicWorkspacePage
         return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
     }
 
-    public String getFilterOrg() {
+    public String getIdOfFriendlyOrgList() {
+        return friendlyIdOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getFilterCategoryOrg() {
         if (idOfCategoryOrgList.isEmpty()) return "Нет";
-        return filterOrg;
+        return filterCategoryOrg;
     }
 
     @Override
@@ -305,12 +309,12 @@ public class OrgEditPage extends BasicWorkspacePage
         if(null != categoryOrgMap) {
             idOfCategoryOrgList = new ArrayList<Long>();
             if(!categoryOrgMap.isEmpty()){
-                filterOrg="";
+                filterCategoryOrg ="";
                 for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
                     idOfCategoryOrgList.add(idOfCategoryOrg);
-                    filterOrg=filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
+                    filterCategoryOrg = filterCategoryOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
                 }
-                filterOrg = filterOrg.substring(0,filterOrg.length()-1);
+                filterCategoryOrg = filterCategoryOrg.substring(0, filterCategoryOrg.length()-1);
             }
 
         }
@@ -350,12 +354,12 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
     /* Getters and Setters */
-    public String getFilterOrgs() {
-        return filterOrgs;
+    public String getFriendlyFilterOrgs() {
+        return filterFriendlyOrgs;
     }
 
-    public void setFilterOrgs(String filterOrgs) {
-        this.filterOrgs = filterOrgs;
+    public void setFilterFriendlyOrgs(String filterFriendlyOrgs) {
+        this.filterFriendlyOrgs = filterFriendlyOrgs;
     }
 
     public String getConfigurationProviderName() {

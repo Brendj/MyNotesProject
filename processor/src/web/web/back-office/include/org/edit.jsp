@@ -55,14 +55,12 @@
     <%-- Список категорий к которым пренадлежит организация --%>
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGroup>
-        <h:inputText value="#{mainPage.orgEditPage.filterOrg}" readonly="true" styleClass="input-text" maxlength="128"
-                     style="margin-right: 2px;" />
         <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfCategoryOrgList}" target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
         </a4j:commandButton>
-
+        <h:outputText value="{#{mainPage.orgEditPage.filterCategoryOrg}}" styleClass="output-text"/>
     </h:panelGroup>
 
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
@@ -116,9 +114,9 @@
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                 styleClass="command-link" style="width: 25px;" >
-            <f:setPropertyActionListener value="#{mainPage.orgEditPage.filterOrgs}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+            <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfFriendlyOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
         </a4j:commandButton>
-        <h:outputText value="{#{mainPage.orgEditPage.filterOrgs}}" styleClass="output-text"/>
+        <h:outputText value="{#{mainPage.orgEditPage.friendlyFilterOrgs}}" styleClass="output-text"/>
     </h:panelGrid>
 
 
