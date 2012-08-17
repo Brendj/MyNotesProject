@@ -1814,7 +1814,7 @@ public class SyncResponse {
         // Distribution Manager
         if(distributionManager != null){
             //ecafeEnvelopeElement.appendChild(RuntimeContext.getAppContext().getBean(DistributionManager.class).toElement(document, idOfOrg));
-            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg));
+            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg, dateFormat, timeFormat));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
@@ -1882,6 +1882,8 @@ public class SyncResponse {
     public DistributionManager getDistributionManager() {
         return distributionManager;
     }
+
+    public OrgOwnerData
 
     @Override
     public String toString() {

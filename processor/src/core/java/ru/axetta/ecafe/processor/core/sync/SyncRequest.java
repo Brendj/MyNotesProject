@@ -2920,7 +2920,7 @@ MenuGroups menuGroups;
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        distributionManager.build(itemNode, org.getIdOfOrg());
+                        distributionManager.build(itemNode, org.getIdOfOrg(), dateOnlyFormat, timeFormat);
                     }
                     itemNode = itemNode.getNextSibling();
                 }
