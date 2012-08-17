@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -49,7 +50,7 @@ public class DAOService {
         if(distributedObject!=null){
             distributedObject.setIdOfConfigurationProvider(idOfConfigurationProvider);
             em.persist(distributedObject);
-        }
+    }
     }
 
     @Transactional
@@ -314,36 +315,65 @@ public class DAOService {
 
     @Transactional
     public boolean enableClientNotificationBySMS(Long contractId, boolean state) {
-        Query q = em.createQuery("update Client set notifyViaSMS=:notifyViaSMS");
+        Query q = em.createQuery("update Client set notifyViaSMS=:notifyViaSMS where contractId=:contractId");
         q.setParameter("notifyViaSMS", state);
+        q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
 
     @Transactional
     public boolean enableClientNotificationByEmail(Long contractId, boolean state) {
-        Query q = em.createQuery("update Client set notifyViaEmail=:notifyViaEmail");
+        Query q = em.createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId=:contractId");
         q.setParameter("notifyViaEmail", state);
+        q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
 
     @Transactional
     public boolean setClientMobilePhone(Long contractId, String mobile) {
-        Query q = em.createQuery("update Client set mobile=:mobile");
+        Query q = em.createQuery("update Client set mobile=:mobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
+        q.setParameter("contractId", contractId);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientPhone(Long contractId, String phone) {
+        Query q = em.createQuery("update Client set phone=:phone where contractId=:contractId");
+        q.setParameter("phone", phone);
+        q.setParameter("contractId", contractId);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientAddress(Long contractId, String address) {
+        Query q = em.createQuery("update Client set address=:address where contractId=:contractId");
+        q.setParameter("address", address);
+        q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
 
     @Transactional
     public boolean setClientEmail(Long contractId, String email) {
-        Query q = em.createQuery("update Client set email=:email");
+        Query q = em.createQuery("update Client set email=:email where contractId=:contractId");
         q.setParameter("email", email);
+        q.setParameter("contractId", contractId);
+        return q.executeUpdate()!=0;
+    }
+
+    @Transactional
+    public boolean setClientPassword(Long contractId, String base64passwordHash) {
+        Query q = em.createQuery("update Client set cypheredPassword=:base64passwordHash where contractId=:contractId");
+        q.setParameter("base64passwordHash",base64passwordHash);
+        q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
 
     @Transactional
     public boolean setClientExpenditureLimit(Long contractId, long limit) {
-        Query q = em.createQuery("update Client set expenditureLimit=:expenditureLimit");
+        Query q = em.createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
+        q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
     @Transactional
