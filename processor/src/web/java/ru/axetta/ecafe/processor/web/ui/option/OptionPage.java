@@ -5,16 +5,25 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.banks.BankListPage;
+import ru.axetta.ecafe.processor.web.ui.option.banks.BankOptionItem;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +34,8 @@ import java.util.Date;
  */
 @Component
 public class OptionPage extends BasicWorkspacePage {
-
+    final Logger logger = LoggerFactory
+            .getLogger(BasicWorkspacePage.class);
     private Boolean notifyBySMSAboutEnterEvent;
     private Boolean withOperator;
     private Boolean cleanMenu;
@@ -38,6 +48,23 @@ public class OptionPage extends BasicWorkspacePage {
     private Double chronopayRate;
     private Double rbkRate;
     private Long defaultOverdraftLimit, defaultExpenditureLimit;
+
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+     private List<BankOptionItem> banks;
+
+
+
+
+    public List<BankOptionItem> getBanks() {
+        return banks;
+    }
+
+    public void setBanks(List<BankOptionItem> banks) {
+        this.banks = banks;
+    }
 
     public Double getRbkRate() {
         return rbkRate;
@@ -127,6 +154,10 @@ public class OptionPage extends BasicWorkspacePage {
         this.menuDaysForDeletion = menuDaysForDeletion;
     }
 
+
+
+
+
     public Long getDefaultExpenditureLimit() {
         return defaultExpenditureLimit;
     }
@@ -143,12 +174,16 @@ public class OptionPage extends BasicWorkspacePage {
         this.defaultOverdraftLimit = defaultOverdraftLimit;
     }
 
+
     public String getPageFilename() {
         return "option/option";
     }
 
     @Autowired
     RuntimeContext runtimeContext;
+
+    @Autowired
+    private BankListPage bankListPage;
 
     @Override
     public void onShow() throws Exception {
@@ -163,8 +198,74 @@ public class OptionPage extends BasicWorkspacePage {
         rbkSection=runtimeContext.getOptionValueBool(Option.OPTION_RBK_SECTION);
         rbkRate=runtimeContext.getOptionValueDouble(Option.OPTION_RBK_RATE);
         chronopayRate=runtimeContext.getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE);
+
+
+
+
+
+     /*   EntityManager entityManager = null;
+        EntityTransaction entityTransaction = null;
+        try {
+            entityManager = EntityManagerUtils.createEntityManager();
+            entityTransaction = entityManager.getTransaction();
+            entityTransaction.begin();
+
+            banks= DAOUtils.getBanks(entityManager);
+            logger.info("getBanks(0): "+banks.get(0).getName());
+            logger.info("getBanks(1): "+banks.get(1).getName());
+            logger.info("getBanks(2): "+banks.get(2).getName());
+
+            entityTransaction.commit();
+            entityTransaction = null;
+        } catch (Exception e) {
+             logger.error("error in getBanks(): ",e);
+        } finally {
+            if (entityTransaction != null)
+                entityTransaction.rollback();
+            if (entityManager != null)
+                entityManager.close();
+        }*/
+
+        bankListPage.onShow();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria banksCriteria = persistenceSession.createCriteria(Bank.class);
+
+            List<Bank> banksList=(List<Bank>)banksCriteria.list();
+            banks=new ArrayList<BankOptionItem>();
+            for(Bank bank:banksList){
+                BankOptionItem bankOptionItem =new BankOptionItem(entityManager);
+                bankOptionItem.setEnrollmentType(bank.getEnrollmentType());
+                bankOptionItem.setLogoUrl(bank.getLogoUrl());
+                bankOptionItem.setMinRate(bank.getMinRate());
+                bankOptionItem.setName(bank.getName());
+                bankOptionItem.setTerminalsUrl(bank.getTerminalsUrl());
+                bankOptionItem.setRate(bank.getRate());
+                bankOptionItem.setIdOfBank(bank.getIdOfBank());
+
+                banks.add(bankOptionItem);
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        }catch(Exception e){
+
+             logger.error("error in banks: ",e);
+        }  finally {
+        HibernateUtils.rollback(persistenceTransaction, logger);
+        HibernateUtils.close(persistenceSession, logger);
+    }
+
+
+
         defaultOverdraftLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
         defaultExpenditureLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
+
     }
 
     public Object save() {
@@ -180,9 +281,54 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_RBK_SECTION, rbkSection);
             runtimeContext.setOptionValue(Option.OPTION_RBK_RATE, rbkRate);
             runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_RATE, chronopayRate);
+
+
+            bankListPage.save();
+            /*
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                for(BankOptionItem bankOptionItem :banks){
+                      Bank bank=new Bank();
+                    bank.setEnrollmentType(bankOptionItem.getEnrollmentType());
+                    bank.setLogoUrl(bankOptionItem.getLogoUrl());
+                    bank.setMinRate(bankOptionItem.getMinRate());
+                    bank.setName(bankOptionItem.getName());
+                    bank.setRate(bankOptionItem.getRate());
+                    bank.setTerminalsUrl(bankOptionItem.getTerminalsUrl());
+                    bank.setIdOfBank(bankOptionItem.getIdOfBank());
+                    persistenceSession.update(bank);}
+
+                persistenceSession.flush();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            }catch(Exception e){
+
+                logger.error("error in creating a new bank : ",e);
+            }  finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+
+            try{
+                onShow();
+            }catch(Exception e){logger.error("error in onShow(): ",e);}
+                */
+
+
+
+            runtimeContext.getPartnerChronopayConfig().setShow(chronopaySection);
+            runtimeContext.getPartnerRbkMoneyConfig().setShow(rbkSection);
+
             runtimeContext.setOptionValue(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT, defaultOverdraftLimit);
             runtimeContext.setOptionValue(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT, defaultExpenditureLimit);
+
             runtimeContext.getPartnerChronopayConfig().setRate(chronopayRate);
+            runtimeContext.getPartnerRbkMoneyConfig().setRate(rbkRate);
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {
@@ -190,6 +336,35 @@ public class OptionPage extends BasicWorkspacePage {
         }
         return null;
     }
+
+/*    public Object addBank(){
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Bank bank=new Bank();
+            persistenceSession.save(bank);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        }catch(Exception e){
+
+            logger.error("error in creating a new bank : ",e);
+        }  finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+       try{
+        onShow();
+       }catch(Exception e){logger.error("error in onShow(): ",e);}
+        return null;
+    }*/
 
     public Object cancel() throws Exception {
         onShow();

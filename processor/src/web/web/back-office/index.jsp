@@ -28,6 +28,12 @@
 
     <rich:calendar rendered="false" />
 
+
+    <f:subview id="bankDeleteSubView">
+        <c:import url="include/option/confirm_delete_bank.jsp" />
+    </f:subview>
+
+
     <f:subview id="abstractConfirmDeletePageSubView">
         <c:import url="include/abstractpage/confirm_delete.jsp" />
     </f:subview>
@@ -43,6 +49,7 @@
     <f:subview id="configurationProviderSelectSubView">
         <c:import url="include/option/configuration_provider/select.jsp" />
     </f:subview>
+
 
     <f:subview id="productSelectSubView">
         <c:import url="include/option/configuration_provider/product/confirm_delete.jsp" />
