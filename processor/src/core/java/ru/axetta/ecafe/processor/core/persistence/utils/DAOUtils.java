@@ -487,13 +487,24 @@ public class DAOUtils {
     public static String getOptionValue(EntityManager em, long nOption, String defaultValue) {
         return getOptionValue((Session)em.getDelegate(),  nOption, defaultValue);
     }
-    public static String getOptionValue(Session session, long nOption, String defaultValue) {
+   /* public static String getOptionValue(Session session, long nOption, String defaultValue) {
         Query q = session.createQuery("from Option where idOfOption=:nOption");
         q.setParameter("nOption", nOption);
         List l = q.list();
         String v;
         if (l.size()==0) v = defaultValue;
         else v=((Option)l.get(0)).getOptionText();
+        return v;
+    }*/
+
+    public static String getOptionValue(Session session, long nOption, String defaultValue) {
+        Query q = session.createQuery("from Option where idOfOption=:nOption");
+        q.setParameter("nOption", nOption);
+        List l = q.list();
+        String v;
+        if (l.size()==0) return defaultValue;
+        v=((Option)l.get(0)).getOptionText();
+        if(v==null) return defaultValue;
         return v;
     }
     public static void setOptionValue(Session session, long nOption, String value) {
@@ -512,6 +523,12 @@ public class DAOUtils {
         javax.persistence.Query q = entityManager.createQuery("from TransactionJournal order by idOfTransactionJournal asc");
         q.setMaxResults(maxRecordsInBatch);
         return (List<TransactionJournal>)q.getResultList();
+    }
+
+    public static List<Bank> getBanks(EntityManager entityManager){
+        javax.persistence.Query q = entityManager.createQuery("from Bank");
+        return (List<Bank>)q.getResultList();
+
     }
 
     /**
@@ -555,6 +572,8 @@ public class DAOUtils {
         q.setParameter("curId", selectedIdOfCategoryOrg);
         return (CategoryOrg) q.getSingleResult();
     }
+
+
 
 
     @SuppressWarnings("unchecked")
