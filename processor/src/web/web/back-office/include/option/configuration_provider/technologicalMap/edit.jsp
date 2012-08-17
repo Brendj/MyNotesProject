@@ -124,11 +124,11 @@
             <h:outputText escape="true" value="Fe" styleClass="output-text" />
 
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.microElCa}" styleClass="input-text"
-                         validatorMessage="Количсество магния должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество кальция должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.microElMg}" styleClass="input-text"
-                         validatorMessage="Количсество фосфора должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество магния должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.microElP}" styleClass="input-text"
@@ -152,27 +152,27 @@
             <h:outputText escape="true" value="C" styleClass="output-text" />
             <h:outputText escape="true" value="E" styleClass="output-text" />
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminA}" styleClass="input-text"
-                         validatorMessage="Количсество белков должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина А должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminB1}" styleClass="input-text"
-                         validatorMessage="Количсество жиров должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина B1 должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminB2}" styleClass="input-text"
-                         validatorMessage="Количсество углеводов должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина B2 должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminPp}" styleClass="input-text"
-                         validatorMessage="Количсество белков должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина PP должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminC}" styleClass="input-text"
-                         validatorMessage="Количсество жиров должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина C должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.vitaminE}" styleClass="input-text"
-                         validatorMessage="Количсество углеводов должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество витамина E должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
         </h:panelGrid>
@@ -183,10 +183,18 @@
             </f:facet>
             <h:outputText escape="true" value="" />
             <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.energyValue}" styleClass="input-text"
-                         validatorMessage="Количсество белков должно быть числом." style="width: 4em">
+                         validatorMessage="Количсество килокаллорий должно быть числом." style="width: 4em">
                 <f:validateDoubleRange minimum="0.00" maximum="99999999.00" />
             </h:inputText>
         </h:panelGrid>
+    </h:panelGrid>
+
+    <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Срок годности (мин.)" />
+        <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.lifeTime}" styleClass="input-text"
+                     validatorMessage="Число должно быть целым.">
+            <f:validateDoubleRange minimum="0" maximum="99999999" />
+        </h:inputText>
     </h:panelGrid>
 
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>

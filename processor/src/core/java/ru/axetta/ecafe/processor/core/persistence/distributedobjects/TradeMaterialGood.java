@@ -41,7 +41,7 @@ public class TradeMaterialGood extends DistributedObject {
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"SelfPrice", selfPrice);
         setAttribute(element,"NDS", nds);
-        setAttribute(element,"GuidOfG", good.getGuid());
+        setAttribute(element,"GuidOfGoods", good.getGuid());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class TradeMaterialGood extends DistributedObject {
         if(longSelfPrice != null) setSelfPrice(longSelfPrice);
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS != null) setNds(longNDS);
-        guidOfG = getStringAttributeValue(node,"GuidOfG",36);
+        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         return this;
     }
 

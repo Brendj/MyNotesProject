@@ -478,11 +478,11 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         this.technologicalMapGroup = technologicalMapGroup;
     }
 
-    public int getLifeTime() {
+    public Integer getLifeTime() {
         return lifeTime;
     }
 
-    public void setLifeTime(int lifeTime) {
+    public void setLifeTime(Integer lifeTime) {
         this.lifeTime = lifeTime;
     }
 

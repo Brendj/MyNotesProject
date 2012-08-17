@@ -44,12 +44,12 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element,"GoodsCreationDate", getDateFormat().format(goodsCreationDate));
         setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"Price", incomingPrice);
+        setAttribute(element,"IncomingPrice", incomingPrice);
         setAttribute(element,"NDS", nds);
         setAttribute(element, "Date", getDateFormat().format(goodsCreationDate));
-        setAttribute(element, "GuidOfIID", internalIncomingDocument.getGuid());
-        setAttribute(element, "GuidOfTMD", tradeMaterialGood.getGuid());
-        setAttribute(element, "GuidOfIG", good.getGuid());
+        setAttribute(element, "GuidOfInternalIncomingDocument", internalIncomingDocument.getGuid());
+        setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        setAttribute(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
@@ -66,13 +66,13 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         if(longTotalCount != null) setTotalCount(longNetWeight);
         Long longLifeTime = getLongAttributeValue(node, "LifeTime");
         if(longLifeTime != null) setLifeTime(longLifeTime);
-        Long longPrice = getLongAttributeValue(node, "Price");
+        Long longPrice = getLongAttributeValue(node, "IncomingPrice");
         if(longPrice != null) setIncomingPrice(longPrice);
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS != null) setNds(longNDS);
-        guidOfIID = getStringAttributeValue(node,"GuidOfIID",36);
-        guidOfTMG = getStringAttributeValue(node,"GuidOfTMD",36);
-        guidOfG = getStringAttributeValue(node,"GuidOfIG",36);
+        guidOfIID = getStringAttributeValue(node,"GuidOfInternalIncomingDocument",36);
+        guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
+        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         return this;
     }
 

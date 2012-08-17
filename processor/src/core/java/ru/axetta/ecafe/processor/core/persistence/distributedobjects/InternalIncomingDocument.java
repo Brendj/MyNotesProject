@@ -47,11 +47,11 @@ public class InternalIncomingDocument extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "State", state);
         setAttribute(element, "Date", getDateFormat().format(date));
-        setAttribute(element, "GuidOfIWB", wayBill.getGuid());
-        setAttribute(element, "GuidOfIDD", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfIAI", actOfInventarization.getGuid());
-        setAttribute(element, "GuidOfIRD", returnDocument.getGuid());
-        setAttribute(element, "GuidOfS", staff.getGuid());
+        setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
+        setAttribute(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
+        setAttribute(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
+        setAttribute(element, "GuidOfReturnDoc", returnDocument.getGuid());
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
@@ -62,11 +62,11 @@ public class InternalIncomingDocument extends DistributedObject {
         if(integerState!=null) setState(integerState);
         Date dateOfInternalIncomingDocument = getDateAttributeValue(node,"Date");
         if(dateOfInternalIncomingDocument != null) setDate(dateOfInternalIncomingDocument);
-        guidOfWB = getStringAttributeValue(node,"GuidOfIWB",36);
-        guidOfIDD = getStringAttributeValue(node,"GuidOfIDD",36);
-        guidOfAI = getStringAttributeValue(node,"GuidOfIAI",36);
-        guidOfRD = getStringAttributeValue(node,"GuidOfIRD",36);
-        guidOfS = getStringAttributeValue(node,"GuidOfS",36);
+        guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
+        guidOfIDD = getStringAttributeValue(node,"GuidOfDisposingDoc",36);
+        guidOfAI = getStringAttributeValue(node,"GuidOfInventorizationAct",36);
+        guidOfRD = getStringAttributeValue(node,"GuidOfReturnDoc",36);
+        guidOfS = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
 

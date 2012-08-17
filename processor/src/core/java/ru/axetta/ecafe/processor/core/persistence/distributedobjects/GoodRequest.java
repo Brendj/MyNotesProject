@@ -33,19 +33,19 @@ public class GoodRequest extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"DateGR", getDateFormat().format(dateOfGoodsRequest));
+        setAttribute(element,"Date", getDateFormat().format(dateOfGoodsRequest));
         setAttribute(element,"Number", number);
         setAttribute(element,"State", state);
         setAttribute(element,"DoneDate", getDateFormat().format(doneDate));
         setAttribute(element,"Comment", comment);
-        setAttribute(element, "GuidOfSt", staff.getGuid());
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
     protected GoodRequest parseAttributes(Node node) throws ParseException, IOException {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Date dateDateOfGoodsRequest = getDateAttributeValue(node,"DateGR");
+        Date dateDateOfGoodsRequest = getDateAttributeValue(node,"Date");
         String stringNumber = getStringAttributeValue(node, "Number", 128);
         if(stringNumber != null) setNumber(stringNumber);
         Integer integerState = getIntegerAttributeValue(node,"State");
@@ -55,7 +55,7 @@ public class GoodRequest extends DistributedObject {
         if(dateDoneDate!=null) setDoneDate(dateDoneDate);
         String stringComment = getStringAttributeValue(node, "Comment", 128);
         if(stringComment != null) setComment(stringComment);
-        guidOfStaff = getStringAttributeValue(node,"GuidOfSt",36);
+        guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
 

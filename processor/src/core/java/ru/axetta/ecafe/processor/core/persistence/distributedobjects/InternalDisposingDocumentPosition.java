@@ -40,8 +40,8 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element, "DisposePrice", disposePrice);
         setAttribute(element, "NDS", nds);
-        setAttribute(element, "GuidOfIDD", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfTMG", tradeMaterialGood.getGuid());
+        setAttribute(element, "GuidOfInternalDisposingDocument", internalDisposingDocument.getGuid());
+        setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
     }
 
     @Override
@@ -58,8 +58,8 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         if(longDisposePrice!=null) setDisposePrice(longDisposePrice);
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS!=null) setNds(longNDS);
-        guidOfIDD = getStringAttributeValue(node,"GuidOfIDD",36);
-        guidOfTMG = getStringAttributeValue(node,"GuidOfTMG",36);
+        guidOfIDD = getStringAttributeValue(node,"GuidOfInternalDisposingDocument",36);
+        guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
         return this;
     }
 

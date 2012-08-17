@@ -27,6 +27,7 @@
         <property name="type" column="TypeOfInternalDisposingDocument" type="integer" not-null="true"/>
         <property name="date" column="DateOfInternalDisposingDocument" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="state" column="State" type="integer" not-null="true"/>
+        <property name="comments" column="Comments" type="string" length="1024" not-null="true"/>
 
         <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Staff" fetch="select" lazy="false">
             <column name="IdOfStaff" not-null="true" />

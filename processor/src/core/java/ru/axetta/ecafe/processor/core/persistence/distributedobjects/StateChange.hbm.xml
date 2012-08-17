@@ -40,10 +40,6 @@
             <column name="IdOfGoodsRequest" not-null="true" />
         </many-to-one>
 
-        <many-to-one name="returnDocument" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.ReturnDocument" fetch="select" lazy="false">
-            <column name="IdOfReturnDocument" not-null="true" />
-        </many-to-one>
-
         <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Staff" fetch="select" lazy="false">
             <column name="IdOfStaff" not-null="true" />
         </many-to-one>

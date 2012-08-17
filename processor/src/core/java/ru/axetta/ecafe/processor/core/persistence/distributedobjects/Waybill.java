@@ -38,12 +38,12 @@ public class Waybill extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Number", number);
-        setAttribute(element,"DateWayBill", getDateFormat().format(dateOfWayBill));
+        setAttribute(element,"Date", getDateFormat().format(dateOfWayBill));
         setAttribute(element,"State", state);
         setAttribute(element, "Shipper", shipper);
         setAttribute(element,"Receiver", receiver);
-        setAttribute(element, "GuidOfS", staff.getGuid());
-        setAttribute(element, "GuidOfAWD", actOfWaybillDifference.getGuid());
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
+        setAttribute(element, "GuidOfActOfDifference", actOfWaybillDifference.getGuid());
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Waybill extends DistributedObject {
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringNumber = getStringAttributeValue(node, "Number", 128);
         if(stringNumber != null) setNumber(stringNumber);
-        Date dateWayBill = getDateAttributeValue(node, "DateWayBill");
+        Date dateWayBill = getDateAttributeValue(node, "Date");
         if(dateWayBill!=null) setDateOfWayBill(dateWayBill);
         Integer integerState = getIntegerAttributeValue(node, "State");
         if(integerState != null) setState(integerState);
@@ -60,8 +60,8 @@ public class Waybill extends DistributedObject {
         if(stringShipper != null) setShipper(stringShipper);
         String stringReceiver = getStringAttributeValue(node, "Receiver", 128);
         if(stringReceiver != null) setReceiver(stringReceiver);
-        guidOfSt = getStringAttributeValue(node,"GuidOfS",36);
-        guidOfAWD = getStringAttributeValue(node,"GuidOfAWD",36);
+        guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
+        guidOfAWD = getStringAttributeValue(node,"GuidOfActOfDifference",36);
         return this;
     }
 

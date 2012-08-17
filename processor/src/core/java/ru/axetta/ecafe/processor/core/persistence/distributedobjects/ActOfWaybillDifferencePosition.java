@@ -44,8 +44,8 @@ public class ActOfWaybillDifferencePosition extends DistributedObject {
         setAttribute(element,"Price", price);
         setAttribute(element,"NDS", nds);
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GuidOfG", good.getGuid());
-        setAttribute(element, "GuidOfAWD", actOfWaybillDifference.getGuid());
+        setAttribute(element, "GuidOfGoods", good.getGuid());
+        setAttribute(element, "GuidOfActOfDifference", actOfWaybillDifference.getGuid());
     }
 
     @Override
@@ -68,8 +68,8 @@ public class ActOfWaybillDifferencePosition extends DistributedObject {
         if(longPrice != null) setPrice(longPrice);
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS != null) setNds(longNDS);
-        guidOfG = getStringAttributeValue(node,"GuidOfG",36);
-        guidOfAWD = getStringAttributeValue(node,"GuidOfAWD",36);
+        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
+        guidOfAWD = getStringAttributeValue(node,"GuidOfActOfDifference",36);
         return this;
     }
 

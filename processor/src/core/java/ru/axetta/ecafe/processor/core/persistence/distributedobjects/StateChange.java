@@ -35,9 +35,9 @@ public class StateChange extends DistributedObject {
         GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class,guidOfGR);
         if(gr==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setGoodRequest(gr);
-        ReturnDocument rd = DAOService.getInstance().findDistributedObjectByRefGUID(ReturnDocument.class,guidOfRD);
-        if(rd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setReturnDocument(rd);
+        InternalIncomingDocument iid = DAOService.getInstance().findDistributedObjectByRefGUID(InternalIncomingDocument.class,guidOfIID);
+        if(iid==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        setInternalIncomingDocument(iid);
         Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setStaff(st);
@@ -49,11 +49,11 @@ public class StateChange extends DistributedObject {
         setAttribute(element, "StateFrom", stateFrom);
         setAttribute(element, "StateTo", stateTo);
         setAttribute(element, "Date", getDateFormat().format(date));
-        setAttribute(element, "GuidOfIWB", wayBill.getGuid());
-        setAttribute(element, "GuidOfIDD", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfIGR", goodRequest.getGuid());
-        setAttribute(element, "GuidOfIRD", returnDocument.getGuid());
-        setAttribute(element, "GuidOfS", staff.getGuid());
+        setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
+        setAttribute(element, "GuidOfIncomingDocument", internalDisposingDocument.getGuid());
+        setAttribute(element, "GuidOfGoodsRequest", goodRequest.getGuid());
+        setAttribute(element, "GuidOfIncomingDocument", internalIncomingDocument.getGuid());
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
@@ -66,11 +66,11 @@ public class StateChange extends DistributedObject {
         if(longStateTo!=null) setStateTo(longStateTo);
         Date dateOfInternalIncomingDocument = getDateAttributeValue(node,"Date");
         if(dateOfInternalIncomingDocument != null) setDate(dateOfInternalIncomingDocument);
-        guidOfWB = getStringAttributeValue(node,"GuidOfIWB",36);
-        guidOfIDD = getStringAttributeValue(node,"GuidOfIDD",36);
-        guidOfGR = getStringAttributeValue(node,"GuidOfIGR",36);
-        guidOfRD = getStringAttributeValue(node,"GuidOfIRD",36);
-        guidOfS = getStringAttributeValue(node,"GuidOfS",36);
+        guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
+        guidOfIDD = getStringAttributeValue(node,"GuidOfIncomingDocument",36);
+        guidOfGR = getStringAttributeValue(node,"GuidOfGoodsRequest",36);
+        guidOfIID = getStringAttributeValue(node,"GuidOfIncomingDocument",36);
+        guidOfS = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
 
@@ -91,8 +91,8 @@ public class StateChange extends DistributedObject {
     private String guidOfIDD;
     private Staff staff;
     private String guidOfS;
-    private ReturnDocument returnDocument;
-    private String guidOfRD;
+    private InternalIncomingDocument internalIncomingDocument;
+    private String guidOfIID;
     private Waybill wayBill;
     private String guidOfWB;
 
@@ -104,12 +104,12 @@ public class StateChange extends DistributedObject {
         this.guidOfS = guidOfS;
     }
 
-    public String getGuidOfRD() {
-        return guidOfRD;
+    public String getGuidOfIID() {
+        return guidOfIID;
     }
 
-    public void setGuidOfRD(String guidOfRD) {
-        this.guidOfRD = guidOfRD;
+    public void setGuidOfIID(String guidOfIID) {
+        this.guidOfIID = guidOfIID;
     }
 
     public String getGuidOfGR() {
@@ -136,12 +136,12 @@ public class StateChange extends DistributedObject {
         this.wayBill = wayBill;
     }
 
-    public ReturnDocument getReturnDocument() {
-        return returnDocument;
+    public InternalIncomingDocument getInternalIncomingDocument() {
+        return internalIncomingDocument;
     }
 
-    public void setReturnDocument(ReturnDocument returnDocument) {
-        this.returnDocument = returnDocument;
+    public void setInternalIncomingDocument(InternalIncomingDocument internalIncomingDocument) {
+        this.internalIncomingDocument = internalIncomingDocument;
     }
 
     public Staff getStaff() {

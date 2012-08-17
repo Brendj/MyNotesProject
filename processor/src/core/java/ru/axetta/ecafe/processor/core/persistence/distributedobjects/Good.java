@@ -45,9 +45,9 @@ public class Good extends DistributedObject {
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"Margin", margin);
-        setAttribute(element,"GuidOfGG", goodGroup.getGuid());
-        setAttribute(element,"GuidOfP", product.getGuid());
-        setAttribute(element,"GuidOfTM", technologicalMap.getGuid());
+        setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
+        setAttribute(element,"GuidOfBaseProduct", product.getGuid());
+        setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
     }
     @Override
     protected Good parseAttributes(Node node) throws ParseException, IOException {
@@ -67,9 +67,9 @@ public class Good extends DistributedObject {
         if(longLifeTime != null) setLifeTime(longLifeTime);
         Long longMargin = getLongAttributeValue(node, "Margin");
         if(longMargin != null) setMargin(longMargin);
-        guidOfGG = getStringAttributeValue(node,"GuidOfGG",36);
-        guidOfP = getStringAttributeValue(node,"GuidOfP",36);
-        guidOfTM = getStringAttributeValue(node,"GuidOfTM",36);
+        guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
+        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
+        guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
         return this;
     }
 

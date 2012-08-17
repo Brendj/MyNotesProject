@@ -40,8 +40,9 @@ public class InternalDisposingDocument extends DistributedObject {
         setAttribute(element,"Type", type);
         setAttribute(element,"Date", getDateFormat().format(date));
         setAttribute(element,"State", state);
-        setAttribute(element, "GuidOfS", staff.getGuid());
-        setAttribute(element, "GuidOfAI", actOfInventarization.getGuid());
+        setAttribute(element,"Comment", comments);
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
+        setAttribute(element, "GuidOfInventarizationAct", actOfInventarization.getGuid());
     }
 
     @Override
@@ -54,8 +55,10 @@ public class InternalDisposingDocument extends DistributedObject {
         if(dateOfInternalDisposingDocument!=null) setDate(dateOfInternalDisposingDocument);
         Integer integerState = getIntegerAttributeValue(node, "State");
         if(integerState != null) setState(integerState);
-        guidOfSt = getStringAttributeValue(node,"GuidOfS",36);
-        guidOfAI = getStringAttributeValue(node,"GuidOfAI",36);
+        String stringComments = getStringAttributeValue(node,"Comment",1024);
+        if(stringComments != null) setComments(stringComments);
+        guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
+        guidOfAI = getStringAttributeValue(node,"GuidOfInventarizationAct",36);
         return this;
     }
 
@@ -65,6 +68,7 @@ public class InternalDisposingDocument extends DistributedObject {
         setType(((InternalDisposingDocument) distributedObject).getType());
         setDate(((InternalDisposingDocument) distributedObject).getDate());
         setState(((InternalDisposingDocument) distributedObject).getState());
+        setComments(((InternalDisposingDocument) distributedObject).getComments());
     }
 
     private Integer type;
@@ -74,6 +78,16 @@ public class InternalDisposingDocument extends DistributedObject {
     private String guidOfAI;
     private Staff staff;
     private String guidOfSt;
+    private String comments;
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
 
     public Integer getState() {
         return state;

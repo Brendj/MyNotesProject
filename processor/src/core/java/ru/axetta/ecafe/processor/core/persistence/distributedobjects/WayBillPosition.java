@@ -45,8 +45,8 @@ public class WayBillPosition extends DistributedObject {
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"Price", price);
         setAttribute(element,"NDS", nds);
-        setAttribute(element, "GuidOfG", good.getGuid());
-        setAttribute(element, "GuidOfWB", wayBill.getGuid());
+        setAttribute(element, "GuidOfGoods", good.getGuid());
+        setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
     }
 
     @Override
@@ -69,8 +69,8 @@ public class WayBillPosition extends DistributedObject {
         if(longPrice != null) setPrice(longPrice);
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS != null) setNds(longNDS);
-        guidOfG = getStringAttributeValue(node,"GuidOfG",36);
-        guidOfWB = getStringAttributeValue(node,"GuidOfAWD",36);
+        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
+        guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
         return this;
     }
 

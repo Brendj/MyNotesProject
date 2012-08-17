@@ -41,9 +41,9 @@ public class GoodRequestPosition extends DistributedObject {
         setAttribute(element,"UnitsScale", unitsScale);
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element,"NetWeight", netWeight);
-        setAttribute(element,"GuidOfGR", goodRequest.getGuid());
-        setAttribute(element,"GuidOfG", good.getGuid());
-        setAttribute(element,"GuidOfP", product.getGuid());
+        setAttribute(element,"GuidOfGoodsRequest", goodRequest.getGuid());
+        setAttribute(element,"GuidOfGoods", good.getGuid());
+        setAttribute(element,"GuidOfBaseProduct", product.getGuid());
     }
 
     @Override
@@ -56,9 +56,9 @@ public class GoodRequestPosition extends DistributedObject {
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
         if( longNetWeight != null) setNetWeight(longNetWeight);
-        guidOfGR = getStringAttributeValue(node,"GuidOfGR",36);
-        guidOfG = getStringAttributeValue(node,"GuidOfG",36);
-        guidOfP = getStringAttributeValue(node,"GuidOfP",36);
+        guidOfGR = getStringAttributeValue(node,"GuidOfGoodsRequest",36);
+        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
+        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
         return this;
     }
     @Override

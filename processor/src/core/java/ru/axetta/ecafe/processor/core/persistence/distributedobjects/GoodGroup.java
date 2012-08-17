@@ -33,14 +33,14 @@ public class GoodGroup extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"NameOfGoodsGroup", NameOfGoodsGroup);
+        setAttribute(element,"Name", NameOfGoodsGroup);
     }
 
     @Override
     protected GoodGroup parseAttributes(Node node) throws ParseException, IOException {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGoodsGroup = getStringAttributeValue(node,"NameOfGood",128);
+        String stringNameOfGoodsGroup = getStringAttributeValue(node,"Name",128);
         if(stringNameOfGoodsGroup!=null) setNameOfGoodsGroup(stringNameOfGoodsGroup);
         return this;
     }

@@ -35,7 +35,7 @@ public class ActOfWaybillDifference extends DistributedObject {
         setAttribute(element,"Date", getDateFormat().format(date));
         setAttribute(element, "Number", number);
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GuidOfS", staff.getGuid());
+        setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ActOfWaybillDifference extends DistributedObject {
         if(stringNumber != null) setNumber(stringNumber);
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        guidOfStaff = getStringAttributeValue(node,"GuidOfS",36);
+        guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
 

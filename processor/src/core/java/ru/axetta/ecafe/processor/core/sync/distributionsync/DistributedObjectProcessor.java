@@ -141,8 +141,7 @@ public class DistributedObjectProcessor {
                         + "'", DistributedObject.class);
         DistributedObject currDistributedObject = query.getSingleResult();
         conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
-        // выйдет в 22 версии
-        //conflict.setgVersionResult(currentVersion);
+        conflict.setgVersionResult(currentVersion);
         conflict.setValueCur(createStringElement(document, currDistributedObject));
         conflict.setCreateConflictDate(new Date());
         entityManager.persist(conflict);

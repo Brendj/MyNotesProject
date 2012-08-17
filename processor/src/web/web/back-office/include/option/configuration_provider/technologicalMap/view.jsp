@@ -126,11 +126,11 @@
             <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.vitaminB2}" styleClass="input-text"
                          validatorMessage="Количсество углеводов должно быть числом." style="width: 4em" readonly="true"/>
             <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.vitaminPp}" styleClass="input-text"
-                         validatorMessage="Количсество белков должно быть числом." style="width: 4em" readonly="true"/>
+                         style="width: 4em" readonly="true"/>
             <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.vitaminC}" styleClass="input-text"
-                         validatorMessage="Количсество жиров должно быть числом." style="width: 4em" readonly="true"/>
+                          style="width: 4em" readonly="true"/>
             <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.vitaminE}" styleClass="input-text"
-                         validatorMessage="Количсество углеводов должно быть числом." style="width: 4em" readonly="true"/>
+                          style="width: 4em" readonly="true"/>
         </h:panelGrid>
 
         <h:panelGrid columns="1">
@@ -139,10 +139,14 @@
             </f:facet>
             <h:outputText escape="true" value="" />
             <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.energyValue}" styleClass="input-text"
-                         validatorMessage="Количсество белков должно быть числом." style="width: 4em" readonly="true"/>
+                         style="width: 4em" readonly="true"/>
         </h:panelGrid>
     </h:panelGrid>
-
+    <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Срок годности (мин.)" />
+        <h:inputText value="#{technologicalMapViewPage.currentTechnologicalMap.lifeTime}" styleClass="input-text" readonly="true"
+                     validatorMessage="Число должно быть целым."/>
+    </h:panelGrid>
     <h:outputText value="Технология приготовления:" styleClass="output-text" escape="true"/>
     <h:inputTextarea value="#{technologicalMapViewPage.currentTechnologicalMap.technologyOfPreparation}" rows="10" cols="50" readonly="true"/>
 

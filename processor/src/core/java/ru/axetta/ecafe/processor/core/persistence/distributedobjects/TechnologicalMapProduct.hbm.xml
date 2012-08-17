@@ -24,6 +24,7 @@
 
         <property name="grossWeight" column="GrossWeight" type="integer" />
         <property name="netWeight" column="NetWeight" type="integer" />
+        <property name="numberGroupReplace" column="NumberGroupReplace" type="integer" />
 
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 

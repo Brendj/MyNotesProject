@@ -26,6 +26,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
         setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
+        setNumberGroupReplace(((TechnologicalMapProduct) distributedObject).getNumberGroupReplace());
     }
 
 
@@ -34,6 +35,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         //setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GWeight", grossWeight);
         setAttribute(element, "NWeight", netWeight);
+        setAttribute(element, "NumberGroupReplace", netWeight);
         setAttribute(element, "GuidOfP", product.getGuid());
         setAttribute(element, "GuidOfTM", technologicalMap.getGuid());
     }
@@ -51,6 +53,11 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         if (integerNetMass != null) {
             setNetWeight(integerNetMass);
         }
+        Integer integerNumberGroupReplace = getIntegerAttributeValue(node, "NumberGroupReplace");
+        if (integerNumberGroupReplace != null) {
+            setNumberGroupReplace(integerNumberGroupReplace);
+        }
+
 
         guidOfP = getStringAttributeValue(node, "GuidOfP", 36);
         guidOfTM = getStringAttributeValue(node, "GuidOfTM", 36);
@@ -79,7 +86,15 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     private String guidOfP;
     private String guidOfTM;
     private Long idOfConfigurationProvider;
+    private Integer numberGroupReplace;
 
+    public Integer getNumberGroupReplace() {
+        return numberGroupReplace;
+    }
+
+    public void setNumberGroupReplace(Integer numberGroupReplace) {
+        this.numberGroupReplace = numberGroupReplace;
+    }
 
     public Product getProduct() {
         return product;
