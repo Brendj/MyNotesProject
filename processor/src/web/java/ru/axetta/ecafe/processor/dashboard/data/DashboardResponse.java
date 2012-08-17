@@ -160,6 +160,7 @@ public class DashboardResponse {
         long numOfOperations;
         
         String error;
+        Date timestamp;
 
         public long getIdOfContragent() {
             return idOfContragent;
@@ -191,6 +192,14 @@ public class DashboardResponse {
 
         public void setError(String error) {
             this.error = error;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
         }
     }
 

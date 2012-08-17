@@ -186,11 +186,14 @@ public class DashboardServiceBean {
             query.setParameter("dayEnd", dayEnd);
 
             List queryResult = query.getResultList();
+            Date timestamp = new Date();
+
             List<DashboardResponse.PaymentSystemItemInfo> paymentSystemItemInfoList = dashboardResponse
                     .getPaymentSystemItemInfoList();
             for (Object object : queryResult) {
                 DashboardResponse.PaymentSystemItemInfo paymentSystemItemInfo = new DashboardResponse.PaymentSystemItemInfo();
                 try {
+                    paymentSystemItemInfo.setTimestamp(timestamp);
                     Object[] result = (Object[]) object;
                     paymentSystemItemInfo.setIdOfContragent((Long) result[0]);
                     paymentSystemItemInfo.setLastOperationTime((Date) result[1]);
