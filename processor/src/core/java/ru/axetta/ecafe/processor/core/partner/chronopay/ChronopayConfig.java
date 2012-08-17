@@ -58,6 +58,8 @@ public class ChronopayConfig {
      */
   private  final String callbackUrl;
 
+    private Boolean show;
+
     /**
      * Берет параметры конфигурации - поля класса из свойств properties, которые извлекаются из таблицы
      * cf_options в базе процессинга
@@ -65,7 +67,7 @@ public class ChronopayConfig {
      * @param paramBaseName база имен параметров в объекте properties
      * @throws Exception
      */
-    public ChronopayConfig(Properties properties, String paramBaseName,Double rate) throws Exception {
+    public ChronopayConfig(Properties properties, String paramBaseName,Double rate,Boolean show) throws Exception {
            String sharedSecParam=paramBaseName+SHARED_SEC_PARAM;
            //String rateParam=paramBaseName+RATE_PARAM;
            String ipParam=paramBaseName+IP_PARAM;
@@ -79,8 +81,8 @@ public class ChronopayConfig {
         this.ip=properties.getProperty(ipParam,"");
         this.contragentName=properties.getProperty(contragentNameParam,"Chronopay");
         this.purchaseUri=properties.getProperty(purchaseUriParam,"https://payments.chronopay.com/");
-        this.callbackUrl=properties.getProperty(callbackUrlParam,"");
-
+        this.callbackUrl=properties.getProperty(callbackUrlParam,"https://78.46.34.200:9999/processor/chronopay/acceptpay");
+         this.show=show;
     }
 
 
@@ -129,5 +131,13 @@ public class ChronopayConfig {
 
     public String getCallbackUrl() {
         return callbackUrl;
+    }
+
+    public Boolean getShow() {
+        return show;
+    }
+
+    public void setShow(Boolean show) {
+        this.show = show;
     }
 }

@@ -24,22 +24,23 @@ public class RBKMoneyConfig {
     private static final String CONTRAGENT_NAME_PARAM = RBK_PARAM_BASE + ".contragentName";
     private static final String PURCHASE_URI_NAME_PARAM = RBK_PARAM_BASE + ".purchaseUri";
     private static final String SECRET_KEY_PARAM = RBK_PARAM_BASE + ".secretKey";
-    private static final String RATE_PARAM = RBK_PARAM_BASE + ".rate";
+    //private static final String RATE_PARAM = RBK_PARAM_BASE + ".rate";
 
     private final String eshopId;
     private final String serviceName;
     private final String contragentName;
     private final URI purchaseUri;
     private final String secretKey;
-    private final Double rate;
+    private  Double rate;
+    private Boolean show;
 
-    public RBKMoneyConfig(Properties properties, String paramBaseName) throws Exception {
+    public RBKMoneyConfig(Properties properties, String paramBaseName,Double rate,Boolean show) throws Exception {
         String eshopIdParam = paramBaseName + ESHOP_ID_PARAM;
         String serviceNameParam = paramBaseName + SERVICE_NAME_PARAM;
         String contragentNameParam = paramBaseName + CONTRAGENT_NAME_PARAM;
         String purchaseUriNameParam = paramBaseName + PURCHASE_URI_NAME_PARAM;
         String secretKeyParam = paramBaseName + SECRET_KEY_PARAM;
-        String rateParam = paramBaseName + RATE_PARAM;
+        //String rateParam = paramBaseName + RATE_PARAM;
 
         this.eshopId = properties.getProperty(eshopIdParam);
         if (StringUtils.isEmpty(eshopId)) {
@@ -51,7 +52,11 @@ public class RBKMoneyConfig {
         this.contragentName = properties.getProperty(contragentNameParam, "RBK Money");
         this.purchaseUri = new URI(
                 properties.getProperty(purchaseUriNameParam, "https://rbkmoney.ru/acceptpurchase.aspx"));
-        this.rate = Double.valueOf(properties.getProperty(rateParam, "1"));
+        //this.rate = Double.valueOf(properties.getProperty(rateParam, "1"));
+        this.rate=rate;
+        this.show=show;
+
+
     }
 
     public String getEshopId() {
@@ -76,5 +81,17 @@ public class RBKMoneyConfig {
 
     public Double getRate() {
         return rate;
+    }
+
+    public void setRate(Double rate) {
+        this.rate = rate;
+    }
+
+    public Boolean getShow() {
+        return show;
+    }
+
+    public void setShow(Boolean show) {
+        this.show = show;
     }
 }
