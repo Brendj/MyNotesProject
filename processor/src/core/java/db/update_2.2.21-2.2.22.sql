@@ -1,3 +1,17 @@
+  CREATE TABLE cf_banks
+(
+  name character varying(128),
+  logourl character varying(128),
+  terminalsurl character varying(128),
+  enrollmenttype character varying(128),
+  idofbank bigserial NOT NULL,
+  minrate double precision,
+  rate double precision,
+  CONSTRAINT cf_banks_pkey PRIMARY KEY (idofbank )
+)
+WITH (
+  OIDS=FALSE
+);
 
 -- не использовать
 -- -- колонка результирующей версии после обновления объекта
