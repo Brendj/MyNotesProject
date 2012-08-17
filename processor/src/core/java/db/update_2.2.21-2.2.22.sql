@@ -1,4 +1,4 @@
-  CREATE TABLE cf_banks
+CREATE TABLE cf_banks
 (
   name character varying(128),
   logourl character varying(128),
@@ -9,9 +9,6 @@
   rate double precision,
   CONSTRAINT cf_banks_pkey PRIMARY KEY (idofbank )
 )
-WITH (
-  OIDS=FALSE
-);
 
 -- не использовать
 -- -- колонка результирующей версии после обновления объекта
