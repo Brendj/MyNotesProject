@@ -10,13 +10,13 @@ import org.w3c.dom.Node;
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
- * Date: 17.08.12
- * Time: 19:17
+ * Date: 18.08.12
+ * Time: 11:38
  * To change this template use File | Settings | File Templates.
  */
-public class Source extends DistributedObject {
+public class Fund extends DistributedObject {
 
-    private String sourceName;
+    private String fundName;
 
     @Override
     protected void appendAttributes(Element element) {
@@ -24,32 +24,32 @@ public class Source extends DistributedObject {
     }
 
     @Override
-    public Source parseAttributes(Node node) {
+    public Fund parseAttributes(Node node) {
 
-        String sourceName = getStringAttributeValue(node, "sourceName", 1024);
-        if (sourceName != null) {
-            setSourceName(sourceName);
+        String fundName = getStringAttributeValue(node, "fundName", 128);
+        if (fundName != null) {
+            setFundName(fundName);
         }
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setSourceName(((Source) distributedObject).getSourceName());
+        setFundName(((Fund) distributedObject).getFundName());
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public String getFundName() {
+        return fundName;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public void setFundName(String fundName) {
+        this.fundName = fundName;
     }
 
     @Override
     public String toString() {
-        return "Source{" +
-                "sourceName='" + sourceName + '\'' +
+        return "Fund{" +
+                "fundName='" + fundName + '\'' +
                 '}';
     }
 }

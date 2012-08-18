@@ -285,22 +285,22 @@
                 <tr>
                     <td>
                         <%=circulation.getGlobalId() + " " +
-                            circulation.getOrg().getIdOfOrg()%>
+                            circulation.getOrgOwner()%>
                     </td>
                     <td>
-                        <%=circulation.getIssuable().getPublication().getAuthor()%>
+                        <%=circulation.getIssuable().getInstance().getPublication().getAuthor()%>
                     </td>
                     <td>
-                        <%=circulation.getIssuable().getPublication().getTitle()%>
+                        <%=circulation.getIssuable().getInstance().getPublication().getTitle()%>
                     </td>
                     <td>
-                        <%=circulation.getIssuable().getPublication().getTitle2()%>
+                        <%=circulation.getIssuable().getInstance().getPublication().getTitle2()%>
                     </td>
                     <td>
-                        <%=circulation.getIssuable().getPublication().getPublicationdate()%>
+                        <%=circulation.getIssuable().getInstance().getPublication().getPublicationdate()%>
                     </td>
                     <td>
-                        <%=circulation.getIssuable().getPublication().getPublisher()%>
+                        <%=circulation.getIssuable().getInstance().getPublication().getPublisher()%>
                     </td>
                     <td>
                         <%=StringEscapeUtils.escapeHtml(timeFormat.format(circulation.getIssuanceDate()))%>

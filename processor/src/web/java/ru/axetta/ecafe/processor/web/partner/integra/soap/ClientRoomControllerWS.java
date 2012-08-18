@@ -1206,7 +1206,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ci.setStatus(c.getStatus());
             ci.setRealRefundDate(toXmlDateTime(c.getRealRefundDate()));
             ci.setRefundDate(toXmlDateTime(c.getRefundDate()));
-            Publication p = c.getIssuable().getPublication();
+            Publication p = c.getIssuable().getInstance().getPublication();
             if (p!=null) {
                 PublicationItem pi = new PublicationItem();
                 pi.setAuthor(p.getAuthor());

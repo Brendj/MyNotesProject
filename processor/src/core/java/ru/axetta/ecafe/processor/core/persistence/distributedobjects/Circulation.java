@@ -26,60 +26,34 @@ public class Circulation extends DistributedObject {
 
     public final static int ISSUED = 0, EXTENDED = 1, LOST = 2, REFUNDED = 3;
 
+    private Circulation parentCirculation;
+    private Reader reader;
     private Issuable issuable;
-    private Org org;
-    private Client client;
     private Date issuanceDate;
     private Date refundDate;
     private Date realRefundDate;
     private int status;
-    private int quantity;
 
-    private long idoforg;
-    private long idofclient;
-    private String guidIssuable;
-
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MM yyyy HH:mm:ss");
+    String guidParentCirculation;
+    String guidReader;
+    String guidIssuable;
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "issuanceDate", issuanceDate);
-        setAttribute(element, "refundDate", refundDate);
-        setAttribute(element, "realRefundDate", realRefundDate);
-        setAttribute(element, "quantity", quantity);
-        setAttribute(element, "status", status);
-        setAttribute(element, "idoforg", idoforg);
-        setAttribute(element, "idofclient", idofclient);
+        setAttribute(element, "Guid", guid);
     }
 
     @Override
     protected Circulation parseAttributes(Node node) throws ParseException {
-        String stringIssuanceDate = getStringAttributeValue(node, "issuanceDate", 32);
-        if (stringIssuanceDate != null) {
-            setIssuanceDate(simpleDateFormat.parse(stringIssuanceDate));
-        }
-        String stringRefundDate = getStringAttributeValue(node, "refundDate", 32);
-        if (stringRefundDate != null) {
-            setRefundDate(simpleDateFormat.parse(stringRefundDate));
-        }
-        String stringRealRefundDate = getStringAttributeValue(node, "realRefundDate", 128);
-        if (stringRealRefundDate != null) {
-            setRealRefundDate(simpleDateFormat.parse(stringRealRefundDate));
-        }
-        String stringQuantity = getStringAttributeValue(node, "quantity", 512);
-        if (stringQuantity != null) {
-            setQuantity(Integer.parseInt(stringQuantity));
-        }
-        Integer integerStatus = getIntegerAttributeValue(node, "status");
-        if (integerStatus != null) {
-            setStatus(integerStatus);
-        }
 
-        //setIdofpubl(getLongAttributeValue(node, "idofpubl"));
-        setIdoforg(getLongAttributeValue(node, "idoforg"));
-        setIdofclient(getLongAttributeValue(node, "idofclient"));
+        guidParentCirculation = getStringAttributeValue(node, "guidParentCirculation", 1024);
+        guidReader = getStringAttributeValue(node, "guidReader", 1024);
+        guidIssuable = getStringAttributeValue(node, "GUIDIssuable", 1024);
 
-        guidIssuable = getStringAttributeValue(node, "GUIDIssuable", 36);
+        issuanceDate = getDateAttributeValue(node, "issuanceDate");
+        refundDate = getDateAttributeValue(node, "refundDate");
+        realRefundDate = getDateAttributeValue(node, "realRefundDate");
+        status = getIntegerAttributeValue(node, "status");
         return this;
     }
 
@@ -87,8 +61,8 @@ public class Circulation extends DistributedObject {
     public void preProcess() {
         DAOService daoService = DAOService.getInstance();
         setIssuable(daoService.findDistributedObjectByRefGUID(Issuable.class, guidIssuable));
-        setOrg(daoService.findOrById(idoforg));
-        setClient(daoService.findClientById(idofclient));
+        setParentCirculation(daoService.findDistributedObjectByRefGUID(Circulation.class, guidParentCirculation));
+        setReader(daoService.findDistributedObjectByRefGUID(Reader.class, guidReader));
     }
 
     @Override
@@ -96,10 +70,26 @@ public class Circulation extends DistributedObject {
         setIssuanceDate(((Circulation) distributedObject).getIssuanceDate());
         setRefundDate(((Circulation) distributedObject).getRefundDate());
         setRealRefundDate(((Circulation) distributedObject).getRealRefundDate());
-        setQuantity(((Circulation) distributedObject).getQuantity());
-        setIdofclient(((Circulation) distributedObject).getIdofclient());
-        setIdoforg(((Circulation) distributedObject).getIdoforg());
-        //setIdofpubl(((Circulation) distributedObject).getIdofpubl());
+        setStatus(((Circulation) distributedObject).getStatus());
+        setParentCirculation(((Circulation) distributedObject).getParentCirculation());
+        setIssuable(((Circulation) distributedObject).getIssuable());
+        setReader(((Circulation) distributedObject).getReader());
+    }
+
+    public Circulation getParentCirculation() {
+        return parentCirculation;
+    }
+
+    public void setParentCirculation(Circulation parentCirculation) {
+        this.parentCirculation = parentCirculation;
+    }
+
+    public Reader getReader() {
+        return reader;
+    }
+
+    public void setReader(Reader reader) {
+        this.reader = reader;
     }
 
     public Issuable getIssuable() {
@@ -108,22 +98,6 @@ public class Circulation extends DistributedObject {
 
     public void setIssuable(Issuable issuable) {
         this.issuable = issuable;
-    }
-
-    public Org getOrg() {
-        return org;
-    }
-
-    public void setOrg(Org org) {
-        this.org = org;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public Date getIssuanceDate() {
@@ -150,39 +124,6 @@ public class Circulation extends DistributedObject {
         this.realRefundDate = realRefundDate;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-
-    /*public long getIdofpubl() {
-        return idofpubl;
-    }
-
-    public void setIdofpubl(long idofpubl) {
-        this.idofpubl = idofpubl;
-    }*/
-
-    public long getIdoforg() {
-        return idoforg;
-    }
-
-    public void setIdoforg(long idoforg) {
-        this.idoforg = idoforg;
-    }
-
-    public long getIdofclient() {
-        return idofclient;
-    }
-
-    public void setIdofclient(long idofclient) {
-        this.idofclient = idofclient;
-    }
-
     public int getStatus() {
         return status;
     }
@@ -190,6 +131,4 @@ public class Circulation extends DistributedObject {
     public void setStatus(int status) {
         this.status = status;
     }
-
-
 }

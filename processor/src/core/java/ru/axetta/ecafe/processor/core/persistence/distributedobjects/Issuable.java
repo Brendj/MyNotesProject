@@ -20,17 +20,17 @@ import java.text.ParseException;
  */
 public class Issuable extends DistributedObject {
 
-    private long barcode;
+    private Long barcode;
     private char type;
-    private Publication publication;
+    private Instance instance;
+    private JournalItem journalItem;
 
-    private String guidPublication;
+    private String guidInstance;
+    private String guidJournalItem;
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "barcode", barcode);
-        setAttribute(element, "type", type);
-        setAttribute(element, "publicationid", publication.getGlobalId());
+        setAttribute(element, "Guid", guid);
     }
 
     @Override
@@ -44,28 +44,31 @@ public class Issuable extends DistributedObject {
             setType(charType);
         }
 
-
-        guidPublication = getStringAttributeValue(node, "GUIDPublication", 36);
+        guidInstance = getStringAttributeValue(node, "guidInstance", 1024);
+        guidJournalItem = getStringAttributeValue(node, "guidJournalItem", 1024);
         return this;
     }
 
     @Override
     public void preProcess() {
-        setPublication(DAOService.getInstance().findDistributedObjectByRefGUID(Publication.class, guidPublication));
+        DAOService daoService = DAOService.getInstance();
+        setInstance(daoService.findDistributedObjectByRefGUID(Instance.class, guidInstance));
+        setJournalItem(daoService.findDistributedObjectByRefGUID(JournalItem.class, guidJournalItem));
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
         setBarcode(((Issuable) distributedObject).getBarcode());
         setType(((Issuable) distributedObject).getType());
-        setPublication(((Issuable) distributedObject).getPublication());
+        setBarcode(((Issuable) distributedObject).getBarcode());
+        setType((((Issuable) distributedObject).getType()));
     }
 
-    public long getBarcode() {
+    public Long getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(long barcode) {
+    public void setBarcode(Long barcode) {
         this.barcode = barcode;
     }
 
@@ -77,11 +80,29 @@ public class Issuable extends DistributedObject {
         this.type = type;
     }
 
-    public Publication getPublication() {
-        return publication;
+    public Instance getInstance() {
+        return instance;
     }
 
-    public void setPublication(Publication publication) {
-        this.publication = publication;
+    public void setInstance(Instance instance) {
+        this.instance = instance;
+    }
+
+    public JournalItem getJournalItem() {
+        return journalItem;
+    }
+
+    public void setJournalItem(JournalItem journalItem) {
+        this.journalItem = journalItem;
+    }
+
+    @Override
+    public String toString() {
+        return "Issuable{" +
+                "barcode=" + barcode +
+                ", type=" + type +
+                ", instance=" + instance +
+                ", journalItem=" + journalItem +
+                '}';
     }
 }
