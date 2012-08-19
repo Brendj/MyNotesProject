@@ -34,7 +34,7 @@ public class AccompanyingDocument extends DistributedObject {
     public AccompanyingDocument parseAttributes(Node node) {
 
         guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "guidTypeOfAccompanyingDocument", 1024);
-        guidSource = getStringAttributeValue(node, "guidTypeOfAccompanyingDocument", 1024);
+        guidSource = getStringAttributeValue(node, "guidSource", 1024);
         return this;
     }
 
