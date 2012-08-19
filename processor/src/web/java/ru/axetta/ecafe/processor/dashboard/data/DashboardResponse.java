@@ -21,6 +21,7 @@ public class DashboardResponse {
     public static class EduInstItemInfo {
 
         long idOfOrg;
+        String orgName;
         Date lastFullSyncTime;
         Date firstFullSyncTime;
         Date lastSuccessfulBalanceSyncTime;
@@ -46,6 +47,14 @@ public class DashboardResponse {
 
         public void setIdOfOrg(long idOfOrg) {
             this.idOfOrg = idOfOrg;
+        }
+
+        public String getOrgName() {
+            return orgName;
+        }
+
+        public void setOrgName(String orgName) {
+            this.orgName = orgName;
         }
 
         public Date getLastFullSyncTime() {
@@ -156,6 +165,7 @@ public class DashboardResponse {
     public static class PaymentSystemItemInfo {
 
         long idOfContragent;
+        String contragentName;
         Date lastOperationTime;
         long numOfOperations;
         
@@ -168,6 +178,14 @@ public class DashboardResponse {
 
         public void setIdOfContragent(long idOfContragent) {
             this.idOfContragent = idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
+
+        public void setContragentName(String contragentName) {
+            this.contragentName = contragentName;
         }
 
         public Date getLastOperationTime() {

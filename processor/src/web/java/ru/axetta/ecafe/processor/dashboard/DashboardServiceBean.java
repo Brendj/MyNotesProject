@@ -30,6 +30,27 @@ import java.util.List;
 @TransactionManagement(TransactionManagementType.BEAN)
 public class DashboardServiceBean {
 
+    private static final int ID_OF_ORG_PARAM_INDEX = 0;
+    private static final int ORG_NAME_PARAM_INDEX = ID_OF_ORG_PARAM_INDEX + 1;
+    private static final int LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX = ORG_NAME_PARAM_INDEX + 1;
+    private static final int LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX = LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX + 1;
+    private static final int FIRST_FULL_SYNC_TIME_PARAM_INDEX = LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX + 1;
+    private static final int SYNC_HISTORY_PARAM_INDEX = FIRST_FULL_SYNC_TIME_PARAM_INDEX + 1;
+    private static final int NUM_OF_STUDENTS_PARAM_INDEX = SYNC_HISTORY_PARAM_INDEX + 1;
+    private static final int NUM_OF_STAFF_PARAM_INDEX = NUM_OF_STUDENTS_PARAM_INDEX + 1;
+    private static final int NUM_OF_STUDENT_ENTER_EVENTS_PARAM_INDEX = NUM_OF_STAFF_PARAM_INDEX + 1;
+    private static final int NUM_OF_STAFF_ENTER_EVENTS_PARAM_INDEX = NUM_OF_STUDENT_ENTER_EVENTS_PARAM_INDEX + 1;
+    private static final int NUM_OF_STUDENT_SOC_MENU_PARAM_INDEX = NUM_OF_STAFF_ENTER_EVENTS_PARAM_INDEX + 1;
+    private static final int NUM_OF_STUDENT_MENU_PARAM_INDEX = NUM_OF_STUDENT_SOC_MENU_PARAM_INDEX + 1;
+    private static final int NUM_OF_STAFF_SOC_MENU_PARAM_INDEX = NUM_OF_STUDENT_MENU_PARAM_INDEX + 1;
+    private static final int NUM_OF_STAFF_MENU_PARAM_INDEX = NUM_OF_STAFF_SOC_MENU_PARAM_INDEX + 1;
+
+    private static final int ID_OF_CONTRAGENT_PARAM_INDEX = 0;
+    private static final int CONTRAGENT_NAME_PARAM_INDEX = ID_OF_CONTRAGENT_PARAM_INDEX + 1;
+    private static final int LAST_OPERATION_TIME_PARAM_INDEX = CONTRAGENT_NAME_PARAM_INDEX + 1;
+    private static final int NUM_OF_OPERATIONS_PARAM_INDEX = LAST_OPERATION_TIME_PARAM_INDEX + 1;
+
+
     @PersistenceUnit(unitName = "processor")
     EntityManagerFactory entityManagerFactory;
 
@@ -48,7 +69,7 @@ public class DashboardServiceBean {
         try {
             entityTransaction.begin();
             Query query = entityManager.createQuery(
-                    "SELECT DISTINCT " + "org.idOfOrg, " + "org.lastSuccessfulBalanceSync, "
+                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
                             + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
                             + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
@@ -93,28 +114,29 @@ public class DashboardServiceBean {
                     eduInstItemInfo.setTimestamp(timestamp);
                     Object[] result = (Object[]) object;
 
-                    eduInstItemInfo.setIdOfOrg((Long) result[0]);
-                    eduInstItemInfo.setLastSuccessfulBalanceSyncTime((Date) result[1]);
-                    eduInstItemInfo.setLastUnSuccessfulBalanceSyncTime((Date) result[2]);
-                    eduInstItemInfo.setFirstFullSyncTime((Date) result[3]);
+                    eduInstItemInfo.setIdOfOrg((Long) result[ID_OF_ORG_PARAM_INDEX]);
+                    eduInstItemInfo.setOrgName((String) result[ORG_NAME_PARAM_INDEX]);
+                    eduInstItemInfo.setLastSuccessfulBalanceSyncTime((Date) result[LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
+                    eduInstItemInfo.setLastUnSuccessfulBalanceSyncTime((Date) result[LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
+                    eduInstItemInfo.setFirstFullSyncTime((Date) result[FIRST_FULL_SYNC_TIME_PARAM_INDEX]);
 
-                    SyncHistory syncHistory = (SyncHistory) result[4];
+                    SyncHistory syncHistory = (SyncHistory) result[SYNC_HISTORY_PARAM_INDEX];
                     if (syncHistory != null) {
                         eduInstItemInfo.setLastFullSyncTime(syncHistory.getSyncStartTime());
                     }
                     eduInstItemInfo.setLastSyncErrors(syncHistory.getSyncResult() != 0);
 
-                    long numOfStudents = (Long) result[5];
-                    long numOfStaff = (Long) result[6];
+                    long numOfStudents = (Long) result[NUM_OF_STUDENTS_PARAM_INDEX];
+                    long numOfStaff = (Long) result[NUM_OF_STAFF_PARAM_INDEX];
 
-                    long numOfStudentEnterEvents = (Long) result[7];
-                    long numOfStaffEnterEvents = (Long) result[8];
+                    long numOfStudentEnterEvents = (Long) result[NUM_OF_STUDENT_ENTER_EVENTS_PARAM_INDEX];
+                    long numOfStaffEnterEvents = (Long) result[NUM_OF_STAFF_ENTER_EVENTS_PARAM_INDEX];
 
-                    long numOfStudentSocMenu = (Long) result[9];
-                    long numOfStudentMenu = (Long) result[10];
+                    long numOfStudentSocMenu = (Long) result[NUM_OF_STUDENT_SOC_MENU_PARAM_INDEX];
+                    long numOfStudentMenu = (Long) result[NUM_OF_STUDENT_MENU_PARAM_INDEX];
 
-                    long numOfStaffSocMenu = (Long) result[11];
-                    long numOfStaffMenu = (Long) result[12];
+                    long numOfStaffSocMenu = (Long) result[NUM_OF_STAFF_SOC_MENU_PARAM_INDEX];
+                    long numOfStaffMenu = (Long) result[NUM_OF_STAFF_MENU_PARAM_INDEX];
 
                     if (numOfStudents > 0) {
                         eduInstItemInfo.setNumberOfPassagesPerNumOfStudents(numOfStudentEnterEvents / numOfStudents);
@@ -173,7 +195,7 @@ public class DashboardServiceBean {
         try {
             entityTransaction.begin();
             Query query = entityManager.createQuery(
-                    "SELECT DISTINCT contragent.idOfContragent, " + "max(clientPayment.createTime), "
+                    "SELECT DISTINCT contragent.idOfContragent, contragent.contragentName, " + "max(clientPayment.createTime), "
                             + "(SELECT count(clientPayment) FROM clientPayment WHERE clientPayment.createTime BETWEEN :dayStart AND :dayEnd) "
                             + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPayments clientPayment GROUP BY contragent.idOfContragent");
 
@@ -195,9 +217,10 @@ public class DashboardServiceBean {
                 try {
                     paymentSystemItemInfo.setTimestamp(timestamp);
                     Object[] result = (Object[]) object;
-                    paymentSystemItemInfo.setIdOfContragent((Long) result[0]);
-                    paymentSystemItemInfo.setLastOperationTime((Date) result[1]);
-                    paymentSystemItemInfo.setNumOfOperations((Long) result[2]);
+                    paymentSystemItemInfo.setIdOfContragent((Long) result[ID_OF_CONTRAGENT_PARAM_INDEX]);
+                    paymentSystemItemInfo.setContragentName((String) result[CONTRAGENT_NAME_PARAM_INDEX]);
+                    paymentSystemItemInfo.setLastOperationTime((Date) result[LAST_OPERATION_TIME_PARAM_INDEX]);
+                    paymentSystemItemInfo.setNumOfOperations((Long) result[NUM_OF_OPERATIONS_PARAM_INDEX]);
                 } catch (Exception e) {
                     paymentSystemItemInfo.setError(e.getMessage());
                 } finally {
