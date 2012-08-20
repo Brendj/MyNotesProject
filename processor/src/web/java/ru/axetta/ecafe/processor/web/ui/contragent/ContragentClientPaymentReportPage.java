@@ -25,6 +25,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ContragentClientPaymentReportPage extends BasicWorkspacePage {
+    public final static int RECORDS_LIMIT=200;
 
     private Long idOfContragent;
     private String shortName;
@@ -95,12 +96,16 @@ public class ContragentClientPaymentReportPage extends BasicWorkspacePage {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         this.contragentClientPaymentReport = new ContragentClientPaymentReport(this.startDate, this.endDate);
         ContragentClientPaymentReport.Builder reportBuilder = new ContragentClientPaymentReport.Builder();
-        this.contragentClientPaymentReport = reportBuilder.build(session, this.startDate, this.endDate, contragent);
+        this.contragentClientPaymentReport = reportBuilder.build(session, this.startDate, this.endDate, contragent, RECORDS_LIMIT);
         fill(contragent);
     }
 
     public void fill(Contragent contragent) throws Exception {
         this.idOfContragent = contragent.getIdOfContragent();
         this.shortName = contragent.getContragentName();
+    }
+    
+    public int getRecordsLimit() {
+        return RECORDS_LIMIT;
     }
 }

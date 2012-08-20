@@ -9,9 +9,11 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<f:view>
+
 <html>
 <head>
-    <title>Новая школа: администрирование</title>
+    <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}: администрирование"/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="ru">
     <link rel="icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
@@ -21,7 +23,6 @@
 
 <body style="margin: 4px; padding: 0;">
 
-<f:view>
     <rich:simpleTogglePanel rendered="false" />
 
     <rich:fileUpload rendered="false" />
@@ -51,7 +52,7 @@
     </f:subview>
 
 
-    <f:subview id="productSelectSubView">
+<f:subview id="productSelectSubView">
         <c:import url="include/option/configuration_provider/product/confirm_delete.jsp" />
     </f:subview>
 
@@ -169,7 +170,7 @@
                         <h:panelGroup style="text-align: left;">
                             <h:graphicImage value="/images/ecafe-favicon.png"
                                             style="border: 0; margin: 0 8px 0 0; vertical-align: middle; " />
-                            <h:outputText escape="true" id="headerText" value="Новая школа: администрирование"
+                            <h:outputText escape="true" id="headerText" value="Новая школа#{runtimeContext.instanceNameDecorated}: администрирование"
                                           styleClass="page-header-text" />
                         </h:panelGroup>
                     </rich:panel>
@@ -201,7 +202,8 @@
         </tr>
     </table>
 
-</f:view>
 </body>
 
 </html>
+
+</f:view>

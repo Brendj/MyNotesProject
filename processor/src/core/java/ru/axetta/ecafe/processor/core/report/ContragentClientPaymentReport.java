@@ -173,10 +173,11 @@ public class ContragentClientPaymentReport extends BasicReport {
 
     public static class Builder {
 
-        public ContragentClientPaymentReport build(Session session, Date startTime, Date endTime, Contragent contragent)
+        public ContragentClientPaymentReport build(Session session, Date startTime, Date endTime, Contragent contragent, int recordsLimit)
                 throws Exception {
             Date generateTime = new Date();
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
+            clientPaymentCriteria.setMaxResults(recordsLimit);
             clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
             clientPaymentCriteria.add(Restrictions.ge("createTime", startTime));
             clientPaymentCriteria.add(Restrictions.lt("createTime", endTime));

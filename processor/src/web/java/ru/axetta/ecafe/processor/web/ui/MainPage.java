@@ -120,6 +120,7 @@ public class MainPage {
     private final ContragentEditPage contragentEditPage = new ContragentEditPage();
     private final ContragentCreatePage contragentCreatePage = new ContragentCreatePage();
     private final ContragentClientPaymentReportPage contragentClientPaymentReportPage = new ContragentClientPaymentReportPage();
+    private final BasicWorkspacePage caOpsGroupPage = new BasicWorkspacePage();
 
     // Contragent client account manipulation
     private final BasicWorkspacePage ccAccountGroupPage = new BasicWorkspacePage();
@@ -3392,6 +3393,15 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         currentWorkspacePage = ccAccountGroupPage;
         updateSelectedMainMenu();
         return null;
+    }
+    public Object showContragentOpsGroupPage() {
+        currentWorkspacePage = caOpsGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage getCaOpsGroupPage() {
+        return caOpsGroupPage;
     }
 
     public CCAccountListPage getCcAccountListPage() {

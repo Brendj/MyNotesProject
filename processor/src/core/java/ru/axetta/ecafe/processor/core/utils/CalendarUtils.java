@@ -46,12 +46,17 @@ public class CalendarUtils {
     }
 
     static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     public static Date parseDate(String validTime) throws ParseException {
         return dateFormat.parse(validTime);
     }
 
     public static String dateToString(Date date) {
         return dateFormat.format(date);
+    }
+
+    public static String dateTimeToString(Date date) {
+        return dateTimeFormat.format(date);
     }
 
     public static long getTimeFirstDayOfMonth(long time) {

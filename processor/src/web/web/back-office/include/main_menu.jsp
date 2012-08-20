@@ -197,6 +197,16 @@
                             action="#{contractCreatePage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
+    <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}"
+                         label="Операции">
+        <a4j:support event="onclick" action="#{mainPage.showContragentOpsGroupPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="reconciliationPage" type="ru.axetta.ecafe.processor.web.ui.contragent.ReconciliationPage"--%>
+        <rich:panelMenuItem id="caReconcileMenuItem" label="Сверка реестров"
+                            binding="#{reconciliationPage.mainMenuComponent}"
+                            action="#{reconciliationPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
 

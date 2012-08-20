@@ -29,6 +29,9 @@
         <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="IdOfContragent"
                      not-null="false" update="false"/>
+        <many-to-one name="contragentReceiver" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
+                     column="IdOfContragentReceiver"
+                     not-null="false" update="false"/>
         <many-to-one name="clientPaymentOrder" class="ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder"
                      column="IdOfClientPaymentOrder"
                      not-null="false" update="false"/>

@@ -134,6 +134,11 @@ public class BasicWorkspacePage extends BasicPage {
         facesContext.addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
+    public void printMessageFor(String componentId, String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(componentId,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
 
     public void printError(String msg) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -149,6 +154,12 @@ public class BasicWorkspacePage extends BasicPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         logger.error(msg, e);
         facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+(e==null?"":": "+e), null));
+    }
+    public void logAndPrintMessageFor(String componentId, String msg, Exception e) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        logger.error(msg, e);
+        facesContext.addMessage(componentId,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+(e==null?"":": "+e), null));
     }
 

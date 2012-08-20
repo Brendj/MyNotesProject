@@ -10,6 +10,11 @@ CREATE TABLE cf_banks
   CONSTRAINT cf_banks_pkey PRIMARY KEY (idofbank )
 );
 
+ALTER TABLE CF_ClientPayments ADD COLUMN IdOfContragentReceiver bigint;
+ALTER TABLE CF_ClientPayments ADD CONSTRAINT cf_clientpayments_to_ca_rcvr_fk FOREIGN KEY (IdOfContragentReceiver)
+   REFERENCES CF_Contragents (IdOfContragent);
+
+
 -- колонка результирующей версии после обновления объекта
 ALTER TABLE cf_do_conflicts ADD COLUMN gversion_result bigint;
 

@@ -72,7 +72,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.OGRN = OGRN;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.defaultSupplier = new ContragentItem(contragent);

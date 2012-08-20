@@ -173,7 +173,8 @@ public class FinancialOpsManager {
     }
 
     public void createClientPayment(Session session, Client client, Integer paymentMethod, Long paySum, Integer payType,
-            Date createTime, String idOfPayment, Contragent contragent, String addPaymentMethod, String addIdOfPayment)
+            Date createTime, String idOfPayment, Contragent contragent,
+            String addPaymentMethod, String addIdOfPayment)
             throws Exception {
         // регистрируем транзакцию и проводим по балансу
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
@@ -181,44 +182,30 @@ public class FinancialOpsManager {
                 AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
         // регистрируем платеж клиента
         ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, payType, createTime,
-                idOfPayment, contragent, addPaymentMethod, addIdOfPayment);
+                idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
         registerClientPayment(session, clientPayment, client);
     }
-    public void createClientPaymentWithOrder(Session session,
-            ClientPaymentOrder clientPaymentOrder,
+
+    private Contragent getContragentReceiverForPayments(Session session, Client client) {
+        if (isOperatorScheme(session)) {
+            // Оператор
+            return DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
+        }
+        else {
+            return client.getOrg().getDefaultSupplier();
+        }
+    }
+
+    public void createClientPaymentWithOrder(Session session, ClientPaymentOrder clientPaymentOrder,
             Client client,String addIdOfPayment) throws Exception {
         // регистрируем транзакцию и проводим по балансу
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                 null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
                 AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
 
-        //AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-            //    null, contragentSum, clientPaymentOrder.getIdOfPayment(),
-            //    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-
-
         // регистрируем платеж клиента
-        ClientPayment clientPayment= new ClientPayment(accountTransaction, clientPaymentOrder,new Date(),addIdOfPayment);
-
-        registerClientPayment(session, clientPayment, client);
-    }
-
-    public void createClientPaymentWithOrder(Session session,
-            ClientPaymentOrder clientPaymentOrder,
-            Client client) throws Exception {
-        // регистрируем транзакцию и проводим по балансу
-         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-          null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
-          AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-
-        //AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-           //     null, contragentSum, clientPaymentOrder.getIdOfPayment(),
-             //   AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-
-
-        // регистрируем платеж клиента
-        ClientPayment clientPayment= new ClientPayment(accountTransaction, clientPaymentOrder,
-                    new Date());
+        ClientPayment clientPayment = new ClientPayment(accountTransaction, clientPaymentOrder,
+                getContragentReceiverForPayments(session, client),new Date(),addIdOfPayment);
 
         registerClientPayment(session, clientPayment, client);
     }
@@ -229,16 +216,7 @@ public class FinancialOpsManager {
         Long paySum = clientPayment.getPaySum();
         Contragent payAgent = clientPayment.getContragent();
 
-        Contragent objectContragent;
-        if (isOperatorScheme(session)) {
-            // Оператор
-            objectContragent = DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
-        }
-        else {
-            objectContragent = client.getOrg().getDefaultSupplier();
-        }
-
-        getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, objectContragent);
+        getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, clientPayment.getContragentReceiver());
         session.save(clientPayment);
 
         eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{

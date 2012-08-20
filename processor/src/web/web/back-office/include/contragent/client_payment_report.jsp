@@ -22,7 +22,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true"
-                      value="Отчет по платежам клиентов через контрагента \"#{mainPage.contragentClientPaymentReportPage.shortName}\""
+                      value="Отчет по платежам клиентов через контрагента \"#{mainPage.contragentClientPaymentReportPage.shortName}\", выводится не более #{mainPage.contragentClientPaymentReportPage.recordsLimit} записей"
                       styleClass="output-text" />
         <rich:dataTable id="contragentClientPaymentReportTable"
                         value="#{mainPage.contragentClientPaymentReportPage.contragentClientPaymentReport.clientPaymentItems}"

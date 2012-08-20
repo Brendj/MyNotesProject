@@ -114,7 +114,7 @@ public class PosListPage extends BasicWorkspacePage
         return filter;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         this.filter.completeContragentSelection(session, idOfContragent);
     }
 

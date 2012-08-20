@@ -821,4 +821,19 @@ public class DAOUtils {
         q.setParameter("contract", entity);
         q.executeUpdate();
     }
+
+    public static List<Object[]> getClientPaymentsDataForPeriod(EntityManager em, Date dtFrom, Date dtTo, Contragent caReceiver) {
+        if (caReceiver==null) {
+            javax.persistence.TypedQuery<Object[]> q = em.createQuery("select c.contractId, cp.createTime, cp.paySum, cp.idOfPayment from ClientPayment cp, AccountTransaction at, Client c where at=cp.transaction and at.client=c and cp.createTime>=:dtFrom and cp.createTime<:dtTo", Object[].class);
+            q.setParameter("dtFrom", dtFrom);
+            q.setParameter("dtTo", dtTo);
+            return q.getResultList();
+        } else {
+            javax.persistence.TypedQuery<Object[]> q = em.createQuery("select c.contractId, cp.createTime, cp.paySum, cp.idOfPayment from ClientPayment cp, AccountTransaction at, Client c where at=cp.transaction and at.client=c and cp.createTime>=:dtFrom and cp.createTime<:dtTo and cp.contragentReceiver=:caReceiver", Object[].class);
+            q.setParameter("dtFrom", dtFrom);
+            q.setParameter("dtTo", dtTo);
+            q.setParameter("caReceiver", caReceiver);
+            return q.getResultList();
+        }
+    }
 }

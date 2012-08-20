@@ -48,7 +48,7 @@ public class PosEditPage extends BasicWorkspacePage
         return "contragent/pos/edit";
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.contragent = new ContragentItem(contragent);

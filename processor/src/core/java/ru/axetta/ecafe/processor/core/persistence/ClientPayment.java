@@ -37,24 +37,26 @@ public class ClientPayment {
     private ClientPaymentOrder clientPaymentOrder;
     private String addPaymentMethod;
     private String addIdOfPayment;
+    private Contragent contragentReceiver;
 
     ClientPayment() {
         // For Hibernate only
     }
 
     ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType, Date createTime,
-            String idOfPayment, Contragent contragent) {
+            String idOfPayment, Contragent contragent, Contragent contragentReceiver) {
         this.transaction = transaction;
         this.paymentMethod = paymentMethod;
         this.paySum = paySum;
         this.payType = payType;
         this.createTime = createTime;
         this.idOfPayment = idOfPayment;
+        this.contragentReceiver = contragentReceiver;
         this.contragent = contragent;
     }
 
     public ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType,
-            Date createTime, String idOfPayment, Contragent contragent, String addPaymentMethod, String addIdOfPayment) {
+            Date createTime, String idOfPayment, Contragent contragent, Contragent contragentReceiver, String addPaymentMethod, String addIdOfPayment) {
         this.transaction = transaction;
         this.paymentMethod = paymentMethod;
         this.paySum = paySum;
@@ -62,11 +64,12 @@ public class ClientPayment {
         this.createTime = createTime;
         this.idOfPayment = idOfPayment;
         this.contragent = contragent;
+        this.contragentReceiver = contragentReceiver;
         this.addPaymentMethod = addPaymentMethod;
         this.addIdOfPayment = addIdOfPayment;
     }
 
-    public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime) {
+    public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Contragent contragentReceiver, Date createTime) {
         this.transaction = transaction;
         this.paymentMethod = clientPaymentOrder.getPaymentMethod();
         this.paySum = clientPaymentOrder.getPaySum();
@@ -74,10 +77,11 @@ public class ClientPayment {
         this.createTime = createTime;
         this.idOfPayment = clientPaymentOrder.getIdOfPayment();
         this.contragent = clientPaymentOrder.getContragent();
+        this.contragentReceiver = contragentReceiver;
         this.clientPaymentOrder = clientPaymentOrder;
     }
 
-    public ClientPayment( AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime, String addIdOfPayment) {
+    public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Contragent contragentReceiver, Date createTime, String addIdOfPayment) {
         this.transaction = transaction;
         this.paymentMethod = clientPaymentOrder.getPaymentMethod();
         this.paySum = clientPaymentOrder.getPaySum();
@@ -86,10 +90,11 @@ public class ClientPayment {
         this.idOfPayment = clientPaymentOrder.getIdOfPayment();
         this.contragent = clientPaymentOrder.getContragent();
         this.clientPaymentOrder = clientPaymentOrder;
+        this.contragentReceiver = contragentReceiver;
         this.addIdOfPayment = addIdOfPayment;
     }
 
-    public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime) {
+    public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Contragent contragentReceiver, Date createTime) {
         this.transaction = transaction;
         this.paymentMethod = clientPaymentOrder.getPaymentMethod();
         this.paySum = contragentSum;
@@ -97,6 +102,7 @@ public class ClientPayment {
         this.createTime = createTime;
         this.idOfPayment = clientPaymentOrder.getIdOfPayment();
         this.contragent = clientPaymentOrder.getContragent();
+        this.contragentReceiver = contragentReceiver;
         this.clientPaymentOrder = clientPaymentOrder;
 
     }
@@ -171,6 +177,15 @@ public class ClientPayment {
     private void setContragent(Contragent contragent) {
         // For Hibernate only
         this.contragent = contragent;
+    }
+
+    public Contragent getContragentReceiver() {
+        return contragentReceiver;
+    }
+
+    private void setContragentReceiver(Contragent contragentReceiver) {
+        // For Hibernate only
+        this.contragentReceiver = contragentReceiver;
     }
 
     public ClientPaymentOrder getClientPaymentOrder() {

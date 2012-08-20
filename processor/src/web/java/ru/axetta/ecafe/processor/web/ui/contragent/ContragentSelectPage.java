@@ -31,7 +31,7 @@ public class ContragentSelectPage extends BasicPage {
 
     public interface CompleteHandler {
 
-        void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception;
+        void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception;
     }
 
     public static class Item {
@@ -61,7 +61,7 @@ public class ContragentSelectPage extends BasicPage {
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
     private List<Item> items = Collections.emptyList();
     private Item selectedItem = new Item();
-    private String filter;
+    private String filter, classTypesString;
     private int multiContrFlag;
 
     public void pushCompleteHandler(CompleteHandler handler) {
@@ -70,7 +70,8 @@ public class ContragentSelectPage extends BasicPage {
 
     public void completeContragentSelection(Session session) throws Exception {
         if (!completeHandlers.empty()) {
-            completeHandlers.peek().completeContragentSelection(session, selectedItem.getIdOfContragent(), multiContrFlag);
+            completeHandlers.peek().completeContragentSelection(session, selectedItem.getIdOfContragent(),
+                    multiContrFlag, classTypesString);
             completeHandlers.pop();
         }
     }
@@ -129,6 +130,7 @@ public class ContragentSelectPage extends BasicPage {
     }*/
 
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
+        this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contragent.class);
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));

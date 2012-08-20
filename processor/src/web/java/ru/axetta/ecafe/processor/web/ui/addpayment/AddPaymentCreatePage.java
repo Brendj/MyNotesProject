@@ -101,7 +101,7 @@ public class AddPaymentCreatePage extends BasicWorkspacePage
         this.toDate = toDate;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             if (multiContrFlag == 0)

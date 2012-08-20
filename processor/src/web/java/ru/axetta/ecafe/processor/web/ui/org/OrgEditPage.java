@@ -341,7 +341,7 @@ public class OrgEditPage extends BasicWorkspacePage
         reloadMenuExchangeSourceOrgName(session);
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.defaultSupplier = new ContragentItem(contragent);

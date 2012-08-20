@@ -183,7 +183,7 @@ public class CCAccountCreatePage extends BasicWorkspacePage
         this.idOfAccount = idOfAccount;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.contragent = new ContragentItem(contragent);
