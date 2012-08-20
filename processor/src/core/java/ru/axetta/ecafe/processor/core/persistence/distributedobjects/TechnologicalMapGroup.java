@@ -35,12 +35,14 @@ public class TechnologicalMapGroup extends DistributedObject implements IConfigP
 
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Name", nameOfGroup);
     }
 
     @Override
     protected TechnologicalMapGroup parseAttributes(Node node) {
-
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringNameOfGroup = getStringAttributeValue(node,"Name",128);
         if(stringNameOfGroup!=null) setNameOfGroup(stringNameOfGroup);
 
@@ -49,6 +51,7 @@ public class TechnologicalMapGroup extends DistributedObject implements IConfigP
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
         setNameOfGroup(((TechnologicalMapGroup) distributedObject).getNameOfGroup());
     }
 

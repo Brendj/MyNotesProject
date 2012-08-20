@@ -26,6 +26,8 @@ import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.ErrorObjectData;
+import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -191,6 +193,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         DistributionManager distributionManager = null;
+        OrgOwnerData orgOwnerData = null;
         try {
             if (request.getType() == SyncRequest.TYPE_FULL) {
                 // Generate IdOfPacket
@@ -338,6 +341,13 @@ public class Processor implements SyncProcessor,
                             e);
                 }
 
+                try {
+                    orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
+                }
+
                 // Process Distribution Manager
                 try {
                     if(request.getDistributionManager() != null){
@@ -387,7 +397,7 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, distributionManager);
+                correctingNumbersOrdersRegistry, distributionManager, orgOwnerData);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -522,6 +532,23 @@ public class Processor implements SyncProcessor,
         }
     }
 
+    private OrgOwnerData processOrgOwnerData(Long idOfOrg) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        OrgOwnerData orgOwnerData = new OrgOwnerData();
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            orgOwnerData.process(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return orgOwnerData;
+    }
+
     /* TODO: логика обработки менеджера глобальных объектов */
     private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
         Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
@@ -530,14 +557,12 @@ public class Processor implements SyncProcessor,
         Arrays.sort(array,distributedObjectsEnumComparator);
 
         RuntimeContext.getAppContext().getBean(DistributionManager.class).clearConfirmTable(distributionManager.getConfirmDistributedObject());
-
         for (int i=0; i<array.length; i++){
             if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
                 RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
             }
         }
-
-
+        ErrorObjectData errorObjectData = RuntimeContext.getAppContext().getBean(DistributionManager.class).getErrorObjectData();
         return distributionManager;
     }
 

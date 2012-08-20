@@ -48,6 +48,16 @@ public class DistributedObjectProcessor {
     @PersistenceContext
     EntityManager entityManager;
 
+    private ErrorObjectData errorObjectData;
+
+    public ErrorObjectData getErrorObjectData() {
+        return errorObjectData;
+    }
+
+    public void setErrorObjectData(ErrorObjectData errorObjectData) {
+        this.errorObjectData = errorObjectData;
+    }
+
     private Logger logger = LoggerFactory.getLogger(DistributedObjectProcessor.class);
 
     public static DistributedObjectProcessor getInstance() {
@@ -74,7 +84,7 @@ public class DistributedObjectProcessor {
             } else {
                 errorObject.setType(DistributedObjectException.ErrorType.UNKNOWN_ERROR.getValue());
             }
-            DistributedObjectsEnumComparator.getErrorObjectList().add(errorObject);
+            errorObjectData.getErrorObjectList().add(errorObject);
             logger.error(errorObject.toString(), e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
@@ -88,7 +98,7 @@ public class DistributedObjectProcessor {
             DAOService.getInstance().updateDeleteState(distributedObject);
         } else {
             if (distributedObject.getTagName().equals("C")) {
-                Long currentUpdateVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
+                Long currentUpdateVersion = DAOService.getInstance().getDOVersionByGUID(distributedObject);
                 distributedObject = createDistributedObject(distributedObject, currentUpdateVersion);
                 distributedObject.setTagName("C");
             }

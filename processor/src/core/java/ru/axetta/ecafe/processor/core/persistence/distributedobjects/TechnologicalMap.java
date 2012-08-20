@@ -71,7 +71,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     public void fill(DistributedObject distributedObject) {
-
+        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
         setNameOfTechnologicalMap(((TechnologicalMap) distributedObject).getNameOfTechnologicalMap());
         setNumberOfTechnologicalMap(((TechnologicalMap) distributedObject).getNumberOfTechnologicalMap());
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
@@ -98,12 +98,12 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "Name", nameOfTechnologicalMap);
         setAttribute(element, "Number", numberOfTechnologicalMap);
         setAttribute(element, "Technology", technologyOfPreparation);
         setAttribute(element, "TempPreparation", tempOfPreparation);
         setAttribute(element, "LifeTime", lifeTime);
-        /* setAttribute(element,"GroupName", groupName);*/
 
         setAttribute(element, "Energy", energyValue);
 
@@ -125,21 +125,12 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
         setAttribute(element, "GuidOfTMG", technologicalMapGroup.getGuid());
 
-
-        /*Document document = element.getOwnerDocument();
-        for (TechnologicalMapProduct technologicalMapProduct: getTechnologicalMapProduct()){
-            Element tmpElement = document.createElement("Product");
-            technologicalMapProduct.appendAttributes(tmpElement);
-            element.appendChild(tmpElement);
-        }*/
     }
 
     @Override
     protected TechnologicalMap parseAttributes(Node node) {
-
-        /* String stringGroupName = getStringAttributeValue(node,"GroupName",512);
-       if(stringGroupName!=null) setGroupName(stringGroupName);*/
-
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringNameOfTechnologicalMap = getStringAttributeValue(node, "Name", 128);
         if (stringNameOfTechnologicalMap != null) {
             setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
@@ -238,16 +229,6 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
         guidOfTMG = getStringAttributeValue(node, "GuidOfTMG", 36);
 
-        /*node = node.getFirstChild();
-        while (node!=null){
-            TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
-            technologicalMapProduct = (TechnologicalMapProduct) technologicalMapProduct.build(node);
-            technologicalMapProduct.setTechnologicalMap(this);
-            technologicalMapProduct.setCreatedDate(new Date());
-            technologicalMapProduct.setGuid(UUID.randomUUID().toString());
-            this.addTechnologicalMapProduct(technologicalMapProduct);
-            node = node.getNextSibling();
-        }*/
         return this;
     }
 
@@ -259,8 +240,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     }
 
     public List<TechnologicalMapProduct> getTechnologicalMapProduct() {
-        return Collections
-                .unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
+        return Collections.unmodifiableList(new ArrayList<TechnologicalMapProduct>(getTechnologicalMapProductInternal()));
     }
 
     public void addTechnologicalMapProduct(TechnologicalMapProduct technologicalMapProduct) {
@@ -443,13 +423,6 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         return technologicalMapGroup;
     }
 
-    /*public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }*/
     public User getUserEdit() {
         return userEdit;
     }

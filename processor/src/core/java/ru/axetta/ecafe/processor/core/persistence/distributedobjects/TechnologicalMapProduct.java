@@ -21,7 +21,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        //setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
+        setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
@@ -32,7 +32,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     protected void appendAttributes(Element element) {
-        //setAttribute(element, "OrgOwner", orgOwner);
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GWeight", grossWeight);
         setAttribute(element, "NWeight", netWeight);
         setAttribute(element, "NumberGroupReplace", netWeight);
@@ -42,8 +42,8 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     protected TechnologicalMapProduct parseAttributes(Node node) {
-        //Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        //if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Integer integerGrossMass = getIntegerAttributeValue(node, "GWeight");
         if (integerGrossMass != null) {
             setGrossWeight(integerGrossMass);

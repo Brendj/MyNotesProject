@@ -19,6 +19,7 @@ ALTER TABLE cf_products ADD COLUMN Density  FLOAT DEFAULT NULL;
 -- Срок годности – срок годности (минут)
 ALTER TABLE cf_technological_map DROP COLUMN termOfRealization;
 ALTER TABLE cf_technological_map ADD COLUMN LifeTime integer NOT NULL DEFAULT 0;
+ALTER TABLE cf_technological_map ALTER COLUMN NumberOfTechnologicalMap TYPE character varying(128);
 
 -- № группы замены – одинаковый для альтернативных продуктов
 ALTER TABLE cf_technological_map_products DROP COLUMN NameOfProduct;
@@ -27,6 +28,7 @@ ALTER TABLE cf_technological_map_products ADD COLUMN NumberGroupReplace integer;
 -- количество в граммах (нетто) на 100 гр блюда
 ALTER TABLE cf_technological_map_products ALTER COLUMN NetWeight TYPE integer;
 ALTER TABLE cf_technological_map_products ALTER COLUMN GrossWeight TYPE integer;
+
 
 CREATE TABLE  cf_goods_groups (
   IdOfGoodsGroup BigSerial NOT NULL,

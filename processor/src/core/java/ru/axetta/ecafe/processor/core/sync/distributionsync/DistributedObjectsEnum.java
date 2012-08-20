@@ -28,6 +28,8 @@ public enum DistributedObjectsEnum {
     StateChanges(StateChange.class,3),
     WayBill(Waybill.class,1),
     WayBillPosition(WayBillPosition.class,3),
+    Staff(Staff.class, 0),
+    ReturnDocument(ReturnDocument.class, 0),
     /* товары продукты */
     ProductGroup(ProductGroup.class,0),
     TechnologicalMapGroup(TechnologicalMapGroup.class,0),

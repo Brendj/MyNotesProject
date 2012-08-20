@@ -223,12 +223,12 @@ public class DAOService {
             doVersion.setCurrentVersion(0L);
             version = 0L;
         } else {
-            doVersion = doVersionList.get(0);
+            doVersion = em.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
             version = doVersion.getCurrentVersion()+1;
             doVersion.setCurrentVersion(version);
         }
         doVersion.setDistributedObjectClassName(name);
-        em.persist(doVersion);
+        doVersion = em.merge(doVersion);
         return version;
     }
 

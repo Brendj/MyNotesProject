@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
+import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -35,8 +36,19 @@ public class DAOUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(DAOUtils.class);
 
-    private DAOUtils() {
+    private DAOUtils() {}
 
+    public static List<OrgOwner> getOrgSourceByMenuExchangeRule(Session session, Long idOfSourceOrg){
+        Criteria menuExchangeRuleCriteria = session.createCriteria(MenuExchangeRule.class);
+        menuExchangeRuleCriteria.add(Restrictions.eq("idOfSourceOrg", idOfSourceOrg));
+        List list = menuExchangeRuleCriteria.list();
+        List<OrgOwner> orgOwnerList = new ArrayList<OrgOwner>(list.size());
+        for (Object object: list){
+            MenuExchangeRule menuExchangeRule = (MenuExchangeRule) object;
+            Org org = (Org) session.get(Org.class, menuExchangeRule.getIdOfDestOrg());
+            orgOwnerList.add(new OrgOwner(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        }
+        return orgOwnerList;
     }
 
     public static Contragent findContragent(Session persistenceSession, long idOfContragent) throws Exception {

@@ -36,12 +36,15 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
 
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Name", nameOfGroup);
         setAttribute(element,"ClassificationCode", сlassificationCode);
     }
 
     @Override
     protected ProductGroup parseAttributes(Node node) {
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
 
         String stringNameOfGroup = getStringAttributeValue(node,"Name",512);
         if(stringNameOfGroup!=null) setNameOfGroup(stringNameOfGroup);
@@ -54,6 +57,7 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
         setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
         setСlassificationCode(((ProductGroup) distributedObject).getСlassificationCode());
     }

@@ -32,7 +32,7 @@ public class Product extends DistributedObject implements IConfigProvider {
     private ProductGroup productGroup;
     private String guidOfPG;
     private String classificationCode;
-    private float density;
+    private Float density;
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.
@@ -41,6 +41,7 @@ public class Product extends DistributedObject implements IConfigProvider {
      */
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"FullName", fullName);
         setAttribute(element,"ProductName", productName);
         setAttribute(element,"Code", code);
@@ -54,7 +55,8 @@ public class Product extends DistributedObject implements IConfigProvider {
 
     @Override
     protected Product parseAttributes(Node node) {
-
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringCode = getStringAttributeValue(node,"Code",16);
         if(stringCode!=null) setCode(stringCode);
         String stringFullName= getStringAttributeValue(node,"FullName",1024);
@@ -82,6 +84,7 @@ public class Product extends DistributedObject implements IConfigProvider {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
         setCode( ((Product) distributedObject).getCode());
         setFullName (((Product) distributedObject).getFullName());
         setProductName( ((Product) distributedObject).getProductName());
@@ -170,11 +173,11 @@ public class Product extends DistributedObject implements IConfigProvider {
         this.classificationCode = classificationCode;
     }
 
-    public float getDensity() {
+    public Float getDensity() {
         return density;
     }
 
-    public void setDensity(float density) {
+    public void setDensity(Float density) {
         this.density = density;
     }
 

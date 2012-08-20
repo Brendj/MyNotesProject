@@ -28,7 +28,7 @@
         <property name="okpCode" column="OkpCode" type="string" length="32"/>
         <property name="productName" column="ProductName" type="string" length="512"/>
         <property name="classificationCode" column="ClassificationCode" type="string" length="32"/>
-        <property name="density" column="Density" type="float" length="32"/>
+        <property name="density" column="Density" type="float"/>
 
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />

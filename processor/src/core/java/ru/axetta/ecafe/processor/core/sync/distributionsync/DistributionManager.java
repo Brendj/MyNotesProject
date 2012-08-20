@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,8 +48,6 @@ public class DistributionManager {
      * Логгер
      */
     private Logger logger = LoggerFactory.getLogger(DistributionManager.class);
-
-    //private Long idOfOrg;
     /**
      * Ключи = имена элементов (Пример элемента: <Pr>),
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
@@ -57,12 +56,19 @@ public class DistributionManager {
     /**
      * Список глобальных объектов на базе процессинга
      */
-    //private List<DistributedObject> distributedObjects = new ArrayList<DistributedObject>();
     /* Пара ключ значение ключ имя класса значение список объектов этого класса */
     private Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
 
-    //private Map<String,String> errorMap = new HashMap<String, String>();
-    //private List<ErrorObject> errorObjectList = new ArrayList<ErrorObject>();
+    @Autowired
+    private ErrorObjectData errorObjectData;
+
+    public ErrorObjectData getErrorObjectData() {
+        return errorObjectData;
+    }
+
+    public void setErrorObjectData(ErrorObjectData errorObjectData) {
+        this.errorObjectData = errorObjectData;
+    }
 
     private Document document;
 
@@ -90,8 +96,7 @@ public class DistributionManager {
         List<DistributedObject> distributedObjects = null;
         for (DistributedObjectsEnum key : distributedObjectsListMap.keySet()) {
             distributedObjects = distributedObjectsListMap.get(key);
-            for (int i = 0; i < distributedObjects.size(); i++) {
-                DistributedObject distributedObject = distributedObjects.get(i);
+            for (DistributedObject distributedObject : distributedObjects) {
                 tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
                 if (!elementMap.containsKey(tagName)) {
                     Element distributedObjectElement = document.createElement(tagName);
@@ -99,12 +104,15 @@ public class DistributionManager {
                     elementMap.put(tagName, distributedObjectElement);
                 }
                 Element element = document.createElement(distributedObject.getTagName());
-                if (!(DistributedObjectsEnumComparator.isEmptyOrNull())) {
+                //if (!(DistributedObjectsEnumComparator.isEmptyOrNull())) {
+                if (!(errorObjectData.isEmptyOrNull())) {
                     ErrorObject errorObject = new ErrorObject(distributedObject.getClass(),
                             distributedObject.getGuid());
-                    int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
+                    //int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
+                    int index = errorObjectData.getErrorObject(errorObject);
                     if (index != -1) {
-                        element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
+                        element.setAttribute("errorType", errorObjectData.getTypeByIndex(index));
+                        //element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
                     }
                 }
                 Long version = DAOService.getInstance().getDOVersionByGUID(distributedObject);
@@ -122,23 +130,23 @@ public class DistributionManager {
         // Arrays.sort(array,distributedObjectsEnumComparator);
 
         distributedObjects = new ArrayList<DistributedObject>();
-        for (int i = 0; i < array.length; i++) {
-            String name = array[i].name();
+        for (DistributedObjectsEnum anArray : array) {
+            String name = anArray.name();
             List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>(0);
-            try{
+            try {
                 distributedObjectList = DAOService.getInstance()
-                        .getDistributedObjects(array[i].getValue(), currentMaxVersions.get(name), idOfOrg);
-            } catch (Exception e){
+                        .getDistributedObjects(anArray.getValue(), currentMaxVersions.get(name), idOfOrg);
+            } catch (Exception e) {
                 if (e instanceof DistributedObjectException) {
-                    Element element = document.createElement(array[i].name());
-                    element.setAttribute("errorType",String.valueOf(((DistributedObjectException) e).getType()));
+                    Element element = document.createElement(anArray.name());
+                    element.setAttribute("errorType", String.valueOf(((DistributedObjectException) e).getType()));
                     elementRO.appendChild(element);
                 }
                 continue;
             }
-            if (!(distributedObjectList==null || distributedObjectList.isEmpty())) {
+            if (!(distributedObjectList == null || distributedObjectList.isEmpty())) {
                 distributedObjects.addAll(distributedObjectList);
-                for (DistributedObject distributedObject: distributedObjectList) {
+                for (DistributedObject distributedObject : distributedObjectList) {
                     DOConfirm confirm = new DOConfirm();
                     confirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
                     confirm.setGuid(distributedObject.getGuid());
@@ -149,12 +157,12 @@ public class DistributionManager {
 
             List<String> guidList = DAOService.getInstance().getGUIDsInConfirms(name, idOfOrg);
             List<DistributedObject> distributedObjectsConfirm = null;
-            if(guidList!=null && !guidList.isEmpty()){
-                distributedObjectsConfirm = DAOService.getInstance().findDistributedObjectByInGUID(name,guidList);
+            if (guidList != null && !guidList.isEmpty()) {
+                distributedObjectsConfirm = DAOService.getInstance().findDistributedObjectByInGUID(name, guidList);
             }
-            if (distributedObjectsConfirm!=null && !distributedObjectsConfirm.isEmpty()) {
-                for (DistributedObject distributedObject: distributedObjectsConfirm){
-                    if(!distributedObjectList.contains(distributedObject)){
+            if (distributedObjectsConfirm != null && !distributedObjectsConfirm.isEmpty()) {
+                for (DistributedObject distributedObject : distributedObjectsConfirm) {
+                    if (!distributedObjectList.contains(distributedObject)) {
                         distributedObjects.add(distributedObject);
                     }
                 }
@@ -175,7 +183,7 @@ public class DistributionManager {
         }
 
         /* очистим список ошибок */
-        DistributedObjectsEnumComparator.setErrorObjectList(new ArrayList<ErrorObject>(0));
+        //DistributedObjectsEnumComparator.setErrorObjectList(new ArrayList<ErrorObject>(0));
 
         return elementRO;
     }
@@ -191,10 +199,11 @@ public class DistributionManager {
             Long currentMaxVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             DistributedObjectProcessor distributedObjectProcessor = DistributedObjectProcessor.getInstance();
+            distributedObjectProcessor.setErrorObjectData(errorObjectData);
             for (DistributedObject distributedObject : distributedObjects) {
                 distributedObjectProcessor.process(distributedObject, currentMaxVersion, idOfOrg, getSimpleDocument());
-
             }
+            errorObjectData = distributedObjectProcessor.getErrorObjectData();
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw e;
@@ -242,7 +251,6 @@ public class DistributionManager {
                     if (Node.ELEMENT_NODE == node.getNodeType()) {
                         DistributedObject distributedObject = createDistributedObject(currentObject);
                         distributedObject = distributedObject.build(node);
-                        distributedObject.setOrgOwner(idOfOrg);
                         distributedObject.setDateFormat(dateFormat);
                         distributedObject.setTimeFormat(timeFormat);
                         if (!distributedObjectsListMap.containsKey(currentObject)) {
