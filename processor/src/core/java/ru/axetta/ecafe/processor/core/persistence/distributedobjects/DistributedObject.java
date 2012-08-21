@@ -12,7 +12,11 @@ import org.w3c.dom.Node;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,8 +47,6 @@ public abstract class DistributedObject{
     /* Идентификатор организации */
     protected Long orgOwner;
 
-    private DateFormat dateFormat;
-    private DateFormat timeFormat;
     /* Node для последующего разбора */
     private Node node;
 
@@ -98,6 +100,9 @@ public abstract class DistributedObject{
 
     public abstract void fill(DistributedObject distributedObject);
 
+    public List<DistributedObject> getDistributedObjectChildren(HashMap<String, Long> currentMaxVersions) throws Exception
+    { return null;}
+
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {
             if(value instanceof Boolean) {
@@ -111,7 +116,10 @@ public abstract class DistributedObject{
 
     protected Date getDateAttributeValue(Node node, String attributeName)  throws ParseException{
         if(getAttributeValue(node, attributeName)==null) return null;
-        return dateFormat.parse(getAttributeValue(node,attributeName));
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        timeFormat1.setTimeZone(localTimeZone);
+        return timeFormat1.parse(getAttributeValue(node,attributeName));
     }
 
     protected String getStringAttributeValue(Node node, String attributeName,Integer length){
@@ -238,19 +246,17 @@ public abstract class DistributedObject{
     }
 
     public DateFormat getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(DateFormat dateFormat) {
-        this.dateFormat = dateFormat;
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        timeFormat1.setTimeZone(localTimeZone);
+        return timeFormat1;
     }
 
     public DateFormat getTimeFormat() {
-        return timeFormat;
-    }
-
-    public void setTimeFormat(DateFormat timeFormat) {
-        this.timeFormat = timeFormat;
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        timeFormat1.setTimeZone(localTimeZone);
+        return timeFormat1;
     }
 
     @Override

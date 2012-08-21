@@ -7,9 +7,14 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,9 +53,22 @@ public class Product extends DistributedObject implements IConfigProvider {
         setAttribute(element,"OkpCode", okpCode);
         setAttribute(element,"OrgOwner", orgOwner);
         setAttribute(element,"Density", density);
-        //setAttribute(element,"IdOfConfigurationProvider", idOfConfigurationProvider);
         setAttribute(element,"ClassificationCode", classificationCode);
         setAttribute(element,"GuidOfPG", productGroup.getGuid());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DistributedObject> getDistributedObjectChildren(HashMap<String, Long> currentMaxVersions) throws Exception {
+        List<DistributedObject> list = new ArrayList<DistributedObject>(0);
+        list.addAll(DAOService.getInstance().getDistributedObjectsWithOutVersionStatus(ProductGroup.class, currentMaxVersions.get(
+                DistributedObjectsEnum.ProductGroup.name()), orgOwner));
+        List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
+        for (DistributedObject distributedObject: list){
+            temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
+        }
+        list.addAll(temp);
+        return list;
     }
 
     @Override
@@ -69,17 +87,8 @@ public class Product extends DistributedObject implements IConfigProvider {
         if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
         Float floatDensity = getFloatAttributeValue(node,"Density");
         if(floatDensity!=null) setDensity(floatDensity);
-        /*Long idOfConfigurationProvider = getLongAttributeValue(node,"IdOfConfigurationProvider");
-        if(idOfConfigurationProvider!=null) setIdOfConfigurationProvider(idOfConfigurationProvider);*/
         guidOfPG = getStringAttributeValue(node,"GuidOfPG",36);
         return this;
-    }
-
-    @Override
-    public void preProcess() throws DistributedObjectException {
-        ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
-        if(pg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setProductGroup(pg);
     }
 
     @Override
@@ -92,6 +101,13 @@ public class Product extends DistributedObject implements IConfigProvider {
         setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
         setClassificationCode(((Product) distributedObject).getClassificationCode());
         setDensity(((Product) distributedObject).getDensity());
+    }
+
+    @Override
+    public void preProcess() throws DistributedObjectException {
+        ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
+        if(pg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        setProductGroup(pg);
     }
 
     public Long getIdOfConfigurationProvider() {

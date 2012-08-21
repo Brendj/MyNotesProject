@@ -6,12 +6,16 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,20 +29,33 @@ public class Good extends DistributedObject {
     @Override
     public void preProcess() throws DistributedObjectException {
         GoodGroup gg = DAOService.getInstance().findDistributedObjectByRefGUID(GoodGroup.class, guidOfGG);
-        if(gg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        if(gg == null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setGoodGroup(gg);
         Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        if(p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setProduct(p);
         TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
-        if(tm==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setTechnologicalMap(tm);
+        if(p == null && tm == null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        if(p != null) setProduct(p);
+        if(tm != null) setTechnologicalMap(tm);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DistributedObject> getDistributedObjectChildren(HashMap<String, Long> currentMaxVersions) throws Exception {
+        List<DistributedObject> list = new ArrayList<DistributedObject>(0);
+        list.addAll(DAOService.getInstance().getDistributedObjectsWithOutVersionStatus(Product.class, currentMaxVersions.get(DistributedObjectsEnum.Product.name()), orgOwner));
+        list.addAll(DAOService.getInstance().getDistributedObjectsWithOutVersionStatus(TechnologicalMap.class, currentMaxVersions.get(DistributedObjectsEnum.TechnologicalMap.name()), orgOwner));
+        List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
+        for (DistributedObject distributedObject: list){
+            temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
+        }
+        list.addAll(temp);
+        return list;
     }
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"NameOfGood", nameOfGood);
+        setAttribute(element,"Name", nameOfGood);
         setAttribute(element,"FullName", fullName);
         setAttribute(element,"GoodsCode", goodsCode);
         setAttribute(element,"UnitsScale", unitsScale);
@@ -46,14 +63,14 @@ public class Good extends DistributedObject {
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"Margin", margin);
         setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
-        setAttribute(element,"GuidOfBaseProduct", product.getGuid());
-        setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
+        if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
+        if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
     }
     @Override
     protected Good parseAttributes(Node node) throws ParseException, IOException {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGood = getStringAttributeValue(node,"NameOfGood",512);
+        String stringNameOfGood = getStringAttributeValue(node,"Name",512);
         if(stringNameOfGood!=null) setNameOfGood(stringNameOfGood);
         String stringFullName = getStringAttributeValue(node,"FullName",1024);
         if(stringFullName!=null) setFullName(stringFullName);

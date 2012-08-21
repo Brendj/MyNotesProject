@@ -35,6 +35,7 @@ public class ActOfWaybillDifferencePosition extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"UnitsScale", unitsScale);
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element,"NetWeight", netWeight);
@@ -43,7 +44,6 @@ public class ActOfWaybillDifferencePosition extends DistributedObject {
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"Price", price);
         setAttribute(element,"NDS", nds);
-        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfGoods", good.getGuid());
         setAttribute(element, "GuidOfActOfDifference", actOfWaybillDifference.getGuid());
     }

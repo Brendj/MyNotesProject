@@ -32,29 +32,29 @@ public class ActOfWaybillDifference extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Date", getDateFormat().format(date));
         setAttribute(element, "Number", number);
-        setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
     protected ActOfWaybillDifference parseAttributes(Node node) throws ParseException, IOException {
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Date dateOfActOfDifference = getDateAttributeValue(node, "Date");
         if(dateOfActOfDifference != null) setDate(dateOfActOfDifference);
         String stringNumber = getStringAttributeValue(node, "Number",128);
         if(stringNumber != null) setNumber(stringNumber);
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((ActOfWaybillDifference) distributedObject).getOrgOwner());
         setDate(((ActOfWaybillDifference) distributedObject).getDate());
         setNumber(((ActOfWaybillDifference) distributedObject).getNumber());
-        setOrgOwner(((ActOfWaybillDifference) distributedObject).getOrgOwner());
     }
 
     private Date date;

@@ -28,7 +28,7 @@ public class DistributedObjectException extends Exception {
         public static ErrorType parse(Integer key) {
             ErrorType errorType = null; // Default
             for (ErrorType item: ErrorType.values()) {
-                if (errorType.getValue().equals(key)) {
+                if (item.getValue().equals(key)) {
                     errorType = item;
                     break;
                 }

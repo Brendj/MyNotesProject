@@ -22,7 +22,7 @@ import java.util.Date;
  * Time: 17:29
  * To change this template use File | Settings | File Templates.
  */
-public class Waybill extends DistributedObject {
+public class Waybill extends DistributedObject implements WayBillInterface {
 
     @Override
     public void preProcess() throws DistributedObjectException {

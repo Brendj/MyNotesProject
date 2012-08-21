@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -67,7 +68,23 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     private User userEdit;
 
     private String guidOfTMG;
-    private int lifeTime;
+    private Integer lifeTime;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DistributedObject> getDistributedObjectChildren(HashMap<String, Long> currentMaxVersions) throws Exception {
+        List<DistributedObject> list = new ArrayList<DistributedObject>(0);
+        list.addAll(DAOService.getInstance().getDistributedObjectsWithOutVersionStatus(TechnologicalMapGroup.class, currentMaxVersions.get(
+                DistributedObjectsEnum.TechnologicalMapGroup.name()), orgOwner));
+        list.addAll(DAOService.getInstance().getDistributedObjectsWithOutVersionStatus(TechnologicalMapProduct.class, currentMaxVersions.get(
+                DistributedObjectsEnum.TechnologicalMapProduct.name()), orgOwner));
+        List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
+        for (DistributedObject distributedObject: list){
+            temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
+        }
+        list.addAll(temp);
+        return list;
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {

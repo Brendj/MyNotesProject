@@ -27,10 +27,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,20 +64,28 @@ public class DistributionManager {
         return errorObjectData;
     }
 
-    public void setErrorObjectData(ErrorObjectData errorObjectData) {
-        this.errorObjectData = errorObjectData;
-    }
-
     private Document document;
+    private DateFormat dateFormat;
+    private DateFormat timeFormat;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public DistributionManager() {
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        dateFormat.setTimeZone(localTimeZone);
+        timeFormat.setTimeZone(localTimeZone);
     }
 
     @PostConstruct
     public void init() {
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        dateFormat.setTimeZone(localTimeZone);
+        timeFormat.setTimeZone(localTimeZone);
     }
 
     /**
@@ -88,7 +94,7 @@ public class DistributionManager {
      * @param document выходной xml документ
      * @return элемент <RO> выходного xml документа
      */
-    public Element toElement(Document document, Long idOfOrg, DateFormat dateFormat,DateFormat timeFormat) throws Exception {
+    public Element toElement(Document document, Long idOfOrg) throws Exception {
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
@@ -104,15 +110,12 @@ public class DistributionManager {
                     elementMap.put(tagName, distributedObjectElement);
                 }
                 Element element = document.createElement(distributedObject.getTagName());
-                //if (!(DistributedObjectsEnumComparator.isEmptyOrNull())) {
                 if (!(errorObjectData.isEmptyOrNull())) {
                     ErrorObject errorObject = new ErrorObject(distributedObject.getClass(),
                             distributedObject.getGuid());
-                    //int index = DistributedObjectsEnumComparator.getErrorObject(errorObject);
                     int index = errorObjectData.getErrorObject(errorObject);
                     if (index != -1) {
-                        element.setAttribute("errorType", errorObjectData.getTypeByIndex(index));
-                        //element.setAttribute("errorType", DistributedObjectsEnumComparator.getTypeByIndex(index));
+                        element.setAttribute("ErrorType", errorObjectData.getTypeByIndex(index));
                     }
                 }
                 Long version = DAOService.getInstance().getDOVersionByGUID(distributedObject);
@@ -127,8 +130,7 @@ public class DistributionManager {
         // Раскоментировать при не обходимости отсортированного вывода к клиенту
         //DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-        // Arrays.sort(array,distributedObjectsEnumComparator);
-
+        //Arrays.sort(array,distributedObjectsEnumComparator);
         distributedObjects = new ArrayList<DistributedObject>();
         for (DistributedObjectsEnum anArray : array) {
             String name = anArray.name();
@@ -136,10 +138,15 @@ public class DistributionManager {
             try {
                 distributedObjectList = DAOService.getInstance()
                         .getDistributedObjects(anArray.getValue(), currentMaxVersions.get(name), idOfOrg);
+                List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
+                for (DistributedObject distributedObject: distributedObjectList){
+                    temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
+                }
+                distributedObjectList.addAll(temp);
             } catch (Exception e) {
                 if (e instanceof DistributedObjectException) {
                     Element element = document.createElement(anArray.name());
-                    element.setAttribute("errorType", String.valueOf(((DistributedObjectException) e).getType()));
+                    element.setAttribute("ErrorType", String.valueOf(((DistributedObjectException) e).getType()));
                     elementRO.appendChild(element);
                 }
                 continue;
@@ -168,7 +175,6 @@ public class DistributionManager {
                 }
             }
         }
-
         for (DistributedObject distributedObject : distributedObjects) {
             tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
             if (!elementMap.containsKey(tagName)) {
@@ -177,13 +183,10 @@ public class DistributionManager {
                 elementMap.put(tagName, distributedObjectElement);
             }
             Element element = document.createElement("O");
-            distributedObject.setDateFormat(dateFormat);
-            distributedObject.setTimeFormat(timeFormat);
             elementMap.get(tagName).appendChild(distributedObject.toElement(element));
         }
 
-        /* очистим список ошибок */
-        //DistributedObjectsEnumComparator.setErrorObjectList(new ArrayList<ErrorObject>(0));
+        errorObjectData.getErrorObjectList().clear();
 
         return elementRO;
     }
@@ -227,14 +230,14 @@ public class DistributionManager {
     }
 
     /**
-     * Берет информацию из элемента <Pr> входного xml документа. Выполняет действия, указанные в этом элементе
+     * Берет информацию из элемента <RO> входного xml документа. Выполняет действия, указанные в этом элементе
      * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
      * в список - поле distributedObjectItems.
      *
-     * @param node Элемент <Pr>
+     * @param node Элемент <RO>
      * @throws Exception
      */
-    public void build(Node node, Long idOfOrg, DateFormat dateFormat,DateFormat timeFormat) throws Exception {
+    public void build(Node node, Long idOfOrg) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
             if(node.getNodeName().equals("Confirm")){
                 Node childNode = node.getFirstChild();
@@ -244,6 +247,7 @@ public class DistributionManager {
                 }
             } else {
                 DistributedObjectsEnum currentObject = null;
+                init();
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
                 currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
                 node = node.getFirstChild();
@@ -251,8 +255,6 @@ public class DistributionManager {
                     if (Node.ELEMENT_NODE == node.getNodeType()) {
                         DistributedObject distributedObject = createDistributedObject(currentObject);
                         distributedObject = distributedObject.build(node);
-                        distributedObject.setDateFormat(dateFormat);
-                        distributedObject.setTimeFormat(timeFormat);
                         if (!distributedObjectsListMap.containsKey(currentObject)) {
                             distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
                         }

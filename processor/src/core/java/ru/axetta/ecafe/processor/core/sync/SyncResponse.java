@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
+import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1685,6 +1686,7 @@ public class SyncResponse {
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
     private final DistributionManager distributionManager;
+    private final OrgOwnerData orgOwnerData;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
@@ -1695,7 +1697,7 @@ public class SyncResponse {
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, DistributionManager distributionManager) {
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, DistributionManager distributionManager, OrgOwnerData orgOwnerData) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1717,6 +1719,7 @@ public class SyncResponse {
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
         this.distributionManager = distributionManager;
+        this.orgOwnerData = orgOwnerData;
     }
 
     public Document toDocument() throws Exception {
@@ -1814,7 +1817,11 @@ public class SyncResponse {
         // Distribution Manager
         if(distributionManager != null){
             //ecafeEnvelopeElement.appendChild(RuntimeContext.getAppContext().getBean(DistributionManager.class).toElement(document, idOfOrg));
-            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg, dateFormat, timeFormat));
+            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg));
+        }
+
+        if(orgOwnerData != null){
+            ecafeEnvelopeElement.appendChild(orgOwnerData.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
@@ -1881,6 +1888,10 @@ public class SyncResponse {
 
     public DistributionManager getDistributionManager() {
         return distributionManager;
+    }
+
+    public OrgOwnerData getOrgOwnerData() {
+        return orgOwnerData;
     }
 
     @Override

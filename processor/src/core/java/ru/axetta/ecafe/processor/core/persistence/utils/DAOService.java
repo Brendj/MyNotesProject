@@ -169,12 +169,15 @@ public class DAOService {
                 queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
                 List<DOVersion> doVersionList = queryVersion.getResultList();
                 Long doVersion = null;
+                String versionWhere = "";
                 if(doVersionList.isEmpty()) {
                     doVersion = -1L;
                 } else {
                     doVersion = doVersionList.get(0).getCurrentVersion();
+                    // производит сверку версии если произошли изменения в таблице версий
+                    versionWhere = (!doVersionList.get(0).getStatus()?"":String.format(" and globalVersion != %d",doVersion));
                 }
-                where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " and globalVersion != "+doVersion+")";
+                where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + versionWhere + " )";
             }
             String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
             query = em.createQuery(select, DistributedObject.class);
@@ -185,6 +188,46 @@ public class DAOService {
         }
         return result;
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<DistributedObject> getDistributedObjectsWithOutVersionStatus(Class<? extends DistributedObject> clazz, Long currentMaxVersion,Long orgOwner) throws Exception{
+        List<DistributedObject> result = null;
+        try{
+            TypedQuery<DistributedObject> query ;
+            String where = "";
+            if(orgOwner != null){
+                List list = Arrays.asList(clazz.getInterfaces());
+                if(list.contains(IConfigProvider.class)){
+                    ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
+                    where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+                }  else {
+                    where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
+                }
+
+            }
+            if(currentMaxVersion != null){
+                /*TypedQuery<DOVersion> queryVersion = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+                queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
+                List<DOVersion> doVersionList = queryVersion.getResultList();
+                Long doVersion = null;
+                String versionWhere = "";
+                if(doVersionList.isEmpty()) {
+                    doVersion = -1L;
+                } else {
+                    doVersion = doVersionList.get(0).getCurrentVersion();
+                }*/
+                where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " )";
+            }
+            String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
+            query = em.createQuery(select, DistributedObject.class);
+            result = query.getResultList();
+            em.flush();
+        } catch (Exception e){
+            logger.error("Error getDistributedObjects: ",e);
+        }
+        return result;
+    }
+
 
     @Transactional
     public Long getDOVersionByGUID(DistributedObject distributedObject) {
@@ -227,6 +270,7 @@ public class DAOService {
             version = doVersion.getCurrentVersion()+1;
             doVersion.setCurrentVersion(version);
         }
+        doVersion.setStatus(true);
         doVersion.setDistributedObjectClassName(name);
         doVersion = em.merge(doVersion);
         return version;
