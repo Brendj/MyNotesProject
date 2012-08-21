@@ -397,7 +397,7 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, distributionManager);
+                correctingNumbersOrdersRegistry, distributionManager, orgOwnerData);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }

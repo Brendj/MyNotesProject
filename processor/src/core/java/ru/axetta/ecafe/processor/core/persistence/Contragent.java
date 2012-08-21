@@ -58,6 +58,7 @@ public class Contragent {
     private Date createTime;
     private Date updateTime;
     private String publicKey;
+    private String publicKeyGOSTAlias;
     private Boolean needAccountTranslate;
     private Set<User> users = new HashSet<User>();
     private Set<ContragentPayment> contragentPayments = new HashSet<ContragentPayment>();
@@ -476,6 +477,14 @@ public class Contragent {
 
     public Set<AddPayment> getReceiverAddPayments() {
         return Collections.unmodifiableSet(getReceiverAddPaymentsInternal());
+    }
+
+    public String getPublicKeyGOSTAlias() {
+        return publicKeyGOSTAlias;
+    }
+
+    public void setPublicKeyGOSTAlias(String publicKeyGOSTAlias) {
+        this.publicKeyGOSTAlias = publicKeyGOSTAlias;
     }
 
     @Override

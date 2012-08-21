@@ -313,6 +313,8 @@ public class MainPage {
     private String currentConfigurationProvider;
 
     private Long editedProductGuideItemId;
+    
+    private BasicWorkspacePage infoGroupMenu = new BasicWorkspacePage();
 
     private final BasicWorkspacePage technologicalMapGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
@@ -6890,6 +6892,10 @@ public User getCurrentUser() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_PAYMENT_EDIT);
     }
 
+    public boolean isEligibleToProcessPayment() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_PAY_PROCESS);
+    }
+
     public boolean isEligibleToViewCategory() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_CATEGORY_VIEW);
     }
@@ -7520,5 +7526,9 @@ return null;
 
     public UvDeletePage getOpenedDeletePage() {
         return (UvDeletePage)modalPages.peek();
+    }
+
+    public BasicWorkspacePage getInfoGroupMenu() {
+        return infoGroupMenu;
     }
 }

@@ -39,6 +39,7 @@
         <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="publicKey" column="PublicKey" type="string" length="1024" not-null="true"/>
+        <property name="publicKeyGOSTAlias" column="PublicKeyGOSTAlias" type="string" length="64" />
         <property name="needAccountTranslate" column="NeedAccountTranslate"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <set name="usersInternal" inverse="true" cascade="all">

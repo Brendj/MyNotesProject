@@ -52,8 +52,10 @@
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.corrAccount}" styleClass="input-text" />
     <h:outputText escape="true" value="Счет" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.account}" styleClass="input-text" />
-    <h:outputText escape="true" value="Публичный ключ" styleClass="output-text" />
+    <h:outputText escape="true" value="Открытый ключ (RSA)" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.publicKey}" styleClass="input-text" />
+    <h:outputText escape="true" value="Открытый ключ (ГОСТ) - контейнер" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.publicKeyGOSTAlias}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Переводить номер счета" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.contragentViewPage.needAccountTranslate}" disabled="true" readonly="true"
                              styleClass="output-text" />

@@ -105,6 +105,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
     private String corrAccount;
     private String account;
     private String publicKey;
+    private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
     private final ContragentClassMenu contragentClassMenu = new ContragentClassMenu();
 
@@ -268,6 +269,14 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.publicKey = publicKey;
     }
 
+    public String getPublicKeyGOSTAlias() {
+        return publicKeyGOSTAlias;
+    }
+
+    public void setPublicKeyGOSTAlias(String publicKeyGOSTAlias) {
+        this.publicKeyGOSTAlias = publicKeyGOSTAlias;
+    }
+
     public boolean isNeedAccountTranslate() {
         return needAccountTranslate;
     }
@@ -303,6 +312,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         contragent.setAccount(this.account);
         contragent.setUpdateTime(new Date());
         contragent.setPublicKey(this.publicKey);
+        contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
         contragent.setNeedAccountTranslate(this.needAccountTranslate);
         session.update(contragent);
         fill(contragent);
@@ -328,6 +338,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.corrAccount = contragent.getCorrAccount();
         this.account = contragent.getAccount();
         this.publicKey = contragent.getPublicKey();
+        this.publicKeyGOSTAlias = contragent.getPublicKeyGOSTAlias();
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
     }
 

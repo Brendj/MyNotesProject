@@ -34,6 +34,7 @@ CREATE TABLE CF_Contragents (
   CreatedDate             BIGINT            NOT NULL,
   LastUpdate              BIGINT            NOT NULL,
   PublicKey               VARCHAR(1024)     NOT NULL,
+  PublicKeyGOSTAlias varchar(64), --v22
   NeedAccountTranslate    INTEGER           NOT NULL,
   CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
   CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
@@ -412,10 +413,12 @@ CREATE TABLE CF_ClientPayments (
   IdOfClientPaymentOrder  BIGINT,
   AddPaymentMethod        VARCHAR(1024),
   AddIdOfPayment          VARCHAR(1024),
+  IdOfContragentReceiver bigint, --v22
   CONSTRAINT CF_ClientPayments_pk PRIMARY KEY (IdOfClientPayment),
   CONSTRAINT CF_ClientPayments_IdOfTransaction_fk FOREIGN KEY (IdOfTransaction) REFERENCES CF_Transactions (IdOfTransaction),
   CONSTRAINT CF_ClientPayments_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent),
-  CONSTRAINT CF_ClientPayments_IdOfClientPaymentOrder_fk FOREIGN KEY (IdOfClientPaymentOrder) REFERENCES CF_ClientPaymentOrders (IdOfClientPaymentOrder)
+  CONSTRAINT CF_ClientPayments_IdOfClientPaymentOrder_fk FOREIGN KEY (IdOfClientPaymentOrder) REFERENCES CF_ClientPaymentOrders (IdOfClientPaymentOrder),
+  CONSTRAINT cf_clientpayments_to_ca_rcvr_fk FOREIGN KEY (IdOfContragentReceiver) REFERENCES CF_Contragents (IdOfContragent) --v22
 );
 
 CREATE TABLE CF_DiaryClasses (
@@ -1199,6 +1202,19 @@ CREATE index "cf_tokens_idofclient_idx" ON cf_linking_tokens (IdOfClient);
 CREATE index "cf_tokens_token_idx" ON cf_linking_tokens (Token);
 ALTER TABLE cf_linking_tokens ADD CONSTRAINT cf_linking_tokens_idofclient FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient);
 
+
+--v22
+CREATE TABLE cf_banks
+(
+  name character varying(128),
+  logourl character varying(128),
+  terminalsurl character varying(128),
+  enrollmenttype character varying(128),
+  idofbank bigserial NOT NULL,
+  minrate double precision,
+  rate double precision,
+  CONSTRAINT cf_banks_pkey PRIMARY KEY (idofbank)
+);
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)

@@ -77,6 +77,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private Date createTime;
     private Date updateTime;
     private String publicKey;
+    private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
 
     public Long getIdOfContragent() {
@@ -163,6 +164,10 @@ public class ContragentViewPage extends BasicWorkspacePage {
         return publicKey;
     }
 
+    public String getPublicKeyGOSTAlias() {
+        return publicKeyGOSTAlias;
+    }
+
     public boolean isNeedAccountTranslate() {
         return needAccountTranslate;
     }
@@ -190,6 +195,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.createTime = contragent.getCreateTime();
         this.updateTime = contragent.getUpdateTime();
         this.publicKey = contragent.getPublicKey();
+        this.publicKeyGOSTAlias = contragent.getPublicKeyGOSTAlias();
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
     }
 

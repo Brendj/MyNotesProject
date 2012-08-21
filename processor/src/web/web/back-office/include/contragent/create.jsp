@@ -54,8 +54,10 @@
     <h:inputText value="#{mainPage.contragentCreatePage.corrAccount}" maxlength="20" styleClass="input-text" />
     <h:outputText escape="true" value="Счет" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.account}" maxlength="20" styleClass="input-text" />
-    <h:outputText escape="true" value="Публичный ключ" styleClass="output-text" />
+    <h:outputText escape="true" value="Открытый ключ (RSA)" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.publicKey}" maxlength="1024" styleClass="input-text" />
+    <h:outputText escape="true" value="Открытый ключ (ГОСТ) - контейнер" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentCreatePage.publicKeyGOSTAlias}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Переводить номер счета" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.contragentCreatePage.needAccountTranslate}" styleClass="output-text" />
 </h:panelGrid>

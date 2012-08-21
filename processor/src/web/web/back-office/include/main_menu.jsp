@@ -174,37 +174,37 @@
     <%--@elvariable id="contractGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractGroupPage"--%>
     <%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage"--%>
     <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
-    <rich:panelMenuGroup id="contractGroupMenu" label="Контракты" binding="#{contractListPage.groupPage.mainMenuComponent}">
+    <rich:panelMenuGroup id="contractGroupMenu" label="Контракты"
+                         binding="#{contractListPage.groupPage.mainMenuComponent}">
         <a4j:support event="onclick" action="#{contractListPage.groupPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="contractListPageMenuItem" label="Список"
-                            binding="#{contractListPage.mainMenuComponent}"
+        <rich:panelMenuItem id="contractListPageMenuItem" label="Список" binding="#{contractListPage.mainMenuComponent}"
                             action="#{contractListPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="selectedContractGroupMenu" label="#{contractEditPage.selectedEntityGroupPage.title}"
                              binding="#{contractEditPage.selectedEntityGroupPage.mainMenuComponent}" rendered="false">
-            <a4j:support event="onclick" action="#{contractEditPage.selectedEntityGroupPage.show}" reRender="workspaceForm" />
+            <a4j:support event="onclick" action="#{contractEditPage.selectedEntityGroupPage.show}"
+                         reRender="workspaceForm" />
             <%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
-            <rich:panelMenuItem id="viewContractMenuItem" binding="#{contractViewPage.mainMenuComponent}" label="Просмотр"
-                                action="#{contractViewPage.show}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="viewContractMenuItem" binding="#{contractViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{contractViewPage.show}" reRender="workspaceForm" />
             <rich:panelMenuItem id="editContractMenuItem" binding="#{contractEditPage.mainMenuComponent}"
                                 label="Редактирование" action="#{contractEditPage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
 
-            <%--@elvariable id="contractCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractCreatePage"--%>
-        <rich:panelMenuItem id="createContractMenuItem" binding="#{contractCreatePage.mainMenuComponent}" label="Регистрация"
-                            action="#{contractCreatePage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="contractCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractCreatePage"--%>
+        <rich:panelMenuItem id="createContractMenuItem" binding="#{contractCreatePage.mainMenuComponent}"
+                            label="Регистрация" action="#{contractCreatePage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
-    <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}"
-                         label="Операции">
+    <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}" label="Операции">
         <a4j:support event="onclick" action="#{mainPage.showContragentOpsGroupPage}" reRender="workspaceForm" />
 
         <%--@elvariable id="reconciliationPage" type="ru.axetta.ecafe.processor.web.ui.contragent.ReconciliationPage"--%>
         <rich:panelMenuItem id="caReconcileMenuItem" label="Сверка реестров"
-                            binding="#{reconciliationPage.mainMenuComponent}"
-                            action="#{reconciliationPage.show}" reRender="workspaceForm" />
+                            binding="#{reconciliationPage.mainMenuComponent}" action="#{reconciliationPage.show}"
+                            reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 
@@ -318,8 +318,7 @@
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         reRender="workspaceForm" />
 
-    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}"
-                         label="Реестры">
+    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Реестры">
         <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="nsiOrgCatalogFind" binding="#{orgCatalogFindPage.mainMenuComponent}"
@@ -440,10 +439,10 @@
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}"
                         label="Конфигурация" action="#{mainPage.showConfigurationPage}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
-                            action="#{licInfoPage.show}" reRender="workspaceForm"/>
+    <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
+                        action="#{licInfoPage.show}" reRender="workspaceForm" />
 
-    </rich:panelMenuGroup>
+</rich:panelMenuGroup>
 
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
@@ -759,6 +758,12 @@
     </rich:panelMenuGroup>
 
 
+</rich:panelMenuGroup>
+
+<rich:panelMenuGroup id="infoGroupMenu" binding="#{mainPage.infoGroupMenu.mainMenuComponent}"
+                     label="Информация">
+    <rich:panelMenuItem id="showCryptoInfo" binding="#{cryptoInfoPage.mainMenuComponent}" label="Крипто-провайдер"
+                        action="#{cryptoInfoPage.show}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
 

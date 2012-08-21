@@ -92,6 +92,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     private String corrAccount;
     private String account;
     private String publicKey;
+    private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
     private final ContragentClassMenu contragentClassMenu = new ContragentClassMenu();
 
@@ -243,6 +244,14 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         this.publicKey = publicKey;
     }
 
+    public String getPublicKeyGOSTAlias() {
+        return publicKeyGOSTAlias;
+    }
+
+    public void setPublicKeyGOSTAlias(String publicKeyGOSTAlias) {
+        this.publicKeyGOSTAlias = publicKeyGOSTAlias;
+    }
+
     public boolean isNeedAccountTranslate() {
         return needAccountTranslate;
     }
@@ -276,6 +285,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setBic(this.bic);
         contragent.setCorrAccount(this.corrAccount);
         contragent.setAccount(this.account);
+        contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
         session.save(contragent);
     }
 
