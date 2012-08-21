@@ -14,6 +14,8 @@ ALTER TABLE CF_ClientPayments ADD COLUMN IdOfContragentReceiver bigint;
 ALTER TABLE CF_ClientPayments ADD CONSTRAINT cf_clientpayments_to_ca_rcvr_fk FOREIGN KEY (IdOfContragentReceiver)
    REFERENCES CF_Contragents (IdOfContragent);
 
+-- статус измение версии в таблице вресий
+ALTER TABLE cf_do_versions ADD COLUMN status integer DEFAULT 0;
 
 -- колонка результирующей версии после обновления объекта
 ALTER TABLE cf_do_conflicts ADD COLUMN gversion_result bigint;
@@ -51,8 +53,8 @@ CREATE TABLE  cf_goods_groups (
 CREATE TABLE  cf_goods (
   IdOfGood BigSerial NOT NULL,
   IdOfGoodsGroup bigint NOT NULL,
-  IdOfTechnologicalMaps bigint NOT NULL,
-  IdOfProducts bigint NOT NULL,
+  IdOfTechnologicalMaps bigint,
+  IdOfProducts bigint,
   GUID character varying(36) NOT NULL,
   DeletedState boolean NOT NULL DEFAULT false,
   GlobalVersion BIGINT DEFAULT NULL,
@@ -69,11 +71,7 @@ CREATE TABLE  cf_goods (
   Margin  bigint DEFAULT 0,
   CONSTRAINT cf_goods_pk PRIMARY KEY (IdOfGood ),
   CONSTRAINT cf_goods_group_fk FOREIGN KEY (IdOfGoodsGroup)
-      REFERENCES cf_goods_groups (IdOfGoodsGroup),
-  CONSTRAINT cf_goods_product_fk FOREIGN KEY (IdOfProducts)
-      REFERENCES cf_products (IdOfProducts),
-  CONSTRAINT cf_goods_technological_map_fk FOREIGN KEY (IdOfTechnologicalMaps)
-      REFERENCES cf_technological_map (IdOfTechnologicalMaps)
+      REFERENCES cf_goods_groups (IdOfGoodsGroup)
 );
 
 CREATE TABLE  cf_trade_material_goods (
