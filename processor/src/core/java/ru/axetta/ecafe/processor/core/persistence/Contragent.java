@@ -301,22 +301,14 @@ public class Contragent {
         return Collections.unmodifiableSet(getContragentPaymentsInternal());
     }
 
-    private Set<ClientPayment> getClientPaymentsInternal() {
+    public Set<ClientPayment> getClientPaymentsInternal() {
         // For Hibernate only
         return clientPayments;
     }
 
-    private void setClientPaymentsInternal(Set<ClientPayment> clientPayments) {
+    public void setClientPaymentsInternal(Set<ClientPayment> clientPayments) {
         // For Hibernate only
         this.clientPayments = clientPayments;
-    }
-
-    public Set<ClientPayment> getClientPayments() {
-        return Collections.unmodifiableSet(getClientPaymentsInternal());
-    }
-
-    public void setClientPayments(Set<ClientPayment> clientPayments) {
-        setClientPaymentsInternal(clientPayments);
     }
 
     private Set<ClientPaymentOrder> getClientPaymentOrdersInternal() {

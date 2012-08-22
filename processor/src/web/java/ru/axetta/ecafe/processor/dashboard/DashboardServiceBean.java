@@ -9,11 +9,22 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.persistence.*;
 import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -26,14 +37,15 @@ import java.util.List;
  * Time: 12:39
  * To change this template use File | Settings | File Templates.
  */
-@Stateless
-@TransactionManagement(TransactionManagementType.BEAN)
+@Component
+@Scope("singleton")
 public class DashboardServiceBean {
 
     private static final int ID_OF_ORG_PARAM_INDEX = 0;
     private static final int ORG_NAME_PARAM_INDEX = ID_OF_ORG_PARAM_INDEX + 1;
     private static final int LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX = ORG_NAME_PARAM_INDEX + 1;
-    private static final int LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX = LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX + 1;
+    private static final int LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX =
+            LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX + 1;
     private static final int FIRST_FULL_SYNC_TIME_PARAM_INDEX = LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX + 1;
     private static final int SYNC_HISTORY_PARAM_INDEX = FIRST_FULL_SYNC_TIME_PARAM_INDEX + 1;
     private static final int NUM_OF_STUDENTS_PARAM_INDEX = SYNC_HISTORY_PARAM_INDEX + 1;
@@ -50,9 +62,11 @@ public class DashboardServiceBean {
     private static final int LAST_OPERATION_TIME_PARAM_INDEX = CONTRAGENT_NAME_PARAM_INDEX + 1;
     private static final int NUM_OF_OPERATIONS_PARAM_INDEX = LAST_OPERATION_TIME_PARAM_INDEX + 1;
 
+    @Autowired
+    PlatformTransactionManager txManager;
 
-    @PersistenceUnit(unitName = "processor")
-    EntityManagerFactory entityManagerFactory;
+    @PersistenceContext
+    EntityManager entityManager;
 
     private DashboardResponse prepareDashboardResponse() {
         DashboardResponse dashboardResponse = new DashboardResponse();
@@ -61,13 +75,12 @@ public class DashboardServiceBean {
         return dashboardResponse;
     }
 
-    private DashboardResponse getOrgInfo(DashboardResponse dashboardResponse) throws SystemException {
-
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
+    private DashboardResponse getOrgInfo(DashboardResponse dashboardResponse) throws Exception {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = txManager.getTransaction(def);
 
         try {
-            entityTransaction.begin();
             Query query = entityManager.createQuery(
                     "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
                             + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
@@ -116,8 +129,10 @@ public class DashboardServiceBean {
 
                     eduInstItemInfo.setIdOfOrg((Long) result[ID_OF_ORG_PARAM_INDEX]);
                     eduInstItemInfo.setOrgName((String) result[ORG_NAME_PARAM_INDEX]);
-                    eduInstItemInfo.setLastSuccessfulBalanceSyncTime((Date) result[LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
-                    eduInstItemInfo.setLastUnSuccessfulBalanceSyncTime((Date) result[LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
+                    eduInstItemInfo.setLastSuccessfulBalanceSyncTime(
+                            (Date) result[LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
+                    eduInstItemInfo.setLastUnSuccessfulBalanceSyncTime(
+                            (Date) result[LAST_UNSUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
                     eduInstItemInfo.setFirstFullSyncTime((Date) result[FIRST_FULL_SYNC_TIME_PARAM_INDEX]);
 
                     SyncHistory syncHistory = (SyncHistory) result[SYNC_HISTORY_PARAM_INDEX];
@@ -156,10 +171,11 @@ public class DashboardServiceBean {
                     eduInstItemInfoList.add(eduInstItemInfo);
                 }
             }
-            entityTransaction.commit();
         } catch (Exception e) {
-            entityTransaction.rollback();
+            txManager.rollback(status);
+            throw e;
         }
+        txManager.commit(status);
 
         return dashboardResponse;
     }
@@ -188,16 +204,16 @@ public class DashboardServiceBean {
         return dayEndDate;
     }
 
-    private DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse) throws SystemException {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
+    private DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse) throws Exception {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = txManager.getTransaction(def);
         try {
-            entityTransaction.begin();
             Query query = entityManager.createQuery(
-                    "SELECT DISTINCT contragent.idOfContragent, contragent.contragentName, " + "max(clientPayment.createTime), "
+                    "SELECT DISTINCT contragent.idOfContragent, contragent.contragentName, "
+                            + "max(clientPayment.createTime), "
                             + "(SELECT count(clientPayment) FROM clientPayment WHERE clientPayment.createTime BETWEEN :dayStart AND :dayEnd) "
-                            + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPayments clientPayment GROUP BY contragent.idOfContragent");
+                            + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPaymentsInternal clientPayment GROUP BY contragent.idOfContragent");
 
 
             Calendar currentTimeStamp = Calendar.getInstance();
@@ -227,16 +243,15 @@ public class DashboardServiceBean {
                     paymentSystemItemInfoList.add(paymentSystemItemInfo);
                 }
             }
-
-            entityTransaction.commit();
         } catch (Exception e) {
-            entityTransaction.rollback();
+            txManager.rollback(status);
+            throw e;
         }
-
+        txManager.commit(status);
         return dashboardResponse;
     }
 
-    public DashboardResponse getInfoForDashboard() throws SystemException {
+    public DashboardResponse getInfoForDashboard() throws Exception {
 
         DashboardResponse dashboardResponse = prepareDashboardResponse();
         dashboardResponse = getOrgInfo(dashboardResponse);
