@@ -57,7 +57,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/web/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/web/test" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="JDK 1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="core" exported="" scope="PROVIDED" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">

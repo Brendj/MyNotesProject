@@ -48,4 +48,20 @@
 
     </target>
 
+
+    <target name="gen_msknsiws" description="">
+        <wsimport
+                package="generated.nsiws"
+            keep="true"
+            destdir="${generatedSrcDest}"
+            extension="true"
+            wsdl="http://10.126.216.2:2000/nsiws/services/NSIService?wsdl">
+            <binding file="tools/nsiws_jaxb.xml"/>
+        </wsimport>
+    </target>
+    <!-- после генерации необходимо в AppDataType добавить
+        @XmlElement(name = "generalResponse", namespace = "http://rstyle.com/nsi/beans")
+        перед     protected GeneralResponse generalResponse;
+    -->
+
 </project>

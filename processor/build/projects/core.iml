@@ -8,7 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/core/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/core/test" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="JDK 1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
@@ -363,6 +363,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="cryptopro" level="project" />
   </component>
 </module>
 
