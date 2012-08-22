@@ -46,6 +46,7 @@ public abstract class DistributedObject{
     protected String guid;
     /* Идентификатор организации */
     protected Long orgOwner;
+    protected Boolean sendAll;
 
     /* Node для последующего разбора */
     private Node node;
@@ -62,6 +63,7 @@ public abstract class DistributedObject{
 
     /* меод добавления свойств наследника атрибутов в узел */
     protected abstract void appendAttributes(Element element);
+
     /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
         if(getDeletedState()){
@@ -71,10 +73,10 @@ public abstract class DistributedObject{
         }
         element.setAttribute("Guid", getGuid());
         element.setAttribute("V", String.valueOf(getGlobalVersion()));
+        element.setAttribute("SendAll", String.valueOf(getSendAll()));
         return element;
         /* Метод определения названия элемента */
     }
-
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException, IOException {
         /* Begin required params */
@@ -84,6 +86,7 @@ public abstract class DistributedObject{
         Long version = getLongAttributeValue(node,"V");
         if(version!=null) setGlobalVersion(version);
 
+
         Integer status = getIntegerAttributeValue(node,"D");
         setDeletedState(status != null);
         tagName = node.getNodeName();
@@ -91,6 +94,8 @@ public abstract class DistributedObject{
         if(deletedState){
             return this;
         }
+        Boolean boolSendAll = getBollAttributeValue(node,"SendAll");
+        if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
 
@@ -142,6 +147,14 @@ public abstract class DistributedObject{
         return result;
     }
 
+    protected Boolean getBollAttributeValue(Node node, String attributeName){
+        Boolean result = null;
+        try{
+            result = Boolean.parseBoolean(getAttributeValue(node, attributeName));
+        } catch (Exception e){ result=null;}
+        return result;
+    }
+
     protected Long getLongAttributeValue(Node node, String attributeName){
         Long result = null;
         try{
@@ -167,7 +180,7 @@ public abstract class DistributedObject{
         }
         return result;
     }
-    
+
     private String getAttributeValue(Node node, String attributeName){
         if(node.getAttributes().getNamedItem(attributeName)==null) return null;
         return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
@@ -181,10 +194,10 @@ public abstract class DistributedObject{
     public void setOrgOwner(Long orgOwner) {
         this.orgOwner = orgOwner;
     }
+
     public String getTagName() {
         return tagName;
     }
-
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
@@ -257,6 +270,14 @@ public abstract class DistributedObject{
         DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         timeFormat1.setTimeZone(localTimeZone);
         return timeFormat1;
+    }
+
+    public Boolean getSendAll() {
+        return sendAll;
+    }
+
+    public void setSendAll(Boolean sendAll) {
+        this.sendAll = sendAll;
     }
 
     @Override

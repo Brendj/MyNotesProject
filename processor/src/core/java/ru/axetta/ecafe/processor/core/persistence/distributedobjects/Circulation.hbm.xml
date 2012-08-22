@@ -6,12 +6,12 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" table="cf_circulations">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" table="cf_circuls">
         <id name="globalId" column="idofcircul" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->
-        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="globalVersion" column="version" type="long"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
         <property name="deletedState" column="DeletedState" type="boolean"/>
@@ -25,13 +25,13 @@
         <!-- End Global params -->
 
         <many-to-one name="issuable" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Issuable" not-null="true"
-                     column="idofissuable"/>
+                     column="idOfIssuable"/>
 
-        <many-to-one name="parentCirculation" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" not-null="false"
-                     column="IdOfParentCirculation"/>
+        <!--        <many-to-one name="parentCirculation" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" not-null="false"-->
+        <!--column="IdOfParentCirculation"/>-->
 
-        <many-to-one name="reader" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Reader" not-null="true"
-                     column="IdOfReader"/>
+        <!--<many-to-one name="reader" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Reader" not-null="true"-->
+        <!--column="IdOfReader"/>-->
 
         <property name="issuanceDate" column="IssuanceDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>

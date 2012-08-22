@@ -101,11 +101,6 @@ public class DAOService {
     }
 
     @Transactional
-    public List<TechnologicalMapProduct> getTechnologicalMapProduct(Long id){
-        return em.createQuery("from TechnologicalMapProduct where idOfTechnoMap="+id,TechnologicalMapProduct.class).getResultList();
-    }
-
-    @Transactional
     public <T> List<T> getDistributedObjects(Class<T> clazz){
         return em.createQuery("from "+clazz.getSimpleName()+" order by id",clazz).getResultList();
     }
@@ -159,9 +154,17 @@ public class DAOService {
                 if(list.contains(IConfigProvider.class)){
                     ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
                     where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
-                }  else {
-                    where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
                 }
+                // вытянем номер организации поставщика если есть.
+                TypedQuery<MenuExchangeRule> queryMER = em.createQuery("from MenuExchangeRule where idOfSourceOrg=:idOfOrg",MenuExchangeRule.class);
+                queryMER.setParameter("idOfOrg",orgOwner);
+                List<MenuExchangeRule> menuExchangeRule = queryMER.getResultList();
+                String whereOrgSource = "";
+                if(!(menuExchangeRule == null || menuExchangeRule.isEmpty() || menuExchangeRule.get(0)==null)){
+                    Org sourceOrg = em.find(Org.class, menuExchangeRule.get(0).getIdOfDestOrg());
+                    whereOrgSource = "or orgOwner = "+ sourceOrg.getIdOfOrg();
+                }
+                where = (where.equals("")?"": where + " and (orgOwner="+orgOwner+whereOrgSource+" ) ");
 
             }
             if(currentMaxVersion != null){
@@ -199,23 +202,13 @@ public class DAOService {
                 List list = Arrays.asList(clazz.getInterfaces());
                 if(list.contains(IConfigProvider.class)){
                     ConfigurationProvider configurationProvider = getConfigurationProvider(orgOwner, clazz);
-                    where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
-                }  else {
-                    where = "(orgOwner="+orgOwner+" or orgOwner = NULL) ";
+                    where = "( idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider()+" )";
                 }
+                // вытянем номер организации поставщика если есть.
+                where = (where.equals("")?"": where + " and (orgOwner="+orgOwner+" or orgOwner = NULL) ");
 
             }
             if(currentMaxVersion != null){
-                /*TypedQuery<DOVersion> queryVersion = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
-                queryVersion.setParameter("distributedObjectClassName",clazz.getSimpleName().toUpperCase());
-                List<DOVersion> doVersionList = queryVersion.getResultList();
-                Long doVersion = null;
-                String versionWhere = "";
-                if(doVersionList.isEmpty()) {
-                    doVersion = -1L;
-                } else {
-                    doVersion = doVersionList.get(0).getCurrentVersion();
-                }*/
                 where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + " )";
             }
             String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
@@ -229,7 +222,7 @@ public class DAOService {
     }
 
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long getDOVersionByGUID(DistributedObject distributedObject) {
         String stringQuery = String.format("select globalVersion from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
         Query query = em.createQuery(stringQuery);
@@ -254,7 +247,7 @@ public class DAOService {
     }
 
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long updateVersionByDistributedObjects(String name) {
         TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
         query.setParameter("distributedObjectClassName",name.toUpperCase());
@@ -272,7 +265,8 @@ public class DAOService {
         }
         doVersion.setStatus(true);
         doVersion.setDistributedObjectClassName(name);
-        doVersion = em.merge(doVersion);
+        em.persist(doVersion);
+        em.flush();
         return version;
     }
 

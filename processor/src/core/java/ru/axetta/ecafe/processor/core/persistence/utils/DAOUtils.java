@@ -38,15 +38,24 @@ public class DAOUtils {
 
     private DAOUtils() {}
 
-    public static List<OrgOwner> getOrgSourceByMenuExchangeRule(Session session, Long idOfSourceOrg){
+    public static List<OrgOwner> getOrgSourceByMenuExchangeRule(Session session, Long idOfOrg, Boolean source){
         Criteria menuExchangeRuleCriteria = session.createCriteria(MenuExchangeRule.class);
-        menuExchangeRuleCriteria.add(Restrictions.eq("idOfSourceOrg", idOfSourceOrg));
+        if(source){
+            menuExchangeRuleCriteria.add(Restrictions.eq("idOfDestOrg", idOfOrg));
+        } else {
+            menuExchangeRuleCriteria.add(Restrictions.eq("idOfSourceOrg", idOfOrg));
+        }
         List list = menuExchangeRuleCriteria.list();
         List<OrgOwner> orgOwnerList = new ArrayList<OrgOwner>(list.size());
         for (Object object: list){
             MenuExchangeRule menuExchangeRule = (MenuExchangeRule) object;
-            Org org = (Org) session.get(Org.class, menuExchangeRule.getIdOfDestOrg());
-            orgOwnerList.add(new OrgOwner(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            Org org = null;
+            if(source){
+                org = (Org) session.get(Org.class, menuExchangeRule.getIdOfSourceOrg());
+            } else {
+                org = (Org) session.get(Org.class, menuExchangeRule.getIdOfDestOrg());
+            }
+            orgOwnerList.add(new OrgOwner(org.getIdOfOrg(), org.getShortName(), org.getOfficialName(), source));
         }
         return orgOwnerList;
     }

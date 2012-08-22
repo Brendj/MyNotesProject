@@ -34,9 +34,6 @@ public class InternalIncomingDocument extends DistributedObject {
         ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class,guidOfAI);
         if(ai==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setActOfInventarization(ai);
-        ReturnDocument rd = DAOService.getInstance().findDistributedObjectByRefGUID(ReturnDocument.class,guidOfRD);
-        if(rd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setReturnDocument(rd);
         Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setStaff(st);
@@ -50,7 +47,6 @@ public class InternalIncomingDocument extends DistributedObject {
         setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
         setAttribute(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
         setAttribute(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
-        setAttribute(element, "GuidOfReturnDoc", returnDocument.getGuid());
         setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
@@ -65,7 +61,6 @@ public class InternalIncomingDocument extends DistributedObject {
         guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
         guidOfIDD = getStringAttributeValue(node,"GuidOfDisposingDoc",36);
         guidOfAI = getStringAttributeValue(node,"GuidOfInventorizationAct",36);
-        guidOfRD = getStringAttributeValue(node,"GuidOfReturnDoc",36);
         guidOfS = getStringAttributeValue(node,"GuidOfStaff",36);
         return this;
     }
@@ -83,8 +78,6 @@ public class InternalIncomingDocument extends DistributedObject {
     private String guidOfIDD;
     private Staff staff;
     private String guidOfS;
-    private ReturnDocument returnDocument;
-    private String guidOfRD;
     private ActOfInventarization actOfInventarization;
     private String guidOfAI;
     private Waybill wayBill;
@@ -96,14 +89,6 @@ public class InternalIncomingDocument extends DistributedObject {
 
     public void setGuidOfS(String guidOfS) {
         this.guidOfS = guidOfS;
-    }
-
-    public String getGuidOfRD() {
-        return guidOfRD;
-    }
-
-    public void setGuidOfRD(String guidOfRD) {
-        this.guidOfRD = guidOfRD;
     }
 
     public String getGuidOfAI() {
@@ -136,14 +121,6 @@ public class InternalIncomingDocument extends DistributedObject {
 
     public void setActOfInventarization(ActOfInventarization actOfInventarization) {
         this.actOfInventarization = actOfInventarization;
-    }
-
-    public ReturnDocument getReturnDocument() {
-        return returnDocument;
-    }
-
-    public void setReturnDocument(ReturnDocument returnDocument) {
-        this.returnDocument = returnDocument;
     }
 
     public Staff getStaff() {

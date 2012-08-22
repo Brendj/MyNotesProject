@@ -22,7 +22,7 @@
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
-
+        <property name="sendAll" column="SendAll" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
         <!-- End Global params -->
