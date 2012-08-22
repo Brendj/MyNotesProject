@@ -4,10 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +33,14 @@ import javax.persistence.PersistenceContext;
  */
 @Component
 @Scope("session")
-public class ProductGroupEditPage extends BasicWorkspacePage {
+public class ProductGroupEditPage extends BasicWorkspacePage implements ConfigurationProviderSelect, OrgSelectPage.CompleteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductGroupEditPage.class);
     private ProductGroup currentProductGroup;
+    private ConfigurationProvider currentConfigurationProvider;
+    private Org org;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
@@ -47,10 +57,21 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
 
     public Object onSave(){
         try {
+            if(org==null){
+                printError("Поле 'Организация поставщик' обязательное.");
+                return null;
+            }
+            if(currentConfigurationProvider==null){
+                printError("Поле 'Производственная конфигурация' обязательное.");
+                return null;
+            }
             if(currentProductGroup.getNameOfGroup() == null || currentProductGroup.getNameOfGroup().equals("")){
                 printError("Поле 'Наименование группы' обязательное.");
                 return null;
             }
+            currentProductGroup.setOrgOwner(org.getIdOfOrg());
+            currentProductGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
+            currentProductGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(ProductGroup.class.getSimpleName()));
             currentProductGroup = (ProductGroup) daoService.mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
             printMessage("Группа для продуктов сохранена успешно.");
         } catch (Exception e) {
@@ -76,6 +97,30 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
         }
     }
 
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        currentConfigurationProvider = configurationProvider;
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if (null != idOfOrg) {
+            org = daoService.findOrById(idOfOrg);
+        }
+    }
+
+    public String getShortName() {
+        return (org == null?"":this.org.getShortName());
+    }
     public String getPageFilename() {
         return "option/configuration_provider/product/group/edit";
     }
@@ -86,5 +131,13 @@ public class ProductGroupEditPage extends BasicWorkspacePage {
 
     public void setCurrentProductGroup(ProductGroup currentProductGroup) {
         this.currentProductGroup = currentProductGroup;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

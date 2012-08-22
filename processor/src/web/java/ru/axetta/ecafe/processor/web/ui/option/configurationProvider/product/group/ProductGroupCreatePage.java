@@ -4,18 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,10 +32,14 @@ import java.util.UUID;
  */
 @Component
 @Scope("session")
-public class ProductGroupCreatePage extends BasicWorkspacePage {
+public class ProductGroupCreatePage extends BasicWorkspacePage implements ConfigurationProviderSelect, OrgSelectPage.CompleteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductGroupCreatePage.class);
     private ProductGroup productGroup;
+    private ConfigurationProvider currentConfigurationProvider;
+    private Org org;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private DAOService daoService;
 
@@ -40,15 +50,25 @@ public class ProductGroupCreatePage extends BasicWorkspacePage {
 
     public Object onSave(){
         try {
+            if(org==null){
+                printError("Поле 'Организация поставщик' обязательное.");
+                return null;
+            }
             if(productGroup.getNameOfGroup() == null || productGroup.getNameOfGroup().equals("")){
                 printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
+            if(currentConfigurationProvider==null){
+                printError("Поле 'Производственная конфигурация' обязательное.");
                 return null;
             }
             productGroup.setCreatedDate(new Date());
             productGroup.setDeletedState(false);
             productGroup.setGuid(UUID.randomUUID().toString());
+            productGroup.setOrgOwner(org.getIdOfOrg());
+            productGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
 
-            productGroup.setGlobalVersion(daoService.getVersionByDistributedObjects(ProductGroup.class));
+            productGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(ProductGroup.class.getSimpleName()));
             daoService.persistEntity(productGroup);
             printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
@@ -58,8 +78,33 @@ public class ProductGroupCreatePage extends BasicWorkspacePage {
         return null;
     }
 
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        currentConfigurationProvider = configurationProvider;
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if (null != idOfOrg) {
+            org = daoService.findOrById(idOfOrg);
+        }
+    }
+
     public String getPageFilename() {
         return "option/configuration_provider/product/group/create";
+    }
+
+    public String getShortName() {
+        return (org == null?"":this.org.getShortName());
     }
 
     public ProductGroup getProductGroup() {
@@ -68,5 +113,13 @@ public class ProductGroupCreatePage extends BasicWorkspacePage {
 
     public void setProductGroup(ProductGroup productGroup) {
         this.productGroup = productGroup;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

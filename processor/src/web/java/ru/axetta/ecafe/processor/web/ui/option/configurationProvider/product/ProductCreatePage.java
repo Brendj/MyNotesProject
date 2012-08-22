@@ -34,16 +34,16 @@ import java.util.UUID;
  */
 @Component
 @Scope("session")
-public class ProductCreatePage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
-
+//public class ProductCreatePage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
+public class ProductCreatePage extends BasicWorkspacePage implements ProductGroupSelect {
     private static final Logger logger = LoggerFactory.getLogger(ProductCreatePage.class);
     private Product product;
-    private ConfigurationProvider currentConfigurationProvider;
+    //private ConfigurationProvider currentConfigurationProvider;
     private ProductGroup currentProductGroup;
     @Autowired
     private ProductGroupItemsPanel productGroupItemsPanel;
-    @Autowired
-    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    //@Autowired
+    //private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private DAOService daoService;
 
@@ -54,16 +54,16 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
 
     private void reload() {
         product = new Product();
-        currentConfigurationProvider = null;
+        //currentConfigurationProvider = null;
         currentProductGroup = null;
     }
 
     public Object onSave(){
         try {
-            if(currentConfigurationProvider==null){
-                printError("Поле 'Производственная конфигурация' обязательное.");
-                return null;
-            }
+            //if(currentConfigurationProvider==null){
+            //    printError("Поле 'Производственная конфигурация' обязательное.");
+            //    return null;
+            //}
             if(currentProductGroup==null){
                 printError("Поле 'Группа продуктов' обязательное.");
                 return null;
@@ -80,16 +80,18 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
             product.setDeletedState(false);
             product.setGuid(UUID.randomUUID().toString());
             product.setGlobalVersion(daoService.getVersionByDistributedObjects(Product.class));
-            product.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
+            product.setIdOfConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
+            product.setOrgOwner(currentProductGroup.getOrgOwner());
+            //product.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
 
             MainPage mainPage = MainPage.getSessionInstance();
             product.setUserCreate(mainPage.getCurrentUser());
             product.setProductGroup(currentProductGroup);
-            daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
-                    currentConfigurationProvider.getIdOfConfigurationProvider());
+            //daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
+            //        currentConfigurationProvider.getIdOfConfigurationProvider());
 
             daoService.persistEntity(product);
-            currentConfigurationProvider = new ConfigurationProvider();
+            //currentConfigurationProvider = new ConfigurationProvider();
             reload();
             printMessage("Продукт сохранена успешно.");
         } catch (Exception e) {
@@ -99,19 +101,19 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         return null;
     }
 
-    public Object selectConfigurationProvider() throws Exception{
-        configurationProviderItemsPanel.reload();
-        if(currentConfigurationProvider!=null){
-            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
-        }
-        configurationProviderItemsPanel.pushCompleteHandler(this);
-        return null;
-    }
-
-    @Override
-    public void select(ConfigurationProvider configurationProvider) {
-        currentConfigurationProvider = configurationProvider;
-    }
+    //public Object selectConfigurationProvider() throws Exception{
+    //    configurationProviderItemsPanel.reload();
+    //    if(currentConfigurationProvider!=null){
+    //        configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+    //    }
+    //    configurationProviderItemsPanel.pushCompleteHandler(this);
+    //    return null;
+    //}
+    //
+    //@Override
+    //public void select(ConfigurationProvider configurationProvider) {
+    //    currentConfigurationProvider = configurationProvider;
+    //}
 
     public Object selectProductGroup() throws Exception{
         productGroupItemsPanel.reload();
@@ -135,13 +137,13 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         return "option/configuration_provider/product/create";
     }
 
-    public ConfigurationProvider getCurrentConfigurationProvider() {
-        return currentConfigurationProvider;
-    }
-
-    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
-        this.currentConfigurationProvider = currentConfigurationProvider;
-    }
+    //public ConfigurationProvider getCurrentConfigurationProvider() {
+    //    return currentConfigurationProvider;
+    //}
+    //
+    //public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+    //    this.currentConfigurationProvider = currentConfigurationProvider;
+    //}
 
     public Product getProduct() {
         return product;

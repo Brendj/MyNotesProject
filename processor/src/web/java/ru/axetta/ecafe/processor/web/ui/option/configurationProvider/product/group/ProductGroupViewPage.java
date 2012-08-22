@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -35,6 +37,8 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(ProductGroupViewPage.class);
     private ProductGroup currentProductGroup;
     private Integer countProducts;
+    private Org currentOrg;
+    private ConfigurationProvider currentConfigurationProvider;
     @Autowired
     private SelectedProductGroupGroupPage selectedProductGroupGroupPage;
     @Autowired
@@ -49,6 +53,8 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
         TypedQuery<Product> query = entityManager.createQuery("from Product where productGroup=:productGroup", Product.class);
         query.setParameter("productGroup",currentProductGroup);
         countProducts = query.getResultList().size();
+        currentOrg = entityManager.find(Org.class,currentProductGroup.getOrgOwner());
+        currentConfigurationProvider = entityManager.find(ConfigurationProvider.class,currentProductGroup.getIdOfConfigurationProvider());
     }
 
     public Object showProducts() throws Exception{
@@ -74,5 +80,13 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
 
     public Integer getCountProducts() {
         return countProducts;
+    }
+
+    public Org getCurrentOrg() {
+        return currentOrg;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
     }
 }
