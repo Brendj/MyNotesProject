@@ -136,13 +136,12 @@ public class DistributionManager {
             String name = anArray.name();
             List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>(0);
             try {
-                distributedObjectList = DAOService.getInstance()
-                        .getDistributedObjects(anArray.getValue(), currentMaxVersions.get(name), idOfOrg);
-                List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
-                for (DistributedObject distributedObject: distributedObjectList){
-                    temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
-                }
-                distributedObjectList.addAll(temp);
+                distributedObjectList = DAOService.getInstance().getDistributedObjects(anArray.getValue(), currentMaxVersions.get(name), idOfOrg);
+                //List<DistributedObject> temp = new ArrayList<DistributedObject>(0);
+                //for (DistributedObject distributedObject: distributedObjectList){
+                //    temp.addAll(distributedObject.getDistributedObjectChildren(currentMaxVersions));
+                //}
+                //distributedObjectList.addAll(temp);
             } catch (Exception e) {
                 if (e instanceof DistributedObjectException) {
                     Element element = document.createElement(anArray.name());

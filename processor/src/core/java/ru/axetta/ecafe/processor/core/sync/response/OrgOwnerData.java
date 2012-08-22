@@ -34,7 +34,10 @@ public class OrgOwnerData {
     }
 
     public void process(Session session, Long idOfOrg){
-        orgOwnerList = DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg);
+        List<OrgOwner> orgOwners = new LinkedList<OrgOwner>();
+        orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, false));
+        orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, true));
+        orgOwnerList = orgOwners;
     }
 
     public Element toElement(Document document) throws Exception {

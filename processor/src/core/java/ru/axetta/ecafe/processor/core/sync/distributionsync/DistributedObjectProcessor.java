@@ -98,8 +98,8 @@ public class DistributedObjectProcessor {
             DAOService.getInstance().updateDeleteState(distributedObject);
         } else {
             if (distributedObject.getTagName().equals("C")) {
-                Long currentUpdateVersion = DAOService.getInstance().getDOVersionByGUID(distributedObject);
-                distributedObject = createDistributedObject(distributedObject, currentUpdateVersion);
+                //Long currentUpdateVersion = DAOService.getInstance().getDOVersionByGUID(distributedObject);
+                distributedObject = createDistributedObject(distributedObject, currentMaxVersion);
                 distributedObject.setTagName("C");
             }
             if (distributedObject.getTagName().equals("M")) {
