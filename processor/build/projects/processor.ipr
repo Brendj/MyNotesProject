@@ -413,7 +413,6 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" compressed="false" hash="3658325209" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -662,7 +661,16 @@
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
+        <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
+          <option name="INDENT_SIZE" value="2" />
+        </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="haml">
+          <option name="INDENT_SIZE" value="2" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="sass">
+          <option name="INDENT_SIZE" value="2" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="yml">
           <option name="INDENT_SIZE" value="2" />
         </ADDITIONAL_INDENT_OPTIONS>
         <codeStyleSettings language="CFML">
@@ -699,11 +707,6 @@
           <option name="WHILE_BRACE_FORCE" value="3" />
           <option name="FOR_BRACE_FORCE" value="3" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
-        </codeStyleSettings>
-        <codeStyleSettings language="GSP">
-          <indentOptions>
-            <option name="INDENT_SIZE" value="2" />
-          </indentOptions>
         </codeStyleSettings>
         <codeStyleSettings language="Groovy">
           <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
@@ -876,7 +879,7 @@
     <resource url="http://www.jboss.org/j2ee/dtd/jboss-ds_5_0.dtd" location="$USER_HOME$/jboss-5.0.1.GA/docs/dtd/jboss-ds_5_0.dtd" />
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="JDK 1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -918,6 +921,13 @@
           <value>
             <SvnBranchConfiguration>
               <option name="trunkUrl" value="svn://freexter.com/dwc/ecafe/processor/src/core" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/dashboard-ws-client">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
             </SvnBranchConfiguration>
           </value>
         </entry>
@@ -1041,6 +1051,15 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
+    <library name="cryptopro">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/../lib/cryptopro" />
+        <root url="file://$PROJECT_DIR$/../lib/cryptopro" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/../lib/cryptopro" recursive="false" />
+    </library>
     <library name="Java EE 5-Java EE 5">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/javaee.jar!/" />

@@ -7,7 +7,7 @@
     <content url="file://$MODULE_DIR$/../../src/synctest">
       <sourceFolder url="file://$MODULE_DIR$/../../src/synctest/java" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="JDK 1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="">
       <library>
