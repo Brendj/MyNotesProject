@@ -13,14 +13,14 @@
 <h:panelGrid id="productCreatePanelGrid" binding="#{productCreatePage.pageComponent}" styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
 
-        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
-        <h:panelGroup styleClass="borderless-div">
-            <h:outputText value="#{productCreatePage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
-            <a4j:commandButton value="..." action="#{productCreatePage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
-                               styleClass="command-link" style="width: 25px; float: right;" />
+        <%--<h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />--%>
+        <%--<h:panelGroup styleClass="borderless-div">--%>
+            <%--<h:outputText value="#{productCreatePage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />--%>
+            <%--<a4j:commandButton value="..." action="#{productCreatePage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"--%>
+                               <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"--%>
+                               <%--styleClass="command-link" style="width: 25px; float: right;" />--%>
 
-        </h:panelGroup>
+        <%--</h:panelGroup>--%>
 
         <h:outputText escape="true" value="Группа продуктов" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
