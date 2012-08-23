@@ -107,10 +107,14 @@
             <column name="idOfContract"/>
         </many-to-one>
 
-        <set name="friendlyOrgInternal" table="cf_friendly_organization">
+        <set name="friendlyOrg" table="cf_friendly_organization">
             <key column="currentOrg"/>
             <many-to-many column="friendlyOrg" entity-name="ru.axetta.ecafe.processor.core.persistence.Org"/>
         </set>
+        <!--<set name="friendlyOrgInternal" table="cf_friendly_organization">
+            <key column="currentOrg"/>
+            <many-to-many column="friendlyOrg" entity-name="ru.axetta.ecafe.processor.core.persistence.Org"/>
+        </set>-->
 
         <join table="cf_friendly_organization" inverse="true">
             <key column="friendlyOrg"/>

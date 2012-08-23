@@ -73,23 +73,34 @@ public class Org {
     private Contract contract;
     private Date lastSuccessfulBalanceSync;
     private Date lastUnSuccessfulBalanceSync;
-    private Set<Org> friendlyOrgInternal;
-
-    private Set<Org> getFriendlyOrgInternal() {
-        return friendlyOrgInternal;
-    }
-
-    private void setFriendlyOrgInternal(Set<Org> friendlyOrgInternal) {
-        this.friendlyOrgInternal = friendlyOrgInternal;
-    }
+    private Set<Org> friendlyOrg;
 
     public Set<Org> getFriendlyOrg() {
-        return getFriendlyOrgInternal();
+        return friendlyOrg;
     }
 
-    public void addFriendlyOrg(Org friendlyOrg) {
-        this.friendlyOrgInternal.add(friendlyOrg);
+    public void setFriendlyOrg(Set<Org> friendlyOrg) {
+        this.friendlyOrg = friendlyOrg;
     }
+
+
+    //private Set<Org> friendlyOrgInternal;
+    //
+    //private Set<Org> getFriendlyOrgInternal() {
+    //    return friendlyOrgInternal;
+    //}
+    //
+    //private void setFriendlyOrgInternal(Set<Org> friendlyOrgInternal) {
+    //    this.friendlyOrgInternal = friendlyOrgInternal;
+    //}
+    //
+    //public Set<Org> getFriendlyOrg() {
+    //    return getFriendlyOrgInternal();
+    //}
+    //
+    //public void addFriendlyOrg(Org friendlyOrg) {
+    //    this.friendlyOrgInternal.add(friendlyOrg);
+    //}
 
     public Contract getContract() {
         return contract;
