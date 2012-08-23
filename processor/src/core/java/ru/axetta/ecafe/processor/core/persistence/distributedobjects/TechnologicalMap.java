@@ -88,7 +88,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
+        setOrgOwner(((TechnologicalMap) distributedObject).getOrgOwner());
         setNameOfTechnologicalMap(((TechnologicalMap) distributedObject).getNameOfTechnologicalMap());
         setNumberOfTechnologicalMap(((TechnologicalMap) distributedObject).getNumberOfTechnologicalMap());
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
