@@ -13,6 +13,23 @@
 <h:panelGrid id="technologicalMapGroupEditPanelGrid" binding="#{technologicalMapGroupEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Организация поставщик" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{technologicalMapGroupEditPage.shortName}" readonly="true" styleClass="input-text"
+                         style="margin-right: 2px; width: 374px; float: left;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
+        <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field" />
+        <h:inputTextarea value="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup.nameOfGroup}" cols="128" rows="4" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:outputText value="#{technologicalMapGroupEditPage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{technologicalMapGroupEditPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
         <h:inputText value="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup.nameOfGroup}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Статус" styleClass="output-text" />

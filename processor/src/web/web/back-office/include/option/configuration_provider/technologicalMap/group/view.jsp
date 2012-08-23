@@ -9,12 +9,22 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="technologicalMapGroupViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupViewPage"--%>
-
+<%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
+<%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderViewPage"--%>
+<%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
 <h:panelGrid id="technologicalMapGroupViewPanelGrid" binding="#{technologicalMapGroupViewPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
         <h:inputText value="#{technologicalMapGroupViewPage.currentTechnologicalMapGroup.nameOfGroup}" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Организация поставщик" styleClass="output-text" />
+        <h:commandLink value="#{technologicalMapGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{technologicalMapGroupViewPage.currentOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+        </h:commandLink>
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+        <h:commandLink value="#{technologicalMapGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{technologicalMapGroupViewPage.currentConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
+        </h:commandLink>
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{technologicalMapGroupViewPage.currentTechnologicalMapGroup.deletedState}" readonly="true" disabled="true"/>
         <h:outputText escape="true" value="Технологической карты" styleClass="output-text" />
@@ -22,7 +32,7 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Редактировать" action="#{technologicalMapGroupViewPage.show}"
+        <a4j:commandButton value="Редактировать" action="#{technologicalMapGroupEditPage.show}"
                            reRender="workspaceTogglePanel, mainMenu" styleClass="command-button" />
     </h:panelGrid>
 

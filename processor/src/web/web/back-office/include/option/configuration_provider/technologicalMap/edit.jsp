@@ -16,13 +16,6 @@
 
 
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div">
-            <h:outputText value="#{technologicalMapEditPage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
-            <a4j:commandButton value="..." action="#{technologicalMapEditPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
-                               styleClass="command-link" style="width: 25px; float: right;" />
-        </h:panelGroup>
         <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
             <h:outputText value="#{technologicalMapEditPage.currentTechnologicalMapGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
@@ -42,52 +35,53 @@
         </h:selectOneListbox>
     </h:panelGrid>
 
+    <h:panelGrid>
+        <rich:dataTable id="productsTable" value="#{technologicalMapEditPage.technologicalMapProducts}" var="technologicalMapProduct" >
 
-    <rich:dataTable id="productsTable" value="#{technologicalMapEditPage.technologicalMapProducts}" var="technologicalMapProduct" >
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column rowspan="2" headerClass="center-aligned-column column-header" width="200px">
+                        <h:outputText escape="true" value="Наименование продукта" />
+                    </rich:column>
+                    <rich:column colspan="2" headerClass="center-aligned-column column-header">
+                        <h:outputText value="Норма расхода продуктов на 1 порцию массой нетто 100 г" escape="true"/>
+                    </rich:column>
+                    <rich:column rowspan="2" headerClass="center-aligned-column column-header">
+                        <h:outputText value="Удалить" escape="true"/>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column column-header"  breakBefore="true">
+                        <h:outputText value="Масса брутто, г." escape="true"/>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column column-header" >
+                        <h:outputText value="Масса нетто, г." escape="true"/>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column >
+                <h:outputText value="#{technologicalMapProduct.product.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:inputText value="#{technologicalMapProduct.grossWeight}"/>
+            </rich:column>
+            <rich:column >
+                <h:inputText value="#{technologicalMapProduct.netWeight}"/>
+            </rich:column>
+            <rich:column style="text-align:center">
+                <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapEditPage.deleteProduct}" reRender="productsTable">
+                    <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                    <f:setPropertyActionListener value="#{technologicalMapProduct}"
+                                                 target="#{technologicalMapEditPage.currentTechnologicalMapProduct}" />
+                </a4j:commandLink>
+            </rich:column>
+        </rich:dataTable>
 
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" width="200px">
-                    <h:outputText escape="true" value="Наименование продукта" />
-                </rich:column>
-                <rich:column colspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Норма расхода продуктов на 1 порцию массой нетто 100 г" escape="true"/>
-                </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Удалить" escape="true"/>
-                </rich:column>
-                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true">
-                    <h:outputText value="Масса брутто, г." escape="true"/>
-                </rich:column>
-                <rich:column headerClass="center-aligned-column column-header" >
-                    <h:outputText value="Масса нетто, г." escape="true"/>
-                </rich:column>
-            </rich:columnGroup>
-        </f:facet>
-        <rich:column >
-            <h:outputText value="#{technologicalMapProduct.product.fullName}"/>
-        </rich:column>
-        <rich:column>
-            <h:inputText value="#{technologicalMapProduct.grossWeight}"/>
-        </rich:column>
-        <rich:column >
-            <h:inputText value="#{technologicalMapProduct.netWeight}"/>
-        </rich:column>
-        <rich:column style="text-align:center">
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapEditPage.deleteProduct}" reRender="productsTable">
-                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{technologicalMapProduct}"
-                                             target="#{technologicalMapEditPage.currentTechnologicalMapProduct}" />
-            </a4j:commandLink>
-        </rich:column>
-    </rich:dataTable>
-
-    <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapEditPage.showProducts}" reRender="modalTechnologicalMapListSelectorPanel"
-                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.show();"
-                       styleClass="command-button">
-        <f:setPropertyActionListener value="#{technologicalMapEditPage.currentTechnologicalMap}"
-                                     target="#{productItemsPanel.technologicalMap}" />
-    </a4j:commandButton>
+        <a4j:commandButton value="Добавить продукт"  action="#{technologicalMapEditPage.showProducts}" reRender="modalTechnologicalMapListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.show();"
+                           styleClass="command-button">
+            <f:setPropertyActionListener value="#{technologicalMapEditPage.currentTechnologicalMap}"
+                                         target="#{productItemsPanel.technologicalMap}" />
+        </a4j:commandButton>
+    </h:panelGrid>
 
     <h:panelGrid columns="2">
         <f:facet name="header">
@@ -190,7 +184,7 @@
     </h:panelGrid>
 
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Срок годности (мин.)" />
+        <h:outputText escape="true" value="Срок годности (мин.)" styleClass="output-text"/>
         <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.lifeTime}" styleClass="input-text"
                      validatorMessage="Число должно быть целым.">
             <f:validateDoubleRange minimum="0" maximum="99999999" />

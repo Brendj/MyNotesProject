@@ -154,6 +154,11 @@
     <a4j:commandButton value="Восстановить" action="#{mainPage.showOrgEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
+<a4j:status id="sOrgCreateStatus">
+    <f:facet name="start">
+        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+    </f:facet>
+</a4j:status>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
