@@ -15,7 +15,10 @@ import java.io.Serializable;
  */
 public class MenuExchangeRule implements Serializable {
 
-    private Long idOfSourceOrg, idOfDestOrg;
+    /* Ид поставщика основного меню */
+    private Long idOfSourceOrg;
+    /* ид потребителя основного меню */
+    private Long idOfDestOrg;
 
     private MenuExchangeRule() {
 

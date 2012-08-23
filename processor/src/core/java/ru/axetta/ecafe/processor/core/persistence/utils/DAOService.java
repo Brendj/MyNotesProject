@@ -21,10 +21,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -114,6 +111,10 @@ public class DAOService {
         return  query.getResultList();
     }
 
+    public ConfigurationProvider getConfigurationProvider(Long idOfConfigurationProvider) throws Exception{
+        return em.find(ConfigurationProvider.class, idOfConfigurationProvider);
+    }
+
     public ConfigurationProvider getConfigurationProvider(Long orgOwner, Class<? extends DistributedObject> clazz) throws Exception{
         List list = Arrays.asList(clazz.getInterfaces());
         ConfigurationProvider configurationProvider = null;
@@ -156,15 +157,21 @@ public class DAOService {
                     where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
                 }
                 // вытянем номер организации поставщика если есть.
-                TypedQuery<MenuExchangeRule> queryMER = em.createQuery("from MenuExchangeRule where idOfSourceOrg=:idOfOrg",MenuExchangeRule.class);
+                List<Long> menuExchangeRuleList = new LinkedList<Long>();
+                TypedQuery<Long> queryMER ;
+                queryMER = em.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg",Long.class);
                 queryMER.setParameter("idOfOrg",orgOwner);
-                List<MenuExchangeRule> menuExchangeRule = queryMER.getResultList();
+                menuExchangeRuleList.addAll(queryMER.getResultList());
+                queryMER = em.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg",Long.class);
+                queryMER.setParameter("idOfOrg",orgOwner);
+                menuExchangeRuleList.addAll(queryMER.getResultList());
                 String whereOrgSource = "";
-                if(!(menuExchangeRule == null || menuExchangeRule.isEmpty() || menuExchangeRule.get(0)==null)){
-                    Org sourceOrg = em.find(Org.class, menuExchangeRule.get(0).getIdOfDestOrg());
-                    whereOrgSource = "or orgOwner = "+ sourceOrg.getIdOfOrg();
+                if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
+                    whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+orgOwner+")";
+                } else{
+                    whereOrgSource = " orgOwner = "+orgOwner;
                 }
-                where = (where.equals("")?"": where + " and (orgOwner="+orgOwner+whereOrgSource+" ) ");
+                where = (where.equals("")?whereOrgSource: where + " and  " + whereOrgSource)+" ";
 
             }
             if(currentMaxVersion != null){
@@ -178,6 +185,7 @@ public class DAOService {
                 } else {
                     doVersion = doVersionList.get(0).getCurrentVersion();
                     // производит сверку версии если произошли изменения в таблице версий
+                    // versionWhere = String.format(" and globalVersion != %d",doVersion);
                     versionWhere = (!doVersionList.get(0).getStatus()?"":String.format(" and globalVersion != %d",doVersion));
                 }
                 where = (where.equals("")?"": where + " and ") + " (globalVersion>"+currentMaxVersion + versionWhere + " )";
@@ -246,6 +254,20 @@ public class DAOService {
         return version;
     }
 
+    public boolean setFalseStatusDOVersionByDistributedObjects(Class clazz){
+        try{
+            TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
+            query.setParameter("distributedObjectClassName", clazz.getSimpleName().toUpperCase());
+            List<DOVersion> doVersionList = query.getResultList();
+            if(!(doVersionList==null || doVersionList.isEmpty())){
+                Query queryV = em.createQuery("update DOVersion set status=false where UPPER(distributedObjectClassName)=:distributedObjectClassName");
+                queryV.setParameter("distributedObjectClassName", clazz.getSimpleName().toUpperCase());
+                return queryV.executeUpdate()!=0;
+            }
+        } catch (Exception e){
+        }
+        return false;
+    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long updateVersionByDistributedObjects(String name) {
