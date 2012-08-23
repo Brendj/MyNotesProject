@@ -53,6 +53,8 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
         selectedProductGroupGroupPage.onShow();
         currentProductGroup = selectedProductGroupGroupPage.getCurrentProductGroup();
         currentProductGroup = entityManager.merge(currentProductGroup);
+        org = daoService.findOrById(currentProductGroup.getOrgOwner());
+        currentConfigurationProvider = daoService.getConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
     }
 
     public Object onSave(){
@@ -121,6 +123,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     public String getShortName() {
         return (org == null?"":this.org.getShortName());
     }
+
     public String getPageFilename() {
         return "option/configuration_provider/product/group/edit";
     }

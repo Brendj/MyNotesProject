@@ -4,11 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,10 +34,14 @@ import java.util.UUID;
  */
 @Component
 @Scope("session")
-public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
+public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage implements ConfigurationProviderSelect, OrgSelectPage.CompleteHandler  {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapGroupCreatePage.class);
     private TechnologicalMapGroup technologicalMapGroup;
+    private ConfigurationProvider currentConfigurationProvider;
+    private Org org;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private DAOService daoService;
 
@@ -42,14 +52,24 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
 
     public Object onSave(){
         try {
+            if(org==null){
+                printError("Поле 'Организация поставщик' обязательное.");
+                return null;
+            }
             if(technologicalMapGroup.getNameOfGroup() == null || technologicalMapGroup.getNameOfGroup().equals("")){
                 printError("Поле 'Наименование группы' обязательное.");
+                return null;
+            }
+            if(currentConfigurationProvider==null){
+                printError("Поле 'Производственная конфигурация' обязательное.");
                 return null;
             }
             technologicalMapGroup.setCreatedDate(new Date());
             technologicalMapGroup.setDeletedState(false);
             technologicalMapGroup.setGuid(UUID.randomUUID().toString());
             technologicalMapGroup.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapGroup.class));
+            technologicalMapGroup.setOrgOwner(org.getIdOfOrg());
+            technologicalMapGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
             daoService.persistEntity(technologicalMapGroup);
             printMessage("Группа сохранена успешно.");
         } catch (Exception e) {
@@ -59,8 +79,33 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
         return null;
     }
 
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        currentConfigurationProvider = configurationProvider;
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if (null != idOfOrg) {
+            org = daoService.findOrById(idOfOrg);
+        }
+    }
+
     public String getPageFilename() {
         return "option/configuration_provider/technologicalMap/group/create";
+    }
+
+    public String getShortName() {
+        return (org == null?"":this.org.getShortName());
     }
 
     public TechnologicalMapGroup getTechnologicalMapGroup() {
@@ -69,5 +114,13 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage {
 
     public void setTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup) {
         this.technologicalMapGroup = technologicalMapGroup;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupGroupPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapListPage;
 
 import org.slf4j.Logger;
@@ -33,12 +37,18 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapGroupViewPage.class);
     private TechnologicalMapGroup currentTechnologicalMapGroup;
     private Integer countTechnologicalMaps;
+    private Org currentOrg;
+    private ConfigurationProvider currentConfigurationProvider;
+    @Autowired
+    private SelectedProductGroupGroupPage selectedProductGroupGroupPage;
     @Autowired
     private SelectedTechnologicalMapGroupGroupPage selectedTechnologicalMapGroupGroupPage;
     @Autowired
     private TechnologicalMapListPage technologicalMapListPage;
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onShow() throws Exception {
@@ -47,6 +57,8 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
         TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup", TechnologicalMap.class);
         query.setParameter("technologicalMapGroup",currentTechnologicalMapGroup);
         countTechnologicalMaps = query.getResultList().size();
+        currentOrg = daoService.findOrById(currentTechnologicalMapGroup.getOrgOwner());
+        currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
     }
 
     public Object showTechnologicalMaps() throws Exception{
@@ -72,5 +84,21 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
 
     public Integer getCountTechnologicalMaps() {
         return countTechnologicalMaps;
+    }
+
+    public Org getCurrentOrg() {
+        return currentOrg;
+    }
+
+    public void setCurrentOrg(Org currentOrg) {
+        this.currentOrg = currentOrg;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

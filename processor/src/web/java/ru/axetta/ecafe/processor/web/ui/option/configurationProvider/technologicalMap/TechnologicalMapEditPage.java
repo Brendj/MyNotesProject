@@ -38,8 +38,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class TechnologicalMapEditPage extends BasicWorkspacePage implements ProductSelect, ConfigurationProviderSelect,
-        TechnologicalMapGroupSelect {
+public class TechnologicalMapEditPage extends BasicWorkspacePage implements ProductSelect, TechnologicalMapGroupSelect {
 
     private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapEditPage.class);
 
@@ -47,8 +46,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     private TechnologicalMapProduct currentTechnologicalMapProduct;
     private List<Product> pr = new LinkedList<Product>();
     private List<TechnologicalMapProduct> technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
-
-    private ConfigurationProvider currentConfigurationProvider;
     private TechnologicalMapGroup currentTechnologicalMapGroup;
 
     @PersistenceContext
@@ -58,25 +55,9 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     @Autowired
     private ProductItemsPanel productItemsPanel;
     @Autowired
-    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
-    @Autowired
     private TechnologicalMapGroupItemsPanel technologicalMapGroupItemsPanel;
     @Autowired
     private SelectedTechnologicalMapGroupPage selectedTechnologicalMapGroupPage;
-
-    public Object selectConfigurationProvider() throws Exception{
-        configurationProviderItemsPanel.reload();
-        if(currentConfigurationProvider !=null){
-            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
-        }
-        configurationProviderItemsPanel.pushCompleteHandler(this);
-        return null;
-    }
-
-    @Override
-    public void select(ConfigurationProvider configurationProvider) {
-        currentConfigurationProvider = configurationProvider;
-    }
 
     public Object selectTechnologicalMapGroup() throws Exception{
         technologicalMapGroupItemsPanel.reload();
@@ -94,9 +75,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     public void onShow() throws Exception {
         selectedTechnologicalMapGroupPage.onShow();
         currentTechnologicalMap = selectedTechnologicalMapGroupPage.getCurrentTechnologicalMap();
-        if(currentTechnologicalMap.getIdOfConfigurationProvider() !=null){
-            currentConfigurationProvider = em.find(ConfigurationProvider.class, currentTechnologicalMap.getIdOfConfigurationProvider());
-        }
         if(currentTechnologicalMap.getTechnologicalMapGroup()!=null){
             currentTechnologicalMapGroup = currentTechnologicalMap.getTechnologicalMapGroup();
         }
@@ -129,7 +107,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     @Transactional
     public void remove(){
         if(!currentTechnologicalMap.getDeletedState()) {
-            printMessage("Технологическая карта не может быть удалена.");
+            printError("Технологическая карта не может быть удалена.");
             return;
         }
         try{
@@ -166,10 +144,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 printError("Введите группу для технологической карты.");
                 return;
             }
-            if(currentConfigurationProvider==null){
-                printError("Введите конфигурацию для технологической карты.");
-                return;
-            }
             TechnologicalMap tm = em.find(TechnologicalMap.class, currentTechnologicalMap.getGlobalId());
 
             tm.fill(currentTechnologicalMap);
@@ -184,39 +158,35 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 tm.setUserEdit(mainPage.getCurrentUser());
             }
 
+            Long currentIdOfConfigurationProvider = currentTechnologicalMapGroup.getIdOfConfigurationProvider();
+            Long orgOwner = currentTechnologicalMapGroup.getOrgOwner();
+            tm.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+            tm.setOrgOwner(orgOwner);
+            tm.setTechnologicalMapGroup(currentTechnologicalMapGroup);
+
             List<TechnologicalMapProduct> technologicalMapProductList = daoService.getTechnologicalMapProducts(tm);
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProductList){
                 daoService.deleteEntity(technologicalMapProduct);
             }
-
-            //tm.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
-
-            tm.setTechnologicalMapGroup(daoService
-                    .findRefDistributedObject(TechnologicalMapGroup.class, currentTechnologicalMapGroup.getGlobalId()));
-            daoService.setConfigurationProviderInDO(TechnologicalMapGroup.class, currentTechnologicalMapGroup.getGlobalId(),
-                    currentConfigurationProvider.getIdOfConfigurationProvider());
-
-            currentTechnologicalMap = (TechnologicalMap) daoService.mergeDistributedObject(tm, tm.getGlobalVersion() + 1);
-            daoService.setConfigurationProviderInDO(TechnologicalMap.class, currentTechnologicalMap.getGlobalId(),
-                    currentConfigurationProvider.getIdOfConfigurationProvider());
-
-            for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
-                if(technologicalMapProduct.getGlobalId()==null){
-                    technologicalMapProduct.setCreatedDate(new Date());
-                    technologicalMapProduct.setGuid(UUID.randomUUID().toString());
-                    technologicalMapProduct.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class));
-                    technologicalMapProduct.setTechnologicalMap(currentTechnologicalMap);
-                    technologicalMapProduct.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
-                } else {
-                    technologicalMapProduct.setGlobalId(null);
-                    technologicalMapProduct.setLastUpdate(new Date());
-                    technologicalMapProduct.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
-                    if(technologicalMapProduct.getGlobalVersion()==null){
-                        technologicalMapProduct.setGlobalVersion(daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class));
+            if(!(technologicalMapProducts == null || technologicalMapProducts.isEmpty())){
+                Long version = daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class);
+                for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
+                    if(technologicalMapProduct.getGlobalId()==null){
+                        technologicalMapProduct.setCreatedDate(new Date());
+                        technologicalMapProduct.setGuid(UUID.randomUUID().toString());
+                        technologicalMapProduct.setGlobalVersion(version);
+                        technologicalMapProduct.setTechnologicalMap(currentTechnologicalMap);
+                        technologicalMapProduct.setOrgOwner(orgOwner);
+                        technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
+                    } else {
+                        technologicalMapProduct.setGlobalId(null);
+                        technologicalMapProduct.setLastUpdate(new Date());
+                        technologicalMapProduct.setGlobalVersion(version);
+                        technologicalMapProduct.setOrgOwner(orgOwner);
+                        technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
                     }
-                    technologicalMapProduct.setGlobalVersion(technologicalMapProduct.getGlobalVersion()+1);
+                    daoService.persistEntity(technologicalMapProduct);
                 }
-                daoService.persistEntity(technologicalMapProduct);
             }
 
             printMessage("Технологическая карта сохранена успешно.");
@@ -239,14 +209,6 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
 
     public String getPageFilename() {
         return "option/configuration_provider/technologicalMap/edit";
-    }
-
-    public ConfigurationProvider getCurrentConfigurationProvider() {
-        return currentConfigurationProvider;
-    }
-
-    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
-        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 
     public TechnologicalMapGroup getCurrentTechnologicalMapGroup() {
