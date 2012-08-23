@@ -149,7 +149,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
-           // org.setFriendlyOrg(new HashSet<Org>(0));
+            org.setFriendlyOrg(new HashSet<Org>(0));
         }
         else{
             /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/

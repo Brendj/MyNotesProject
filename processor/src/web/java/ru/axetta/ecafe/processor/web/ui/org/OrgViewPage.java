@@ -235,6 +235,7 @@ public class OrgViewPage extends BasicWorkspacePage {
            configurationProviderName = configurationProvider.getName();
         }
         Set<Org> friendlyOrganisation = org.getFriendlyOrg();
+        friendlyFilterOrgs = "Не выбрано";
         if(!(friendlyOrganisation==null || friendlyOrganisation.isEmpty())){
             StringBuilder stringBuilder = new StringBuilder();
             for (Org friendlyOrg: org.getFriendlyOrg()){
