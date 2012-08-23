@@ -198,12 +198,14 @@ public class DistributionManager {
             throws Exception {
         /* В методе нужно обрабатывать объекты одного типа - проще передавать список однотипных аргументов через параметр*/
         try {
-            Long currentMaxVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
-            // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             DistributedObjectProcessor distributedObjectProcessor = DistributedObjectProcessor.getInstance();
             distributedObjectProcessor.setErrorObjectData(errorObjectData);
-            for (DistributedObject distributedObject : distributedObjects) {
-                distributedObjectProcessor.process(distributedObject, currentMaxVersion, idOfOrg, getSimpleDocument());
+            if(!(distributedObjects==null || distributedObjects.isEmpty())){
+                // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
+                Long currentMaxVersion = DAOService.getInstance().updateVersionByDistributedObjects(objectClass.name());
+                for (DistributedObject distributedObject : distributedObjects) {
+                    distributedObjectProcessor.process(distributedObject, currentMaxVersion, idOfOrg, getSimpleDocument());
+                }
             }
             errorObjectData = distributedObjectProcessor.getErrorObjectData();
         } catch (Exception e) {
