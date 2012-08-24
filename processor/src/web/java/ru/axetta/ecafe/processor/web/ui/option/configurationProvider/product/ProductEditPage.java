@@ -96,10 +96,12 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             }
 
             p.setProductGroup(currentProductGroup);
-            daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
-                    currentConfigurationProvider.getIdOfConfigurationProvider());
-
-            currentProduct = (Product) daoService.mergeDistributedObject(p, currentProduct.getGlobalVersion() + 1);
+            //daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
+            //        currentConfigurationProvider.getIdOfConfigurationProvider());
+            p.setGlobalVersion(daoService.updateVersionByDistributedObjects(Product.class.getSimpleName()));
+            //currentProduct = (Product) daoService.mergeDistributedObject(p, currentProduct.getGlobalVersion() + 1);
+            daoService.persistEntity(p);
+            currentProduct = entityManager.find(Product.class, currentProduct.getGlobalId());
             printMessage("Продукт сохранен успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении продукта.");

@@ -72,6 +72,7 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage implements
             }
             currentTechnologicalMapGroup.setOrgOwner(org.getIdOfOrg());
             currentTechnologicalMapGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
+            currentTechnologicalMapGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(TechnologicalMapGroup.class.getSimpleName()));
             currentTechnologicalMapGroup = (TechnologicalMapGroup) daoService.mergeDistributedObject(currentTechnologicalMapGroup,currentTechnologicalMapGroup.getGlobalVersion()+1);
             printMessage("Группа сохранена успешно.");
         } catch (Exception e) {

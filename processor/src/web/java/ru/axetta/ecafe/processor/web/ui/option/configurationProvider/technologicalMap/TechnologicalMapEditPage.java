@@ -157,7 +157,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
             } else {
                 tm.setUserEdit(mainPage.getCurrentUser());
             }
-
+            tm.setGlobalVersion(daoService.updateVersionByDistributedObjects(TechnologicalMap.class.getSimpleName()));
             Long currentIdOfConfigurationProvider = currentTechnologicalMapGroup.getIdOfConfigurationProvider();
             Long orgOwner = currentTechnologicalMapGroup.getOrgOwner();
             tm.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
@@ -169,7 +169,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 daoService.deleteEntity(technologicalMapProduct);
             }
             if(!(technologicalMapProducts == null || technologicalMapProducts.isEmpty())){
-                Long version = daoService.getVersionByDistributedObjects(TechnologicalMapProduct.class);
+                Long version = daoService.updateVersionByDistributedObjects(TechnologicalMapProduct.class.getSimpleName());
                 for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
                     if(technologicalMapProduct.getGlobalId()==null){
                         technologicalMapProduct.setCreatedDate(new Date());

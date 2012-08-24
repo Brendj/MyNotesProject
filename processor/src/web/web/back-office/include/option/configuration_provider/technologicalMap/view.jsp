@@ -40,7 +40,7 @@
     </h:panelGrid>
 
 
-    <rich:dataTable id="productsTable" value="#{technologicalMapViewPage.technologicalMapProducts}" var="technologicalMapProduct" >
+    <rich:dataTable id="productsTableView" value="#{technologicalMapViewPage.technologicalMapProducts}" var="technologicalMapProduct" >
 
         <f:facet name="header">
             <rich:columnGroup>

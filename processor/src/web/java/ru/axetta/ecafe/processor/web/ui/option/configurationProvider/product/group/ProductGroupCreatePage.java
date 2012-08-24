@@ -67,7 +67,6 @@ public class ProductGroupCreatePage extends BasicWorkspacePage implements Config
             productGroup.setGuid(UUID.randomUUID().toString());
             productGroup.setOrgOwner(org.getIdOfOrg());
             productGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
-
             productGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(ProductGroup.class.getSimpleName()));
             daoService.persistEntity(productGroup);
             printMessage("Группа сохранена успешно.");

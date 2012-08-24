@@ -29,7 +29,7 @@
 
     </h:panelGrid>
 
-    <rich:dataTable id="productsTable" value="#{technologicalMapCreatePage.technologicalMapProducts}" var="technologicalMapProduct" >
+    <rich:dataTable id="productsTableCreate" value="#{technologicalMapCreatePage.technologicalMapProducts}" var="technologicalMapProduct" >
 
         <f:facet name="header">
             <rich:columnGroup>
@@ -51,7 +51,7 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column >
-            <h:outputText value="#{technologicalMapProduct.product.fullName}"/>
+            <h:outputText value="#{technologicalMapProduct.product.productName}"/>
         </rich:column>
         <rich:column>
             <h:inputText value="#{technologicalMapProduct.grossWeight}"/>
@@ -60,7 +60,7 @@
             <h:inputText value="#{technologicalMapProduct.netWeight}"/>
         </rich:column>
         <rich:column style="text-align:center">
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapCreatePage.deleteProduct}" reRender="productsTable">
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{technologicalMapCreatePage.deleteProduct}" reRender="productsTableCreate">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{technologicalMapProduct}"
                                              target="#{technologicalMapCreatePage.currTechnologicalMapProduct}" />

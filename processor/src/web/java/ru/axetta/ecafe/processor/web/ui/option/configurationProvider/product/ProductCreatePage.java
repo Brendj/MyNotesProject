@@ -70,7 +70,7 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
             product.setCreatedDate(new Date());
             product.setDeletedState(false);
             product.setGuid(UUID.randomUUID().toString());
-            product.setGlobalVersion(daoService.getVersionByDistributedObjects(Product.class));
+            product.setGlobalVersion(daoService.updateVersionByDistributedObjects(Product.class.getSimpleName()));
             product.setIdOfConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
             product.setOrgOwner(currentProductGroup.getOrgOwner());
 
