@@ -38,7 +38,7 @@ public class DAOUtils {
 
     private DAOUtils() {}
 
-    public static List<OrgOwner> getOrgSourceByMenuExchangeRule(Session session, Long idOfOrg, Boolean source){
+    public static List<OrgOwner> getOrgSourceByMenuExchangeRule(Session session, Long idOfOrg, Boolean source) throws Exception{
         Criteria menuExchangeRuleCriteria = session.createCriteria(MenuExchangeRule.class);
         if(source){
             menuExchangeRuleCriteria.add(Restrictions.eq("idOfDestOrg", idOfOrg));

@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,6 +48,12 @@ public abstract class DistributedObject{
     protected Long orgOwner;
     protected Boolean sendAll;
 
+    private DateFormat dateOnlyFormat;
+
+    private DateFormat timeFormat;
+
+    private DistributedObjectException.ErrorType errorType;
+
     /* Node для последующего разбора */
     private Node node;
 
@@ -58,6 +64,10 @@ public abstract class DistributedObject{
             element.setAttribute("D", "1");
         }
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
+        if(this.errorType != null){
+            String error = String.format("%d : %s", errorType.getValue(), errorType.name());
+            element.setAttribute("ErrorType", error);
+        }
         return element;
     }
 
@@ -77,6 +87,7 @@ public abstract class DistributedObject{
         return element;
         /* Метод определения названия элемента */
     }
+
     /* метод парсинга элемента */
     public DistributedObject build(Node node) throws ParseException, IOException {
         /* Begin required params */
@@ -98,8 +109,8 @@ public abstract class DistributedObject{
         if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
-
-    public void preProcess() throws DistributedObjectException {}
+    public void preProcess() throws DistributedObjectException,
+            ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException {}
 
     protected abstract DistributedObject parseAttributes(Node node) throws ParseException, IOException;
 
@@ -198,10 +209,10 @@ public abstract class DistributedObject{
     public String getTagName() {
         return tagName;
     }
+
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
-
     public String getGuid() {
         return guid;
     }
@@ -258,19 +269,47 @@ public abstract class DistributedObject{
         this.deletedState = deletedState;
     }
 
-    public DateFormat getDateFormat() {
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        timeFormat1.setTimeZone(localTimeZone);
-        return timeFormat1;
+    public DateFormat getDateOnlyFormat() {
+        return dateOnlyFormat;
+    }
+
+    public void setDateOnlyFormat(DateFormat dateOnlyFormat) {
+        this.dateOnlyFormat = dateOnlyFormat;
     }
 
     public DateFormat getTimeFormat() {
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        timeFormat1.setTimeZone(localTimeZone);
-        return timeFormat1;
+        return timeFormat;
     }
+
+    public void setTimeFormat(DateFormat timeFormat) {
+        this.timeFormat = timeFormat;
+    }
+
+    public DistributedObjectException.ErrorType getErrorType() {
+        return errorType;
+    }
+
+    public void setErrorType(DistributedObjectException.ErrorType errorType) {
+        this.errorType = errorType;
+    }
+
+    public DateFormat getDateFormat() {
+        return timeFormat;
+    }
+
+    //public DateFormat getDateFormat() {
+    //    TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+    //    DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    //    timeFormat1.setTimeZone(localTimeZone);
+    //    return timeFormat1;
+    //}
+    //
+    //public DateFormat getTimeFormat() {
+    //    TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+    //    DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    //    timeFormat1.setTimeZone(localTimeZone);
+    //    return timeFormat1;
+    //}
 
     public Boolean getSendAll() {
         return sendAll;
@@ -301,5 +340,17 @@ public abstract class DistributedObject{
     @Override
     public int hashCode() {
         return guid != null ? guid.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "DistributedObject{" +
+                "globalId=" + globalId +
+                ", globalVersion=" + globalVersion +
+                ", guid='" + guid + '\'' +
+                ", orgOwner=" + orgOwner +
+                ", errorType=" + errorType +
+                ", className=" + getClass().getSimpleName() +
+                '}';
     }
 }

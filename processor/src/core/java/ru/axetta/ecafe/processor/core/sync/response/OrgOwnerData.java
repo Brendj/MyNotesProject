@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
@@ -33,9 +34,13 @@ public class OrgOwnerData {
         return orgOwnerList;
     }
 
-    public void process(Session session, Long idOfOrg){
+    public void process(Session session, Long idOfOrg) throws Exception{
         List<OrgOwner> orgOwners = new LinkedList<OrgOwner>();
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, false));
+        if(!orgOwners.isEmpty()){
+            Org org = DAOUtils.findOrg(session, idOfOrg);
+            orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), true));
+        }
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, true));
         orgOwnerList = orgOwners;
     }

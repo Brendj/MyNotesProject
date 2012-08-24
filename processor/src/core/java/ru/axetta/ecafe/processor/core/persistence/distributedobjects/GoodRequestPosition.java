@@ -28,11 +28,10 @@ public class GoodRequestPosition extends DistributedObject {
         if(gr==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setGoodRequest(gr);
         Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
-        if(g==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setGood(g);
         Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        if(p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setProduct(p);
+        if(g==null && p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        if(g!=null) setGood(g);
+        if(p!=null) setProduct(p);
     }
 
     @Override
@@ -42,8 +41,8 @@ public class GoodRequestPosition extends DistributedObject {
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"GuidOfGoodsRequest", goodRequest.getGuid());
-        setAttribute(element,"GuidOfGoods", good.getGuid());
-        setAttribute(element,"GuidOfBaseProduct", product.getGuid());
+        if(good!=null) setAttribute(element,"GuidOfGoods", good.getGuid());
+        if(product!=null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
     }
 
     @Override

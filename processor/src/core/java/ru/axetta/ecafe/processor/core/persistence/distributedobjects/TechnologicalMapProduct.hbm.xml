@@ -11,7 +11,7 @@
         </id>
         <!-- Begin Global params -->
         <property name="globalVersion" column="GlobalVersion" type="long"/>
-        <!--<property name="orgOwner" column="OrgOwner" type="long"/>-->
+        <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="deletedState" column="DeletedState" type="boolean"/>
 
         <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>

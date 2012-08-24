@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
+import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -2762,7 +2763,8 @@ MenuGroups menuGroups;
         private final EnterEvents.Builder enterEventsBuilder;
         private final LibraryData.Builder libraryDataBuilder;
         private final LibraryData2.Builder libraryData2Builder;
-        private final DistributionManager distributionManager;
+       // private final DistributionManager distributionManager;
+        private final Manager manager;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2784,7 +2786,8 @@ MenuGroups menuGroups;
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.libraryDataBuilder = new LibraryData.Builder();
             this.libraryData2Builder = new LibraryData2.Builder();
-            this.distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
+            //this.distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
+            this.manager = new Manager(dateOnlyFormat, timeFormat);
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2916,20 +2919,33 @@ MenuGroups menuGroups;
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
 
+            //if(roNode != null){
+            //    Node itemNode = roNode.getFirstChild();
+            //    while (null != itemNode) {
+            //        if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
+            //            distributionManager.build(itemNode, org.getIdOfOrg());
+            //        }
+            //        itemNode = itemNode.getNextSibling();
+            //    }
+            //}
+
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        distributionManager.build(itemNode, org.getIdOfOrg());
+                        manager.setIdOfOrg(org.getIdOfOrg());
+                        manager.build(itemNode);
                     }
                     itemNode = itemNode.getNextSibling();
                 }
             }
 
 
+
+
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2, distributionManager);
+                    enterEvents, libraryData, libraryData2, manager);//distributionManager);
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
@@ -2987,17 +3003,19 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
-    private final DistributionManager distributionManager;
+   // private final DistributionManager distributionManager;
+    private final Manager manager;
 
     public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
             EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2,
-            DistributionManager distributionManager) {
+            Manager manager) {
         this.protoVersion = protoVersion;
         this.type = type;
-        this.distributionManager = distributionManager;
+        //this.distributionManager = distributionManager;
+        this.manager = manager;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -3080,8 +3098,13 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
         return libraryData2;
     }
 
-    public DistributionManager getDistributionManager() {
-        return distributionManager;
+    //public DistributionManager getDistributionManager() {
+    //    return distributionManager;
+    //}
+
+
+    public Manager getManager() {
+        return manager;
     }
 
     @Override

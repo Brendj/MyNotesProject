@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
+import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 
 import org.apache.commons.lang.StringUtils;
@@ -401,7 +402,7 @@ public class SyncResponse {
                 element.setAttribute("Address", this.address);
                 element.setAttribute("Phone", this.phone);
                 element.setAttribute("Mobile", this.mobile);
-                element.setAttribute("Mobile", this.fax);
+                element.setAttribute("Fax", this.fax);
                 element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
@@ -1685,8 +1686,9 @@ public class SyncResponse {
     private final ResLibraryData2 resLibraryData2;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
-    private final DistributionManager distributionManager;
+    //private final DistributionManager distributionManager;
     private final OrgOwnerData orgOwnerData;
+    private final Manager manager;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
@@ -1697,7 +1699,7 @@ public class SyncResponse {
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, DistributionManager distributionManager, OrgOwnerData orgOwnerData) {
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1718,7 +1720,8 @@ public class SyncResponse {
         this.resLibraryData2 = resLibraryData2;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
-        this.distributionManager = distributionManager;
+        //this.distributionManager = distributionManager;
+        this.manager = manager;
         this.orgOwnerData = orgOwnerData;
     }
 
@@ -1814,10 +1817,8 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
         }
 
-        // Distribution Manager
-        if(distributionManager != null){
-            //ecafeEnvelopeElement.appendChild(RuntimeContext.getAppContext().getBean(DistributionManager.class).toElement(document, idOfOrg));
-            ecafeEnvelopeElement.appendChild(distributionManager.toElement(document, idOfOrg));
+        if(manager != null){
+            ecafeEnvelopeElement.appendChild(manager.toElement(document));
         }
 
         if(orgOwnerData != null){
@@ -1886,8 +1887,12 @@ public class SyncResponse {
         return resLibraryData;
     }
 
-    public DistributionManager getDistributionManager() {
-        return distributionManager;
+    //public DistributionManager getDistributionManager() {
+    //    return distributionManager;
+    //}
+
+    public Manager getManager(){
+        return manager;
     }
 
     public OrgOwnerData getOrgOwnerData() {

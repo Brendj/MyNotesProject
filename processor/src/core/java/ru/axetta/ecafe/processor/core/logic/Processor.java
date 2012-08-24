@@ -16,9 +16,10 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
+//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
+//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -27,6 +28,9 @@ import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.ErrorObjectData;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectsEnum;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectsEnumComparator;
+import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.*;
 
@@ -192,7 +196,8 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResLibraryData2 resLibraryData2 = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
-        DistributionManager distributionManager = null;
+        //DistributionManager distributionManager = null;
+        Manager manager = null;
         OrgOwnerData orgOwnerData = null;
         try {
             if (request.getType() == SyncRequest.TYPE_FULL) {
@@ -349,9 +354,20 @@ public class Processor implements SyncProcessor,
                 }
 
                 // Process Distribution Manager
+                //try {
+                //    if(request.getDistributionManager() != null){
+                //        distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
+                //    }
+                //} catch (Exception e) {
+                //    logger.error(
+                //            String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
+                //            e);
+                //}
+
                 try {
-                    if(request.getDistributionManager() != null){
-                        distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
+                    if(request.getManager() != null){
+                        manager = request.getManager();
+                        manager.process(persistenceSessionFactory);
                     }
                 } catch (Exception e) {
                     logger.error(
@@ -397,7 +413,7 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, distributionManager, orgOwnerData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -550,21 +566,33 @@ public class Processor implements SyncProcessor,
     }
 
     /* TODO: логика обработки менеджера глобальных объектов */
-    private DistributionManager processDistributionManager(DistributionManager distributionManager, Long idOfOrg) throws Exception{
-        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = distributionManager.getDistributedObjectsListMap();
-        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
-        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-        Arrays.sort(array,distributedObjectsEnumComparator);
 
-        RuntimeContext.getAppContext().getBean(DistributionManager.class).clearConfirmTable(distributionManager.getConfirmDistributedObject());
-        for (int i=0; i<array.length; i++){
-            if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
-                RuntimeContext.getAppContext().getBean(DistributionManager.class).process(distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
-            }
-        }
-        ErrorObjectData errorObjectData = RuntimeContext.getAppContext().getBean(DistributionManager.class).getErrorObjectData();
-        return distributionManager;
-    }
+    //private Manager processManager(Manager manager, Long idOfOrg) throws Exception {
+    //    Session persistenceSession = null;
+    //    Transaction persistenceTransaction = null;
+    //    try {
+    //        persistenceSession = persistenceSessionFactory.openSession();
+    //        persistenceTransaction = persistenceSession.beginTransaction();
+    //        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = manager.getDistributedObjectsListMap();
+    //        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
+    //        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
+    //        Arrays.sort(array,distributedObjectsEnumComparator);
+    //        manager.clearConfirmTable(persistenceSession, manager.getConfirmDistributedObject());
+    //        for (int i=0; i<array.length; i++){
+    //            if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
+    //                manager.process(persistenceSession ,distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
+    //            } else {
+    //                boolean status = DAOService.getInstance().setFalseStatusDOVersionByDistributedObjects(array[i].getValue());
+    //            }
+    //        }
+    //        persistenceTransaction.commit();
+    //        persistenceTransaction = null;
+    //    } finally {
+    //        HibernateUtils.rollback(persistenceTransaction, logger);
+    //        HibernateUtils.close(persistenceSession, logger);
+    //    }
+    //    return manager;
+    //}
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
             SyncRequest.PaymentRegistry.Payment payment) throws Exception {
