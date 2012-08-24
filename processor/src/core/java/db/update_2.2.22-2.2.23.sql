@@ -8,6 +8,8 @@ ALTER TABLE cf_technological_map_groups ADD COLUMN SendAll integer DEFAULT 0;
 
 -- статус измение версии в таблице вресий
 ALTER TABLE cf_do_versions ADD COLUMN status integer DEFAULT 0;
+-- добавляем условие уникальности для имен классов
+ALTER TABLE cf_do_versions ADD CONSTRAINT cf_do_versions_distributedobjectclassname_unique UNIQUE (distributedobjectclassname);
 
 -- колонка результирующей версии после обновления объекта
 ALTER TABLE cf_do_conflicts ADD COLUMN gversion_result bigint;
@@ -139,8 +141,8 @@ CREATE TABLE  cf_goods_requests (
 CREATE TABLE  cf_goods_requests_positions (
   IdOfGoodsRequestPosition BigSerial NOT NULL,
   IdOfGoodsRequest bigint NOT NULL,
-  IdOfGood bigint NOT NULL,
-  IdOfProducts bigint NOT NULL,
+  IdOfGood bigint,
+  IdOfProducts bigint,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner bigint,
@@ -154,11 +156,7 @@ CREATE TABLE  cf_goods_requests_positions (
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_goods_requests_positions_pk PRIMARY KEY (IdOfGoodsRequestPosition ),
   CONSTRAINT cf_goods_requests_positions_goods_request_fk FOREIGN KEY (IdOfGoodsRequest)
-      REFERENCES cf_goods_requests (IdOfGoodsRequest),
-  CONSTRAINT cf_goods_requests_positions_good_fk FOREIGN KEY (IdOfGood)
-      REFERENCES cf_goods (IdOfGood),
-  CONSTRAINT cf_goods_requests_positions_product_fk FOREIGN KEY (IdOfProducts)
-      REFERENCES cf_products (IdOfProducts)
+      REFERENCES cf_goods_requests (IdOfGoodsRequest)
 );
 
 CREATE TABLE  cf_acts_of_waybill_difference (
