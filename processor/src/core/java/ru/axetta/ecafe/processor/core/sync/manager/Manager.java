@@ -148,6 +148,8 @@ public class Manager {
                     elementMap.put(tagName, distributedObjectElement);
                 }
                 Element element = document.createElement("O");
+                distributedObject.setDateOnlyFormat(dateOnlyFormat);
+                distributedObject.setTimeFormat(timeFormat);
                 elementMap.get(tagName).appendChild(distributedObject.toElement(element));
             }
             elementMap.clear();
@@ -248,6 +250,12 @@ public class Manager {
             /* уберем все объекты которые есть вконвисрме */
             if(!(currentResultDistributedObjectsList == null || currentResultDistributedObjectsList.isEmpty())){
                 currentResultDistributedObjectsList.removeAll(distributedObjectList);
+            }
+            if(objectClass.getValue().equals(GoodRequest.class)){
+                if (currentResultDistributedObjectsList == null) {
+                    currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
+                }
+                currentResultDistributedObjectsList.addAll(distributedObjectList);
             }
             resultDistributedObjectsListMap.put(objectClass, currentResultDistributedObjectsList);
         }
@@ -447,6 +455,12 @@ public class Manager {
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
+        if(distributedObject instanceof GoodRequest){
+            GoodRequest goodRequest = (GoodRequest) distributedObject;
+            if(goodRequest.getState().equals(0)){
+                goodRequest.setState(1);
+            }
+        }
         return (DistributedObject) session.merge(distributedObject);
     }
 
@@ -503,14 +517,15 @@ public class Manager {
     private void clearConfirmTable(SessionFactory sessionFactory){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        logger.info("Begin clear confirm elements");
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             for (DOConfirm confirm: confirmDistributedObject){
-                Query query = persistenceSession.createQuery("from DOConfirm where distributedObjectClassName=:distributedObjectClassName and guid=:guid and orgOwner=:orgOwner");
-                query.setParameter("distributedObjectClassName",confirm.getDistributedObjectClassName());
-                query.setParameter("guid",confirm.getGuid());
+                Query query = persistenceSession.createQuery("from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName and guid=:guid");
                 query.setParameter("orgOwner",confirm.getOrgOwner());
+                query.setParameter("distributedObjectClassName", confirm.getDistributedObjectClassName());
+                query.setParameter("guid",confirm.getGuid());
                 List list = query.list();
                 for (Object object: list){
                     DOConfirm doConfirm = (DOConfirm) object;
@@ -523,6 +538,7 @@ public class Manager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        logger.info("End clear confirm elements");
     }
 
     private long getGlobalIDByGUID(Session session, DistributedObject distributedObject) {

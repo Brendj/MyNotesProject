@@ -688,7 +688,6 @@ public class SyncRequest {
         }
     }
 
-
     public static class MenuGroups {
 
         public String findMenuGroup(long idOfMenuGroup) {
@@ -781,7 +780,6 @@ public class SyncRequest {
 
     }
 
-
     public static class AccIncRegistryRequest {
 
         public final Date dateTime;
@@ -834,7 +832,6 @@ public class SyncRequest {
                         }
                     }
                 }
-
 
                 public static class Builder {
 
@@ -2355,7 +2352,6 @@ public class SyncRequest {
             return publications;
         }
     }
-
 
     public static class LibraryData2 {
 

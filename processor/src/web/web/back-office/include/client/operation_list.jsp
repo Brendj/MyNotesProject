@@ -202,9 +202,15 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Скидка" />
+            <h:outputText escape="true" value="Социальная скидка" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.discount}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.socDiscount}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Скидка поставщика" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.tradeDiscount}" converter="copeckSumConverter" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">

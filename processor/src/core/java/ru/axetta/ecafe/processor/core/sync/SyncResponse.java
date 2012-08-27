@@ -457,8 +457,6 @@ public class SyncResponse {
         }
     }
 
-    // 12-01-2012 Kadyrov D.I. CorrectingNumbersOrdersRegistry
-
     public static class CorrectingNumbersOrdersRegistry {
 
         private  Long IdOfOrder;
@@ -490,7 +488,6 @@ public class SyncResponse {
             return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails=" + IdOfOrderDetail +", IdOfEnterEvent='"+IdOfEnterEvent + '}';
         }
     }
-
 
     public static class ResOrgStructure {
 

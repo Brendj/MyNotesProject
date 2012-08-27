@@ -93,7 +93,8 @@ public class ClientOrderList {
         private final Long idOfCard;
         private final Long cardNo;
         private final Long idOfCashier;
-        private final Long discount;
+        private final Long socDiscount;
+        private final Long tradeDiscount;
         private final Long grantSum;
         private final Long rSum;
         private final Date createTime;
@@ -116,7 +117,8 @@ public class ClientOrderList {
                 this.cardNo = card.getCardNo();
             }
             this.idOfCashier = order.getIdOfCashier();
-            this.discount = order.getSocDiscount();
+            this.socDiscount = order.getSocDiscount();
+            this.tradeDiscount = order.getTrdDiscount();
             this.grantSum = order.getGrantSum();
             this.rSum = order.getRSum();
             this.createTime = order.getCreateTime();
@@ -153,8 +155,12 @@ public class ClientOrderList {
             return idOfCashier;
         }
 
-        public Long getDiscount() {
-            return discount;
+        public Long getSocDiscount() {
+            return socDiscount;
+        }
+
+        public Long getTradeDiscount() {
+            return tradeDiscount;
         }
 
         public Long getGrantSum() {

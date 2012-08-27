@@ -56,6 +56,9 @@
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="distributionRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.DistributionRulesPage"--%>
+    <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}" label="Правила распространения"
+                        action="#{distributionRulesPage.show}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
 
