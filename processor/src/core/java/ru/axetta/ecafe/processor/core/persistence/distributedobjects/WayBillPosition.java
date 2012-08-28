@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.persistence.DateType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
 
@@ -29,7 +28,7 @@ public class WayBillPosition extends DistributedObject {
         Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
         if(g==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setGood(g);
-        Waybill wb = DAOService.getInstance().findDistributedObjectByRefGUID(Waybill.class, guidOfWB);
+        WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class, guidOfWB);
         if(wb==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setWayBill(wb);
     }
@@ -58,7 +57,7 @@ public class WayBillPosition extends DistributedObject {
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if(longTotalCount != null) setTotalCount(longNetWeight);
+        if(longTotalCount != null) setNetWeight(longNetWeight);
         Long longGrossWeight = getLongAttributeValue(node,"GrossWeight");
         if(longGrossWeight != null) setGrossWeight(longGrossWeight);
         Date dateNameOfGood = getDateAttributeValue(node,"GoodsCreationDate");
@@ -97,7 +96,7 @@ public class WayBillPosition extends DistributedObject {
     private Long nds;
     private Good good;
     private String guidOfG;
-    private Waybill wayBill;
+    private WayBill wayBill;
     private String guidOfWB;
 
     public Long getUnitsScale() {
@@ -124,11 +123,11 @@ public class WayBillPosition extends DistributedObject {
         this.guidOfWB = guidOfWB;
     }
 
-    public Waybill getWayBill() {
+    public WayBill getWayBill() {
         return wayBill;
     }
 
-    public void setWayBill(Waybill wayBill) {
+    public void setWayBill(WayBill wayBill) {
         this.wayBill = wayBill;
     }
 

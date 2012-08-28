@@ -26,21 +26,19 @@ public class StateChange extends DistributedObject {
 
     @Override
     public void preProcess() throws DistributedObjectException {
-        Waybill wb = DAOService.getInstance().findDistributedObjectByRefGUID(Waybill.class,guidOfWB);
-        if(wb==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setWayBill(wb);
+        WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
         InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        if(idd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setInternalDisposingDocument(idd);
         GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class,guidOfGR);
-        if(gr==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setGoodRequest(gr);
         InternalIncomingDocument iid = DAOService.getInstance().findDistributedObjectByRefGUID(InternalIncomingDocument.class,guidOfIID);
-        if(iid==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setInternalIncomingDocument(iid);
+        if(wb == null && idd == null && gr==null && iid==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        if(wb!=null) setWayBill(wb);
+        if(idd!=null) setInternalDisposingDocument(idd);
+        if(gr!=null) setGoodRequest(gr);
+        if(iid!=null) setInternalIncomingDocument(iid);
         Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setStaff(st);
+
     }
 
     @Override
@@ -49,10 +47,10 @@ public class StateChange extends DistributedObject {
         setAttribute(element, "StateFrom", stateFrom);
         setAttribute(element, "StateTo", stateTo);
         setAttribute(element, "Date", getDateFormat().format(date));
-        setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
-        setAttribute(element, "GuidOfIncomingDocument", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfGoodsRequest", goodRequest.getGuid());
-        setAttribute(element, "GuidOfIncomingDocument", internalIncomingDocument.getGuid());
+        if(wayBill!=null) setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
+        if(internalDisposingDocument!=null) setAttribute(element, "GuidOfIncomingDocument", internalDisposingDocument.getGuid());
+        if(goodRequest!=null) setAttribute(element, "GuidOfGoodsRequest", goodRequest.getGuid());
+        if(internalIncomingDocument!=null) setAttribute(element, "GuidOfIncomingDocument", internalIncomingDocument.getGuid());
         setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
@@ -93,7 +91,7 @@ public class StateChange extends DistributedObject {
     private String guidOfS;
     private InternalIncomingDocument internalIncomingDocument;
     private String guidOfIID;
-    private Waybill wayBill;
+    private WayBill wayBill;
     private String guidOfWB;
 
     public String getGuidOfS() {
@@ -128,11 +126,11 @@ public class StateChange extends DistributedObject {
         this.guidOfWB = guidOfWB;
     }
 
-    public Waybill getWayBill() {
+    public WayBill getWayBill() {
         return wayBill;
     }
 
-    public void setWayBill(Waybill wayBill) {
+    public void setWayBill(WayBill wayBill) {
         this.wayBill = wayBill;
     }
 

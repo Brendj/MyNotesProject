@@ -93,7 +93,7 @@ public class Product extends DistributedObject implements IConfigProvider {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((StateChange) distributedObject).getOrgOwner());
+        setOrgOwner(((Product) distributedObject).getOrgOwner());
         setCode( ((Product) distributedObject).getCode());
         setFullName (((Product) distributedObject).getFullName());
         setProductName( ((Product) distributedObject).getProductName());

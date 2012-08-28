@@ -26,7 +26,7 @@ public enum DistributedObjectsEnum {
     InternalIncomingDocument(InternalIncomingDocument.class,2),
     InternalIncomingDocumentPosition(InternalIncomingDocumentPosition.class, 4),
     StateChange(StateChange.class,3),
-    WayBill(Waybill.class,1),
+    WayBill(WayBill.class,1),
     WayBillPosition(WayBillPosition.class,3),
     Staff(Staff.class, 0),
     /* товары продукты */

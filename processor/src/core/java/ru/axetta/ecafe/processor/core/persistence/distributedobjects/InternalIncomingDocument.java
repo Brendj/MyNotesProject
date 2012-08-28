@@ -25,15 +25,14 @@ public class InternalIncomingDocument extends DistributedObject {
 
     @Override
     public void preProcess() throws DistributedObjectException {
-        Waybill wb = DAOService.getInstance().findDistributedObjectByRefGUID(Waybill.class,guidOfWB);
-        if(wb==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setWayBill(wb);
+        WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
         InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        if(idd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setInternalDisposingDocument(idd);
         ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class,guidOfAI);
-        if(ai==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setActOfInventarization(ai);
+        if(wb==null && idd==null && ai==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        if(wb!=null) setWayBill(wb);
+        if(idd!=null) setInternalDisposingDocument(idd);
+        if(ai!=null) setActOfInventarization(ai);
+
         Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setStaff(st);
@@ -44,9 +43,9 @@ public class InternalIncomingDocument extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "State", state);
         setAttribute(element, "Date", getDateFormat().format(date));
-        setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
-        setAttribute(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
+        if(wayBill!=null) setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
+        if(internalDisposingDocument!=null) setAttribute(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
+        if(actOfInventarization!=null) setAttribute(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
         setAttribute(element, "GuidOfStaff", staff.getGuid());
     }
 
@@ -80,7 +79,7 @@ public class InternalIncomingDocument extends DistributedObject {
     private String guidOfS;
     private ActOfInventarization actOfInventarization;
     private String guidOfAI;
-    private Waybill wayBill;
+    private WayBill wayBill;
     private String guidOfWB;
 
     public String getGuidOfS() {
@@ -107,11 +106,11 @@ public class InternalIncomingDocument extends DistributedObject {
         this.guidOfWB = guidOfWB;
     }
 
-    public Waybill getWayBill() {
+    public WayBill getWayBill() {
         return wayBill;
     }
 
-    public void setWayBill(Waybill wayBill) {
+    public void setWayBill(WayBill wayBill) {
         this.wayBill = wayBill;
     }
 

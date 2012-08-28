@@ -15,11 +15,6 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnum;
-//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectsEnumComparator;
-//import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -27,9 +22,6 @@ import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.ErrorObjectData;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectsEnum;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectsEnumComparator;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -196,7 +188,6 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResLibraryData2 resLibraryData2 = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
-        //DistributionManager distributionManager = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
         try {
@@ -352,17 +343,6 @@ public class Processor implements SyncProcessor,
                     logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
                             request.getIdOfOrg()), e);
                 }
-
-                // Process Distribution Manager
-                //try {
-                //    if(request.getDistributionManager() != null){
-                //        distributionManager =  processDistributionManager(request.getDistributionManager(), request.getIdOfOrg());
-                //    }
-                //} catch (Exception e) {
-                //    logger.error(
-                //            String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
-                //            e);
-                //}
 
                 try {
                     if(request.getManager() != null){

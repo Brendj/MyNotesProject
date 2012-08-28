@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributionManager;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
 import org.apache.commons.lang.StringUtils;
@@ -2759,7 +2758,6 @@ MenuGroups menuGroups;
         private final EnterEvents.Builder enterEventsBuilder;
         private final LibraryData.Builder libraryDataBuilder;
         private final LibraryData2.Builder libraryData2Builder;
-       // private final DistributionManager distributionManager;
         private final Manager manager;
 
         public Builder() {
@@ -2782,7 +2780,6 @@ MenuGroups menuGroups;
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.libraryDataBuilder = new LibraryData.Builder();
             this.libraryData2Builder = new LibraryData2.Builder();
-            //this.distributionManager = RuntimeContext.getAppContext().getBean(DistributionManager.class);
             this.manager = new Manager(dateOnlyFormat, timeFormat);
         }
 
@@ -2914,22 +2911,12 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-
-            //if(roNode != null){
-            //    Node itemNode = roNode.getFirstChild();
-            //    while (null != itemNode) {
-            //        if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-            //            distributionManager.build(itemNode, org.getIdOfOrg());
-            //        }
-            //        itemNode = itemNode.getNextSibling();
-            //    }
-            //}
-
+            /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
+            manager.setIdOfOrg(org.getIdOfOrg());
             if(roNode != null){
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        manager.setIdOfOrg(org.getIdOfOrg());
                         manager.build(itemNode);
                     }
                     itemNode = itemNode.getNextSibling();
@@ -2941,7 +2928,7 @@ MenuGroups menuGroups;
 
 return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2, manager);//distributionManager);
+                    enterEvents, libraryData, libraryData2, manager);
         }
 
         private static int parseSyncType(String sSyncType) throws Exception {
@@ -2999,7 +2986,6 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
-   // private final DistributionManager distributionManager;
     private final Manager manager;
 
     public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
@@ -3010,7 +2996,6 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
             Manager manager) {
         this.protoVersion = protoVersion;
         this.type = type;
-        //this.distributionManager = distributionManager;
         this.manager = manager;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
@@ -3093,10 +3078,6 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
     public LibraryData2 getLibraryData2() {
         return libraryData2;
     }
-
-    //public DistributionManager getDistributionManager() {
-    //    return distributionManager;
-    //}
 
 
     public Manager getManager() {

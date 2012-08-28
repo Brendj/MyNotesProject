@@ -78,12 +78,11 @@ public abstract class DistributedObject{
     public Element toElement(Element element){
         if(getDeletedState()){
             element.setAttribute("D", "1");
-        } else {
-            appendAttributes(element);
         }
+        appendAttributes(element);
         element.setAttribute("Guid", getGuid());
         element.setAttribute("V", String.valueOf(getGlobalVersion()));
-        element.setAttribute("SendAll", String.valueOf(getSendAll()));
+        //element.setAttribute("SendAll", String.valueOf(getSendAll()));
         return element;
         /* Метод определения названия элемента */
     }

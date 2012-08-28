@@ -38,7 +38,7 @@
             <column name="IdOfGood" not-null="true" />
         </many-to-one>
 
-        <many-to-one name="wayBill" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Waybill" fetch="select" lazy="false">
+        <many-to-one name="wayBill" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.WayBill" fetch="select" lazy="false">
             <column name="IdOfWayBill" not-null="true" />
         </many-to-one>
 

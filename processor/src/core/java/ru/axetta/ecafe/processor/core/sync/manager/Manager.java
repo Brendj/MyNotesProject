@@ -5,8 +5,10 @@
 package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.*;
@@ -17,7 +19,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -27,7 +28,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -168,14 +168,13 @@ public class Manager {
         Map<DistributedObjectsEnum, List<DistributedObject>> currentDistributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
         for (DistributedObjectsEnum anArray : array) {
             List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()));
-            /*  */
-            addConfirms(sessionFactory, currentResultDistributedObjectsList);
             resultDistributedObjectsListMap.put(anArray, currentResultDistributedObjectsList);
             if (!(distributedObjectsListMap.get(anArray) == null || distributedObjectsListMap.get(anArray).isEmpty())) {
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
                         distributedObjectsListMap.get(anArray), anArray);
-                currentDistributedObjectsListMap.put(anArray,distributedObjectsList);
+                currentDistributedObjectsListMap.put(anArray, distributedObjectsList);
             }
+            addConfirms(sessionFactory, currentResultDistributedObjectsList);
             List<DistributedObject> currentConfirmDistributedObjectsList = generateConfirmResponseResult(sessionFactory, anArray.getValue());
             if(!(currentConfirmDistributedObjectsList == null || currentConfirmDistributedObjectsList.isEmpty())){
                 for (DistributedObject distributedObject: currentConfirmDistributedObjectsList){
@@ -242,6 +241,7 @@ public class Manager {
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             Long currentMaxVersion = updateVersionByDistributedObjects(sessionFactory, objectClass.name());
             for (DistributedObject distributedObject : distributedObjects) {
+                logger.info("Process: "+distributedObject.toString());
                 DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion);
                 distributedObjectList.add(currentDistributedObject);
             }
@@ -251,12 +251,18 @@ public class Manager {
             if(!(currentResultDistributedObjectsList == null || currentResultDistributedObjectsList.isEmpty())){
                 currentResultDistributedObjectsList.removeAll(distributedObjectList);
             }
-            if(objectClass.getValue().equals(GoodRequest.class)){
-                if (currentResultDistributedObjectsList == null) {
-                    currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
-                }
-                currentResultDistributedObjectsList.addAll(distributedObjectList);
-            }
+            //if(objectClass.getValue().equals(GoodRequest.class)){
+            //    if (currentResultDistributedObjectsList == null) {
+            //        currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
+            //    }
+            //    currentResultDistributedObjectsList.addAll(distributedObjectList);
+            //}
+            //if(objectClass.getValue().equals(WayBill.class)){
+            //    if (currentResultDistributedObjectsList == null) {
+            //        currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
+            //    }
+            //    currentResultDistributedObjectsList.addAll(distributedObjectList);
+            //}
             resultDistributedObjectsListMap.put(objectClass, currentResultDistributedObjectsList);
         }
         return distributedObjectList;
@@ -270,7 +276,7 @@ public class Manager {
             persistenceTransaction = persistenceSession.beginTransaction();
             distributedObject.preProcess();
             if(distributedObject instanceof IConfigProvider){
-                ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg, distributedObject.getClass());
+                ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
                 ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
             }
             distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
@@ -323,6 +329,33 @@ public class Manager {
         return resultList;
     }
 
+    private ConfigurationProvider getConfigurationProvider(Session session, Class<? extends DistributedObject> clazz) throws Exception{
+        List classList = Arrays.asList(clazz.getInterfaces());
+        ConfigurationProvider configurationProvider = null;
+        if(classList.contains(IConfigProvider.class)){
+            Org org = DAOUtils.findOrg(session,idOfOrg);
+            configurationProvider = org.getConfigurationProvider();
+            /* Если есть конфигурация синхронизируемой организации */
+            if(configurationProvider==null){
+                Query query = session.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg");
+                query.setParameter("idOfOrg",idOfOrg);
+                List list = query.list();
+                if(!(list == null || list.isEmpty())){
+                    Org sourceOrg = DAOUtils.findOrg(session, ((MenuExchangeRule) list.get(0)).getIdOfSourceOrg());
+                    if(sourceOrg != null){
+                        configurationProvider = sourceOrg.getConfigurationProvider();
+                    }
+                }
+            }
+            if(configurationProvider == null) {
+                //return new ArrayList<DistributedObject>(0);
+                // При выбрасывании исключения падает вся синхронизация как быть с библиотекой?
+                throw new DistributedObjectException(DistributedObjectException.ErrorType.CONFIGURATION_PROVIDER_NOT_FOUND);
+            }
+        }
+        return configurationProvider;
+    }
+
     private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion){
         List<DistributedObject> result = new LinkedList<DistributedObject>();
         Session persistenceSession = null;
@@ -333,10 +366,11 @@ public class Manager {
             List classList = Arrays.asList(clazz.getInterfaces());
             String where = "";
             if(classList.contains(IConfigProvider.class)){
-                ConfigurationProvider configurationProvider = DAOService.getInstance().getConfigurationProvider(idOfOrg,clazz);
+                ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
                 where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
             }
             // вытянем номер организации поставщика если есть.
+            // TODO Надо расмотретьь случай с библиотекой
             List<Long> menuExchangeRuleList = getListIdOfOrgList(sessionFactory);
             String whereOrgSource = "";
             if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
@@ -403,24 +437,43 @@ public class Manager {
         return result;
     }
 
+    private Long getDistributedObjectVersion(Session session, DistributedObject distributedObject) throws Exception{
+        String where = String.format("from %s where guid = '%s'",distributedObject.getClass().getSimpleName(),distributedObject.getGuid());
+        Query query = session.createQuery(where);
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        }
+        return ((DistributedObject)list.get(0)).getGlobalVersion();
+    }
+
+    private void updateDeleteState(Session session, DistributedObject distributedObject,Long currentMaxVersion) throws Exception{
+        Long id = getGlobalIDByGUID(session, distributedObject);
+        if (id < 0) {
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        }
+        DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
+        object.setGlobalVersion(currentMaxVersion);
+        object.setDeletedState(true);
+        object.setDeleteDate(new Date());
+        session.save(object);
+    }
+
     private DistributedObject processDistributedObject(Session session,DistributedObject distributedObject, long currentMaxVersion) throws Exception {
         if (distributedObject.getDeletedState()) {
-            distributedObject.setGlobalVersion(currentMaxVersion);
-            DAOService.getInstance().updateDeleteState(distributedObject);
+            updateDeleteState(session, distributedObject, currentMaxVersion);
         } else {
             if (distributedObject.getTagName().equals("C")) {
                 distributedObject = createDistributedObject(session, distributedObject, currentMaxVersion);
                 distributedObject.setTagName("C");
             }
             if (distributedObject.getTagName().equals("M")) {
-                long version = distributedObject.getGlobalVersion();
-                Long currentVersion = DAOService.getInstance().getDistributedObjectVersion(distributedObject);
-                if(currentVersion==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-                Long currentUpdateVersion = DAOService.getInstance().updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName());
-                if (version != currentVersion) {
-                    createConflict(session, distributedObject, currentUpdateVersion);
+                Long currentVersion = getDistributedObjectVersion(session, distributedObject);
+                Long objectVersion = distributedObject.getGlobalVersion();
+                if (!objectVersion.equals(currentVersion)) {
+                    createConflict(session, distributedObject, currentMaxVersion);
                 }
-                distributedObject = DAOService.getInstance().mergeDistributedObject(distributedObject, currentUpdateVersion);
+                distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);
                 distributedObject.setTagName("M");
             }
         }
@@ -447,6 +500,30 @@ public class Manager {
         }
     }
 
+    private DistributedObject mergeDistributedObject(Session session, DistributedObject distributedObject, long currentVersion) throws Exception{
+        long id = getGlobalIDByGUID(session,distributedObject);
+        if (id < 0) {
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        }
+        DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
+        object.fill(distributedObject);
+        object.setLastUpdate(new Date());
+        object.setGlobalVersion(currentVersion);
+        //if(object instanceof GoodRequest){
+        //    GoodRequest goodRequest = (GoodRequest) object;
+        //    if(goodRequest.getState().equals(0)){
+        //        goodRequest.setState(1);
+        //    }
+        //}
+        //if(distributedObject instanceof WayBill){
+        //    WayBill wayBill = (WayBill) distributedObject;
+        //    if(wayBill.getState().equals(0)){
+        //        wayBill.setState(1);
+        //    }
+        //}
+        return (DistributedObject) session.merge(object);
+    }
+
     private DistributedObject createDistributedObject(Session session, DistributedObject distributedObject, long currentVersion)
             throws DistributedObjectException {
         long id = getGlobalIDByGUID(session,distributedObject);
@@ -455,21 +532,19 @@ public class Manager {
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
-        if(distributedObject instanceof GoodRequest){
-            GoodRequest goodRequest = (GoodRequest) distributedObject;
-            if(goodRequest.getState().equals(0)){
-                goodRequest.setState(1);
-            }
-        }
+        //if(distributedObject instanceof GoodRequest){
+        //    GoodRequest goodRequest = (GoodRequest) distributedObject;
+        //    if(goodRequest.getState().equals(0)){
+        //        goodRequest.setState(1);
+        //    }
+        //}
+        //if(distributedObject instanceof WayBill){
+        //    WayBill wayBill = (WayBill) distributedObject;
+        //    if(wayBill.getState().equals(0)){
+        //        wayBill.setState(1);
+        //    }
+        //}
         return (DistributedObject) session.merge(distributedObject);
-    }
-
-    private Document getSimpleDocument() throws Exception {
-        if (document == null) {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            document = factory.newDocumentBuilder().newDocument();
-        }
-        return document;
     }
 
     private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception {
@@ -522,10 +597,8 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             for (DOConfirm confirm: confirmDistributedObject){
-                Query query = persistenceSession.createQuery("from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName and guid=:guid");
-                query.setParameter("orgOwner",confirm.getOrgOwner());
-                query.setParameter("distributedObjectClassName", confirm.getDistributedObjectClassName());
-                query.setParameter("guid",confirm.getGuid());
+                String where = String.format("from DOConfirm where orgOwner=%d and UPPER(distributedObjectClassName)='%s' and guid='%s'",confirm.getOrgOwner(),confirm.getDistributedObjectClassName().toUpperCase(),confirm.getGuid());
+                Query query = persistenceSession.createQuery(where);
                 List list = query.list();
                 for (Object object: list){
                     DOConfirm doConfirm = (DOConfirm) object;
@@ -563,6 +636,14 @@ public class Manager {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(new DOMSource(element), new StreamResult(buffer));
         return buffer.toString();
+    }
+
+    private Document getSimpleDocument() throws Exception {
+        if (document == null) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            document = factory.newDocumentBuilder().newDocument();
+        }
+        return document;
     }
 
 }

@@ -29,16 +29,20 @@
         <property name="stateFrom" column="StateFrom" type="long" not-null="true"/>
         <property name="stateTo" column="StateTo" type="long" not-null="true"/>
 
-        <many-to-one name="wayBill" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Waybill" fetch="select" lazy="false">
-            <column name="IdOfWayBill" not-null="true" />
+        <many-to-one name="wayBill" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.WayBill" fetch="select" lazy="false">
+            <column name="IdOfWayBill" not-null="false" />
         </many-to-one>
 
         <many-to-one name="internalDisposingDocument" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.InternalDisposingDocument" fetch="select" lazy="false">
-            <column name="IdOfInternalDisposingDocument" not-null="true" />
+            <column name="IdOfInternalDisposingDocument" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="internalIncomingDocument" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.InternalIncomingDocument" fetch="select" lazy="false">
+            <column name="IdOfInternalIncomingDocument" not-null="false" />
         </many-to-one>
 
         <many-to-one name="goodRequest" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.GoodRequest" fetch="select" lazy="false">
-            <column name="IdOfGoodsRequest" not-null="true" />
+            <column name="IdOfGoodsRequest" not-null="false" />
         </many-to-one>
 
         <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Staff" fetch="select" lazy="false">

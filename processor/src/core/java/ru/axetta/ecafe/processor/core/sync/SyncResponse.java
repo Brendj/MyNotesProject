@@ -1683,7 +1683,6 @@ public class SyncResponse {
     private final ResLibraryData2 resLibraryData2;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
-    //private final DistributionManager distributionManager;
     private final OrgOwnerData orgOwnerData;
     private final Manager manager;
 
@@ -1717,7 +1716,6 @@ public class SyncResponse {
         this.resLibraryData2 = resLibraryData2;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
-        //this.distributionManager = distributionManager;
         this.manager = manager;
         this.orgOwnerData = orgOwnerData;
     }
