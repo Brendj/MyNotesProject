@@ -207,7 +207,7 @@ CREATE TABLE  cf_acts_of_waybill_difference_positions (
 CREATE TABLE  cf_waybills (
   IdOfWayBill BigSerial NOT NULL,
   IdOfStaff bigint NOT NULL,
-  IdOfActOfDifference bigint NOT NULL,
+  IdOfActOfDifference bigint,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner bigint,
@@ -222,8 +222,6 @@ CREATE TABLE  cf_waybills (
   Receiver  character varying(128) NOT NULL,
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_waybills_pk PRIMARY KEY (IdOfWayBill ),
-  CONSTRAINT cf_waybills_act_of_waybill_difference_fk FOREIGN KEY (IdOfActOfDifference)
-      REFERENCES cf_acts_of_waybill_difference (IdOfActOfDifference),
   CONSTRAINT cf_waybills_staff_fk FOREIGN KEY (IdOfStaff)
       REFERENCES cf_staffs (IdOfStaff)
 );
@@ -320,9 +318,9 @@ CREATE TABLE  cf_internal_disposing_document_positions (
 
 CREATE TABLE  cf_internal_incoming_documents (
   IdOfInternalIncomingDocument BigSerial NOT NULL,
-  IdOfWayBill bigint NOT NULL,
-  IdOfInternalDisposingDocument bigint NOT NULL,
-  IdOfActOfInventarization bigint NOT NULL,
+  IdOfWayBill bigint,
+  IdOfInternalDisposingDocument bigint,
+  IdOfActOfInventarization bigint,
   IdOfStaff bigint NOT NULL,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
@@ -335,12 +333,6 @@ CREATE TABLE  cf_internal_incoming_documents (
   State integer NOT NULL,
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_internal_incoming_documents_pk PRIMARY KEY (IdOfInternalIncomingDocument ),
-  CONSTRAINT cf_internal_incoming_documents_waybill_fk FOREIGN KEY (IdOfWayBill)
-      REFERENCES cf_waybills (IdOfWayBill),
-  CONSTRAINT cf_internal_incoming_documents_internal_disposing_document_fk FOREIGN KEY (IdOfInternalDisposingDocument)
-      REFERENCES cf_internal_disposing_documents (IdOfInternalDisposingDocument),
-  CONSTRAINT cf_internal_incoming_documents_act_of_inventarization_fk FOREIGN KEY (IdOfActOfInventarization)
-      REFERENCES cf_acts_of_inventarization (IdOfActOfInventarization),
   CONSTRAINT cf_internal_incoming_documents_staff_fk FOREIGN KEY (IdOfStaff)
       REFERENCES cf_staffs (IdOfStaff)
 );
@@ -376,10 +368,11 @@ CREATE TABLE  cf_internal_incoming_document_positions (
 
 CREATE TABLE  cf_state_changes (
   IdOfStateChange BigSerial NOT NULL,
-  IdOfWayBill bigint NOT NULL,
-  IdOfInternalDisposingDocument bigint NOT NULL,
-  IdOfGoodsRequest bigint NOT NULL,
-  IdOfStaff bigint NOT NULL,
+  IdOfWayBill bigint,
+  IdOfInternalDisposingDocument bigint,
+  IdOfGoodsRequest bigint,
+  IdOfStaff bigint,
+  IdOfInternalIncomingDocument bigint,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner bigint,
@@ -392,12 +385,6 @@ CREATE TABLE  cf_state_changes (
   StateTo bigint NOT NULL,
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_state_changes_pk PRIMARY KEY (IdOfStateChange ),
-  CONSTRAINT cf_state_changes_waybill_fk FOREIGN KEY (IdOfWayBill)
-      REFERENCES cf_waybills (IdOfWayBill),
-  CONSTRAINT cf_state_changes_internal_disposing_document_fk FOREIGN KEY (IdOfInternalDisposingDocument)
-      REFERENCES cf_internal_disposing_documents (IdOfInternalDisposingDocument),
-  CONSTRAINT cf_state_changes__goods_request_fk FOREIGN KEY (IdOfGoodsRequest)
-      REFERENCES cf_goods_requests (IdOfGoodsRequest),
   CONSTRAINT cf_state_changes_staff_fk FOREIGN KEY (IdOfStaff)
       REFERENCES cf_staffs (IdOfStaff)
 );
