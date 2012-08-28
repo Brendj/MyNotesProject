@@ -53,6 +53,7 @@ public class ClientOrderList {
             private final String menuDetailName;
             private final String rootMenu;
             private final String itemCode;
+            private final String menuOutput;
 
             public Detail(OrderDetail orderDetail) {
                 this.qty = orderDetail.getQty();
@@ -61,6 +62,7 @@ public class ClientOrderList {
                 this.menuDetailName = orderDetail.getMenuDetailName();
                 this.rootMenu = orderDetail.getRootMenu();
                 this.itemCode = orderDetail.getItemCode();
+                this.menuOutput = orderDetail.getMenuOutput();
             }
 
             public String getItemCode() {
@@ -85,6 +87,10 @@ public class ClientOrderList {
 
             public String getRootMenu() {
                 return rootMenu;
+            }
+
+            public String getMenuOutput() {
+                return menuOutput;
             }
         }
 
@@ -198,6 +204,7 @@ public class ClientOrderList {
         public String getState() {
             return state;
         }
+
     }
 
     private List<Item> items = Collections.emptyList();

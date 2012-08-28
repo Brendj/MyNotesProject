@@ -236,6 +236,9 @@
                               styleClass="output-text" />
             </rich:column>
             <rich:column>
+                <h:outputText escape="true" value="#{detail.menuOutput}" styleClass="output-text" />
+            </rich:column>
+            <rich:column>
                 <h:outputText escape="true" value="#{detail.qty}" styleClass="output-text" />
             </rich:column>
             <rich:column>
