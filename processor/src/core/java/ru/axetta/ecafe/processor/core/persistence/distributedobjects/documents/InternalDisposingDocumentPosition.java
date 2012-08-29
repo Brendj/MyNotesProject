@@ -27,8 +27,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         if(idd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setInternalDisposingDocument(idd);
         TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class,guidOfTMG);
-        if(tmg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setTradeMaterialGood(tmg);
+        if(tmg!=null) setTradeMaterialGood(tmg);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setAttribute(element, "DisposePrice", disposePrice);
         setAttribute(element, "NDS", nds);
         setAttribute(element, "GuidOfInternalDisposingDocument", internalDisposingDocument.getGuid());
-        setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        if(tradeMaterialGood!=null) setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
     }
 
     @Override

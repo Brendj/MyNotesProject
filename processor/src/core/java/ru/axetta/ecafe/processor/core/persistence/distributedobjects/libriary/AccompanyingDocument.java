@@ -2,11 +2,9 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
+package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Source;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.TypeOfAccompanyingDocument;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.w3c.dom.Element;

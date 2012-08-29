@@ -25,7 +25,7 @@
         <!-- End Global params -->
 
         <many-to-one name="accompanyingDocument" column="AccompanyingDocument"
-                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.AccompanyingDocument"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.AccompanyingDocument"
                      not-null="false"/>
 
         <many-to-one name="fund" column="IdOfFund"

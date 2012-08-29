@@ -29,12 +29,11 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         InternalIncomingDocument iid = DAOService.getInstance().findDistributedObjectByRefGUID(InternalIncomingDocument.class,guidOfIID);
         if(iid==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setInternalIncomingDocument(iid);
-        TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class, guidOfTMG);
-        if(tmg==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
-        setTradeMaterialGood(tmg);
         Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class,guidOfG);
         if(g==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setGood(g);
+        TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class, guidOfTMG);
+        if(tmg!=null) setTradeMaterialGood(tmg);
     }
 
     @Override
@@ -47,9 +46,8 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"IncomingPrice", incomingPrice);
         setAttribute(element,"NDS", nds);
-        setAttribute(element, "Date", getDateFormat().format(goodsCreationDate));
         setAttribute(element, "GuidOfInternalIncomingDocument", internalIncomingDocument.getGuid());
-        setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        if(tradeMaterialGood != null) setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
         setAttribute(element, "GuidOfGoods", good.getGuid());
     }
 

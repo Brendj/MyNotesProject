@@ -19,8 +19,10 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 public enum DistributedObjectsEnum {
     /* Накладная */
     ActOfInventorization(ActOfInventarization.class,0),
-    ActOfWayBillDifference(ActOfWaybillDifference.class, 0),
-    ActOfWayBillDifferencePosition(ActOfWaybillDifferencePosition.class, 3),
+    ActOfWayBillDifference(
+            ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference.class, 0),
+    ActOfWayBillDifferencePosition(
+            ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition.class, 3),
     GoodsRequest(GoodRequest.class, 0),
     GoodsRequestPosition(GoodRequestPosition.class,3),
     InternalDisposingDocument(InternalDisposingDocument.class,1),

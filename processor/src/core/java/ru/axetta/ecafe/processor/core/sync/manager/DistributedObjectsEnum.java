@@ -18,12 +18,11 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
  * Time: 15:51
  * To change this template use File | Settings | File Templates.
  */
-/* TODO: надежнее будет сделать поле value типа Class */
 public enum DistributedObjectsEnum {
     /* Накладная */
     ActOfInventorization(ActOfInventarization.class,0),
-    ActOfWayBillDifference(ActOfWaybillDifference.class, 0),
-    ActOfWayBillDifferencePosition(ActOfWaybillDifferencePosition.class, 3),
+    ActOfWayBillDifference(ActOfWayBillDifference.class, 0),
+    ActOfWayBillDifferencePosition(ActOfWayBillDifferencePosition.class, 3),
     GoodRequest(GoodRequest.class, 0),
     GoodRequestPosition(GoodRequestPosition.class,3),
     InternalDisposingDocument(InternalDisposingDocument.class,1),

@@ -35,7 +35,7 @@
             <column name="IdOfStaff" not-null="true" />
         </many-to-one>
 
-        <many-to-one name="actOfWaybillDifference" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWaybillDifference" fetch="select" lazy="false">
+        <many-to-one name="actOfWayBillDifference" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference" fetch="select" lazy="false">
             <column name="IdOfActOfDifference" not-null="true" />
         </many-to-one>
 

@@ -214,7 +214,7 @@ public class Manager {
     private void addConfirms(SessionFactory sessionFactory, List<DistributedObject> confirmDistributedObjectList){
         for (DistributedObject distributedObject: confirmDistributedObjectList){
             DOConfirm doConfirm = new DOConfirm();
-            doConfirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
+            doConfirm.setDistributedObjectClassName(DistributedObjectsEnum.parse(distributedObject.getClass()).name());
             doConfirm.setGuid(distributedObject.getGuid());
             doConfirm.setOrgOwner(idOfOrg);
             addConfirm(sessionFactory, doConfirm);
@@ -271,12 +271,18 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if(distributedObject.getErrorType()==null){
-                distributedObject.preProcess();
-                if(distributedObject instanceof IConfigProvider){
-                    ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
-                    ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                if (!(distributedObject.getDeletedState()==null || distributedObject.getDeletedState())) {
+                    distributedObject.preProcess();
+                    if(distributedObject instanceof IConfigProvider){
+                        ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
+                        ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                    }
+                    distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
+                } else {
+                    distributedObject = updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
+                    distributedObject.setDateOnlyFormat(dateOnlyFormat);
+                    distributedObject.setTimeFormat(timeFormat);
                 }
-                distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -375,7 +381,7 @@ public class Manager {
             } else{
                 whereOrgSource = " orgOwner = "+idOfOrg;
             }
-            where = (where.equals("")?whereOrgSource: where + " and  " + whereOrgSource)+" ";
+            where = (where.equals("")?whereOrgSource: where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
             }
@@ -407,7 +413,7 @@ public class Manager {
             persistenceTransaction = persistenceSession.beginTransaction();
             Query query = persistenceSession.createQuery("Select guid from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName");
             query.setParameter("orgOwner",idOfOrg);
-            query.setParameter("distributedObjectClassName",clazz.getSimpleName());
+            query.setParameter("distributedObjectClassName",DistributedObjectsEnum.parse(clazz).name());
             List list = query.list();
             List<String> stringList = new LinkedList<String>();
             if(!(list==null || list.isEmpty())){
@@ -444,7 +450,7 @@ public class Manager {
         return ((DistributedObject)list.get(0)).getGlobalVersion();
     }
 
-    private void updateDeleteState(Session session, DistributedObject distributedObject,Long currentMaxVersion) throws Exception{
+    private DistributedObject updateDeleteState(Session session, DistributedObject distributedObject,Long currentMaxVersion) throws Exception{
         Long id = getGlobalIDByGUID(session, distributedObject);
         if (id < 0) {
             throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
@@ -454,12 +460,13 @@ public class Manager {
         object.setDeletedState(true);
         object.setDeleteDate(new Date());
         session.save(object);
+        return (DistributedObject) session.get(distributedObject.getClass(), id);
     }
 
     private DistributedObject processDistributedObject(Session session,DistributedObject distributedObject, long currentMaxVersion) throws Exception {
-        if (distributedObject.getDeletedState()) {
-            updateDeleteState(session, distributedObject, currentMaxVersion);
-        } else {
+        //if (distributedObject.getDeletedState()) {
+        //    updateDeleteState(session, distributedObject, currentMaxVersion);
+        //} else {
             if (distributedObject.getTagName().equals("C")) {
                 distributedObject = createDistributedObject(session, distributedObject, currentMaxVersion);
                 distributedObject.setTagName("C");
@@ -473,7 +480,7 @@ public class Manager {
                 distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);
                 distributedObject.setTagName("M");
             }
-        }
+      //  }
         return distributedObject;
     }
 

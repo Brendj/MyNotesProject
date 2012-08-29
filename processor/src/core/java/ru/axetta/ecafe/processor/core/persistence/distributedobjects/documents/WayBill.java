@@ -28,8 +28,8 @@ public class WayBill extends DistributedObject implements WayBillInterface {
         Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfSt);
         if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
         setStaff(st);
-        ActOfWaybillDifference awd = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfWaybillDifference.class, guidOfAWD);
-        if(awd!=null) setActOfWaybillDifference(awd);
+        ActOfWayBillDifference awd = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfWayBillDifference.class, guidOfAWD);
+        if(awd!=null) setActOfWayBillDifference(awd);
     }
 
     @Override
@@ -41,8 +41,8 @@ public class WayBill extends DistributedObject implements WayBillInterface {
         setAttribute(element, "Shipper", shipper);
         setAttribute(element,"Receiver", receiver);
         setAttribute(element, "GuidOfStaff", staff.getGuid());
-        if(actOfWaybillDifference!=null){
-            setAttribute(element, "GuidOfActOfDifference", actOfWaybillDifference.getGuid());
+        if(actOfWayBillDifference !=null){
+            setAttribute(element, "GuidOfActOfDifference", actOfWayBillDifference.getGuid());
         }
     }
 
@@ -80,7 +80,7 @@ public class WayBill extends DistributedObject implements WayBillInterface {
     private Integer state;
     private String shipper;
     private String receiver;
-    private ActOfWaybillDifference actOfWaybillDifference;
+    private ActOfWayBillDifference actOfWayBillDifference;
     private String guidOfAWD;
     private Staff staff;
     private String guidOfSt;
@@ -149,12 +149,12 @@ public class WayBill extends DistributedObject implements WayBillInterface {
         this.staff = staff;
     }
 
-    public ActOfWaybillDifference getActOfWaybillDifference() {
-        return actOfWaybillDifference;
+    public ActOfWayBillDifference getActOfWayBillDifference() {
+        return actOfWayBillDifference;
     }
 
-    public void setActOfWaybillDifference(ActOfWaybillDifference actOfWaybillDifference) {
-        this.actOfWaybillDifference = actOfWaybillDifference;
+    public void setActOfWayBillDifference(ActOfWayBillDifference actOfWayBillDifference) {
+        this.actOfWayBillDifference = actOfWayBillDifference;
     }
 
 }
