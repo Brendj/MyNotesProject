@@ -291,7 +291,7 @@ CREATE TABLE  cf_internal_disposing_documents (
 CREATE TABLE  cf_internal_disposing_document_positions (
   IdOfInternalDisposingDocumentPositions BigSerial NOT NULL,
   IdOfInternalDisposingDocument bigint NOT NULL,
-  IdOfTradeMaterialGood bigint NOT NULL,
+  IdOfTradeMaterialGood bigint,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner bigint,
@@ -307,9 +307,7 @@ CREATE TABLE  cf_internal_disposing_document_positions (
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_internal_disposing_document_positions_pk PRIMARY KEY (IdOfInternalDisposingDocumentPositions ),
   CONSTRAINT cf_internal_disposing_document_positions_internal_disposing_document_fk FOREIGN KEY (IdOfInternalDisposingDocument)
-      REFERENCES cf_internal_disposing_documents (IdOfInternalDisposingDocument),
-  CONSTRAINT cf_internal_disposing_document_positions_trade_material_good_fk FOREIGN KEY (IdOfTradeMaterialGood)
-      REFERENCES cf_trade_material_goods (IdOfTradeMaterialGood)
+      REFERENCES cf_internal_disposing_documents (IdOfInternalDisposingDocument)
 );
 
 CREATE TABLE  cf_internal_incoming_documents (
@@ -336,7 +334,7 @@ CREATE TABLE  cf_internal_incoming_documents (
 CREATE TABLE  cf_internal_incoming_document_positions (
   IdOfInternalIncomingDocumentPositions BigSerial NOT NULL,
   IdOfInternalIncomingDocument bigint NOT NULL,
-  IdOfTradeMaterialGood bigint NOT NULL,
+  IdOfTradeMaterialGood bigint,
   IdOfGood bigint NOT NULL,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
@@ -356,8 +354,6 @@ CREATE TABLE  cf_internal_incoming_document_positions (
   CONSTRAINT cf_internal_incoming_document_positions_pk PRIMARY KEY (IdOfInternalIncomingDocumentPositions ),
   CONSTRAINT cf_internal_incoming_document_positions_internal_incoming_document_fk FOREIGN KEY (IdOfInternalIncomingDocument)
       REFERENCES cf_internal_incoming_documents (IdOfInternalIncomingDocument),
-  CONSTRAINT cf_internal_incoming_document_positions_trade_material_good_fk FOREIGN KEY (IdOfTradeMaterialGood)
-      REFERENCES cf_trade_material_goods (IdOfTradeMaterialGood),
   CONSTRAINT cf_internal_incoming_document_positions_good_fk FOREIGN KEY (IdOfGood)
       REFERENCES cf_goods (IdOfGood)
 );
