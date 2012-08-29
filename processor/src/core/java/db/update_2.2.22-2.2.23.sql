@@ -6,8 +6,6 @@ ALTER TABLE cf_product_groups ADD COLUMN SendAll integer DEFAULT 0;
 ALTER TABLE cf_technological_map_groups ADD COLUMN SendAll integer DEFAULT 0;
 
 
--- статус измение версии в таблице вресий
-ALTER TABLE cf_do_versions ADD COLUMN status integer DEFAULT 0;
 -- добавляем условие уникальности для имен классов
 ALTER TABLE cf_do_versions ADD CONSTRAINT cf_do_versions_distributedobjectclassname_unique UNIQUE (distributedobjectclassname);
 
@@ -272,7 +270,7 @@ CREATE TABLE  cf_acts_of_inventarization (
 CREATE TABLE  cf_internal_disposing_documents (
   IdOfInternalDisposingDocument BigSerial NOT NULL,
   IdOfStaff bigint NOT NULL,
-  IdOfActOfInventarization bigint NOT NULL,
+  IdOfActOfInventarization bigint,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   OrgOwner bigint,
@@ -287,9 +285,7 @@ CREATE TABLE  cf_internal_disposing_documents (
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_internal_disposing_documents_pk PRIMARY KEY (IdOfInternalDisposingDocument ),
   CONSTRAINT cf_internal_disposing_documents_staff_fk FOREIGN KEY (IdOfStaff)
-      REFERENCES cf_staffs (IdOfStaff),
-  CONSTRAINT cf_internal_disposing_documents_act_of_inventarization_fk FOREIGN KEY (IdOfActOfInventarization)
-      REFERENCES cf_acts_of_inventarization (IdOfActOfInventarization)
+      REFERENCES cf_staffs (IdOfStaff)
 );
 
 CREATE TABLE  cf_internal_disposing_document_positions (
