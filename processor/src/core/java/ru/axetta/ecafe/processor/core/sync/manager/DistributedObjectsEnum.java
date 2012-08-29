@@ -6,6 +6,10 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,8 +24,8 @@ public enum DistributedObjectsEnum {
     ActOfInventorization(ActOfInventarization.class,0),
     ActOfWayBillDifference(ActOfWaybillDifference.class, 0),
     ActOfWayBillDifferencePosition(ActOfWaybillDifferencePosition.class, 3),
-    GoodRequest(ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest.class, 0),
-    GoodRequestPosition(ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition.class,3),
+    GoodRequest(GoodRequest.class, 0),
+    GoodRequestPosition(GoodRequestPosition.class,3),
     InternalDisposingDocument(InternalDisposingDocument.class,1),
     InternalDisposingDocumentPosition(InternalDisposingDocumentPosition.class, 4),
     InternalIncomingDocument(InternalIncomingDocument.class,2),
@@ -31,19 +35,18 @@ public enum DistributedObjectsEnum {
     WayBillPosition(WayBillPosition.class,3),
     Staff(Staff.class, 0),
     /* товары продукты */
-    ProductGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup.class,0),
-    TechnologicalMapGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup.class,0),
-    Product(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product.class, 1),
-    GoodGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup.class,0),
-    Good(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good.class,2),
-    TechnologicalMap(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap.class, 1),
-    TechnologicalMapProduct(
-            ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct.class, 2),
-    TradeMaterialGood(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood.class,3),
+    ProductGroup(ProductGroup.class,0),
+    TechnologicalMapGroup(TechnologicalMapGroup.class,0),
+    Product(Product.class, 1),
+    GoodGroup(GoodGroup.class,0),
+    Good(Good.class,2),
+    TechnologicalMap(TechnologicalMap.class, 1),
+    TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
+    TradeMaterialGood(TradeMaterialGood.class,3),
     // библиоткека
-    Publication(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication.class, 0),
-    Issuable(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable.class, 1),
-    Circulation(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation.class, 2);
+    Publication(Publication.class, 0),
+    Issuable(Issuable.class, 1),
+    Circulation(Circulation.class, 2);
 
     private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */
