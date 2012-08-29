@@ -5,14 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
@@ -57,10 +54,6 @@ public class ProductCreatePage extends BasicWorkspacePage implements ProductGrou
         try {
             if(currentProductGroup==null){
                 printError("Поле 'Группа продуктов' обязательное.");
-                return null;
-            }
-            if(product.getFullName()==null || product.getFullName().equals("")){
-                printError("Поле 'Полное наименование пищевого продукта' обязательное.");
                 return null;
             }
             if(product.getProductName()==null || product.getProductName().equals("")){

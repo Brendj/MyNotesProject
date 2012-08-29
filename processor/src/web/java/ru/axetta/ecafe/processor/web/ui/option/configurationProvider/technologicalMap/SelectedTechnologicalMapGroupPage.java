@@ -4,15 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * Created by IntelliJ IDEA.

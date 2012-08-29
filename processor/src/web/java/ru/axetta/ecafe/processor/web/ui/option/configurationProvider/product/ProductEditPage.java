@@ -4,18 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
 import org.slf4j.LoggerFactory;
@@ -27,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -96,10 +92,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             }
 
             p.setProductGroup(currentProductGroup);
-            //daoService.setConfigurationProviderInDO(ProductGroup.class, currentProductGroup.getGlobalId(),
-            //        currentConfigurationProvider.getIdOfConfigurationProvider());
             p.setGlobalVersion(daoService.updateVersionByDistributedObjects(Product.class.getSimpleName()));
-            //currentProduct = (Product) daoService.mergeDistributedObject(p, currentProduct.getGlobalVersion() + 1);
             daoService.persistEntity(p);
             currentProduct = entityManager.find(Product.class, currentProduct.getGlobalId());
             printMessage("Продукт сохранен успешно.");

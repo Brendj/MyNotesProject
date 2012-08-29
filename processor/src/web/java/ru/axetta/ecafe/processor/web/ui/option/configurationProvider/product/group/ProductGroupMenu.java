@@ -4,9 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 
-import javax.faces.component.UISelectItems;
 import javax.faces.model.SelectItem;
 import java.util.List;
 

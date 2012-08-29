@@ -1,8 +1,8 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;

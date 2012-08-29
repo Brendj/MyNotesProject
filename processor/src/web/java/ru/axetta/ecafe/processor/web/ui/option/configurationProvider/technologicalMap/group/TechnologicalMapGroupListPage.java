@@ -4,14 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

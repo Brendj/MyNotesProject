@@ -16,8 +16,8 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcess
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Publication;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;

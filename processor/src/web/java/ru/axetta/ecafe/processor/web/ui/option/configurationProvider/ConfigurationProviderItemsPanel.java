@@ -5,11 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgEditPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;

@@ -5,10 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupGroupPage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

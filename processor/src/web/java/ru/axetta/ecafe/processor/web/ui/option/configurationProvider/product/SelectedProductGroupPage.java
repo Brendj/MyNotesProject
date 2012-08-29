@@ -4,15 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * Created by IntelliJ IDEA.

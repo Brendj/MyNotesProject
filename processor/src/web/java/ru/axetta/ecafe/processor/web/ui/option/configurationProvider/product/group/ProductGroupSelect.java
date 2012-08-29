@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 
 /**
  * Created with IntelliJ IDEA.

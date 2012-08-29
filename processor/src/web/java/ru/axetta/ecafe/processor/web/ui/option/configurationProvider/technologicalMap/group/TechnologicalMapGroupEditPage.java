@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologi
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;

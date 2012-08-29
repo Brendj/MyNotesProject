@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;

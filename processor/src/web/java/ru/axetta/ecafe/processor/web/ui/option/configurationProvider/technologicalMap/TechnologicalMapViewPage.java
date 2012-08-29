@@ -5,35 +5,27 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMap;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupSelect;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.

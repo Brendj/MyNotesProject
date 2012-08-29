@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;

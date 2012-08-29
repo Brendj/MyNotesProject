@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;

@@ -16,7 +16,7 @@
 
 
     <h:panelGrid columns="2">
-        <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Группа технологической карты" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
             <h:outputText value="#{technologicalMapEditPage.currentTechnologicalMapGroup.nameOfGroup}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
             <a4j:commandButton value="..." action="#{technologicalMapEditPage.selectTechnologicalMapGroup}" reRender="technologicalMapGroupSelectModalPanel"
@@ -24,9 +24,9 @@
                                styleClass="command-link" style="width: 25px; float: right;" />
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Наименование технологической карты" styleClass="output-text required-field" />
         <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.nameOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Номер технологической карты" styleClass="output-text required-field" />
         <h:inputText value="#{technologicalMapEditPage.currentTechnologicalMap.numberOfTechnologicalMap}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Статус технологической карты" styleClass="output-text" />
         <h:selectOneListbox value="#{technologicalMapEditPage.currentTechnologicalMap.deletedState}" size="1">

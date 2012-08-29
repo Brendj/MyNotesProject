@@ -91,9 +91,8 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
         } catch (Exception e) {
             printError("Ошибка при сохранении производственной конфигурации.");
             logger.error("Error create configuration provider",e);
-        } finally {
-            return null;
         }
+        return null;
     }
 
     @Transactional
@@ -113,7 +112,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
             }
         }
 
-        currentConfigurationProvider = new ConfigurationProvider();
+        //currentConfigurationProvider = new ConfigurationProvider();
     }
 
     public ConfigurationProvider getCurrentConfigurationProvider() {

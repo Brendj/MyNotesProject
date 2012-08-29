@@ -41,24 +41,6 @@
             </h:commandLink>
         </rich:column>
 
-        <rich:column  headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Организации" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <rich:dataList value="#{configurationProvider.orgs}" var="org" rendered="#{configurationProvider.orgs != null}">
-                <h:outputText value="#{org.shortName}"/>
-            </rich:dataList>
-        </rich:column>
-<%--
-        <rich:column  headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="История изминений" styleClass="output-text" escape="true"/>
-            </f:facet>
-            &lt;%&ndash;<h:outputText value="Автор: #{CONFIGURATION_PROVIDER.userCreate.userName} Дата: " rendered="#{CONFIGURATION_PROVIDER.userCreate != null}"/>
-            <h:outputText value="#{CONFIGURATION_PROVIDER.createdDate}" converter="timeConverter"/>&ndash;%&gt;
-            <h:outputText value="#{CONFIGURATION_PROVIDER.history}" styleClass="output-text"/>
-        </rich:column>--%>
-
         <rich:column headerClass="column-header" width="50px">
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" styleClass="output-text"/>

@@ -38,13 +38,13 @@
             <f:selectItem itemLabel="Удален" itemValue="true"/>
         </h:selectOneListbox>
 
-        <h:outputText escape="true" value="Код" styleClass="output-text" />
-        <h:inputText value="#{productEditPage.currentProduct.code}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text required-field" />
         <h:inputText value="#{productEditPage.currentProduct.fullName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Товарное название" styleClass="output-text required-field" />
+        <h:outputText escape="true" value="Код" styleClass="output-text" />
+        <h:inputText value="#{productEditPage.currentProduct.code}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Товарное название" styleClass="output-text" />
         <h:inputText value="#{productEditPage.currentProduct.productName}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text required-field" />
+        <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text" />
         <h:inputText value="#{productEditPage.currentProduct.okpCode}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
         <h:inputText value="#{productEditPage.currentProduct.classificationCode}" maxlength="32" styleClass="input-text long-field" />

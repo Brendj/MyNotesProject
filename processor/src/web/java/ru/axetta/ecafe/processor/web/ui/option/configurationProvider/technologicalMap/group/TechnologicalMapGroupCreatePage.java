@@ -6,8 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologi
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
@@ -20,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.UUID;
 

@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.productGuide;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

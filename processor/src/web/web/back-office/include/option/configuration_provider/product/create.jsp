@@ -21,12 +21,12 @@
 
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Код" styleClass="output-text" />
-        <h:inputText value="#{productCreatePage.product.code}" maxlength="128" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text required-field" />
-        <h:inputText value="#{productCreatePage.product.fullName}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Товарное название" styleClass="output-text required-field" />
         <h:inputText value="#{productCreatePage.product.productName}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Код" styleClass="output-text" />
+        <h:inputText value="#{productCreatePage.product.code}" maxlength="128" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text" />
+        <h:inputText value="#{productCreatePage.product.fullName}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text" />
         <h:inputText value="#{productCreatePage.product.okpCode}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Код классификации" styleClass="output-text" />

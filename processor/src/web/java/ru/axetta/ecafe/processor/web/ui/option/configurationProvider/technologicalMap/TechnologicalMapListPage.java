@@ -4,17 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupSelect;
 
 import org.slf4j.Logger;

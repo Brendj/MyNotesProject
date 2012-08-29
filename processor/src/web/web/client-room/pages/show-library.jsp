@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
@@ -20,7 +20,6 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Circulation" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 

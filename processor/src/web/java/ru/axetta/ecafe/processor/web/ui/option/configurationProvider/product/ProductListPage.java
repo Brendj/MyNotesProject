@@ -5,15 +5,12 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupMenu;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.ProductGroupSelect;
 
 import org.slf4j.Logger;
@@ -25,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

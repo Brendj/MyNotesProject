@@ -27,11 +27,13 @@
 
     <h:outputText escape="true" value="Организации" styleClass="output-text" />
     <h:inputText readonly="true" value="Данная конфигурация не привязана ни к одной организации." styleClass="input-text long-field" rendered="#{configurationProviderViewPage.currentConfigurationProvider.orgEmpty}"/>
-    <rich:dataTable value="#{configurationProviderViewPage.currentConfigurationProvider.orgs}" var="org" rendered="#{!configurationProviderViewPage.currentConfigurationProvider.orgEmpty}">
-        <rich:column>
-            <h:inputText readonly="true" value="#{org.shortName}" styleClass="input-text"/>
-        </rich:column>
-    </rich:dataTable>
+    <h:dataTable value="#{configurationProviderViewPage.currentConfigurationProvider.orgs}" border="0" var="org" rendered="#{!configurationProviderViewPage.currentConfigurationProvider.orgEmpty}">
+        <h:column>
+            <h:commandLink value="#{org.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </h:commandLink>
+        </h:column>
+    </h:dataTable>
     <h:outputText escape="true" value="Продукты" styleClass="output-text" />
     <h:commandLink value="Перейти к списку" action="#{configurationProviderViewPage.showProducts}" styleClass="command-link"/>
 

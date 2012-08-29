@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 
 /**
  * Created with IntelliJ IDEA.
