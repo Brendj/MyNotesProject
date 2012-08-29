@@ -87,6 +87,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     public Object save() {
         try {
             onSave();
+            selectedConfigurationProviderGroupPage.setSelectConfigurationProvider(currentConfigurationProvider);
             printMessage("Производственная конфигурация сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении производственной конфигурации.");
@@ -111,8 +112,6 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
                 daoService.setConfigurationProviderInOrg(idOfOrg, currentConfigurationProvider);
             }
         }
-
-        //currentConfigurationProvider = new ConfigurationProvider();
     }
 
     public ConfigurationProvider getCurrentConfigurationProvider() {

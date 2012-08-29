@@ -188,7 +188,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                     daoService.persistEntity(technologicalMapProduct);
                 }
             }
-
+            selectedTechnologicalMapGroupPage.setCurrentTechnologicalMap(currentTechnologicalMap);
             printMessage("Технологическая карта сохранена успешно.");
         } catch (Exception e){
             printError("Ошибка при сохранении новой технологической карты.");

@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -95,6 +97,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             p.setGlobalVersion(daoService.updateVersionByDistributedObjects(Product.class.getSimpleName()));
             daoService.persistEntity(p);
             currentProduct = entityManager.find(Product.class, currentProduct.getGlobalId());
+            selectedProductGroupPage.setCurrentProduct(currentProduct);
             printMessage("Продукт сохранен успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении продукта.");
@@ -106,7 +109,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
     @Transactional
     public void remove(){
         if(!currentProduct.getDeletedState()) {
-            printMessage("Продукт не может быть удален.");
+            printError("Группа не может быть удален.");
             return;
         }
         try{

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.gr
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,6 +78,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
             currentProductGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
             currentProductGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(ProductGroup.class.getSimpleName()));
             currentProductGroup = (ProductGroup) daoService.mergeDistributedObject(currentProductGroup,currentProductGroup.getGlobalVersion()+1);
+            selectedProductGroupGroupPage.setCurrentProductGroup(currentProductGroup);
             printMessage("Группа для продуктов сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении группы для продуктов.");
@@ -87,6 +91,13 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     public void remove(){
         if(!currentProductGroup.getDeletedState()) {
             printMessage("Группа не может быть удалена.");
+            return;
+        }
+        TypedQuery<Product> query = entityManager.createQuery("from Product where productGroup=:productGroup",Product.class);
+        query.setParameter("productGroup",currentProductGroup);
+        List<Product> productList = query.getResultList();
+        if(!(productList==null || productList.isEmpty())){
+            printError("Группа не может быть удален.");
             return;
         }
         try{

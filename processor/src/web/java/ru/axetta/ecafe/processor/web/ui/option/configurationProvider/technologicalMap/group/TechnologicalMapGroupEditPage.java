@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologi
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -86,6 +89,13 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage implements
     public void remove(){
         if(!currentTechnologicalMapGroup.getDeletedState()) {
             printMessage("Группа не может быть удалена.");
+            return;
+        }
+        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup",TechnologicalMap.class);
+        query.setParameter("technologicalMapGroup",currentTechnologicalMapGroup);
+        List<TechnologicalMap> technologicalMapList = query.getResultList();
+        if(!(technologicalMapList==null || technologicalMapList.isEmpty())){
+            printError("Группа не может быть удален.");
             return;
         }
         try{
