@@ -13,7 +13,5 @@
 
         <property name="distributedObjectClassName" column="DistributedObjectClassName" type="string" length="64"/>
         <property name="currentVersion" column="CurrentVersion" type="long"/>
-        <property name="status" column="Status" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
-       <!-- <property name="editTime" column="edit_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>-->
     </class>
 </hibernate-mapping>

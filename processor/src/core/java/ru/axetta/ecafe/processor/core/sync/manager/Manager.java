@@ -94,7 +94,15 @@ public class Manager {
                         DistributedObject distributedObject = createDistributedObject(currentObject);
                         distributedObject.setTimeFormat(timeFormat);
                         distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                        distributedObject = distributedObject.build(node);
+                        try{
+                            distributedObject = distributedObject.build(node);
+                        } catch (DistributedObjectException e){
+                            distributedObject.setErrorType(((DistributedObjectException) e).getErrorType());
+                            logger.error(distributedObject.toString(), e);
+                        } catch (Exception e){
+                            distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+                            logger.error(distributedObject.toString(), e);
+                        }
                         if (!distributedObjectsListMap.containsKey(currentObject)) {
                             distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
                         }
@@ -247,22 +255,10 @@ public class Manager {
             }
             /* generate result list */
             List<DistributedObject> currentResultDistributedObjectsList = resultDistributedObjectsListMap.get(objectClass);
-            /* уберем все объекты которые есть вконвисрме */
+            /* уберем все объекты которые есть в конфирме */
             if(!(currentResultDistributedObjectsList == null || currentResultDistributedObjectsList.isEmpty())){
                 currentResultDistributedObjectsList.removeAll(distributedObjectList);
             }
-            //if(objectClass.getValue().equals(GoodRequest.class)){
-            //    if (currentResultDistributedObjectsList == null) {
-            //        currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
-            //    }
-            //    currentResultDistributedObjectsList.addAll(distributedObjectList);
-            //}
-            //if(objectClass.getValue().equals(WayBill.class)){
-            //    if (currentResultDistributedObjectsList == null) {
-            //        currentResultDistributedObjectsList = new LinkedList<DistributedObject>();
-            //    }
-            //    currentResultDistributedObjectsList.addAll(distributedObjectList);
-            //}
             resultDistributedObjectsListMap.put(objectClass, currentResultDistributedObjectsList);
         }
         return distributedObjectList;
@@ -274,21 +270,22 @@ public class Manager {
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            distributedObject.preProcess();
-            if(distributedObject instanceof IConfigProvider){
-                ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
-                ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+            if(distributedObject.getErrorType()==null){
+                distributedObject.preProcess();
+                if(distributedObject instanceof IConfigProvider){
+                    ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
+                    ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                }
+                distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
             }
-            distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } catch (Exception e) {
+        } catch (DistributedObjectException e){
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
-            if (e instanceof DistributedObjectException) {
-                distributedObject.setErrorType(((DistributedObjectException) e).getErrorType());
-            } else {
-                distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
-            }
+            distributedObject.setErrorType(e.getErrorType());
+            logger.error(distributedObject.toString(), e);
+        } catch (Exception e){
+            distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
             logger.error(distributedObject.toString(), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -509,18 +506,6 @@ public class Manager {
         object.fill(distributedObject);
         object.setLastUpdate(new Date());
         object.setGlobalVersion(currentVersion);
-        //if(object instanceof GoodRequest){
-        //    GoodRequest goodRequest = (GoodRequest) object;
-        //    if(goodRequest.getState().equals(0)){
-        //        goodRequest.setState(1);
-        //    }
-        //}
-        //if(distributedObject instanceof WayBill){
-        //    WayBill wayBill = (WayBill) distributedObject;
-        //    if(wayBill.getState().equals(0)){
-        //        wayBill.setState(1);
-        //    }
-        //}
         return (DistributedObject) session.merge(object);
     }
 
@@ -532,18 +517,6 @@ public class Manager {
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
-        //if(distributedObject instanceof GoodRequest){
-        //    GoodRequest goodRequest = (GoodRequest) distributedObject;
-        //    if(goodRequest.getState().equals(0)){
-        //        goodRequest.setState(1);
-        //    }
-        //}
-        //if(distributedObject instanceof WayBill){
-        //    WayBill wayBill = (WayBill) distributedObject;
-        //    if(wayBill.getState().equals(0)){
-        //        wayBill.setState(1);
-        //    }
-        //}
         return (DistributedObject) session.merge(distributedObject);
     }
 

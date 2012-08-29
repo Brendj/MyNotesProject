@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct" table="cf_technological_map_products">
+        <id name="globalId" column="IdOfTechnoMapProducts" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <!-- End Global params -->
+
+        <property name="grossWeight" column="GrossWeight" type="integer" />
+        <property name="netWeight" column="NetWeight" type="integer" />
+        <property name="numberGroupReplace" column="NumberGroupReplace" type="integer" />
+
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
+
+        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap" fetch="select" lazy="false">
+            <column name="idOfTechnologicalMaps" not-null="true" />
+        </many-to-one>
+        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" fetch="select" unique="true" lazy="false">
+            <column name="idOfProducts" not-null="true" />
+        </many-to-one>
+
+    </class>
+</hibernate-mapping>

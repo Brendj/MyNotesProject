@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" table="cf_internal_incoming_documents">
+        <id name="globalId" column="IdOfInternalIncomingDocument" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+        not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <!-- End Global params -->
+
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="date" column="DateOfInternalIncomingDocument" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="state" column="State" type="integer" not-null="true"/>
+
+        <many-to-one name="wayBill" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill" fetch="select" lazy="false">
+            <column name="IdOfWayBill" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="internalDisposingDocument" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument" fetch="select" lazy="false">
+            <column name="IdOfInternalDisposingDocument" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="actOfInventarization" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization" fetch="select" lazy="false">
+            <column name="IdOfActOfInventarization" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff" fetch="select" lazy="false">
+            <column name="IdOfStaff" not-null="true" />
+        </many-to-one>
+
+
+
+    </class>
+</hibernate-mapping>

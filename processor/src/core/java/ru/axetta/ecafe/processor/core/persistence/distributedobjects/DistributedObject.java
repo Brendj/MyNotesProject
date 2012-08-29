@@ -54,9 +54,6 @@ public abstract class DistributedObject{
 
     private DistributedObjectException.ErrorType errorType;
 
-    /* Node для последующего разбора */
-    private Node node;
-
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
         element.setAttribute("Guid", getGuid());
@@ -82,13 +79,12 @@ public abstract class DistributedObject{
         appendAttributes(element);
         element.setAttribute("Guid", getGuid());
         element.setAttribute("V", String.valueOf(getGlobalVersion()));
-        //element.setAttribute("SendAll", String.valueOf(getSendAll()));
         return element;
         /* Метод определения названия элемента */
     }
 
     /* метод парсинга элемента */
-    public DistributedObject build(Node node) throws ParseException, IOException {
+    public DistributedObject build(Node node) throws Exception {
         /* Begin required params */
         String stringGUID = getStringAttributeValue(node,"Guid",36);
         if(stringGUID!=null) setGuid(stringGUID);
@@ -111,12 +107,9 @@ public abstract class DistributedObject{
     public void preProcess() throws DistributedObjectException,
             ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException {}
 
-    protected abstract DistributedObject parseAttributes(Node node) throws ParseException, IOException;
+    protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 
     public abstract void fill(DistributedObject distributedObject);
-
-    public List<DistributedObject> getDistributedObjectChildren(HashMap<String, Long> currentMaxVersions) throws Exception
-    { return null;}
 
     protected void setAttribute(Element element, String name, Object value){
         if(value!=null) {
@@ -129,64 +122,101 @@ public abstract class DistributedObject{
         }
     }
 
-    protected Date getDateAttributeValue(Node node, String attributeName)  throws ParseException{
-        if(getAttributeValue(node, attributeName)==null) return null;
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-        DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        timeFormat1.setTimeZone(localTimeZone);
-        return timeFormat1.parse(getAttributeValue(node,attributeName));
+    protected Date getDateOnlyAttributeValue(Node node, String attributeName)  throws Exception{
+        Date result = null;
+        try{
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = dateOnlyFormat.parse(attributeValue);
+            }
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_DATE_VALUE);
+        }
+        return result;
     }
 
-    protected String getStringAttributeValue(Node node, String attributeName,Integer length){
+    protected Date getDateTimeAttributeValue(Node node, String attributeName)  throws Exception{
+        Date result = null;
+        try{
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = timeFormat.parse(attributeValue);
+            }
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_DATE_VALUE);
+        }
+        return result;
+    }
+
+    protected String getStringAttributeValue(Node node, String attributeName,Integer length) throws Exception{
         if(getAttributeValue(node, attributeName)==null) return null;
         String result = getAttributeValue(node, attributeName);
         if(result.length()>length) return result.substring(0, length);
         return result;
     }
 
-    protected Float getFloatAttributeValue(Node node, String attributeName){
+    protected Float getFloatAttributeValue(Node node, String attributeName) throws Exception{
         Float result = null;
         try{
-            String calString = getAttributeValue(node, attributeName);
-            if (calString==null || calString.equals("")) {
-                return null;
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                String replacedString = attributeValue.replaceAll(",", ".");
+                result = Float.parseFloat(replacedString);
             }
-            String replacedString = calString.replaceAll(",", ".");
-            result = Float.parseFloat(replacedString);
-        } catch (Exception e){ result=null;}
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_FLOAT_VALUE);
+        }
         return result;
     }
 
-    protected Boolean getBollAttributeValue(Node node, String attributeName){
+    protected Boolean getBollAttributeValue(Node node, String attributeName) throws DistributedObjectException{
         Boolean result = null;
         try{
-            result = Boolean.parseBoolean(getAttributeValue(node, attributeName));
-        } catch (Exception e){ result=null;}
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = Boolean.parseBoolean(getAttributeValue(node, attributeName));
+            }
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_BOOLEAN_VALUE);
+        }
         return result;
     }
 
-    protected Long getLongAttributeValue(Node node, String attributeName){
+    protected Long getLongAttributeValue(Node node, String attributeName) throws Exception{
         Long result = null;
         try{
-            result = Long.parseLong(getAttributeValue(node, attributeName));
-        } catch (Exception e){ result=null;}
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = Long.parseLong(getAttributeValue(node, attributeName));
+            }
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_LONG_VALUE);
+        }
         return result;
     }
 
-    protected Integer getIntegerAttributeValue(Node node, String attributeName){
+    protected Integer getIntegerAttributeValue(Node node, String attributeName) throws Exception{
         Integer result = null;
         try{
-            result = Integer.parseInt(getAttributeValue(node, attributeName));
-        } catch (Exception e){ result=null;}
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = Integer.parseInt(attributeValue);
+            }
+        } catch (Exception e){
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_INTEGER_VALUE);
+        }
         return result;
     }
 
-    protected Character getCharacterAttributeValue(Node node, String attributeName) {
+    protected Character getCharacterAttributeValue(Node node, String attributeName) throws Exception{
         Character result = null;
         try {
-            result = getAttributeValue(node, attributeName).charAt(0);
+            String attributeValue = getAttributeValue(node, attributeName);
+            if(!(attributeValue==null || attributeValue.equals(""))) {
+                result = getAttributeValue(node, attributeName).charAt(0);
+            }
         } catch (Exception e) {
-            result = null;
+            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_CHAR_VALUE);
         }
         return result;
     }

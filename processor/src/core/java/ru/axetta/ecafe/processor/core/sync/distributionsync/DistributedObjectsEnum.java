@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.sync.distributionsync;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,22 +28,23 @@ public enum DistributedObjectsEnum {
     InternalIncomingDocument(InternalIncomingDocument.class,2),
     InternalIncomingDocumentPosition(InternalIncomingDocumentPosition.class, 4),
     StateChanges(StateChange.class,3),
-    WayBill(ru.axetta.ecafe.processor.core.persistence.distributedobjects.WayBill.class,1),
+    WayBill(ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill.class,1),
     WayBillPosition(WayBillPosition.class,3),
     Staff(Staff.class, 0),
     /* товары продукты */
-    ProductGroup(ProductGroup.class,0),
-    TechnologicalMapGroup(TechnologicalMapGroup.class,0),
-    Product(Product.class, 1),
+    ProductGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup.class,0),
+    TechnologicalMapGroup(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup.class,0),
+    Product(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product.class, 1),
     GoodsGroups(GoodGroup.class,0),
     Goods(Good.class,2),
-    TechnologicalMap(TechnologicalMap.class, 1),
-    TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
+    TechnologicalMap(ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap.class, 1),
+    TechnologicalMapProduct(
+            ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct.class, 2),
     TradeMaterialGoods(TradeMaterialGood.class,3),
     // библиоткека
-    Publication(Publication.class, 0),
-    Issuable(Issuable.class, 1),
-    Circulation(Circulation.class, 2);
+    Publication(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication.class, 0),
+    Issuable(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable.class, 1),
+    Circulation(ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation.class, 2);
 
     private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */
