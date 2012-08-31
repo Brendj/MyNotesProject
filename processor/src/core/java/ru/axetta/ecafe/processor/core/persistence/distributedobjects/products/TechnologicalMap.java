@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -104,8 +104,7 @@ public abstract class DistributedObject{
         if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
-    public void preProcess() throws DistributedObjectException,
-            ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException {}
+    public void preProcess() throws DistributedObjectException{}
 
     protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 

@@ -466,23 +466,19 @@ public class Manager {
     }
 
     private DistributedObject processDistributedObject(Session session,DistributedObject distributedObject, long currentMaxVersion) throws Exception {
-        //if (distributedObject.getDeletedState()) {
-        //    updateDeleteState(session, distributedObject, currentMaxVersion);
-        //} else {
-            if (distributedObject.getTagName().equals("C")) {
-                distributedObject = createDistributedObject(session, distributedObject, currentMaxVersion);
-                distributedObject.setTagName("C");
+        if (distributedObject.getTagName().equals("C")) {
+            distributedObject = createDistributedObject(session, distributedObject, currentMaxVersion);
+            distributedObject.setTagName("C");
+        }
+        if (distributedObject.getTagName().equals("M")) {
+            Long currentVersion = getDistributedObjectVersion(session, distributedObject);
+            Long objectVersion = distributedObject.getGlobalVersion();
+            if (!objectVersion.equals(currentVersion)) {
+                createConflict(session, distributedObject, currentMaxVersion);
             }
-            if (distributedObject.getTagName().equals("M")) {
-                Long currentVersion = getDistributedObjectVersion(session, distributedObject);
-                Long objectVersion = distributedObject.getGlobalVersion();
-                if (!objectVersion.equals(currentVersion)) {
-                    createConflict(session, distributedObject, currentMaxVersion);
-                }
-                distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);
-                distributedObject.setTagName("M");
-            }
-      //  }
+            distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);
+            distributedObject.setTagName("M");
+        }
         return distributedObject;
     }
 

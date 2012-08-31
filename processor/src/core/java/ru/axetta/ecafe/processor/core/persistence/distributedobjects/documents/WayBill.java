@@ -5,9 +5,8 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.WayBillInterface;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.distributionsync.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,7 +20,7 @@ import java.util.Date;
  * Time: 17:29
  * To change this template use File | Settings | File Templates.
  */
-public class WayBill extends DistributedObject implements WayBillInterface {
+public class WayBill extends DistributedObject {
 
     @Override
     public void preProcess() throws DistributedObjectException {
