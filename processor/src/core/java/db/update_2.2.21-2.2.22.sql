@@ -16,4 +16,6 @@ ALTER TABLE CF_ClientPayments ADD CONSTRAINT cf_clientpayments_to_ca_rcvr_fk FOR
 
 ALTER TABLE CF_Contragents ADD COLUMN PublicKeyGOSTAlias varchar(64);
 
+ALTER TABLE CF_EnterEvents ALTER COLUMN TurnstileAddr TYPE VARCHAR(30);
+
 --! ФИНАЛИЗИРОВАН (Кадыров, 120821) НЕ МЕНЯТЬ
