@@ -1216,8 +1216,27 @@ CREATE TABLE cf_banks
   CONSTRAINT cf_banks_pkey PRIMARY KEY (idofbank)
 );
 
+
+--v22
+CREATE TABLE CF_Account_Transfers (
+  IdOfAccountTransfer BigSerial NOT NULL,
+  CreatedDate bigint NOT NULL,
+  IdOfClientBenefactor bigint NOT NULL,
+  IdOfClientBeneficiary bigint NOT NULL,
+  Reason VARCHAR(256),
+  CreatedBy bigint NOT NULL,
+  IdOfTransactionOnBenefactor bigint NOT NULL,
+  IdOfTransactionOnBeneficiary bigint NOT NULL,
+  TransferSum bigint NOT NULL,
+  CONSTRAINT cf_account_transfer_pk PRIMARY KEY (IdOfAccountTransfer),
+  CONSTRAINT cf_account_transfer_c_bctr_fk FOREIGN KEY (IdOfClientBenefactor) REFERENCES cf_clients (IdOfClient),
+  CONSTRAINT cf_account_transfer_c_bcry_fk FOREIGN KEY (IdOfClientBeneficiary) REFERENCES cf_clients (IdOfClient),
+  CONSTRAINT cf_account_transfer_t_bctr_fk FOREIGN KEY (IdOfTransactionOnBenefactor) REFERENCES cf_transactions (IdOfTransaction),
+  CONSTRAINT cf_account_transfer_t_bcry_fk FOREIGN KEY (IdOfTransactionOnBeneficiary) REFERENCES cf_transactions (IdOfTransaction)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 21, 120812, 0, "");
+VALUES(2, 2, 22, 120831, 0, "");
 
 
