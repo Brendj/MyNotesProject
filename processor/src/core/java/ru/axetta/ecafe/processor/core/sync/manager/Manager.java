@@ -279,7 +279,9 @@ public class Manager {
                     }
                     distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
                 } else {
+                    String tagName = distributedObject.getTagName();
                     distributedObject = updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
+                    distributedObject.setTagName(tagName);
                     distributedObject.setDateOnlyFormat(dateOnlyFormat);
                     distributedObject.setTimeFormat(timeFormat);
                 }
