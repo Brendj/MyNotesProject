@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.331000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Table Dataset 1"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<parameter name="startTime" class="java.lang.Long"/>
+	<parameter name="endTime" class="java.lang.Long"/>
+	<parameter name="complexCount_0" class="java.lang.Long"/>
+	<parameter name="complexSum_0" class="java.lang.Long"/>
+	<parameter name="freeComplexCount" class="java.lang.Long"/>
+	<parameter name="freeComplexSum" class="java.lang.Long"/>
+	<parameter name="totalCount" class="java.lang.Long"/>
+	<parameter name="totalSum" class="java.lang.Long"/>
+	<parameter name="complexCount_1" class="java.lang.Long"/>
+	<parameter name="complexSum_1" class="java.lang.Long"/>
+	<parameter name="totalDiscount" class="java.lang.Long"/>
+	<parameter name="complexDiscount_0" class="java.lang.Long"/>
+	<parameter name="complexDiscount_1" class="java.lang.Long"/>
+	<parameter name="freeComplexDiscount" class="java.lang.Long"/>
+	<parameter name="buffetCount" class="java.lang.Long"/>
+	<parameter name="buffetSum" class="java.lang.Long"/>
+	<parameter name="buffetDiscount" class="java.lang.Long"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="count" class="java.lang.Long"/>
+	<field name="price" class="java.lang.Long"/>
+	<field name="sum" class="java.lang.Long"/>
+	<field name="originName" class="java.lang.String"/>
+	<variable name="mealCountGroupTotal" class="java.lang.Long" resetType="Group" resetGroup="origin" calculation="Sum">
+		<variableExpression><![CDATA[$F{count}]]></variableExpression>
+		<initialValueExpression><![CDATA[0L]]></initialValueExpression>
+	</variable>
+	<variable name="mealSumGroupTotal" class="java.lang.Long" resetType="Group" resetGroup="origin" calculation="Sum">
+		<variableExpression><![CDATA[$F{sum}]]></variableExpression>
+	</variable>
+	<group name="origin">
+		<groupExpression><![CDATA[$F{originName}]]></groupExpression>
+		<groupHeader>
+			<band height="46">
+				<staticText>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="20" width="408" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Наименование блюд]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="408" y="20" width="79" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Количество]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="487" y="20" width="93" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Цена]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="580" y="20" width="100" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Сумма]]></text>
+				</staticText>
+				<textField>
+					<reportElement style="table" x="0" y="0" width="680" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["Справка о реализации блюд: "+$F{originName}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="144">
+				<staticText>
+					<reportElement style="table" x="0" y="0" width="408" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[ИТОГО:]]></text>
+				</staticText>
+				<textField evaluationTime="Band">
+					<reportElement style="table" x="408" y="0" width="79" height="20"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Long"><![CDATA[$V{mealCountGroupTotal}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Band" pattern="0.00">
+					<reportElement style="table" x="580" y="0" width="100" height="20"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[(float)$V{mealSumGroupTotal}/100]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="table" x="487" y="0" width="93" height="20"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="100" height="15"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="118" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="30" width="802" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Учреждение: "+$P{orgName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[String.format("Отчет по реализации за: %02d.%02d.%d", $P{day}, $P{month}, $P{year})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="99" width="69" height="19"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<elementGroup>
+				<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+					<reportElement x="83" y="54" width="81" height="20"/>
+					<textElement>
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+					<reportElement x="177" y="54" width="71" height="20"/>
+					<textElement>
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="54" width="83" height="20"/>
+					<textElement>
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Период отчета:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="164" y="54" width="13" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[-]]></text>
+				</staticText>
+			</elementGroup>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band height="20">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="408" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="408" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="0.00">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="487" y="0" width="93" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Float"><![CDATA[(float)$F{price}/100]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="0.00">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Float"><![CDATA[(float)$F{sum}/100]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20"/>
+	</summary>
+</jasperReport>
