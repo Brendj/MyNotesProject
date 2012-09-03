@@ -82,6 +82,10 @@
         <servlet-name>Way4OnlinePaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.way4.Way4PaymentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SBKGDOnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.sberbank_kgd.SBKGDOnlinePaymentServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
@@ -127,6 +131,10 @@
          <servlet-name>Way4OnlinePaymentServlet</servlet-name>
          <url-pattern>/payment-way4</url-pattern>
      </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SBKGDOnlinePaymentServlet</servlet-name>
+        <url-pattern>/payment-sbkgd</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>ClientRoomControllerWS</servlet-name>
