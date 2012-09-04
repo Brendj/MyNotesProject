@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import static ru.axetta.ecafe.processor.core.logic.Processor.PaymentProcessResult.CLIENT_NOT_FOUND;
 import static ru.axetta.ecafe.processor.core.logic.Processor.PaymentProcessResult.OK;
@@ -43,34 +44,70 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         ParseResult parseResult = getRequestParams();
 
         action = parseResult.getParam("action");
+        /* default value */
         Long sum = 0L;
         Long contractId = 1L;
         String receipt = "CHECK_ONLY";
         Boolean bCheckOnly = true;
-        if(action.equals("check") || action.equals("payment")){
+        int paymentMethod= ClientPayment.ATM_PAYMENT_METHOD;
+        String source = action;
+        defaultContragentId = linkConfig.idOfContragent;
+        if(action.equals("check")){
             String number = parseResult.getParam("number");
             contractId = Long.parseLong(number);
-            Integer type = 0;
-            if(!(parseResult.getParam("type")==null || parseResult.getParam("type").equals(""))){
-                type = parseResult.getReqIntParam("type");
-            }
             String amount = parseResult.getParam("amount");
             String replacedString = amount.replaceAll(",", ".");
             Double result = Double.parseDouble(replacedString);
             sum =  result.longValue() * 100;
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true ,defaultContragentId,
+                    null, paymentMethod, contractId,
+                    receipt, source, sum, false);
         }
-        if(action.equals("payment") || action.equals("status")){
+        if(action.equals("payment")){
+            String number = parseResult.getParam("number");
+            contractId = Long.parseLong(number);
+            String amount = parseResult.getParam("amount");
+            String replacedString = amount.replaceAll(",", ".");
+            Double result = Double.parseDouble(replacedString);
+            sum =  result.longValue() * 100;
             receipt = parseResult.getParam("receipt");
-            bCheckOnly = false;
+            date = parseResult.getParam("date");
+            source = source + "/" + date;
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, false ,defaultContragentId,
+                    null, paymentMethod, contractId,
+                    receipt, source, sum, false);
         }
         if(action.equals("status")){
-            date = parseResult.getParam("date");
+            receipt = parseResult.getParam("receipt");
+            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true ,defaultContragentId,
+                    null, paymentMethod, contractId,
+                    receipt, source, sum, false);
         }
-        int paymentMethod= ClientPayment.ATM_PAYMENT_METHOD;
-        String source = action +"/" + date;
-        return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, bCheckOnly,
-                defaultContragentId, null, paymentMethod, contractId,
-                receipt, source, sum, false);
+        return null;
+        //if(action.equals("check") || action.equals("payment")){
+        //    String number = parseResult.getParam("number");
+        //    contractId = Long.parseLong(number);
+        //    Integer type = 0;
+        //    if(!(parseResult.getParam("type")==null || parseResult.getParam("type").equals(""))){
+        //        type = parseResult.getReqIntParam("type");
+        //    }
+        //    String amount = parseResult.getParam("amount");
+        //    String replacedString = amount.replaceAll(",", ".");
+        //    Double result = Double.parseDouble(replacedString);
+        //    sum =  result.longValue() * 100;
+        //}
+        //if(action.equals("payment") || action.equals("status")){
+        //    receipt = parseResult.getParam("receipt");
+        //    bCheckOnly = false;
+        //}
+        //if(action.equals("status")){
+        //    date = parseResult.getParam("date");
+        //}
+        //int paymentMethod= ClientPayment.ATM_PAYMENT_METHOD;
+        //String source = action +"/" + date;
+        //return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, bCheckOnly,
+        //        defaultContragentId, null, paymentMethod, contractId,
+        //        receipt, source, sum, false);
     }
 
     @Override
@@ -79,24 +116,33 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         ParseResult parseResult = getRequestParams();
         String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
-        int resultCode;
+        int resultCode = response.getResultCode();
+        message = response.getResultDescription();
         switch ( response.getResultCode()){
-            case 0: resultCode=0 ;break;
-            case 105: resultCode = 2; break;
-            case 100: resultCode = -3; break;
-            default:resultCode = -2;
+            case 0: {
+                resultCode=0 ;
+                message = action.equals("payment")?"Платеж зачислен.":"Абонент найден.";
+                 }  break;
+            case 140: resultCode = 140; message = "Неизвестный тип запроса. Оплата уже зарегистрирована."; break;
+            case 105: resultCode = 2; message="Абонент не найден." ; break;
         }
-        date = timeFormat.format(new Date());
-        //if(action.equals("check") || action.equals("payment")){
-        //    message = response.getResultDescription();
-        //}
-        //if(action.equals("status") || action.equals("payment")){
-        //    stringBuilder.append(String.format("<date>%s</date>",date));
-        //}
         stringBuilder.append(String.format("<code>%d</code>",resultCode));
         if(response.getPaymentId()!=null) stringBuilder.append(String.format("<authcode>%s</authcode>",response.getPaymentId()));
-        stringBuilder.append(String.format("<date>%s</date>",date));
-        if(message!=null) stringBuilder.append(String.format("<message>%s</message>",message));
+        if(action.equals("payment") || action.equals("status")){
+            date = timeFormat.format(new Date());
+            stringBuilder.append(String.format("<date>%s</date>",date));
+        }
+        if(message!=null){
+            stringBuilder.append(String.format("<message>%s</message>",message));
+        }
+        HashMap<String, String> addInfo = response.getAddInfo();
+        if(!(addInfo==null || addInfo.isEmpty())){
+            stringBuilder.append("<add>");
+            for (String key: addInfo.keySet()){
+                stringBuilder.append(String.format("%s : %s:",key,addInfo.get(key)));
+            }
+            stringBuilder.append("</add>");
+        }
         stringBuilder.append("</response>");
         rsp = stringBuilder.toString();
         printToStream(rsp, httpResponse);
@@ -107,5 +153,11 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         //return parsePostedUrlEncodedParams(httpRequest);
         return  parseGetParams(httpRequest);
     }
+
+    private StdPayConfig.LinkConfig linkConfig;
+    public void setLinkConfig(StdPayConfig.LinkConfig linkConfig) {
+        this.linkConfig = linkConfig;
+    }
+
 
 }

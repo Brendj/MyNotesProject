@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,41 +37,17 @@ public class SBKGDOnlinePaymentServlet extends OnlinePaymentServlet {
         return new SBKGDOnlinePaymentRequestParser();
     }
 
-
     @Override
-    protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest, OnlinePaymentRequestParser requestParser) {
-        return runtimeContext.getPartnerSBRTConfig().getRemoteAddressMasks();
+    protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest,
+            OnlinePaymentRequestParser requestParser) throws Exception {
+        StdPayConfig.LinkConfig linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfigByAdapter("sber_kgd");
+        if (linkConfig==null) throw new Exception("Link config with adapter type sber_kgd  not configured.");
+        ((SBKGDOnlinePaymentRequestParser)requestParser).setLinkConfig(linkConfig);
+        return linkConfig.remoteAddressMask;
     }
 
     @Override
     protected long getDefaultIdOfContragent(RuntimeContext runtimeContext) {
-        return runtimeContext.getPartnerSBRTConfig().getIdOfContragent();
+        return -1;
     }
-    //
-    //@Override
-    //protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest,
-    //        OnlinePaymentRequestParser requestParser) throws Exception {
-    //  // StdPayConfig.LinkConfig linkConfig = null;
-    //  //
-    //  // X509Certificate[] certificates = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
-    //  //// if (certificates==null || certificates.length==0) throw new Exception("Client certificate missing in request");
-    //  //
-    //  // String DNs="";
-    //  // for (int n=0;n<certificates.length;++n) {
-    //  //      String dn = certificates[0].getSubjectDN().getName();
-    //  //      linkConfig =  runtimeContext.getPartnerStdPayConfig().getLinkConfigByCertDN(dn);
-    //  //      if (linkConfig!=null) break;
-    //  //      DNs+=dn+";";
-    //  // }
-    //  // if (linkConfig==null) throw new Exception("Invalid client: DNs: "+DNs);
-    //  //  ((SBKGDOnlinePaymentRequestParser)requestParser).setLinkConfig(linkConfig);
-    //  // // ///
-    //    //return linkConfig.remoteAddressMask;
-    //    return httpRequest.getRemoteAddr();
-    //}
-    //
-    //@Override
-    //protected long getDefaultIdOfContragent(RuntimeContext runtimeContext) {
-    //    return -1;
-    //}
 }

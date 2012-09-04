@@ -26,6 +26,7 @@ public class StdPayConfig {
     private static final String PARAM_CHECK_SIGN = ".checkSignature";
     private static final String PARAM_ALLOWED_CLIENT_ORGS = ".allowedClientOrgs";
     private static final String PARAM_AUTH_TYPE = ".authType";
+    private static final String PARAM_ADAPTER = ".adapter";
 
     private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2;
 
@@ -37,6 +38,7 @@ public class StdPayConfig {
         public PublicKey partnerPublicKey;
         public int authType;
         public boolean checkSignature;
+        public String adapter;
     }
     LinkedList<LinkConfig> linkConfigs = new LinkedList<LinkConfig>();
 
@@ -51,6 +53,8 @@ public class StdPayConfig {
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
             String authTypeParam = paramBaseName + n + PARAM_AUTH_TYPE;
+
+            String adapterParam = paramBaseName + n + PARAM_ADAPTER;
 
             LinkConfig linkConfig = new LinkConfig();
             linkConfig.name = getRequiredParam(nameParam, properties);
@@ -73,6 +77,9 @@ public class StdPayConfig {
                     if (v[i].length()>0) linkConfig.idOfAllowedClientOrgsList.add(Long.parseLong(v[i]));
                 }
             }
+            if(properties.containsKey(adapterParam)){
+                linkConfig.adapter = properties.getProperty(adapterParam);
+            }
             linkConfigs.add(linkConfig);
             logger.info("Registered standart payment interface partner link: "+linkConfig.name);
         }
@@ -85,12 +92,25 @@ public class StdPayConfig {
         return null;
     }
 
+    public LinkConfig getLinkConfigByAdapter(String name) {
+        for (StdPayConfig.LinkConfig config: linkConfigs){
+            if(config.adapter!=null && config.adapter.equals(name)){
+                return config;
+            }
+        }
+        return null;
+    }
+
     public LinkConfig getLinkConfigByCertDN(String dn) {
         for (LinkConfig lc : linkConfigs) {
             if (lc.authType==AUTH_TYPE_CLIENT_CERT && lc.name.equals(dn)) return lc;
         }
         return null;
     }
+
+    //public ArrayList<LinkConfig> getLinkConfigs() {
+    //    return new ArrayList<LinkConfig>(linkConfigs);
+    //}
 
     private static String getRequiredParam(String param, Properties properties) throws Exception {
         String value = properties.getProperty(param);
