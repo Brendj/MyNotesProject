@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0">
+    <deployment>
+        <dependencies>
+            <module name="org.apache.commons.logging"/>
+            <module name="org.apache.commons.collections"/>
+            <module name="org.hibernate"/>
+            <module name="org.slf4j"/>
+            <module name="org.apache.cxf"/>
+            <module name="javax.servlet.api"/>
+           <!-- <module name="ecafe"/>-->
+            <module name="org.apache.ws.security"/>
+            <module name="org.springframework.spring">
+                <imports>
+                    <include path="**"/>
+                </imports>
+            </module>
+            <module name="javax.faces.api" slot="1.2" />
+            <module name="com.sun.jsf-impl" slot="1.2" />
+        </dependencies>
+        <exclusions>
+            <module name="javax.faces.api" slot="main" />
+            <module name="com.sun.jsf-impl" slot="main" />
+            <!--            <module name="org.hibernate" slot="main" />
+         <module name="org.apache.log4j" slot="main" />-->
+        </exclusions>
+    </deployment>
+</jboss-deployment-structure>
+

@@ -1,0 +1,529 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  --%>
+
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
+<%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
+<%--<%@ page import="HibernateUtils" %>--%>
+<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.lang.time.DateUtils" %>
+<%--<%@ page import="org.hibernate.Criteria" %>--%>
+<%--<%@ page import="org.hibernate.Transaction" %>--%>
+<%--<%@ page import="org.hibernate.Session" %>--%>
+<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="java.text.DateFormat" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.*" %>
+<%@ page import="javax.xml.ws.BindingProvider" %>
+<%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
+<%@ page import="javax.xml.datatype.DatatypeFactory" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuItemExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuListResult" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt" %>
+
+<%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
+
+<!--Include YUI Loader: -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js"></script>
+
+<!--Use YUI Loader to bring in your other dependencies: -->
+<script type="text/javascript">
+    // Instantiate and configure YUI Loader:
+    (function() {
+        var loader = new YAHOO.util.YUILoader({
+            base: "",
+            require: [
+                "calendar"],
+            loadOptional: false,
+            combine: true,
+            filter: "MIN",
+            allowRollup: true,
+            onSuccess: function() {
+                //you can make use of all requested YUI modules
+                //here.
+            }
+        });
+        // Load the files using the insert() method.
+        loader.insert();
+    })();
+</script>
+
+<%
+    final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-menu_jsp");
+    final String DAY_OF_WEEK_NAMES[] = {
+            "Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
+    final String PROCESS_PARAM = "submit";
+    final String START_DATE_PARAM = "start-date";
+    final String END_DATE_PARAM = "end-date";
+    final String PARAMS_TO_REMOVE[] = {PROCESS_PARAM, START_DATE_PARAM, END_DATE_PARAM};
+
+    final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+    RuntimeContext runtimeContext = null;
+    try {
+        runtimeContext =new  RuntimeContext();
+
+        final Calendar localCalendar = runtimeContext.getDefaultLocalCalendar(session);
+        final Calendar utcCalendar = Calendar.getInstance(request.getLocale());
+        final DateFormat utcDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        utcCalendar.setTimeZone(utcTimeZone);
+        utcDateFormat.setTimeZone(utcTimeZone);
+        utcCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+        ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
+        URI formAction;
+        try {
+            formAction = UriUtils
+                    .removeParams(ServletUtils.getHostRelativeUriWithQuery(request), Arrays.asList(PARAMS_TO_REMOVE));
+        } catch (Exception e) {
+            logger.error("Failed to build form action", e);
+            throw new ServletException(e);
+        }
+
+        utcCalendar.set(localCalendar.get(Calendar.YEAR), localCalendar.get(Calendar.MONTH),
+                localCalendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        utcCalendar.set(Calendar.MILLISECOND, 0);
+        Date currentTime = utcCalendar.getTime();
+        Date tomorrowDate = DateUtils.addDays(currentTime, 1);
+        Date afterTomorrowDate = DateUtils.addDays(tomorrowDate, 1);
+        utcCalendar.set(Calendar.DAY_OF_WEEK, utcCalendar.getFirstDayOfWeek());
+        Date thisWeekStartDate = utcCalendar.getTime();
+        Date thisWeekEndDate = DateUtils.addDays(DateUtils.addWeeks(thisWeekStartDate, 1), -1);
+        Date nextWeekStartDate = DateUtils.addWeeks(thisWeekStartDate, 1);
+        Date nextWeekEndDate = DateUtils.addDays(DateUtils.addWeeks(nextWeekStartDate, 1), -1);
+        Date prevWeekStartDate = DateUtils.addWeeks(thisWeekStartDate, -1);
+        Date prevWeekEndDate = DateUtils.addWeeks(thisWeekEndDate, -1);
+
+
+        String todayUri;
+        String tomorrowUri;
+        String afterTomorrowUri;
+        String thisWeeekUri;
+        String prevWeeekUri;
+        String nextWeekUri;
+        try {
+            todayUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(currentTime)), END_DATE_PARAM,
+                    utcDateFormat.format(currentTime)), PROCESS_PARAM, Boolean.toString(true)).toString();
+            tomorrowUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(tomorrowDate)), END_DATE_PARAM,
+                    utcDateFormat.format(tomorrowDate)), PROCESS_PARAM, Boolean.toString(true)).toString();
+            afterTomorrowUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)),
+                    END_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)), PROCESS_PARAM, Boolean.toString(true))
+                    .toString();
+            thisWeeekUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(thisWeekStartDate)),
+                    END_DATE_PARAM, utcDateFormat.format(thisWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+                    .toString();
+            prevWeeekUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(prevWeekStartDate)),
+                    END_DATE_PARAM, utcDateFormat.format(prevWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+                    .toString();
+            nextWeekUri = UriUtils.putParam(UriUtils.putParam(
+                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(nextWeekStartDate)),
+                    END_DATE_PARAM, utcDateFormat.format(nextWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+                    .toString();
+        } catch (Exception e) {
+            logger.error("Error during URI building", e);
+            throw new ServletException(e);
+        }
+
+        boolean haveDataToProcess = StringUtils.isNotEmpty(request.getParameter(PROCESS_PARAM));
+        boolean dataToProcessVerified = true;
+        String startDateParamValue = "";
+        String endDateParamValue = "";
+        Date startDate = null;
+        Date endDate = null;
+        String errorMessage = null;
+
+        if (haveDataToProcess) {
+            try {
+                startDateParamValue = StringUtils.defaultString(request.getParameter(START_DATE_PARAM));
+                endDateParamValue = StringUtils.defaultString(request.getParameter(END_DATE_PARAM));
+                startDate = utcDateFormat.parse(startDateParamValue);
+                endDate = utcDateFormat.parse(endDateParamValue);
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Failed to read data", e);
+                }
+                dataToProcessVerified = false;
+                errorMessage = "Неверные данные и/или формат данных";
+            }
+        } else {
+            haveDataToProcess = true;
+            startDate = thisWeekStartDate;
+            endDate = thisWeekEndDate;
+            startDateParamValue = utcDateFormat.format(startDate);
+            endDateParamValue = utcDateFormat.format(endDate);
+        }
+%>
+
+<script type="text/javascript">
+    var startCalendar = null;
+    var endCalendar = null;
+
+    function localizeCalendar(calendar) {
+        calendar.cfg.setProperty("DATE_FIELD_DELIMITER", ".");
+        calendar.cfg.setProperty("MDY_DAY_POSITION", 1);
+        calendar.cfg.setProperty("MDY_MONTH_POSITION", 2);
+        calendar.cfg.setProperty("MDY_YEAR_POSITION", 3);
+        calendar.cfg.setProperty("MD_DAY_POSITION", 1);
+        calendar.cfg.setProperty("MD_MONTH_POSITION", 2);
+        calendar.cfg.setProperty("START_WEEKDAY", 1);
+        calendar.cfg.setProperty("MONTHS_SHORT", [
+            "Янв", "Фев", "Март", "Апр", "Май", "Июнь", "Июль", "Авг", "Сен", "Окт", "Нояб", "Дек"]);
+        calendar.cfg.setProperty("MONTHS_LONG", [
+            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь",
+            "Декабрь"]);
+        calendar.cfg.setProperty("WEEKDAYS_1CHAR", [
+            "В", "П", "В", "С", "Ч", "Т", "С"]);
+        calendar.cfg.setProperty("WEEKDAYS_SHORT", [
+            "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]);
+        calendar.cfg.setProperty("WEEKDAYS_MEDIUM", [
+            "Вос", "Пон", "Втор", "Среда", "Чет", "Пят", "Суб"]);
+        calendar.cfg.setProperty("WEEKDAYS_LONG", [
+            "Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]);
+    }
+
+    startCalendarInit = function() {
+        if (null == startCalendar) {
+            startCalendar = new YAHOO.widget.Calendar("startCalendar", "startCalendarContainer");
+            localizeCalendar(startCalendar);
+            startCalendar.selectEvent.subscribe(ripStartDate);
+            startCalendar.render();
+        }
+        var btn = YAHOO.util.Dom.get("toggleStartCalendarBtn");
+        btn.onclick = startCalendarHide;
+        startCalendar.show();
+    }
+
+    startCalendarHide = function() {
+        var btn = YAHOO.util.Dom.get("toggleStartCalendarBtn");
+        btn.onclick = startCalendarInit;
+        if (null != startCalendar) {
+            startCalendar.hide();
+        }
+    }
+
+    endCalendarInit = function() {
+        if (null == endCalendar) {
+            endCalendar = new YAHOO.widget.Calendar("endCalendar", "endCalendarContainer");
+            localizeCalendar(endCalendar);
+            endCalendar.selectEvent.subscribe(ripEndDate);
+            endCalendar.render();
+        }
+        var btn = YAHOO.util.Dom.get("toggleEndCalendarBtn");
+        btn.onclick = endCalendarHide;
+        endCalendar.show();
+    }
+
+    endCalendarHide = function() {
+        var btn = YAHOO.util.Dom.get("toggleEndCalendarBtn");
+        btn.onclick = endCalendarInit;
+        if (null != endCalendar) {
+            endCalendar.hide();
+        }
+    }
+
+    ripStartDate = function(type, args) {
+        var dates = args[0];
+        var date = dates[0];
+        var theYear = date[0];
+        var theMonth = date[1];
+        var theDay = date[2];
+        var field = YAHOO.util.Dom.get("startDate");
+        field.value = theDay + "." + theMonth + "." + theYear;
+        startCalendarHide();
+    }
+
+    ripEndDate = function(type, args) {
+        var dates = args[0];
+        var date = dates[0];
+        var theYear = date[0];
+        var theMonth = date[1];
+        var theDay = date[2];
+        var field = YAHOO.util.Dom.get("endDate");
+        field.value = theDay + "." + theMonth + "." + theYear;
+        endCalendarHide();
+    }
+</script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script>
+    // скрипт для схлопывания строк таблицы по дням
+    $(document).ready(function(){
+        $("table.day th").click(function () {
+            $(this).parents('table.day').children('tbody').toggle();
+            var $img = $(this).children('div').children(".dayIco");
+            var $tmp = $img.attr("src");
+            $img.attr("src", $img.attr("src2"));
+            $img.attr("src2", $tmp);
+        });
+        $("table.day th").click(); // для начального схлопывания
+    });
+</script>
+
+<form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
+      enctype="application/x-www-form-urlencoded" class="borderless-form">
+    <%if (!dataToProcessVerified) {%>
+    <div class="output-text">Ошибка: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
+    </div>
+    <%}%>
+    <table>
+        <tr>
+            <td>
+                <div class="output-text">Начальная дата</div>
+            </td>
+            <td>
+                <input type="text" class="input-text" name="<%=START_DATE_PARAM%>" id="startDate"
+                       value="<%=StringEscapeUtils.escapeHtml(startDateParamValue)%>" />
+            </td>
+            <td>
+                <input type="button" class="command-button" value="..." id="toggleStartCalendarBtn"
+                       onclick="startCalendarInit();" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div class="yui-skin-sam">
+                    <div id="startCalendarContainer" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="output-text">Конечная дата</div>
+            </td>
+            <td>
+                <input type="text" class="input-text" name="<%=END_DATE_PARAM%>" id="endDate"
+                       value="<%=StringEscapeUtils.escapeHtml(endDateParamValue)%>" />
+            </td>
+            <td>
+                <input type="button" class="command-button" value="..." id="toggleEndCalendarBtn"
+                       onclick="endCalendarInit();" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div class="yui-skin-sam">
+                    <div id="endCalendarContainer" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" name="<%=PROCESS_PARAM%>" value="Показать" class="command-button" />
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(todayUri))%>"
+                   class="command-link">Сегодня</a>
+            </td>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(thisWeeekUri))%>" class="command-link">На
+                    этой
+                    неделе</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(tomorrowUri))%>"
+                   class="command-link">Завтра</a>
+            </td>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(prevWeeekUri))%>" class="command-link">На
+                    прошлой неделе</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(afterTomorrowUri))%>" class="command-link">Послезавтра</a>
+            </td>
+            <td>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(nextWeekUri))%>" class="command-link">На
+                    следующей неделе</a>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<%if (haveDataToProcess && dataToProcessVerified) {%>
+<table>
+    <tr>
+        <td colspan="4">
+            <div class="output-text">Меню с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+                по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
+            </div>
+        </td>
+    </tr>
+    <%
+        /*Session persistenceSession = null;
+        Transaction persistenceTransaction = null;*/
+        try {
+            /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
+            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
+                    = service.getClientRoomControllerWSPort();
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
+            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
+
+
+            /*persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
+            Client client = (Client) clientCriteria.uniqueResult();
+
+            Criteria menuCriteria = persistenceSession.createCriteria(Menu.class);
+            menuCriteria.add(Restrictions.eq("org", client.getOrg()));
+            menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+            menuCriteria.add(Restrictions.ge("menuDate", startDate));
+            menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+            List menus = menuCriteria.list();*/
+
+            GregorianCalendar greStartDate = new GregorianCalendar();
+            greStartDate.setTime(startDate);
+            XMLGregorianCalendar xmlStartDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greStartDate);
+
+            GregorianCalendar greEndDate = new GregorianCalendar();
+            greStartDate.setTime(endDate);
+            XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);
+
+
+
+
+            ru.axetta.ecafe.processor.web.bo.client.MenuListResult menuListResult=port.getMenuList(clientAuthToken.getContractId(), xmlStartDate, xmlEndDate);
+            ru.axetta.ecafe.processor.web.bo.client.MenuListExt menuListExt=menuListResult.getMenuList();
+            List<ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt> menus=menuListExt.getM();
+
+
+
+
+            for (ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt currMenu : menus) {
+             /*   Menu currMenu = (Menu) currObject;
+                Criteria menuDetailCriteria = persistenceSession.createCriteria(MenuDetail.class);
+                menuDetailCriteria.add(Restrictions.eq("menu", currMenu));
+                menuDetailCriteria.add(Restrictions.ne("menuDetailName", "<Новое блюдо>"));
+                HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
+                HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
+                List menuDetails = menuDetailCriteria.list();*/
+                List<ru.axetta.ecafe.processor.web.bo.client.MenuItemExt>menuDetails=currMenu.getE();
+                if (!menuDetails.isEmpty()) {
+    %>
+    <tr>
+        <td>   <!--Added row for the nested table-->
+            <table class="day">     <!--Start of the nested table-->
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="column-header menu-date">
+                                <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
+                                                    src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
+                                <%
+                                    XMLGregorianCalendar xmlDate=currMenu.getDate();
+                                     GregorianCalendar greDate= xmlDate.toGregorianCalendar();
+                                     Date date=greDate.getTime();
+
+                                    utcCalendar.setTime(date);
+                                    int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
+                                %>
+                                <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
+                                <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(date))%>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="column-header">Группа</div></td>
+                        <td><div class="column-header">Наименование</div></td>
+                        <td><div class="column-header">Цена</div></td>
+                    </tr>
+                <%
+                        //boolean firstGroup = true;
+                        String currGroupName = null;
+                        for (ru.axetta.ecafe.processor.web.bo.client.MenuItemExt currMenuDetail : menuDetails) {
+                            //MenuDetail currMenuDetail = (MenuDetail) currMenuDetailObject;
+                            String groupName = currMenuDetail.getGroup();
+                            boolean firstInCurrGroup = false;
+                            //if (firstGroup || !StringUtils.equals(currGroupName, groupName)) {
+                            if (!StringUtils.equals(currGroupName, groupName)) {
+                                currGroupName = groupName;
+                                firstInCurrGroup = true;
+                            }
+                            //if (firstInCurrGroup && !firstGroup) {
+                            if (firstInCurrGroup) {
+
+                %>  <tr>
+                        <td>
+                            <div class="menu-group-name">
+                                <%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(currGroupName))%>
+                            </div>
+                        </td>
+                <%
+                        } else {
+                %>
+                    <tr>
+                        <td>
+                            <div class="menu-group-name">
+                            </div>
+                        </td>
+                <%
+                        }
+                %>
+                        <td>
+                            <div class="output-text">
+                                <%=StringEscapeUtils.escapeHtml(currMenuDetail.getName())%>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="output-text">
+                                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currMenuDetail.getPrice()))%>
+                            </div>
+                        </td>
+                    </tr>
+                <%
+                        //firstGroup = false;
+                    }
+                %>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+        <%      }
+            }
+            /*persistenceTransaction.commit();
+            persistenceTransaction = null;*/
+        } catch (Exception e) {
+            logger.error("Failed to build page", e);
+            throw new ServletException(e);
+        } finally {
+           /* HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);*/
+        }
+    %>
+</table>
+<%
+        }
+    } catch (RuntimeContext.NotInitializedException e) {
+        throw new UnavailableException(e.getMessage());
+    }
+%>

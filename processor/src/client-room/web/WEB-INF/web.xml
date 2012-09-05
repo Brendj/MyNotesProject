@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+           version="2.5">
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/services-app.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
+
+    <display-name>JavaServerFaces</display-name>
+
+    <!-- Change to "Production" when you are ready to deploy -->
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+
+    <!-- Welcome page -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- JSF mapping -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Map these files with JSF -->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>Faces Servlet</servlet-name>-->
+        <!--<url-pattern>/faces/*</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>Faces Servlet</servlet-name>-->
+        <!--<url-pattern>*.jsf</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.faces</url-pattern>
+    </servlet-mapping>
+
+    <context-param>
+        <param-name>com.sun.faces.numberOfViewsInSession</param-name>
+        <param-value>2</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>com.sun.faces.numberOfLogicalViews</param-name>
+        <param-value>2</param-value>
+    </context-param>
+
+    <!--new -->
+    <!--<context-param>
+        <param-name>org.richfaces.SKIN</param-name>
+        <param-value>darkX</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.richfaces.CONTROL_SKINNING</param-name>
+        <param-value>disable</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.jsp</param-value>
+    </context-param>
+
+    <filter>
+        <filter-name>RichfacesFilter</filter-name>
+        <filter-class>org.ajax4jsf.Filter</filter-class>
+        <init-param>
+            <param-name>createTempFiles</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <listener>
+        <display-name>JavaServer Faces configure listener</display-name>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.faces</url-pattern>
+    </servlet-mapping>
+
+    <filter-mapping>
+        <filter-name>RichfacesFilter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+   -->
+
+
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.richfaces.SKIN</param-name>
+        <param-value>darkX</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.richfaces.CONTROL_SKINNING</param-name>
+        <param-value>enable</param-value>
+    </context-param>
+    <filter>
+        <display-name>RichFaces Filter</display-name>
+        <filter-name>richfaces</filter-name>
+        <filter-class>org.ajax4jsf.Filter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>richfaces</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+
+    <!--for authorization
+-->
+
+  <!--  <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/admin-page/login.faces</form-login-page>
+            <form-error-page>/admin-page/login.faces?error=true</form-error-page>
+        </form-login-config>
+    </login-config>
+-->
+   <!-- <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict unauthorized access to service functions</web-resource-name>
+            <url-pattern>/admin-page/index.faces</url-pattern>
+
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>AuthorizedUser</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport for login page</web-resource-name>
+            <url-pattern>/admin-page/login.faces</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict direct access to JSFs</web-resource-name>
+            <url-pattern>/admin-page/login.jsp</url-pattern>
+            <url-pattern>/admin-page/index.jsp</url-pattern>
+
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>-->
+
+  <!--  <security-role>
+        <role-name>AuthorizedUser</role-name>
+    </security-role>-->
+
+    <!--<login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>MyRealm</realm-name>
+        <form-login-config>
+            <form-login-page>/admin-page/login.jsp</form-login-page>
+            <form-error-page>/admin-page/loginerror.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <role-name>SuperAdmin</role-name>
+    </security-role>
+    <security-role>
+        <role-name>Admin</role-name>
+    </security-role>
+    <security-role>
+        <role-name>Manager</role-name>
+    </security-role>
+    <security-role>
+        <role-name>Employee</role-name>
+    </security-role>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>MyApplication</web-resource-name>
+            <url-pattern>/admin-page/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>SuperAdmin</role-name>
+            <role-name>Admin</role-name>
+        </auth-constraint>
+    </security-constraint>-->
+   <!-- <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Unprotected area</web-resource-name>
+            <url-pattern>/resources/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>-->
+
+    <!-- TODO: remove -->
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict direct access to JSFs</web-resource-name>
+            <url-pattern>/admin-page/login.jsp</url-pattern>
+            <url-pattern>/admin-page/index.jsp</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport for login page</web-resource-name>
+            <url-pattern>/admin-page/login.faces</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict unauthorized access to service functions</web-resource-name>
+            <url-pattern>/admin-page/index.faces</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>AuthorizedUser</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!--<security-constraint>-->
+        <!--<web-resource-collection>-->
+            <!--<web-resource-name>Restrict transport safety for client room</web-resource-name>-->
+            <!--<url-pattern>/admin-page/index.jsp</url-pattern>-->
+            <!--<url-pattern>/admin-page/inlinecabinet.jsp</url-pattern>-->
+            <!--<url-pattern>/admin-page/no-styles-inlinecabinet.jsp</url-pattern>-->
+            <!--<url-pattern>/admin-page/sso.jsp</url-pattern>-->
+        <!--</web-resource-collection>-->
+        <!--<user-data-constraint>-->
+            <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
+        <!--</user-data-constraint>-->
+    <!--</security-constraint>-->
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/admin-page/login.faces</form-login-page>
+            <form-error-page>/admin-page/login.faces?error=true</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <role-name>AuthorizedUser</role-name>
+    </security-role>
+
+    <!-- TODO: remove end-->
+</web-app>
