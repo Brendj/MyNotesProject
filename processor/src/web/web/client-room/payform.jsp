@@ -26,14 +26,14 @@
 <%
 
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.payform_jsp");
-    if (StringUtils.isEmpty(request.getCharacterEncoding())) {
-        try {
-            request.setCharacterEncoding("UTF-8");
-        } catch (Exception e) {
-            logger.error("Can\'t assign character set to request", e);
-            throw new ServletException(e);
-        }
-    }
+    //if (StringUtils.isEmpty(request.getCharacterEncoding())) {
+    //    try {
+    //        request.setCharacterEncoding("UTF-8");
+    //    } catch (Exception e) {
+    //        logger.error("Can\'t assign character set to request", e);
+    //        throw new ServletException(e);
+    //    }
+    //}
     Long contractId = null;
     if (StringUtils.isNotEmpty(request.getParameter("contractId"))) {
         try {
@@ -66,13 +66,13 @@
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-    URI formAction;
-    try {
-        formAction = ServletUtils.getHostRelativeUriWithQuery(request);
-    } catch (Exception e) {
-        logger.error("Failed to build form action", e);
-        throw new ServletException(e);
-    }
+    //URI formAction;
+    //try {
+    //    formAction = ServletUtils.getHostRelativeUriWithQuery(request);
+    //} catch (Exception e) {
+    //    logger.error("Failed to build form action", e);
+    //    throw new ServletException(e);
+    //}
     //String fieldReceiver="ООО &quot;АйкьюТек&quot;";
     //String fieldBank = "Отделении «Банк Татарстан» № 8610  г.Казань";
     //String fieldAccount="40702810662260004883";
@@ -80,12 +80,12 @@
 	//String fieldBIK="049205603";
 	//String fieldCorrAcc="30101810600000000603";
 
-    String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"ООО &quot;АйкьюТек&quot;");
-	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"40702810662260004883");
-	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"1656057429");
-	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"Отделении «Банк Татарстан» № 8610  г.Казань");
-	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"049205603");
-	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"30101810600000000603");
+    String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"");
+	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"");
+	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"");
+	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"");
+	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"");
+	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"");
 
 
 %>
@@ -94,72 +94,6 @@
 <meta http-equiv="Content-Language" content="ru">
 <jsp:include page="payform_css.jsp"/>
 <body>
-
-<div id="toolbox">
-    <p>Прежде чем отправлять документ на печать, воспользуйтесь предварительным просмотром (<i>Print preview</i>)
-        и убедитесь в корректном отображении документа.
-        Обычно квитанция формы «№&nbsp;ПД-4» свободно располагается
-        на&nbsp;листе формата А4 и&nbsp;не&nbsp;требует особых настроек
-        печати. В&nbsp;редких случаях может потребоваться уменьшить
-        боковые поля листа до&nbsp;10–15&nbsp;мм или&nbsp;изменить
-        ориентацию страницы на&nbsp;горизонтальную (<i>landscape</i>), чтобы квитанция полностью поместилась в&nbsp;печатное
-        поле.</p>
-    <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
-          enctype="application/x-www-form-urlencoded" class="borderless-form">
-        <table id="login-form" align="center" width="100%">
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>Наименование получателя платежа</label>
-                </td><td>
-                    <input type="text" id="fieldReceiver" value="<%=fieldReceiver%>" name="fieldReceiver" size="64">
-                </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>ИНН получателя платежа</label>
-                </td><td>
-                <input type="text" id="fieldINN" value="<%=fieldINN%>" name="fieldINN" size="64">
-            </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>Номер счета получателя платежа</label>
-                </td><td>
-                    <input type="text" id="fieldAccount" value="<%=fieldAccount%>" name="fieldAccount" size="64">
-                </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>Наименование банка получателя платежа</label>
-                </td><td>
-                    <input type="text" id="fieldBank" value="<%=fieldBank%>" name="fieldBank" size="64">
-                </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>БИК</label>
-                </td><td>
-                    <input type="text" id="fieldBIK" value="<%=fieldBIK%>" name="fieldBIK" size="64">
-                </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td>
-                    <label>Номер кор./сч. банка получателя платежа</label>
-                </td><td>
-                    <input type="text" id="fieldCorrAcc" value="<%=fieldCorrAcc%>" name="fieldCorrAcc" size="64">
-                </td>
-            </tr>
-            <tr valign="middle" class="login-form-input-tr">
-                <td align="center" colspan="2">
-                    <input type="submit" id="submit" name="submit" value="Изменить"/>
-                </td>
-            </tr>
-        </table>
-    <input value="Напечатать" onclick="window.print();" type="button" />
-    <input value="Закрыть" onclick="window.close();" type="button" />
-    <center><span style="font-size: 80%;">информационный блок от начала страницы до пунктирной линии на печать не выводится</span>
-    </center>
-</div>
 
 <jsp:include page="payform_receipt.jsp"/>
 

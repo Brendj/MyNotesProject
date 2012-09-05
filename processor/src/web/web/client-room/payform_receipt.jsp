@@ -31,12 +31,12 @@
         }
     }
 
-	 String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"ООО &quot;АйкьюТек&quot;");
-	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"40702810662260004883");
-	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"1656057429");
-	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"Отделении «Банк Татарстан» № 8610  г.Казань");
-	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"049205603");
-	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"30101810600000000603");
+	 String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"");
+	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"");
+	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"");
+	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"");
+	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"");
+	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"");
 
 
 	String paySum=(String)request.getParameter("paySum");
