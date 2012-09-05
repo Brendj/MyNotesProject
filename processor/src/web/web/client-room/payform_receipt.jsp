@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
@@ -13,16 +14,30 @@
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="windows-1251" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.nio.charset.Charset" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
 <html lang="ru">
 <head>
 <%
-	String fieldReceiver="ООО &quot;АйкьюТек&quot;";
-	String fieldAccount="40702810662260004883";
-	String fieldINN="1656057429";
-	String fieldBank="Отделении «Банк Татарстан» № 8610  г.Казань";
-	String fieldBIK="049205603";
-	String fieldCorrAcc="30101810600000000603";
+    if (StringUtils.isEmpty(request.getCharacterEncoding())) {
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+	 String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"РћРћРћ &quot;РђР№РєСЊСЋРўРµРє&quot;");
+	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"40702810662260004883");
+	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"1656057429");
+	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"РћС‚РґРµР»РµРЅРёРё В«Р‘Р°РЅРє РўР°С‚Р°СЂСЃС‚Р°РЅВ» в„– 8610  Рі.РљР°Р·Р°РЅСЊ");
+	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"049205603");
+	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"30101810600000000603");
+
 
 	String paySum=(String)request.getParameter("paySum");
 
@@ -32,9 +47,10 @@
                     .buildAbbreviation(person.getFirstName(), person.getSurname(), person.getSecondName());
     String clientAddress = client.getAddress();
     Long contractId = client.getContractId();
+
 /////
 /*    if (client!=null && client.getOrg()!=null && client.getOrg().getIdOfOrg()==1) {
-        fieldReceiver="ООО &quot;ЕвроШкола-Поволжье&quot;";
+        fieldReceiver="РћРћРћ &quot;Р•РІСЂРѕРЁРєРѕР»Р°-РџРѕРІРѕР»Р¶СЊРµ&quot;";
         fieldAccount="40702810100010001801";
         fieldINN="1656045695";
     } */
@@ -47,10 +63,10 @@
     <table style="width: 50mm; height: 100%;" cellspacing="0">
 
         <tr>
-            <td class="kassir" style="vertical-align: top; letter-spacing: 0.2em;">Извещение</td>
+            <td class="kassir" style="vertical-align: top; letter-spacing: 0.2em;">РР·РІРµС‰РµРЅРёРµ</td>
         </tr>
         <tr>
-            <td class="kassir" style="vertical-align: bottom;">Кассир</td>
+            <td class="kassir" style="vertical-align: bottom;">РљР°СЃСЃРёСЂ</td>
         </tr>
     </table>
 </td>
@@ -62,8 +78,8 @@
         <table width="100%" cellspacing="0">
             <tr>
                 <td style="height: 5mm;"></td>
-                <td class="stext7" style="text-align: right; vertical-align: middle;"><i>Форма &#8470;
-                    ПД-4</i></td>
+                <td class="stext7" style="text-align: right; vertical-align: middle;"><i>Р¤РѕСЂРјР° &#8470;
+                    РџР”-4</i></td>
             </tr>
         </table>
     </td>
@@ -78,7 +94,7 @@
     </td>
 </tr>
 <tr>
-    <td class="subscript nowr">(наименование получателя платежа)</td>
+    <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
 </tr>
 <tr>
     <td>
@@ -129,9 +145,9 @@
                 </td>
             </tr>
             <tr>
-                <td class="subscript nowr">(ИНН получателя платежа)</td>
+                <td class="subscript nowr">(РРќРќ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(номер счета получателя платежа)</td>
+                <td class="subscript nowr">(РЅРѕРјРµСЂ СЃС‡РµС‚Р° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
             </tr>
         </table>
     </td>
@@ -140,10 +156,10 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td width="2%" class="stext">в</td>
+                <td width="2%" class="stext">РІ</td>
                 <td width="64%" class="string"><span class="nowr"><%=fieldBank%></span>
                 </td>
-                <td width="7%" class="stext" align="right">БИК&nbsp;</td>
+                <td width="7%" class="stext" align="right">Р‘РРљ&nbsp;</td>
                 <td width="27%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
@@ -162,7 +178,7 @@
             </tr>
             <tr>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(наименование банка получателя платежа)</td>
+                <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
             </tr>
         </table>
     </td>
@@ -171,7 +187,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext7 nowr" width="40%">Номер кор./сч. банка получателя платежа</td>
+                <td class="stext7 nowr" width="40%">РќРѕРјРµСЂ РєРѕСЂ./СЃС‡. Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</td>
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
@@ -206,7 +222,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">За оплату питания</span></td>
+                <td class="string" width="55%"><span class="nowr">Р—Р° РѕРїР»Р°С‚Сѓ РїРёС‚Р°РЅРёСЏ</span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>
@@ -215,9 +231,9 @@
                 </span></td>
             </tr>
             <tr>
-                <td class="subscript nowr">(наименование платежа)</td>
+                <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РїР»Р°С‚РµР¶Р°)</td>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(номер лицевого счета (код) плательщика)</td>
+                <td class="subscript nowr">(РЅРѕРјРµСЂ Р»РёС†РµРІРѕРіРѕ СЃС‡РµС‚Р° (РєРѕРґ) РїР»Р°С‚РµР»СЊС‰РёРєР°)</td>
             </tr>
         </table>
     </td>
@@ -226,7 +242,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Ф.И.О&nbsp;плательщика&nbsp;</td>
+                <td class="stext" width="1%">Р¤.Р.Рћ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</td>
                 <td class="string"><span class="nowr"><%=StringEscapeUtils
                         .escapeHtml(StringUtils.defaultString(clientAbbreviation))%></span></td>
             </tr>
@@ -237,7 +253,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Адрес&nbsp;плательщика&nbsp;</td>
+                <td class="stext" width="1%">РђРґСЂРµСЃ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</td>
                 <td class="string"><span class="nowr"><%=StringEscapeUtils
                         .escapeHtml(StringUtils.defaultString(clientAddress))%></span></td>
             </tr>
@@ -248,15 +264,15 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Сумма&nbsp;платежа&nbsp;</td>
+                <td class="stext" width="1%">РЎСѓРјРјР°&nbsp;РїР»Р°С‚РµР¶Р°&nbsp;</td>
                 <td class="string" width="8%"><%=paySum==null?"&nbsp":paySum%></td>
-                <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%"><%=paySum==null?"&nbsp":"00"%></td>
-                <td class="stext" width="1%">&nbsp;коп.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Сумма&nbsp;платы&nbsp;за&nbsp;услуги&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;РєРѕРї.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;РЎСѓРјРјР°&nbsp;РїР»Р°С‚С‹&nbsp;Р·Р°&nbsp;СѓСЃР»СѓРіРё&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;коп.</td>
+                <td class="stext" width="1%">&nbsp;РєРѕРї.</td>
             </tr>
         </table>
     </td>
@@ -265,25 +281,25 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="5%">Итого&nbsp;</td>
+                <td class="stext" width="5%">РС‚РѕРіРѕ&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="5%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="5%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="5%">&nbsp;коп.&nbsp;</td>
+                <td class="stext" width="5%">&nbsp;РєРѕРї.&nbsp;</td>
                 <td class="stext" width="20%" align="right">&laquo;&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
                 <td class="stext" width="1%">&nbsp;&raquo;&nbsp;</td>
                 <td class="string" width="20%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td class="stext" width="3%">&nbsp;20&nbsp;</td>
                 <td class="string" width="5%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;г.</td>
+                <td class="stext" width="1%">&nbsp;Рі.</td>
             </tr>
         </table>
     </td>
 </tr>
 <tr>
-    <td class="stext7" style="text-align: justify">С условиями приема указанной в платежном документе
-        суммы, в т.ч. с суммой взимаемой платы за&nbsp;услуги банка,&nbsp;ознакомлен&nbsp;и&nbsp;согласен.
+    <td class="stext7" style="text-align: justify">РЎ СѓСЃР»РѕРІРёСЏРјРё РїСЂРёРµРјР° СѓРєР°Р·Р°РЅРЅРѕР№ РІ РїР»Р°С‚РµР¶РЅРѕРј РґРѕРєСѓРјРµРЅС‚Рµ
+        СЃСѓРјРјС‹, РІ С‚.С‡. СЃ СЃСѓРјРјРѕР№ РІР·РёРјР°РµРјРѕР№ РїР»Р°С‚С‹ Р·Р°&nbsp;СѓСЃР»СѓРіРё Р±Р°РЅРєР°,&nbsp;РѕР·РЅР°РєРѕРјР»РµРЅ&nbsp;Рё&nbsp;СЃРѕРіР»Р°СЃРµРЅ.
     </td>
 </tr>
 <tr>
@@ -291,7 +307,7 @@
         <table cellspacing="0" width="100%">
             <tr>
                 <td class="stext7" width="50%">&nbsp;</td>
-                <td class="stext7" width="1%"><b>Подпись&nbsp;плательщика&nbsp;</b></td>
+                <td class="stext7" width="1%"><b>РџРѕРґРїРёСЃСЊ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</b></td>
                 <td class="string" width="40%">&nbsp;</td>
             </tr>
         </table>
@@ -302,7 +318,7 @@
 </td>
 </tr>
 <tr>
-<td style="width: 50mm; height: 80mm; vertical-align: bottom;" class="kassir">Квитанция<br><br>Кассир</td>
+<td style="width: 50mm; height: 80mm; vertical-align: bottom;" class="kassir">РљРІРёС‚Р°РЅС†РёСЏ<br><br>РљР°СЃСЃРёСЂ</td>
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
@@ -316,7 +332,7 @@
     </td>
 </tr>
 <tr>
-    <td class="subscript nowr">(наименование получателя платежа)</td>
+    <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
 </tr>
 <tr>
     <td>
@@ -367,9 +383,9 @@
                 </td>
             </tr>
             <tr>
-                <td class="subscript nowr">(ИНН получателя платежа)</td>
+                <td class="subscript nowr">(РРќРќ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(номер счета получателя платежа)</td>
+                <td class="subscript nowr">(РЅРѕРјРµСЂ СЃС‡РµС‚Р° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
             </tr>
         </table>
     </td>
@@ -378,10 +394,10 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td width="2%" class="stext">в</td>
+                <td width="2%" class="stext">РІ</td>
                 <td width="64%" class="string"><span class="nowr"><%=fieldBank%></span>
                 </td>
-                <td width="7%" class="stext" align="right">БИК&nbsp;</td>
+                <td width="7%" class="stext" align="right">Р‘РРљ&nbsp;</td>
                 <td width="27%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
@@ -400,7 +416,7 @@
             </tr>
             <tr>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(наименование банка получателя платежа)</td>
+                <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°)</td>
             </tr>
         </table>
     </td>
@@ -409,7 +425,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext7 nowr" width="40%">Номер кор./сч. банка получателя платежа</td>
+                <td class="stext7 nowr" width="40%">РќРѕРјРµСЂ РєРѕСЂ./СЃС‡. Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</td>
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
@@ -444,7 +460,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">За оплату питания</span></td>
+                <td class="string" width="55%"><span class="nowr">Р—Р° РѕРїР»Р°С‚Сѓ РїРёС‚Р°РЅРёСЏ</span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>
@@ -453,9 +469,9 @@
                 </span></td>
             </tr>
             <tr>
-                <td class="subscript nowr">(наименование платежа)</td>
+                <td class="subscript nowr">(РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РїР»Р°С‚РµР¶Р°)</td>
                 <td class="subscript">&nbsp;</td>
-                <td class="subscript nowr">(номер лицевого счета (код) плательщика)</td>
+                <td class="subscript nowr">(РЅРѕРјРµСЂ Р»РёС†РµРІРѕРіРѕ СЃС‡РµС‚Р° (РєРѕРґ) РїР»Р°С‚РµР»СЊС‰РёРєР°)</td>
             </tr>
         </table>
     </td>
@@ -464,7 +480,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Ф.И.О&nbsp;плательщика&nbsp;</td>
+                <td class="stext" width="1%">Р¤.Р.Рћ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</td>
                 <td class="string"><span class="nowr"><%=StringEscapeUtils
                         .escapeHtml(StringUtils.defaultString(clientAbbreviation))%></span></td>
             </tr>
@@ -475,7 +491,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Адрес&nbsp;плательщика&nbsp;</td>
+                <td class="stext" width="1%">РђРґСЂРµСЃ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</td>
                 <td class="string"><span class="nowr"><%=StringEscapeUtils
                         .escapeHtml(StringUtils.defaultString(clientAddress))%></span></td>
             </tr>
@@ -486,15 +502,15 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="1%">Сумма&nbsp;платежа&nbsp;</td>
+                <td class="stext" width="1%">РЎСѓРјРјР°&nbsp;РїР»Р°С‚РµР¶Р°&nbsp;</td>
                 <td class="string" width="8%"><%=paySum==null?"&nbsp":paySum%></td>
-                <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%"><%=paySum==null?"&nbsp":"00"%></td>
-                <td class="stext" width="1%">&nbsp;коп.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Сумма&nbsp;платы&nbsp;за&nbsp;услуги&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;РєРѕРї.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;РЎСѓРјРјР°&nbsp;РїР»Р°С‚С‹&nbsp;Р·Р°&nbsp;СѓСЃР»СѓРіРё&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="1%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;коп.</td>
+                <td class="stext" width="1%">&nbsp;РєРѕРї.</td>
             </tr>
         </table>
     </td>
@@ -503,25 +519,25 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="stext" width="5%">Итого&nbsp;</td>
+                <td class="stext" width="5%">РС‚РѕРіРѕ&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="5%">&nbsp;руб.&nbsp;</td>
+                <td class="stext" width="5%">&nbsp;СЂСѓР±.&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
-                <td class="stext" width="5%">&nbsp;коп.&nbsp;</td>
+                <td class="stext" width="5%">&nbsp;РєРѕРї.&nbsp;</td>
                 <td class="stext" width="20%" align="right">&laquo;&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
                 <td class="stext" width="1%">&nbsp;&raquo;&nbsp;</td>
                 <td class="string" width="20%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td class="stext" width="3%">&nbsp;20&nbsp;</td>
                 <td class="string" width="5%">&nbsp;</td>
-                <td class="stext" width="1%">&nbsp;г.</td>
+                <td class="stext" width="1%">&nbsp;Рі.</td>
             </tr>
         </table>
     </td>
 </tr>
 <tr>
-    <td class="stext7" style="text-align: justify">С условиями приема указанной в платежном документе
-        суммы, в т.ч. с суммой взимаемой платы за&nbsp;услуги банка,&nbsp;ознакомлен&nbsp;и&nbsp;согласен.
+    <td class="stext7" style="text-align: justify">РЎ СѓСЃР»РѕРІРёСЏРјРё РїСЂРёРµРјР° СѓРєР°Р·Р°РЅРЅРѕР№ РІ РїР»Р°С‚РµР¶РЅРѕРј РґРѕРєСѓРјРµРЅС‚Рµ
+        СЃСѓРјРјС‹, РІ С‚.С‡. СЃ СЃСѓРјРјРѕР№ РІР·РёРјР°РµРјРѕР№ РїР»Р°С‚С‹ Р·Р°&nbsp;СѓСЃР»СѓРіРё Р±Р°РЅРєР°,&nbsp;РѕР·РЅР°РєРѕРјР»РµРЅ&nbsp;Рё&nbsp;СЃРѕРіР»Р°СЃРµРЅ.
     </td>
 </tr>
 <tr>
@@ -529,7 +545,7 @@
         <table cellspacing="0" width="100%">
             <tr>
                 <td class="stext7" width="50%">&nbsp;</td>
-                <td class="stext7" width="1%"><b>Подпись&nbsp;плательщика&nbsp;</b></td>
+                <td class="stext7" width="1%"><b>РџРѕРґРїРёСЃСЊ&nbsp;РїР»Р°С‚РµР»СЊС‰РёРєР°&nbsp;</b></td>
                 <td class="string" width="40%">&nbsp;</td>
             </tr>
         </table>

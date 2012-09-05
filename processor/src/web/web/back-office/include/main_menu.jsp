@@ -56,7 +56,6 @@
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
 
-    <%--@elvariable id="distributionRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.DistributionRulesPage"--%>
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}" label="Правила распространения"
                         action="#{distributionRulesPage.show}" reRender="workspaceForm" />
 
@@ -174,9 +173,7 @@
                             reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
-    <%--@elvariable id="contractGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractGroupPage"--%>
-    <%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage"--%>
-    <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
+
     <rich:panelMenuGroup id="contractGroupMenu" label="Контракты"
                          binding="#{contractListPage.groupPage.mainMenuComponent}">
         <a4j:support event="onclick" action="#{contractListPage.groupPage.show}" reRender="workspaceForm" />
@@ -188,7 +185,7 @@
                              binding="#{contractEditPage.selectedEntityGroupPage.mainMenuComponent}" rendered="false">
             <a4j:support event="onclick" action="#{contractEditPage.selectedEntityGroupPage.show}"
                          reRender="workspaceForm" />
-            <%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
+
             <rich:panelMenuItem id="viewContractMenuItem" binding="#{contractViewPage.mainMenuComponent}"
                                 label="Просмотр" action="#{contractViewPage.show}" reRender="workspaceForm" />
             <rich:panelMenuItem id="editContractMenuItem" binding="#{contractEditPage.mainMenuComponent}"
@@ -196,7 +193,6 @@
 
         </rich:panelMenuGroup>
 
-        <%--@elvariable id="contractCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractCreatePage"--%>
         <rich:panelMenuItem id="createContractMenuItem" binding="#{contractCreatePage.mainMenuComponent}"
                             label="Регистрация" action="#{contractCreatePage.show}" reRender="workspaceForm" />
 
@@ -204,7 +200,6 @@
     <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}" label="Операции">
         <a4j:support event="onclick" action="#{mainPage.showContragentOpsGroupPage}" reRender="workspaceForm" />
 
-        <%--@elvariable id="reconciliationPage" type="ru.axetta.ecafe.processor.web.ui.contragent.ReconciliationPage"--%>
         <rich:panelMenuItem id="caReconcileMenuItem" label="Сверка реестров"
                             binding="#{reconciliationPage.mainMenuComponent}" action="#{reconciliationPage.show}"
                             reRender="workspaceForm" />
@@ -490,17 +485,6 @@
     <rich:panelMenuItem id="showCategoryOrgsCreateMenuItem" binding="#{categoryOrgCreatePage.mainMenuComponent}"
                         label="Регистрация" action="#{categoryOrgCreatePage.show}" reRender="workspaceForm" />
 
-    <%--
-<rich:panelMenuGroup id="selectedCategoryOrgGroupMenu" label="#{selectedCategoryOrgGroupPage.categoryName}"
-                   binding="#{selectedCategoryOrgGroupPage.mainMenuComponent}" rendered="true">
-  <a4j:support event="onclick" action="#{selectedCategoryOrgGroupPage.show}" reRender="workspaceForm" />
-
-  <rich:panelMenuItem id="showCategoryOrgsEditMenuItem"
-                      label="Редактирование" reRender="workspaceForm"/>
-  <rich:panelMenuItem id="showCategoryOrgsViewMenuItem"
-                      label="Просмотр" reRender="workspaceForm"/>
-</rich:panelMenuGroup>
-    --%>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="categoryGroupMenu" binding="#{mainPage.categoryGroupPage.mainMenuComponent}"
@@ -528,9 +512,8 @@
     <rich:panelMenuItem id="ruleListMenuItem" label="Список" binding="#{ruleListPage.mainMenuComponent}"
                         action="#{ruleListPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{ruleEditPage.entityName}" rendered="false">  <%--
-            <a4j:support event="onclick" action="#{mainPage.showSelectedRuleGroupPage}" reRender="workspaceForm" />
-                                                   --%>
+    <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{ruleEditPage.entityName}" rendered="false">
+
         <rich:panelMenuItem id="editRuleMenuItem" binding="#{ruleEditPage.mainMenuComponent}" label="Редактирование"
                             action="#{ruleEditPage.show}" reRender="workspaceForm" />
 
@@ -621,7 +604,7 @@
             <rich:panelMenuItem id="listProductGroupsMenuItem" label="Список"
                                 binding="#{productGroupListPage.mainMenuComponent}"
                                 action="#{productGroupListPage.show}" reRender="workspaceForm" />
-            <%--@elvariable id="selectedProductGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupGroupPage"--%>
+
             <rich:panelMenuGroup id="selectedProductGroupGroupMenu"
                                  binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
                                  label="#{selectedProductGroupGroupPage.title}" rendered="false">
@@ -643,15 +626,10 @@
 
 
         </rich:panelMenuGroup>
-        <%--@elvariable id="productCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductCreatePage"--%>
-        <%--@elvariable id="productEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage"--%>
-        <%--@elvariable id="productViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductViewPage"--%>
-        <%--@elvariable id="productListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductListPage"--%>
-        <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
+
         <rich:panelMenuItem id="productListMenuItem" label="Список" binding="#{productListPage.mainMenuComponent}"
                             action="#{productListPage.show}" reRender="workspaceForm" />
 
-        <%--@elvariable id="selectedProductGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.group.SelectedProductGroupPage"--%>
         <rich:panelMenuGroup id="selectedProductMenu" binding="#{selectedProductGroupPage.mainMenuComponent}"
                              label="#{selectedProductGroupPage.title}" rendered="false">
             <a4j:support event="onclick" action="#{selectedProductGroupPage.show}" reRender="workspaceForm" />
@@ -678,12 +656,10 @@
         <rich:panelMenuGroup id="technologicalMapGroupsGroupMenu"
                              binding="#{mainPage.technologicalMapGroupsGroupPage.mainMenuComponent}"
                              label="Группы технологических карт">
-            <%--@elvariable id="technologicalMapGroupListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupListPage"--%>
             <rich:panelMenuItem id="listTechnologicalMapGroupsMenuItem" label="Список"
                                 binding="#{technologicalMapGroupListPage.mainMenuComponent}"
                                 action="#{technologicalMapGroupListPage.show}" reRender="workspaceForm" />
 
-            <%--@elvariable id="selectedTechnologicalMapGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.SelectedTechnologicalMapGroupGroupPage"--%>
             <rich:panelMenuGroup id="selectedTechnologicalMapGroupsMenu"
                                  binding="#{selectedTechnologicalMapGroupGroupPage.mainMenuComponent}"
                                  label="#{selectedTechnologicalMapGroupGroupPage.title}" rendered="false">
@@ -718,43 +694,35 @@
                                 binding="#{technologicalMapViewPage.mainMenuComponent}"
                                 action="#{technologicalMapViewPage.show}" reRender="workspaceForm" />
 
-            <%--@elvariable id="technologicalMapEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapEditPage"--%>
             <rich:panelMenuItem id="editTechnologicalMapMenuItem" label="Редактирование"
                                 binding="#{technologicalMapEditPage.mainMenuComponent}"
                                 action="#{technologicalMapEditPage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
 
-        <%--@elvariable id="technologicalMapCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapCreatePage"--%>
         <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Регистрация"
                             binding="#{technologicalMapCreatePage.mainMenuComponent}"
                             action="#{technologicalMapCreatePage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="technologicalMapListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapListPage"--%>
 
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderListPage"--%>
     <rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"
                         binding="#{configurationProviderListPage.mainMenuComponent}"
                         action="#{configurationProviderListPage.show}" reRender="workspaceForm" />
 
-    <%--@elvariable id="configurationProviderCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage"--%>
     <rich:panelMenuItem id="configurationProviderCreateMenuItem" label="Регистрация"
                         binding="#{configurationProviderCreatePage.mainMenuComponent}"
                         action="#{configurationProviderCreatePage.show}" reRender="workspaceForm" />
 
-    <%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
     <rich:panelMenuGroup id="selectedConfigurationProviderGroupMenu"
                          binding="#{selectedConfigurationProviderGroupPage.mainMenuComponent}"
                          label="#{selectedConfigurationProviderGroupPage.title}" rendered="false">
         <a4j:support event="onclick" action="#{selectedConfigurationProviderGroupPage.show}" reRender="workspaceForm" />
 
-        <%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderViewPage"--%>
         <rich:panelMenuItem id="configurationProviderViewMenuItem"
                             binding="#{configurationProviderViewPage.mainMenuComponent}" label="Просмотр"
                             action="#{configurationProviderViewPage.show}" reRender="workspaceForm" />
 
-        <%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderEditPage"--%>
         <rich:panelMenuItem id="configurationProviderEditMenuItem"
                             binding="#{configurationProviderEditPage.mainMenuComponent}" label="Редактирование"
                             action="#{configurationProviderEditPage.show}" reRender="workspaceForm" />

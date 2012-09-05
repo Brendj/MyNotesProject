@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
@@ -13,12 +14,26 @@
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="windows-1251" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="ru.axetta.ecafe.processor.core.utils.Base64" %>
+<%@ page import="java.net.URLDecoder" %>
 <html lang="ru">
 <head>
 <%
 
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.payform_jsp");
+    if (StringUtils.isEmpty(request.getCharacterEncoding())) {
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (Exception e) {
+            logger.error("Can\'t assign character set to request", e);
+            throw new ServletException(e);
+        }
+    }
     Long contractId = null;
     if (StringUtils.isNotEmpty(request.getParameter("contractId"))) {
         try {
@@ -51,25 +66,98 @@
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+    URI formAction;
+    try {
+        formAction = ServletUtils.getHostRelativeUriWithQuery(request);
+    } catch (Exception e) {
+        logger.error("Failed to build form action", e);
+        throw new ServletException(e);
+    }
+    //String fieldReceiver="РћРћРћ &quot;РђР№РєСЊСЋРўРµРє&quot;";
+    //String fieldBank = "РћС‚РґРµР»РµРЅРёРё В«Р‘Р°РЅРє РўР°С‚Р°СЂСЃС‚Р°РЅВ» в„– 8610  Рі.РљР°Р·Р°РЅСЊ";
+    //String fieldAccount="40702810662260004883";
+	//String fieldINN="1656057429";
+	//String fieldBIK="049205603";
+	//String fieldCorrAcc="30101810600000000603";
+
+    String fieldReceiver=(request.getParameter("fieldReceiver")!=null?request.getParameter("fieldReceiver"):"РћРћРћ &quot;РђР№РєСЊСЋРўРµРє&quot;");
+	String fieldAccount=(request.getParameter("fieldAccount")!=null?request.getParameter("fieldAccount"):"40702810662260004883");
+	String fieldINN=(request.getParameter("fieldINN")!=null?request.getParameter("fieldINN"):"1656057429");
+	String fieldBank=(request.getParameter("fieldBank")!=null?request.getParameter("fieldBank"):"РћС‚РґРµР»РµРЅРёРё В«Р‘Р°РЅРє РўР°С‚Р°СЂСЃС‚Р°РЅВ» в„– 8610  Рі.РљР°Р·Р°РЅСЊ");
+	String fieldBIK=(request.getParameter("fieldBIK")!=null?request.getParameter("fieldBIK"):"049205603");
+	String fieldCorrAcc=(request.getParameter("fieldCorrAcc")!=null?request.getParameter("fieldCorrAcc"):"30101810600000000603");
+
+
 %>
-<title>Новая школа - Печать квитанции на пополнение счета</title>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<title>РќРѕРІР°СЏ С€РєРѕР»Р° - РџРµС‡Р°С‚СЊ РєРІРёС‚Р°РЅС†РёРё РЅР° РїРѕРїРѕР»РЅРµРЅРёРµ СЃС‡РµС‚Р°</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Content-Language" content="ru">
 <jsp:include page="payform_css.jsp"/>
 <body>
 
 <div id="toolbox">
-    <p>Прежде чем отправлять документ на печать, воспользуйтесь предварительным просмотром (<i>Print preview</i>)
-        и убедитесь в корректном отображении документа.
-        Обычно квитанция формы «№&nbsp;ПД-4» свободно располагается
-        на&nbsp;листе формата А4 и&nbsp;не&nbsp;требует особых настроек
-        печати. В&nbsp;редких случаях может потребоваться уменьшить
-        боковые поля листа до&nbsp;10–15&nbsp;мм или&nbsp;изменить
-        ориентацию страницы на&nbsp;горизонтальную (<i>landscape</i>), чтобы квитанция полностью поместилась в&nbsp;печатное
-        поле.</p>
-    <input value="Напечатать" onclick="window.print();" type="button" />
-    <input value="Закрыть" onclick="window.close();" type="button" />
-    <center><span style="font-size: 80%;">информационный блок от начала страницы до пунктирной линии на печать не выводится</span>
+    <p>РџСЂРµР¶РґРµ С‡РµРј РѕС‚РїСЂР°РІР»СЏС‚СЊ РґРѕРєСѓРјРµРЅС‚ РЅР° РїРµС‡Р°С‚СЊ, РІРѕСЃРїРѕР»СЊР·СѓР№С‚РµСЃСЊ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рј РїСЂРѕСЃРјРѕС‚СЂРѕРј (<i>Print preview</i>)
+        Рё СѓР±РµРґРёС‚РµСЃСЊ РІ РєРѕСЂСЂРµРєС‚РЅРѕРј РѕС‚РѕР±СЂР°Р¶РµРЅРёРё РґРѕРєСѓРјРµРЅС‚Р°.
+        РћР±С‹С‡РЅРѕ РєРІРёС‚Р°РЅС†РёСЏ С„РѕСЂРјС‹ В«в„–&nbsp;РџР”-4В» СЃРІРѕР±РѕРґРЅРѕ СЂР°СЃРїРѕР»Р°РіР°РµС‚СЃСЏ
+        РЅР°&nbsp;Р»РёСЃС‚Рµ С„РѕСЂРјР°С‚Р° Рђ4 Рё&nbsp;РЅРµ&nbsp;С‚СЂРµР±СѓРµС‚ РѕСЃРѕР±С‹С… РЅР°СЃС‚СЂРѕРµРє
+        РїРµС‡Р°С‚Рё. Р’&nbsp;СЂРµРґРєРёС… СЃР»СѓС‡Р°СЏС… РјРѕР¶РµС‚ РїРѕС‚СЂРµР±РѕРІР°С‚СЊСЃСЏ СѓРјРµРЅСЊС€РёС‚СЊ
+        Р±РѕРєРѕРІС‹Рµ РїРѕР»СЏ Р»РёСЃС‚Р° РґРѕ&nbsp;10вЂ“15&nbsp;РјРј РёР»Рё&nbsp;РёР·РјРµРЅРёС‚СЊ
+        РѕСЂРёРµРЅС‚Р°С†РёСЋ СЃС‚СЂР°РЅРёС†С‹ РЅР°&nbsp;РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ (<i>landscape</i>), С‡С‚РѕР±С‹ РєРІРёС‚Р°РЅС†РёСЏ РїРѕР»РЅРѕСЃС‚СЊСЋ РїРѕРјРµСЃС‚РёР»Р°СЃСЊ РІ&nbsp;РїРµС‡Р°С‚РЅРѕРµ
+        РїРѕР»Рµ.</p>
+    <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
+          enctype="application/x-www-form-urlencoded" class="borderless-form">
+        <table id="login-form" align="center" width="100%">
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</label>
+                </td><td>
+                    <input type="text" id="fieldReceiver" value="<%=fieldReceiver%>" name="fieldReceiver" size="64">
+                </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>РРќРќ РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</label>
+                </td><td>
+                <input type="text" id="fieldINN" value="<%=fieldINN%>" name="fieldINN" size="64">
+            </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>РќРѕРјРµСЂ СЃС‡РµС‚Р° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</label>
+                </td><td>
+                    <input type="text" id="fieldAccount" value="<%=fieldAccount%>" name="fieldAccount" size="64">
+                </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>РќР°РёРјРµРЅРѕРІР°РЅРёРµ Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</label>
+                </td><td>
+                    <input type="text" id="fieldBank" value="<%=fieldBank%>" name="fieldBank" size="64">
+                </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>Р‘РРљ</label>
+                </td><td>
+                    <input type="text" id="fieldBIK" value="<%=fieldBIK%>" name="fieldBIK" size="64">
+                </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td>
+                    <label>РќРѕРјРµСЂ РєРѕСЂ./СЃС‡. Р±Р°РЅРєР° РїРѕР»СѓС‡Р°С‚РµР»СЏ РїР»Р°С‚РµР¶Р°</label>
+                </td><td>
+                    <input type="text" id="fieldCorrAcc" value="<%=fieldCorrAcc%>" name="fieldCorrAcc" size="64">
+                </td>
+            </tr>
+            <tr valign="middle" class="login-form-input-tr">
+                <td align="center" colspan="2">
+                    <input type="submit" id="submit" name="submit" value="РР·РјРµРЅРёС‚СЊ"/>
+                </td>
+            </tr>
+        </table>
+    <input value="РќР°РїРµС‡Р°С‚Р°С‚СЊ" onclick="window.print();" type="button" />
+    <input value="Р—Р°РєСЂС‹С‚СЊ" onclick="window.close();" type="button" />
+    <center><span style="font-size: 80%;">РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Р№ Р±Р»РѕРє РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂР°РЅРёС†С‹ РґРѕ РїСѓРЅРєС‚РёСЂРЅРѕР№ Р»РёРЅРёРё РЅР° РїРµС‡Р°С‚СЊ РЅРµ РІС‹РІРѕРґРёС‚СЃСЏ</span>
     </center>
 </div>
 
