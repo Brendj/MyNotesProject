@@ -1,9 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
@@ -20,6 +17,8 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.nio.charset.Charset" %>
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.*" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 <html lang="ru">
 <head>
 <%
@@ -48,6 +47,21 @@
     String clientAddress = client.getAddress();
     Long contractId = client.getContractId();
 
+    Contragent ca = DAOService.getInstance().getClientOrgDefaultSupplier(client);
+    if (StringUtils.isEmpty(fieldReceiver)) fieldReceiver = ca.getContragentName();
+    if (StringUtils.isEmpty(fieldAccount)) fieldAccount = ca.getAccount();
+    if (StringUtils.isEmpty(fieldINN)) fieldINN = ca.getInn();
+    if (StringUtils.isEmpty(fieldBank)) fieldBank = ca.getBank();
+    if (StringUtils.isEmpty(fieldBIK)) fieldBIK = ca.getBic();
+    if (StringUtils.isEmpty(fieldCorrAcc)) fieldCorrAcc = ca.getCorrAccount();
+    if (fieldINN==null) fieldINN="";
+    while (fieldINN.length()<10) fieldINN+="0";
+    if (fieldAccount==null) fieldAccount="";
+    while (fieldAccount.length()<20) fieldAccount+="0";
+    if (fieldCorrAcc==null) fieldCorrAcc="";
+    while (fieldCorrAcc.length()<20) fieldCorrAcc+="0";
+    if (fieldBIK==null) fieldBIK="";
+    while (fieldBIK.length()<9) fieldBIK+="0";
 /////
 /*    if (client!=null && client.getOrg()!=null && client.getOrg().getIdOfOrg()==1) {
         fieldReceiver="ООО &quot;ЕвроШкола-Поволжье&quot;";
