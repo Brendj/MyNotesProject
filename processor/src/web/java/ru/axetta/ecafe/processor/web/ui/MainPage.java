@@ -6779,7 +6779,7 @@ public User getCurrentUser() throws Exception {
                 ///
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                currentWorkspacePage = reportJobCreatePage;
+                //currentWorkspacePage = reportJobCreatePage;
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);

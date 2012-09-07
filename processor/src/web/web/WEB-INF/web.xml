@@ -269,6 +269,7 @@
             <url-pattern>/rbkmoney/acceptpay</url-pattern>
             <url-pattern>/chronopay/acceptpay</url-pattern>
             <url-pattern>/payment-way4</url-pattern>
+            <url-pattern>/payment-sbkgd</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>

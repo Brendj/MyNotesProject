@@ -7,7 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-<%--@elvariable id="optionPage" type="ru.axetta.ecafe.processor.web.ui.option.OptionPage"--%>
+
 <h:panelGrid id="optionPanelGrid" binding="#{optionPage.pageComponent}" styleClass="borderless-grid">
    <rich:tabPanel>
         <rich:tab label="Общие">
@@ -57,45 +57,6 @@
 
            </h:panelGrid>
 
-
-           <%--<h:dataTable value="#{optionPage.banks}" var="bank">
-
-
-               <h:column headerClass="column-header">
-                   <f:facet name="header">Наименование</f:facet>
-                   <h:inputText value="#{bank.name}" styleClass="input-text" size="20"/>
-
-               </h:column>
-               <h:column headerClass="column-header">
-                   <f:facet name="header">URL логотипа</f:facet>
-                   <h:inputText value="#{bank.logoUrl}" styleClass="input-text" size="20"/>
-
-               </h:column>
-               <h:column headerClass="column-header">
-                   <f:facet name="header">URL на адреса</f:facet>
-                   <h:inputText value="#{bank.terminalsUrl}" styleClass="input-text" size="20"/>
-               </h:column>
-               <h:column headerClass="column-header">
-                   <f:facet name="header">Комиссия</f:facet>
-                   <h:inputText value="#{bank.rate}" styleClass="input-text" size="20"/>
-               </h:column>
-               <h:column headerClass="column-header">
-                   <f:facet name="header">Минимальная комиссия</f:facet>
-                   <h:inputText value="#{bank.minRate}" styleClass="input-text" size="20"/>
-               </h:column>
-               <h:column headerClass="column-header">
-                   <f:facet name="header">Тип зачисления</f:facet>
-                   <h:inputText value="#{bank.enrollmentType}" styleClass="input-text" size="20"/>
-               </h:column>
-               <h:column>
-                   <a4j:commandButton value="Удалить" action="#{bank.delete}"
-                                             reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
-                                             styleClass="command-button" />
-               </h:column>
-           </h:dataTable>--%>
-
-           <%--@elvariable id="bankListPage" type="ru.axetta.ecafe.processor.web.ui.option.banks.BankListPage"--%>
-           <%--@elvariable id="bankDeletePage" type="ru.axetta.ecafe.processor.web.ui.option.banks.BankDeletePage"--%>
            <rich:dataTable id="bankListTable" width="700" var="bank" value="#{bankListPage.entityList}"
                            rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
                <rich:column  headerClass="column-header">
@@ -167,69 +128,10 @@
                               reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
                               styleClass="command-button"/>
 
-           <%--<rich:dataTable  value="#{optionPage.banks}"
-                           var="bank"
-                           >
-               <f:facet name="header">
-                   <rich:columnGroup>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="Наименование" styleClass="output-text" />
-                       </rich:column>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="URL логотипа" styleClass="output-text" />
-                       </rich:column>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="URL на адреса" styleClass="output-text" />
-                       </rich:column>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="Комиссия" styleClass="output-text" />
-                       </rich:column>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="Минимальная комиссия" styleClass="output-text" />
-                       </rich:column>
-                       <rich:column headerClass="center-aligned-column" rowspan="2">
-                           <h:outputText escape="true" value="Тип зачисления" styleClass="output-text"/>
-                       </rich:column>
-
-                   </rich:columnGroup>
-               </f:facet>
-
-               <rich:column styleClass="center-aligned-column">
-                   <h:inputText value="#{bank.name}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <h:inputText value="#{bank.logoUrl}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <h:inputText value="#{bank.terminalsUrl}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <h:inputText value="#{bank.rate}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <h:inputText value="#{bank.minRate}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <h:inputText value="#{bank.enrollmentType}" styleClass="input-text" size="20"/>
-               </rich:column>
-               <rich:column styleClass="right-aligned-column">
-                   <a4j:commandButton value="Удалить" action="#{bank.delete}"
-                                      reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
-                                      styleClass="command-button" />
-               </rich:column>
-
-
-           </rich:dataTable>--%>
-
-
-
        </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">
-        <%--<a4j:commandButton value="Добавить банк" action="#{optionPage.addBank}"
-                           reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
-                           styleClass="command-button"/>--%>
 
         <a4j:commandButton value="Сохранить" action="#{optionPage.save}"
                            reRender="mainMenu, workspaceTogglePanel, optionPanelGrid"
