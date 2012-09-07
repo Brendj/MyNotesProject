@@ -100,8 +100,8 @@ public abstract class DistributedObject{
         if(deletedState){
             return this;
         }
-        Boolean boolSendAll = getBollAttributeValue(node,"SendAll");
-        if(boolSendAll!=null) setSendAll(boolSendAll);
+        //Boolean boolSendAll = getBollAttributeValue(node,"SendAll");
+        //if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
     public void preProcess() throws DistributedObjectException{}
@@ -339,11 +339,11 @@ public abstract class DistributedObject{
     //    return timeFormat1;
     //}
 
-    public Boolean getSendAll() {
+    private Boolean getSendAll() {
         return sendAll;
     }
 
-    public void setSendAll(Boolean sendAll) {
+    private void setSendAll(Boolean sendAll) {
         this.sendAll = sendAll;
     }
 

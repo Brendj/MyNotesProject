@@ -545,35 +545,6 @@ public class Processor implements SyncProcessor,
         return orgOwnerData;
     }
 
-    /* TODO: логика обработки менеджера глобальных объектов */
-
-    //private Manager processManager(Manager manager, Long idOfOrg) throws Exception {
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        persistenceSession = persistenceSessionFactory.openSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //        Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = manager.getDistributedObjectsListMap();
-    //        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
-    //        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-    //        Arrays.sort(array,distributedObjectsEnumComparator);
-    //        manager.clearConfirmTable(persistenceSession, manager.getConfirmDistributedObject());
-    //        for (int i=0; i<array.length; i++){
-    //            if(!(distributedObjectsListMap.get(array[i])==null || distributedObjectsListMap.get(array[i]).isEmpty())){
-    //                manager.process(persistenceSession ,distributedObjectsListMap.get(array[i]), array[i], idOfOrg);
-    //            } else {
-    //                boolean status = DAOService.getInstance().setFalseStatusDOVersionByDistributedObjects(array[i].getValue());
-    //            }
-    //        }
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return manager;
-    //}
-
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
             SyncRequest.PaymentRegistry.Payment payment) throws Exception {
         Session persistenceSession = null;

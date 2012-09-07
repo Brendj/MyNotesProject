@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.TypeOfAccompanyingDocument" table="cf_typesofaccompanyingdocuments">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.TypeOfAccompanyingDocument" table="cf_typesofaccompanyingdocument">
         <id name="globalId" column="idOfTypeOfAccompanyingDocument" type="long">
             <generator class="identity"/>
         </id>
