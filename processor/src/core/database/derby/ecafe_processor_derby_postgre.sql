@@ -529,6 +529,7 @@ CREATE TABLE CF_ReportHandleRules (
   Remarks                 VARCHAR(1024),
   Enabled                 INTEGER         NOT NULL,
   templatefilename        VARCHAR(256),
+  Tag varchar(12), --v23
   CONSTRAINT CF_ReportHandleRules_pk PRIMARY KEY (IdOfReportHandleRule)
 );
 
@@ -1235,8 +1236,31 @@ CREATE TABLE CF_Account_Transfers (
   CONSTRAINT cf_account_transfer_t_bcry_fk FOREIGN KEY (IdOfTransactionOnBeneficiary) REFERENCES cf_transactions (IdOfTransaction)
 );
 
+--v23
+CREATE TABLE CF_ReportInfo (
+  IdOfReportInfo BigSerial NOT NULL,
+  RuleName varchar(64) NOT NULL,
+  DocumentFormat integer,
+  ReportName varchar(128) NOT NULL,
+  CreatedDate bigint NOT NULL,
+  GenerationTime integer NOT NULL,
+  StartDate bigint NOT NULL,
+  EndDate bigint NOT NULL,
+  ReportFile varchar(256) NOT NULL,
+  OrgNum varchar(12),
+  IdOfOrg bigint,
+  Tag varchar(12),
+  CONSTRAINT cf_report_info_pk PRIMARY KEY (IdOfReportInfo)
+);
+
+CREATE index "cf_report_info_start_date_idx" ON CF_ReportInfo (StartDate);
+CREATE index "cf_report_info_end_date_idx" ON CF_ReportInfo (EndDate);
+CREATE index "cf_report_info_created_date_idx" ON CF_ReportInfo (CreatedDate);
+CREATE index "cf_report_info_orgnum_date_idx" ON CF_ReportInfo (OrgNum);
+CREATE index "cf_report_info_rulename_idx" ON CF_ReportInfo (RuleName);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 22, 120831, 0, "");
+VALUES(2, 2, 23, 120909, 0, "");
 
 
