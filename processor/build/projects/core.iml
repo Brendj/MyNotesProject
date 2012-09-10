@@ -335,15 +335,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.7.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" scope="TEST" name="test-libs" level="project" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
@@ -363,6 +354,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="cryptopro" level="project" />
     <orderEntry type="library" name="cryptopro" level="project" />
   </component>
 </module>
