@@ -38,6 +38,20 @@ public interface ClientRoomController {
 
     /**
      * 
+     * @param linkingToken
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.ActivateLinkingTokenResult
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "activateLinkingToken", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.ActivateLinkingToken")
+    @ResponseWrapper(localName = "activateLinkingTokenResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.ActivateLinkingTokenResponse")
+    public ActivateLinkingTokenResult activateLinkingToken(
+        @WebParam(name = "linkingToken", targetNamespace = "")
+        String linkingToken);
+
+    /**
+     * 
      * @param idOfContragent
      * @param contragentSum
      * @param idOfClient
@@ -61,6 +75,20 @@ public interface ClientRoomController {
         Long copecksAmount,
         @WebParam(name = "contragentSum", targetNamespace = "")
         Long contragentSum);
+
+    /**
+     * 
+     * @param contractId
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.Result
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "sendLinkingTokenByContractId", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.SendLinkingTokenByContractId")
+    @ResponseWrapper(localName = "sendLinkingTokenByContractIdResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.SendLinkingTokenByContractIdResponse")
+    public Result sendLinkingTokenByContractId(
+        @WebParam(name = "contractId", targetNamespace = "")
+        Long contractId);
 
     /**
      * 
@@ -97,6 +125,34 @@ public interface ClientRoomController {
      * 
      * @param contractId
      * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.GenerateLinkingTokenResult
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "generateLinkingToken", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GenerateLinkingToken")
+    @ResponseWrapper(localName = "generateLinkingTokenResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GenerateLinkingTokenResponse")
+    public GenerateLinkingTokenResult generateLinkingToken(
+        @WebParam(name = "contractId", targetNamespace = "")
+        Long contractId);
+
+    /**
+     * 
+     * @param mobilePhone
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.Result
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "sendLinkingTokenByMobile", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.SendLinkingTokenByMobile")
+    @ResponseWrapper(localName = "sendLinkingTokenByMobileResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.SendLinkingTokenByMobileResponse")
+    public Result sendLinkingTokenByMobile(
+        @WebParam(name = "mobilePhone", targetNamespace = "")
+        String mobilePhone);
+
+    /**
+     * 
+     * @param contractId
+     * @return
      *     returns ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult
      */
     @WebMethod
@@ -126,6 +182,17 @@ public interface ClientRoomController {
         Long idOfClientPaymentOrder,
         @WebParam(name = "orderStatus", targetNamespace = "")
         int orderStatus);
+
+    /**
+     * 
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.HiddenPagesResult
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "getHiddenPages", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GetHiddenPages")
+    @ResponseWrapper(localName = "getHiddenPagesResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GetHiddenPagesResponse")
+    public HiddenPagesResult getHiddenPages();
 
     /**
      * 
@@ -551,7 +618,7 @@ public interface ClientRoomController {
 
     /**
      * 
-     * @param base64PasswordHash
+     * @param token
      * @param contractId
      * @return
      *     returns ru.axetta.ecafe.processor.web.bo.client.Result
@@ -563,8 +630,8 @@ public interface ClientRoomController {
     public Result authorizeClient(
         @WebParam(name = "contractId", targetNamespace = "")
         Long contractId,
-        @WebParam(name = "base64passwordHash", targetNamespace = "")
-        String base64PasswordHash);
+        @WebParam(name = "token", targetNamespace = "")
+        String token);
 
     /**
      * 

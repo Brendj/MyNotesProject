@@ -33,8 +33,10 @@ import javax.xml.bind.annotation.XmlType;
     "description"
 })
 @XmlSeeAlso({
+    ActivateLinkingTokenResult.class,
     DetachGuardSanResult.class,
-    AttachGuardSanResult.class
+    AttachGuardSanResult.class,
+    GenerateLinkingTokenResult.class
 })
 public class Result {
 

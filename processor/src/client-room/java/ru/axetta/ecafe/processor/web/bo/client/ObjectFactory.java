@@ -42,14 +42,18 @@ public class ObjectFactory {
     private final static QName _GetEnterEventListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getEnterEventListResponse");
     private final static QName _GetIdOfClientResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfClientResponse");
     private final static QName _GetSummaryByTypedId_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryByTypedId");
+    private final static QName _GenerateLinkingToken_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "generateLinkingToken");
     private final static QName _GetChronopayConfig_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getChronopayConfig");
     private final static QName _GetCardListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCardListResponse");
     private final static QName _CreatePaymentOrderResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "createPaymentOrderResponse");
     private final static QName _GetMenuListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListResponse");
+    private final static QName _SendLinkingTokenByContractIdResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByContractIdResponse");
     private final static QName _GetGroupListByOrg_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getGroupListByOrg");
     private final static QName _ChangePaymentOrderStatus_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePaymentOrderStatus");
     private final static QName _GetPurchaseListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseListBySan");
     private final static QName _GetStudentListByIdOfClientGroupResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getStudentListByIdOfClientGroupResponse");
+    private final static QName _GenerateLinkingTokenResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "generateLinkingTokenResponse");
+    private final static QName _SendLinkingTokenByMobile_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByMobile");
     private final static QName _GetIdOfClient_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfClient");
     private final static QName _GetRBKMoneyConfig_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getRBKMoneyConfig");
     private final static QName _GetMenuListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListBySanResponse");
@@ -64,15 +68,17 @@ public class ObjectFactory {
     private final static QName _GetIdOfContragent_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfContragent");
     private final static QName _GetStudentListByIdOfClientGroup_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getStudentListByIdOfClientGroup");
     private final static QName _AttachGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSan");
+    private final static QName _SendLinkingTokenByMobileResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByMobileResponse");
     private final static QName _ChangeEmail_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeEmail");
     private final static QName _GetPaymentListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListBySan");
     private final static QName _GetPaymentListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListResponse");
     private final static QName _GetSummaryBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryBySanResponse");
     private final static QName _AttachGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSanResponse");
-    private final static QName _AuthorizeClient_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "authorizeClient");
     private final static QName _CheckPasswordRestoreRequestResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "checkPasswordRestoreRequestResponse");
+    private final static QName _AuthorizeClient_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "authorizeClient");
     private final static QName _DetachGuardSanBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSanBySanResponse");
     private final static QName _GetIdOfContragentResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfContragentResponse");
+    private final static QName _GetHiddenPagesResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getHiddenPagesResponse");
     private final static QName _ChangePaymentOrderStatusResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePaymentOrderStatusResponse");
     private final static QName _GetCardListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCardListBySanResponse");
     private final static QName _SendPasswordRecoverURLFromEmail_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendPasswordRecoverURLFromEmail");
@@ -84,18 +90,22 @@ public class ObjectFactory {
     private final static QName _ChangePersonalInfo_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePersonalInfo");
     private final static QName _DetachGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSanResponse");
     private final static QName _GetPaymentListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListBySanResponse");
+    private final static QName _SendLinkingTokenByContractId_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByContractId");
     private final static QName _ChangeExpenditureLimit_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeExpenditureLimit");
-    private final static QName _ChangePassword_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePassword");
-    private final static QName _ChangeEmailResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeEmailResponse");
+    private final static QName _ActivateLinkingTokenResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "activateLinkingTokenResponse");
     private final static QName _GetClientsByGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getClientsByGuardSan");
+    private final static QName _ChangeEmailResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeEmailResponse");
+    private final static QName _ChangePassword_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePassword");
     private final static QName _EnableNotificationBySMSResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "enableNotificationBySMSResponse");
     private final static QName _GetEnterEventListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getEnterEventListBySanResponse");
     private final static QName _ChangePasswordResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePasswordResponse");
-    private final static QName _GetPurchaseListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseListBySanResponse");
     private final static QName _ChangePersonalInfoResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePersonalInfoResponse");
+    private final static QName _GetPurchaseListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseListBySanResponse");
+    private final static QName _GetHiddenPages_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getHiddenPages");
     private final static QName _GetCardListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCardListBySan");
     private final static QName _GetClientSmsList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getClientSmsList");
     private final static QName _GetCirculationListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCirculationListResponse");
+    private final static QName _ActivateLinkingToken_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "activateLinkingToken");
     private final static QName _GetPurchaseList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseList");
     private final static QName _GetMenuListByOrg_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListByOrg");
     private final static QName _CreatePaymentOrder_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "createPaymentOrder");
@@ -117,43 +127,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentList }
+     * Create an instance of {@link ChangePasswordResponse }
      * 
      */
-    public PaymentList createPaymentList() {
-        return new PaymentList();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListByOrg }
-     * 
-     */
-    public GetMenuListByOrg createGetMenuListByOrg() {
-        return new GetMenuListByOrg();
-    }
-
-    /**
-     * Create an instance of {@link MenuItem }
-     * 
-     */
-    public MenuItem createMenuItem() {
-        return new MenuItem();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupItem }
-     * 
-     */
-    public ClientGroupItem createClientGroupItem() {
-        return new ClientGroupItem();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySan }
-     * 
-     */
-    public GetSummaryBySan createGetSummaryBySan() {
-        return new GetSummaryBySan();
+    public ChangePasswordResponse createChangePasswordResponse() {
+        return new ChangePasswordResponse();
     }
 
     /**
@@ -165,491 +143,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetGroupListByOrg }
+     * Create an instance of {@link Result }
      * 
      */
-    public GetGroupListByOrg createGetGroupListByOrg() {
-        return new GetGroupListByOrg();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseElementExt }
-     * 
-     */
-    public PurchaseElementExt createPurchaseElementExt() {
-        return new PurchaseElementExt();
-    }
-
-    /**
-     * Create an instance of {@link GetIdOfContragentResponse }
-     * 
-     */
-    public GetIdOfContragentResponse createGetIdOfContragentResponse() {
-        return new GetIdOfContragentResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentList }
-     * 
-     */
-    public GetPaymentList createGetPaymentList() {
-        return new GetPaymentList();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSan }
-     * 
-     */
-    public GetClientsByGuardSan createGetClientsByGuardSan() {
-        return new GetClientsByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link ClientSmsList }
-     * 
-     */
-    public ClientSmsList createClientSmsList() {
-        return new ClientSmsList();
-    }
-
-    /**
-     * Create an instance of {@link CheckPasswordRestoreRequestResponse }
-     * 
-     */
-    public CheckPasswordRestoreRequestResponse createCheckPasswordRestoreRequestResponse() {
-        return new CheckPasswordRestoreRequestResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseListExt }
-     * 
-     */
-    public PurchaseListExt createPurchaseListExt() {
-        return new PurchaseListExt();
-    }
-
-    /**
-     * Create an instance of {@link CreatePaymentOrderResponse }
-     * 
-     */
-    public CreatePaymentOrderResponse createCreatePaymentOrderResponse() {
-        return new CreatePaymentOrderResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySanResponse }
-     * 
-     */
-    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
-        return new GetSummaryBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetRBKMoneyConfig }
-     * 
-     */
-    public GetRBKMoneyConfig createGetRBKMoneyConfig() {
-        return new GetRBKMoneyConfig();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseList }
-     * 
-     */
-    public PurchaseList createPurchaseList() {
-        return new PurchaseList();
-    }
-
-    /**
-     * Create an instance of {@link GetContractIdByCardNoResponse }
-     * 
-     */
-    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
-        return new GetContractIdByCardNoResponse();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationBySMS }
-     * 
-     */
-    public EnableNotificationBySMS createEnableNotificationBySMS() {
-        return new EnableNotificationBySMS();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListBySanResponse }
-     * 
-     */
-    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
-        return new GetMenuListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetCardListBySanResponse }
-     * 
-     */
-    public GetCardListBySanResponse createGetCardListBySanResponse() {
-        return new GetCardListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link SendPasswordRecoverURLFromEmailResponse }
-     * 
-     */
-    public SendPasswordRecoverURLFromEmailResponse createSendPasswordRecoverURLFromEmailResponse() {
-        return new SendPasswordRecoverURLFromEmailResponse();
-    }
-
-    /**
-     * Create an instance of {@link Purchase }
-     * 
-     */
-    public Purchase createPurchase() {
-        return new Purchase();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySan }
-     * 
-     */
-    public GetEnterEventListBySan createGetEnterEventListBySan() {
-        return new GetEnterEventListBySan();
-    }
-
-    /**
-     * Create an instance of {@link MenuDateItemExt }
-     * 
-     */
-    public MenuDateItemExt createMenuDateItemExt() {
-        return new MenuDateItemExt();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItem }
-     * 
-     */
-    public CirculationItem createCirculationItem() {
-        return new CirculationItem();
-    }
-
-    /**
-     * Create an instance of {@link AuthorizeClientResponse }
-     * 
-     */
-    public AuthorizeClientResponse createAuthorizeClientResponse() {
-        return new AuthorizeClientResponse();
-    }
-
-    /**
-     * Create an instance of {@link IdResult }
-     * 
-     */
-    public IdResult createIdResult() {
-        return new IdResult();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanBySan }
-     * 
-     */
-    public DetachGuardSanBySan createDetachGuardSanBySan() {
-        return new DetachGuardSanBySan();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSanResponse }
-     * 
-     */
-    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
-        return new GetClientsByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryResponse }
-     * 
-     */
-    public GetSummaryResponse createGetSummaryResponse() {
-        return new GetSummaryResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChronopayConfigResult }
-     * 
-     */
-    public ChronopayConfigResult createChronopayConfigResult() {
-        return new ChronopayConfigResult();
-    }
-
-    /**
-     * Create an instance of {@link Payment }
-     * 
-     */
-    public Payment createPayment() {
-        return new Payment();
-    }
-
-    /**
-     * Create an instance of {@link ClassStudentList }
-     * 
-     */
-    public ClassStudentList createClassStudentList() {
-        return new ClassStudentList();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventList }
-     * 
-     */
-    public GetEnterEventList createGetEnterEventList() {
-        return new GetEnterEventList();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventList }
-     * 
-     */
-    public EnterEventList createEnterEventList() {
-        return new EnterEventList();
-    }
-
-    /**
-     * Create an instance of {@link ChangeExpenditureLimitResponse }
-     * 
-     */
-    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
-        return new ChangeExpenditureLimitResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummary }
-     * 
-     */
-    public GetSummary createGetSummary() {
-        return new GetSummary();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSan }
-     * 
-     */
-    public AttachGuardSan createAttachGuardSan() {
-        return new AttachGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
-     * 
-     */
-    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
-        return new GetStudentListByIdOfClientGroupResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseList }
-     * 
-     */
-    public GetPurchaseList createGetPurchaseList() {
-        return new GetPurchaseList();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListBySanResponse }
-     * 
-     */
-    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
-        return new GetPaymentListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItemList }
-     * 
-     */
-    public CirculationItemList createCirculationItemList() {
-        return new CirculationItemList();
-    }
-
-    /**
-     * Create an instance of {@link CardList }
-     * 
-     */
-    public CardList createCardList() {
-        return new CardList();
-    }
-
-    /**
-     * Create an instance of {@link ChangePaymentOrderStatus }
-     * 
-     */
-    public ChangePaymentOrderStatus createChangePaymentOrderStatus() {
-        return new ChangePaymentOrderStatus();
-    }
-
-    /**
-     * Create an instance of {@link GetClientSmsListResponse }
-     * 
-     */
-    public GetClientSmsListResponse createGetClientSmsListResponse() {
-        return new GetClientSmsListResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupListResult }
-     * 
-     */
-    public ClientGroupListResult createClientGroupListResult() {
-        return new ClientGroupListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedIdResponse }
-     * 
-     */
-    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
-        return new GetSummaryByTypedIdResponse();
-    }
-
-    /**
-     * Create an instance of {@link Sms }
-     * 
-     */
-    public Sms createSms() {
-        return new Sms();
-    }
-
-    /**
-     * Create an instance of {@link GetClientSmsList }
-     * 
-     */
-    public GetClientSmsList createGetClientSmsList() {
-        return new GetClientSmsList();
-    }
-
-    /**
-     * Create an instance of {@link PublicationItem }
-     * 
-     */
-    public PublicationItem createPublicationItem() {
-        return new PublicationItem();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanResult }
-     * 
-     */
-    public DetachGuardSanResult createDetachGuardSanResult() {
-        return new DetachGuardSanResult();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationByEmailResponse }
-     * 
-     */
-    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
-        return new EnableNotificationByEmailResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseListResult }
-     * 
-     */
-    public PurchaseListResult createPurchaseListResult() {
-        return new PurchaseListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySanResponse }
-     * 
-     */
-    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
-        return new GetEnterEventListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListBySan }
-     * 
-     */
-    public GetMenuListBySan createGetMenuListBySan() {
-        return new GetMenuListBySan();
-    }
-
-    /**
-     * Create an instance of {@link CreatePaymentOrder }
-     * 
-     */
-    public CreatePaymentOrder createCreatePaymentOrder() {
-        return new CreatePaymentOrder();
-    }
-
-    /**
-     * Create an instance of {@link ChronopayConfigExt }
-     * 
-     */
-    public ChronopayConfigExt createChronopayConfigExt() {
-        return new ChronopayConfigExt();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSan }
-     * 
-     */
-    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
-        return new GetSummaryByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link RequestWebParam }
-     * 
-     */
-    public RequestWebParam createRequestWebParam() {
-        return new RequestWebParam();
-    }
-
-    /**
-     * Create an instance of {@link Data }
-     * 
-     */
-    public Data createData() {
-        return new Data();
-    }
-
-    /**
-     * Create an instance of {@link ChangePersonalInfoResponse }
-     * 
-     */
-    public ChangePersonalInfoResponse createChangePersonalInfoResponse() {
-        return new ChangePersonalInfoResponse();
-    }
-
-    /**
-     * Create an instance of {@link RBKMoneyConfigExt }
-     * 
-     */
-    public RBKMoneyConfigExt createRBKMoneyConfigExt() {
-        return new RBKMoneyConfigExt();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListBySanResponse }
-     * 
-     */
-    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
-        return new GetPurchaseListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChangeExpenditureLimit }
-     * 
-     */
-    public ChangeExpenditureLimit createChangeExpenditureLimit() {
-        return new ChangeExpenditureLimit();
-    }
-
-    /**
-     * Create an instance of {@link ChangePaymentOrderStatusResponse }
-     * 
-     */
-    public ChangePaymentOrderStatusResponse createChangePaymentOrderStatusResponse() {
-        return new ChangePaymentOrderStatusResponse();
+    public Result createResult() {
+        return new Result();
     }
 
     /**
@@ -661,139 +159,267 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetBanksResponse }
+     * Create an instance of {@link AuthorizeClient }
      * 
      */
-    public GetBanksResponse createGetBanksResponse() {
-        return new GetBanksResponse();
+    public AuthorizeClient createAuthorizeClient() {
+        return new AuthorizeClient();
     }
 
     /**
-     * Create an instance of {@link MenuList }
+     * Create an instance of {@link Payment }
      * 
      */
-    public MenuList createMenuList() {
-        return new MenuList();
+    public Payment createPayment() {
+        return new Payment();
     }
 
     /**
-     * Create an instance of {@link MenuItemExt }
+     * Create an instance of {@link GetPurchaseList }
      * 
      */
-    public MenuItemExt createMenuItemExt() {
-        return new MenuItemExt();
+    public GetPurchaseList createGetPurchaseList() {
+        return new GetPurchaseList();
     }
 
     /**
-     * Create an instance of {@link ChangeEmailResponse }
+     * Create an instance of {@link ClassStudentList }
      * 
      */
-    public ChangeEmailResponse createChangeEmailResponse() {
-        return new ChangeEmailResponse();
+    public ClassStudentList createClassStudentList() {
+        return new ClassStudentList();
     }
 
     /**
-     * Create an instance of {@link CirculationListResult }
+     * Create an instance of {@link GetMenuList }
      * 
      */
-    public CirculationListResult createCirculationListResult() {
-        return new CirculationListResult();
+    public GetMenuList createGetMenuList() {
+        return new GetMenuList();
     }
 
     /**
-     * Create an instance of {@link ChangePersonalInfo }
+     * Create an instance of {@link DetachGuardSanResponse }
      * 
      */
-    public ChangePersonalInfo createChangePersonalInfo() {
-        return new ChangePersonalInfo();
+    public DetachGuardSanResponse createDetachGuardSanResponse() {
+        return new DetachGuardSanResponse();
     }
 
     /**
-     * Create an instance of {@link AttachGuardSanResult }
+     * Create an instance of {@link GetSummaryByGuardSan }
      * 
      */
-    public AttachGuardSanResult createAttachGuardSanResult() {
-        return new AttachGuardSanResult();
+    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
+        return new GetSummaryByGuardSan();
     }
 
     /**
-     * Create an instance of {@link GetCirculationList }
+     * Create an instance of {@link GetMenuListBySanResponse }
      * 
      */
-    public GetCirculationList createGetCirculationList() {
-        return new GetCirculationList();
+    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
+        return new GetMenuListBySanResponse();
     }
 
     /**
-     * Create an instance of {@link GetMenuListByOrgResponse }
+     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
      * 
      */
-    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
-        return new GetMenuListByOrgResponse();
+    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
+        return new GetStudentListByIdOfClientGroupResponse();
     }
 
     /**
-     * Create an instance of {@link GetCardListBySan }
+     * Create an instance of {@link ClientGroupListResult }
      * 
      */
-    public GetCardListBySan createGetCardListBySan() {
-        return new GetCardListBySan();
+    public ClientGroupListResult createClientGroupListResult() {
+        return new ClientGroupListResult();
     }
 
     /**
-     * Create an instance of {@link MenuListResult }
+     * Create an instance of {@link GetClientSmsListResponse }
      * 
      */
-    public MenuListResult createMenuListResult() {
-        return new MenuListResult();
+    public GetClientSmsListResponse createGetClientSmsListResponse() {
+        return new GetClientSmsListResponse();
     }
 
     /**
-     * Create an instance of {@link ClientSmsListResult }
+     * Create an instance of {@link Purchase }
      * 
      */
-    public ClientSmsListResult createClientSmsListResult() {
-        return new ClientSmsListResult();
+    public Purchase createPurchase() {
+        return new Purchase();
     }
 
     /**
-     * Create an instance of {@link ClassStudentListResult }
+     * Create an instance of {@link PublicationItem }
      * 
      */
-    public ClassStudentListResult createClassStudentListResult() {
-        return new ClassStudentListResult();
+    public PublicationItem createPublicationItem() {
+        return new PublicationItem();
     }
 
     /**
-     * Create an instance of {@link GetPurchaseListResponse }
+     * Create an instance of {@link GenerateLinkingToken }
      * 
      */
-    public GetPurchaseListResponse createGetPurchaseListResponse() {
-        return new GetPurchaseListResponse();
+    public GenerateLinkingToken createGenerateLinkingToken() {
+        return new GenerateLinkingToken();
     }
 
     /**
-     * Create an instance of {@link GetContractIdByCardNo }
+     * Create an instance of {@link MenuItem }
      * 
      */
-    public GetContractIdByCardNo createGetContractIdByCardNo() {
-        return new GetContractIdByCardNo();
+    public MenuItem createMenuItem() {
+        return new MenuItem();
     }
 
     /**
-     * Create an instance of {@link ClientSummaryExt }
+     * Create an instance of {@link EnterEventListResult }
      * 
      */
-    public ClientSummaryExt createClientSummaryExt() {
-        return new ClientSummaryExt();
+    public EnterEventListResult createEnterEventListResult() {
+        return new EnterEventListResult();
     }
 
     /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroup }
+     * Create an instance of {@link GenerateLinkingTokenResult }
      * 
      */
-    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
-        return new GetStudentListByIdOfClientGroup();
+    public GenerateLinkingTokenResult createGenerateLinkingTokenResult() {
+        return new GenerateLinkingTokenResult();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanResponse }
+     * 
+     */
+    public AttachGuardSanResponse createAttachGuardSanResponse() {
+        return new AttachGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChronopayConfigResult }
+     * 
+     */
+    public ChronopayConfigResult createChronopayConfigResult() {
+        return new ChronopayConfigResult();
+    }
+
+    /**
+     * Create an instance of {@link ChangeMobilePhone }
+     * 
+     */
+    public ChangeMobilePhone createChangeMobilePhone() {
+        return new ChangeMobilePhone();
+    }
+
+    /**
+     * Create an instance of {@link ChangeExpenditureLimitResponse }
+     * 
+     */
+    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
+        return new ChangeExpenditureLimitResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummary }
+     * 
+     */
+    public ClientSummary createClientSummary() {
+        return new ClientSummary();
+    }
+
+    /**
+     * Create an instance of {@link Sms }
+     * 
+     */
+    public Sms createSms() {
+        return new Sms();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseList }
+     * 
+     */
+    public PurchaseList createPurchaseList() {
+        return new PurchaseList();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItem }
+     * 
+     */
+    public CirculationItem createCirculationItem() {
+        return new CirculationItem();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListBySan }
+     * 
+     */
+    public GetPurchaseListBySan createGetPurchaseListBySan() {
+        return new GetPurchaseListBySan();
+    }
+
+    /**
+     * Create an instance of {@link GenerateLinkingTokenResponse }
+     * 
+     */
+    public GenerateLinkingTokenResponse createGenerateLinkingTokenResponse() {
+        return new GenerateLinkingTokenResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListBySan }
+     * 
+     */
+    public GetMenuListBySan createGetMenuListBySan() {
+        return new GetMenuListBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListResponse }
+     * 
+     */
+    public GetEnterEventListResponse createGetEnterEventListResponse() {
+        return new GetEnterEventListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListResponse }
+     * 
+     */
+    public GetPaymentListResponse createGetPaymentListResponse() {
+        return new GetPaymentListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCardList }
+     * 
+     */
+    public GetCardList createGetCardList() {
+        return new GetCardList();
+    }
+
+    /**
+     * Create an instance of {@link ClientsData }
+     * 
+     */
+    public ClientsData createClientsData() {
+        return new ClientsData();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSan }
+     * 
+     */
+    public AttachGuardSan createAttachGuardSan() {
+        return new AttachGuardSan();
     }
 
     /**
@@ -805,11 +431,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetCardList }
+     * Create an instance of {@link EnableNotificationBySMS }
      * 
      */
-    public GetCardList createGetCardList() {
-        return new GetCardList();
+    public EnableNotificationBySMS createEnableNotificationBySMS() {
+        return new EnableNotificationBySMS();
+    }
+
+    /**
+     * Create an instance of {@link CardList }
+     * 
+     */
+    public CardList createCardList() {
+        return new CardList();
     }
 
     /**
@@ -829,75 +463,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChangePasswordResponse }
+     * Create an instance of {@link MenuDateItemExt }
      * 
      */
-    public ChangePasswordResponse createChangePasswordResponse() {
-        return new ChangePasswordResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientItem }
-     * 
-     */
-    public ClientItem createClientItem() {
-        return new ClientItem();
-    }
-
-    /**
-     * Create an instance of {@link MenuListExt }
-     * 
-     */
-    public MenuListExt createMenuListExt() {
-        return new MenuListExt();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListResponse }
-     * 
-     */
-    public GetPaymentListResponse createGetPaymentListResponse() {
-        return new GetPaymentListResponse();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanResponse }
-     * 
-     */
-    public DetachGuardSanResponse createDetachGuardSanResponse() {
-        return new DetachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanResponse }
-     * 
-     */
-    public AttachGuardSanResponse createAttachGuardSanResponse() {
-        return new AttachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link MenuDateItem }
-     * 
-     */
-    public MenuDateItem createMenuDateItem() {
-        return new MenuDateItem();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListBySan }
-     * 
-     */
-    public GetPaymentListBySan createGetPaymentListBySan() {
-        return new GetPaymentListBySan();
-    }
-
-    /**
-     * Create an instance of {@link ClientList }
-     * 
-     */
-    public ClientList createClientList() {
-        return new ClientList();
+    public MenuDateItemExt createMenuDateItemExt() {
+        return new MenuDateItemExt();
     }
 
     /**
@@ -909,227 +479,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetMenuList }
+     * Create an instance of {@link GetContractIdByCardNo }
      * 
      */
-    public GetMenuList createGetMenuList() {
-        return new GetMenuList();
+    public GetContractIdByCardNo createGetContractIdByCardNo() {
+        return new GetContractIdByCardNo();
     }
 
     /**
-     * Create an instance of {@link BankItem }
+     * Create an instance of {@link ClientSmsList }
      * 
      */
-    public BankItem createBankItem() {
-        return new BankItem();
+    public ClientSmsList createClientSmsList() {
+        return new ClientSmsList();
     }
 
     /**
-     * Create an instance of {@link PaymentListResult }
+     * Create an instance of {@link SendPasswordRecoverURLFromEmailResponse }
      * 
      */
-    public PaymentListResult createPaymentListResult() {
-        return new PaymentListResult();
+    public SendPasswordRecoverURLFromEmailResponse createSendPasswordRecoverURLFromEmailResponse() {
+        return new SendPasswordRecoverURLFromEmailResponse();
     }
 
     /**
-     * Create an instance of {@link GetEnterEventListResponse }
+     * Create an instance of {@link GetCirculationList }
      * 
      */
-    public GetEnterEventListResponse createGetEnterEventListResponse() {
-        return new GetEnterEventListResponse();
+    public GetCirculationList createGetCirculationList() {
+        return new GetCirculationList();
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanBySanResponse }
+     * Create an instance of {@link ClientGroupItem }
      * 
      */
-    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
-        return new DetachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link Result }
-     * 
-     */
-    public Result createResult() {
-        return new Result();
-    }
-
-    /**
-     * Create an instance of {@link ChangeMobilePhoneResponse }
-     * 
-     */
-    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
-        return new ChangeMobilePhoneResponse();
-    }
-
-    /**
-     * Create an instance of {@link CheckPasswordResult }
-     * 
-     */
-    public CheckPasswordResult createCheckPasswordResult() {
-        return new CheckPasswordResult();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventListResult }
-     * 
-     */
-    public EnterEventListResult createEnterEventListResult() {
-        return new EnterEventListResult();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupList }
-     * 
-     */
-    public ClientGroupList createClientGroupList() {
-        return new ClientGroupList();
-    }
-
-    /**
-     * Create an instance of {@link BanksList }
-     * 
-     */
-    public BanksList createBanksList() {
-        return new BanksList();
-    }
-
-    /**
-     * Create an instance of {@link GetIdOfClient }
-     * 
-     */
-    public GetIdOfClient createGetIdOfClient() {
-        return new GetIdOfClient();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSanResponse }
-     * 
-     */
-    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
-        return new GetSummaryByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChangeEmail }
-     * 
-     */
-    public ChangeEmail createChangeEmail() {
-        return new ChangeEmail();
-    }
-
-    /**
-     * Create an instance of {@link CardItem }
-     * 
-     */
-    public CardItem createCardItem() {
-        return new CardItem();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventItem }
-     * 
-     */
-    public EnterEventItem createEnterEventItem() {
-        return new EnterEventItem();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListBySan }
-     * 
-     */
-    public GetPurchaseListBySan createGetPurchaseListBySan() {
-        return new GetPurchaseListBySan();
-    }
-
-    /**
-     * Create an instance of {@link SendPasswordRecoverURLFromEmail }
-     * 
-     */
-    public SendPasswordRecoverURLFromEmail createSendPasswordRecoverURLFromEmail() {
-        return new SendPasswordRecoverURLFromEmail();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseExt }
-     * 
-     */
-    public PurchaseExt createPurchaseExt() {
-        return new PurchaseExt();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummary }
-     * 
-     */
-    public ClientSummary createClientSummary() {
-        return new ClientSummary();
-    }
-
-    /**
-     * Create an instance of {@link CardListResult }
-     * 
-     */
-    public CardListResult createCardListResult() {
-        return new CardListResult();
-    }
-
-    /**
-     * Create an instance of {@link ChangePassword }
-     * 
-     */
-    public ChangePassword createChangePassword() {
-        return new ChangePassword();
-    }
-
-    /**
-     * Create an instance of {@link AuthorizeClient }
-     * 
-     */
-    public AuthorizeClient createAuthorizeClient() {
-        return new AuthorizeClient();
-    }
-
-    /**
-     * Create an instance of {@link ChangeMobilePhone }
-     * 
-     */
-    public ChangeMobilePhone createChangeMobilePhone() {
-        return new ChangeMobilePhone();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedId }
-     * 
-     */
-    public GetSummaryByTypedId createGetSummaryByTypedId() {
-        return new GetSummaryByTypedId();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySanResponse }
-     * 
-     */
-    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
-        return new AttachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link BanksData }
-     * 
-     */
-    public BanksData createBanksData() {
-        return new BanksData();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySan }
-     * 
-     */
-    public AttachGuardSanBySan createAttachGuardSanBySan() {
-        return new AttachGuardSanBySan();
+    public ClientGroupItem createClientGroupItem() {
+        return new ClientGroupItem();
     }
 
     /**
@@ -1141,59 +527,59 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClientsData }
+     * Create an instance of {@link MenuListExt }
      * 
      */
-    public ClientsData createClientsData() {
-        return new ClientsData();
+    public MenuListExt createMenuListExt() {
+        return new MenuListExt();
     }
 
     /**
-     * Create an instance of {@link GetIdOfContragent }
+     * Create an instance of {@link CheckPasswordResult }
      * 
      */
-    public GetIdOfContragent createGetIdOfContragent() {
-        return new GetIdOfContragent();
+    public CheckPasswordResult createCheckPasswordResult() {
+        return new CheckPasswordResult();
     }
 
     /**
-     * Create an instance of {@link CheckPasswordRestoreRequest }
+     * Create an instance of {@link GetSummaryByGuardSanResponse }
      * 
      */
-    public CheckPasswordRestoreRequest createCheckPasswordRestoreRequest() {
-        return new CheckPasswordRestoreRequest();
+    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
+        return new GetSummaryByGuardSanResponse();
     }
 
     /**
-     * Create an instance of {@link PurchaseElement }
+     * Create an instance of {@link ChangePassword }
      * 
      */
-    public PurchaseElement createPurchaseElement() {
-        return new PurchaseElement();
+    public ChangePassword createChangePassword() {
+        return new ChangePassword();
     }
 
     /**
-     * Create an instance of {@link GetCardListResponse }
+     * Create an instance of {@link PurchaseElementExt }
      * 
      */
-    public GetCardListResponse createGetCardListResponse() {
-        return new GetCardListResponse();
+    public PurchaseElementExt createPurchaseElementExt() {
+        return new PurchaseElementExt();
     }
 
     /**
-     * Create an instance of {@link GetRBKMoneyConfigResponse }
+     * Create an instance of {@link GetPurchaseListResponse }
      * 
      */
-    public GetRBKMoneyConfigResponse createGetRBKMoneyConfigResponse() {
-        return new GetRBKMoneyConfigResponse();
+    public GetPurchaseListResponse createGetPurchaseListResponse() {
+        return new GetPurchaseListResponse();
     }
 
     /**
-     * Create an instance of {@link RbkMoneyConfigResult }
+     * Create an instance of {@link ActivateLinkingTokenResult }
      * 
      */
-    public RbkMoneyConfigResult createRbkMoneyConfigResult() {
-        return new RbkMoneyConfigResult();
+    public ActivateLinkingTokenResult createActivateLinkingTokenResult() {
+        return new ActivateLinkingTokenResult();
     }
 
     /**
@@ -1205,19 +591,251 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClientSummaryResult }
+     * Create an instance of {@link AttachGuardSanBySanResponse }
      * 
      */
-    public ClientSummaryResult createClientSummaryResult() {
-        return new ClientSummaryResult();
+    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
+        return new AttachGuardSanBySanResponse();
     }
 
     /**
-     * Create an instance of {@link GetChronopayConfig }
+     * Create an instance of {@link GetBanksResponse }
      * 
      */
-    public GetChronopayConfig createGetChronopayConfig() {
-        return new GetChronopayConfig();
+    public GetBanksResponse createGetBanksResponse() {
+        return new GetBanksResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListBySan }
+     * 
+     */
+    public GetCardListBySan createGetCardListBySan() {
+        return new GetCardListBySan();
+    }
+
+    /**
+     * Create an instance of {@link CreatePaymentOrderResponse }
+     * 
+     */
+    public CreatePaymentOrderResponse createCreatePaymentOrderResponse() {
+        return new CreatePaymentOrderResponse();
+    }
+
+    /**
+     * Create an instance of {@link ActivateLinkingToken }
+     * 
+     */
+    public ActivateLinkingToken createActivateLinkingToken() {
+        return new ActivateLinkingToken();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByTypedId }
+     * 
+     */
+    public GetSummaryByTypedId createGetSummaryByTypedId() {
+        return new GetSummaryByTypedId();
+    }
+
+    /**
+     * Create an instance of {@link ChangePaymentOrderStatus }
+     * 
+     */
+    public ChangePaymentOrderStatus createChangePaymentOrderStatus() {
+        return new ChangePaymentOrderStatus();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListExt }
+     * 
+     */
+    public PurchaseListExt createPurchaseListExt() {
+        return new PurchaseListExt();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByContractId }
+     * 
+     */
+    public SendLinkingTokenByContractId createSendLinkingTokenByContractId() {
+        return new SendLinkingTokenByContractId();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummaryExt }
+     * 
+     */
+    public ClientSummaryExt createClientSummaryExt() {
+        return new ClientSummaryExt();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListBySan }
+     * 
+     */
+    public GetEnterEventListBySan createGetEnterEventListBySan() {
+        return new GetEnterEventListBySan();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseExt }
+     * 
+     */
+    public PurchaseExt createPurchaseExt() {
+        return new PurchaseExt();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListBySanResponse }
+     * 
+     */
+    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
+        return new GetPaymentListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListBySanResponse }
+     * 
+     */
+    public GetCardListBySanResponse createGetCardListBySanResponse() {
+        return new GetCardListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListResponse }
+     * 
+     */
+    public GetCardListResponse createGetCardListResponse() {
+        return new GetCardListResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeMobilePhoneResponse }
+     * 
+     */
+    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
+        return new ChangeMobilePhoneResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetRBKMoneyConfig }
+     * 
+     */
+    public GetRBKMoneyConfig createGetRBKMoneyConfig() {
+        return new GetRBKMoneyConfig();
+    }
+
+    /**
+     * Create an instance of {@link GetRBKMoneyConfigResponse }
+     * 
+     */
+    public GetRBKMoneyConfigResponse createGetRBKMoneyConfigResponse() {
+        return new GetRBKMoneyConfigResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuItemExt }
+     * 
+     */
+    public MenuItemExt createMenuItemExt() {
+        return new MenuItemExt();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByTypedIdResponse }
+     * 
+     */
+    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
+        return new GetSummaryByTypedIdResponse();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByContractIdResponse }
+     * 
+     */
+    public SendLinkingTokenByContractIdResponse createSendLinkingTokenByContractIdResponse() {
+        return new SendLinkingTokenByContractIdResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangePersonalInfo }
+     * 
+     */
+    public ChangePersonalInfo createChangePersonalInfo() {
+        return new ChangePersonalInfo();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseElement }
+     * 
+     */
+    public PurchaseElement createPurchaseElement() {
+        return new PurchaseElement();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanBySanResponse }
+     * 
+     */
+    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
+        return new DetachGuardSanBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link RBKMoneyConfigExt }
+     * 
+     */
+    public RBKMoneyConfigExt createRBKMoneyConfigExt() {
+        return new RBKMoneyConfigExt();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventList }
+     * 
+     */
+    public GetEnterEventList createGetEnterEventList() {
+        return new GetEnterEventList();
+    }
+
+    /**
+     * Create an instance of {@link Data }
+     * 
+     */
+    public Data createData() {
+        return new Data();
+    }
+
+    /**
+     * Create an instance of {@link MenuDateItem }
+     * 
+     */
+    public MenuDateItem createMenuDateItem() {
+        return new MenuDateItem();
+    }
+
+    /**
+     * Create an instance of {@link SendPasswordRecoverURLFromEmail }
+     * 
+     */
+    public SendPasswordRecoverURLFromEmail createSendPasswordRecoverURLFromEmail() {
+        return new SendPasswordRecoverURLFromEmail();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentList }
+     * 
+     */
+    public GetPaymentList createGetPaymentList() {
+        return new GetPaymentList();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryResponse }
+     * 
+     */
+    public GetSummaryResponse createGetSummaryResponse() {
+        return new GetSummaryResponse();
     }
 
     /**
@@ -1229,11 +847,507 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ChangePaymentOrderStatusResponse }
+     * 
+     */
+    public ChangePaymentOrderStatusResponse createChangePaymentOrderStatusResponse() {
+        return new ChangePaymentOrderStatusResponse();
+    }
+
+    /**
+     * Create an instance of {@link CheckPasswordRestoreRequest }
+     * 
+     */
+    public CheckPasswordRestoreRequest createCheckPasswordRestoreRequest() {
+        return new CheckPasswordRestoreRequest();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListByOrgResponse }
+     * 
+     */
+    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
+        return new GetMenuListByOrgResponse();
+    }
+
+    /**
+     * Create an instance of {@link PaymentListResult }
+     * 
+     */
+    public PaymentListResult createPaymentListResult() {
+        return new PaymentListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetHiddenPagesResponse }
+     * 
+     */
+    public GetHiddenPagesResponse createGetHiddenPagesResponse() {
+        return new GetHiddenPagesResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetChronopayConfig }
+     * 
+     */
+    public GetChronopayConfig createGetChronopayConfig() {
+        return new GetChronopayConfig();
+    }
+
+    /**
+     * Create an instance of {@link CheckPasswordRestoreRequestResponse }
+     * 
+     */
+    public CheckPasswordRestoreRequestResponse createCheckPasswordRestoreRequestResponse() {
+        return new CheckPasswordRestoreRequestResponse();
+    }
+
+    /**
+     * Create an instance of {@link PaymentList }
+     * 
+     */
+    public PaymentList createPaymentList() {
+        return new PaymentList();
+    }
+
+    /**
+     * Create an instance of {@link CardItem }
+     * 
+     */
+    public CardItem createCardItem() {
+        return new CardItem();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryBySanResponse }
+     * 
+     */
+    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
+        return new GetSummaryBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientGroupList }
+     * 
+     */
+    public ClientGroupList createClientGroupList() {
+        return new ClientGroupList();
+    }
+
+    /**
+     * Create an instance of {@link ChangePersonalInfoResponse }
+     * 
+     */
+    public ChangePersonalInfoResponse createChangePersonalInfoResponse() {
+        return new ChangePersonalInfoResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuList }
+     * 
+     */
+    public MenuList createMenuList() {
+        return new MenuList();
+    }
+
+    /**
      * Create an instance of {@link DetachGuardSan }
      * 
      */
     public DetachGuardSan createDetachGuardSan() {
         return new DetachGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link CreatePaymentOrder }
+     * 
+     */
+    public CreatePaymentOrder createCreatePaymentOrder() {
+        return new CreatePaymentOrder();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByMobile }
+     * 
+     */
+    public SendLinkingTokenByMobile createSendLinkingTokenByMobile() {
+        return new SendLinkingTokenByMobile();
+    }
+
+    /**
+     * Create an instance of {@link ClassStudentListResult }
+     * 
+     */
+    public ClassStudentListResult createClassStudentListResult() {
+        return new ClassStudentListResult();
+    }
+
+    /**
+     * Create an instance of {@link CardListResult }
+     * 
+     */
+    public CardListResult createCardListResult() {
+        return new CardListResult();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanResult }
+     * 
+     */
+    public AttachGuardSanResult createAttachGuardSanResult() {
+        return new AttachGuardSanResult();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSanResponse }
+     * 
+     */
+    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
+        return new GetClientsByGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationByEmailResponse }
+     * 
+     */
+    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
+        return new EnableNotificationByEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link BankItem }
+     * 
+     */
+    public BankItem createBankItem() {
+        return new BankItem();
+    }
+
+    /**
+     * Create an instance of {@link GetIdOfContragent }
+     * 
+     */
+    public GetIdOfContragent createGetIdOfContragent() {
+        return new GetIdOfContragent();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventList }
+     * 
+     */
+    public EnterEventList createEnterEventList() {
+        return new EnterEventList();
+    }
+
+    /**
+     * Create an instance of {@link RequestWebParam }
+     * 
+     */
+    public RequestWebParam createRequestWebParam() {
+        return new RequestWebParam();
+    }
+
+    /**
+     * Create an instance of {@link GetContractIdByCardNoResponse }
+     * 
+     */
+    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
+        return new GetContractIdByCardNoResponse();
+    }
+
+    /**
+     * Create an instance of {@link IdResult }
+     * 
+     */
+    public IdResult createIdResult() {
+        return new IdResult();
+    }
+
+    /**
+     * Create an instance of {@link AuthorizeClientResponse }
+     * 
+     */
+    public AuthorizeClientResponse createAuthorizeClientResponse() {
+        return new AuthorizeClientResponse();
+    }
+
+    /**
+     * Create an instance of {@link BanksList }
+     * 
+     */
+    public BanksList createBanksList() {
+        return new BanksList();
+    }
+
+    /**
+     * Create an instance of {@link GetGroupListByOrg }
+     * 
+     */
+    public GetGroupListByOrg createGetGroupListByOrg() {
+        return new GetGroupListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByMobileResponse }
+     * 
+     */
+    public SendLinkingTokenByMobileResponse createSendLinkingTokenByMobileResponse() {
+        return new SendLinkingTokenByMobileResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChronopayConfigExt }
+     * 
+     */
+    public ChronopayConfigExt createChronopayConfigExt() {
+        return new ChronopayConfigExt();
+    }
+
+    /**
+     * Create an instance of {@link GetIdOfContragentResponse }
+     * 
+     */
+    public GetIdOfContragentResponse createGetIdOfContragentResponse() {
+        return new GetIdOfContragentResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSan }
+     * 
+     */
+    public GetClientsByGuardSan createGetClientsByGuardSan() {
+        return new GetClientsByGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link RbkMoneyConfigResult }
+     * 
+     */
+    public RbkMoneyConfigResult createRbkMoneyConfigResult() {
+        return new RbkMoneyConfigResult();
+    }
+
+    /**
+     * Create an instance of {@link ActivateLinkingTokenResponse }
+     * 
+     */
+    public ActivateLinkingTokenResponse createActivateLinkingTokenResponse() {
+        return new ActivateLinkingTokenResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetSummary }
+     * 
+     */
+    public GetSummary createGetSummary() {
+        return new GetSummary();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanBySan }
+     * 
+     */
+    public AttachGuardSanBySan createAttachGuardSanBySan() {
+        return new AttachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetStudentListByIdOfClientGroup }
+     * 
+     */
+    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
+        return new GetStudentListByIdOfClientGroup();
+    }
+
+    /**
+     * Create an instance of {@link ClientSmsListResult }
+     * 
+     */
+    public ClientSmsListResult createClientSmsListResult() {
+        return new ClientSmsListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetIdOfClient }
+     * 
+     */
+    public GetIdOfClient createGetIdOfClient() {
+        return new GetIdOfClient();
+    }
+
+    /**
+     * Create an instance of {@link GetClientSmsList }
+     * 
+     */
+    public GetClientSmsList createGetClientSmsList() {
+        return new GetClientSmsList();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummaryResult }
+     * 
+     */
+    public ClientSummaryResult createClientSummaryResult() {
+        return new ClientSummaryResult();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListBySanResponse }
+     * 
+     */
+    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
+        return new GetPurchaseListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeEmailResponse }
+     * 
+     */
+    public ChangeEmailResponse createChangeEmailResponse() {
+        return new ChangeEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanBySan }
+     * 
+     */
+    public DetachGuardSanBySan createDetachGuardSanBySan() {
+        return new DetachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListResult }
+     * 
+     */
+    public PurchaseListResult createPurchaseListResult() {
+        return new PurchaseListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListBySan }
+     * 
+     */
+    public GetPaymentListBySan createGetPaymentListBySan() {
+        return new GetPaymentListBySan();
+    }
+
+    /**
+     * Create an instance of {@link ClientItem }
+     * 
+     */
+    public ClientItem createClientItem() {
+        return new ClientItem();
+    }
+
+    /**
+     * Create an instance of {@link MenuListResult }
+     * 
+     */
+    public MenuListResult createMenuListResult() {
+        return new MenuListResult();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventItem }
+     * 
+     */
+    public EnterEventItem createEnterEventItem() {
+        return new EnterEventItem();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListBySanResponse }
+     * 
+     */
+    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
+        return new GetEnterEventListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListByOrg }
+     * 
+     */
+    public GetMenuListByOrg createGetMenuListByOrg() {
+        return new GetMenuListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItemList }
+     * 
+     */
+    public CirculationItemList createCirculationItemList() {
+        return new CirculationItemList();
+    }
+
+    /**
+     * Create an instance of {@link ClientList }
+     * 
+     */
+    public ClientList createClientList() {
+        return new ClientList();
+    }
+
+    /**
+     * Create an instance of {@link HiddenPagesResult }
+     * 
+     */
+    public HiddenPagesResult createHiddenPagesResult() {
+        return new HiddenPagesResult();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryBySan }
+     * 
+     */
+    public GetSummaryBySan createGetSummaryBySan() {
+        return new GetSummaryBySan();
+    }
+
+    /**
+     * Create an instance of {@link ChangeEmail }
+     * 
+     */
+    public ChangeEmail createChangeEmail() {
+        return new ChangeEmail();
+    }
+
+    /**
+     * Create an instance of {@link ChangeExpenditureLimit }
+     * 
+     */
+    public ChangeExpenditureLimit createChangeExpenditureLimit() {
+        return new ChangeExpenditureLimit();
+    }
+
+    /**
+     * Create an instance of {@link BanksData }
+     * 
+     */
+    public BanksData createBanksData() {
+        return new BanksData();
+    }
+
+    /**
+     * Create an instance of {@link CirculationListResult }
+     * 
+     */
+    public CirculationListResult createCirculationListResult() {
+        return new CirculationListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetHiddenPages }
+     * 
+     */
+    public GetHiddenPages createGetHiddenPages() {
+        return new GetHiddenPages();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanResult }
+     * 
+     */
+    public DetachGuardSanResult createDetachGuardSanResult() {
+        return new DetachGuardSanResult();
     }
 
     /**
@@ -1399,6 +1513,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GenerateLinkingToken }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "generateLinkingToken")
+    public JAXBElement<GenerateLinkingToken> createGenerateLinkingToken(GenerateLinkingToken value) {
+        return new JAXBElement<GenerateLinkingToken>(_GenerateLinkingToken_QNAME, GenerateLinkingToken.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetChronopayConfig }{@code >}}
      * 
      */
@@ -1435,6 +1558,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SendLinkingTokenByContractIdResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "sendLinkingTokenByContractIdResponse")
+    public JAXBElement<SendLinkingTokenByContractIdResponse> createSendLinkingTokenByContractIdResponse(SendLinkingTokenByContractIdResponse value) {
+        return new JAXBElement<SendLinkingTokenByContractIdResponse>(_SendLinkingTokenByContractIdResponse_QNAME, SendLinkingTokenByContractIdResponse.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetGroupListByOrg }{@code >}}
      * 
      */
@@ -1468,6 +1600,24 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getStudentListByIdOfClientGroupResponse")
     public JAXBElement<GetStudentListByIdOfClientGroupResponse> createGetStudentListByIdOfClientGroupResponse(GetStudentListByIdOfClientGroupResponse value) {
         return new JAXBElement<GetStudentListByIdOfClientGroupResponse>(_GetStudentListByIdOfClientGroupResponse_QNAME, GetStudentListByIdOfClientGroupResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GenerateLinkingTokenResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "generateLinkingTokenResponse")
+    public JAXBElement<GenerateLinkingTokenResponse> createGenerateLinkingTokenResponse(GenerateLinkingTokenResponse value) {
+        return new JAXBElement<GenerateLinkingTokenResponse>(_GenerateLinkingTokenResponse_QNAME, GenerateLinkingTokenResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SendLinkingTokenByMobile }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "sendLinkingTokenByMobile")
+    public JAXBElement<SendLinkingTokenByMobile> createSendLinkingTokenByMobile(SendLinkingTokenByMobile value) {
+        return new JAXBElement<SendLinkingTokenByMobile>(_SendLinkingTokenByMobile_QNAME, SendLinkingTokenByMobile.class, null, value);
     }
 
     /**
@@ -1597,6 +1747,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SendLinkingTokenByMobileResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "sendLinkingTokenByMobileResponse")
+    public JAXBElement<SendLinkingTokenByMobileResponse> createSendLinkingTokenByMobileResponse(SendLinkingTokenByMobileResponse value) {
+        return new JAXBElement<SendLinkingTokenByMobileResponse>(_SendLinkingTokenByMobileResponse_QNAME, SendLinkingTokenByMobileResponse.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ChangeEmail }{@code >}}
      * 
      */
@@ -1642,21 +1801,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeClient }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "authorizeClient")
-    public JAXBElement<AuthorizeClient> createAuthorizeClient(AuthorizeClient value) {
-        return new JAXBElement<AuthorizeClient>(_AuthorizeClient_QNAME, AuthorizeClient.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link CheckPasswordRestoreRequestResponse }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "checkPasswordRestoreRequestResponse")
     public JAXBElement<CheckPasswordRestoreRequestResponse> createCheckPasswordRestoreRequestResponse(CheckPasswordRestoreRequestResponse value) {
         return new JAXBElement<CheckPasswordRestoreRequestResponse>(_CheckPasswordRestoreRequestResponse_QNAME, CheckPasswordRestoreRequestResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeClient }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "authorizeClient")
+    public JAXBElement<AuthorizeClient> createAuthorizeClient(AuthorizeClient value) {
+        return new JAXBElement<AuthorizeClient>(_AuthorizeClient_QNAME, AuthorizeClient.class, null, value);
     }
 
     /**
@@ -1675,6 +1834,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getIdOfContragentResponse")
     public JAXBElement<GetIdOfContragentResponse> createGetIdOfContragentResponse(GetIdOfContragentResponse value) {
         return new JAXBElement<GetIdOfContragentResponse>(_GetIdOfContragentResponse_QNAME, GetIdOfContragentResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetHiddenPagesResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getHiddenPagesResponse")
+    public JAXBElement<GetHiddenPagesResponse> createGetHiddenPagesResponse(GetHiddenPagesResponse value) {
+        return new JAXBElement<GetHiddenPagesResponse>(_GetHiddenPagesResponse_QNAME, GetHiddenPagesResponse.class, null, value);
     }
 
     /**
@@ -1777,6 +1945,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SendLinkingTokenByContractId }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "sendLinkingTokenByContractId")
+    public JAXBElement<SendLinkingTokenByContractId> createSendLinkingTokenByContractId(SendLinkingTokenByContractId value) {
+        return new JAXBElement<SendLinkingTokenByContractId>(_SendLinkingTokenByContractId_QNAME, SendLinkingTokenByContractId.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ChangeExpenditureLimit }{@code >}}
      * 
      */
@@ -1786,12 +1963,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangePassword }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActivateLinkingTokenResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changePassword")
-    public JAXBElement<ChangePassword> createChangePassword(ChangePassword value) {
-        return new JAXBElement<ChangePassword>(_ChangePassword_QNAME, ChangePassword.class, null, value);
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "activateLinkingTokenResponse")
+    public JAXBElement<ActivateLinkingTokenResponse> createActivateLinkingTokenResponse(ActivateLinkingTokenResponse value) {
+        return new JAXBElement<ActivateLinkingTokenResponse>(_ActivateLinkingTokenResponse_QNAME, ActivateLinkingTokenResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetClientsByGuardSan }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getClientsByGuardSan")
+    public JAXBElement<GetClientsByGuardSan> createGetClientsByGuardSan(GetClientsByGuardSan value) {
+        return new JAXBElement<GetClientsByGuardSan>(_GetClientsByGuardSan_QNAME, GetClientsByGuardSan.class, null, value);
     }
 
     /**
@@ -1804,12 +1990,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetClientsByGuardSan }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangePassword }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getClientsByGuardSan")
-    public JAXBElement<GetClientsByGuardSan> createGetClientsByGuardSan(GetClientsByGuardSan value) {
-        return new JAXBElement<GetClientsByGuardSan>(_GetClientsByGuardSan_QNAME, GetClientsByGuardSan.class, null, value);
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changePassword")
+    public JAXBElement<ChangePassword> createChangePassword(ChangePassword value) {
+        return new JAXBElement<ChangePassword>(_ChangePassword_QNAME, ChangePassword.class, null, value);
     }
 
     /**
@@ -1840,6 +2026,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangePersonalInfoResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changePersonalInfoResponse")
+    public JAXBElement<ChangePersonalInfoResponse> createChangePersonalInfoResponse(ChangePersonalInfoResponse value) {
+        return new JAXBElement<ChangePersonalInfoResponse>(_ChangePersonalInfoResponse_QNAME, ChangePersonalInfoResponse.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetPurchaseListBySanResponse }{@code >}}
      * 
      */
@@ -1849,12 +2044,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangePersonalInfoResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetHiddenPages }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changePersonalInfoResponse")
-    public JAXBElement<ChangePersonalInfoResponse> createChangePersonalInfoResponse(ChangePersonalInfoResponse value) {
-        return new JAXBElement<ChangePersonalInfoResponse>(_ChangePersonalInfoResponse_QNAME, ChangePersonalInfoResponse.class, null, value);
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getHiddenPages")
+    public JAXBElement<GetHiddenPages> createGetHiddenPages(GetHiddenPages value) {
+        return new JAXBElement<GetHiddenPages>(_GetHiddenPages_QNAME, GetHiddenPages.class, null, value);
     }
 
     /**
@@ -1882,6 +2077,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getCirculationListResponse")
     public JAXBElement<GetCirculationListResponse> createGetCirculationListResponse(GetCirculationListResponse value) {
         return new JAXBElement<GetCirculationListResponse>(_GetCirculationListResponse_QNAME, GetCirculationListResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActivateLinkingToken }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "activateLinkingToken")
+    public JAXBElement<ActivateLinkingToken> createActivateLinkingToken(ActivateLinkingToken value) {
+        return new JAXBElement<ActivateLinkingToken>(_ActivateLinkingToken_QNAME, ActivateLinkingToken.class, null, value);
     }
 
     /**
