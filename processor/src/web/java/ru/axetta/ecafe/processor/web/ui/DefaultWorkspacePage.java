@@ -14,7 +14,7 @@ package ru.axetta.ecafe.processor.web.ui;
 public class DefaultWorkspacePage extends BasicWorkspacePage {
 
     public String getPageTitle() {
-        return "Welcome!";
+        return "Добро пожаловать!";
     }
 
 }
