@@ -530,6 +530,11 @@ CREATE TABLE CF_ReportHandleRules (
   Enabled                 INTEGER         NOT NULL,
   templatefilename        VARCHAR(256),
   Tag varchar(12), --v23
+  City varchar(128), --v23
+  District varchar(128), --v23
+  Location varchar(128), --v23
+  Latitude varchar(12), --v23
+  Longitude varchar(12), --v23
   CONSTRAINT CF_ReportHandleRules_pk PRIMARY KEY (IdOfReportHandleRule)
 );
 
