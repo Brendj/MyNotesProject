@@ -85,9 +85,9 @@ public class Client {
     private Set<ru.axetta.ecafe.processor.core.persistence.ClientSms> clientSms = new HashSet<ru.axetta.ecafe.processor.core.persistence.ClientSms>();
     private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
-    private Set<Circulation> circulations = new HashSet<Circulation>();
-    private Set<ru.axetta.ecafe.processor.core.persistence.EnterEvent> enterEvents = new HashSet<ru.axetta.ecafe.processor.core.persistence.EnterEvent>();
-    private Set<ru.axetta.ecafe.processor.core.persistence.CategoryDiscount> categoriesInternal = new HashSet<ru.axetta.ecafe.processor.core.persistence.CategoryDiscount>();
+    //private Set<Circulation> circulations = new HashSet<Circulation>();
+    private Set<EnterEvent> enterEvents = new HashSet<ru.axetta.ecafe.processor.core.persistence.EnterEvent>();
+    private Set<CategoryDiscount> categoriesInternal = new HashSet<ru.axetta.ecafe.processor.core.persistence.CategoryDiscount>();
 
     public Set<ru.axetta.ecafe.processor.core.persistence.CategoryDiscount> getCategories(){
         return getCategoriesInternal();
@@ -602,19 +602,19 @@ public class Client {
         return null;
     }*/
 
-    private Set<Circulation> getCirculationsInternal() {
-        // For Hibernate only
-        return circulations;
-    }
-
-    private void setCirculationsInternal(Set<Circulation> cards) {
-        // For Hibernate only
-        this.circulations = circulations;
-    }
-
-    public Set<Circulation> getCirculations() {
-        return Collections.unmodifiableSet(getCirculationsInternal());
-    }
+    //private Set<Circulation> getCirculationsInternal() {
+    //    // For Hibernate only
+    //    return circulations;
+    //}
+    //
+    //private void setCirculationsInternal(Set<Circulation> cards) {
+    //    // For Hibernate only
+    //    this.circulations = circulations;
+    //}
+    //
+    //public Set<Circulation> getCirculations() {
+    //    return Collections.unmodifiableSet(getCirculationsInternal());
+    //}
 
     @Override
     public boolean equals(Object o) {
