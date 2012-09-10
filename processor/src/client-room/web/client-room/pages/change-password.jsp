@@ -30,6 +30,9 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="java.security.MessageDigest" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -105,13 +108,21 @@
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
                 Client client = (Client) clientCriteria.uniqueResult();*/
+                String plainPassword= currPassword;
+                final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+                final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+                String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
 
-
-                 boolean clientHasCurrPassword=port.authorizeClient(clientAuthToken.getContractId(),Client.encryptPassword(currPassword)).getResultCode().equals(new Long(0));
+                 boolean clientHasCurrPassword=port.authorizeClient(clientAuthToken.getContractId(),sha1HashString).getResultCode().equals(new Long(0));
                 try {
                     if (clientHasCurrPassword) {
                        /* client.setPassword(newPassword);*/
-                          port.changePassword(contractId,Client.encryptPassword(newPassword));
+
+                        /*final byte[] plainPasswordBytes2 = newPassword.getBytes(CharEncoding.UTF_8);
+                        final MessageDigest messageDigest2 = MessageDigest.getInstance("SHA1");
+                        String sha1HashString2 = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes2)), CharEncoding.US_ASCII);*/
+                         String base64passwordHash  =new String(Base64.encodeBase64(newPassword.getBytes()), CharEncoding.US_ASCII) ;
+                          port.changePassword(contractId,base64passwordHash);
                         /*client.setUpdateTime(new Date());*/
                         /*persistenceSession.update(client);*/
                         dataProcessSucceed = true;

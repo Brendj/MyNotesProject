@@ -23,6 +23,9 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="java.security.MessageDigest" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.client-room.web.client-room.pages.login_jsp");
@@ -91,7 +94,12 @@
 
                 logger.info("password: "+password);
 
-                Result ra = port.authorizeClient(contractId, Client.encryptPassword(password));
+                String plainPassword=password;
+                final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+                final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+                String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
+
+                Result ra = port.authorizeClient(contractId, sha1HashString);
                 //System.out.println("AUTH CLIENT: " + ra.getResultCode()+":"+ra.getDescription());
 
 

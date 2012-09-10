@@ -12,6 +12,7 @@
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.util.Arrays" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%--<%@ page import="RuntimeContext" %>--%>
 
 
@@ -82,9 +83,11 @@
         logger.error("Error during currentUri building", e);
         throw new ServletException(e);
     }
-   // String hidePagesAttr=(String)request.getAttribute("hidePages");
-   // if (hidePagesAttr==null) hidePagesAttr="";
+   String hidePagesAttr=(String)request.getAttribute("hidePages");
+    if (hidePagesAttr==null) hidePagesAttr="";
+   ClientRoomController port= clientAuthToken.getPort() ;
    // hidePagesAttr+=","+RuntimeContext.getInstance().getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
+    hidePagesAttr+=","+port.getHiddenPages().getHiddenPages();
     String[] pageNames = {
             SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_JOURNAL,  SHOW_LIBRARY, PAY_BANK_INFO, PREPARE_PAY_PAGE,
             SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
@@ -96,7 +99,7 @@
     <tr>
         <% 
             for (int i = 0; i != pageNames.length; ++i) {
-                if (pageNames[i]==null /*|| hidePagesAttr.indexOf(pageNames[i])!=-1*/) continue;
+                if (pageNames[i]==null || hidePagesAttr.indexOf(pageNames[i])!=-1) continue;
                 if (!(clientAuthToken.isSsoAuth() && (StringUtils.equals(LOGOUT_PAGE, pageNames[i]) || StringUtils
                         .equals(CHANGE_PASSWORD_PAGE, pageNames[i])))) {
                     boolean activePage = null != pageNames[i] && StringUtils.equals(pageNames[i], pageName);
