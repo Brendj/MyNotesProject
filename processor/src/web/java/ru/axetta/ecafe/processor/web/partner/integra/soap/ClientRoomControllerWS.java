@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
@@ -1884,6 +1885,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
 
+    @WebMethod(operationName="getHiddenPages")
 
+    public HiddenPagesResult getHiddenPages(){
+        RuntimeContext runtimeContext=null;
+        HiddenPagesResult r=new HiddenPagesResult();
+        r.resultCode=RC_OK;
+        r.description=RC_OK_DESC;
+        runtimeContext=RuntimeContext.getInstance();
+        String hiddenPages=runtimeContext.getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
+        r.hiddenPages=hiddenPages;
+        return r;
+    }
 
 }

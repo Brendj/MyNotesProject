@@ -137,5 +137,7 @@ public interface ClientRoomController {
            @WebParam(name="email") String email,@WebParam(name="smsNotificationState") boolean smsNotificationState);
 
 
+    @WebMethod(operationName="getHiddenPages")
+    public HiddenPagesResult getHiddenPages();
 
 }
