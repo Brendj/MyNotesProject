@@ -29,7 +29,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
-          <factory-entry name="client_room" />
+          <factory-entry name="client_room" value="ae486cbf-e3ec-4e67-9bc9-200ddeee8589" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../../src/client-room/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
@@ -53,6 +53,9 @@
     <orderEntry type="module" module-name="core" exported="" scope="PROVIDED" />
     <orderEntry type="module" module-name="web" exported="" scope="PROVIDED" />
     <orderEntry type="module" module-name="util" exported="" scope="PROVIDED" />
+    <orderEntry type="library" name="jsr181-api" level="project" />
+    <orderEntry type="library" name="richfaces-api-3.3.2.SR1" level="project" />
+    <orderEntry type="library" name="client-room" level="project" />
   </component>
 </module>
 
