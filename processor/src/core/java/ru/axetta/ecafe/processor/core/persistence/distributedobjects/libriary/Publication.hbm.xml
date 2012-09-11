@@ -31,7 +31,7 @@
         <property name="title2" column="title2" type="string" length="255" not-null="false"/>
         <property name="publicationdate" column="publicationdate" type="string" length="15" not-null="false"/>
         <property name="publisher" column="publisher" type="string" length="255" not-null="false"/>
-        <property name="hash" column="hash" type="string" length="32" not-null="false"/>
+        <property name="hash" column="hash" type="integer" not-null="false"/>
 
     </class>
 </hibernate-mapping>

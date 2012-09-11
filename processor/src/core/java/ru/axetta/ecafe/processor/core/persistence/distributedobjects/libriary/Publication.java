@@ -38,7 +38,7 @@ public class Publication extends DistributedObject {
     private String title2;
     private String publicationdate;
     private String publisher;
-    private String hash;
+    private Integer hash;
 
     @Override
     protected void appendAttributes(Element element) {
@@ -61,7 +61,7 @@ public class Publication extends DistributedObject {
             setIsbn(stringIsbn);
         }
 
-        String stringHash = record.getStringForHash();
+        Integer stringHash = record.getStringForHash().hashCode();
         if (stringHash != null) {
             setHash(stringHash);
         }
@@ -159,11 +159,11 @@ public class Publication extends DistributedObject {
         this.publisher = publisher;
     }
 
-    public String getHash() {
+    public Integer getHash() {
         return hash;
     }
 
-    public void setHash(String hash) {
+    public void setHash(Integer hash) {
         this.hash = hash;
     }
 

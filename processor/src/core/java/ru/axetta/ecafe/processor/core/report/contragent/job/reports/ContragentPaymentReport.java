@@ -11,10 +11,12 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,125 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
     public static class Builder implements BasicReportForContragentJob.Builder{
 
+        public static class PersonItem {
+
+            private final String firstName;
+            private final String surName;
+            private final String secondName;
+            private final String idDocument;
+
+            public String getFirstName() {
+                return firstName;
+            }
+
+            public String getSurName() {
+                return surName;
+            }
+
+            public String getSecondName() {
+                return secondName;
+            }
+
+            public String getIdDocument() {
+                return idDocument;
+            }
+
+            public PersonItem(Person person) {
+                this.firstName = person.getFirstName();
+                this.surName = person.getSurname();
+                this.secondName = person.getSecondName();
+                this.idDocument = person.getIdDocument();
+            }
+        }
+
+        public static class OrgItem{
+            private final Long idOfOrg;
+            private final String shortName;
+            private final String officialName;
+
+            public OrgItem(Org org) {
+                this.idOfOrg = org.getIdOfOrg();
+                this.shortName = org.getShortName();
+                this.officialName = org.getOfficialName();
+            }
+
+            public Long getIdOfOrg() {
+                return idOfOrg;
+            }
+
+            public String getShortName() {
+                return shortName;
+            }
+
+            public String getOfficialName() {
+                return officialName;
+            }
+        }
+
+        public static class ClientItem {
+
+            private final Long idOfClient;
+            private final Long contractId;
+            private final PersonItem person;
+            private final OrgItem orgItem;
+
+            public OrgItem getOrgItem() {
+                return orgItem;
+            }
+
+            public Long getIdOfClient() {
+                return idOfClient;
+            }
+
+            public Long getContractId() {
+                return contractId;
+            }
+
+            public PersonItem getPerson() {
+                return person;
+            }
+
+            public ClientItem(Client client) {
+                this.idOfClient = client.getIdOfClient();
+                this.contractId = client.getContractId();
+                this.person = new PersonItem(client.getPerson());
+                this.orgItem = new OrgItem(client.getOrg());
+            }
+        }
+
+        public static class CardItem {
+
+            private Long idOfCard;
+            private Long cardNo;
+            private Integer state;
+            private Integer lifeState;
+
+            public Long getIdOfCard() {
+                return idOfCard;
+            }
+
+            public Long getCardNo() {
+                return cardNo;
+            }
+
+            public Integer getState() {
+                return state;
+            }
+
+            public Integer getLifeState() {
+                return lifeState;
+            }
+
+            public CardItem(Card card) {
+                if (card!=null) {
+                    this.idOfCard = card.getIdOfCard();
+                    this.cardNo = card.getCardNo();
+                    this.state = card.getState();
+                    this.lifeState = card.getLifeState();
+                }
+            }
+        }
+
         public static class TransactionItem {
 
             private final Date transactionTime;
@@ -45,13 +166,25 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             }
         }
 
-        public static class ContragentPaymentItem {
+        public static class ClientPaymentItem {
+
+            private final ClientItem client;
             private final TransactionItem transaction;
+            private final CardItem card;
             private final long paySum;
             private final Date createTime;
+            private final String idOfPayment;
+
+            public ClientItem getClient() {
+                return client;
+            }
 
             public TransactionItem getTransaction() {
                 return transaction;
+            }
+
+            public CardItem getCard() {
+                return card;
             }
 
             public long getPaySum() {
@@ -62,11 +195,18 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 return createTime;
             }
 
-            public ContragentPaymentItem(ContragentPayment contragentPayment) {
-                AccountTransaction accountTransaction = contragentPayment.getTransaction();
+            public String getIdOfPayment() {
+                return idOfPayment;
+            }
+
+            public ClientPaymentItem(ClientPayment clientPayment) {
+                AccountTransaction accountTransaction = clientPayment.getTransaction();
+                this.client = new ClientItem(accountTransaction.getClient());
                 this.transaction = new TransactionItem(accountTransaction);
-                this.paySum = contragentPayment.getPaySum();
-                this.createTime = contragentPayment.getCreateTime();
+                this.card = new CardItem(accountTransaction.getCard());
+                this.paySum = clientPayment.getPaySum();
+                this.createTime = clientPayment.getCreateTime();
+                this.idOfPayment = clientPayment.getIdOfPayment();
             }
         }
 
@@ -75,6 +215,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
+
+        private long totalSum;
 
         @Override
         public BasicReportJob build(Session session, Contragent contragent, Date startTime, Date endTime,
@@ -95,22 +237,39 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, contragent, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
+            parameterMap.put("totalSum", totalSum);
             return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, contragent.getIdOfContragent());
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
                 Calendar clone, Map<Object, Object> parameterMap) {
-            List<ContragentPaymentItem> contragentInfoList = new LinkedList<ContragentPaymentItem>();
-            Criteria criteria = session.createCriteria(ContragentPayment.class);
-            criteria.add(Restrictions.eq("contragent",contragent));
-            criteria.add(Restrictions.between("createTime",startTime,endTime));
-            List list = criteria.list();
-            for (Object  object: list){
-                ContragentPayment contragentPayment = (ContragentPayment) object;
-                ContragentPaymentItem contragentPaymentItem = new ContragentPaymentItem(contragentPayment);
+            //Criteria criteria = session.createCriteria(ContragentPayment.class);
+            //criteria.add(Restrictions.eq("contragent",contragent));
+            //criteria.add(Restrictions.between("createTime", startTime, endTime));
+            //criteria.addOrder(Order.asc("createTime"));
+            //List list = criteria.list();
+            //for (Object  object: list){
+            //    ContragentPayment contragentPayment = (ContragentPayment) object;
+            //    ClientPaymentItem contragentPaymentItem = new ClientPaymentItem(contragentPayment);
+            //    contragentInfoList.add(contragentPaymentItem);
+            //}
+            Date generateTime = new Date();
+            Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
+            clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
+            clientPaymentCriteria.add(Restrictions.between("createTime",startTime,endTime));
+            clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+            HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");
+            List clientPayments = clientPaymentCriteria.list();
+            totalSum = 0;
+            List<ClientPaymentItem> clientPaymentItems = new LinkedList<ClientPaymentItem>();
+            for (Object currObject : clientPayments) {
+                ClientPayment currClientPayment = (ClientPayment) currObject;
+                ClientPaymentItem newClientPaymentItem = new ClientPaymentItem(currClientPayment);
+                clientPaymentItems.add(newClientPaymentItem);
+                totalSum += newClientPaymentItem.getPaySum();
             }
-            return new JRBeanCollectionDataSource(contragentInfoList);
+            return new JRBeanCollectionDataSource(clientPaymentItems);
         }
     }
 

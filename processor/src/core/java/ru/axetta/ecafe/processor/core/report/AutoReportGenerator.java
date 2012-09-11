@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
+import ru.axetta.ecafe.processor.core.report.contragent.job.reports.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -425,6 +426,27 @@ public class AutoReportGenerator {
                         return jobDetail;
                     }
                 }));
+        REPORT_DEFS.add(new ReportDef(ContragentPaymentReport.class, ContragentPaymentReport.AutoReportBuildJob.class, new  JobDetailCreator(){
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new ContragentPaymentReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(ContragentPaymentReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        })
+        );
     } // static
 
 
@@ -696,7 +718,8 @@ public class AutoReportGenerator {
 
     public String getReportsTemplateFilePath() {
         //TODO заменить "path" на константу
-        String path = this.getReportProperties().getProperty("path");
+        //String path = this.getReportProperties().getProperty("path");
+        String path = "D:\\home\\jbosser\\processor\\report_templates";
         if (path==null) return null;
         if (!path.endsWith("/") && !path.endsWith("\\")) path+='/';
         return path;

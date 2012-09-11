@@ -383,7 +383,7 @@ public class Manager {
             } else{
                 whereOrgSource = " orgOwner = "+idOfOrg;
             }
-            where = (where.equals("")?whereOrgSource: where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
+            where = (where.equals("")?whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
             }

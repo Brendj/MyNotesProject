@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.report.contragent.job.reports.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -121,7 +122,8 @@ public class ReportRuleConstants {
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25})
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25}),
+            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{21})
     };
 
     private ReportRuleConstants() {
