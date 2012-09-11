@@ -1864,7 +1864,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         //enableNotificationBySms
-        if (!daoService.enableClientNotificationByEmail(contractId, smsNotificationState)) {
+        if (!daoService.enableClientNotificationBySMS(contractId, smsNotificationState)) {
             r.resultCode=RC_CLIENT_NOT_FOUND;
             r.description=RC_CLIENT_NOT_FOUND_DESC;
         }
