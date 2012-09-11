@@ -635,9 +635,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         fromCal.add(Calendar.HOUR, -1);
         menuCriteria.add(Restrictions.eq("org", org));
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
-        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        //menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+
+        /*menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));*/
+        //menuCriteria.add(Restrictions.ge("menuDate", DateUtils.addDays(startDate, 1)));
+       // menuCriteria.add(Restrictions.lt("menuDate", endDate));
+        menuCriteria.add(Restrictions.between("menuDate",DateUtils.addDays(startDate, 1),DateUtils.addDays(endDate, 1)));
+       // menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
 
         List menus = menuCriteria.list();
         MenuListExt menuListExt = objectFactory.createMenuListExt();
