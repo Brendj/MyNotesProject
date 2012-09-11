@@ -121,7 +121,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
-            List<MealRow> mealRows = new LinkedList<MealRow>();;
+            List<MealRow> mealRows = new LinkedList<MealRow>();
 
             Object[] vals;
 
@@ -136,7 +136,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
             complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
             complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
-            complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
+            complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбор
             complexQuery_1.setParameter("startTime", startTime.getTime());
             complexQuery_1.setParameter("endTime", endTime.getTime());
 
@@ -245,6 +245,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         super(generateTime, generateDuration, print, startTime, endTime,
                 idOfOrg);    //To change body of overridden methods use File | Settings | File Templates.
     }
+
     private static final Logger logger = LoggerFactory.getLogger(DailySalesByGroupsReport.class);
 
     public DailySalesByGroupsReport() {}

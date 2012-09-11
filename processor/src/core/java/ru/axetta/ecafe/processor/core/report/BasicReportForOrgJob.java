@@ -116,7 +116,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
     }
 
     @Override
-    String getReportDistinctText() {
+    public String getReportDistinctText() {
         return Long.toString(idOfOrg);
     }
 

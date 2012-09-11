@@ -249,7 +249,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
     }
 
-    abstract String getReportDistinctText();
+    public abstract String getReportDistinctText();
 
     public static class DocumentBuilderCallback implements BasicReport.DocumentBuilderCallback {
         public String getReportDistinctText(BasicReport report) {

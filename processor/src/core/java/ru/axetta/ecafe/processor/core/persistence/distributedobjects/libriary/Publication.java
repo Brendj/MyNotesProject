@@ -42,13 +42,13 @@ public class Publication extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
-        setAttribute(element, "data", data);
+        //setAttribute(element, "Guid", guid);
+        setAttribute(element, "Data", data);
     }
 
     @Override
     protected Publication parseAttributes(Node node) throws Exception {
-        String data = getStringAttributeValue(node, "data", 65536);
+        String data = getStringAttributeValue(node, "Data", 65536);
         String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
         DataInputStream dataInputStream = new DataInputStream(
                 new ByteArrayInputStream(Base64AndZip.decodeAndUngzip(data.getBytes())));

@@ -22,13 +22,14 @@ public class RetirementReason extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "Guid", guid);
+        setAttribute(element, "RetirementReasonName", retirementReasonName);
     }
 
     @Override
     public RetirementReason parseAttributes(Node node) throws Exception{
 
-        String retirementReasonName = getStringAttributeValue(node, "retirementReasonName", 45);
+        String retirementReasonName = getStringAttributeValue(node, "RetirementReasonName", 45);
         if (retirementReasonName != null) {
             setRetirementReasonName(retirementReasonName);
         }
