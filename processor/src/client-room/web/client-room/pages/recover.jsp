@@ -22,17 +22,20 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
 
 <%//ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
     // ClientAuthToken clientAuthToken=ClientAuthToken.loadFrom(session);
-
-    //ClientRoomController port=clientAuthToken.getPort();
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.recover_jsp");
-    String cityName=request.getParameter("cityName");
-    logger.info("from recover: cityName="+cityName);
+    try{
+    //ClientRoomController port=clientAuthToken.getPort();
+
+   Long  cityId=Long.parseLong(request.getParameter("cityId"));
+    logger.info("from recover: cityId="+cityId);
 
 
-    City city= DAOService.getInstance().getCityByName(cityName);
+    City city= DAOService.getInstance().getCity(cityId).get(0);
 
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
@@ -100,7 +103,8 @@
         if (havePasswordData && dataToProcessVerified) {
             contractId = Long.valueOf(request.getParameter(CONTRACT_ID_PARAM));
 
-            ru.axetta.ecafe.processor.web.bo.client.Result r= port.changePassword(contractId, Client.encryptPassword(newPassword));
+            String base64passwordHash  =new String(Base64.encodeBase64(newPassword.getBytes()), CharEncoding.US_ASCII) ;
+            ru.axetta.ecafe.processor.web.bo.client.Result r= port.changePassword(contractId, base64passwordHash);
 
 
             if (r.getResultCode().equals(0L)) {
@@ -182,4 +186,4 @@
         <td>Ссылка недействительна.</td>
     </tr>
 </table>
-<%}%>
+<%}}catch(Exception e){logger.error("error",e);}%>

@@ -281,6 +281,7 @@
                     = service.getClientRoomControllerWSPort();
             ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
 */           ClientRoomController port=clientAuthToken.getPort();
+            logger.info("from show-library: "+port);
 
            /* persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -298,7 +299,13 @@
             List<Circulation> circulationList = circulationCriteria.list();*/
             for(int status=0;status<4;status++){
             ru.axetta.ecafe.processor.web.bo.client.CirculationListResult circulationListResult=port.getCirculationList(clientAuthToken.getContractId(),status)  ;
-              ru.axetta.ecafe.processor.web.bo.client.CirculationItemList circulationItemList =circulationListResult.getCirculationList();
+                logger.info("circulationListResult: "+circulationListResult.getResultCode()+" "+circulationListResult.getDescription());
+                if(circulationListResult.getResultCode()!=0) {
+
+                     return;}
+
+
+                ru.axetta.ecafe.processor.web.bo.client.CirculationItemList circulationItemList =circulationListResult.getCirculationList();
                 List<ru.axetta.ecafe.processor.web.bo.client.CirculationItem> circulations=circulationItemList.getC();
 
 

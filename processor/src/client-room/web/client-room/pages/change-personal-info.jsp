@@ -33,6 +33,9 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
+<%@ page import="java.security.MessageDigest" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -123,7 +126,13 @@
                 logger.info("work");
                 try {
                     dataProcessSucceed = false;
-                   boolean passwordIsRight= port.authorizeClient(contractId,Client.encryptPassword(currPassword)).getResultCode().equals(new Long(0));
+
+                    String plainPassword=currPassword;
+                    final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+                    final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+                    String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
+
+                   boolean passwordIsRight= port.authorizeClient(contractId,sha1HashString).getResultCode().equals(new Long(0));
 
                     if (passwordIsRight) {
                         logger.info("Work start");

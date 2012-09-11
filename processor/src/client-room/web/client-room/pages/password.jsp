@@ -89,7 +89,7 @@
 
 
 
-                 requestWebParam.setUrl(passwordRecoverURI.toString()+"?"+CITY_PARAM+"="+cityName);
+                 requestWebParam.setUrl(passwordRecoverURI.toString()+"?"+"cityId"+"="+city.getIdOfCity().toString());
 
                   SendResult sr=  port.sendPasswordRecoverURLFromEmail(contractId,requestWebParam);
 
