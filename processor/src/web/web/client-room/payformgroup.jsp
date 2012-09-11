@@ -118,9 +118,7 @@
         %>
         <p><%=docTitle%></p>
         <p><%=c.getPerson().getSurname()+" "+c.getPerson().getFirstName()+" "+c.getPerson().getSecondName()+": баланс "+ CurrencyStringUtils.copecksToRubles(c.getBalance())+" руб."%></p>
-        <jsp:include page="payform_receipt.jsp">
-            <jsp:param name="paySum" value="500"/>
-        </jsp:include>
+        <jsp:include page="payform_receipt.jsp"/>
         <p style="page-break-before: always"/>
         <%
     }
