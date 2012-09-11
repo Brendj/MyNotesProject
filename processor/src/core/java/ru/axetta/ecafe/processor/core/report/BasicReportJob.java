@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -76,6 +77,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
             private final DateFormat dateFormat;
             private final DateFormat timeFormat;
             private final BasicReportJob reportJob;
+            private Date startDate, endDate;
 
             public ExecuteEnvironment(BasicReportJob reportJob, ExecutorService executorService, SessionFactory sessionFactory,
                     AutoReportProcessor autoReportProcessor, String reportPath, String templateFileName,
@@ -128,6 +130,22 @@ public abstract class BasicReportJob extends BasicJasperReport {
                     return (DateFormat) timeFormat.clone();
                 }
             }
+
+            public Date getStartDate() {
+                return startDate;
+            }
+
+            public void setStartDate(Date startDate) {
+                this.startDate = startDate;
+            }
+
+            public Date getEndDate() {
+                return endDate;
+            }
+
+            public void setEndDate(Date endDate) {
+                this.endDate = endDate;
+            }
         }
 
         public static final String ENVIRONMENT_JOB_PARAM = ExecuteEnvironment.class.getCanonicalName();
@@ -142,32 +160,36 @@ public abstract class BasicReportJob extends BasicJasperReport {
             final ExecuteEnvironment executeEnvironment = (ExecuteEnvironment) context.getJobDetail().getJobDataMap()
                     .get(ENVIRONMENT_JOB_PARAM);
             Calendar calendar = executeEnvironment.getCalendar();
-            Date endTime=null, startTime;
-            startTime = (Date)context.getJobDetail().getJobDataMap().get(JOB_PARAM_START_DATE);
-            context.getJobDetail().getJobDataMap().put(JOB_PARAM_START_DATE, null);
+            Date endTime, startTime;
+            startTime = executeEnvironment.getStartDate();
+            executeEnvironment.setStartDate(null);
+            endTime = executeEnvironment.getEndDate();
+            executeEnvironment.setEndDate(null);
 
-            if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_MONTH) {
-                if (startTime==null) startTime = calculateLastMonthFirstDay(calendar, context.getScheduledFireTime());
-                endTime = calculatePlusOneMonth(calendar, startTime);
-            } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_DAY) {
-                if (startTime==null) startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
-                endTime = calculatePlusOneDay(calendar, startTime);
-            } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_PREV_DAY) {
-                if (startTime==null) {
-                    startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
-                    startTime = calculateMinusOneDay(calendar, startTime);
+            if (endTime==null) {
+                if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_MONTH) {
+                    if (startTime==null) startTime = calculateLastMonthFirstDay(calendar, context.getScheduledFireTime());
+                    endTime = calculatePlusOneMonth(calendar, startTime);
+                } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_DAY) {
+                    if (startTime==null) startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
+                    endTime = calculatePlusOneDay(calendar, startTime);
+                } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_PREV_DAY) {
+                    if (startTime==null) {
+                        startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
+                        startTime = calculateMinusOneDay(calendar, startTime);
+                    }
+                    endTime = calculatePlusOneDay(calendar, startTime);
+                } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_PREV_PREV_DAY) {
+                    if (startTime==null) {
+                        startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
+                        startTime = calculateMinusOneDay(calendar, startTime);
+                        startTime = calculateMinusOneDay(calendar, startTime);
+                    }
+                    endTime = calculatePlusOneDay(calendar, startTime);
+                } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_TODAY) {
+                    if (startTime==null) startTime = calculateTodayStart(calendar, context.getScheduledFireTime());
+                    endTime = calculatePlusOneDay(calendar, startTime);
                 }
-                endTime = calculatePlusOneDay(calendar, startTime);
-            } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_PREV_PREV_DAY) {
-                if (startTime==null) {
-                    startTime = calculateYesterdayStart(calendar, context.getScheduledFireTime());
-                    startTime = calculateMinusOneDay(calendar, startTime);
-                    startTime = calculateMinusOneDay(calendar, startTime);
-                }
-                endTime = calculatePlusOneDay(calendar, startTime);
-            } else if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_TODAY) {
-                if (startTime==null) startTime = calculateTodayStart(calendar, context.getScheduledFireTime());
-                endTime = calculatePlusOneDay(calendar, startTime);
             }
             return new AutoReportBuildTask(executeEnvironment.reportJob.getAutoReportRunner(), executeEnvironment.getExecutorService(),
                     executeEnvironment.getAutoReportProcessor(), executeEnvironment.getSessionFactory(),
