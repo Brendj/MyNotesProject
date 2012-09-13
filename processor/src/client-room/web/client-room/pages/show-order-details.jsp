@@ -34,6 +34,26 @@
     final Logger logger = LoggerFactory
             .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-order-details_jsp");
 
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     RuntimeContext runtimeContext = null;
     try {
@@ -104,7 +124,14 @@
         greEndDate.setTime(orderTime);
         XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);*/
         ru.axetta.ecafe.processor.web.bo.client.PurchaseExt order=null;
-        List<ru.axetta.ecafe.processor.web.bo.client.PurchaseExt> orders= port.getPurchaseList(clientAuthToken.getContractId(),xmlOrderTime,xmlOrderTime).getPurchaseList().getP();
+        PurchaseListResult purchsesResult=port.getPurchaseList(clientAuthToken.getContractId(),xmlOrderTime,xmlOrderTime);
+
+        if(!RC_OK.equals(purchsesResult.getResultCode())){
+
+            throw new Exception(purchsesResult.getDescription());
+        }
+
+        List<ru.axetta.ecafe.processor.web.bo.client.PurchaseExt> orders= purchsesResult.getPurchaseList().getP();
          order = orders.get(0);
        // for(PurchaseExt purchaseExt:orders){if(purchaseExt.getTime().toGregorianCalendar().getTime().equals(orderTime)){order = purchaseExt;}  }
 
@@ -197,7 +224,13 @@
        // Card card = order.getCard();
         //Long idOfCard=order.getIdOfCard();
         ru.axetta.ecafe.processor.web.bo.client.CardItem card=null;
-        List<ru.axetta.ecafe.processor.web.bo.client.CardItem>cards=port.getCardList(clientAuthToken.getContractId()).getCardList().getC();
+
+         CardListResult cardsResult=port.getCardList(clientAuthToken.getContractId());
+
+          if(!RC_OK.equals(cardsResult.getResultCode())){
+              throw new Exception(cardsResult.getDescription());
+          }
+        List<ru.axetta.ecafe.processor.web.bo.client.CardItem>cards=cardsResult.getCardList().getC();
 
         logger.info("requiredId: "+order.getIdOfCard());
         logger.info("cardsCount: "+cards.size());
@@ -286,7 +319,11 @@
                 persistenceTransaction = null;*/
             } catch (Exception e) {
                 logger.error("Failed to build page", e);
-                throw new ServletException(e);
+
+                    %>
+        <div class="error-output-text"> Не удалось отобразить данные заказа </div>
+<%
+               // throw new ServletException(e);
             } finally {
                /* HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);*/

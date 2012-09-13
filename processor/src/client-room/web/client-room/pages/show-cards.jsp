@@ -22,15 +22,32 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.TimeZone" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CardList" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CardItem" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-cards_jsp");
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
 
     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     RuntimeContext runtimeContext = null;
@@ -50,6 +67,7 @@
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
 
         ClientRoomController port=clientAuthToken.getPort();
+        //if(true){throw new Exception();}
 
 %>
 
@@ -88,8 +106,11 @@
         Criteria cardsCritieria = persistenceSession.createCriteria(Card.class);
         cardsCritieria.add(Restrictions.eq("client", client));
         cardsCritieria.addOrder(org.hibernate.criterion.Order.asc("createTime"));*/
-
-        CardList cardList= port.getCardList(contractId).getCardList();
+        CardListResult cardResult= port.getCardList(contractId);
+        if(!cardResult.getResultCode().equals(RC_OK)){
+            throw new Exception(cardResult.getDescription());
+        }
+        CardList cardList= cardResult.getCardList();
         List<CardItem> cardItemList=cardList.getC();
         //List cardsList = cardsCritieria.list();
         /*for (Object currCardObject : cardsList) {
@@ -150,7 +171,12 @@
             /*throw new UnavailableException(e.getMessage());*/
         } catch (Exception e) {
             logger.error("Failed to build page", e);
-            throw new ServletException(e);
+              %>
+    <div class="error-output-text"> Не удалось отобразить список карт</div>
+
+    <%
+
+            //throw new ServletException(e);
         } finally {
             /*HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);*/

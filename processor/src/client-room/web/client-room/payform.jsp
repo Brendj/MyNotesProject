@@ -17,6 +17,8 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="windows-1251" %>
 <%--
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
@@ -27,7 +29,29 @@
 <%
 
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.payform_jsp");
+
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     Long contractId = null;
+    boolean haveDataToShow=true;
     if (StringUtils.isNotEmpty(request.getParameter("contractId"))) {
         try {
             contractId = Long.parseLong(request.getParameter("contractId"));
@@ -47,12 +71,24 @@
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
             clientCriteria.add(Restrictions.eq("contractId", contractId));
             Client client = (Client) clientCriteria.uniqueResult();*/
-             ClientRoomControllerWSService service = new ClientRoomControllerWSService();
+
+
+             /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
         ClientRoomController port
                 = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+             ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
-             ClientSummaryExt summaryExt=port.getSummary(contractId).getClientSummary();
+             ClientRoomController port=clientAuthToken.getPort();
+             ClientSummaryResult summaryResult= port.getSummary(contractId);
+
+              if(!RC_OK.equals(summaryResult.getResultCode())){
+              haveDataToShow=false;
+              throw new Exception(summaryResult.getDescription());
+
+              }
+
+             ClientSummaryExt summaryExt=summaryResult.getClientSummary();
 
             session.setAttribute("__payform.client", summaryExt);
            /* persistenceTransaction.commit();
@@ -66,6 +102,8 @@
             HibernateUtils.close(persistenceSession, logger);*/
         }
     }
+
+    if(haveDataToShow){
 %>
 <title>Новая школа - Печать квитанции на пополнение счета</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
@@ -92,3 +130,9 @@
 
 </body>
 </html>
+<%}else{
+
+ %>
+<div class="error-output-text"> Не удалось отобразить квитанцию </div>
+<%
+}%>

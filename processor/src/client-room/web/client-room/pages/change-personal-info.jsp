@@ -38,6 +38,26 @@
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
 
 <%
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     final Logger logger = LoggerFactory
             .getLogger("ru.axetta.ecafe.processor.client-room.web.client-room.pages.change-personal-info_jsp");
 
@@ -101,7 +121,7 @@
                 errorMessage = "Неверные данные и/или формат данных";
             }
         }
-        
+
         /*Session persistenceSession = null;
         Transaction persistenceTransaction = null;*/
         if (haveDataToProcess && dataToProcessVerified) {
@@ -121,7 +141,7 @@
                 ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
                 ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
 
-                  ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult= port.getSummary(contractId) ;
+                  //ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult= port.getSummary(contractId) ;
 
                 logger.info("work");
                 try {
@@ -164,7 +184,13 @@
                             if(phone==null)phone="";
                             if(address==null)address="";
 
-                            port.changePersonalInfo(contractId,limit,address,phone,mobilePhone,email,smsNotificationState);
+                           Result r= port.changePersonalInfo(contractId,limit,address,phone,mobilePhone,email,smsNotificationState);
+
+                            if(!r.getResultCode().equals(RC_OK)) {
+
+                                throw new Exception(r.getDescription());
+                            }
+
                             /*persistenceSession.update(client);*/
 
 
@@ -206,7 +232,20 @@
             ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
 
             ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult= port.getSummary(contractId) ;
+
+            if(!summaryResult.getResultCode().equals(RC_OK)) {
+
+                throw new Exception(summaryResult.getDescription());
+
+            }
+
+             /*if(true){
+
+                 throw new Exception(summaryResult.getDescription());
+             }*/
+
             ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt summaryExt=summaryResult.getClientSummary();
+
 %>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
@@ -475,8 +514,12 @@
             persistenceTransaction = null;*/
         } catch (Exception e) {
             logger.error("Failed to build page", e);
-            throw new ServletException(e);
-        } finally {
+            //throw new ServletException(e);
+            %>
+    <div class="error-output-text"> Не удалось отобразить персональные данные </div>
+            <%
+
+           } finally {
             /*HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);*/
         }

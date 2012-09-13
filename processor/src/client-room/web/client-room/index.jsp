@@ -19,7 +19,8 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 
 <%ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
-     application.setAttribute("indexResponse",response);
+
+    application.setAttribute("indexResponse",response);
 
     Cookie[] cks=request.getCookies();
     Long cityIdFromCookie =null;
@@ -34,36 +35,7 @@
     Cookie ck=new Cookie("cityId","1");
     ck.setMaxAge(60*60*24*183);
     response.addCookie(ck); }
-    /*final Logger logger = LoggerFactory
-            .getLogger("index_jsp");*/
 
-    /*RuntimeContext runtimeContext = new RuntimeContext();
-    Session persistenceSession = null;
-    Transaction persistenceTransaction = null;
-    try {
-        persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
-        Criteria criteria =persistenceSession.createCriteria(City.class);
-        List<City> cities =(List<City>)criteria.list();
-        for(City city:cities){
-            System.out.println(city.getName()+" "+city.getAuthorizationType().getName());
-        }
-
-        persistenceSession.flush();
-        persistenceTransaction.commit();
-        persistenceTransaction = null;
-    }catch(Exception e){
-
-        logger.error("error in cities criteria : ",e);
-    }  finally {
-        HibernateUtils.rollback(persistenceTransaction, logger);
-        HibernateUtils.close(persistenceSession, logger);
-    }*/
-
-   /*List<City> cities = DAOService.getInstance().getTowns();
-    for(City city : cities){
-        System.out.println(city.getName()+" "+city.getAuthorizationType().getName());
-    }*/
 
 %>
 
@@ -83,6 +55,6 @@
 </head>
 <body>
 <jsp:include page="inlinecabinet.jsp"/>
- <%--<a href="../admin-page/index.html">admin page</a>--%>
+
 </body>
 </html>

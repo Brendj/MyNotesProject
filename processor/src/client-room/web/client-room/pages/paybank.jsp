@@ -12,8 +12,28 @@
 <%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.BankItem" %>
 <%@ page import="java.util.List" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.BanksData" %>
 
-<%
+<%  final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+    boolean haveDataToShow=true;
     ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
     /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
     ClientRoomController port
@@ -21,8 +41,13 @@
     ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
 */
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
+    BanksData banksData=port.getBanks();
 
-   List<BankItem> banks=port.getBanks().getBanksList().getBanks();
+    haveDataToShow=RC_OK.equals(banksData.getResultCode());
+
+    if(haveDataToShow){
+
+   List<BankItem> banks=banksData.getBanksList().getBanks();
 %>
 <table class="borderless-grid">
     <tr>
@@ -74,3 +99,9 @@
         </td>
     </tr>
 </table>
+    <%}else{
+
+        %>
+<div class="error-output-text"> Не удалось отобразить данные банков </div>
+<%
+    }%>

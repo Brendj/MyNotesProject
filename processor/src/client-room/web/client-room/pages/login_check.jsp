@@ -28,6 +28,26 @@
 <%@ page import="org.apache.commons.codec.binary.Base64" %>
 
 <%
+     final Long RC_CLIENT_NOT_FOUND = 110L;
+     final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+     final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+     final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+     final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+     final Long RC_INVALID_DATA = 150L;
+     final Long RC_NO_CONTACT_DATA = 160L;
+     final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+     final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+     final String RC_OK_DESC="OK";
+     final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+     final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+     final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+     final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+     final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+     final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+     final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.client-room.web.client-room.pages.login_jsp");
     final String HAVE_LOGIN_DATA_PARAM = "login";
     final String CONTRACT_ID_PARAM = "contractId";
@@ -72,21 +92,20 @@
             errorMessage = "Неверные данные и/или формат данных";
         }
         if (null != contractId && null != password&& null!=cityName) {
-            //RuntimeContext runtimeContext = null;
+
             try {
 
-               /* Cookie ck=new Cookie("cityName",cityName);
-                ck.setMaxAge(60*60*24*183);
-                response.addCookie(ck);*/
-
-
-
                 City city= DAOService.getInstance().getCityByName(cityName);
-
 
                 ClientRoomControllerWSService service = new ClientRoomControllerWSService();
                 ClientRoomController port
                         = service.getClientRoomControllerWSPort();
+
+                if(port==null){
+
+                    throw new Exception("web service is not available");
+                }
+
                 ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, city.getServiceUrl());
 
                // Map context = ((BindingProvider) port).getRequestContext();
@@ -100,26 +119,32 @@
                 String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
 
                 Result ra = port.authorizeClient(contractId, sha1HashString);
-                //System.out.println("AUTH CLIENT: " + ra.getResultCode()+":"+ra.getDescription());
 
+               // logger.info("resultCode: "+ra.getResultCode().toString());
 
-                 logger.info("resultCode: "+ra.getResultCode().toString());
+                loginSucceed = ra.getResultCode().equals(RC_OK);
 
-               // runtimeContext = RuntimeContext.getInstance();
-               // ClientAuthenticator clientAuthenticator = runtimeContext.getClientAuthenticator();
-                loginSucceed = ra.getResultCode().equals(new Long(0));
+                if(ra.getResultCode().equals(RC_INTERNAL_ERROR))
+                {
+                    throw new Exception(RC_INTERNAL_ERROR_DESC);
+                }
 
                 if (!loginSucceed) {
                     errorMessage = "Неверный номер договора и/или пароль";
                 } else {
                     HttpServletResponse indexResponse=(HttpServletResponse) application.getAttribute("indexResponse");
-                    logger.info("from login_check: getIdOfCity="+city.getIdOfCity().toString());
+                    //logger.info("from login_check: getIdOfCity="+city.getIdOfCity().toString());
+
                     Cookie ck=new Cookie("cityId",city.getIdOfCity().toString());
+
                     ck.setMaxAge(60*60*24*183);
+
                     indexResponse.addCookie(ck);
 
                     ClientAuthToken clientAuthToken = new ClientAuthToken(port,contractId, false);
+
                     clientAuthToken.storeTo(session);
+
                     session.setMaxInactiveInterval(INACTIVE_SESSION_TIMOUT_SECONDS);
                 }
             /*} catch (RuntimeContext.NotInitializedException e) {

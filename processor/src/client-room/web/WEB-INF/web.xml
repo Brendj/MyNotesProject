@@ -297,4 +297,15 @@
     </security-role>
 
     <!-- TODO: remove end-->
+
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/sessionexpired.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/sessionexpired.jsp</location>
+    </error-page>
+
 </web-app>

@@ -34,6 +34,8 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuListResult" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt" %>
+<%@ page import="javax.xml.datatype.DatatypeConfigurationException" %>
+<%@ page import="javax.xml.datatype.DatatypeConstants" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -61,8 +63,40 @@
         loader.insert();
     })();
 </script>
+<%!
+    XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {
+        if (date==null) return null;
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        XMLGregorianCalendar xc = DatatypeFactory.newInstance()
+                .newXMLGregorianCalendarDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1,
+                        c.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+        xc.setTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+        return xc;
+    }
 
+%>
 <%
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-menu_jsp");
     final String DAY_OF_WEEK_NAMES[] = {
             "Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
@@ -398,19 +432,31 @@
             menuCriteria.add(Restrictions.ge("menuDate", startDate));
             menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
             List menus = menuCriteria.list();*/
+           // DateUtils.addDays(endDate, 1);
 
-            GregorianCalendar greStartDate = new GregorianCalendar();
-            greStartDate.setTime(startDate);
-            XMLGregorianCalendar xmlStartDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greStartDate);
+           // logger.info("startDate: "+startDate);
+           // logger.info("endDate: "+endDate);
 
-            GregorianCalendar greEndDate = new GregorianCalendar();
-            greStartDate.setTime(endDate);
-            XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);
+            //GregorianCalendar greStartDate = new GregorianCalendar();
+           // greStartDate.setTime(startDate);
+            XMLGregorianCalendar xmlStartDate = toXmlDateTime(startDate);
+                    //DatatypeFactory.newInstance().newXMLGregorianCalendar(greStartDate);
+
+            //GregorianCalendar greEndDate = new GregorianCalendar();
+           // greEndDate.setTime(endDate);
+            XMLGregorianCalendar xmlEndDate = toXmlDateTime(endDate);
+                    //DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);
 
 
 
 
             ru.axetta.ecafe.processor.web.bo.client.MenuListResult menuListResult=port.getMenuList(clientAuthToken.getContractId(), xmlStartDate, xmlEndDate);
+
+            if(!RC_OK.equals(menuListResult.getResultCode())){
+
+                throw new Exception(menuListResult.getDescription());
+            }
+
             ru.axetta.ecafe.processor.web.bo.client.MenuListExt menuListExt=menuListResult.getMenuList();
             List<ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt> menus=menuListExt.getM();
 
@@ -441,7 +487,10 @@
                                     XMLGregorianCalendar xmlDate=currMenu.getDate();
                                      GregorianCalendar greDate= xmlDate.toGregorianCalendar();
                                      Date date=greDate.getTime();
-
+                                   // logger.info("date: "+date);
+                                    //logger.info("utcDateFormat.format(date): "+utcDateFormat.format(date));
+                                    date=DateUtils.addDays(date,1);
+                                    //logger.info("utcDateFormat.format(date+1): "+utcDateFormat.format(date));
                                     utcCalendar.setTime(date);
                                     int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
                                 %>
@@ -514,7 +563,11 @@
             persistenceTransaction = null;*/
         } catch (Exception e) {
             logger.error("Failed to build page", e);
-            throw new ServletException(e);
+        %>
+        <div class="error-output-text"> Не удалось отобразить меню </div>
+         <%
+
+            //throw new ServletException(e);
         } finally {
            /* HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);*/

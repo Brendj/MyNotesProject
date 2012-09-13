@@ -412,8 +412,10 @@
           ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt summary=summaryResult.getClientSummary();
            clientEmail=summary.getEmail();
         IdResult idOfClientResult=port.getIdOfClient(clientAuthToken.getContractId());
+
         idOfClient=idOfClientResult.getId();
         IdResult idOfContragentResult=port.getIdOfContragent(contragentName);
+
         idOfContragent=idOfContragentResult.getId();
 
         Long idOfClientPaymentOrder;
@@ -421,6 +423,7 @@
             /*idOfClientPaymentOrder = runtimeContext.getClientPaymentOrderProcessor()
                     .createPaymentOrder(idOfClient, idOfContragent, paymentMethod, copecksAmount, contragentSum);*/
              IdResult idOfClientPaymentOrderResult=port.createPaymentOrder(idOfClient,idOfContragent,paymentMethod,copecksAmount,contragentSum);
+
             idOfClientPaymentOrder=idOfClientPaymentOrderResult.getId();
         } catch (Exception e) {
             logger.error("Failed to add clientPaymentOrder", e);

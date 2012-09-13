@@ -24,19 +24,37 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
 <%@ page import="java.security.MessageDigest" %>
 <%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
 
 <%
     final Logger logger = LoggerFactory
             .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.change-password_jsp");
+
+
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
 
     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     RuntimeContext runtimeContext = null;
@@ -102,19 +120,27 @@
         Transaction persistenceTransaction = null;*/
         Long contractId=clientAuthToken.getContractId();
         if (haveDataToProcess && dataToProcessVerified) {
-            try {                
+
                 /*persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
                 Client client = (Client) clientCriteria.uniqueResult();*/
-                String plainPassword= currPassword;
-                final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
-                final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-                String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
 
-                 boolean clientHasCurrPassword=port.authorizeClient(clientAuthToken.getContractId(),sha1HashString).getResultCode().equals(new Long(0));
                 try {
+                    String plainPassword= currPassword;
+                    final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+                    final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+                    String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
+
+
+                    Result authorizeResult= port.authorizeClient(clientAuthToken.getContractId(),sha1HashString);
+
+                    if(authorizeResult.getResultCode().equals(RC_INTERNAL_ERROR)){
+                        throw new Exception(authorizeResult.getDescription());}
+
+                    boolean clientHasCurrPassword=port.authorizeClient(clientAuthToken.getContractId(),sha1HashString).getResultCode().equals(new Long(0));
+
                     if (clientHasCurrPassword) {
                        /* client.setPassword(newPassword);*/
 
@@ -122,7 +148,12 @@
                         final MessageDigest messageDigest2 = MessageDigest.getInstance("SHA1");
                         String sha1HashString2 = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes2)), CharEncoding.US_ASCII);*/
                          String base64passwordHash  =new String(Base64.encodeBase64(newPassword.getBytes()), CharEncoding.US_ASCII) ;
-                          port.changePassword(contractId,base64passwordHash);
+                          Result r=port.changePassword(contractId,base64passwordHash);
+
+                           if(!r.getResultCode().equals(RC_OK)){
+
+                              throw new Exception(r.getDescription());
+                          }
                         /*client.setUpdateTime(new Date());*/
                         /*persistenceSession.update(client);*/
                         dataProcessSucceed = true;
@@ -137,22 +168,28 @@
                 /*persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;*/
-            } finally {
-                /*HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);*/
-            }
+
         }
 
         /*persistenceSession = null;
         persistenceTransaction = null;*/
-        
+
         try {
             /*persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
             clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
             Client client = (Client) clientCriteria.uniqueResult();*/
-              ClientSummaryExt summaryExt=port.getSummary(contractId).getClientSummary();
+              ClientSummaryResult summaryResult=port.getSummary(contractId);
+
+
+              if(!RC_OK.equals(summaryResult.getResultCode())){
+
+                  throw new Exception(summaryResult.getDescription());
+              }
+
+            ClientSummaryExt summaryExt=summaryResult.getClientSummary();
+
 %>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
@@ -381,7 +418,12 @@
             persistenceTransaction = null;*/
         } catch (Exception e) {
             logger.error("Failed to build page", e);
-            throw new ServletException(e);
+
+           %>
+           <div class="error-output-text"> Не удалось отобразить персональные данные </div>
+            <%
+
+           // throw new ServletException(e);
         } finally {
             /*HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);*/

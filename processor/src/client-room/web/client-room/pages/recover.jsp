@@ -115,6 +115,7 @@
                 bPasswordChanged = true;
                 //response.sendRedirect(mainPage);
             } else {
+                errorMessage="Внутренняя ошибка"
                 logger.info("Error");
             }
         }

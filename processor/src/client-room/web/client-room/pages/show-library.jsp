@@ -60,6 +60,28 @@
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-menu_jsp");
+
+
+    final Long RC_CLIENT_NOT_FOUND = 110L;
+    final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
+    final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
+    final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
+    final Long RC_INVALID_DATA = 150L;
+    final Long RC_NO_CONTACT_DATA = 160L;
+    final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+
+    final String RC_OK_DESC="OK";
+    final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
+    final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
+    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
+    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
+    final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
+    final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
+    final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+
     final String DAY_OF_WEEK_NAMES[] = {
             "Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
     final String PROCESS_PARAM = "submit";
@@ -299,10 +321,12 @@
             List<Circulation> circulationList = circulationCriteria.list();*/
             for(int status=0;status<4;status++){
             ru.axetta.ecafe.processor.web.bo.client.CirculationListResult circulationListResult=port.getCirculationList(clientAuthToken.getContractId(),status)  ;
-                logger.info("circulationListResult: "+circulationListResult.getResultCode()+" "+circulationListResult.getDescription());
-                if(circulationListResult.getResultCode()!=0) {
+                //logger.info("circulationListResult: "+circulationListResult.getResultCode()+" "+circulationListResult.getDescription());
+                if(!circulationListResult.getResultCode().equals(RC_OK)) {
 
-                     return;}
+                     throw new Exception(circulationListResult.getDescription());
+
+                }
 
 
                 ru.axetta.ecafe.processor.web.bo.client.CirculationItemList circulationItemList =circulationListResult.getCirculationList();
@@ -356,7 +380,12 @@
             persistenceTransaction = null;*/
         } catch (Exception e) {
             logger.error("Failed to build page", e);
-            throw new ServletException(e);
+             %>
+    <div class="error-output-text"> Не удалось отобразить список книг </div>
+
+    <%
+
+            //throw new ServletException(e);
         } finally {
             /*HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);*/
