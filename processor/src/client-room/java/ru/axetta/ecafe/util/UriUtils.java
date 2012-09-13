@@ -37,7 +37,7 @@ public final class UriUtils {
     }
 
     public static URI putParam(URI uri, String paramName, String paramValue) throws Exception {
-        logger.info("begin putParam");
+        //logger.info("begin putParam");
         String scheme = uri.getScheme();
         String host = uri.getHost();
         int port = uri.getPort();
@@ -46,7 +46,7 @@ public final class UriUtils {
         Map<String, String> params = parseQuery(rawQuery);
         params.put(paramName, paramValue);
         String fragment = uri.getFragment();
-        logger.info("end putParam");
+       // logger.info("end putParam");
         return new URI(scheme, null, host, port, path, buildRawQuery(params), fragment);
     }
 
