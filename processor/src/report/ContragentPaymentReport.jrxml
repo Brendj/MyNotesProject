@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
-	<property name="ireport.zoom" value="1.0000000000000009"/>
-	<property name="ireport.x" value="29"/>
+	<property name="ireport.zoom" value="1.2100000000000095"/>
+	<property name="ireport.x" value="37"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -27,174 +27,271 @@
 			<style backcolor="#EFF7FF"/>
 		</conditionalStyle>
 	</style>
-	<subDataset name="Table Dataset 1" uuid="ecfef786-381b-4366-995a-ddc10cd83fab"/>
+	<subDataset name="Table Dataset 1" uuid="ecfef786-381b-4366-995a-ddc10cd83fab">
+		<queryString>
+			<![CDATA[SELECT
+     cf_contragentpayments."idofcontragentpayment" AS cf_contragentpayments_idofcontragentpayment,
+     cf_contragentpayments."idofcontragent" AS cf_contragentpayments_idofcontragent,
+     cf_contragentpayments."idoftransaction" AS cf_contragentpayments_idoftransaction,
+     cf_contragentpayments."paysum" AS cf_contragentpayments_paysum,
+     cf_contragentpayments."paytype" AS cf_contragentpayments_paytype,
+     cf_contragentpayments."state" AS cf_contragentpayments_state,
+     cf_contragentpayments."createddate" AS cf_contragentpayments_createddate,
+     cf_contragentpayments."paymentdate" AS cf_contragentpayments_paymentdate
+FROM
+     "public"."cf_contragentpayments" cf_contragentpayments]]>
+		</queryString>
+		<field name="cf_contragentpayments_idofcontragentpayment" class="java.lang.Long"/>
+		<field name="cf_contragentpayments_idofcontragent" class="java.lang.Long"/>
+		<field name="cf_contragentpayments_idoftransaction" class="java.lang.Long"/>
+		<field name="cf_contragentpayments_paysum" class="java.lang.Long"/>
+		<field name="cf_contragentpayments_paytype" class="java.lang.Integer"/>
+		<field name="cf_contragentpayments_state" class="java.lang.Integer"/>
+		<field name="cf_contragentpayments_createddate" class="java.lang.Long"/>
+		<field name="cf_contragentpayments_paymentdate" class="java.lang.Long"/>
+	</subDataset>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="contragentName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<parameter name="endTime" class="java.lang.Long"/>
+	<parameter name="startTime" class="java.lang.Long"/>
+	<parameter name="totalSum" class="java.lang.Long"/>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<field name="idOfPayment" class="java.lang.Long"/>
+	<field name="transactionTime" class="java.lang.String"/>
+	<field name="idDocument" class="java.lang.Long"/>
+	<field name="totalSum" class="java.lang.Long"/>
+	<field name="createTime" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="surName" class="java.lang.String"/>
+	<field name="firstName" class="java.lang.String"/>
+	<field name="secondName" class="java.lang.String"/>
+	<field name="cardNo" class="java.lang.Long"/>
+	<field name="paySum" class="java.lang.String"/>
+	<field name="nameOfContragentReceiver" class="java.lang.String"/>
+	<field name="nameOfContragentSender" class="java.lang.String"/>
+	<field name="shortName" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch">
+		<band height="67" splitType="Stretch">
 			<textField>
 				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="10" y="10" width="802" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.format("Отчет по реализации за: %02d.%02d.%d", $P{day}, $P{month}, $P{year})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.format("Отчет за: %02d.%02d.%d", $P{day}, $P{month}, $P{year})]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="97670135-f8b4-4fc6-aeac-e18705d7e461" x="10" y="40" width="802" height="24"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+			<staticText>
+				<reportElement uuid="ab7657ea-10b9-4d20-9cd3-ff0ac44c9d71" x="174" y="36" width="13" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Учреждение: "+$P{contragentName}]]></textFieldExpression>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="72fdfc22-15c9-46d3-b36e-d238b86fbc5c" x="93" y="36" width="81" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4dcb0689-770d-4e85-85ea-b52b6fbf6e17" x="10" y="36" width="83" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Период отчета:]]></text>
+			</staticText>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="a5a9fdd2-292e-48af-a4ba-e4241462d5fd" x="187" y="36" width="71" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="35" splitType="Stretch">
-			<textField>
-				<reportElement uuid="1973481a-3175-4714-9087-63c3e2f90be6" style="table" x="10" y="10" width="680" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[String.format("Отчет по платежам клиентов через контрагента '%s'", $F{contragentName}), ]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="22" splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
 		<band height="61" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="5f1396ff-5684-46e5-a7f5-c7e126ea2319" style="table" stretchType="RelativeToTallestObject" x="648" y="20" width="73" height="41"/>
+				<reportElement uuid="5f1396ff-5684-46e5-a7f5-c7e126ea2319" style="table" stretchType="RelativeToTallestObject" x="684" y="20" width="73" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер карты]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="63d8318d-90f3-46f9-8dd2-46139712e48a" style="table" stretchType="RelativeToTallestObject" x="302" y="20" width="346" height="16"/>
+				<reportElement uuid="63d8318d-90f3-46f9-8dd2-46139712e48a" style="table" stretchType="RelativeToTallestObject" x="375" y="20" width="309" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Клиент]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a5f656fd-5fab-4c34-9aee-0201b02f8c18" style="table" stretchType="RelativeToTallestObject" x="10" y="20" width="82" height="41"/>
+				<reportElement uuid="a5f656fd-5fab-4c34-9aee-0201b02f8c18" style="table" stretchType="RelativeToTallestObject" x="0" y="20" width="50" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дата платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="table" stretchType="RelativeToTallestObject" x="212" y="20" width="90" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="table" stretchType="RelativeToTallestObject" x="130" y="20" width="60" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дата транзакции	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="table" stretchType="RelativeToTallestObject" x="92" y="20" width="120" height="41"/>
+				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="table" stretchType="RelativeToTallestObject" x="50" y="20" width="81" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Идентификатор платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="table" stretchType="RelativeToTallestObject" x="302" y="35" width="93" height="26"/>
+				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="table" stretchType="RelativeToTallestObject" x="375" y="35" width="84" height="26"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер договора]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="table" stretchType="RelativeToTallestObject" x="395" y="35" width="88" height="26"/>
+				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="table" stretchType="RelativeToTallestObject" x="459" y="35" width="73" height="26"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Фамилия]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="table" stretchType="RelativeToTallestObject" x="483" y="35" width="84" height="26"/>
+				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="table" stretchType="RelativeToTallestObject" x="532" y="35" width="84" height="26"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Имя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="table" stretchType="RelativeToTallestObject" x="567" y="35" width="81" height="26"/>
+				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="table" stretchType="RelativeToTallestObject" x="616" y="35" width="68" height="26"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Отчество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="table" stretchType="RelativeToTallestObject" x="721" y="20" width="73" height="41"/>
+				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="table" stretchType="RelativeToTallestObject" x="756" y="20" width="46" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Сумма платежа]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="table" stretchType="RelativeToTallestObject" x="190" y="20" width="56" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Получатель]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="table" stretchType="RelativeToTallestObject" x="246" y="20" width="59" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Плательщик]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="table" stretchType="RelativeToTallestObject" x="305" y="20" width="70" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Организация]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch">
+		<band height="23" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="a3400338-c53e-443f-bc95-d94fb4288aef" style="table" stretchType="RelativeToBandHeight" x="10" y="1" width="82" height="20"/>
-				<textElement/>
+				<reportElement uuid="a3400338-c53e-443f-bc95-d94fb4288aef" style="table" stretchType="RelativeToBandHeight" x="0" y="2" width="50" height="19"/>
+				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{createTime}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="ae276361-c685-4ed3-ae9a-e1a1a997b37b" style="table" x="395" y="2" width="88" height="19"/>
+				<reportElement uuid="ae276361-c685-4ed3-ae9a-e1a1a997b37b" style="table" x="459" y="2" width="73" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{surName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="table" x="567" y="2" width="81" height="19"/>
+				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="table" x="616" y="2" width="68" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{secondName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="483" y="2" width="84" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="532" y="2" width="84" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{firstName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="302" y="2" width="93" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="375" y="2" width="84" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{idDocument}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="92" y="2" width="120" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="50" y="2" width="81" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{idOfPayment}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="212" y="2" width="90" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="130" y="2" width="60" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{transactionTime}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="648" y="0" width="73" height="21"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="684" y="2" width="73" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cardNo}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="721" y="0" width="73" height="21"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="756" y="2" width="46" height="19"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{paySum}]]></textFieldExpression>
 			</textField>
+			<textField pattern="">
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="190" y="2" width="56" height="19"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nameOfContragentReceiver}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="246" y="2" width="59" height="19"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nameOfContragentSender}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="305" y="2" width="70" height="19"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nameOfContragentSender}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="21" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="77e3e524-8070-43ca-8b84-702eb22fa89f" style="table" x="10" y="21" width="711" height="21"/>
+				<reportElement uuid="77e3e524-8070-43ca-8b84-702eb22fa89f" style="table" x="0" y="0" width="756" height="21"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[ИТОГО:]]></text>
 			</staticText>
 			<textField pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="721" y="21" width="73" height="21"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="table" x="756" y="0" width="45" height="21"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="10" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{totalSum}]]></textFieldExpression>
 			</textField>
 		</band>
-	</detail>
-	<columnFooter>
-		<band height="45" splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
 		<band height="54" splitType="Stretch"/>
