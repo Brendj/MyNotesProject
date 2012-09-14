@@ -4,8 +4,10 @@ DROP TABLE cf_issuable;
 
 ALTER TABLE cf_publs DROP COLUMN hash;
 ALTER TABLE cf_publs DROP COLUMN isbn;
+ALTER TABLE cf_publs DROP COLUMN data;
 ALTER TABLE cf_publs ADD COLUMN isbn character varying(255);
 ALTER TABLE cf_publs ADD COLUMN hash integer NOT NULL;
+ALTER TABLE cf_publs ADD COLUMN data bytea NOT NULL;
 
 --тип сопр.документа
 --TypeOfAccompanyingDocumentName - название (акт, накладная, т.п.)
