@@ -339,11 +339,11 @@ public abstract class DistributedObject{
     //    return timeFormat1;
     //}
 
-    private Boolean getSendAll() {
+    public Boolean getSendAll() {
         return sendAll;
     }
 
-    private void setSendAll(Boolean sendAll) {
+    public void setSendAll(Boolean sendAll) {
         this.sendAll = sendAll;
     }
 
