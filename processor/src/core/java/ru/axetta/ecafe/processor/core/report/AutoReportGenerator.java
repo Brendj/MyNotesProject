@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
-import ru.axetta.ecafe.processor.core.report.contragent.job.reports.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -13,7 +12,6 @@ import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -718,8 +716,8 @@ public class AutoReportGenerator {
 
     public String getReportsTemplateFilePath() {
         //TODO заменить "path" на константу
-        //String path = this.getReportProperties().getProperty("path");
-        String path = "D:\\home\\jbosser\\processor\\report_templates";
+        String path = this.getReportProperties().getProperty("path");
+        //String path = "D:\\home\\jbosser\\processor\\templates";
         if (path==null) return null;
         if (!path.endsWith("/") && !path.endsWith("\\")) path+='/';
         return path;
