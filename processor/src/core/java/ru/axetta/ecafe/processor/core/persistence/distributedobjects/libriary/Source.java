@@ -28,7 +28,7 @@ public class Source extends DistributedObject {
     @Override
     public Source parseAttributes(Node node) throws Exception{
 
-        String sourceName = getStringAttributeValue(node, "sourceName", 1024);
+        String sourceName = getStringAttributeValue(node, "SourceName", 1024);
         if (sourceName != null) {
             setSourceName(sourceName);
         }

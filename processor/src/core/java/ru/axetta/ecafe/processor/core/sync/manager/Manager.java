@@ -383,11 +383,12 @@ public class Manager {
             } else{
                 whereOrgSource = " orgOwner = "+idOfOrg;
             }
-            where = (where.equals("")?whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
+            where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
             }
-            String select = "from " + clazz.getSimpleName() + (where.equals("")?"":" where " + where);
+            String sendAllWhere = " sendAll is null and ";
+            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where "+ sendAllWhere + where);
             Query query = persistenceSession.createQuery(select);
             List list = query.list();
             if(!(list==null || list.isEmpty())){

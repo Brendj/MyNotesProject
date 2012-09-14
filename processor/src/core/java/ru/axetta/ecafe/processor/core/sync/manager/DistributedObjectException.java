@@ -25,7 +25,8 @@ public class DistributedObjectException extends Exception {
         PARSE_INTEGER_VALUE(9),
         PARSE_DATE_VALUE(10),
         PARSE_DOUBLE_VALUE(11),
-        PARSE_FLOAT_VALUE(12);
+        PARSE_FLOAT_VALUE(12),
+        BUILD_DATA_PUBLICATION_VALUE(13);
 
         Integer value;
 

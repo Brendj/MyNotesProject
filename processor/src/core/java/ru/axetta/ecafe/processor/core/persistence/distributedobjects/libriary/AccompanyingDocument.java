@@ -28,14 +28,14 @@ public class AccompanyingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "Guid", guid);
     }
 
     @Override
     public AccompanyingDocument parseAttributes(Node node) throws Exception{
 
-        guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "guidTypeOfAccompanyingDocument", 1024);
-        guidSource = getStringAttributeValue(node, "guidSource", 1024);
+        guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 1024);
+        guidSource = getStringAttributeValue(node, "GuidSource", 1024);
         return this;
     }
 

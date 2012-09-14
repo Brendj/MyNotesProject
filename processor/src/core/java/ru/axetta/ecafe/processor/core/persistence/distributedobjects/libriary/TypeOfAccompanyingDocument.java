@@ -29,7 +29,7 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
     @Override
     public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception{
 
-        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "typeOfAccompanyingDocumentName", 1024);
+        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 1024);
         if (typeOfAccompanyingDocumentName != null) {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
         }

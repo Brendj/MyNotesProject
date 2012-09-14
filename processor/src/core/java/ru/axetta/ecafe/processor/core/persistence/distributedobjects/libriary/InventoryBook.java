@@ -22,16 +22,18 @@ public class InventoryBook extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "Guid", guid);
     }
 
     @Override
     public InventoryBook parseAttributes(Node node) throws Exception{
 
-        String bookName = getStringAttributeValue(node, "bookName", 256);
+        String bookName = getStringAttributeValue(node, "BookName", 256);
         if (bookName != null) {
             setBookName(bookName);
         }
+
+        setSendAll(false);
         return this;
     }
 

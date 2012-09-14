@@ -32,6 +32,9 @@ public class Fund extends DistributedObject {
         if (fundName != null) {
             setFundName(fundName);
         }
+
+        setSendAll(false);
+
         return this;
     }
 
