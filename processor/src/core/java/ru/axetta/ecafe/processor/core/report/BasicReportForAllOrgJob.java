@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -25,17 +26,17 @@ import java.util.*;
  * Time: 15:28
  * To change this template use File | Settings | File Templates.
  */
-public abstract class BasicReportForContragentJob extends BasicReportJob {
+public abstract class BasicReportForAllOrgJob extends BasicReportJob {
+    public Class getMyClass() { return getClass(); }
+    public abstract BasicReportForAllOrgJob createInstance();
+    public abstract Builder createBuilder(String templateFilename);
 
-    protected Class getMyClass() { return getClass(); }
-    public abstract BasicReportForContragentJob createInstance();
-    protected abstract Builder createBuilder(String templateFilename);
-    protected abstract Logger getLogger();
+    public abstract Logger getLogger();
 
     @Override
     public AutoReportRunner getAutoReportRunner() {
-        return new AutoReportRunner(){
-            @Override
+
+        return new AutoReportRunner() {
             public void run(AutoReportBuildTask autoReportBuildTask) {
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(String.format("Building auto reports \"%s\"",
@@ -49,22 +50,13 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                     session = autoReportBuildTask.sessionFactory.openSession();
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
-                    Criteria allContragentCriteria = session.createCriteria(Contragent.class);
-                    List allContragents = allContragentCriteria.list();
-                    for (Object object: allContragents){
-                        Contragent contragent = (Contragent) object;
-                        if (getLogger().isDebugEnabled()) {
-                             getLogger().debug(String.format("Building report \"%s\" for contragent: %s", classPropertyValue, contragent));
-                        }
-                        Properties properties = new Properties();
-                        ReportPropertiesUtils.addProperties(properties,getMyClass());
-                        ReportPropertiesUtils.addProperties(properties, contragent, null);
-                        BasicReportForContragentJob report = createInstance();
-                        report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
-                                contragent.getIdOfContragent(),autoReportBuildTask.templateFileName,
-                                autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
-                        autoReports.add(new AutoReport(report, properties));
-                    }
+
+                    Properties properties = new Properties();
+                    ReportPropertiesUtils.addProperties(properties, getMyClass());
+                    BasicReportForAllOrgJob report = createInstance();
+                    report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime, autoReportBuildTask.templateFileName,
+                            autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
+                    autoReports.add(new AutoReport(report, properties));
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
@@ -76,45 +68,47 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                     HibernateUtils.rollback(transaction, getLogger());
                     HibernateUtils.close(session, getLogger());
                 }
+
             }
         };
     }
 
-    public BasicReportForContragentJob(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime, Long idOfContragent) {
+
+    public BasicReportForAllOrgJob(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
-        this.idOfContragent = idOfContragent;
     }
 
-    public BasicReportForContragentJob(){}
-
-    @Override
-    public String getReportDistinctText() {
-        return Long.toString(idOfContragent);
+    // call initialize after this constructor
+    protected BasicReportForAllOrgJob() {
     }
 
-    public interface Builder {
-        public BasicReportJob build(Session session, Contragent contragent, Date startTime, Date endTime, Calendar calendar)
-                throws Exception;
-    }
-
-    public void initialize(Date startTime, Date endTime, Long idOfContragent, String templateFilename,
+    public void initialize(Date startTime, Date endTime, String templateFilename,
             SessionFactory sessionFactory, Calendar calendar) {
         super.initialize(startTime, endTime, templateFilename, sessionFactory, calendar);
-        this.idOfContragent = idOfContragent;
     }
-
+    public void BasicReportForOrgJob(Date startTime, Date endTime,  String templateFilename,
+            SessionFactory sessionFactory, Calendar calendar) {
+        initialize(startTime, endTime, templateFilename, sessionFactory, calendar);
+    }
     @Override
     public String toString() {
-        return getMyClass().getCanonicalName()+"{" + "startTime=" + startTime + ", endTime=" + endTime + ", idOfContragent="
-                + idOfContragent + ", templateFilename='" + templateFilename + '\'' + ", sessionFactory="
+        return getMyClass().getCanonicalName()+"{" + "startTime=" + startTime + ", endTime=" + endTime + ", templateFilename='" + templateFilename + '\'' + ", sessionFactory="
                 + sessionFactory + "} " + super.toString();
     }
 
-    private Long idOfContragent;
+    @Override
+    public String getReportDistinctText() {
+        return "";
+    }
+
+    public interface Builder {
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
+                throws Exception;
+    }
 
     protected void prepare() {
-        if (!hasPrint() && idOfContragent != null && templateFilename != null && sessionFactory != null) {
+        if (!hasPrint() && templateFilename != null && sessionFactory != null) {
             // templateFilename может содержать только имя файла отчета или относительный путь к нему
             // добавляем путь к файлам отчетов, если это необходимо
             templateFilename = AutoReportGenerator.restoreFilename(
@@ -126,8 +120,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                 session = sessionFactory.openSession();
                 transaction = BasicReport.createTransaction(session);
                 transaction.begin();
-                Contragent contragent = (Contragent) session.get(Contragent.class, this.idOfContragent);
-                BasicReportJob report = builder.build(session, contragent, startTime, endTime, calendar);
+                BasicReportJob report = builder.build(session, startTime, endTime, calendar);
                 setGenerateTime(report.getGenerateTime());
                 setGenerateDuration(report.getGenerateDuration());
                 setPrint(report.getPrint());

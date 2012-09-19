@@ -403,7 +403,7 @@ public class AutoReportGenerator {
                         return jobDetail;
                     }
                 }));
-
+                           //MenuDetailsGroupByMenuOriginReport
         REPORT_DEFS.add(new ReportDef(DailySalesByGroupsReport.class, DailySalesByGroupsReport.AutoReportBuildJob.class, new JobDetailCreator() {
                     public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                         Class jobClass = BasicReportJob.AutoReportBuildJob.class;
@@ -424,6 +424,28 @@ public class AutoReportGenerator {
                         return jobDetail;
                     }
                 }));
+
+        REPORT_DEFS.add(new ReportDef(MenuDetailsGroupByMenuOriginReport.class, MenuDetailsGroupByMenuOriginReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MenuDetailsGroupByMenuOriginReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        new MenuDetailsGroupByMenuOriginReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(MenuDetailsGroupByMenuOriginReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
         REPORT_DEFS.add(new ReportDef(ContragentPaymentReport.class, ContragentPaymentReport.AutoReportBuildJob.class, new  JobDetailCreator(){
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
