@@ -167,9 +167,6 @@ public class Processor implements SyncProcessor,
         this.eventNotificator = eventNotificator;
     }
 
-    //@Autowired
-    //private DistributionManager distributionManager;
-
     public SyncResponse processSyncRequest(SyncRequest request) throws Exception {
         Date syncStartTime = new Date();
         int syncResult = 0;
