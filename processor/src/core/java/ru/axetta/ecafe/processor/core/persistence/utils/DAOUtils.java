@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -844,5 +845,17 @@ public class DAOUtils {
             q.setParameter("caReceiver", caReceiver);
             return q.getResultList();
         }
+    }
+
+    public static DistributedObject findDistributedObjectByRefGUID(Session session, String guid){
+        Criteria criteria = session.createCriteria(DistributedObject.class);
+        criteria.add(Restrictions.eq("guid",guid));
+        return (DistributedObject) criteria.uniqueResult();
+        //TypedQuery<T> query = em.createQuery("from "+clazz.getSimpleName()+" where guid='"+guid+"'",clazz);
+        //List<T> list = query.getResultList();
+        //if (list.isEmpty()) {
+        //    return null;
+        //}
+        //return list.get(0);
     }
 }
