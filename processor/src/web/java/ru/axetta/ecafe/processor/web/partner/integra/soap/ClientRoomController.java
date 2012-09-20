@@ -140,4 +140,8 @@ public interface ClientRoomController {
     @WebMethod(operationName="getHiddenPages")
     public HiddenPagesResult getHiddenPages();
 
+    @WebMethod(operationName="getComplexList")
+    public ComplexListResult getComplexList(@WebParam(name = "contractId") Long contractId,
+            final Date startDate, final Date endDate);
+
 }

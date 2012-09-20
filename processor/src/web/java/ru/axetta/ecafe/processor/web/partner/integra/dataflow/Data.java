@@ -51,7 +51,8 @@ import javax.xml.bind.annotation.XmlType;
     "menuListExt",
     "cardList",
     "enterEventList",
-    "circulationItemList"
+    "circulationItemList",
+      "complexDateList"
 })
 @XmlRootElement(name = "Data")
 public class Data {
@@ -70,6 +71,8 @@ public class Data {
     protected MenuList menuList;
     @XmlElement(name = "MenuListExt")
     protected MenuListExt menuListExt;
+    @XmlElement(name = "ComplexDateList")
+    protected ComplexDateList complexDateList;
     @XmlElement(name = "CardList")
     protected CardList cardList;
     @XmlElement(name = "EnterEventList")
@@ -82,6 +85,15 @@ public class Data {
     protected Long resultCode;
     @XmlAttribute(name = "Description")
     protected String description;
+
+
+    public ComplexDateList getComplexDateList() {
+        return complexDateList;
+    }
+
+    public void setComplexDateList(ComplexDateList complexDateList) {
+        this.complexDateList = complexDateList;
+    }
 
     /**
      * Gets the value of the clientSummary property.

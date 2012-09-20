@@ -12,8 +12,14 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
+
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
+
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
+
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -617,6 +623,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuListResult;
     }
 
+
+
+
+    @Override
+    public ComplexListResult getComplexList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                processComplexList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+            }
+        });
+
+        ComplexListResult complexListResult = new ComplexListResult();
+        complexListResult.complexDateList = data.getComplexDateList();
+        complexListResult.resultCode = data.getResultCode();
+        complexListResult.description = data.getDescription();
+        return complexListResult;
+    }
+
+
+
     public  void calendarResetTime(Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -675,6 +704,128 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         data.setMenuListExt(menuListExt);
     }
+
+    private void processComplexList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
+            Date endDate) throws DatatypeConfigurationException {
+
+
+        Criteria complexCriteria = session.createCriteria(ComplexInfo.class);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate); toCal.setTime(endDate);
+        calendarResetTime(fromCal); calendarResetTime(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        complexCriteria.add(Restrictions.eq("org", org));
+
+        complexCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        complexCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+
+        //complexCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+
+       List<ComplexInfo> complexes=complexCriteria.list();
+
+
+        ArrayList<ArrayList<ComplexInfo>> sortedComplexes=new ArrayList<ArrayList<ComplexInfo>>();
+
+        Date currDate=null;
+        ArrayList<ComplexInfo>currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+
+        for(Object complexObject:complexes){
+
+            ComplexInfo currComplex=(ComplexInfo)complexObject;
+
+            if(currDate==null){
+                currComplexListWithSameDate.add(currComplex);
+                currDate=currComplex.getMenuDate();
+                continue;
+            }
+
+            if(currComplex.getMenuDate().equals(currDate)){
+                currComplexListWithSameDate.add(currComplex);
+
+            }else{
+
+                ArrayList<ComplexInfo>newComplexes=new ArrayList<ComplexInfo>();
+                newComplexes.addAll(currComplexListWithSameDate);
+
+                sortedComplexes.add(newComplexes);
+
+                currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+                currComplexListWithSameDate.add(currComplex);
+                currDate=currComplex.getMenuDate();
+
+            }
+
+
+        }
+
+
+        currDate=null;
+       ComplexDateList complexDateList=new ComplexDateList();
+
+
+        for(ArrayList<ComplexInfo> complexesWithSameDate:sortedComplexes){
+
+             ComplexDate complexDate=new ComplexDate();
+
+           // boolean emptyComplexDate=true;
+
+           // ComplexInfo currComplex=complexesWithSameDate.get(0);
+
+            //currDate=currComplex.getMenuDate();
+
+
+            // for(Object complexObject:complexes){
+           // ArrayList<ArrayList<ComplexInfoDetail>> complexDetailsWithSameDate =new ArrayList<ArrayList<ComplexInfoDetail>>();
+
+            for(ComplexInfo complexInfo :complexesWithSameDate){
+
+                Complex complex=new Complex();
+
+                Criteria complexDetailsCriteria=session.createCriteria(ComplexInfoDetail.class);
+                complexDetailsCriteria.add(Restrictions.eq("complexInfo", complexInfo));
+
+
+                List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();
+
+                if(!complexDetails.isEmpty()) {
+
+                    for(ComplexInfoDetail complexInfoDetail:complexDetails){
+                        ComplexDetail complexDetail=new ComplexDetail();
+                        complexDetail.setName(complexInfoDetail.getMenuDetail().getMenuDetailName());
+                        complex.getE().add(complexDetail);
+                        complex.setName(complexInfoDetail.getComplexInfo().getComplexName());
+                    }
+
+                    complexDate.getE().add(complex);
+                    complexDate.setDate(toXmlDateTime(complexInfo.getMenuDate()));
+
+
+                   // emptyComplexDate=false;
+                    logger.info("complexName: "+ complexInfo.getComplexName());
+
+                  //  ArrayList<ComplexInfoDetail>complexDetailList=new ArrayList<ComplexInfoDetail>();
+                   // complexDetailList.addAll(complexDetails);
+                   // complexDetailsWithSameDate.add(complexDetailList);
+
+                }
+
+
+
+
+            }
+
+            if(!complexDate.getE().isEmpty()) {
+
+                complexDateList.getE().add(complexDate);
+            }
+
+        }
+
+
+        data.setComplexDateList(complexDateList);
+
+    }
+
 
     @Override
     public CardListResult getCardList(Long contractId) {
