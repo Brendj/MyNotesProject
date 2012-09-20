@@ -757,20 +757,23 @@ public interface ClientRoomController {
 
     /**
      * 
-     * @param san
-     * @param guardSan
+     * @param arg2
+     * @param arg1
+     * @param contractId
      * @return
-     *     returns ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanResult
+     *     returns ru.axetta.ecafe.processor.web.bo.client.ComplexListResult
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "detachGuardSanBySan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanBySan")
-    @ResponseWrapper(localName = "detachGuardSanBySanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanBySanResponse")
-    public DetachGuardSanResult detachGuardSanBySan(
-        @WebParam(name = "san", targetNamespace = "")
-        String san,
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
+    @RequestWrapper(localName = "getComplexList", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GetComplexList")
+    @ResponseWrapper(localName = "getComplexListResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.GetComplexListResponse")
+    public ComplexListResult getComplexList(
+        @WebParam(name = "contractId", targetNamespace = "")
+        Long contractId,
+        @WebParam(name = "arg1", targetNamespace = "")
+        XMLGregorianCalendar arg1,
+        @WebParam(name = "arg2", targetNamespace = "")
+        XMLGregorianCalendar arg2);
 
     /**
      * 
@@ -784,6 +787,23 @@ public interface ClientRoomController {
     @RequestWrapper(localName = "attachGuardSanBySan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.AttachGuardSanBySan")
     @ResponseWrapper(localName = "attachGuardSanBySanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.AttachGuardSanBySanResponse")
     public AttachGuardSanResult attachGuardSanBySan(
+        @WebParam(name = "san", targetNamespace = "")
+        String san,
+        @WebParam(name = "guardSan", targetNamespace = "")
+        String guardSan);
+
+    /**
+     * 
+     * @param san
+     * @param guardSan
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanResult
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "detachGuardSanBySan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanBySan")
+    @ResponseWrapper(localName = "detachGuardSanBySanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.DetachGuardSanBySanResponse")
+    public DetachGuardSanResult detachGuardSanBySan(
         @WebParam(name = "san", targetNamespace = "")
         String san,
         @WebParam(name = "guardSan", targetNamespace = "")

@@ -14,6 +14,7 @@
         <xs:element minOccurs="0" name="CardList" type="tns:CardList"/>
         <xs:element minOccurs="0" name="EnterEventList" type="tns:EnterEventList"/>
         <xs:element minOccurs="0" name="CirculationItemList" type="tns:CirculationItemList"/>
+        <xs:element minOccurs="0" name="ComplexDateList" type="tns:ComplexDateList"/>
       </xs:sequence>
       <xs:attribute name="IdOfContract" type="xs:long"/>
       <xs:attribute name="ResultCode" type="xs:long"/>
@@ -68,6 +69,8 @@
 <xs:element name="getClientSmsListResponse" type="tns:getClientSmsListResponse"/>
 <xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
 <xs:element name="getClientsByGuardSanResponse" type="tns:getClientsByGuardSanResponse"/>
+<xs:element name="getComplexListByOrg" type="tns:getComplexListByOrg"/>
+<xs:element name="getComplexListByOrgResponse" type="tns:getComplexListByOrgResponse"/>
 <xs:element name="getContractIdByCardNo" type="tns:getContractIdByCardNo"/>
 <xs:element name="getContractIdByCardNoResponse" type="tns:getContractIdByCardNoResponse"/>
 <xs:element name="getEnterEventList" type="tns:getEnterEventList"/>
@@ -76,6 +79,8 @@
 <xs:element name="getEnterEventListResponse" type="tns:getEnterEventListResponse"/>
 <xs:element name="getGroupListByOrg" type="tns:getGroupListByOrg"/>
 <xs:element name="getGroupListByOrgResponse" type="tns:getGroupListByOrgResponse"/>
+<xs:element name="getHiddenPages" type="tns:getHiddenPages"/>
+<xs:element name="getHiddenPagesResponse" type="tns:getHiddenPagesResponse"/>
 <xs:element name="getIdOfClient" type="tns:getIdOfClient"/>
 <xs:element name="getIdOfClientResponse" type="tns:getIdOfClientResponse"/>
 <xs:element name="getIdOfContragent" type="tns:getIdOfContragent"/>
@@ -304,6 +309,21 @@
     <xs:attribute name="LastFreePayTime" type="xs:date"/>
     <xs:attribute name="DiscountMode" type="xs:int"/>
     <xs:attribute name="Limit" type="xs:long"/>
+  </xs:complexType>
+<xs:complexType name="getHiddenPages">
+    <xs:sequence/>
+  </xs:complexType>
+<xs:complexType name="getHiddenPagesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:hiddenPagesResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="hiddenPagesResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="hiddenPages" type="xs:string"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
   </xs:complexType>
 <xs:complexType name="changePaymentOrderStatus">
     <xs:sequence>
@@ -806,6 +826,46 @@
       <xs:element minOccurs="0" name="return" type="tns:idResult"/>
     </xs:sequence>
   </xs:complexType>
+<xs:complexType name="getComplexListByOrg">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="orgId" type="xs:long"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getComplexListByOrgResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:complexListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="complexListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="complexDateList" type="tns:ComplexDateList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ComplexDateList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:ComplexDate"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ComplexDate">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:Complex"/>
+    </xs:sequence>
+    <xs:attribute name="Date" type="xs:date"/>
+  </xs:complexType>
+<xs:complexType name="Complex">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:ComplexDetail"/>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="ComplexDetail">
+    <xs:sequence/>
+    <xs:attribute name="Name" type="xs:string"/>
+  </xs:complexType>
 <xs:complexType name="getRBKMoneyConfig">
     <xs:sequence/>
   </xs:complexType>
@@ -1043,6 +1103,10 @@
     <wsdl:part element="tns:authorizeClientResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="getComplexListByOrg">
+    <wsdl:part element="tns:getComplexListByOrg" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="checkPasswordRestoreRequest">
     <wsdl:part element="tns:checkPasswordRestoreRequest" name="parameters">
     </wsdl:part>
@@ -1087,12 +1151,16 @@
     <wsdl:part element="tns:getRBKMoneyConfigResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="getSummaryBySan">
+    <wsdl:part element="tns:getSummaryBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="getCardList">
     <wsdl:part element="tns:getCardList" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="getSummaryBySan">
-    <wsdl:part element="tns:getSummaryBySan" name="parameters">
+  <wsdl:message name="getComplexListByOrgResponse">
+    <wsdl:part element="tns:getComplexListByOrgResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getClientsByGuardSanResponse">
@@ -1255,6 +1323,10 @@
     <wsdl:part element="tns:getIdOfContragentResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="getHiddenPagesResponse">
+    <wsdl:part element="tns:getHiddenPagesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="changePaymentOrderStatusResponse">
     <wsdl:part element="tns:changePaymentOrderStatusResponse" name="parameters">
     </wsdl:part>
@@ -1339,6 +1411,10 @@
     <wsdl:part element="tns:getPurchaseListBySanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="getHiddenPages">
+    <wsdl:part element="tns:getHiddenPages" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="changePersonalInfoResponse">
     <wsdl:part element="tns:changePersonalInfoResponse" name="parameters">
     </wsdl:part>
@@ -1399,12 +1475,12 @@
     <wsdl:part element="tns:changeExpenditureLimitResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="enableNotificationByEmailResponse">
-    <wsdl:part element="tns:enableNotificationByEmailResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getGroupListByOrgResponse">
     <wsdl:part element="tns:getGroupListByOrgResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="enableNotificationByEmailResponse">
+    <wsdl:part element="tns:enableNotificationByEmailResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="ClientRoomController">
@@ -1460,6 +1536,12 @@
       <wsdl:input message="tns:getSummary" name="getSummary">
     </wsdl:input>
       <wsdl:output message="tns:getSummaryResponse" name="getSummaryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getHiddenPages">
+      <wsdl:input message="tns:getHiddenPages" name="getHiddenPages">
+    </wsdl:input>
+      <wsdl:output message="tns:getHiddenPagesResponse" name="getHiddenPagesResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="changePaymentOrderStatus">
@@ -1610,6 +1692,12 @@
       <wsdl:input message="tns:getIdOfContragent" name="getIdOfContragent">
     </wsdl:input>
       <wsdl:output message="tns:getIdOfContragentResponse" name="getIdOfContragentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getComplexListByOrg">
+      <wsdl:input message="tns:getComplexListByOrg" name="getComplexListByOrg">
+    </wsdl:input>
+      <wsdl:output message="tns:getComplexListByOrgResponse" name="getComplexListByOrgResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getRBKMoneyConfig">
@@ -1774,6 +1862,15 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="changePaymentOrderStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getHiddenPages">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getHiddenPages">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getHiddenPagesResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -1990,6 +2087,15 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="getPurchaseListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getComplexListByOrg">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getComplexListByOrg">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getComplexListByOrgResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>

@@ -400,6 +400,9 @@
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
 <table>
+ <tr>
+ <td valign="top">
+<table>
     <tr>
         <td colspan="4">
             <div class="output-text">Меню с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
@@ -407,6 +410,7 @@
             </div>
         </td>
     </tr>
+
     <%
         /*Session persistenceSession = null;
         Transaction persistenceTransaction = null;*/
@@ -559,8 +563,130 @@
     </tr>
         <%      }
             }
-            /*persistenceTransaction.commit();
-            persistenceTransaction = null;*/
+
+        %>
+
+  </table>
+     </td>
+ <td valign="top">
+   <table>
+    <tr>
+        <td colspan="4">
+            <div class="output-text">Комплексы с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+                по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
+            </div>
+        </td>
+    </tr>
+    <%   // ClientSummaryResult clientSummaryResult=port.getSummary(clientAuthToken.getContractId());
+
+
+          ComplexListResult complexListResult=port.getComplexList(clientAuthToken.getContractId(),xmlStartDate,xmlEndDate);
+          ComplexDateList complexDateList=complexListResult.getComplexDateList();
+
+          List<ComplexDate> complexDates=complexDateList.getE();
+
+
+
+
+
+           /*persistenceTransaction.commit();
+           persistenceTransaction = null;*/
+        for(ComplexDate complexDate:complexDates){
+
+          Date currDate=  complexDate.getDate().toGregorianCalendar().getTime();
+
+ %>
+
+       <tr>
+           <td>   <!--Added row for the nested table-->
+               <table class="day">     <!--Start of the nested table-->
+                   <thead>
+                   <tr>
+                       <th>
+                           <div class="column-header menu-date">
+                               <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
+                                    src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
+                               <%
+                                   utcCalendar.setTime(currDate);
+                                   int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
+                               %>
+                               <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
+                               <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(currDate))%>
+                           </div>
+                       </th>
+                   </tr>
+                   </thead>
+
+                   <tbody>
+                   <tr>
+                       <td><div class="column-header">Комплекс</div></td>
+                       <td><div class="column-header">Содержание</div></td>
+                       <%--<td><div class="column-header">Цена</div></td>--%>
+                   </tr>
+
+
+           <%
+
+           List<Complex> complexes = complexDate.getE();
+
+           for(Complex complex:complexes){
+
+              List<ComplexDetail> complexDetails= complex.getE();
+
+              for(int i=0;i<complexDetails.size();i++){
+                ComplexDetail complexDetail=complexDetails.get(i);
+                if(i==0){
+                %>
+                   <tr>
+                       <td>
+                           <div class="menu-group-name">
+                               <%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(complex.getName()))%>
+                           </div>
+                       </td>
+                           <%
+                       } else {
+                %>
+                   <tr>
+                       <td>
+                           <div class="menu-group-name">
+                           </div>
+                       </td>
+                       <%
+                           }
+                       %>
+                       <td>
+                           <div class="output-text">
+                               <%=StringEscapeUtils.escapeHtml(complexDetail.getName())%>
+                           </div>
+                       </td>
+                       <%--<td>
+                           <div class="output-text">
+                               <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currComplexDetail.getMenuDetail().getPrice()))%>
+                           </div>
+                       </td>--%>
+                   </tr>
+
+
+
+
+                       <%
+
+
+              }
+           } %>
+                   </tbody>
+                   </table>
+               </td>
+           </tr>
+                       <%
+
+            }  %>
+           </table>
+ </td>
+   </tr>
+</table>
+           <%
+
         } catch (Exception e) {
             logger.error("Failed to build page", e);
         %>
@@ -573,7 +699,7 @@
             HibernateUtils.close(persistenceSession, logger);*/
         }
     %>
-</table>
+<%--</table>--%>
 <%
         }
     } catch (RuntimeContext.NotInitializedException e) {

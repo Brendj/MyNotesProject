@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="CardList" type="{http://soap.integra.partner.web.processor.ecafe.axetta.ru/}CardList" minOccurs="0"/>
  *         &lt;element name="EnterEventList" type="{http://soap.integra.partner.web.processor.ecafe.axetta.ru/}EnterEventList" minOccurs="0"/>
  *         &lt;element name="CirculationItemList" type="{http://soap.integra.partner.web.processor.ecafe.axetta.ru/}CirculationItemList" minOccurs="0"/>
+ *         &lt;element name="ComplexDateList" type="{http://soap.integra.partner.web.processor.ecafe.axetta.ru/}ComplexDateList" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="IdOfContract" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="ResultCode" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -51,7 +52,8 @@ import javax.xml.bind.annotation.XmlType;
     "menuListExt",
     "cardList",
     "enterEventList",
-    "circulationItemList"
+    "circulationItemList",
+    "complexDateList"
 })
 @XmlRootElement(name = "Data")
 public class Data {
@@ -76,6 +78,8 @@ public class Data {
     protected EnterEventList enterEventList;
     @XmlElement(name = "CirculationItemList")
     protected CirculationItemList circulationItemList;
+    @XmlElement(name = "ComplexDateList")
+    protected ComplexDateList complexDateList;
     @XmlAttribute(name = "IdOfContract")
     protected Long idOfContract;
     @XmlAttribute(name = "ResultCode")
@@ -321,6 +325,30 @@ public class Data {
      */
     public void setCirculationItemList(CirculationItemList value) {
         this.circulationItemList = value;
+    }
+
+    /**
+     * Gets the value of the complexDateList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ComplexDateList }
+     *     
+     */
+    public ComplexDateList getComplexDateList() {
+        return complexDateList;
+    }
+
+    /**
+     * Sets the value of the complexDateList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ComplexDateList }
+     *     
+     */
+    public void setComplexDateList(ComplexDateList value) {
+        this.complexDateList = value;
     }
 
     /**

@@ -14,6 +14,7 @@
         <xs:element minOccurs="0" name="CardList" type="tns:CardList"/>
         <xs:element minOccurs="0" name="EnterEventList" type="tns:EnterEventList"/>
         <xs:element minOccurs="0" name="CirculationItemList" type="tns:CirculationItemList"/>
+        <xs:element minOccurs="0" name="ComplexDateList" type="tns:ComplexDateList"/>
       </xs:sequence>
       <xs:attribute name="IdOfContract" type="xs:long"/>
       <xs:attribute name="ResultCode" type="xs:long"/>
@@ -68,6 +69,8 @@
 <xs:element name="getClientSmsListResponse" type="tns:getClientSmsListResponse"/>
 <xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
 <xs:element name="getClientsByGuardSanResponse" type="tns:getClientsByGuardSanResponse"/>
+<xs:element name="getComplexList" type="tns:getComplexList"/>
+<xs:element name="getComplexListResponse" type="tns:getComplexListResponse"/>
 <xs:element name="getContractIdByCardNo" type="tns:getContractIdByCardNo"/>
 <xs:element name="getContractIdByCardNoResponse" type="tns:getContractIdByCardNoResponse"/>
 <xs:element name="getEnterEventList" type="tns:getEnterEventList"/>
@@ -973,16 +976,45 @@
       <xs:element minOccurs="0" name="return" type="tns:menuListResult"/>
     </xs:sequence>
   </xs:complexType>
-<xs:complexType name="detachGuardSanBySan">
+<xs:complexType name="getComplexList">
     <xs:sequence>
-      <xs:element minOccurs="0" name="san" type="xs:string"/>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>
-<xs:complexType name="detachGuardSanBySanResponse">
+<xs:complexType name="getComplexListResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
+      <xs:element minOccurs="0" name="return" type="tns:complexListResult"/>
     </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="complexListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="complexDateList" type="tns:ComplexDateList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ComplexDateList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:ComplexDate"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ComplexDate">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:Complex"/>
+    </xs:sequence>
+    <xs:attribute name="Date" type="xs:date"/>
+  </xs:complexType>
+<xs:complexType name="Complex">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:ComplexDetail"/>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="ComplexDetail">
+    <xs:sequence/>
+    <xs:attribute name="Name" type="xs:string"/>
   </xs:complexType>
 <xs:complexType name="attachGuardSanBySan">
     <xs:sequence>
@@ -993,6 +1025,17 @@
 <xs:complexType name="attachGuardSanBySanResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="return" type="tns:attachGuardSanResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
     </xs:sequence>
   </xs:complexType>
 <xs:complexType name="getEnterEventListBySan">
@@ -1280,6 +1323,10 @@
     <wsdl:part element="tns:changePaymentOrderStatusResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="getComplexList">
+    <wsdl:part element="tns:getComplexList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="getCardListBySanResponse">
     <wsdl:part element="tns:getCardListBySanResponse" name="parameters">
     </wsdl:part>
@@ -1326,6 +1373,10 @@
   </wsdl:message>
   <wsdl:message name="changeExpenditureLimit">
     <wsdl:part element="tns:changeExpenditureLimit" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getComplexListResponse">
+    <wsdl:part element="tns:getComplexListResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="activateLinkingTokenResponse">
@@ -1697,16 +1748,22 @@
       <wsdl:output message="tns:getMenuListByOrgResponse" name="getMenuListByOrgResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="detachGuardSanBySan">
-      <wsdl:input message="tns:detachGuardSanBySan" name="detachGuardSanBySan">
+    <wsdl:operation name="getComplexList">
+      <wsdl:input message="tns:getComplexList" name="getComplexList">
     </wsdl:input>
-      <wsdl:output message="tns:detachGuardSanBySanResponse" name="detachGuardSanBySanResponse">
+      <wsdl:output message="tns:getComplexListResponse" name="getComplexListResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="attachGuardSanBySan">
       <wsdl:input message="tns:attachGuardSanBySan" name="attachGuardSanBySan">
     </wsdl:input>
       <wsdl:output message="tns:attachGuardSanBySanResponse" name="attachGuardSanBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSanBySan">
+      <wsdl:input message="tns:detachGuardSanBySan" name="detachGuardSanBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:detachGuardSanBySanResponse" name="detachGuardSanBySanResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getEnterEventListBySan">
@@ -2114,12 +2171,12 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="detachGuardSanBySan">
+    <wsdl:operation name="getComplexList">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="detachGuardSanBySan">
+      <wsdl:input name="getComplexList">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="detachGuardSanBySanResponse">
+      <wsdl:output name="getComplexListResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -2129,6 +2186,15 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="attachGuardSanBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSanBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="detachGuardSanBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="detachGuardSanBySanResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
