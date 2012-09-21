@@ -847,15 +847,15 @@ public class DAOUtils {
         }
     }
 
+    public static Client findClientByRefGUID(Session session, String guid){
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("clientGUID",guid));
+        return (Client) criteria.uniqueResult();
+    }
+
     public static DistributedObject findDistributedObjectByRefGUID(Session session, String guid){
         Criteria criteria = session.createCriteria(DistributedObject.class);
         criteria.add(Restrictions.eq("guid",guid));
         return (DistributedObject) criteria.uniqueResult();
-        //TypedQuery<T> query = em.createQuery("from "+clazz.getSimpleName()+" where guid='"+guid+"'",clazz);
-        //List<T> list = query.getResultList();
-        //if (list.isEmpty()) {
-        //    return null;
-        //}
-        //return list.get(0);
     }
 }
