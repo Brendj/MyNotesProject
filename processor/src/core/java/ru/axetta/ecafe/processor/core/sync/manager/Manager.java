@@ -97,10 +97,11 @@ public class Manager {
                         try{
                             distributedObject = distributedObject.build(node);
                         } catch (DistributedObjectException e){
-                            distributedObject.setErrorType(((DistributedObjectException) e).getErrorType());
+                            distributedObject.setDistributedObjectException(e);
                             logger.error(distributedObject.toString(), e);
                         } catch (Exception e){
-                            distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+                            //distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+                            distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
                             logger.error(distributedObject.toString(), e);
                         }
                         if (!distributedObjectsListMap.containsKey(currentObject)) {
@@ -270,9 +271,9 @@ public class Manager {
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(distributedObject.getErrorType()==null){
+            if(distributedObject.getDistributedObjectException()==null){
                 if (!(distributedObject.getDeletedState()==null || distributedObject.getDeletedState())) {
-                    distributedObject.preProcess();
+                    distributedObject.preProcess(persistenceSession);
                     if(distributedObject instanceof IConfigProvider){
                         ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
                         ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
@@ -290,10 +291,12 @@ public class Manager {
             persistenceTransaction = null;
         } catch (DistributedObjectException e){
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
-            distributedObject.setErrorType(e.getErrorType());
+            //distributedObject.setError(e.getErrorType());
+            distributedObject.setDistributedObjectException(e);
             logger.error(distributedObject.toString(), e);
         } catch (Exception e){
-            distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+            //distributedObject.setError(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+            distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             logger.error(distributedObject.toString(), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -355,7 +358,7 @@ public class Manager {
             if(configurationProvider == null) {
                 //return new ArrayList<DistributedObject>(0);
                 // При выбрасывании исключения падает вся синхронизация как быть с библиотекой?
-                throw new DistributedObjectException(DistributedObjectException.ErrorType.CONFIGURATION_PROVIDER_NOT_FOUND);
+                throw new DistributedObjectException("CONFIGURATION_PROVIDER_NOT_FOUND");
             }
         }
         return configurationProvider;
@@ -448,7 +451,7 @@ public class Manager {
         Query query = session.createQuery(where);
         List list = query.list();
         if(list==null || list.isEmpty()){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
         }
         return ((DistributedObject)list.get(0)).getGlobalVersion();
     }
@@ -456,7 +459,7 @@ public class Manager {
     private DistributedObject updateDeleteState(Session session, DistributedObject distributedObject,Long currentMaxVersion) throws Exception{
         Long id = getGlobalIDByGUID(session, distributedObject);
         if (id < 0) {
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
         }
         DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
         object.setGlobalVersion(currentMaxVersion);
@@ -506,10 +509,12 @@ public class Manager {
     private DistributedObject mergeDistributedObject(Session session, DistributedObject distributedObject, long currentVersion) throws Exception{
         long id = getGlobalIDByGUID(session,distributedObject);
         if (id < 0) {
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         }
         DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
         object.fill(distributedObject);
+        object.setDeletedState(distributedObject.getDeletedState());
         object.setLastUpdate(new Date());
         object.setGlobalVersion(currentVersion);
         return (DistributedObject) session.merge(object);
@@ -519,10 +524,12 @@ public class Manager {
             throws DistributedObjectException {
         long id = getGlobalIDByGUID(session,distributedObject);
         if (id > 0) {
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.DUPLICATE_VALUE);
+            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
+            //throw new DistributedObjectException(DistributedObjectException.ErrorType.DUPLICATE_VALUE);
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
+        distributedObject.setDeletedState(distributedObject.getDeletedState());
         return (DistributedObject) session.merge(distributedObject);
     }
 

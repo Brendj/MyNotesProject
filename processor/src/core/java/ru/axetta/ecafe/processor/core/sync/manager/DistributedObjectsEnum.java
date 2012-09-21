@@ -42,21 +42,21 @@ public enum DistributedObjectsEnum {
     TradeMaterialGood(TradeMaterialGood.class,3),
     // библиоткека
     Publication(Publication.class, 0),
-    Issuable(Issuable.class, 1),
-    Circulation(Circulation.class, 2),
-    AccompanyingDocument(AccompanyingDocument.class, 10),
-    Fund(Fund.class,10),
-    Instance(Instance.class,10),
-    InventoryBook(InventoryBook.class,10),
-    Journal(Journal.class, 10),
-    JournalItem(JournalItem.class,10),
-    Ksu1Record(Ksu1Record.class, 10),
-    Ksu2Record(Ksu2Record.class,10),
-    //LibVisit(LibVisit.class,10),
-    Reader(Reader.class, 10),
-    RetirementReason(RetirementReason.class,20),
-    Source(Source.class,20),
-    TypeOfAccompanyingDocument(TypeOfAccompanyingDocument.class,20);
+    Source(Source.class,0),
+    TypeOfAccompanyingDocument(TypeOfAccompanyingDocument.class,0),
+    InventoryBook(InventoryBook.class,0),
+    Fund(Fund.class,0),
+    RetirementReason(RetirementReason.class,0),
+    AccompanyingDocument(AccompanyingDocument.class, 1),
+    Journal(Journal.class, 1),
+    Ksu2Record(Ksu2Record.class,1),
+    Ksu1Record(Ksu1Record.class, 2),
+    Instance(Instance.class,3),
+    JournalItem(JournalItem.class,3),
+    Issuable(Issuable.class, 4),
+    Circulation(Circulation.class, 5);
+    //LibVisit(LibVisit.class,13),
+    //Reader(Reader.class, 14),
 
     private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */
