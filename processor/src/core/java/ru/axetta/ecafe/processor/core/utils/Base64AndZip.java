@@ -90,6 +90,11 @@ public class Base64AndZip {
         return result.getBytes();
     }
 
+    public static String enCode(byte[] data) {
+        BASE64Encoder base64Encoder = new BASE64Encoder();
+        return base64Encoder.encode(data);
+    }
+
     public static byte[] decode(byte[] data) throws IOException {
         BASE64Decoder base64Decoder = new BASE64Decoder();
         return base64Decoder.decodeBuffer(new String(data));
@@ -97,6 +102,10 @@ public class Base64AndZip {
 
     public static byte[] unzipAndDecode(byte[] data) throws IOException {
         return decode(unzip(data));
+    }
+
+    public static String zipAndEncode(byte[] data) throws IOException {
+        return enCode(zip(data));
     }
 
     public static byte[] decodeAndUnzip(byte[] data) throws IOException {
