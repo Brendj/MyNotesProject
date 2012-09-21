@@ -5,7 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -19,6 +23,29 @@ import org.w3c.dom.Node;
 public class RetirementReason extends DistributedObject {
 
     private String retirementReasonName;
+    private int hashCode;
+
+    public int getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+    }
+
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException {
+        Criteria criteria = session.createCriteria(RetirementReason.class);
+        criteria.add(Restrictions.eq("hashCode",getHashCode()));
+        RetirementReason retirementReason = (RetirementReason) criteria.uniqueResult();
+        if(retirementReason!=null){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("RetirementReason DATA_EXIST_VALUE");
+            distributedObjectException.setData(retirementReason.getGuid());
+            throw  distributedObjectException;
+        }
+        //if(retirementReason!=null) throw new DistributedObjectException("RetirementReason exists : " + retirementReason.getGuid(),
+        //        DistributedObjectException.ErrorType.DATA_EXIST_VALUE);
+    }
 
     @Override
     protected void appendAttributes(Element element) {
@@ -33,12 +60,16 @@ public class RetirementReason extends DistributedObject {
         if (retirementReasonName != null) {
             setRetirementReasonName(retirementReasonName);
         }
+
+        setHashCode(hashCode());
+
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
         setRetirementReasonName(((RetirementReason) distributedObject).getRetirementReasonName());
+        setHashCode(((RetirementReason) distributedObject).getHashCode());
     }
 
     public String getRetirementReasonName() {
@@ -54,5 +85,48 @@ public class RetirementReason extends DistributedObject {
         return "RetirementReason{" +
                 "retirementReasonName='" + retirementReasonName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        RetirementReason that = (RetirementReason) o;
+
+        return !(retirementReasonName != null ? !retirementReasonName.equals(that.retirementReasonName)
+                : that.retirementReasonName != null);
+
+    }
+
+    private static final String Consonants = "бвгджзклмнпрстфхцчшщbcdfghklmnpqrstuvwxyz1234567890";
+
+    private static boolean isConsonant(char c) {
+        for (char consonant : Consonants.toCharArray())
+            if (consonant == c)
+                return true;
+        return false;
+    }
+
+    private String getStringForHash(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        for (int i = sb.length() - 1; i >= 0; --i) {
+            if (isConsonant(sb.charAt(i))) continue;
+            sb.delete(i, i + 1);
+        }
+        return sb.toString().toLowerCase();
+    }
+
+
+    @Override
+    public int hashCode() {
+        return 31 * ((retirementReasonName != null ? getStringForHash(retirementReasonName).hashCode() : 0)) + (retirementReasonName != null ? getStringForHash(retirementReasonName).hashCode() : 0);
     }
 }

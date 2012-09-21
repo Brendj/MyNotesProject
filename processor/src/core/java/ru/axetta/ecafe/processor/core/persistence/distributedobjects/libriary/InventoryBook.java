@@ -22,7 +22,7 @@ public class InventoryBook extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        //setAttribute(element, "Guid", guid);
+        setAttribute(element, "BookName", bookName);
     }
 
     @Override

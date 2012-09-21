@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -44,10 +47,15 @@ public class LibVisit extends DistributedObject {
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
+    public void preProcess(Session session) throws DistributedObjectException{
+        //DAOService daoService = DAOService.getInstance();
+        //setClient(daoService.findClientById(idOfClient));
         if (idOfClient != null) {
-            setClient(daoService.findClientById(idOfClient));
+            try{
+                setClient(DAOUtils.findClient(session, idOfClient));
+            } catch (Exception e){
+                throw new DistributedObjectException("NOT_FOUND_VALUE");
+            }
         }
     }
 

@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -23,11 +25,13 @@ import java.util.Date;
 public class InternalDisposingDocument extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfSt);
-        if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfSt);
+        Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
-        ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class, guidOfAI);
+        //ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class, guidOfAI);
+        ActOfInventarization ai = (ActOfInventarization) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAI);
         if(ai!=null) setActOfInventarization(ai);
     }
 

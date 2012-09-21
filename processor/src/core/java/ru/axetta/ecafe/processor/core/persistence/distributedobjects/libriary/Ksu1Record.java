@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -30,26 +33,35 @@ public class Ksu1Record extends DistributedObject {
     private String guidAccompanyingDocument;
 
     @Override
+    public void preProcess(Session session) throws DistributedObjectException{
+        //DAOService daoService = DAOService.getInstance();
+        //setAccompanyingDocument(
+        //        daoService.findDistributedObjectByRefGUID(AccompanyingDocument.class, guidAccompanyingDocument));
+        AccompanyingDocument ad = (AccompanyingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidAccompanyingDocument);
+        if(ad==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setAccompanyingDocument(ad);
+        //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
+        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setFund(f);
+    }
+
+    @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "GuidFund", guidFund);
+        //setAttribute(element, "GuidAccompanyingDocument", guidAccompanyingDocument);
+        //setAttribute(element, "IncomeDate", incomeDate);
+        //setAttribute(element, "RecordNumber", recordNumber);
     }
 
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "guidFund", 1024);
-        guidAccompanyingDocument = getStringAttributeValue(node, "guidAccompanyingDocument", 1024);
-        incomeDate = getDateTimeAttributeValue(node, "incomeDate");
-        recordNumber = getIntegerAttributeValue(node, "recordNumber");
+        guidFund = getStringAttributeValue(node, "GuidFund", 1024);
+        guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 1024);
+        incomeDate = getDateTimeAttributeValue(node, "IncomeDate");
+        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
         return this;
-    }
-
-    @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setAccompanyingDocument(
-                daoService.findDistributedObjectByRefGUID(AccompanyingDocument.class, guidAccompanyingDocument));
-        setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
     }
 
     @Override

@@ -22,13 +22,13 @@ public class Source extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        setAttribute(element, "SourceName", sourceName);
     }
 
     @Override
     public Source parseAttributes(Node node) throws Exception{
 
-        String sourceName = getStringAttributeValue(node, "SourceName", 1024);
+        String sourceName = getStringAttributeValue(node, "SourceName", 127);
         if (sourceName != null) {
             setSourceName(sourceName);
         }

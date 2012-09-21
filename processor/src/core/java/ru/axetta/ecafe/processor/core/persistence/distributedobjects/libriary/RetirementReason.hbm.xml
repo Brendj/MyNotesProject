@@ -25,5 +25,7 @@
         <!-- End Global params -->
 
         <property name="retirementReasonName" column="RetirementReasonName" type="string" length="45" not-null="false"/>
+        <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
+
     </class>
 </hibernate-mapping>

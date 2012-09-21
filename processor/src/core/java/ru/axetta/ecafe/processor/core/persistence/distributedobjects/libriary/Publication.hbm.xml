@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication" table="cf_publs">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication" table="cf_publications">
         <id name="globalId" column="idofpubl" type="long">
             <generator class="identity"/>
         </id>
@@ -24,14 +24,14 @@
                   not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <property name="isbn" column="isbn" type="string" length="15" not-null="false"/>
-        <property name="data" column="data" type="string" not-null="false"/>
-        <property name="author" column="author" type="string" length="255" not-null="false"/>
-        <property name="title" column="title" type="string" length="512" not-null="false"/>
-        <property name="title2" column="title2" type="string" length="255" not-null="false"/>
-        <property name="publicationdate" column="publicationdate" type="string" length="15" not-null="false"/>
-        <property name="publisher" column="publisher" type="string" length="255" not-null="false"/>
-        <property name="hash" column="hash" type="integer" not-null="false"/>
+        <property name="isbn" column="ISBN" type="string" length="15" not-null="false"/>
+        <property name="data" column="DataOfPublication" type="byte[]" not-null="false"/>
+        <property name="author" column="Author" type="string" length="255" not-null="false"/>
+        <property name="title" column="Title" type="string" length="512" not-null="false"/>
+        <property name="title2" column="Title2" type="string" length="255" not-null="false"/>
+        <property name="publicationdate" column="PublicationDate" type="string" length="15" not-null="false"/>
+        <property name="publisher" column="Publisher" type="string" length="255" not-null="false"/>
+        <property name="hash" column="Hash" type="integer" not-null="false"/>
 
     </class>
 </hibernate-mapping>

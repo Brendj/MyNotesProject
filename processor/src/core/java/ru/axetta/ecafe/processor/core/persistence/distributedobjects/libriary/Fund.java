@@ -22,13 +22,13 @@ public class Fund extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        setAttribute(element, "FundName", fundName);
     }
 
     @Override
     public Fund parseAttributes(Node node) throws Exception{
 
-        String fundName = getStringAttributeValue(node, "fundName", 128);
+        String fundName = getStringAttributeValue(node, "FundName", 128);
         if (fundName != null) {
             setFundName(fundName);
         }

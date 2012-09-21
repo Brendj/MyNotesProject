@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -21,13 +23,16 @@ import org.w3c.dom.Node;
 public class Good extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        GoodGroup gg = DAOService.getInstance().findDistributedObjectByRefGUID(GoodGroup.class, guidOfGG);
-        if(gg == null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+        //GoodGroup gg = DAOService.getInstance().findDistributedObjectByRefGUID(GoodGroup.class, guidOfGG);
+        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
+        if(gg == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGoodGroup(gg);
-        Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
-        if(p == null && tm == null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
+        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
+        //TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
+        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
+        if(p == null && tm == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
     }

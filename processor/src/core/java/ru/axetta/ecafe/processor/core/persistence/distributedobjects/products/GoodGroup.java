@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -25,7 +26,7 @@ import java.util.Set;
 public class GoodGroup extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
+    public void preProcess(Session session) throws DistributedObjectException {
 
     }
 

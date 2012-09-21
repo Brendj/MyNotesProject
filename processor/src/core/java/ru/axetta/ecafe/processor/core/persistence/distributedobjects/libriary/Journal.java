@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -30,26 +33,35 @@ public class Journal extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "GuidFund", fund.getGuid());
+        //setAttribute(element, "GuidPublication", publication.getGuid());
+        //setAttribute(element, "IsNewspaper", isNewspaper);
+        //setAttribute(element, "MonthCount", monthCount);
+        //setAttribute(element, "Count", count);
     }
 
     @Override
     public Journal parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "guidFund", 1024);
-        guidPublication = getStringAttributeValue(node, "guidPublication", 1024);
+        guidFund = getStringAttributeValue(node, "GuidFund", 32);
+        guidPublication = getStringAttributeValue(node, "GuidPublication", 32);
 
-        isNewspaper = (getIntegerAttributeValue(node, "isNewspaper") == 1);
-        monthCount = getIntegerAttributeValue(node, "monthCount");
-        count = getIntegerAttributeValue(node, "count");
+        isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
+        monthCount = getIntegerAttributeValue(node, "MonthCount");
+        count = getIntegerAttributeValue(node, "Count");
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setPublication(daoService.findDistributedObjectByRefGUID(Publication.class, guidPublication));
-        setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
+    public void preProcess(Session session) throws DistributedObjectException{
+
+        Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
+        if(p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setPublication(p);
+
+        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        //if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(f!=null) setFund(f);
     }
 
     @Override

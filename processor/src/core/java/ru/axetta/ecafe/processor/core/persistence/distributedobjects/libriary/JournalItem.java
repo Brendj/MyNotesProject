@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -38,30 +41,47 @@ public class JournalItem extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "Guid", guid);
     }
 
     @Override
     public JournalItem parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "guidFund", 1024);
-        guidJournal = getStringAttributeValue(node, "guidJournal", 1024);
-        guidKsu1Record = getStringAttributeValue(node, "guidKsu1Record", 1024);
-        guidKsu2Record = getStringAttributeValue(node, "guidKsu2Record", 1024);
+        guidFund = getStringAttributeValue(node, "GuidFund", 1024);
+        guidJournal = getStringAttributeValue(node, "GuidJournal", 1024);
+        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 1024);
+        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 1024);
 
-        date = getDateTimeAttributeValue(node, "date");
-        number = getStringAttributeValue(node, "number", 10);
-        cost = getIntegerAttributeValue(node, "cost");
+        date = getDateTimeAttributeValue(node, "Date");
+        number = getStringAttributeValue(node, "Number", 10);
+        cost = getIntegerAttributeValue(node, "Cost");
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setJournal(daoService.findDistributedObjectByRefGUID(Journal.class, guidJournal));
-        setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
-        setKsu1Record(daoService.findDistributedObjectByRefGUID(Ksu1Record.class, guidKsu1Record));
-        setKsu2Record(daoService.findDistributedObjectByRefGUID(Ksu2Record.class, guidKsu2Record));
+    public void preProcess(Session session) throws DistributedObjectException {
+        //DAOService daoService = DAOService.getInstance();
+        //setJournal(daoService.findDistributedObjectByRefGUID(Journal.class, guidJournal));
+        //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
+
+        Journal j = (Journal) DAOUtils.findDistributedObjectByRefGUID(session, guidJournal);
+        if(j==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setJournal(j);
+
+        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        //if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setFund(f);
+
+        Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
+        //if(ksu1==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setKsu1Record(ksu1);
+
+        Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
+        //if(ksu2==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setKsu2Record(ksu2);
+
+        //setKsu1Record(daoService.findDistributedObjectByRefGUID(Ksu1Record.class, guidKsu1Record));
+        //setKsu2Record(daoService.findDistributedObjectByRefGUID(Ksu2Record.class, guidKsu2Record));
     }
 
     @Override

@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -21,7 +24,7 @@ import java.util.Date;
  */
 public class Ksu2Record extends DistributedObject {
 
-    private int recordNumber;
+    private Integer recordNumber;
     private Fund fund;
     private Date retirementDate;
     private RetirementReason retirementReason;
@@ -31,24 +34,38 @@ public class Ksu2Record extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        //setAttribute(element, "GuidFund", guid);
+        //setAttribute(element, "GuidRetirementReason", guid);
+        //setAttribute(element, "RetirementDate", getDateFormat().format(retirementDate));
+        //setAttribute(element, "RecordNumber", recordNumber);
     }
 
     @Override
     public Ksu2Record parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "guidFund", 1024);
-        guidRetirementReason = getStringAttributeValue(node, "guidRetirementReason", 1024);
-        retirementDate = getDateTimeAttributeValue(node, "retirementDate");
-        recordNumber = getIntegerAttributeValue(node, "recordNumber");
+        guidFund = getStringAttributeValue(node, "GuidFund", 32);
+        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 32);
+        retirementDate = getDateTimeAttributeValue(node, "RetirementDate");
+        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setRetirementReason(daoService.findDistributedObjectByRefGUID(RetirementReason.class, guidRetirementReason));
-        setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
+    public void preProcess(Session session) throws DistributedObjectException{
+        //DAOService daoService = DAOService.getInstance();
+        //setRetirementReason(daoService.findDistributedObjectByRefGUID(RetirementReason.class, guidRetirementReason));
+        RetirementReason rr = (RetirementReason) DAOUtils.findDistributedObjectByRefGUID(session, guidRetirementReason);
+        if(rr==null) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE");
+        }
+        setRetirementReason(rr);
+
+        //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
+        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        if(f==null){
+            throw new DistributedObjectException("NOT_FOUND_VALUE");
+        }
+        setFund(f);
     }
 
     @Override
@@ -59,11 +76,11 @@ public class Ksu2Record extends DistributedObject {
         setRetirementDate(((Ksu2Record) distributedObject).getRetirementDate());
     }
 
-    public int getRecordNumber() {
+    public Integer getRecordNumber() {
         return recordNumber;
     }
 
-    public void setRecordNumber(int recordNumber) {
+    public void setRecordNumber(Integer recordNumber) {
         this.recordNumber = recordNumber;
     }
 

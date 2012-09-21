@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -22,11 +24,13 @@ import org.w3c.dom.Node;
 public class InternalDisposingDocumentPosition extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        if(idd==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+        //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
+        InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
+        if(idd==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setInternalDisposingDocument(idd);
-        TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class,guidOfTMG);
+        //TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class,guidOfTMG);
+        TradeMaterialGood tmg  = (TradeMaterialGood) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
         if(tmg!=null) setTradeMaterialGood(tmg);
     }
 

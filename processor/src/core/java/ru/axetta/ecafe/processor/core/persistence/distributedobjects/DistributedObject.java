@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -52,7 +53,16 @@ public abstract class DistributedObject{
 
     private DateFormat timeFormat;
 
-    private DistributedObjectException.ErrorType errorType;
+   // private DistributedObjectException.ErrorType errorType;
+    private DistributedObjectException distributedObjectException;
+
+    public DistributedObjectException getDistributedObjectException() {
+        return distributedObjectException;
+    }
+
+    public void setDistributedObjectException(DistributedObjectException distributedObjectException) {
+        this.distributedObjectException = distributedObjectException;
+    }
 
     /* метод добавления атрибутов в узел в тег подтверждения*/
     public Element toConfirmElement(Element element){
@@ -61,9 +71,17 @@ public abstract class DistributedObject{
             element.setAttribute("D", "1");
         }
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
-        if(this.errorType != null){
-            String error = String.format("%d : %s", errorType.getValue(), errorType.name());
-            element.setAttribute("ErrorType", error);
+        if(this.distributedObjectException != null){
+            //if(distributedObjectException.equals(DistributedObjectException.ErrorType.DATA_EXIST_VALUE)){
+            //    element.setAttribute("ErrorType", );
+            //} else {
+            //    String error = String.format("%d : %s", errorType.getValue(), errorType.name());
+            //    element.setAttribute("ErrorType", error);
+            //}
+            element.setAttribute("ErrorType", distributedObjectException.getMessage());
+            if(distributedObjectException.getData()!=null){
+                element.setAttribute("ErrorData", distributedObjectException.getData());
+            }
         }
         return element;
     }
@@ -73,12 +91,12 @@ public abstract class DistributedObject{
 
     /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
+        element.setAttribute("Guid", getGuid());
+        element.setAttribute("V", String.valueOf(getGlobalVersion()));
         if(getDeletedState()){
             element.setAttribute("D", "1");
         }
         appendAttributes(element);
-        element.setAttribute("Guid", getGuid());
-        element.setAttribute("V", String.valueOf(getGlobalVersion()));
         return element;
         /* Метод определения названия элемента */
     }
@@ -104,7 +122,9 @@ public abstract class DistributedObject{
         //if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
-    public void preProcess() throws DistributedObjectException{}
+
+    /* TODO: вставить входным параметром session от hibernate*/
+    public void preProcess(Session session) throws DistributedObjectException{}
 
     protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 
@@ -129,7 +149,7 @@ public abstract class DistributedObject{
                 result = dateOnlyFormat.parse(attributeValue);
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_DATE_VALUE);
+            throw new DistributedObjectException("PARSE_DATE_VALUE");
         }
         return result;
     }
@@ -142,7 +162,7 @@ public abstract class DistributedObject{
                 result = timeFormat.parse(attributeValue);
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_DATE_VALUE);
+            throw new DistributedObjectException("PARSE_DATE_VALUE");
         }
         return result;
     }
@@ -163,7 +183,7 @@ public abstract class DistributedObject{
                 result = Float.parseFloat(replacedString);
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_FLOAT_VALUE);
+            throw new DistributedObjectException("PARSE_FLOAT_VALUE");
         }
         return result;
     }
@@ -176,7 +196,7 @@ public abstract class DistributedObject{
                 result = Boolean.parseBoolean(getAttributeValue(node, attributeName));
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_BOOLEAN_VALUE);
+            throw new DistributedObjectException("PARSE_BOOLEAN_VALUE");
         }
         return result;
     }
@@ -189,7 +209,7 @@ public abstract class DistributedObject{
                 result = Long.parseLong(getAttributeValue(node, attributeName));
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_LONG_VALUE);
+            throw new DistributedObjectException("PARSE_LONG_VALUE");
         }
         return result;
     }
@@ -202,7 +222,7 @@ public abstract class DistributedObject{
                 result = Integer.parseInt(attributeValue);
             }
         } catch (Exception e){
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_INTEGER_VALUE);
+            throw new DistributedObjectException("PARSE_INTEGER_VALUE");
         }
         return result;
     }
@@ -215,7 +235,7 @@ public abstract class DistributedObject{
                 result = getAttributeValue(node, attributeName).charAt(0);
             }
         } catch (Exception e) {
-            throw new DistributedObjectException(DistributedObjectException.ErrorType.PARSE_CHAR_VALUE);
+            throw new DistributedObjectException("PARSE_CHAR_VALUE");
         }
         return result;
     }
@@ -313,13 +333,13 @@ public abstract class DistributedObject{
         this.timeFormat = timeFormat;
     }
 
-    public DistributedObjectException.ErrorType getErrorType() {
-        return errorType;
-    }
-
-    public void setErrorType(DistributedObjectException.ErrorType errorType) {
-        this.errorType = errorType;
-    }
+    //public DistributedObjectException.ErrorType getErrorType() {
+    //    return errorType;
+    //}
+    //
+    //public void setErrorType(DistributedObjectException.ErrorType errorType) {
+    //    this.errorType = errorType;
+    //}
 
     public DateFormat getDateFormat() {
         return timeFormat;
@@ -377,7 +397,6 @@ public abstract class DistributedObject{
                 ", globalVersion=" + globalVersion +
                 ", guid='" + guid + '\'' +
                 ", orgOwner=" + orgOwner +
-                ", errorType=" + errorType +
                 ", className=" + getClass().getSimpleName() +
                 '}';
     }

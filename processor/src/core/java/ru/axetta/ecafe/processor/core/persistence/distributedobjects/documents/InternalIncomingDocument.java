@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -23,17 +25,21 @@ import java.util.Date;
 public class InternalIncomingDocument extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
-        InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class,guidOfAI);
-        if(wb==null && idd==null && ai==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+        //WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
+        WayBill wb  = (WayBill) DAOUtils.findDistributedObjectByRefGUID(session, guidOfWB);
+        //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
+        //ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class,guidOfAI);
+        InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
+        ActOfInventarization ai  = (ActOfInventarization) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAI);
+        if(wb==null && idd==null && ai==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(wb!=null) setWayBill(wb);
         if(idd!=null) setInternalDisposingDocument(idd);
         if(ai!=null) setActOfInventarization(ai);
 
-        Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
-        if(st==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
+        Staff st  = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfS);
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
     }
 

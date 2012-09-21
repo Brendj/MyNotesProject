@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -67,10 +69,12 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     }
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
-        if(tm==null || p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
+        //TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
+        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
+        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
+        if(tm==null || p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setProduct(p);
         setTechnologicalMap(tm);
     }

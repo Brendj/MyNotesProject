@@ -4,15 +4,19 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
 import ru.axetta.rusmarc.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +27,11 @@ import java.io.DataInputStream;
  */
 public class Publication extends DistributedObject {
 
-    //private Long idofpubl;
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException {
+        //Publication publication = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guid);
+
+    }
 
     private static final int AUTHOR = 2;
     private static final int TITLE = 0;
@@ -32,29 +40,51 @@ public class Publication extends DistributedObject {
     private static final int PUBLICATION_DATE = 4;
 
     private String isbn;
-    private String data;
+    private byte[] data;
     private String author;
     private String title;
-    private String title2;
-    private String publicationdate;
     private String publisher;
     private Integer hash;
+    private String title2;
+    private String publicationdate;
+
+    public String getPublicationdate() {
+        return publicationdate;
+    }
+
+    public void setPublicationdate(String publicationdate) {
+        this.publicationdate = publicationdate;
+    }
+
+    public String getTitle2() {
+        return title2;
+    }
+
+    public void setTitle2(String title2) {
+        this.title2 = title2;
+    }
 
     @Override
     protected void appendAttributes(Element element) {
-        //setAttribute(element, "Guid", guid);
-        setAttribute(element, "Data", data);
+        String decodedString = null;
+        try {
+            decodedString = Base64AndZip.zipAndEncode(data);
+        } catch (IOException e) {
+            setDistributedObjectException(new DistributedObjectException("BUILD_DATA_PUBLICATION_VALUE"));
+        }
+        setAttribute(element, "Data", decodedString);
     }
 
     @Override
     protected Publication parseAttributes(Node node) throws Exception {
+
         String data = getStringAttributeValue(node, "Data", 65536);
-        String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
+        //String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
         DataInputStream dataInputStream = new DataInputStream(
                 new ByteArrayInputStream(Base64AndZip.decodeAndUngzip(data.getBytes())));
         Record record = new Record(dataInputStream);
 
-        setData(data);
+        setData(record.getRUSMARCRecord());
 
         String stringIsbn = record.getISBN();
         if (stringIsbn != null) {
@@ -78,11 +108,11 @@ public class Publication extends DistributedObject {
         }
         String stringTitle2 = info[TITLE2];
         if (stringTitle2 != null) {
-            setTitle(stringTitle2);
+            setTitle2(stringTitle2);
         }
-        String stringPublicationdate = info[PUBLICATION_DATE];
-        if (stringPublicationdate != null) {
-            setPublicationdate(stringPublicationdate);
+        String stringPublicationDate = info[PUBLICATION_DATE];
+        if (stringPublicationDate != null) {
+            setPublicationdate(stringPublicationDate);
         }
         String stringPublisher = info[PUBLISHER];
         if (stringPublisher != null) {
@@ -111,11 +141,11 @@ public class Publication extends DistributedObject {
         this.isbn = isbn;
     }
 
-    public String getData() {
+    public byte[] getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
 
@@ -135,22 +165,6 @@ public class Publication extends DistributedObject {
         this.title = title;
     }
 
-    public String getTitle2() {
-        return title2;
-    }
-
-    public void setTitle2(String title2) {
-        this.title2 = title2;
-    }
-
-    public String getPublicationdate() {
-        return publicationdate;
-    }
-
-    public void setPublicationdate(String publicationdate) {
-        this.publicationdate = publicationdate;
-    }
-
     public String getPublisher() {
         return publisher;
     }
@@ -167,11 +181,12 @@ public class Publication extends DistributedObject {
         this.hash = hash;
     }
 
+
+
     @Override
     public String toString() {
         return "Publication{" +
                 "isbn='" + isbn + '\'' +
-                ", data='" + data + '\'' +
                 ", author='" + author + '\'' +
                 ", title='" + title + '\'' +
                 ", title2='" + title2 + '\'' +

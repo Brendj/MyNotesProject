@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -29,30 +32,31 @@ public class Issuable extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
     }
 
     @Override
     protected Issuable parseAttributes(Node node) throws Exception {
-        Long longBarCode = getLongAttributeValue(node, "barcode");
+        Long longBarCode = getLongAttributeValue(node, "Barcode");
         if (longBarCode != null) {
             setBarcode(longBarCode);
         }
-        Character charType = getCharacterAttributeValue(node, "type");
+        Character charType = getCharacterAttributeValue(node, "Type");
         if (charType != null) {
             setType(charType);
         }
 
-        guidInstance = getStringAttributeValue(node, "guidInstance", 1024);
-        guidJournalItem = getStringAttributeValue(node, "guidJournalItem", 1024);
+        guidInstance = getStringAttributeValue(node, "GuidInstance", 32);
+        guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 32);
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setInstance(daoService.findDistributedObjectByRefGUID(Instance.class, guidInstance));
-        setJournalItem(daoService.findDistributedObjectByRefGUID(JournalItem.class, guidJournalItem));
+    public void preProcess(Session session) throws DistributedObjectException{
+        Instance i = (Instance) DAOUtils.findDistributedObjectByRefGUID(session, guidInstance);
+        JournalItem ji = (JournalItem) DAOUtils.findDistributedObjectByRefGUID(session, guidJournalItem);
+        if((i==null && ji==null) || (i!=null && ji!=null)) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(i!=null) setInstance(i);
+        if(ji!=null) setJournalItem(ji);
     }
 
     @Override

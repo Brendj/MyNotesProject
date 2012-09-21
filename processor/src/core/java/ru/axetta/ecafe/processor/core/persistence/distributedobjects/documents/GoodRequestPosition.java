@@ -8,8 +8,10 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -23,13 +25,16 @@ import org.w3c.dom.Node;
 public class GoodRequestPosition extends DistributedObject {
 
     @Override
-    public void preProcess() throws DistributedObjectException {
-        GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class, guidOfGR);
-        if(gr==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+    public void preProcess(Session session) throws DistributedObjectException {
+       // GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class, guidOfGR);
+        GoodRequest gr =  (GoodRequest) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGR);
+        if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGoodRequest(gr);
-        Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
-        Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        if(g==null && p==null) throw new DistributedObjectException(DistributedObjectException.ErrorType.NOT_FOUND_VALUE);
+        //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
+        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
+        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
+        Product p =(Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
+        if(g==null && p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(g!=null) setGood(g);
         if(p!=null) setProduct(p);
     }

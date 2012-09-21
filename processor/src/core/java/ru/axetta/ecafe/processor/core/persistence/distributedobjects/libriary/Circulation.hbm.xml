@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" table="cf_circuls">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" table="cf_circulations">
         <id name="globalId" column="idofcircul" type="long">
             <generator class="identity"/>
         </id>
@@ -32,6 +32,9 @@
 
         <!--<many-to-one name="reader" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Reader" not-null="true"-->
         <!--column="IdOfReader"/>-->
+
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="true" update="false" fetch="join"/>
 
         <property name="issuanceDate" column="IssuanceDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>

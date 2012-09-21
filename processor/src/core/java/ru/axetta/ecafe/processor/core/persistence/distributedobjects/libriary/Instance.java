@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -36,32 +39,68 @@ public class Instance extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        setAttribute(element, "GuidFund", fund.getGuid());
+        setAttribute(element, "GuidPublication", publication.getGuid());
+        setAttribute(element, "GuidInventaryBook", inventoryBook.getGuid());
+        setAttribute(element, "GuidKsu1Record", ksu1Record.getGuid());
+        setAttribute(element, "GuidKsu2Record", ksu2Record.getGuid());
+        setAttribute(element, "InGroup", inGroup);
+        setAttribute(element, "InvNumber", invNumber);
+        setAttribute(element, "Cost", cost);
     }
 
     @Override
     public Instance parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "guidFund", 1024);
-        guidPublication = getStringAttributeValue(node, "guidPublication", 1024);
-        guidInventaryBook = getStringAttributeValue(node, "guidInventaryBook", 1024);
-        guidKsu1Record = getStringAttributeValue(node, "guidKsu1Record", 1024);
-        guidKsu2Record = getStringAttributeValue(node, "guidKsu2Record", 1024);
+        guidFund = getStringAttributeValue(node, "GuidFund", 32);
+        guidPublication = getStringAttributeValue(node, "GuidPublication", 32);
+        guidInventaryBook = getStringAttributeValue(node, "GuidInventaryBook", 32);
+        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 32);
+        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 32);
 
-        inGroup = (getIntegerAttributeValue(node, "inGroup") == 1);
-        invNumber = getStringAttributeValue(node, "invNumber", 10);
-        cost = getIntegerAttributeValue(node, "cost");
+        inGroup = (getIntegerAttributeValue(node, "InGroup") == 1);
+        invNumber = getStringAttributeValue(node, "InvNumber", 10);
+        cost = getIntegerAttributeValue(node, "Cost");
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setPublication(daoService.findDistributedObjectByRefGUID(Publication.class, guidPublication));
-        setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
-        setInventoryBook(daoService.findDistributedObjectByRefGUID(InventoryBook.class, guidInventaryBook));
-        setKsu1Record(daoService.findDistributedObjectByRefGUID(Ksu1Record.class, guidKsu1Record));
-        setKsu2Record(daoService.findDistributedObjectByRefGUID(Ksu2Record.class, guidKsu2Record));
+    public void preProcess(Session session) throws DistributedObjectException {
+        //DAOService daoService = DAOService.getInstance();
+        Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
+        if(p==null) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE");
+        } else {
+            setPublication(p);
+        }
+
+        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        if(f==null) {
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        } else {
+            setFund(f);
+        }
+
+        InventoryBook ib = (InventoryBook) DAOUtils.findDistributedObjectByRefGUID(session, guidInventaryBook);
+        if(ib==null){
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        } else {
+            setInventoryBook(ib);
+        }
+
+        Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
+        if(ksu1==null){
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        } else {
+            setKsu1Record(ksu1);
+        }
+
+        Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
+        if(ksu2==null) {
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        } else {
+            setKsu2Record(ksu2);
+        }
     }
 
     @Override

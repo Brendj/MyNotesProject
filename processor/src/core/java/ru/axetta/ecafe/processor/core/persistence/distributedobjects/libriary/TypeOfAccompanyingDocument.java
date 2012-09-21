@@ -23,13 +23,13 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        setAttribute(element, "TypeOfAccompanyingDocumentName", guid);
     }
 
     @Override
     public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception{
 
-        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 1024);
+        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 45);
         if (typeOfAccompanyingDocumentName != null) {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
         }

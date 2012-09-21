@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -31,35 +35,62 @@ public class Circulation extends DistributedObject {
     private Date realRefundDate;
     private int status;
 
-    String guidParentCirculation;
-    String guidReader;
-    String guidIssuable;
+    private String guidClient;
+    private Long idOfClient;
+
+    private String guidParentCirculation;
+    private String guidReader;
+    private String guidIssuable;
+    private Client client;
+
+
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
     }
 
     @Override
     protected Circulation parseAttributes(Node node) throws Exception {
 
-        guidParentCirculation = getStringAttributeValue(node, "guidParentCirculation", 1024);
-        guidReader = getStringAttributeValue(node, "guidReader", 1024);
-        guidIssuable = getStringAttributeValue(node, "GUIDIssuable", 1024);
+        guidClient = getStringAttributeValue(node, "GuidClient", 36);
+        idOfClient = getLongAttributeValue(node, "IdOfClient");
 
-        issuanceDate = getDateTimeAttributeValue(node, "issuanceDate");
-        refundDate = getDateTimeAttributeValue(node, "refundDate");
-        realRefundDate = getDateTimeAttributeValue(node, "realRefundDate");
-        status = getIntegerAttributeValue(node, "status");
+        guidParentCirculation = getStringAttributeValue(node, "GuidParentCirculation", 36);
+        guidReader = getStringAttributeValue(node, "GuidReader", 36);
+        guidIssuable = getStringAttributeValue(node, "GuidIssuable", 36);
+
+        issuanceDate = getDateTimeAttributeValue(node, "IssuanceDate");
+        refundDate = getDateTimeAttributeValue(node, "RefundDate");
+        realRefundDate = getDateTimeAttributeValue(node, "RealRefundDate");
+        status = getIntegerAttributeValue(node, "Status");
         return this;
     }
 
     @Override
-    public void preProcess() {
-        DAOService daoService = DAOService.getInstance();
-        setIssuable(daoService.findDistributedObjectByRefGUID(Issuable.class, guidIssuable));
-        setParentCirculation(daoService.findDistributedObjectByRefGUID(Circulation.class, guidParentCirculation));
-        setReader(daoService.findDistributedObjectByRefGUID(Reader.class, guidReader));
+    public void preProcess(Session session) throws DistributedObjectException{
+        //DAOService daoService = DAOService.getInstance();
+        //Issuable iss = daoService.findDistributedObjectByRefGUID(Issuable.class, guidIssuable);
+        //if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+
+        Issuable iss = (Issuable) DAOUtils.findDistributedObjectByRefGUID(session, guidIssuable);
+        if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setIssuable(iss);
+
+        //Circulation parentCirculation = daoService.findDistributedObjectByRefGUID(Circulation.class, guidParentCirculation);
+        Circulation parentCirculation = (Circulation) DAOUtils.findDistributedObjectByRefGUID(session, guidParentCirculation);
+       // if(parentCirculation==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(parentCirculation!=null) setParentCirculation(parentCirculation);
+
+        //Reader read = daoService.findDistributedObjectByRefGUID(Reader.class, guidReader);
+        Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
+        if(cl==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        setClient(cl);
+        //Reader read = (Reader) DAOUtils.findDistributedObjectByRefGUID(session, guidReader);
+        //if(read==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        //setReader(read);
+
+
+
     }
 
     @Override
@@ -70,7 +101,8 @@ public class Circulation extends DistributedObject {
         setStatus(((Circulation) distributedObject).getStatus());
         setParentCirculation(((Circulation) distributedObject).getParentCirculation());
         setIssuable(((Circulation) distributedObject).getIssuable());
-        setReader(((Circulation) distributedObject).getReader());
+        setClient(((Circulation) distributedObject).getClient());
+        //setReader(((Circulation) distributedObject).getReader());
     }
 
     public Circulation getParentCirculation() {
@@ -127,5 +159,13 @@ public class Circulation extends DistributedObject {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }
