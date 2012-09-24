@@ -30,7 +30,7 @@ var inter = setInterval (updateList, 1000 * 60 * 10);
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
-    <h:outputText id="lastOrgUpdateTime" styleClass="output-text" value="Последнее обновление произведено: #{orgSynchMonitorPage.lastUpdate}" converter="timeConverter" />
+    <h:outputText styleClass="output-text" value="Последнее обновление произведено: "  /><h:outputText id="lastOrgUpdateTime" styleClass="output-text" value="#{orgSynchMonitorPage.lastUpdate}" converter="timeConverter" />
     <rich:dataTable id="orgUnsychMonitorListTable" value="#{orgSynchMonitorPage.itemList}"
                     var="item" footerClass="data-table-footer"
                     columnClasses="center-aligned-column">
