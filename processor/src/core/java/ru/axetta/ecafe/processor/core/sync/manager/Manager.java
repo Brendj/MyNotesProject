@@ -74,19 +74,27 @@ public class Manager {
      */
     public void build(Node node) throws Exception {
         if (Node.ELEMENT_NODE == node.getNodeType()) {
-            logger.info("RO parse XML section");
+            if (logger.isDebugEnabled()) {
+                logger.debug("RO parse XML section");
+            }
             if(node.getNodeName().equals("Confirm")){
-                logger.info("RO parse Confirm XML section");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("RO parse Confirm XML section");
+                }
                 Node childNode = node.getFirstChild();
                 while (childNode != null) {
                     buildConfirm(childNode);
                     childNode = childNode.getNextSibling();
                 }
-                logger.info("RO end parse Confirm XML section");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("RO end parse Confirm XML section");
+                }
             } else {
                 DistributedObjectsEnum currentObject = null;
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-                logger.info("RO parse '"+currentObject.name()+"' node XML section");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("RO parse '"+currentObject.name()+"' node XML section");
+                }
                 currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
                 node = node.getFirstChild();
                 while (node != null) {
@@ -111,22 +119,30 @@ public class Manager {
                     }
                     node = node.getNextSibling();
                 }
-                logger.info("RO end parse '"+currentObject.name()+"' node XML section");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("RO end parse '"+currentObject.name()+"' node XML section");
+                }
             }
-            logger.info("RO end parse XML section");
+            if (logger.isDebugEnabled()) {
+                logger.debug("RO end parse XML section");
+            }
         }
 
     }
 
     public Element toElement(Document document) throws Exception {
-        logger.info("RO section begin generate XML node");
+        if (logger.isDebugEnabled()) {
+            logger.debug("RO section begin generate XML node");
+        }
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
         HashMap<String, Element> elementMap = new HashMap<String, Element>();
         String tagName;
         List<DistributedObject> distributedObjects = null;
         /* generate confirm element */
-        logger.info("Generate confirm element");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Generate confirm element");
+        }
         for (DistributedObjectsEnum key : distributedObjectsListMap.keySet()) {
             distributedObjects = distributedObjectsListMap.get(key);
             for (DistributedObject distributedObject : distributedObjects) {
@@ -146,7 +162,9 @@ public class Manager {
             distributedObjects.clear();
         }
         /* generate result objects */
-        logger.info("Generate result objects.");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Generate result objects.");
+        }
         for (DistributedObjectsEnum key : resultDistributedObjectsListMap.keySet()) {
             distributedObjects = resultDistributedObjectsListMap.get(key);
             for (DistributedObject distributedObject : distributedObjects) {
@@ -164,12 +182,16 @@ public class Manager {
             elementMap.clear();
             distributedObjects.clear();
         }
-        logger.info("Complete manager generate XML node.");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Complete manager generate XML node.");
+        }
         return elementRO;
     }
 
     public void process(SessionFactory sessionFactory) {
-        logger.info("RO begin process section");
+        if (logger.isDebugEnabled()) {
+            logger.debug("RO begin process section");
+        }
         DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
         DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
         Arrays.sort(array, distributedObjectsEnumComparator);
@@ -194,7 +216,9 @@ public class Manager {
             }
         }
         distributedObjectsListMap = currentDistributedObjectsListMap;
-        logger.info("RO end process section");
+        if (logger.isDebugEnabled()) {
+            logger.debug("RO end process section");
+        }
     }
 
     public void setIdOfOrg(Long idOfOrg) {
@@ -250,7 +274,9 @@ public class Manager {
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             Long currentMaxVersion = updateVersionByDistributedObjects(sessionFactory, objectClass.name());
             for (DistributedObject distributedObject : distributedObjects) {
-                logger.info("Process: "+distributedObject.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Process: "+distributedObject.toString());
+                }
                 DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion);
                 distributedObjectList.add(currentDistributedObject);
             }
@@ -378,7 +404,6 @@ public class Manager {
                 where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
             }
             // вытянем номер организации поставщика если есть.
-            // TODO Надо расмотретьь случай с библиотекой
             List<Long> menuExchangeRuleList = getListIdOfOrgList(sessionFactory);
             String whereOrgSource = "";
             if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
@@ -389,9 +414,10 @@ public class Manager {
             where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
+                // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
             }
-            String sendAllWhere = " sendAll is null and ";
-            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where "+ sendAllWhere + where);
+            String sendAllWhere = " (sendAll is null or sendAll=0) ";
+            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where "+ sendAllWhere + " and " + where);
             Query query = persistenceSession.createQuery(select);
             List list = query.list();
             if(!(list==null || list.isEmpty())){
@@ -402,7 +428,7 @@ public class Manager {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }catch (Exception e){
-            logger.error("Error getDistributedObjects: ",e);
+            logger.error("Error generateResponseResult: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -524,7 +550,7 @@ public class Manager {
             throws DistributedObjectException {
         long id = getGlobalIDByGUID(session,distributedObject);
         if (id > 0) {
-            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
+            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" DUPLICATE_GUID : "+distributedObject.getGuid());
             //throw new DistributedObjectException(DistributedObjectException.ErrorType.DUPLICATE_VALUE);
         }
         distributedObject.setCreatedDate(new Date());
@@ -578,7 +604,9 @@ public class Manager {
     private void clearConfirmTable(SessionFactory sessionFactory){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        logger.info("Begin clear confirm elements");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Begin clear confirm elements");
+        }
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -597,7 +625,9 @@ public class Manager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        logger.info("End clear confirm elements");
+        if (logger.isDebugEnabled()) {
+            logger.debug("End clear confirm elements");
+        }
     }
 
     private long getGlobalIDByGUID(Session session, DistributedObject distributedObject) {
