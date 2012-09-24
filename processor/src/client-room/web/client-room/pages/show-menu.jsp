@@ -584,8 +584,8 @@
            endDate=DateUtils.addDays(endDate,2);
           xmlEndDate=toXmlDateTime(endDate);
           xmlStartDate=toXmlDateTime(startDate);
-          logger.info("xmlStartDate.getTime()="+xmlStartDate.toGregorianCalendar().getTime());
-        logger.info("xmlEndDate.getTime()="+xmlEndDate.toGregorianCalendar().getTime());
+          //logger.info("xmlStartDate.getTime()="+xmlStartDate.toGregorianCalendar().getTime());
+       // logger.info("xmlEndDate.getTime()="+xmlEndDate.toGregorianCalendar().getTime());
 
           ComplexListResult complexListResult=port.getComplexList(clientAuthToken.getContractId(),xmlStartDate,xmlEndDate);
           ComplexDateList complexDateList=complexListResult.getComplexDateList();
@@ -615,11 +615,11 @@
                                     src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
                                <%
                                    currDate=DateUtils.addDays(currDate,1);
-                                   logger.info("currDate="+currDate);
+                                  // logger.info("currDate="+currDate);
 
 
                                    utcCalendar.setTime(currDate);
-                                   logger.info("tcDateFormat.format(currDate)"+utcDateFormat.format(currDate));
+                                  // logger.info("tcDateFormat.format(currDate)"+utcDateFormat.format(currDate));
                                    int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
                                %>
                                <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
