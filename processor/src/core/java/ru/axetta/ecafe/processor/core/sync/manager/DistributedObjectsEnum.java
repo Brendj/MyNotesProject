@@ -18,7 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
  */
 public enum DistributedObjectsEnum {
     /* Накладная */
-    ActOfInventorization(ActOfInventarization.class,0),
+    /*ActOfInventorization(ActOfInventarization.class,0),
     ActOfWayBillDifference(ActOfWayBillDifference.class, 0),
     ActOfWayBillDifferencePosition(ActOfWayBillDifferencePosition.class, 3),
     GoodRequest(GoodRequest.class, 0),
@@ -31,7 +31,7 @@ public enum DistributedObjectsEnum {
     WayBill(WayBill.class,1),
     WayBillPosition(WayBillPosition.class,3),
     Staff(Staff.class, 0),
-    /* товары продукты */
+    *//* товары продукты *//*
     ProductGroup(ProductGroup.class,0),
     TechnologicalMapGroup(TechnologicalMapGroup.class,0),
     Product(Product.class, 1),
@@ -54,7 +54,7 @@ public enum DistributedObjectsEnum {
     Instance(Instance.class,3),
     JournalItem(JournalItem.class,3),
     Issuable(Issuable.class, 4),
-    Circulation(Circulation.class, 5);
+    Circulation(Circulation.class, 5);*/ ;
     //LibVisit(LibVisit.class,13),
     //Reader(Reader.class, 14),
 
