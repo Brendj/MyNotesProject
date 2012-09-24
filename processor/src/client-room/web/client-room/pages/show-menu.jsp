@@ -443,12 +443,14 @@
 
             //GregorianCalendar greStartDate = new GregorianCalendar();
            // greStartDate.setTime(startDate);
+
+
             XMLGregorianCalendar xmlStartDate = toXmlDateTime(startDate);
                     //DatatypeFactory.newInstance().newXMLGregorianCalendar(greStartDate);
 
             //GregorianCalendar greEndDate = new GregorianCalendar();
            // greEndDate.setTime(endDate);
-            XMLGregorianCalendar xmlEndDate = toXmlDateTime(endDate);
+            XMLGregorianCalendar xmlEndDate = toXmlDateTime(DateUtils.addDays(endDate,1));
                     //DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);
 
 
@@ -578,7 +580,12 @@
         </td>
     </tr>
     <%   // ClientSummaryResult clientSummaryResult=port.getSummary(clientAuthToken.getContractId());
-
+          // startDate=DateUtils.addDays(startDate,1);
+           endDate=DateUtils.addDays(endDate,2);
+          xmlEndDate=toXmlDateTime(endDate);
+          xmlStartDate=toXmlDateTime(startDate);
+          logger.info("xmlStartDate.getTime()="+xmlStartDate.toGregorianCalendar().getTime());
+        logger.info("xmlEndDate.getTime()="+xmlEndDate.toGregorianCalendar().getTime());
 
           ComplexListResult complexListResult=port.getComplexList(clientAuthToken.getContractId(),xmlStartDate,xmlEndDate);
           ComplexDateList complexDateList=complexListResult.getComplexDateList();
@@ -607,7 +614,12 @@
                                <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
                                     src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
                                <%
+                                   currDate=DateUtils.addDays(currDate,1);
+                                   logger.info("currDate="+currDate);
+
+
                                    utcCalendar.setTime(currDate);
+                                   logger.info("tcDateFormat.format(currDate)"+utcDateFormat.format(currDate));
                                    int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
                                %>
                                <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
