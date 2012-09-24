@@ -5,7 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -20,19 +24,43 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
 
     private long idOfTypeOfAccompanyingDocument;
     private String typeOfAccompanyingDocumentName;
+    private Integer hashCode;
+
+    public Integer getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(Integer hashCode) {
+        this.hashCode = hashCode;
+    }
+
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException {
+        Criteria criteria = session.createCriteria(TypeOfAccompanyingDocument.class);
+        criteria.add(Restrictions.eq("hashCode", getHashCode()));
+        TypeOfAccompanyingDocument typeOfAccompanyingDocument = (TypeOfAccompanyingDocument) criteria.uniqueResult();
+        if(!(typeOfAccompanyingDocument==null || typeOfAccompanyingDocument.getDeletedState() || guid.equals(typeOfAccompanyingDocument.getGuid()))){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("TypeOfAccompanyingDocument DATA_EXIST_VALUE");
+            distributedObjectException.setData(typeOfAccompanyingDocument.getGuid());
+            throw  distributedObjectException;
+        }
+    }
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "TypeOfAccompanyingDocumentName", guid);
+        setAttribute(element, "TypeOfAccompanyingDocumentName", typeOfAccompanyingDocumentName);
     }
 
     @Override
     public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception{
 
-        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 45);
+        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 36);
         if (typeOfAccompanyingDocumentName != null) {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
         }
+
+        setHashCode(hashCode());
+
         return this;
     }
 
@@ -41,6 +69,8 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
 
         setTypeOfAccompanyingDocumentName(
                 ((TypeOfAccompanyingDocument) distributedObject).getTypeOfAccompanyingDocumentName());
+
+        setHashCode(((TypeOfAccompanyingDocument) distributedObject).getHashCode());
     }
 
     public long getIdOfTypeOfAccompanyingDocument() {
@@ -65,5 +95,48 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
                 "idOfTypeOfAccompanyingDocument=" + idOfTypeOfAccompanyingDocument +
                 ", typeOfAccompanyingDocumentName='" + typeOfAccompanyingDocumentName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        TypeOfAccompanyingDocument that = (TypeOfAccompanyingDocument) o;
+
+        return !(typeOfAccompanyingDocumentName != null ? !typeOfAccompanyingDocumentName.equals(that.typeOfAccompanyingDocumentName)
+                : that.typeOfAccompanyingDocumentName != null);
+
+    }
+
+    private static final String Consonants = "бвгджзклмнпрстфхцчшщbcdfghklmnpqrstuvwxyz1234567890";
+
+    private static boolean isConsonant(char c) {
+        for (char consonant : Consonants.toCharArray())
+            if (consonant == c)
+                return true;
+        return false;
+    }
+
+    private String getStringForHash(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        for (int i = sb.length() - 1; i >= 0; --i) {
+            if (isConsonant(sb.charAt(i))) continue;
+            sb.delete(i, i + 1);
+        }
+        return sb.toString().toLowerCase();
+    }
+
+
+    @Override
+    public int hashCode() {
+        return 31 * ((typeOfAccompanyingDocumentName != null ? getStringForHash(typeOfAccompanyingDocumentName).hashCode() : 0)) + (typeOfAccompanyingDocumentName != null ? getStringForHash(typeOfAccompanyingDocumentName).hashCode() : 0);
     }
 }

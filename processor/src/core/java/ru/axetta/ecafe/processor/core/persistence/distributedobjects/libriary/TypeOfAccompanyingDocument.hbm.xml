@@ -26,5 +26,6 @@
         <!-- End Global params -->
 
         <property name="typeOfAccompanyingDocumentName" column="typeOfAccompanyingDocumentName" type="string" not-null="true"/>
+        <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
     </class>
 </hibernate-mapping>

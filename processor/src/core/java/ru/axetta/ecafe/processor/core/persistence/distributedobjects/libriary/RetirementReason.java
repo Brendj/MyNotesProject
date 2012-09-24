@@ -38,13 +38,11 @@ public class RetirementReason extends DistributedObject {
         Criteria criteria = session.createCriteria(RetirementReason.class);
         criteria.add(Restrictions.eq("hashCode",getHashCode()));
         RetirementReason retirementReason = (RetirementReason) criteria.uniqueResult();
-        if(retirementReason!=null){
+        if(!(retirementReason==null || retirementReason.getDeletedState() || guid.equals(retirementReason.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("RetirementReason DATA_EXIST_VALUE");
             distributedObjectException.setData(retirementReason.getGuid());
             throw  distributedObjectException;
         }
-        //if(retirementReason!=null) throw new DistributedObjectException("RetirementReason exists : " + retirementReason.getGuid(),
-        //        DistributedObjectException.ErrorType.DATA_EXIST_VALUE);
     }
 
     @Override
