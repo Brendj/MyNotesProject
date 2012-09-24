@@ -324,6 +324,9 @@
         <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
                             label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="orgSynchMonitorPage" binding="#{orgSynchMonitorPage.mainMenuComponent}" label="Отчет по синхронизации"
+                        action="#{orgSynchMonitorPage.show}" reRender="workspaceForm" />
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
     <%--reRender="mainMenu, workspaceForm" />
     --%>
