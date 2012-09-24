@@ -6,12 +6,13 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("singleton")
@@ -461,6 +465,12 @@ public class DAOService {
     public List<Client> findClientsByMobilePhone(String mobilePhone) {
         TypedQuery<Client> query = em.createQuery("from Client where mobile=:mobile", Client.class);
         query.setParameter("mobile", mobilePhone);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<Org> getOrderedSynchOrgsList() {
+        TypedQuery<Org> query = em.createQuery("from Org order by lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 
