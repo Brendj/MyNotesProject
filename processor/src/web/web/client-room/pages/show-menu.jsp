@@ -7,6 +7,8 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDetail" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
@@ -357,6 +359,10 @@
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
 <table>
+<tr>
+<td valign="top">
+    <%--<div style="margin-top: 0px">--%>
+    <table>
     <tr>
         <td colspan="4">
             <div class="output-text">Меню с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
@@ -390,7 +396,9 @@
                 HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
                 HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
                 List menuDetails = menuDetailCriteria.list();
-                if (!menuDetails.isEmpty()) {
+                if (!menuDetails.isEmpty())
+                //if(false)
+                {
     %>
     <tr>
         <td>   <!--Added row for the nested table-->
@@ -469,7 +477,214 @@
         </td>
     </tr>
         <%      }
+            }%>
+
+</table>
+
+</td>
+<td valign="top">
+    <%--<div style="margin-top: 0px">--%>
+<table>
+    <tr>
+        <td colspan="4">
+            <div class="output-text">Комплексы с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+                по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
+            </div>
+        </td>
+    </tr>
+    <%
+
+            Criteria complexInfoCriteria = persistenceSession.createCriteria(ComplexInfo.class);
+            complexInfoCriteria.add(Restrictions.eq("org",client.getOrg()));
+            complexInfoCriteria.add(Restrictions.ge("menuDate", startDate));
+            complexInfoCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 2)));
+      //  complexInfoCriteria.add(Restrictions.lt("menuDate", endDate));
+
+           // HibernateUtils.addAscOrder(complexInfoCriteria,"menuDate");
+
+            List complexes=complexInfoCriteria.list();
+
+            ArrayList<ArrayList<ComplexInfo>> sortedComplexes=new ArrayList<ArrayList<ComplexInfo>>();
+
+                   Date currDate=null;
+                   ArrayList<ComplexInfo>currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+
+              for(Object complexObject:complexes){
+
+               ComplexInfo currComplex=(ComplexInfo)complexObject;
+
+                 if(currDate==null){
+                 currComplexListWithSameDate.add(currComplex);
+                 currDate=currComplex.getMenuDate();
+                 continue;
+                 }
+
+                if(currComplex.getMenuDate().equals(currDate)){
+                currComplexListWithSameDate.add(currComplex);
+
+                }else{
+
+                ArrayList<ComplexInfo>newComplexes=new ArrayList<ComplexInfo>();
+                 newComplexes.addAll(currComplexListWithSameDate);
+
+                sortedComplexes.add(newComplexes);
+
+                currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+                currComplexListWithSameDate.add(currComplex);
+                currDate=currComplex.getMenuDate();
+
+                }
+
+
+              }
+
+              currDate=null;
+
+            for(ArrayList<ComplexInfo> complexesWithSameDate:sortedComplexes){
+                boolean emptyComplexes=true;
+                ComplexInfo currComplex=complexesWithSameDate.get(0);
+
+                currDate=currComplex.getMenuDate();
+
+
+           // for(Object complexObject:complexes){
+             ArrayList<ArrayList<ComplexInfoDetail>> complexDetailsWithSameDate =new ArrayList<ArrayList<ComplexInfoDetail>>();
+
+             for(ComplexInfo complex:complexesWithSameDate){
+               Criteria complexDetailsCriteria=persistenceSession.createCriteria(ComplexInfoDetail.class);
+            complexDetailsCriteria.add(Restrictions.eq("complexInfo",complex));
+
+
+            List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();
+            if(!complexDetails.isEmpty()) {emptyComplexes=false;
+            logger.info("complexName: "+complex.getComplexName());
+
             }
+
+            ArrayList<ComplexInfoDetail>complexDetailList=new ArrayList<ComplexInfoDetail>();
+            complexDetailList.addAll(complexDetails);
+            complexDetailsWithSameDate.add(complexDetailList);
+
+
+             }
+
+             //boolean emptyDetailList;
+             //for(ArrayList){}
+
+
+            /*Criteria complexDetailsCriteria=persistenceSession.createCriteria(ComplexInfoDetail.class);
+            complexDetailsCriteria.add(Restrictions.eq("complexInfo",currComplex));
+
+            List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();*/
+
+               //if(true)
+             if(!emptyComplexes)
+             {
+
+
+              %>
+    <tr>
+        <td>   <!--Added row for the nested table-->
+            <table class="day">     <!--Start of the nested table-->
+                <thead>
+                <tr>
+                    <th>
+                        <div class="column-header menu-date">
+                            <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
+                                 src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
+                            <%
+
+                               // logger.info("currDate: "+currDate);
+
+                                utcCalendar.setTime(currDate);
+
+                               // logger.info("utcCalendar.setTime(): "+);
+                                int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
+                            %>
+                            <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
+                            <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(currDate))%>
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td><div class="column-header">Комплекс</div></td>
+                    <td><div class="column-header">Содержание</div></td>
+                    <%--<td><div class="column-header">Цена</div></td>--%>
+                </tr>
+                <%
+                    //boolean firstGroup = true;
+                     for(ArrayList<ComplexInfoDetail>complexDetails:complexDetailsWithSameDate) {
+
+                    String currComplexName = null;
+                         if(!complexDetails.isEmpty()){
+                    for (int index=0;index<complexDetails.size();index++) {
+
+                        ComplexInfoDetail currComplexDetail=complexDetails.get(index);
+                        logger.info("currComplexDetail: "+currComplexDetail.getComplexInfo().getComplexName());
+
+                        if (index==0) {
+
+                %>  <tr>
+                    <td>
+                        <div class="menu-group-name">
+                            <%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(currComplexDetail.getComplexInfo().getComplexName()))%>
+                        </div>
+                    </td>
+                        <%
+                       } else {
+                %>
+                <tr>
+                    <td>
+                        <div class="menu-group-name">
+                        </div>
+                    </td>
+                    <%
+                        }
+                    %>
+                    <td>
+                        <div class="output-text">
+                            <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailName())%>
+                        </div>
+                    </td>
+                    <%--<td>
+                        <div class="output-text">
+                            <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currComplexDetail.getMenuDetail().getPrice()))%>
+                        </div>
+                    </td>--%>
+                </tr>
+                <%
+                        //firstGroup = false;
+                    } } }
+                %>
+                </tbody>
+            </table>
+
+        </td>
+    </tr>
+
+
+
+
+
+        <%
+
+
+
+             }
+
+
+
+            }
+      %>
+</table>
+</td>
+</tr>
+</table>
+
+    <%
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -480,7 +695,7 @@
             HibernateUtils.close(persistenceSession, logger);
         }
     %>
-</table>
+
 <%
         }
     } catch (RuntimeContext.NotInitializedException e) {
