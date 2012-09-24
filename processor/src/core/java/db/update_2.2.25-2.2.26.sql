@@ -105,6 +105,7 @@ CREATE TABLE cf_typesofaccompanyingdocuments (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  HashCode integer NOT NULL,
   PRIMARY KEY  (IdOfTypeOfAccompanyingDocument)
 );
 
@@ -120,6 +121,7 @@ CREATE TABLE cf_sources (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  HashCode integer NOT NULL,
   PRIMARY KEY  (IdOfSource)
 );
 
