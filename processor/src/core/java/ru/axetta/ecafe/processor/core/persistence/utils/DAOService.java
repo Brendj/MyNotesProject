@@ -39,6 +39,12 @@ public class DAOService {
     EntityManager em;
 
     @Transactional
+    public Contragent getClientOrgDefaultSupplier(Client client) {
+        Org org = em.find(Org.class, client.getOrg().getIdOfOrg());
+        return em.find(Contragent.class, org.getDefaultSupplier().getIdOfContragent());
+    }
+
+    @Transactional
     public List<TransactionJournal> fetchTransactionJournal(int nRecs) {
         return DAOUtils.fetchTransactionJournalRecs(em, nRecs);
     }
@@ -74,6 +80,18 @@ public class DAOService {
             org.setConfigurationProvider(configurationProvider);
             em.persist(org);
         }
+    }
+
+    @Transactional
+    public Contragent getContragentByName(String name){
+        TypedQuery<Contragent> query=em.createQuery("from Contragent where contragentName=:name",Contragent.class);
+        query.setParameter("name",name);
+        List<Contragent> result=query.getResultList();
+
+         if (result.isEmpty()){return null;}
+        return result.get(0);
+
+
     }
 
     @Transactional

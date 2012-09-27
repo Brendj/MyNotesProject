@@ -4,6 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.partner.chronopay;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -134,6 +143,10 @@ public class ChronopayConfig {
     }
 
     public Boolean getShow() {
+         DAOService daoService=DAOService.getInstance();
+        Contragent contragent=daoService.getContragentByName("Chronopay");
+        if(contragent==null)return false;
+
         return show;
     }
 
