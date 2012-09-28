@@ -169,6 +169,16 @@
         <url-pattern>/soap/dashboard</url-pattern>
     </servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>BarcodeServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.barcode.BarcodeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BarcodeServlet</servlet-name>
+        <url-pattern>/barcode</url-pattern>
+    </servlet-mapping>
+
     <filter-mapping>
         <filter-name>RichfacesFilter</filter-name>
         <servlet-name>Faces Servlet</servlet-name>
