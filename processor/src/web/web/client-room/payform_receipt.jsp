@@ -70,8 +70,10 @@
         fieldINN="1656045695";
     } */
 /////
-      String stringForBarcode=ca.getInn().toString()+"L"+client.getContractId().toString();
-      logger.info("inn: "+ca.getInn());
+
+
+     // String stringForBarcode=ca.getInn().toString()+"L"+client.getContractId().toString();
+     // logger.info("inn: "+ca.getInn());
 
 
 %>
@@ -108,11 +110,11 @@
         </table>
     </td>
 </tr>
- <tr>
+ <%--<tr>
     <td align="center">
       <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
     </td>
-</tr>
+</tr>--%>
 <tr>
     <td>
         <table style="width: 100%; height: 100%;" cellspacing="0">
@@ -366,11 +368,13 @@
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
+<%--
 <tr valign="bottom">
     <td align="center">
         <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
     </td>
 </tr>
+--%>
 
 <tr>
     <td style="height: 8mm;">
