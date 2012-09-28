@@ -48,21 +48,21 @@
     String clientAddress = client.getAddress();
     Long contractId = client.getContractId();
 
-    //Contragent ca = DAOService.getInstance().getClientOrgDefaultSupplier(client);
-    //if (StringUtils.isEmpty(fieldReceiver)) fieldReceiver = ca.getContragentName();
-    //if (StringUtils.isEmpty(fieldAccount)) fieldAccount = ca.getAccount();
-    //if (StringUtils.isEmpty(fieldINN)) fieldINN = ca.getInn();
-    //if (StringUtils.isEmpty(fieldBank)) fieldBank = ca.getBank();
-    //if (StringUtils.isEmpty(fieldBIK)) fieldBIK = ca.getBic();
-    //if (StringUtils.isEmpty(fieldCorrAcc)) fieldCorrAcc = ca.getCorrAccount();
-    //if (fieldINN==null) fieldINN="";
-    //while (fieldINN.length()<10) fieldINN+="0";
-    //if (fieldAccount==null) fieldAccount="";
-    //while (fieldAccount.length()<20) fieldAccount+="0";
-    //if (fieldCorrAcc==null) fieldCorrAcc="";
-    //while (fieldCorrAcc.length()<20) fieldCorrAcc+="0";
-    //if (fieldBIK==null) fieldBIK="";
-    //while (fieldBIK.length()<9) fieldBIK+="0";
+    Contragent ca = DAOService.getInstance().getClientOrgDefaultSupplier(client);
+    if (StringUtils.isEmpty(fieldReceiver)) fieldReceiver = ca.getContragentName();
+    if (StringUtils.isEmpty(fieldAccount)) fieldAccount = ca.getAccount();
+    if (StringUtils.isEmpty(fieldINN)) fieldINN = ca.getInn();
+    if (StringUtils.isEmpty(fieldBank)) fieldBank = ca.getBank();
+    if (StringUtils.isEmpty(fieldBIK)) fieldBIK = ca.getBic();
+    if (StringUtils.isEmpty(fieldCorrAcc)) fieldCorrAcc = ca.getCorrAccount();
+    if (fieldINN==null) fieldINN="";
+    while (fieldINN.length()<10) fieldINN+="0";
+    if (fieldAccount==null) fieldAccount="";
+    while (fieldAccount.length()<20) fieldAccount+="0";
+    if (fieldCorrAcc==null) fieldCorrAcc="";
+    while (fieldCorrAcc.length()<20) fieldCorrAcc+="0";
+    if (fieldBIK==null) fieldBIK="";
+    while (fieldBIK.length()<9) fieldBIK+="0";
 /////
 /*    if (client!=null && client.getOrg()!=null && client.getOrg().getIdOfOrg()==1) {
         fieldReceiver="ООО &quot;ЕвроШкола-Поволжье&quot;";
@@ -72,8 +72,8 @@
 /////
 
 
-     // String stringForBarcode=ca.getInn().toString()+"L"+client.getContractId().toString();
-     // logger.info("inn: "+ca.getInn());
+      String stringForBarcode=ca.getInn().toString()+"L"+client.getContractId().toString();
+      logger.info("inn: "+ca.getInn());
 
 
 %>
@@ -110,11 +110,11 @@
         </table>
     </td>
 </tr>
- <%--<tr>
+ <tr>
     <td align="center">
       <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
     </td>
-</tr>--%>
+</tr>
 <tr>
     <td>
         <table style="width: 100%; height: 100%;" cellspacing="0">
@@ -368,13 +368,11 @@
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
-<%--
 <tr valign="bottom">
     <td align="center">
         <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
     </td>
 </tr>
---%>
 
 <tr>
     <td style="height: 8mm;">
