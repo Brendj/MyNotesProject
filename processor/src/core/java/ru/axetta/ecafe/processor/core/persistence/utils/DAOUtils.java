@@ -858,4 +858,25 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("guid",guid));
         return (DistributedObject) criteria.uniqueResult();
     }
+
+    public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
+        List<Long> resultList = new LinkedList<Long>();
+        Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        List list = query.list();
+        if(!(list==null || list.isEmpty())){
+            for (Object object: list){
+                resultList.add((Long) object);
+            }
+        }
+        query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        list = query.list();
+        if(!(list==null || list.isEmpty())){
+            for (Object object: list){
+                resultList.add((Long) object);
+            }
+        }
+        return resultList;
+    }
 }

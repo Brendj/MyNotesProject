@@ -25,6 +25,7 @@
         <!-- End Global params -->
 
         <property name="isbn" column="ISBN" type="string" length="15" not-null="false"/>
+        <property name="validISBN" column="validISBN" type="boolean" not-null="true"/>
         <property name="data" column="DataOfPublication" type="byte[]" not-null="false"/>
         <property name="author" column="Author" type="string" length="255" not-null="false"/>
         <property name="title" column="Title" type="string" length="512" not-null="false"/>

@@ -14,7 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
-import ru.axetta.rusmarc.*;
+import ru.axetta.ecafe.processor.core.utils.rusmarc.ISBN;
+import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -29,13 +30,24 @@ import java.io.IOException;
  */
 public class Publication extends DistributedObject {
 
+    private Boolean validISBN;
+
+    public Boolean getValidISBN() {
+        return validISBN;
+    }
+
+    public void setValidISBN(Boolean validISBN) {
+        this.validISBN = validISBN;
+    }
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Publication publication = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guid);
         //if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
-        if(!(isbn==null || isbn.isEmpty())){
+        if(!(isbn==null || isbn.isEmpty() || !validISBN)){
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("isbn",isbn));
+            criteria.add(Restrictions.eq("validISBN",true));
             Publication publication = (Publication) criteria.uniqueResult();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE");
@@ -108,10 +120,13 @@ public class Publication extends DistributedObject {
 
         setData(record.getRUSMARCRecord());
 
-        String stringIsbn = record.getISBN();
+        ISBN isbn1 = record.getISBN();
+        String stringIsbn = isbn1.toString();
         if (stringIsbn != null) {
             setIsbn(stringIsbn);
         }
+
+        setValidISBN(isbn1.getState() == ISBN.StateEnum.Normal);
 
         Integer stringHash = record.getStringForHash().hashCode();
         if (stringHash != null) {

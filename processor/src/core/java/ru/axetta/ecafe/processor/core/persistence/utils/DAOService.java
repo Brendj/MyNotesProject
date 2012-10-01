@@ -54,26 +54,6 @@ public class DAOService {
     }
 
     @Transactional
-    public void setConfigurationProviderInDO(Class<? extends IConfigProvider> clazz,Long id, Long idOfConfigurationProvider){
-        IConfigProvider distributedObject = em.find(clazz, id);
-        if(distributedObject!=null){
-            distributedObject.setIdOfConfigurationProvider(idOfConfigurationProvider);
-            em.persist(distributedObject);
-    }
-    }
-
-    @Transactional
-    public void updateDeleteState(DistributedObject distributedObject) throws Exception{
-        List list = em.createQuery("from "+distributedObject.getClass().getSimpleName() + " where guid='"+distributedObject.getGuid()+"'").getResultList();
-        if(!list.isEmpty()){
-            DistributedObject object = (DistributedObject) list.get(0);
-            object.setDeletedState(true);
-            object.setDeleteDate(new Date());
-            em.persist(object);
-        }
-    }
-
-    @Transactional
     public void setConfigurationProviderInOrg(Long idOfOrg, ConfigurationProvider configurationProvider){
         Org org = em.find(Org.class, idOfOrg);
         if(org!=null){
@@ -95,11 +75,6 @@ public class DAOService {
     }
 
     @Transactional
-    public <T> T findRefDistributedObject(Class<T> clazz, Long longIdOfTechnoMap){
-        return em.getReference(clazz, longIdOfTechnoMap);
-    }
-
-    @Transactional
     public void setDeletedState(DistributedObject distributedObject){
         distributedObject = em.find(distributedObject.getClass(),distributedObject.getGlobalId());
         distributedObject.setDeletedState(true);
@@ -115,72 +90,9 @@ public class DAOService {
         return list.get(0);
     }
 
-    public List<DistributedObject> findDistributedObjectByInGUID(String name, List<String> guids){
-        TypedQuery<DistributedObject> query = em.createQuery("from "+name+" where guid in (:guids)",DistributedObject.class);
-        query.setParameter("guids",guids);
-        return query.getResultList();
-    }
-
-    @Transactional
-    public <T> List<T> getDistributedObjects(Class<T> clazz){
-        return em.createQuery("from "+clazz.getSimpleName()+" order by id",clazz).getResultList();
-    }
-
-    @Transactional
-    public List<String> getGUIDsInConfirms(String className, Long orgOwner){
-        TypedQuery<String> query ;
-        query = em.createQuery("Select guid from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName",String.class);
-        query.setParameter("orgOwner",orgOwner);
-        query.setParameter("distributedObjectClassName",className);
-        return  query.getResultList();
-    }
-
     public ConfigurationProvider getConfigurationProvider(Long idOfConfigurationProvider) throws Exception{
         return em.find(ConfigurationProvider.class, idOfConfigurationProvider);
     }
-
-    public ConfigurationProvider getConfigurationProvider(Long orgOwner, Class<? extends DistributedObject> clazz) throws Exception{
-        List list = Arrays.asList(clazz.getInterfaces());
-        ConfigurationProvider configurationProvider = null;
-        if(list.contains(IConfigProvider.class)){
-            TypedQuery<ConfigurationProvider> configurationProviderQuery = null; //= em.createQuery("select configurationProvider from Org where idOfOrg=:idOfOrg", ConfigurationProvider.class);
-            //configurationProviderQuery.setParameter("idOfOrg",orgOwner);
-            Org org = em.find(Org.class, orgOwner);
-            configurationProvider = org.getConfigurationProvider();
-            /* Если есть конфигурация синхронизируемой организации */
-            if(configurationProvider==null){
-                TypedQuery<MenuExchangeRule> queryMER = em.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg",MenuExchangeRule.class);
-                queryMER.setParameter("idOfOrg",orgOwner);
-                List<MenuExchangeRule> menuExchangeRule = queryMER.getResultList();
-                if(!(menuExchangeRule == null || menuExchangeRule.isEmpty() || menuExchangeRule.get(0)==null)){
-                    Org sourceOrg = em.find(Org.class, menuExchangeRule.get(0).getIdOfSourceOrg());
-                    if(sourceOrg != null){
-                        configurationProvider = sourceOrg.getConfigurationProvider();
-                    }
-                }
-            }
-            if(configurationProvider == null) {
-                //return new ArrayList<DistributedObject>(0);
-                // При выбрасывании исключения падает вся синхронизация как быть с библиотекой?
-                throw new DistributedObjectException(DistributedObjectException.ErrorType.CONFIGURATION_PROVIDER_NOT_FOUND);
-            }
-        }
-        return configurationProvider;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long getDOVersionByGUID(DistributedObject distributedObject) {
-        String stringQuery = String.format("select globalVersion from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
-        Query query = em.createQuery(stringQuery);
-        List list = query.getResultList();
-        long version = 0L;
-        if(!list.isEmpty()){
-            version = (Long) list.get(0);
-        }
-        return version;
-    }
-
-
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long updateVersionByDistributedObjects(String name) {
@@ -202,39 +114,6 @@ public class DAOService {
         em.persist(doVersion);
         em.flush();
         return version;
-    }
-
-    @Transactional
-    public Long getDistributedObjectVersion(DistributedObject distributedObject) {
-        TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
-        List<DistributedObject> distributedObjectList = query.getResultList();
-        if (distributedObjectList.isEmpty()) {
-            return null;
-        }
-        return distributedObjectList.get(0).getGlobalVersion();
-    }
-
-    @Transactional
-    public DistributedObject createDistributedObject(DistributedObject distributedObject){
-        distributedObject.setCreatedDate(new Date());
-        TypedQuery<DOVersion> query = em.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",DOVersion.class);
-        query.setParameter("distributedObjectClassName",distributedObject.getClass().getSimpleName().toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        if(doVersionList.size()==0) {
-            distributedObject.setGlobalVersion(0L);
-        } else {
-            distributedObject.setGlobalVersion(doVersionList.get(0).getCurrentVersion()-1);
-        }
-        return em.merge(distributedObject);
-    }
-
-    public DistributedObject findDistributedObject(DistributedObject distributedObject){
-        TypedQuery<DistributedObject> query = em.createQuery("from "+distributedObject.getClass().getSimpleName()+" where guid='"+distributedObject.getGuid()+"'", DistributedObject.class);
-        List<DistributedObject> distributedObjectList = query.getResultList();
-        if (distributedObjectList.isEmpty()) {
-            return null;
-        }
-        return em.find(distributedObject.getClass(),distributedObjectList.get(0).getGlobalId());
     }
 
     @Transactional
@@ -347,6 +226,7 @@ public class DAOService {
         q.setParameter("contractId", contractId);
         return q.executeUpdate()!=0;
     }
+
     @Transactional
     public Org getOrg(Long idOfOrg) {
         Query q = em.createQuery("from Org where idOfOrg = :idOfOrg");
@@ -381,25 +261,12 @@ public class DAOService {
         cl.addIntegraPartnerAccessPermission(idOfIntegraPartner);
         em.persist(cl);
     }
+
     @Transactional
     public List<TechnologicalMapProduct> getTechnologicalMapProducts(TechnologicalMap technologicalMap) {
         TypedQuery<TechnologicalMapProduct> query = em.createQuery("from TechnologicalMapProduct where technologicalMap=:technologicalMap", TechnologicalMapProduct.class);
         query.setParameter("technologicalMap",technologicalMap);
         return query.getResultList();
-    }
-
-    @Transactional
-    public Publication getPublicationByIsbn(String isbn) {
-        Query query = em.createQuery("from Publication2 where isbn=:isbn", Publication.class);
-        query.setParameter("isbn", isbn);
-        return (Publication) query.getSingleResult();
-    }
-
-    @Transactional
-    public Publication getPublicationByHash(String hash) {
-        Query query = em.createQuery("from Publication2 where hash=:hash", Publication.class);
-        query.setParameter("hash", hash);
-        return (Publication) query.getSingleResult();
     }
     
     @Transactional
@@ -429,7 +296,6 @@ public class DAOService {
             return null;
         }
     }
-    
 
     @Transactional
     public LinkingToken generateLinkingToken(Client client) {
