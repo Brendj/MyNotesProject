@@ -33,6 +33,7 @@ CREATE TABLE cf_publications
   Publisher character varying(255),
   Version bigint NOT NULL,
   ISBN character varying(255),
+  ValidISBN boolean NOT NULL DEFAULT false,
   Hash integer NOT NULL,
   GlobalVersion bigint,
   OrgOwner bigint,
