@@ -65,34 +65,34 @@ public class IntegraTest extends TestCase {
         System.out.println("CLIENT MiddleName: " + client.getMiddleName());
     }
 
-    public void testSHA1password() throws Exception {
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        ClientRoomControllerWSService service = new ClientRoomControllerWSService();
-        ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://localhost:8443/processor/soap/client");
-        ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new PaymentWSTest.TestHostnameVerifier());
-        Map context = ((BindingProvider) port).getRequestContext();
-        context.put(BindingProvider.USERNAME_PROPERTY, "tbaltica");
-        context.put(BindingProvider.PASSWORD_PROPERTY, "Dthntfe333");
-        long clientId=91L;
-        String plainPassword= "91";
-        final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
-        final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-        String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
-
-        Result ra = port.authorizeClient(clientId, sha1HashString);
-        System.out.println("tbaltica test");
-        System.out.println("https://localhost:8443/processor/soap/client");
-        System.out.println("AUTH CLIENT: " + ra.getResultCode()+":"+ra.getDescription());
-        ClientSummaryResult r = port.getSummary(clientId);
-        ClientSummaryExt client = r.getClientSummary();
-        System.out.println("CLIENT FirstName: " + client.getFirstName());
-        System.out.println("CLIENT LastName: " + client.getLastName());
-        System.out.println("CLIENT MiddleName: " + client.getMiddleName());
-        System.out.println("CLIENT PlainPassword: " + plainPassword);
-        System.out.println("CLIENT CryptPassword: " + sha1HashString);
-    }
+    //public void testSHA1password() throws Exception {
+    //    System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+    //    ClientRoomControllerWSService service = new ClientRoomControllerWSService();
+    //    ClientRoomController port
+    //            = service.getClientRoomControllerWSPort();
+    //    ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://localhost:8443/processor/soap/client");
+    //    ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new PaymentWSTest.TestHostnameVerifier());
+    //    Map context = ((BindingProvider) port).getRequestContext();
+    //    context.put(BindingProvider.USERNAME_PROPERTY, "tbaltica");
+    //    context.put(BindingProvider.PASSWORD_PROPERTY, "Dthntfe333");
+    //    long clientId=91L;
+    //    String plainPassword= "91";
+    //    final byte[] plainPasswordBytes = plainPassword.getBytes(CharEncoding.UTF_8);
+    //    final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+    //    String sha1HashString = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes)), CharEncoding.US_ASCII);
+    //
+    //    Result ra = port.authorizeClient(clientId, sha1HashString);
+    //    System.out.println("tbaltica test");
+    //    System.out.println("https://localhost:8443/processor/soap/client");
+    //    System.out.println("AUTH CLIENT: " + ra.getResultCode()+":"+ra.getDescription());
+    //    ClientSummaryResult r = port.getSummary(clientId);
+    //    ClientSummaryExt client = r.getClientSummary();
+    //    System.out.println("CLIENT FirstName: " + client.getFirstName());
+    //    System.out.println("CLIENT LastName: " + client.getLastName());
+    //    System.out.println("CLIENT MiddleName: " + client.getMiddleName());
+    //    System.out.println("CLIENT PlainPassword: " + plainPassword);
+    //    System.out.println("CLIENT CryptPassword: " + sha1HashString);
+    //}
 
     //private void testGetSummaryOld() throws Exception {
     //    System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
