@@ -21,7 +21,7 @@ public class ClientGroup {
     public static final long TEMPORARY_GROUP_MAX_ID = -100000;
 
     public enum Predefined{
-        CLIENT_STUDENTS_CLASS_BEGIN(1000000000L,"Учиники"),
+        CLIENT_STUDENTS_CLASS_BEGIN(1000000000L,"Ученики"),
         CLIENT_EMPLOYEES (1100000000L,"Пед. состав"),
         CLIENT_ADMINISTRATION (1100000010L,"Администрация"),
         CLIENT_TECH_EMPLOYEES (1100000020L,"Тех. персонал"),
