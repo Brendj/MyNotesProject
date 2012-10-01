@@ -160,10 +160,12 @@ CREATE TABLE cf_readers (
 
 --фонд
 --FundName - название
---! `InvBook` bigint(20) NOT NULL,--инвентарная книга фонда
+--! `InvBook` bigint(20) NOT NULL,- инвентарная книга фонда
+-- Stud - булево поле если true фонд учебников иначе фонд худ. литературы
 CREATE TABLE cf_funds (
   IdOfFund bigserial NOT NULL,
   FundName varchar(127) default NULL,
+  Stud boolean NOT NULL DEFAULT false,
   GlobalVersion bigint,
   OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,
@@ -433,3 +435,5 @@ ALTER TABLE cf_readers ADD COLUMN SendAll integer DEFAULT 0;
 ALTER TABLE cf_retirementreasons ADD COLUMN SendAll integer DEFAULT 0;
 ALTER TABLE cf_sources ADD COLUMN SendAll integer DEFAULT 0;
 ALTER TABLE cf_typesofaccompanyingdocument ADD COLUMN SendAll integer DEFAULT 0;
+
+ALTER TABLE cf_staffs ADD COLUMN HashCode integer NOT NULL DEFAULT 0;
