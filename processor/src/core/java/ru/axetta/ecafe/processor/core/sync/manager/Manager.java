@@ -331,37 +331,26 @@ public class Manager {
         return distributedObject;
     }
 
-    private List<Long> getListIdOfOrgList(SessionFactory sessionFactory){
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        List<Long> resultList = new LinkedList<Long>();
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Query query = persistenceSession.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
-            query.setParameter("idOfOrg",idOfOrg);
-            List list = query.list();
-            if(!(list==null || list.isEmpty())){
-                for (Object object: list){
-                    resultList.add((Long) object);
-                }
-            }
-            query = persistenceSession.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
-            query.setParameter("idOfOrg",idOfOrg);
-            list = query.list();
-            if(!(list==null || list.isEmpty())){
-                for (Object object: list){
-                    resultList.add((Long) object);
-                }
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return resultList;
-    }
+    //private List<Long> getListIdOfOrgList(Session session){
+    //    List<Long> resultList = new LinkedList<Long>();
+    //    Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
+    //    query.setParameter("idOfOrg",idOfOrg);
+    //    List list = query.list();
+    //    if(!(list==null || list.isEmpty())){
+    //        for (Object object: list){
+    //            resultList.add((Long) object);
+    //        }
+    //    }
+    //    query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
+    //    query.setParameter("idOfOrg",idOfOrg);
+    //    list = query.list();
+    //    if(!(list==null || list.isEmpty())){
+    //        for (Object object: list){
+    //            resultList.add((Long) object);
+    //        }
+    //    }
+    //    return resultList;
+    //}
 
     private ConfigurationProvider getConfigurationProvider(Session session, Class<? extends DistributedObject> clazz) throws Exception{
         List classList = Arrays.asList(clazz.getInterfaces());
@@ -404,7 +393,7 @@ public class Manager {
                 where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
             }
             // вытянем номер организации поставщика если есть.
-            List<Long> menuExchangeRuleList = getListIdOfOrgList(sessionFactory);
+            List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
             String whereOrgSource = "";
             if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
                 whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
