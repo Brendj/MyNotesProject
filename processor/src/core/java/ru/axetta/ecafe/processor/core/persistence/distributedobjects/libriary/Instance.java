@@ -52,11 +52,11 @@ public class Instance extends DistributedObject {
     @Override
     public Instance parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "GuidFund", 32);
-        guidPublication = getStringAttributeValue(node, "GuidPublication", 32);
-        guidInventaryBook = getStringAttributeValue(node, "GuidInventaryBook", 32);
-        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 32);
-        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 32);
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
+        guidInventaryBook = getStringAttributeValue(node, "GuidInventaryBook", 36);
+        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);
+        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 36);
 
         inGroup = (getIntegerAttributeValue(node, "InGroup") == 1);
         invNumber = getStringAttributeValue(node, "InvNumber", 10);
@@ -69,7 +69,10 @@ public class Instance extends DistributedObject {
         //DAOService daoService = DAOService.getInstance();
         Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
         if(p==null) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE");
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidPublication);
+            throw  distributedObjectException;
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         } else {
             setPublication(p);
         }

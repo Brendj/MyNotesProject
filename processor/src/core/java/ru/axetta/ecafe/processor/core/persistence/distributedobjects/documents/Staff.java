@@ -5,7 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -17,6 +21,18 @@ import org.w3c.dom.Node;
  * To change this template use File | Settings | File Templates.
  */
 public class Staff extends DistributedObject {
+
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException {
+        Criteria criteria = session.createCriteria(Staff.class);
+        criteria.add(Restrictions.eq("hashCode", getHashCode()));
+        Staff staff = (Staff) criteria.uniqueResult();
+        if(!(staff==null || staff.getDeletedState() || guid.equals(staff.getGuid()))){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("Staff DATA_EXIST_VALUE");
+            distributedObjectException.setData(staff.getGuid());
+            throw distributedObjectException;
+        }
+    }
 
     @Override
     protected void appendAttributes(Element element) {
@@ -55,6 +71,7 @@ public class Staff extends DistributedObject {
         if(stringPersonalCode != null) setPersonalCode(stringPersonalCode);
         String stringRights = getStringAttributeValue(node, "Rights", 256);
         if(stringRights != null) setRights(stringRights);
+        setHashCode(hashCode());
         return this;
     }
 
@@ -83,6 +100,15 @@ public class Staff extends DistributedObject {
     private String staffPosition;
     private String personalCode;
     private String rights;
+    private Integer hashCode;
+
+    public Integer getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(Integer hashCode) {
+        this.hashCode = hashCode;
+    }
 
     public long getParentId() {
         return parentId;
@@ -162,5 +188,52 @@ public class Staff extends DistributedObject {
 
     public void setIdOfClient(long idOfClient) {
         this.idOfClient = idOfClient;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        Staff that = (Staff) o;
+
+        return !(firstName != null && orgOwner !=null? !(firstName.equals(that.firstName) && orgOwner.equals(that.orgOwner))
+                : (that.firstName != null && that.orgOwner != null));
+
+    }
+
+    private static final String Consonants = "бвгджзклмнпрстфхцчшщbcdfghklmnpqrstuvwxyz1234567890";
+
+    private static boolean isConsonant(char c) {
+        for (char consonant : Consonants.toCharArray())
+            if (consonant == c)
+                return true;
+        return false;
+    }
+
+    private String getStringForHash(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        for (int i = sb.length() - 1; i >= 0; --i) {
+            if (isConsonant(sb.charAt(i))) continue;
+            sb.delete(i, i + 1);
+        }
+        return sb.toString().toLowerCase();
+    }
+
+
+
+
+    @Override
+    public int hashCode() {
+        int result = 31 * ((firstName != null ? getStringForHash(firstName).hashCode() : 0)) + (firstName != null ? getStringForHash(firstName).hashCode() : 0);
+        result = result + (orgOwner != null ? orgOwner.hashCode() : 0);
+        return result;
     }
 }

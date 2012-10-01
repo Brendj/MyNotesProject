@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -30,6 +32,26 @@ public class Publication extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Publication publication = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guid);
+        //if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
+        if(!(isbn==null || isbn.isEmpty())){
+            Criteria criteria = session.createCriteria(Publication.class);
+            criteria.add(Restrictions.eq("isbn",isbn));
+            Publication publication = (Publication) criteria.uniqueResult();
+            if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE");
+                distributedObjectException.setData(publication.getGuid());
+                throw  distributedObjectException;
+            }
+        } else {
+            Criteria criteria = session.createCriteria(Publication.class);
+            criteria.add(Restrictions.eq("hash",hash));
+            Publication publication = (Publication) criteria.uniqueResult();
+            if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE");
+                distributedObjectException.setData(publication.getGuid());
+                throw  distributedObjectException;
+            }
+        }
 
     }
 

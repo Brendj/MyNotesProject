@@ -45,8 +45,8 @@ public class Issuable extends DistributedObject {
             setType(charType);
         }
 
-        guidInstance = getStringAttributeValue(node, "GuidInstance", 32);
-        guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 32);
+        guidInstance = getStringAttributeValue(node, "GuidInstance", 36);
+        guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 36);
         return this;
     }
 

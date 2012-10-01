@@ -40,13 +40,17 @@ public class AccompanyingDocument extends DistributedObject {
     public void preProcess(Session session) throws DistributedObjectException{
         Source s = (Source) DAOUtils.findDistributedObjectByRefGUID(session, guidSource);
         if(s==null){
-            throw new DistributedObjectException("NOT_FOUND_VALUE");
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Source NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidSource);
+            throw distributedObjectException;
         } else {
             setSource(s);
         }
         TypeOfAccompanyingDocument tad = (TypeOfAccompanyingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidTypeOfAccompanyingDocument);
         if(tad==null) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE");
+            DistributedObjectException distributedObjectException = new DistributedObjectException("TypeOfAccompanyingDocument NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidTypeOfAccompanyingDocument);
+            throw distributedObjectException;
         } else {
             setTypeOfAccompanyingDocument(tad);
         }
@@ -60,8 +64,8 @@ public class AccompanyingDocument extends DistributedObject {
             setAccompanyingDocumentNumber(stringAccompanyingDocumentNumber);
         }
 
-        guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 32);
-        guidSource = getStringAttributeValue(node, "GuidSource", 32);
+        guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 36);
+        guidSource = getStringAttributeValue(node, "GuidSource", 36);
         return this;
     }
 

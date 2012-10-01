@@ -43,9 +43,9 @@ public class Ksu2Record extends DistributedObject {
     @Override
     public Ksu2Record parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "GuidFund", 32);
-        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 32);
-        retirementDate = getDateTimeAttributeValue(node, "RetirementDate");
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
+        retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
         recordNumber = getIntegerAttributeValue(node, "RecordNumber");
         return this;
     }
@@ -56,14 +56,19 @@ public class Ksu2Record extends DistributedObject {
         //setRetirementReason(daoService.findDistributedObjectByRefGUID(RetirementReason.class, guidRetirementReason));
         RetirementReason rr = (RetirementReason) DAOUtils.findDistributedObjectByRefGUID(session, guidRetirementReason);
         if(rr==null) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE");
+            DistributedObjectException distributedObjectException = new DistributedObjectException("RetirementReason NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidRetirementReason);
+            throw distributedObjectException;
         }
         setRetirementReason(rr);
 
         //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
         if(f==null){
-            throw new DistributedObjectException("NOT_FOUND_VALUE");
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Fund NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidFund);
+            throw distributedObjectException;
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         }
         setFund(f);
     }

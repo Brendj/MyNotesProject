@@ -43,8 +43,8 @@ public class Journal extends DistributedObject {
     @Override
     public Journal parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "GuidFund", 32);
-        guidPublication = getStringAttributeValue(node, "GuidPublication", 32);
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
 
         isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
         monthCount = getIntegerAttributeValue(node, "MonthCount");
@@ -56,7 +56,12 @@ public class Journal extends DistributedObject {
     public void preProcess(Session session) throws DistributedObjectException{
 
         Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
-        if(p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(p==null){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidPublication);
+            throw  distributedObjectException;
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        }
         setPublication(p);
 
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);

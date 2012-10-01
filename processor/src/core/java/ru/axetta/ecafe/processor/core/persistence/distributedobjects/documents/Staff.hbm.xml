@@ -35,6 +35,7 @@
         <property name="staffPosition" column="StaffPosition" type="string" length="30"/>
         <property name="personalCode" column="PersonalCode" type="string" length="128"/>
         <property name="rights" column="Rights" type="string" length="256"/>
+        <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
 
     </class>
 </hibernate-mapping>

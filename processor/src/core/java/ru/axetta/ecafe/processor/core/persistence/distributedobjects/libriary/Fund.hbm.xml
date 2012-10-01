@@ -25,5 +25,6 @@
         <!-- End Global params -->
 
         <property name="fundName" column="fundName" type="string" length="128" not-null="false"/>
+        <property name="stud" column="Stud" type="boolean"/>
     </class>
 </hibernate-mapping>

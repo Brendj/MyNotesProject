@@ -57,10 +57,11 @@ public class Ksu1Record extends DistributedObject {
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "GuidFund", 1024);
-        guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 1024);
-        incomeDate = getDateTimeAttributeValue(node, "IncomeDate");
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
+        incomeDate = getDateOnlyAttributeValue(node, "IncomeDate");
         recordNumber = getIntegerAttributeValue(node, "RecordNumber");
+        setSendAll(true);
         return this;
     }
 

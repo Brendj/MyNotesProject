@@ -47,10 +47,10 @@ public class JournalItem extends DistributedObject {
     @Override
     public JournalItem parseAttributes(Node node) throws Exception {
 
-        guidFund = getStringAttributeValue(node, "GuidFund", 1024);
-        guidJournal = getStringAttributeValue(node, "GuidJournal", 1024);
-        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 1024);
-        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 1024);
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidJournal = getStringAttributeValue(node, "GuidJournal", 36);
+        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);
+        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 36);
 
         date = getDateTimeAttributeValue(node, "Date");
         number = getStringAttributeValue(node, "Number", 10);
@@ -65,7 +65,12 @@ public class JournalItem extends DistributedObject {
         //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
 
         Journal j = (Journal) DAOUtils.findDistributedObjectByRefGUID(session, guidJournal);
-        if(j==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(j==null) {
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("Journal NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidJournal);
+            throw  distributedObjectException;
+            //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        }
         setJournal(j);
 
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);

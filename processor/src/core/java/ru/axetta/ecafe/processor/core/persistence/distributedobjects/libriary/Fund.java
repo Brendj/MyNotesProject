@@ -19,10 +19,20 @@ import org.w3c.dom.Node;
 public class Fund extends DistributedObject {
 
     private String fundName;
+    private Boolean stud;
+
+    public Boolean isStud() {
+        return stud;
+    }
+
+    public void setStud(Boolean stud) {
+        this.stud = stud;
+    }
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "FundName", fundName);
+        setAttribute(element, "Stud", stud);
     }
 
     @Override
@@ -31,6 +41,11 @@ public class Fund extends DistributedObject {
         String fundName = getStringAttributeValue(node, "FundName", 128);
         if (fundName != null) {
             setFundName(fundName);
+        }
+
+        Boolean bollStud =  getBollAttributeValue(node, "Stud");
+        if(bollStud != null){
+            setStud(bollStud);
         }
 
         setSendAll(false);
