@@ -71,9 +71,17 @@
     } */
 /////
 
+       String inn=ca.getInn();
+      // inn=null;
 
-      String stringForBarcode=ca.getInn().toString()+"L"+client.getContractId().toString();
-      logger.info("inn: "+ca.getInn());
+        if(inn==null||inn.isEmpty()){%>
+
+<div class="error-output-text">  Ошибка: У контрагента не задан inn  </div>
+        <%
+
+        return;}
+      String stringForBarcode=inn+"L"+client.getContractId().toString();
+     // logger.info("inn: "+ca.getInn());
 
 
 %>
@@ -112,7 +120,9 @@
 </tr>
  <tr>
     <td align="center">
-      <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
+
+      <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0" />
+
     </td>
 </tr>
 <tr>
@@ -368,9 +378,14 @@
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
+
 <tr valign="bottom">
     <td align="center">
-        <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"/>
+
+
+        <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"  />
+
+
     </td>
 </tr>
 

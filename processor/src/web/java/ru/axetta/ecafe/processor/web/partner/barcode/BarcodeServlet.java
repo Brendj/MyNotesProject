@@ -11,9 +11,11 @@ package ru.axetta.ecafe.processor.web.partner.barcode;
  * Time: 18:05
  * To change this template use File | Settings | File Templates.
  */
+
 import com.onbarcode.barcode.AbstractBarcode;
 import com.onbarcode.barcode.Code128;
 import com.onbarcode.barcode.IBarcode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,53 +31,70 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 
 
+public class BarcodeServlet extends HttpServlet {
 
-public class BarcodeServlet extends HttpServlet
-{
-    Logger logger= LoggerFactory.getLogger(BarcodeServlet.class);
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException
-    {
+    Logger logger = LoggerFactory.getLogger(BarcodeServlet.class);
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
-            String data=request.getParameter("data");
-
-            String set= request.getParameter("SET");
-
-            int rotate=Integer.parseInt(request.getParameter("rotate"));
-
-            int SET;
-            if(set==null){
-                SET=Code128.SET_B;} else{
-
-            SET=Integer.parseInt(set);  }
-
-
-            Code128 barcode = new Code128();
-
-
-            barcode.setCodeSet(SET);
-
-
-            if(data!=null){
-                barcode.setData(data); }
-            else{
-                barcode.setData("2724567890L20204010");
-            }
-
-
-
-            ServletOutputStream servletoutputstream = response.getOutputStream();
-
             response.setContentType("image/jpeg");
             response.setHeader("Pragma", "no-cache");
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expires", 0);
 
-            barcode.setRotate(rotate);
+            ServletOutputStream servletoutputstream = response.getOutputStream();
 
-            barcode.drawBarcode(servletoutputstream);
+            try {
 
-        } catch (Exception e) {
-            throw new ServletException(e);
+
+                String data = request.getParameter("data");
+
+                String set = request.getParameter("SET");
+
+                int rotate = Integer.parseInt(request.getParameter("rotate"));
+
+                int SET;
+                if (set == null) {
+                    SET = Code128.SET_B;
+                } else {
+
+                    SET = Integer.parseInt(set);
+                }
+
+
+                Code128 barcode = new Code128();
+
+
+                barcode.setCodeSet(SET);
+
+
+                if (data != null) {
+                    barcode.setData(data);
+                } else {
+                    throw new Exception("no data");
+                }
+
+
+                barcode.setRotate(rotate);
+
+                barcode.drawBarcode(servletoutputstream);
+
+            } catch (Exception e) {
+
+
+                BufferedImage bimg = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+                Graphics g = bimg.getGraphics();
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0, 1, 1);
+                ImageIO.write(bimg, "jpeg", servletoutputstream);
+
+                logger.error(e.getMessage(), e);
+                throw new ServletException(e);
+            }
+        } catch (Exception ex) {
+
+            logger.error(ex.getMessage(), ex);
+            throw new ServletException(ex);
         }
     }
 }
