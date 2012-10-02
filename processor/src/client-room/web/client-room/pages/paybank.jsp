@@ -35,11 +35,7 @@
 
     boolean haveDataToShow=true;
     ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
-    /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
-    ClientRoomController port
-            = service.getClientRoomControllerWSPort();
-    ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
-*/
+
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
     BanksData banksData=port.getBanks();
 

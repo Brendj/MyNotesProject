@@ -103,10 +103,7 @@
         Calendar localCalendar = runtimeContext.getDefaultLocalCalendar(session);
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
-        /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-        ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
         ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
          Long contractId=clientAuthToken.getContractId();
 
@@ -421,8 +418,7 @@
     </td>
 </tr>
 <%
-    /*Session persistenceSession = null;
-    org.hibernate.Transaction persistenceTransaction = null;*/
+
 
     try {
         List<ru.axetta.ecafe.processor.web.bo.client.PurchaseExt> ordersList=null;
@@ -436,9 +432,7 @@
 
 
 
-       //  logger.info("startDate= " +startDate);
-            //logger.info("enfDate= "+endDate);
-            //logger.info("port= "+port);
+
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
 
         GregorianCalendar greStartDate = new GregorianCalendar();
@@ -502,11 +496,7 @@
                 minTime = minTime == null ? clientPaymentTime
                         : (clientPaymentTime.before(minTime) ? clientPaymentTime : minTime);
             }
-           /* if (clientSmsIndex != clientSmsCount) {
-                Sms clientSms =  clientSmsList.get(clientSmsIndex);
-                Date clientSmsTime = clientSms.getServiceSendTime().toGregorianCalendar().getTime();
-                minTime = minTime == null ? clientSmsTime : (clientSmsTime.before(minTime) ? clientSmsTime : minTime);
-            }*/
+
             if (minTime == null) {
                 done = true;
                 continue;
@@ -514,9 +504,7 @@
             if (clientPaymentIndex != clientPaymentsCount) {
                 ru.axetta.ecafe.processor.web.bo.client.Payment clientPayment =  clientPaymentsList.get(clientPaymentIndex);
                 if (clientPayment.getTime().toGregorianCalendar().getTime().equals(minTime)) {
-                    //if (logger.isDebugEnabled()) {
-                    //    logger.debug(clientPayment.toString());
-                    //}
+
 %>
 
 <tr valign="top">
@@ -561,11 +549,7 @@
 <tr valign="top">
     <td>
         <%
-            //CompositeIdOfOrder compositeIdOfOrder = order.getCompositeIdOfOrder();
-           /* URI showOrderDetailsUri = UriUtils
-                    .putParam(formAction, ID_OF_ORG_PARAM, compositeIdOfOrder.getIdOfOrg().toString());*/
-           /* showOrderDetailsUri = UriUtils
-                    .putParam(showOrderDetailsUri, ID_OF_ORDER_PARAM, compositeIdOfOrder.getIdOfOrder().toString());*/
+
               Date orderTime=order.getTime().toGregorianCalendar().getTime();
 
             URI showOrderDetailsUri = UriUtils
@@ -791,18 +775,14 @@
         %>
     </table>
     <%
-       /* persistenceTransaction.commit();
-        persistenceTransaction = null;*/
+
     } catch (Exception e) {
         logger.error("Failed to build page", e);
 
       %>
       <div class="error-output-text"> Не удалось отобразить данные </div>
        <%
-// throw new ServletException(e);
-    } finally {
-       /* HibernateUtils.rollback(persistenceTransaction, logger);
-        HibernateUtils.close(persistenceSession, logger);*/
+
     }
 %>
 <%--</table>--%>

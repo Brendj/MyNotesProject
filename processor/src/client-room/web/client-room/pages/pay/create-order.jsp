@@ -89,19 +89,7 @@
      Boolean chronopaySection;
      Boolean rbkSection;
 
-    /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-    ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-            = service.getClientRoomControllerWSPort();
-    ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
 
-
-   // RuntimeContext runtimeContext = null;
-
-        //runtimeContext = new RuntimeContext();
-
-       // DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-       // TimeZone localTimeZone = runtimeContext.getDefaultLocalTimeZone(session);
-        //timeFormat.setTimeZone(localTimeZone);
 
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
     ClientRoomController port=clientAuthToken.getPort();
@@ -149,11 +137,7 @@
             }
         }
 
-        /*RBKMoneyConfig rbkMoneyConfig = runtimeContext.getPartnerRbkMoneyConfig();
-        ChronopayConfig chronopayConfig=runtimeContext.getPartnerChronopayConfig();
 
-        chronopaySection=chronopayConfig.getShow();
-        rbkSection=rbkMoneyConfig.getShow();*/
 
     RbkMoneyConfigResult rbkConfigResult =port.getRBKMoneyConfig();
     ChronopayConfigResult chronopayConfigResult=port.getChronopayConfig();
@@ -381,32 +365,7 @@
         Long idOfClient = null;
         Long idOfContragent = null;
         String clientEmail = null;
-        //Session persistenceSession = null;
-       // org.hibernate.Transaction persistenceTransaction = null;
-     /*   try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();
-            idOfClient = client.getIdOfClient();
-            clientEmail = client.getEmail();
-
-            Criteria contragentCriteria = persistenceSession.createCriteria(Contragent.class);
-            contragentCriteria.add(Restrictions.eq("contragentName", contragentName));
-            Contragent contragent = (Contragent) contragentCriteria.uniqueResult();
-            idOfContragent = contragent.getIdOfContragent();
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            throw new ServletException(e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }*/
 
          ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult=port.getSummary(clientAuthToken.getContractId()) ;
           ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt summary=summaryResult.getClientSummary();
@@ -552,32 +511,7 @@
         Long idOfClient = null;
         Long idOfContragent = null;
         String clientEmail = null;
-        //Session persistenceSession = null;
-        //org.hibernate.Transaction persistenceTransaction = null;
-       /* try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();
-            idOfClient = client.getIdOfClient();
-            clientEmail = client.getEmail();
-
-            Criteria contragentCriteria = persistenceSession.createCriteria(Contragent.class);
-            contragentCriteria.add(Restrictions.eq("contragentName", contragentName));
-            Contragent contragent = (Contragent) contragentCriteria.uniqueResult();
-            idOfContragent = contragent.getIdOfContragent();
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            throw new ServletException(e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }*/
         IdResult idOfClientResult=port.getIdOfClient(clientAuthToken.getContractId());
         idOfClient=idOfClientResult.getId();
         IdResult idOfContragentResult=port.getIdOfContragent(contragentName);

@@ -129,267 +129,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetCirculationListResponse }
+     * Create an instance of {@link GenerateLinkingTokenResult }
      * 
      */
-    public GetCirculationListResponse createGetCirculationListResponse() {
-        return new GetCirculationListResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChangeEmail }
-     * 
-     */
-    public ChangeEmail createChangeEmail() {
-        return new ChangeEmail();
-    }
-
-    /**
-     * Create an instance of {@link BankItem }
-     * 
-     */
-    public BankItem createBankItem() {
-        return new BankItem();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanBySanResponse }
-     * 
-     */
-    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
-        return new DetachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseListExt }
-     * 
-     */
-    public PurchaseListExt createPurchaseListExt() {
-        return new PurchaseListExt();
-    }
-
-    /**
-     * Create an instance of {@link BanksData }
-     * 
-     */
-    public BanksData createBanksData() {
-        return new BanksData();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItem }
-     * 
-     */
-    public CirculationItem createCirculationItem() {
-        return new CirculationItem();
-    }
-
-    /**
-     * Create an instance of {@link CirculationItemList }
-     * 
-     */
-    public CirculationItemList createCirculationItemList() {
-        return new CirculationItemList();
-    }
-
-    /**
-     * Create an instance of {@link ChangePaymentOrderStatusResponse }
-     * 
-     */
-    public ChangePaymentOrderStatusResponse createChangePaymentOrderStatusResponse() {
-        return new ChangePaymentOrderStatusResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSanResponse }
-     * 
-     */
-    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
-        return new GetClientsByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link SendLinkingTokenByMobile }
-     * 
-     */
-    public SendLinkingTokenByMobile createSendLinkingTokenByMobile() {
-        return new SendLinkingTokenByMobile();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseList }
-     * 
-     */
-    public GetPurchaseList createGetPurchaseList() {
-        return new GetPurchaseList();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedIdResponse }
-     * 
-     */
-    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
-        return new GetSummaryByTypedIdResponse();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventList }
-     * 
-     */
-    public EnterEventList createEnterEventList() {
-        return new EnterEventList();
-    }
-
-    /**
-     * Create an instance of {@link ClassStudentList }
-     * 
-     */
-    public ClassStudentList createClassStudentList() {
-        return new ClassStudentList();
-    }
-
-    /**
-     * Create an instance of {@link GetContractIdByCardNoResponse }
-     * 
-     */
-    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
-        return new GetContractIdByCardNoResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientItem }
-     * 
-     */
-    public ClientItem createClientItem() {
-        return new ClientItem();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupItem }
-     * 
-     */
-    public ClientGroupItem createClientGroupItem() {
-        return new ClientGroupItem();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSan }
-     * 
-     */
-    public GetClientsByGuardSan createGetClientsByGuardSan() {
-        return new GetClientsByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseElement }
-     * 
-     */
-    public PurchaseElement createPurchaseElement() {
-        return new PurchaseElement();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByTypedId }
-     * 
-     */
-    public GetSummaryByTypedId createGetSummaryByTypedId() {
-        return new GetSummaryByTypedId();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanBySan }
-     * 
-     */
-    public DetachGuardSanBySan createDetachGuardSanBySan() {
-        return new DetachGuardSanBySan();
-    }
-
-    /**
-     * Create an instance of {@link CreatePaymentOrderResponse }
-     * 
-     */
-    public CreatePaymentOrderResponse createCreatePaymentOrderResponse() {
-        return new CreatePaymentOrderResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetCardListResponse }
-     * 
-     */
-    public GetCardListResponse createGetCardListResponse() {
-        return new GetCardListResponse();
-    }
-
-    /**
-     * Create an instance of {@link PublicationItem }
-     * 
-     */
-    public PublicationItem createPublicationItem() {
-        return new PublicationItem();
-    }
-
-    /**
-     * Create an instance of {@link MenuDateItemExt }
-     * 
-     */
-    public MenuDateItemExt createMenuDateItemExt() {
-        return new MenuDateItemExt();
-    }
-
-    /**
-     * Create an instance of {@link ChronopayConfigResult }
-     * 
-     */
-    public ChronopayConfigResult createChronopayConfigResult() {
-        return new ChronopayConfigResult();
-    }
-
-    /**
-     * Create an instance of {@link CirculationListResult }
-     * 
-     */
-    public CirculationListResult createCirculationListResult() {
-        return new CirculationListResult();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSanResult }
-     * 
-     */
-    public DetachGuardSanResult createDetachGuardSanResult() {
-        return new DetachGuardSanResult();
-    }
-
-    /**
-     * Create an instance of {@link GetCirculationList }
-     * 
-     */
-    public GetCirculationList createGetCirculationList() {
-        return new GetCirculationList();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListResponse }
-     * 
-     */
-    public GetPaymentListResponse createGetPaymentListResponse() {
-        return new GetPaymentListResponse();
-    }
-
-    /**
-     * Create an instance of {@link Payment }
-     * 
-     */
-    public Payment createPayment() {
-        return new Payment();
-    }
-
-    /**
-     * Create an instance of {@link GetRBKMoneyConfigResponse }
-     * 
-     */
-    public GetRBKMoneyConfigResponse createGetRBKMoneyConfigResponse() {
-        return new GetRBKMoneyConfigResponse();
+    public GenerateLinkingTokenResult createGenerateLinkingTokenResult() {
+        return new GenerateLinkingTokenResult();
     }
 
     /**
@@ -401,11 +145,131 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnableNotificationByEmailResponse }
+     * Create an instance of {@link GetSummary }
      * 
      */
-    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
-        return new EnableNotificationByEmailResponse();
+    public GetSummary createGetSummary() {
+        return new GetSummary();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByTypedId }
+     * 
+     */
+    public GetSummaryByTypedId createGetSummaryByTypedId() {
+        return new GetSummaryByTypedId();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventItem }
+     * 
+     */
+    public EnterEventItem createEnterEventItem() {
+        return new EnterEventItem();
+    }
+
+    /**
+     * Create an instance of {@link HiddenPagesResult }
+     * 
+     */
+    public HiddenPagesResult createHiddenPagesResult() {
+        return new HiddenPagesResult();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventList }
+     * 
+     */
+    public EnterEventList createEnterEventList() {
+        return new EnterEventList();
+    }
+
+    /**
+     * Create an instance of {@link GetClientSmsListResponse }
+     * 
+     */
+    public GetClientSmsListResponse createGetClientSmsListResponse() {
+        return new GetClientSmsListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByTypedIdResponse }
+     * 
+     */
+    public GetSummaryByTypedIdResponse createGetSummaryByTypedIdResponse() {
+        return new GetSummaryByTypedIdResponse();
+    }
+
+    /**
+     * Create an instance of {@link CardList }
+     * 
+     */
+    public CardList createCardList() {
+        return new CardList();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListResponse }
+     * 
+     */
+    public GetMenuListResponse createGetMenuListResponse() {
+        return new GetMenuListResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientGroupItem }
+     * 
+     */
+    public ClientGroupItem createClientGroupItem() {
+        return new ClientGroupItem();
+    }
+
+    /**
+     * Create an instance of {@link CheckPasswordRestoreRequest }
+     * 
+     */
+    public CheckPasswordRestoreRequest createCheckPasswordRestoreRequest() {
+        return new CheckPasswordRestoreRequest();
+    }
+
+    /**
+     * Create an instance of {@link Data }
+     * 
+     */
+    public Data createData() {
+        return new Data();
+    }
+
+    /**
+     * Create an instance of {@link IdResult }
+     * 
+     */
+    public IdResult createIdResult() {
+        return new IdResult();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanResult }
+     * 
+     */
+    public DetachGuardSanResult createDetachGuardSanResult() {
+        return new DetachGuardSanResult();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByContractId }
+     * 
+     */
+    public SendLinkingTokenByContractId createSendLinkingTokenByContractId() {
+        return new SendLinkingTokenByContractId();
+    }
+
+    /**
+     * Create an instance of {@link ClientSmsListResult }
+     * 
+     */
+    public ClientSmsListResult createClientSmsListResult() {
+        return new ClientSmsListResult();
     }
 
     /**
@@ -417,43 +281,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GenerateLinkingToken }
+     * Create an instance of {@link GenerateLinkingTokenResponse }
      * 
      */
-    public GenerateLinkingToken createGenerateLinkingToken() {
-        return new GenerateLinkingToken();
+    public GenerateLinkingTokenResponse createGenerateLinkingTokenResponse() {
+        return new GenerateLinkingTokenResponse();
     }
 
     /**
-     * Create an instance of {@link EnableNotificationBySMSResponse }
+     * Create an instance of {@link GetEnterEventListBySan }
      * 
      */
-    public EnableNotificationBySMSResponse createEnableNotificationBySMSResponse() {
-        return new EnableNotificationBySMSResponse();
+    public GetEnterEventListBySan createGetEnterEventListBySan() {
+        return new GetEnterEventListBySan();
     }
 
     /**
-     * Create an instance of {@link AttachGuardSanBySanResponse }
+     * Create an instance of {@link GetComplexListResponse }
      * 
      */
-    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
-        return new AttachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanResult }
-     * 
-     */
-    public AttachGuardSanResult createAttachGuardSanResult() {
-        return new AttachGuardSanResult();
-    }
-
-    /**
-     * Create an instance of {@link ClientSmsListResult }
-     * 
-     */
-    public ClientSmsListResult createClientSmsListResult() {
-        return new ClientSmsListResult();
+    public GetComplexListResponse createGetComplexListResponse() {
+        return new GetComplexListResponse();
     }
 
     /**
@@ -473,107 +321,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetChronopayConfigResponse }
+     * Create an instance of {@link ChangeExpenditureLimitResponse }
      * 
      */
-    public GetChronopayConfigResponse createGetChronopayConfigResponse() {
-        return new GetChronopayConfigResponse();
+    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
+        return new ChangeExpenditureLimitResponse();
     }
 
     /**
-     * Create an instance of {@link GetIdOfClientResponse }
+     * Create an instance of {@link ClientSummary }
      * 
      */
-    public GetIdOfClientResponse createGetIdOfClientResponse() {
-        return new GetIdOfClientResponse();
-    }
-
-    /**
-     * Create an instance of {@link BanksList }
-     * 
-     */
-    public BanksList createBanksList() {
-        return new BanksList();
-    }
-
-    /**
-     * Create an instance of {@link CardList }
-     * 
-     */
-    public CardList createCardList() {
-        return new CardList();
-    }
-
-    /**
-     * Create an instance of {@link GetIdOfContragentResponse }
-     * 
-     */
-    public GetIdOfContragentResponse createGetIdOfContragentResponse() {
-        return new GetIdOfContragentResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetHiddenPagesResponse }
-     * 
-     */
-    public GetHiddenPagesResponse createGetHiddenPagesResponse() {
-        return new GetHiddenPagesResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListBySan }
-     * 
-     */
-    public GetMenuListBySan createGetMenuListBySan() {
-        return new GetMenuListBySan();
-    }
-
-    /**
-     * Create an instance of {@link GetIdOfClient }
-     * 
-     */
-    public GetIdOfClient createGetIdOfClient() {
-        return new GetIdOfClient();
-    }
-
-    /**
-     * Create an instance of {@link ChangePersonalInfo }
-     * 
-     */
-    public ChangePersonalInfo createChangePersonalInfo() {
-        return new ChangePersonalInfo();
-    }
-
-    /**
-     * Create an instance of {@link GenerateLinkingTokenResponse }
-     * 
-     */
-    public GenerateLinkingTokenResponse createGenerateLinkingTokenResponse() {
-        return new GenerateLinkingTokenResponse();
-    }
-
-    /**
-     * Create an instance of {@link ComplexDateList }
-     * 
-     */
-    public ComplexDateList createComplexDateList() {
-        return new ComplexDateList();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySanResponse }
-     * 
-     */
-    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
-        return new GetEnterEventListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClassStudentListResult }
-     * 
-     */
-    public ClassStudentListResult createClassStudentListResult() {
-        return new ClassStudentListResult();
+    public ClientSummary createClientSummary() {
+        return new ClientSummary();
     }
 
     /**
@@ -585,275 +345,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanResponse }
+     * Create an instance of {@link GetSummaryResponse }
      * 
      */
-    public DetachGuardSanResponse createDetachGuardSanResponse() {
-        return new DetachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link MenuItemExt }
-     * 
-     */
-    public MenuItemExt createMenuItemExt() {
-        return new MenuItemExt();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListResponse }
-     * 
-     */
-    public GetPurchaseListResponse createGetPurchaseListResponse() {
-        return new GetPurchaseListResponse();
-    }
-
-    /**
-     * Create an instance of {@link MenuItem }
-     * 
-     */
-    public MenuItem createMenuItem() {
-        return new MenuItem();
-    }
-
-    /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroup }
-     * 
-     */
-    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
-        return new GetStudentListByIdOfClientGroup();
-    }
-
-    /**
-     * Create an instance of {@link CheckPasswordResult }
-     * 
-     */
-    public CheckPasswordResult createCheckPasswordResult() {
-        return new CheckPasswordResult();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySan }
-     * 
-     */
-    public AttachGuardSanBySan createAttachGuardSanBySan() {
-        return new AttachGuardSanBySan();
-    }
-
-    /**
-     * Create an instance of {@link Complex }
-     * 
-     */
-    public Complex createComplex() {
-        return new Complex();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListResponse }
-     * 
-     */
-    public GetMenuListResponse createGetMenuListResponse() {
-        return new GetMenuListResponse();
-    }
-
-    /**
-     * Create an instance of {@link ActivateLinkingToken }
-     * 
-     */
-    public ActivateLinkingToken createActivateLinkingToken() {
-        return new ActivateLinkingToken();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanResponse }
-     * 
-     */
-    public AttachGuardSanResponse createAttachGuardSanResponse() {
-        return new AttachGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link SendLinkingTokenByContractIdResponse }
-     * 
-     */
-    public SendLinkingTokenByContractIdResponse createSendLinkingTokenByContractIdResponse() {
-        return new SendLinkingTokenByContractIdResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSan }
-     * 
-     */
-    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
-        return new GetSummaryByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link Sms }
-     * 
-     */
-    public Sms createSms() {
-        return new Sms();
-    }
-
-    /**
-     * Create an instance of {@link ChangeExpenditureLimitResponse }
-     * 
-     */
-    public ChangeExpenditureLimitResponse createChangeExpenditureLimitResponse() {
-        return new ChangeExpenditureLimitResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummaryResult }
-     * 
-     */
-    public ClientSummaryResult createClientSummaryResult() {
-        return new ClientSummaryResult();
-    }
-
-    /**
-     * Create an instance of {@link ComplexDate }
-     * 
-     */
-    public ComplexDate createComplexDate() {
-        return new ComplexDate();
-    }
-
-    /**
-     * Create an instance of {@link GetChronopayConfig }
-     * 
-     */
-    public GetChronopayConfig createGetChronopayConfig() {
-        return new GetChronopayConfig();
-    }
-
-    /**
-     * Create an instance of {@link PurchaseElementExt }
-     * 
-     */
-    public PurchaseElementExt createPurchaseElementExt() {
-        return new PurchaseElementExt();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupList }
-     * 
-     */
-    public ClientGroupList createClientGroupList() {
-        return new ClientGroupList();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListBySan }
-     * 
-     */
-    public GetPaymentListBySan createGetPaymentListBySan() {
-        return new GetPaymentListBySan();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListBySanResponse }
-     * 
-     */
-    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
-        return new GetPurchaseListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link Result }
-     * 
-     */
-    public Result createResult() {
-        return new Result();
-    }
-
-    /**
-     * Create an instance of {@link MenuListResult }
-     * 
-     */
-    public MenuListResult createMenuListResult() {
-        return new MenuListResult();
-    }
-
-    /**
-     * Create an instance of {@link ClientGroupListResult }
-     * 
-     */
-    public ClientGroupListResult createClientGroupListResult() {
-        return new ClientGroupListResult();
-    }
-
-    /**
-     * Create an instance of {@link ChangePaymentOrderStatus }
-     * 
-     */
-    public ChangePaymentOrderStatus createChangePaymentOrderStatus() {
-        return new ChangePaymentOrderStatus();
-    }
-
-    /**
-     * Create an instance of {@link SendResult }
-     * 
-     */
-    public SendResult createSendResult() {
-        return new SendResult();
-    }
-
-    /**
-     * Create an instance of {@link ChangePassword }
-     * 
-     */
-    public ChangePassword createChangePassword() {
-        return new ChangePassword();
-    }
-
-    /**
-     * Create an instance of {@link SendPasswordRecoverURLFromEmailResponse }
-     * 
-     */
-    public SendPasswordRecoverURLFromEmailResponse createSendPasswordRecoverURLFromEmailResponse() {
-        return new SendPasswordRecoverURLFromEmailResponse();
-    }
-
-    /**
-     * Create an instance of {@link SendLinkingTokenByMobileResponse }
-     * 
-     */
-    public SendLinkingTokenByMobileResponse createSendLinkingTokenByMobileResponse() {
-        return new SendLinkingTokenByMobileResponse();
-    }
-
-    /**
-     * Create an instance of {@link CardItem }
-     * 
-     */
-    public CardItem createCardItem() {
-        return new CardItem();
-    }
-
-    /**
-     * Create an instance of {@link ChangePersonalInfoResponse }
-     * 
-     */
-    public ChangePersonalInfoResponse createChangePersonalInfoResponse() {
-        return new ChangePersonalInfoResponse();
-    }
-
-    /**
-     * Create an instance of {@link Purchase }
-     * 
-     */
-    public Purchase createPurchase() {
-        return new Purchase();
-    }
-
-    /**
-     * Create an instance of {@link GetClientSmsListResponse }
-     * 
-     */
-    public GetClientSmsListResponse createGetClientSmsListResponse() {
-        return new GetClientSmsListResponse();
+    public GetSummaryResponse createGetSummaryResponse() {
+        return new GetSummaryResponse();
     }
 
     /**
@@ -873,99 +369,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PurchaseListResult }
+     * Create an instance of {@link GetPaymentListResponse }
      * 
      */
-    public PurchaseListResult createPurchaseListResult() {
-        return new PurchaseListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetCardListBySanResponse }
-     * 
-     */
-    public GetCardListBySanResponse createGetCardListBySanResponse() {
-        return new GetCardListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ActivateLinkingTokenResult }
-     * 
-     */
-    public ActivateLinkingTokenResult createActivateLinkingTokenResult() {
-        return new ActivateLinkingTokenResult();
-    }
-
-    /**
-     * Create an instance of {@link GenerateLinkingTokenResult }
-     * 
-     */
-    public GenerateLinkingTokenResult createGenerateLinkingTokenResult() {
-        return new GenerateLinkingTokenResult();
-    }
-
-    /**
-     * Create an instance of {@link RequestWebParam }
-     * 
-     */
-    public RequestWebParam createRequestWebParam() {
-        return new RequestWebParam();
-    }
-
-    /**
-     * Create an instance of {@link GetRBKMoneyConfig }
-     * 
-     */
-    public GetRBKMoneyConfig createGetRBKMoneyConfig() {
-        return new GetRBKMoneyConfig();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSanResponse }
-     * 
-     */
-    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
-        return new GetSummaryByGuardSanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummary }
-     * 
-     */
-    public ClientSummary createClientSummary() {
-        return new ClientSummary();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListResponse }
-     * 
-     */
-    public GetEnterEventListResponse createGetEnterEventListResponse() {
-        return new GetEnterEventListResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySanResponse }
-     * 
-     */
-    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
-        return new GetSummaryBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link MenuList }
-     * 
-     */
-    public MenuList createMenuList() {
-        return new MenuList();
-    }
-
-    /**
-     * Create an instance of {@link RBKMoneyConfigExt }
-     * 
-     */
-    public RBKMoneyConfigExt createRBKMoneyConfigExt() {
-        return new RBKMoneyConfigExt();
+    public GetPaymentListResponse createGetPaymentListResponse() {
+        return new GetPaymentListResponse();
     }
 
     /**
@@ -977,363 +385,35 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MenuDateItem }
+     * Create an instance of {@link ActivateLinkingToken }
      * 
      */
-    public MenuDateItem createMenuDateItem() {
-        return new MenuDateItem();
+    public ActivateLinkingToken createActivateLinkingToken() {
+        return new ActivateLinkingToken();
     }
 
     /**
-     * Create an instance of {@link EnableNotificationBySMS }
+     * Create an instance of {@link Sms }
      * 
      */
-    public EnableNotificationBySMS createEnableNotificationBySMS() {
-        return new EnableNotificationBySMS();
+    public Sms createSms() {
+        return new Sms();
     }
 
     /**
-     * Create an instance of {@link ClientsData }
+     * Create an instance of {@link MenuItemExt }
      * 
      */
-    public ClientsData createClientsData() {
-        return new ClientsData();
+    public MenuItemExt createMenuItemExt() {
+        return new MenuItemExt();
     }
 
     /**
-     * Create an instance of {@link DetachGuardSan }
+     * Create an instance of {@link GetSummaryBySanResponse }
      * 
      */
-    public DetachGuardSan createDetachGuardSan() {
-        return new DetachGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link CheckPasswordRestoreRequestResponse }
-     * 
-     */
-    public CheckPasswordRestoreRequestResponse createCheckPasswordRestoreRequestResponse() {
-        return new CheckPasswordRestoreRequestResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetCardListBySan }
-     * 
-     */
-    public GetCardListBySan createGetCardListBySan() {
-        return new GetCardListBySan();
-    }
-
-    /**
-     * Create an instance of {@link ChangeMobilePhoneResponse }
-     * 
-     */
-    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
-        return new ChangeMobilePhoneResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuList }
-     * 
-     */
-    public GetMenuList createGetMenuList() {
-        return new GetMenuList();
-    }
-
-    /**
-     * Create an instance of {@link Data }
-     * 
-     */
-    public Data createData() {
-        return new Data();
-    }
-
-    /**
-     * Create an instance of {@link GetMenuListBySanResponse }
-     * 
-     */
-    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
-        return new GetMenuListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ChangePasswordResponse }
-     * 
-     */
-    public ChangePasswordResponse createChangePasswordResponse() {
-        return new ChangePasswordResponse();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSan }
-     * 
-     */
-    public AttachGuardSan createAttachGuardSan() {
-        return new AttachGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link ComplexDetail }
-     * 
-     */
-    public ComplexDetail createComplexDetail() {
-        return new ComplexDetail();
-    }
-
-    /**
-     * Create an instance of {@link AuthorizeClientResponse }
-     * 
-     */
-    public AuthorizeClientResponse createAuthorizeClientResponse() {
-        return new AuthorizeClientResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetBanksResponse }
-     * 
-     */
-    public GetBanksResponse createGetBanksResponse() {
-        return new GetBanksResponse();
-    }
-
-    /**
-     * Create an instance of {@link PaymentListResult }
-     * 
-     */
-    public PaymentListResult createPaymentListResult() {
-        return new PaymentListResult();
-    }
-
-    /**
-     * Create an instance of {@link CheckPasswordRestoreRequest }
-     * 
-     */
-    public CheckPasswordRestoreRequest createCheckPasswordRestoreRequest() {
-        return new CheckPasswordRestoreRequest();
-    }
-
-    /**
-     * Create an instance of {@link SendLinkingTokenByContractId }
-     * 
-     */
-    public SendLinkingTokenByContractId createSendLinkingTokenByContractId() {
-        return new SendLinkingTokenByContractId();
-    }
-
-    /**
-     * Create an instance of {@link GetSummary }
-     * 
-     */
-    public GetSummary createGetSummary() {
-        return new GetSummary();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryResponse }
-     * 
-     */
-    public GetSummaryResponse createGetSummaryResponse() {
-        return new GetSummaryResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetPaymentListBySanResponse }
-     * 
-     */
-    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
-        return new GetPaymentListBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientSmsList }
-     * 
-     */
-    public ClientSmsList createClientSmsList() {
-        return new ClientSmsList();
-    }
-
-    /**
-     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
-     * 
-     */
-    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
-        return new GetStudentListByIdOfClientGroupResponse();
-    }
-
-    /**
-     * Create an instance of {@link ClientList }
-     * 
-     */
-    public ClientList createClientList() {
-        return new ClientList();
-    }
-
-    /**
-     * Create an instance of {@link ActivateLinkingTokenResponse }
-     * 
-     */
-    public ActivateLinkingTokenResponse createActivateLinkingTokenResponse() {
-        return new ActivateLinkingTokenResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetGroupListByOrg }
-     * 
-     */
-    public GetGroupListByOrg createGetGroupListByOrg() {
-        return new GetGroupListByOrg();
-    }
-
-    /**
-     * Create an instance of {@link CreatePaymentOrder }
-     * 
-     */
-    public CreatePaymentOrder createCreatePaymentOrder() {
-        return new CreatePaymentOrder();
-    }
-
-    /**
-     * Create an instance of {@link GetComplexList }
-     * 
-     */
-    public GetComplexList createGetComplexList() {
-        return new GetComplexList();
-    }
-
-    /**
-     * Create an instance of {@link ChangeEmailResponse }
-     * 
-     */
-    public ChangeEmailResponse createChangeEmailResponse() {
-        return new ChangeEmailResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetPurchaseListBySan }
-     * 
-     */
-    public GetPurchaseListBySan createGetPurchaseListBySan() {
-        return new GetPurchaseListBySan();
-    }
-
-    /**
-     * Create an instance of {@link ComplexListResult }
-     * 
-     */
-    public ComplexListResult createComplexListResult() {
-        return new ComplexListResult();
-    }
-
-    /**
-     * Create an instance of {@link CardListResult }
-     * 
-     */
-    public CardListResult createCardListResult() {
-        return new CardListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetGroupListByOrgResponse }
-     * 
-     */
-    public GetGroupListByOrgResponse createGetGroupListByOrgResponse() {
-        return new GetGroupListByOrgResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetEnterEventListBySan }
-     * 
-     */
-    public GetEnterEventListBySan createGetEnterEventListBySan() {
-        return new GetEnterEventListBySan();
-    }
-
-    /**
-     * Create an instance of {@link EnterEventListResult }
-     * 
-     */
-    public EnterEventListResult createEnterEventListResult() {
-        return new EnterEventListResult();
-    }
-
-    /**
-     * Create an instance of {@link HiddenPagesResult }
-     * 
-     */
-    public HiddenPagesResult createHiddenPagesResult() {
-        return new HiddenPagesResult();
-    }
-
-    /**
-     * Create an instance of {@link GetComplexListResponse }
-     * 
-     */
-    public GetComplexListResponse createGetComplexListResponse() {
-        return new GetComplexListResponse();
-    }
-
-    /**
-     * Create an instance of {@link IdResult }
-     * 
-     */
-    public IdResult createIdResult() {
-        return new IdResult();
-    }
-
-    /**
-     * Create an instance of {@link RbkMoneyConfigResult }
-     * 
-     */
-    public RbkMoneyConfigResult createRbkMoneyConfigResult() {
-        return new RbkMoneyConfigResult();
-    }
-
-    /**
-     * Create an instance of {@link AuthorizeClient }
-     * 
-     */
-    public AuthorizeClient createAuthorizeClient() {
-        return new AuthorizeClient();
-    }
-
-    /**
-     * Create an instance of {@link ChronopayConfigExt }
-     * 
-     */
-    public ChronopayConfigExt createChronopayConfigExt() {
-        return new ChronopayConfigExt();
-    }
-
-    /**
-     * Create an instance of {@link PaymentList }
-     * 
-     */
-    public PaymentList createPaymentList() {
-        return new PaymentList();
-    }
-
-    /**
-     * Create an instance of {@link GetClientSmsList }
-     * 
-     */
-    public GetClientSmsList createGetClientSmsList() {
-        return new GetClientSmsList();
-    }
-
-    /**
-     * Create an instance of {@link ClientSummaryExt }
-     * 
-     */
-    public ClientSummaryExt createClientSummaryExt() {
-        return new ClientSummaryExt();
-    }
-
-    /**
-     * Create an instance of {@link MenuListExt }
-     * 
-     */
-    public MenuListExt createMenuListExt() {
-        return new MenuListExt();
+    public GetSummaryBySanResponse createGetSummaryBySanResponse() {
+        return new GetSummaryBySanResponse();
     }
 
     /**
@@ -1345,27 +425,59 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnterEventItem }
-     * 
-     */
-    public EnterEventItem createEnterEventItem() {
-        return new EnterEventItem();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryBySan }
-     * 
-     */
-    public GetSummaryBySan createGetSummaryBySan() {
-        return new GetSummaryBySan();
-    }
-
-    /**
      * Create an instance of {@link GetHiddenPages }
      * 
      */
     public GetHiddenPages createGetHiddenPages() {
         return new GetHiddenPages();
+    }
+
+    /**
+     * Create an instance of {@link GetClientSmsList }
+     * 
+     */
+    public GetClientSmsList createGetClientSmsList() {
+        return new GetClientSmsList();
+    }
+
+    /**
+     * Create an instance of {@link BanksList }
+     * 
+     */
+    public BanksList createBanksList() {
+        return new BanksList();
+    }
+
+    /**
+     * Create an instance of {@link ChronopayConfigResult }
+     * 
+     */
+    public ChronopayConfigResult createChronopayConfigResult() {
+        return new ChronopayConfigResult();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByMobileResponse }
+     * 
+     */
+    public SendLinkingTokenByMobileResponse createSendLinkingTokenByMobileResponse() {
+        return new SendLinkingTokenByMobileResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeEmail }
+     * 
+     */
+    public ChangeEmail createChangeEmail() {
+        return new ChangeEmail();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummaryExt }
+     * 
+     */
+    public ClientSummaryExt createClientSummaryExt() {
+        return new ClientSummaryExt();
     }
 
     /**
@@ -1377,11 +489,611 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link GetIdOfClientResponse }
+     * 
+     */
+    public GetIdOfClientResponse createGetIdOfClientResponse() {
+        return new GetIdOfClientResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListBySan }
+     * 
+     */
+    public GetPaymentListBySan createGetPaymentListBySan() {
+        return new GetPaymentListBySan();
+    }
+
+    /**
+     * Create an instance of {@link ClientSmsList }
+     * 
+     */
+    public ClientSmsList createClientSmsList() {
+        return new ClientSmsList();
+    }
+
+    /**
+     * Create an instance of {@link PaymentListResult }
+     * 
+     */
+    public PaymentListResult createPaymentListResult() {
+        return new PaymentListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetCirculationList }
+     * 
+     */
+    public GetCirculationList createGetCirculationList() {
+        return new GetCirculationList();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryBySan }
+     * 
+     */
+    public GetSummaryBySan createGetSummaryBySan() {
+        return new GetSummaryBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetBanksResponse }
+     * 
+     */
+    public GetBanksResponse createGetBanksResponse() {
+        return new GetBanksResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuListExt }
+     * 
+     */
+    public MenuListExt createMenuListExt() {
+        return new MenuListExt();
+    }
+
+    /**
+     * Create an instance of {@link GetStudentListByIdOfClientGroup }
+     * 
+     */
+    public GetStudentListByIdOfClientGroup createGetStudentListByIdOfClientGroup() {
+        return new GetStudentListByIdOfClientGroup();
+    }
+
+    /**
+     * Create an instance of {@link GetChronopayConfig }
+     * 
+     */
+    public GetChronopayConfig createGetChronopayConfig() {
+        return new GetChronopayConfig();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListBySanResponse }
+     * 
+     */
+    public GetCardListBySanResponse createGetCardListBySanResponse() {
+        return new GetCardListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetStudentListByIdOfClientGroupResponse }
+     * 
+     */
+    public GetStudentListByIdOfClientGroupResponse createGetStudentListByIdOfClientGroupResponse() {
+        return new GetStudentListByIdOfClientGroupResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSanResponse }
+     * 
+     */
+    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
+        return new GetClientsByGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItemList }
+     * 
+     */
+    public CirculationItemList createCirculationItemList() {
+        return new CirculationItemList();
+    }
+
+    /**
+     * Create an instance of {@link GetHiddenPagesResponse }
+     * 
+     */
+    public GetHiddenPagesResponse createGetHiddenPagesResponse() {
+        return new GetHiddenPagesResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListBySanResponse }
+     * 
+     */
+    public GetPurchaseListBySanResponse createGetPurchaseListBySanResponse() {
+        return new GetPurchaseListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCirculationListResponse }
+     * 
+     */
+    public GetCirculationListResponse createGetCirculationListResponse() {
+        return new GetCirculationListResponse();
+    }
+
+    /**
+     * Create an instance of {@link RbkMoneyConfigResult }
+     * 
+     */
+    public RbkMoneyConfigResult createRbkMoneyConfigResult() {
+        return new RbkMoneyConfigResult();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListByOrgResponse }
+     * 
+     */
+    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
+        return new GetMenuListByOrgResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListBySanResponse }
+     * 
+     */
+    public GetMenuListBySanResponse createGetMenuListBySanResponse() {
+        return new GetMenuListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationBySMSResponse }
+     * 
+     */
+    public EnableNotificationBySMSResponse createEnableNotificationBySMSResponse() {
+        return new EnableNotificationBySMSResponse();
+    }
+
+    /**
+     * Create an instance of {@link RequestWebParam }
+     * 
+     */
+    public RequestWebParam createRequestWebParam() {
+        return new RequestWebParam();
+    }
+
+    /**
+     * Create an instance of {@link ChangePersonalInfoResponse }
+     * 
+     */
+    public ChangePersonalInfoResponse createChangePersonalInfoResponse() {
+        return new ChangePersonalInfoResponse();
+    }
+
+    /**
+     * Create an instance of {@link ComplexDetail }
+     * 
+     */
+    public ComplexDetail createComplexDetail() {
+        return new ComplexDetail();
+    }
+
+    /**
+     * Create an instance of {@link ChangePaymentOrderStatus }
+     * 
+     */
+    public ChangePaymentOrderStatus createChangePaymentOrderStatus() {
+        return new ChangePaymentOrderStatus();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanResult }
+     * 
+     */
+    public AttachGuardSanResult createAttachGuardSanResult() {
+        return new AttachGuardSanResult();
+    }
+
+    /**
+     * Create an instance of {@link Result }
+     * 
+     */
+    public Result createResult() {
+        return new Result();
+    }
+
+    /**
+     * Create an instance of {@link GenerateLinkingToken }
+     * 
+     */
+    public GenerateLinkingToken createGenerateLinkingToken() {
+        return new GenerateLinkingToken();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListBySanResponse }
+     * 
+     */
+    public GetEnterEventListBySanResponse createGetEnterEventListBySanResponse() {
+        return new GetEnterEventListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListResponse }
+     * 
+     */
+    public GetPurchaseListResponse createGetPurchaseListResponse() {
+        return new GetPurchaseListResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetGroupListByOrgResponse }
+     * 
+     */
+    public GetGroupListByOrgResponse createGetGroupListByOrgResponse() {
+        return new GetGroupListByOrgResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuItem }
+     * 
+     */
+    public MenuItem createMenuItem() {
+        return new MenuItem();
+    }
+
+    /**
+     * Create an instance of {@link ClassStudentList }
+     * 
+     */
+    public ClassStudentList createClassStudentList() {
+        return new ClassStudentList();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanResponse }
+     * 
+     */
+    public DetachGuardSanResponse createDetachGuardSanResponse() {
+        return new DetachGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeEmailResponse }
+     * 
+     */
+    public ChangeEmailResponse createChangeEmailResponse() {
+        return new ChangeEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link ComplexDate }
+     * 
+     */
+    public ComplexDate createComplexDate() {
+        return new ComplexDate();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanResponse }
+     * 
+     */
+    public AttachGuardSanResponse createAttachGuardSanResponse() {
+        return new AttachGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link Purchase }
+     * 
+     */
+    public Purchase createPurchase() {
+        return new Purchase();
+    }
+
+    /**
+     * Create an instance of {@link PublicationItem }
+     * 
+     */
+    public PublicationItem createPublicationItem() {
+        return new PublicationItem();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSan }
+     * 
+     */
+    public AttachGuardSan createAttachGuardSan() {
+        return new AttachGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link BankItem }
+     * 
+     */
+    public BankItem createBankItem() {
+        return new BankItem();
+    }
+
+    /**
      * Create an instance of {@link GetMenuListByOrg }
      * 
      */
     public GetMenuListByOrg createGetMenuListByOrg() {
         return new GetMenuListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanBySanResponse }
+     * 
+     */
+    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
+        return new DetachGuardSanBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientGroupListResult }
+     * 
+     */
+    public ClientGroupListResult createClientGroupListResult() {
+        return new ClientGroupListResult();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListResult }
+     * 
+     */
+    public PurchaseListResult createPurchaseListResult() {
+        return new PurchaseListResult();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByGuardSanResponse }
+     * 
+     */
+    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
+        return new GetSummaryByGuardSanResponse();
+    }
+
+    /**
+     * Create an instance of {@link MenuDateItemExt }
+     * 
+     */
+    public MenuDateItemExt createMenuDateItemExt() {
+        return new MenuDateItemExt();
+    }
+
+    /**
+     * Create an instance of {@link AuthorizeClientResponse }
+     * 
+     */
+    public AuthorizeClientResponse createAuthorizeClientResponse() {
+        return new AuthorizeClientResponse();
+    }
+
+    /**
+     * Create an instance of {@link RBKMoneyConfigExt }
+     * 
+     */
+    public RBKMoneyConfigExt createRBKMoneyConfigExt() {
+        return new RBKMoneyConfigExt();
+    }
+
+    /**
+     * Create an instance of {@link SendResult }
+     * 
+     */
+    public SendResult createSendResult() {
+        return new SendResult();
+    }
+
+    /**
+     * Create an instance of {@link MenuDateItem }
+     * 
+     */
+    public MenuDateItem createMenuDateItem() {
+        return new MenuDateItem();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListResponse }
+     * 
+     */
+    public GetCardListResponse createGetCardListResponse() {
+        return new GetCardListResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeMobilePhoneResponse }
+     * 
+     */
+    public ChangeMobilePhoneResponse createChangeMobilePhoneResponse() {
+        return new ChangeMobilePhoneResponse();
+    }
+
+    /**
+     * Create an instance of {@link ComplexDateList }
+     * 
+     */
+    public ComplexDateList createComplexDateList() {
+        return new ComplexDateList();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuList }
+     * 
+     */
+    public GetMenuList createGetMenuList() {
+        return new GetMenuList();
+    }
+
+    /**
+     * Create an instance of {@link GetSummaryByGuardSan }
+     * 
+     */
+    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
+        return new GetSummaryByGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationBySMS }
+     * 
+     */
+    public EnableNotificationBySMS createEnableNotificationBySMS() {
+        return new EnableNotificationBySMS();
+    }
+
+    /**
+     * Create an instance of {@link CheckPasswordResult }
+     * 
+     */
+    public CheckPasswordResult createCheckPasswordResult() {
+        return new CheckPasswordResult();
+    }
+
+    /**
+     * Create an instance of {@link ChangePersonalInfo }
+     * 
+     */
+    public ChangePersonalInfo createChangePersonalInfo() {
+        return new ChangePersonalInfo();
+    }
+
+    /**
+     * Create an instance of {@link GetCardListBySan }
+     * 
+     */
+    public GetCardListBySan createGetCardListBySan() {
+        return new GetCardListBySan();
+    }
+
+    /**
+     * Create an instance of {@link CardListResult }
+     * 
+     */
+    public CardListResult createCardListResult() {
+        return new CardListResult();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseElement }
+     * 
+     */
+    public PurchaseElement createPurchaseElement() {
+        return new PurchaseElement();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseListBySan }
+     * 
+     */
+    public GetPurchaseListBySan createGetPurchaseListBySan() {
+        return new GetPurchaseListBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetRBKMoneyConfig }
+     * 
+     */
+    public GetRBKMoneyConfig createGetRBKMoneyConfig() {
+        return new GetRBKMoneyConfig();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanBySan }
+     * 
+     */
+    public AttachGuardSanBySan createAttachGuardSanBySan() {
+        return new AttachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link PaymentList }
+     * 
+     */
+    public PaymentList createPaymentList() {
+        return new PaymentList();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseElementExt }
+     * 
+     */
+    public PurchaseElementExt createPurchaseElementExt() {
+        return new PurchaseElementExt();
+    }
+
+    /**
+     * Create an instance of {@link GetClientsByGuardSan }
+     * 
+     */
+    public GetClientsByGuardSan createGetClientsByGuardSan() {
+        return new GetClientsByGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link ComplexListResult }
+     * 
+     */
+    public ComplexListResult createComplexListResult() {
+        return new ComplexListResult();
+    }
+
+    /**
+     * Create an instance of {@link CreatePaymentOrder }
+     * 
+     */
+    public CreatePaymentOrder createCreatePaymentOrder() {
+        return new CreatePaymentOrder();
+    }
+
+    /**
+     * Create an instance of {@link GetIdOfClient }
+     * 
+     */
+    public GetIdOfClient createGetIdOfClient() {
+        return new GetIdOfClient();
+    }
+
+    /**
+     * Create an instance of {@link GetGroupListByOrg }
+     * 
+     */
+    public GetGroupListByOrg createGetGroupListByOrg() {
+        return new GetGroupListByOrg();
+    }
+
+    /**
+     * Create an instance of {@link GetIdOfContragentResponse }
+     * 
+     */
+    public GetIdOfContragentResponse createGetIdOfContragentResponse() {
+        return new GetIdOfContragentResponse();
+    }
+
+    /**
+     * Create an instance of {@link CreatePaymentOrderResponse }
+     * 
+     */
+    public CreatePaymentOrderResponse createCreatePaymentOrderResponse() {
+        return new CreatePaymentOrderResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientItem }
+     * 
+     */
+    public ClientItem createClientItem() {
+        return new ClientItem();
+    }
+
+    /**
+     * Create an instance of {@link BanksData }
+     * 
+     */
+    public BanksData createBanksData() {
+        return new BanksData();
     }
 
     /**
@@ -1393,6 +1105,262 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CheckPasswordRestoreRequestResponse }
+     * 
+     */
+    public CheckPasswordRestoreRequestResponse createCheckPasswordRestoreRequestResponse() {
+        return new CheckPasswordRestoreRequestResponse();
+    }
+
+    /**
+     * Create an instance of {@link CardItem }
+     * 
+     */
+    public CardItem createCardItem() {
+        return new CardItem();
+    }
+
+    /**
+     * Create an instance of {@link ChangePassword }
+     * 
+     */
+    public ChangePassword createChangePassword() {
+        return new ChangePassword();
+    }
+
+    /**
+     * Create an instance of {@link ActivateLinkingTokenResult }
+     * 
+     */
+    public ActivateLinkingTokenResult createActivateLinkingTokenResult() {
+        return new ActivateLinkingTokenResult();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSanBySan }
+     * 
+     */
+    public DetachGuardSanBySan createDetachGuardSanBySan() {
+        return new DetachGuardSanBySan();
+    }
+
+    /**
+     * Create an instance of {@link GetRBKMoneyConfigResponse }
+     * 
+     */
+    public GetRBKMoneyConfigResponse createGetRBKMoneyConfigResponse() {
+        return new GetRBKMoneyConfigResponse();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventListResult }
+     * 
+     */
+    public EnterEventListResult createEnterEventListResult() {
+        return new EnterEventListResult();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByContractIdResponse }
+     * 
+     */
+    public SendLinkingTokenByContractIdResponse createSendLinkingTokenByContractIdResponse() {
+        return new SendLinkingTokenByContractIdResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientGroupList }
+     * 
+     */
+    public ClientGroupList createClientGroupList() {
+        return new ClientGroupList();
+    }
+
+    /**
+     * Create an instance of {@link SendPasswordRecoverURLFromEmailResponse }
+     * 
+     */
+    public SendPasswordRecoverURLFromEmailResponse createSendPasswordRecoverURLFromEmailResponse() {
+        return new SendPasswordRecoverURLFromEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link EnableNotificationByEmailResponse }
+     * 
+     */
+    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
+        return new EnableNotificationByEmailResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetChronopayConfigResponse }
+     * 
+     */
+    public GetChronopayConfigResponse createGetChronopayConfigResponse() {
+        return new GetChronopayConfigResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetMenuListBySan }
+     * 
+     */
+    public GetMenuListBySan createGetMenuListBySan() {
+        return new GetMenuListBySan();
+    }
+
+    /**
+     * Create an instance of {@link Payment }
+     * 
+     */
+    public Payment createPayment() {
+        return new Payment();
+    }
+
+    /**
+     * Create an instance of {@link GetPaymentListBySanResponse }
+     * 
+     */
+    public GetPaymentListBySanResponse createGetPaymentListBySanResponse() {
+        return new GetPaymentListBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetEnterEventListResponse }
+     * 
+     */
+    public GetEnterEventListResponse createGetEnterEventListResponse() {
+        return new GetEnterEventListResponse();
+    }
+
+    /**
+     * Create an instance of {@link AttachGuardSanBySanResponse }
+     * 
+     */
+    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
+        return new AttachGuardSanBySanResponse();
+    }
+
+    /**
+     * Create an instance of {@link DetachGuardSan }
+     * 
+     */
+    public DetachGuardSan createDetachGuardSan() {
+        return new DetachGuardSan();
+    }
+
+    /**
+     * Create an instance of {@link GetPurchaseList }
+     * 
+     */
+    public GetPurchaseList createGetPurchaseList() {
+        return new GetPurchaseList();
+    }
+
+    /**
+     * Create an instance of {@link MenuListResult }
+     * 
+     */
+    public MenuListResult createMenuListResult() {
+        return new MenuListResult();
+    }
+
+    /**
+     * Create an instance of {@link ChangePaymentOrderStatusResponse }
+     * 
+     */
+    public ChangePaymentOrderStatusResponse createChangePaymentOrderStatusResponse() {
+        return new ChangePaymentOrderStatusResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClassStudentListResult }
+     * 
+     */
+    public ClassStudentListResult createClassStudentListResult() {
+        return new ClassStudentListResult();
+    }
+
+    /**
+     * Create an instance of {@link ClientSummaryResult }
+     * 
+     */
+    public ClientSummaryResult createClientSummaryResult() {
+        return new ClientSummaryResult();
+    }
+
+    /**
+     * Create an instance of {@link ClientList }
+     * 
+     */
+    public ClientList createClientList() {
+        return new ClientList();
+    }
+
+    /**
+     * Create an instance of {@link ChronopayConfigExt }
+     * 
+     */
+    public ChronopayConfigExt createChronopayConfigExt() {
+        return new ChronopayConfigExt();
+    }
+
+    /**
+     * Create an instance of {@link ClientsData }
+     * 
+     */
+    public ClientsData createClientsData() {
+        return new ClientsData();
+    }
+
+    /**
+     * Create an instance of {@link ActivateLinkingTokenResponse }
+     * 
+     */
+    public ActivateLinkingTokenResponse createActivateLinkingTokenResponse() {
+        return new ActivateLinkingTokenResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangePasswordResponse }
+     * 
+     */
+    public ChangePasswordResponse createChangePasswordResponse() {
+        return new ChangePasswordResponse();
+    }
+
+    /**
+     * Create an instance of {@link Complex }
+     * 
+     */
+    public Complex createComplex() {
+        return new Complex();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseListExt }
+     * 
+     */
+    public PurchaseListExt createPurchaseListExt() {
+        return new PurchaseListExt();
+    }
+
+    /**
+     * Create an instance of {@link GetContractIdByCardNoResponse }
+     * 
+     */
+    public GetContractIdByCardNoResponse createGetContractIdByCardNoResponse() {
+        return new GetContractIdByCardNoResponse();
+    }
+
+    /**
+     * Create an instance of {@link AuthorizeClient }
+     * 
+     */
+    public AuthorizeClient createAuthorizeClient() {
+        return new AuthorizeClient();
+    }
+
+    /**
      * Create an instance of {@link ChangeMobilePhone }
      * 
      */
@@ -1401,11 +1369,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetMenuListByOrgResponse }
+     * Create an instance of {@link MenuList }
      * 
      */
-    public GetMenuListByOrgResponse createGetMenuListByOrgResponse() {
-        return new GetMenuListByOrgResponse();
+    public MenuList createMenuList() {
+        return new MenuList();
+    }
+
+    /**
+     * Create an instance of {@link GetComplexList }
+     * 
+     */
+    public GetComplexList createGetComplexList() {
+        return new GetComplexList();
+    }
+
+    /**
+     * Create an instance of {@link SendLinkingTokenByMobile }
+     * 
+     */
+    public SendLinkingTokenByMobile createSendLinkingTokenByMobile() {
+        return new SendLinkingTokenByMobile();
+    }
+
+    /**
+     * Create an instance of {@link CirculationItem }
+     * 
+     */
+    public CirculationItem createCirculationItem() {
+        return new CirculationItem();
+    }
+
+    /**
+     * Create an instance of {@link CirculationListResult }
+     * 
+     */
+    public CirculationListResult createCirculationListResult() {
+        return new CirculationListResult();
     }
 
     /**

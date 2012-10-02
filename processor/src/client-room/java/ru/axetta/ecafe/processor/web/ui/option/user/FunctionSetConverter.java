@@ -48,13 +48,9 @@ public class FunctionSetConverter implements Converter {
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
         DAOService daoService= DAOService.getInstance();
         StringBuilder stringBuilder = new StringBuilder();
-      ///  RuntimeContext runtimeContext = null;
-      //  Session persistenceSession = null;
-       // Transaction persistenceTransaction = null;
+
         try {
-          //  runtimeContext = RuntimeContext.getInstance();
-          //  persistenceSession = runtimeContext.createPersistenceSession();
-          //  persistenceTransaction = persistenceSession.beginTransaction();
+
             boolean first = true;
             for (Object currObject : (Set) object) {
                 if (!first) {
@@ -62,24 +58,19 @@ public class FunctionSetConverter implements Converter {
                 }
                 Long idOfFunction = (Long) currObject;
 
-               // Query q=entityManager.createQuery("from Function where idOfFunction=:idOfFunction");
-               // q.setParameter("idOfFunction",idOfFunction);
+
                 Function function = daoService.getFunction(idOfFunction).get(0);
-               // Function function = (Function) persistenceSession.load(Function.class, idOfFunction);
+
                 stringBuilder.append(function.getFunctionName());
                 first = false;
                 if (stringBuilder.length() > MAX_LEN) {
                     break;
                 }
             }
-          //  persistenceTransaction.commit();
-         //   persistenceTransaction = null;
+
         } catch (Exception e) {
             logger.error("Failed to convert function set", e);
             return "";
-        } finally {
-          //  HibernateUtils.rollback(persistenceTransaction, logger);
-           // HibernateUtils.close(persistenceSession, logger);
         }
         int len = stringBuilder.length();
         if (len > MAX_LEN) {

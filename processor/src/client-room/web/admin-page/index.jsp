@@ -33,47 +33,7 @@
 
 <f:view>
 
-<%--<f:subview id="loginPage" rendered="#{!loginPage.loginSuccess}" >
-&lt;%&ndash;<c:import url="login.jsp" />&ndash;%&gt;
-    <table style="width: 100%; height: 100%">
-        <tr valign="middle">
-            <td align="center">
-                <h:panelGrid cellpadding="0" cellspacing="0">
-                    <rich:panel header="Необходима авторизация" styleClass="login-panel"
-                                headerClass="login-panel-header" bodyClass="login-panel-body">
-                        <div align="center">
-                           &lt;%&ndash; <a4j:outputPanel id="outPanel">&ndash;%&gt;
-                                <h:outputText id="errorText" styleClass="error-output-text" value="Ошибка аутентификации" rendered="#{loginPage.rendered}"/>
-                           &lt;%&ndash; </a4j:outputPanel>&ndash;%&gt;
-                            <h:form id="loginForm">
 
-
-                               &lt;%&ndash; <%if (null != request.getParameter("error")) {%>&ndash;%&gt;
-                               &lt;%&ndash; <h:outputText styleClass="error-output-text" value="Ошибка аутентификации" />&ndash;%&gt;
-                                &lt;%&ndash;<%}%>&ndash;%&gt;
-
-
-                                <h:panelGrid columns="2">
-                                    <h:outputText value="Пользователь" styleClass="output-text" />
-                                    <h:inputText value="#{loginPage.userName}" size="16" maxlength="64" styleClass="input-text" />
-                                    <h:outputText value="Пароль" styleClass="output-text" />
-                                    <h:inputSecret value="#{loginPage.password}" size="16" maxlength="64" styleClass="input-text" />
-                                </h:panelGrid>
-
-                                   <a4j:commandButton id="submitBtn" value="Войти"  action="#{loginPage.login}" reRender="adminPage, errorText" onclick="submit()"
-                                                 styleClass="command-button" />
-
-
-
-                        </h:form>
-                        </div>
-                    </rich:panel>
-                </h:panelGrid>
-            </td>
-        </tr>
-    </table>
-
-</f:subview>--%>
 
 <f:subview id="adminPage" >
 
@@ -115,89 +75,7 @@
                 <f:subview id="workspaceSubView">
 
                     <c:import url="/admin-page/include/workspace.jsp" />
-            <%--        <h:form id="buttonForm">
-                        <a4j:commandButton value="Добавить город" action="#{cityPage.addCity}"
-                                           reRender="cityTable"
-                                           styleClass="command-button"/>
-                    </h:form>
 
-                    <h:form id="saveForm" >
-
-                        <a4j:commandButton value="Сохранить" action="#{cityPage.save}"
-                                           reRender="cityTable"
-                                           styleClass="command-button"/>
-
-
-                        <rich:dataTable id="cityTable" width="700" var="cityItem" value="#{cityPage.cityItems}"
-                                        rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
-
-                            <rich:column  headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Название"> </h:outputText>
-                                </f:facet>
-                                <h:inputText value="#{cityItem.name}" />
-
-                            </rich:column>
-
-                            <rich:column  headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="URL сервиса">   </h:outputText>
-                                </f:facet>
-                                <h:inputText value="#{cityItem.serviceUrl}"/>
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Маска лицевого счета">  </h:outputText>
-                                </f:facet>
-                                <h:inputText value="#{cityItem.contractIdMask}"/>
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Активность">   </h:outputText>
-                                </f:facet>
-                                <h:selectBooleanCheckbox value="#{cityItem.activity}" styleClass="output-text" />
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Имя пользователя">  </h:outputText>
-                                </f:facet>
-                                <h:inputText value="#{cityItem.userName}"/>
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Пароль"> </h:outputText>
-                                </f:facet>
-                                <h:inputText value="#{cityItem.password}"/>
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Тип авторизации "> </h:outputText>
-                                </f:facet>
-
-                                <h:selectOneMenu value="#{cityItem.indexOfAuthType}"
-                                                 styleClass="input-text">
-                                    <f:selectItems value="#{cityPage.authTypeItems}" />
-                                </h:selectOneMenu>
-                            </rich:column>
-
-                            <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText value="Удалить">  </h:outputText>
-                                </f:facet>
-
-                                <a4j:commandButton value="Удалить" action="#{cityItem.delete}"
-                                                   reRender="cityTable"
-                                                   styleClass="command-button"/>
-                            </rich:column>
-
-                        </rich:dataTable>
-
-                    </h:form>--%>
                 </f:subview>
             </td>
         </tr>

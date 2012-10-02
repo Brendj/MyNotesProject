@@ -25,8 +25,7 @@
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
 <%@ page import="org.apache.commons.codec.binary.Base64" %>
 
-<%//ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-    // ClientAuthToken clientAuthToken=ClientAuthToken.loadFrom(session);
+<%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.recover_jsp");
     try{
     //ClientRoomController port=clientAuthToken.getPort();

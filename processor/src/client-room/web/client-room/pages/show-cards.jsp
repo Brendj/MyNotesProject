@@ -51,8 +51,7 @@
 
     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     RuntimeContext runtimeContext = null;
-    /*Session persistenceSession = null;
-    Transaction persistenceTransaction = null;*/
+
     try {
         runtimeContext = new RuntimeContext();
         TimeZone localTimeZone = runtimeContext.getDefaultLocalTimeZone(session);
@@ -61,13 +60,10 @@
 
          Long contractId=clientAuthToken.getContractId();
 
-        /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
-        ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
 
         ClientRoomController port=clientAuthToken.getPort();
-        //if(true){throw new Exception();}
+
 
 %>
 
@@ -96,25 +92,14 @@
         </td>
     </tr>
     <%
-        /*persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
 
-        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-        clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-        Client client = (Client) clientCriteria.uniqueResult();
-
-        Criteria cardsCritieria = persistenceSession.createCriteria(Card.class);
-        cardsCritieria.add(Restrictions.eq("client", client));
-        cardsCritieria.addOrder(org.hibernate.criterion.Order.asc("createTime"));*/
         CardListResult cardResult= port.getCardList(contractId);
         if(!cardResult.getResultCode().equals(RC_OK)){
             throw new Exception(cardResult.getDescription());
         }
         CardList cardList= cardResult.getCardList();
         List<CardItem> cardItemList=cardList.getC();
-        //List cardsList = cardsCritieria.list();
-        /*for (Object currCardObject : cardsList) {
-            Card currCard = (Card) currCardObject;*/
+
         for(CardItem currCard:cardItemList){
     %>
     <tr valign="top">
@@ -177,9 +162,6 @@
     <%
 
             //throw new ServletException(e);
-        } finally {
-            /*HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
         }
     %>
 </table>

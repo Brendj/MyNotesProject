@@ -52,11 +52,7 @@
 
 
         runtimeContext = new RuntimeContext();
-       /* ClientRoomControllerWSService service = new ClientRoomControllerWSService();
 
-        ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client"); */
         ClientRoomController port=clientAuthToken.getPort();
         ClientSummaryResult summaryResult=port.getSummary(clientAuthToken.getContractId());
         if(!RC_OK.equals(summaryResult.getResultCode())){
@@ -70,11 +66,7 @@
 
 
 
-       /* persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
-        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-        clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-        Client client = (Client) clientCriteria.uniqueResult();*/
+
         if (null != summaryExt) {
             if (-summaryExt.getLimit() > summaryExt.getBalance()) {
 %>
@@ -91,8 +83,7 @@
 <%
             }
         }
-       /* persistenceTransaction.commit();
-        persistenceTransaction = null;*/
+
     } catch (RuntimeContext.NotInitializedException e) {
         logger.error("Failed to build page", e);
         throw new UnavailableException(e.getMessage());
@@ -101,9 +92,6 @@
                 %>
 <div class="error-output-text"> Ошибка при проверке баланса </div>
 <%
-        //throw new ServletException(e);
-    } finally {
-       /* HibernateUtils.rollback(persistenceTransaction, logger);
-        HibernateUtils.close(persistenceSession, logger);*/
+
     }
 %>

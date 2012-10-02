@@ -24,11 +24,9 @@ import javax.persistence.Query;
  * Time: 14:23:22
  * To change this template use File | Settings | File Templates.
  */
-/*@Component
-      @Scope("singleton")*/
+
 public class SelectedUserGroupPage extends BasicWorkspacePage {
-    /*@PersistenceContext
-    private EntityManager entityManager;*/
+
 
     private String userName;
 
@@ -36,14 +34,6 @@ public class SelectedUserGroupPage extends BasicWorkspacePage {
         return userName;
     }
 
-    /*public void fill(Session session, Long idOfUser) throws Exception {
-        User user = (User) session.load(User.class, idOfUser);
-        if (null == user) {
-            this.userName = null;
-        } else {
-            this.userName = user.getUserName();
-        }
-    }*/
 
     public void fill(Session session, Long idOfUser) throws Exception {
          DAOService daoService= DAOService.getInstance();

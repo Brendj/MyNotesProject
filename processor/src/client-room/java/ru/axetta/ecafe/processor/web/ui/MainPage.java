@@ -131,21 +131,15 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             userListPage.fill(persistenceSession);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = userListPage;
         } catch (Exception e) {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей",
                             null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
         }
         updateSelectedMainMenu();
         return null;
@@ -157,21 +151,15 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             cityListPage.fill(persistenceSession);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = cityListPage;
         } catch (Exception e) {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей",
                             null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
         }
         updateSelectedMainMenu();
         return null;
@@ -192,21 +180,15 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
-            //persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = selectedUserGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected user group page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы пользователя",
                             null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
         }
         updateSelectedMainMenu();
         return null;
@@ -218,20 +200,14 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedCityGroupPage.fill(persistenceSession, selectedIdOfUser);
-            //persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = selectedCityGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected city group page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы города", null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
         }
         updateSelectedMainMenu();
         return null;
@@ -251,23 +227,16 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            //  persistenceSession = runtimeContext.createPersistenceSession();
-            //  persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
             userViewPage.fill(persistenceSession, selectedIdOfUser);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             selectedUserGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = userViewPage;
         } catch (Exception e) {
             logger.error("Failed to fill user view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы просмотра данных пользователя", null));
-        } finally {
-            //  HibernateUtils.rollback(persistenceTransaction, logger);
-            //  HibernateUtils.close(persistenceSession, logger);
-
         }
         updateSelectedMainMenu();
         return null;
@@ -279,13 +248,10 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            //  persistenceSession = runtimeContext.createPersistenceSession();
-            //  persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedCityGroupPage.fill(persistenceSession, selectedIdOfCity);
             cityViewPage.fill(persistenceSession, selectedIdOfCity);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             selectedCityGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = cityViewPage;
         } catch (Exception e) {
@@ -293,8 +259,7 @@ public class MainPage {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы просмотра данных города", null));
         } finally {
-            //  HibernateUtils.rollback(persistenceTransaction, logger);
-            //  HibernateUtils.close(persistenceSession, logger);
+
 
         }
         updateSelectedMainMenu();
@@ -315,23 +280,16 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            //  persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
             userEditPage.fill(persistenceSession, selectedIdOfUser);
-            // persistenceTransaction.commit();
-            //  persistenceTransaction = null;
+
             selectedUserGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = userEditPage;
         } catch (Exception e) {
             logger.error("Failed to fill user edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы редактирования данных пользователя", null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
-
         }
         updateSelectedMainMenu();
         return null;
@@ -343,30 +301,21 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            //  persistenceTransaction = persistenceSession.beginTransaction();
+
             selectedCityGroupPage.fill(persistenceSession, selectedIdOfCity);
             cityEditPage.fill(persistenceSession, selectedIdOfCity);
-            // persistenceTransaction.commit();
-            //  persistenceTransaction = null;
+
             selectedCityGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = cityEditPage;
         } catch (Exception e) {
             logger.error("Failed to fill city edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы редактирования данных города", null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            // HibernateUtils.close(persistenceSession, logger);
-
         }
         updateSelectedMainMenu();
         return null;
     }
-    /* public Object showCityEditPage() {
-    return null;
-    }*/
+
 
     public UserCreatePage getUserCreatePage() {
         return userCreatePage;
@@ -382,21 +331,14 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            //persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             userCreatePage.fill(persistenceSession);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = userCreatePage;
         } catch (Exception e) {
             logger.error("Failed to show user create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы создания пользователя", null));
-        } finally {
-            //  HibernateUtils.rollback(persistenceTransaction, logger);
-            //  HibernateUtils.close(persistenceSession, logger);
-
         }
         updateSelectedMainMenu();
         return null;
@@ -409,22 +351,15 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // runtimeContext = RuntimeContext.getInstance();
-            //persistenceSession = runtimeContext.createPersistenceSession();
-            // persistenceTransaction = persistenceSession.beginTransaction();
+
             cityCreatePage.fill(persistenceSession);
-            // persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             currentWorkspacePage = cityCreatePage;
         } catch (Exception e) {
             logger.error("Failed to show city create page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы создания города",
                             null));
-        } finally {
-            //  HibernateUtils.rollback(persistenceTransaction, logger);
-            //  HibernateUtils.close(persistenceSession, logger);
-
         }
         updateSelectedMainMenu();
         return null;
@@ -460,22 +395,15 @@ public class MainPage {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                //runtimeContext = RuntimeContext.getInstance();
-                // persistenceSession = runtimeContext.createPersistenceSession();
-                // persistenceTransaction = persistenceSession.beginTransaction();
+
                 userCreatePage.createUser(persistenceSession);
-                // persistenceTransaction.commit();
-                // persistenceTransaction = null;
+
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to create user", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании пользователя", null));
-            } finally {
-                // HibernateUtils.rollback(persistenceTransaction, logger);
-                //HibernateUtils.close(persistenceSession, logger);
-
             }
         }
         return null;
@@ -483,32 +411,22 @@ public class MainPage {
 
     public Object createCity() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        /* if (!StringUtils.equals(userCreatePage.getPlainPassword(), userCreatePage.getPlainPasswordConfirmation())) {
-          facesContext.addMessage(null,
-                  new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-      } else */
+
 
         {
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                //runtimeContext = RuntimeContext.getInstance();
-                // persistenceSession = runtimeContext.createPersistenceSession();
-                // persistenceTransaction = persistenceSession.beginTransaction();
+
                 cityCreatePage.createCity(persistenceSession);
-                // persistenceTransaction.commit();
-                // persistenceTransaction = null;
+
                 facesContext
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Город создан успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to create city", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании города", null));
-            } finally {
-                // HibernateUtils.rollback(persistenceTransaction, logger);
-                //HibernateUtils.close(persistenceSession, logger);
-
             }
         }
         return null;
@@ -525,13 +443,10 @@ public class MainPage {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                // runtimeContext = RuntimeContext.getInstance();
-                // persistenceSession = runtimeContext.createPersistenceSession();
-                // persistenceTransaction = persistenceSession.beginTransaction();
+
                 userEditPage.updateUser(persistenceSession, selectedIdOfUser);
                 selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
-                // persistenceTransaction.commit();
-                // persistenceTransaction = null;
+
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные пользователя обновлены успешно", null));
             } catch (Exception e) {
@@ -539,10 +454,6 @@ public class MainPage {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных пользователя",
                                 null));
-            } finally {
-                //HibernateUtils.rollback(persistenceTransaction, logger);
-                // HibernateUtils.close(persistenceSession, logger);
-
             }
         }
         return null;
@@ -550,34 +461,23 @@ public class MainPage {
 
     public Object updateCity() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        /* if (userEditPage.isChangePassword() && !StringUtils
-               .equals(userEditPage.getPlainPassword(), userEditPage.getPlainPasswordConfirmation())) {
-           facesContext.addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-       } else*/
+
 
         {
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                // runtimeContext = RuntimeContext.getInstance();
-                // persistenceSession = runtimeContext.createPersistenceSession();
-                // persistenceTransaction = persistenceSession.beginTransaction();
+
                 cityEditPage.updateCity(persistenceSession, selectedIdOfCity);
                 selectedCityGroupPage.fill(persistenceSession, selectedIdOfCity);
-                // persistenceTransaction.commit();
-                // persistenceTransaction = null;
+
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные города обновлены успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to update user", e);
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных города", null));
-            } finally {
-                //HibernateUtils.rollback(persistenceTransaction, logger);
-                // HibernateUtils.close(persistenceSession, logger);
-
             }
         }
         return null;
@@ -593,26 +493,14 @@ public class MainPage {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             RuntimeContext runtimeContext = null;
-            try {
-                //  runtimeContext = RuntimeContext.getInstance();
-                //  persistenceSession = runtimeContext.createPersistenceSession();
-                // persistenceTransaction = persistenceSession.beginTransaction();
-                ///
+
+
                 DAOService daoService = DAOService.getInstance();
                 /*currentUser = DAOUtils.findUser(persistenceSession, userName);*/
                 currentUser = daoService.getUserByName(userName).get(0);
 
-                /// perform lazy load of function
-               // currentUser.hasFunction(Function.FUNC_USER_VIEW);
-                ///
-                //  persistenceTransaction.commit();
-                //  persistenceTransaction = null;
-                /*  currentWorkspacePage = reportJobCreatePage;*/
-            } finally {
-                //  HibernateUtils.rollback(persistenceTransaction, logger);
-                //  HibernateUtils.close(persistenceSession, logger);
 
-            }
+
         }
         /////
         return currentUser;
@@ -641,12 +529,9 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            //runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            //persistenceTransaction = persistenceSession.beginTransaction();
+
             userListPage.removeUser(persistenceSession, removedIdOfUser);
-            //   persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             if (removedIdOfUser.equals(selectedIdOfUser)) {
                 selectedIdOfUser = null;
                 selectedUserGroupPage.hideMenuGroup();
@@ -655,9 +540,6 @@ public class MainPage {
             logger.error("Failed to remove user", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении пользователя", null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            //HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }
@@ -668,13 +550,10 @@ public class MainPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            //runtimeContext = RuntimeContext.getInstance();
-            // persistenceSession = runtimeContext.createPersistenceSession();
-            //persistenceTransaction = persistenceSession.beginTransaction();
+
             logger.info("from MainPage: removedIdOfCity=" + removedIdOfCity);
             cityListPage.removeCity(persistenceSession, removedIdOfCity);
-            //   persistenceTransaction.commit();
-            // persistenceTransaction = null;
+
             if (removedIdOfCity.equals(selectedIdOfCity)) {
                 selectedIdOfCity = null;
                 selectedCityGroupPage.hideMenuGroup();
@@ -683,9 +562,6 @@ public class MainPage {
             logger.error("Failed to remove city", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении города", null));
-        } finally {
-            // HibernateUtils.rollback(persistenceTransaction, logger);
-            //HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }

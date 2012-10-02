@@ -22,11 +22,9 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-/*@Component
-@Scope("singleton")*/
+
 public class CityViewPage extends BasicWorkspacePage {
- /*   @PersistenceContext
-    private EntityManager entityManager;*/
+
 
     private Long idOfCity;
     private String  name;

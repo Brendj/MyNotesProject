@@ -332,29 +332,12 @@
         </td>
     </tr>
     <%
-        /*Session persistenceSession = null;
-        Transaction persistenceTransaction = null;*/
+
         try {
-            /*persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();
 
-            Criteria enterEventCriteria = persistenceSession.createCriteria(EnterEvent.class);
-            enterEventCriteria.createAlias("client","c").add(Restrictions.eq("c.idOfClient",client.getIdOfClient()));
-            enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
-            enterEventCriteria.add(Restrictions.lt("evtDateTime", DateUtils.addDays(endDate, 1)));
-
-            enterEventCriteria.addOrder(Order.asc("evtDateTime"));
-
-*/
             Long contractId=clientAuthToken.getContractId();
-            /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                    = service.getClientRoomControllerWSPort();
-            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
             ClientRoomController port=clientAuthToken.getPort();
 
             GregorianCalendar greStartDate = new GregorianCalendar();
@@ -428,17 +411,13 @@
                 </tr>
     <%
             }
-            /*persistenceTransaction.commit();
-            persistenceTransaction = null;*/
+
         } catch (Exception e) {
             logger.error("Failed to build page", e);
             %>
     <div class="error-output-text"> Не удалось отобразить данные </div>
     <%
-            //throw new ServletException(e);
-        } finally {
-           /* HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
+
         }
     %>
 </table>

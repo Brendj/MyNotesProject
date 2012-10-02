@@ -412,46 +412,22 @@
     </tr>
 
     <%
-        /*Session persistenceSession = null;
-        Transaction persistenceTransaction = null;*/
+
         try {
-            /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                    = service.getClientRoomControllerWSPort();
-            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
 
             ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
 
 
-            /*persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();
-
-            Criteria menuCriteria = persistenceSession.createCriteria(Menu.class);
-            menuCriteria.add(Restrictions.eq("org", client.getOrg()));
-            menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-            menuCriteria.add(Restrictions.ge("menuDate", startDate));
-            menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
-            List menus = menuCriteria.list();*/
-           // DateUtils.addDays(endDate, 1);
-
-           // logger.info("startDate: "+startDate);
-           // logger.info("endDate: "+endDate);
-
-            //GregorianCalendar greStartDate = new GregorianCalendar();
-           // greStartDate.setTime(startDate);
 
 
             XMLGregorianCalendar xmlStartDate = toXmlDateTime(startDate);
-                    //DatatypeFactory.newInstance().newXMLGregorianCalendar(greStartDate);
 
-            //GregorianCalendar greEndDate = new GregorianCalendar();
-           // greEndDate.setTime(endDate);
+
+
             XMLGregorianCalendar xmlEndDate = toXmlDateTime(DateUtils.addDays(endDate,1));
-                    //DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);
+
 
 
 
@@ -470,13 +446,7 @@
 
 
             for (ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt currMenu : menus) {
-             /*   Menu currMenu = (Menu) currObject;
-                Criteria menuDetailCriteria = persistenceSession.createCriteria(MenuDetail.class);
-                menuDetailCriteria.add(Restrictions.eq("menu", currMenu));
-                menuDetailCriteria.add(Restrictions.ne("menuDetailName", "<Новое блюдо>"));
-                HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
-                HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
-                List menuDetails = menuDetailCriteria.list();*/
+
                 List<ru.axetta.ecafe.processor.web.bo.client.MenuItemExt>menuDetails=currMenu.getE();
                 if (!menuDetails.isEmpty()) {
     %>
@@ -579,13 +549,11 @@
             </div>
         </td>
     </tr>
-    <%   // ClientSummaryResult clientSummaryResult=port.getSummary(clientAuthToken.getContractId());
-          // startDate=DateUtils.addDays(startDate,1);
+    <%
            endDate=DateUtils.addDays(endDate,2);
           xmlEndDate=toXmlDateTime(endDate);
           xmlStartDate=toXmlDateTime(startDate);
-          //logger.info("xmlStartDate.getTime()="+xmlStartDate.toGregorianCalendar().getTime());
-       // logger.info("xmlEndDate.getTime()="+xmlEndDate.toGregorianCalendar().getTime());
+
 
           ComplexListResult complexListResult=port.getComplexList(clientAuthToken.getContractId(),xmlStartDate,xmlEndDate);
           ComplexDateList complexDateList=complexListResult.getComplexDateList();
@@ -596,8 +564,7 @@
 
 
 
-           /*persistenceTransaction.commit();
-           persistenceTransaction = null;*/
+
         for(ComplexDate complexDate:complexDates){
 
           Date currDate=  complexDate.getDate().toGregorianCalendar().getTime();
@@ -705,10 +672,7 @@
         <div class="error-output-text"> Не удалось отобразить меню </div>
          <%
 
-            //throw new ServletException(e);
-        } finally {
-           /* HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
+
         }
     %>
 <%--</table>--%>

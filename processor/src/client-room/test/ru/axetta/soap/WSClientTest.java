@@ -21,7 +21,7 @@ import javax.xml.ws.BindingProvider;
  */
 public class WSClientTest extends TestCase {
 
-    public void testGetSummary() throws Exception {
+/*    public void testGetSummary() throws Exception {
         ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
         ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
                 = service.getClientRoomControllerWSPort();
@@ -45,7 +45,7 @@ public class WSClientTest extends TestCase {
 
 
 
-    }
+    }*/
 
 
     }

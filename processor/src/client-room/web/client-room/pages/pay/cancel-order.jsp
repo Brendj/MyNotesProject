@@ -53,34 +53,14 @@
 
         if (haveDataToProcess && dataToProcessVerified) {
             Long idOfClient = null;
-            /*Session persistenceSession = null;
-            org.hibernate.Transaction persistenceTransaction = null;
-            try {
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
 
-                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-                Client client = (Client) clientCriteria.uniqueResult();
-                idOfClient = client.getIdOfClient();
-
-                persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                throw new ServletException(e);
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }*/
 
             IdResult idOfClientResult=port.getIdOfClient(clientAuthToken.getContractId());
             idOfClient=idOfClientResult.getId();
 
-            //ClientPaymentOrderProcessor clientPaymentOrderProcessor = runtimeContext.getClientPaymentOrderProcessor();
+
             try {
-               /* clientPaymentOrderProcessor.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder,
-                        ClientPaymentOrder.ORDER_STATUS_CANCELLED);*/
+
                 port.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder,
                         ClientPaymentOrder.ORDER_STATUS_CANCELLED);
             } catch (Exception e) {

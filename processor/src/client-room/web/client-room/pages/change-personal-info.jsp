@@ -9,15 +9,12 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
 <%@ page import="ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
+
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
+
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
@@ -122,26 +119,18 @@
             }
         }
 
-        /*Session persistenceSession = null;
-        Transaction persistenceTransaction = null;*/
+
         if (haveDataToProcess && dataToProcessVerified) {
             try {
 
 
-                /*persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-                Client client = (Client) clientCriteria.uniqueResult();*/
+
                 Long contractId=clientAuthToken.getContractId();
 
-               /* ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-                ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                        = service.getClientRoomControllerWSPort();
-                ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
                 ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
 
-                  //ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult= port.getSummary(contractId) ;
+
 
                 logger.info("work");
                 try {
@@ -156,9 +145,7 @@
 
                     if (passwordIsRight) {
                         logger.info("Work start");
-                        /*client.setAddress(address);*/
 
-                        /*client.setPhone(phone);*/
 
                         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
                         if (mobilePhone==null) {
@@ -167,20 +154,7 @@
                         else {
                             logger.info("contractId: "+contractId);
 
-                             /*port.changeMobilePhone(contractId,mobilePhone);
 
-                            port.changeEmail(contractId,email);
-
-
-                            port.enableNotificationBySMS(contractId,smsNotificationState);
-
-
-                            port.enableNotificationByEmail(contractId,notifyViaEmail);
-
-                            *//*client.setUpdateTime(new Date());*//*
-
-
-                           port.changeExpenditureLimit(contractId,limit);*/
                             if(phone==null)phone="";
                             if(address==null)address="";
 
@@ -190,8 +164,6 @@
 
                                 throw new Exception(r.getDescription());
                             }
-
-                            /*persistenceSession.update(client);*/
 
 
                             dataProcessSucceed = true;
@@ -203,32 +175,19 @@
                     logger.error("Failed to proceed client credentials check", e);
                     errorMessage = "Внутренняя ошибка";
                 }
-                /*persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;*/
+
             } catch (Exception e) {
                 logger.error("Failed extract client from persistance layer", e);
                 dataProcessSucceed = false;
                 errorMessage = "Внутренняя ошибка";
-            } finally {
-               /* HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);*/
             }
         }
-       /* persistenceSession = null;
-        persistenceTransaction = null;*/
+
         try {
-            /*persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();*/
+
 
             Long contractId=clientAuthToken.getContractId();
-            /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                    = service.getClientRoomControllerWSPort();
-            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
             ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port=clientAuthToken.getPort();
 
             ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult summaryResult= port.getSummary(contractId) ;
@@ -239,10 +198,7 @@
 
             }
 
-             /*if(true){
 
-                 throw new Exception(summaryResult.getDescription());
-             }*/
 
             ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt summaryExt=summaryResult.getClientSummary();
 

@@ -13,10 +13,7 @@
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
+
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
@@ -68,10 +65,6 @@
         final String NEW_PASSWORD_PARAM = "new-password";
         final String NEW_PASSWORD_CONFIRM_PARAM = "new-password-confirm";
 
-        /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
-        ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
 
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
@@ -121,11 +114,6 @@
         Long contractId=clientAuthToken.getContractId();
         if (haveDataToProcess && dataToProcessVerified) {
 
-                /*persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-                Client client = (Client) clientCriteria.uniqueResult();*/
 
                 try {
                     String plainPassword= currPassword;
@@ -142,11 +130,7 @@
                     boolean clientHasCurrPassword=port.authorizeClient(clientAuthToken.getContractId(),sha1HashString).getResultCode().equals(new Long(0));
 
                     if (clientHasCurrPassword) {
-                       /* client.setPassword(newPassword);*/
 
-                        /*final byte[] plainPasswordBytes2 = newPassword.getBytes(CharEncoding.UTF_8);
-                        final MessageDigest messageDigest2 = MessageDigest.getInstance("SHA1");
-                        String sha1HashString2 = new String(Base64.encodeBase64(messageDigest.digest(plainPasswordBytes2)), CharEncoding.US_ASCII);*/
                          String base64passwordHash  =new String(Base64.encodeBase64(newPassword.getBytes()), CharEncoding.US_ASCII) ;
                           Result r=port.changePassword(contractId,base64passwordHash);
 
@@ -165,21 +149,14 @@
                     logger.error("Failed to proceed client credentials check", e);
                     errorMessage = "Внутренняя ошибка";
                 }
-                /*persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;*/
+
 
         }
 
-        /*persistenceSession = null;
-        persistenceTransaction = null;*/
+
 
         try {
-            /*persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();*/
+
               ClientSummaryResult summaryResult=port.getSummary(contractId);
 
 
@@ -413,9 +390,7 @@
 </table>
 </form>
 <%
-            /*persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;*/
+
         } catch (Exception e) {
             logger.error("Failed to build page", e);
 
@@ -423,10 +398,9 @@
            <div class="error-output-text"> Не удалось отобразить персональные данные </div>
             <%
 
-           // throw new ServletException(e);
+
         } finally {
-            /*HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
+
         }
     } catch (Exception e) {
         throw new UnavailableException(e.getMessage());                

@@ -295,30 +295,13 @@
     <%
         // TODO статус (0- на руках, 1 – продлено, 2 – утеряно, 3 – возвращено)
 
-        /*Session persistenceSession = null;
-        Transaction persistenceTransaction = null;*/
+
         try {
-            /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-            ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                    = service.getClientRoomControllerWSPort();
-            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
-*/           ClientRoomController port=clientAuthToken.getPort();
+
+           ClientRoomController port=clientAuthToken.getPort();
             logger.info("from show-library: "+port);
 
-           /* persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-            Client client = (Client) clientCriteria.uniqueResult();
-
-            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
-            //Query query = persistenceSession.createQuery("from Circulation as c inner join Publication as p");
-            Criteria circulationCriteria = persistenceSession.createCriteria(Circulation.class);
-            circulationCriteria.add(Restrictions.eq("client", client));
-
-            List<Circulation> circulationList = circulationCriteria.list();*/
             for(int status=0;status<4;status++){
             ru.axetta.ecafe.processor.web.bo.client.CirculationListResult circulationListResult=port.getCirculationList(clientAuthToken.getContractId(),status)  ;
                 //logger.info("circulationListResult: "+circulationListResult.getResultCode()+" "+circulationListResult.getDescription());
@@ -385,10 +368,7 @@
 
     <%
 
-            //throw new ServletException(e);
-        } finally {
-            /*HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
+
         }
     %>
 </table>

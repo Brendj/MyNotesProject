@@ -32,14 +32,6 @@ public class SelectedCityGroupPage extends BasicWorkspacePage {
         return cityName;
     }
 
-    /*public void fill(Session session, Long idOfCity) throws Exception {
-        User user = (User) session.load(User.class, idOfCity);
-        if (null == user) {
-            this.userName = null;
-        } else {
-            this.userName = user.getUserName();
-        }
-    }*/
 
     public void fill(Session session, Long idOfCity) throws Exception {
          DAOService daoService= DAOService.getInstance();

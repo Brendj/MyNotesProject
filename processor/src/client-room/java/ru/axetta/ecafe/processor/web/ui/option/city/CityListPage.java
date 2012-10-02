@@ -102,17 +102,7 @@ public class CityListPage extends BasicWorkspacePage {
         return items;
     }
 
-    /*public void fill(Session session) throws Exception {
 
-        List<Item> items = new LinkedList<Item>();
-        Criteria criteria = session.createCriteria(User.class);
-        List users = criteria.list();
-        for (Object object : users) {
-            User user = (User) object;
-            items.add(new Item(user));
-        }
-        this.items = items;
-    }*/
 
     public void fill(Session session) throws Exception {
          DAOService daoService= DAOService.getInstance();

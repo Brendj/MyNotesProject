@@ -62,21 +62,10 @@
 
     if (null != contractId) {
         RuntimeContext runtimeContext = null;
-        /*Session persistenceSession = null;
-        Transaction persistenceTransaction = null;*/
+
         try {
             runtimeContext =new  RuntimeContext();
-         /*   persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", contractId));
-            Client client = (Client) clientCriteria.uniqueResult();*/
 
-
-             /*ClientRoomControllerWSService service = new ClientRoomControllerWSService();
-        ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
              ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
              ClientRoomController port=clientAuthToken.getPort();
@@ -91,15 +80,13 @@
              ClientSummaryExt summaryExt=summaryResult.getClientSummary();
 
             session.setAttribute("__payform.client", summaryExt);
-           /* persistenceTransaction.commit();
-            persistenceTransaction = null;*/
+
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
         } catch (Exception e) {
             throw new ServletException(e);
         } finally {
-           /* HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);*/
+
         }
     }
 

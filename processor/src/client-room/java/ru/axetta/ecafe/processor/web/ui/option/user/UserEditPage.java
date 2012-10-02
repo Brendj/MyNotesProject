@@ -25,11 +25,8 @@ import java.util.Date;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-/*@Component
-@Scope("singleton")*/
+
 public class UserEditPage extends BasicWorkspacePage {
-  /*  @PersistenceContext
-    private EntityManager entityManager;*/
 
     private Long idOfUser;
     private String userName;

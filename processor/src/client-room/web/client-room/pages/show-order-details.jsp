@@ -59,10 +59,7 @@
     try {
 
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
-        /*ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
-        ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
-                = service.getClientRoomControllerWSPort();
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");*/
+
 
         ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port= clientAuthToken.getPort();
 
@@ -82,9 +79,7 @@
         String errorMessage = null;
         Date orderTime=new Date();
         try {
-           // long idOfOrg = Long.parseLong(request.getParameter(ID_OF_ORG_PARAM));
-           // long idOfOrder = Long.parseLong(request.getParameter(ID_OF_ORDER_PARAM));
-           // compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, idOfOrder);
+
             logger.info("TIME_OF_ORDER_PARAM "+request.getParameter(TIME_OF_ORDER_PARAM));
             orderTime.setTime(Long.parseLong(request.getParameter(TIME_OF_ORDER_PARAM)));
             logger.info("orderTime: "+timeFormat.format(orderTime));
@@ -102,27 +97,15 @@
 </div>
 <%
 } else {
-    /*Session persistenceSession = null;
-    Transaction persistenceTransaction = null;*/
+
     try {
-       /* persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
 
-        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-        clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-        Client client = (Client) clientCriteria.uniqueResult();
-
-        Order order = (Order) persistenceSession.get(Order.class, compositeIdOfOrder);*/
-
-        //Date endDate = DateUtils.addDays(orderTime, 1);
 
         GregorianCalendar greOrderTime = new GregorianCalendar();
         greOrderTime.setTime(orderTime);
         XMLGregorianCalendar xmlOrderTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greOrderTime);
 
-        /*GregorianCalendar greEndDate = new GregorianCalendar();
-        greEndDate.setTime(orderTime);
-        XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(greEndDate);*/
+
         ru.axetta.ecafe.processor.web.bo.client.PurchaseExt order=null;
         PurchaseListResult purchsesResult=port.getPurchaseList(clientAuthToken.getContractId(),xmlOrderTime,xmlOrderTime);
 
@@ -133,7 +116,7 @@
 
         List<ru.axetta.ecafe.processor.web.bo.client.PurchaseExt> orders= purchsesResult.getPurchaseList().getP();
          order = orders.get(0);
-       // for(PurchaseExt purchaseExt:orders){if(purchaseExt.getTime().toGregorianCalendar().getTime().equals(orderTime)){order = purchaseExt;}  }
+
 
         dataProcessSucceed = null != order && order.getTime().toGregorianCalendar().getTime().equals(orderTime);
         if (!dataProcessSucceed) {
@@ -315,18 +298,14 @@
 </table>
 <%
                 }
-               /* persistenceTransaction.commit();
-                persistenceTransaction = null;*/
+
             } catch (Exception e) {
                 logger.error("Failed to build page", e);
 
                     %>
         <div class="error-output-text"> Не удалось отобразить данные заказа </div>
 <%
-               // throw new ServletException(e);
-            } finally {
-               /* HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);*/
+
             }
         }
     } catch (RuntimeContext.NotInitializedException e) {
