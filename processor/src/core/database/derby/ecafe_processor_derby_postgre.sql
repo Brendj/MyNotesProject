@@ -621,26 +621,26 @@ CREATE TABLE CF_SubscriptionFee (
   CONSTRAINT CF_SubscriptionFee_IdOfTransaction_fk FOREIGN KEY (IdOfTransaction) REFERENCES CF_Transactions (IdOfTransaction)
 );
 
-CREATE TABLE CF_SochiClients (
-  ContractId              BIGINT            NOT NULL,
-  CreateTime              BIGINT            NOT NULL,
-  UpdateTime              BIGINT            NOT NULL,
-  FullName                VARCHAR(255)      NOT NULL,
-  Address                 VARCHAR(255),
-  CONSTRAINT CF_SochiClients_pk PRIMARY KEY (ContractId)
-);
-
-CREATE TABLE CF_SochiClientPayments (
-  PaymentId               BIGINT            NOT NULL,
-  ContractId              BIGINT            NOT NULL,
-  PaymentSum              BIGINT            NOT NULL,
-  PaymentSumF             BIGINT            NOT NULL,
-  PaymentTime             BIGINT            NOT NULL,
-  TerminalId              BIGINT            NOT NULL,
-  CreateTime              BIGINT            NOT NULL,
-  CONSTRAINT CF_SochiClientPayments_pk PRIMARY KEY (PaymentId),
-  CONSTRAINT CF_SochiClientPayments_ContractId_fk FOREIGN KEY (ContractId) REFERENCES CF_SochiClients (ContractId)
-);
+-- CREATE TABLE CF_SochiClients (
+--   ContractId              BIGINT            NOT NULL,
+--   CreateTime              BIGINT            NOT NULL,
+--   UpdateTime              BIGINT            NOT NULL,
+--   FullName                VARCHAR(255)      NOT NULL,
+--   Address                 VARCHAR(255),
+--   CONSTRAINT CF_SochiClients_pk PRIMARY KEY (ContractId)
+-- );
+--
+-- CREATE TABLE CF_SochiClientPayments (
+--   PaymentId               BIGINT            NOT NULL,
+--   ContractId              BIGINT            NOT NULL,
+--   PaymentSum              BIGINT            NOT NULL,
+--   PaymentSumF             BIGINT            NOT NULL,
+--   PaymentTime             BIGINT            NOT NULL,
+--   TerminalId              BIGINT            NOT NULL,
+--   CreateTime              BIGINT            NOT NULL,
+--   CONSTRAINT CF_SochiClientPayments_pk PRIMARY KEY (PaymentId),
+--   CONSTRAINT CF_SochiClientPayments_ContractId_fk FOREIGN KEY (ContractId) REFERENCES CF_SochiClients (ContractId)
+-- );
 
 CREATE TABLE CF_MenuExchange (
   MenuDate                BIGINT            NOT NULL,
@@ -1128,10 +1128,10 @@ CREATE TABLE cf_publs
   CONSTRAINT cf_publs_guid_key UNIQUE (guid )
 );
 
-CREATE INDEX cf_publ_idx
-  ON cf_publs
-  USING btree
-  (author, title, title2, publicationdate, publisher);
+-- CREATE INDEX cf_publ_idx
+--   ON cf_publs
+--   USING btree
+--   (author, title, title2, publicationdate, publisher);
 
 CREATE TABLE cf_circuls
 (
