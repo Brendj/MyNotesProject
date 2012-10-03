@@ -1072,6 +1072,13 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
+    <library name="barcode">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/barcode.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="client-room">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/activation.jar!/" />
