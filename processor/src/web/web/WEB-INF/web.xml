@@ -179,6 +179,15 @@
         <url-pattern>/barcode</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>SyncROServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.SyncROServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SyncROServlet</servlet-name>
+        <url-pattern>/syncro</url-pattern>
+    </servlet-mapping>
+
     <filter-mapping>
         <filter-name>RichfacesFilter</filter-name>
         <servlet-name>Faces Servlet</servlet-name>
