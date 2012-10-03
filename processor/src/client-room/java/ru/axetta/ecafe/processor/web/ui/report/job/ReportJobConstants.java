@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.report.job;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.report.contragent.job.reports.ContragentPaymentReport;
+/*import ru.axetta.ecafe.processor.core.report.contragent.job.reports.ContragentPaymentReport;*/
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
