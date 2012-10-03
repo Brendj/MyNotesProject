@@ -6,8 +6,8 @@ package ru.axetta.soap;
 
 import junit.framework.TestCase;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.web.bo.client.Result;
+/*import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.web.bo.client.Result;*/
 
 
 import javax.xml.ws.BindingProvider;
