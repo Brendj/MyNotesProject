@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication" table="cf_publications">
-        <id name="globalId" column="idofpubl" type="long">
+        <id name="globalId" column="IdOfPublication" type="long">
             <generator class="identity"/>
         </id>
         <!-- Begin Global params -->

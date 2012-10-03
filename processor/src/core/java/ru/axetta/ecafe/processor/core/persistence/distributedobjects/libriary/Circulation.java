@@ -72,7 +72,7 @@ public class Circulation extends DistributedObject {
         //if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
 
         Issuable iss = (Issuable) DAOUtils.findDistributedObjectByRefGUID(session, guidIssuable);
-        if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(iss==null) throw new DistributedObjectException("Issuable NOT_FOUND_VALUE");
         setIssuable(iss);
 
         //Circulation parentCirculation = daoService.findDistributedObjectByRefGUID(Circulation.class, guidParentCirculation);
@@ -82,7 +82,7 @@ public class Circulation extends DistributedObject {
 
         //Reader read = daoService.findDistributedObjectByRefGUID(Reader.class, guidReader);
         Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
-        if(cl==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
         setClient(cl);
         //Reader read = (Reader) DAOUtils.findDistributedObjectByRefGUID(session, guidReader);
         //if(read==null) throw new DistributedObjectException("NOT_FOUND_VALUE");

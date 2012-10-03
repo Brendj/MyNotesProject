@@ -52,6 +52,9 @@ public class Instance extends DistributedObject {
     @Override
     public Instance parseAttributes(Node node) throws Exception {
 
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
         guidInventaryBook = getStringAttributeValue(node, "GuidInventaryBook", 36);

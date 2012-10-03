@@ -45,8 +45,12 @@ public class Issuable extends DistributedObject {
             setType(charType);
         }
 
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
         guidInstance = getStringAttributeValue(node, "GuidInstance", 36);
         guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 36);
+        setSendAll(true);
         return this;
     }
 

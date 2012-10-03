@@ -43,12 +43,16 @@ public class Journal extends DistributedObject {
     @Override
     public Journal parseAttributes(Node node) throws Exception {
 
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
 
         isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
         monthCount = getIntegerAttributeValue(node, "MonthCount");
         count = getIntegerAttributeValue(node, "Count");
+        setSendAll(true);
         return this;
     }
 

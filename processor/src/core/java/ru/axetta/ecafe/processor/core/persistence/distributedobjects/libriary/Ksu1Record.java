@@ -57,6 +57,9 @@ public class Ksu1Record extends DistributedObject {
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
 
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
         incomeDate = getDateOnlyAttributeValue(node, "IncomeDate");

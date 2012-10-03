@@ -47,6 +47,9 @@ public class JournalItem extends DistributedObject {
     @Override
     public JournalItem parseAttributes(Node node) throws Exception {
 
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidJournal = getStringAttributeValue(node, "GuidJournal", 36);
         guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);

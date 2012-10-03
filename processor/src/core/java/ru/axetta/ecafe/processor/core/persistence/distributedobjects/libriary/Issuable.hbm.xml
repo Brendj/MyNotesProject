@@ -24,14 +24,14 @@
                   not-null="true" update="false"/>
         <!-- End Global params -->
 
-        <!--<many-to-one name="instance" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Instance" not-null="false"-->
-                     <!--column="IdOfInstance"/>-->
+        <many-to-one name="instance" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" not-null="false"
+                     column="IdOfInstance"/>
 
-        <!--<many-to-one name="journalItem" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.JournalItem" not-null="false"-->
-                     <!--column="IdOfJournalItem"/>-->
+        <many-to-one name="journalItem" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.JournalItem" not-null="false"
+                     column="IdOfJournalItem"/>
 
         <property name="barcode" type="long" not-null="false" column="barcode"/>
-        <property name="type" type="char" not-null="true" column="type"/>
+        <property name="type" type="char" not-null="true" column="TypeOfIssuable"/>
 
     </class>
 </hibernate-mapping>

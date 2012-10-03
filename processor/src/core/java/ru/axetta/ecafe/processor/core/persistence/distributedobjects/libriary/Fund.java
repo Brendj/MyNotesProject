@@ -21,7 +21,7 @@ public class Fund extends DistributedObject {
     private String fundName;
     private Boolean stud;
 
-    public Boolean isStud() {
+    public Boolean getStud() {
         return stud;
     }
 
