@@ -159,7 +159,7 @@ public class SyncROServlet extends HttpServlet  {
 
              Node roNode=dataNode.getFirstChild();
                /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
-            //   manager.setIdOfOrg(org.getIdOfOrg());
+               manager.setIdOfOrg(0L);
                if(roNode != null){
                    Node itemNode = roNode.getFirstChild();
                    while (null != itemNode) {
@@ -174,87 +174,39 @@ public class SyncROServlet extends HttpServlet  {
 
 
            }catch(Exception e){
-
                logger.error("Failed to parse XML request", e);
                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                return;
 
            }
-            //SyncRequest syncRequest;
-            //try {
-            //    SyncRequest.Builder syncRequestBuilder = new SyncRequest.Builder();
-            //    syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync);
-            //} catch (Exception e) {
-            //    logger.error("Failed to parse XML request", e);
-            //    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            //    return;
-            //}
-            //TODO: Manager.process(SessionFactory)
-
-
-            try{
-
-            manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
-
-
+           try{
+                    manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
            }catch(Exception e){
                 logger.error("Failed to process request", e);
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
 
            }
-            // Process request
-            //SyncResponse syncResponse;
-            //try {
-            //    SyncProcessor processor = runtimeContext.getSyncProcessor();
-            //    syncResponse = processor.processSyncRequest(syncRequest);
-            //    syncRequest = null;
-            //} catch (Exception e) {
-            //    logger.error("Failed to process request", e);
-            //    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            //    return;
-            //}
 
             // Sign XML response
             Document responseDocument=null;
              try{
-
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.newDocument();
-            Element dataElement = document.createElement("Data");
-
-            dataElement.appendChild(manager.toElement(document)) ;
-
-                 responseDocument=document;
-             }catch(Exception e ){
-
+                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                 Document document = documentBuilder.newDocument();
+                 Element dataElement = document.createElement("Data");
+                 document.appendChild(dataElement);
+                 dataElement.appendChild(manager.toElement(document)) ;
+                 responseDocument = document;
+             } catch(Exception e ){
                  logger.error("Failed to serialize response", e);
                      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                     return;}
-            //TODO: Manager.toElement(Document)
-
-
-
-            //try {
-            //    responseDocument = syncResponse.toDocument();
-            //    syncResponse = null;
-            //    DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
-            //} catch (Exception e) {
-            //    logger.error("Failed to serialize response", e);
-            //    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            //    return;
-            //}
-
-            //if (bLogPackets) {
-            //    // Save responseDocument by means of SyncLogger as IdOfOrg-IdOfSync-out.xml
-            //    syncLogger.registerSyncResponse(responseDocument, idOfOrg, idOfSync);
-            //}
-
+                     return;
+             }
             // Send XML response
 
             try {
-                writeResponse(response, requestData.isCompressed, responseDocument);
+                writeResponse(response, false , responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);
                 throw new ServletException(e);
