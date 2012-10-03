@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS cf_journalitems CASCADE;
 DROP TABLE IF EXISTS cf_readerreg CASCADE;
 DROP TABLE IF EXISTS cf_libvisits CASCADE;
 DROP TABLE IF EXISTS cf_issuable CASCADE;
-DROP TABLE IF EXISTS cf_circulations;
+DROP TABLE IF EXISTS cf_circulations CASCADE;
 
 CREATE TABLE cf_publications
 (
@@ -28,10 +28,9 @@ CREATE TABLE cf_publications
   DataOfPublication bytea NOT NULL,
   Author character varying(255),
   Title character varying(512),
-  ExtTitle character varying(255),
+  Title2 character varying(255),
   PublicationDate character varying(15),
   Publisher character varying(255),
-  Version bigint NOT NULL,
   ISBN character varying(255),
   ValidISBN boolean NOT NULL DEFAULT false,
   Hash integer NOT NULL,
@@ -42,22 +41,29 @@ CREATE TABLE cf_publications
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  CONSTRAINT cf_publications_pk PRIMARY KEY (idofpubl ),
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_publications_pk PRIMARY KEY (IdOfPublication ),
   CONSTRAINT cf_publications_GUID_key UNIQUE (GUID )
 );
 
+--книговыдача
+--IdOfParentCirculation - родительская выдача (древовидная структура для продления выдач)
+--IdOfReader - читатель --можно выкинуть Readers, тогда связь будет сразу на client
+--IdOfIssuable - книга/журнал
+--IssuanceDate - дата выдачи
+--RefundDate - дата возврата(срок)
+--RealRefundDate - дата возврата
+--Status - статус(выдано, возвращено, т.п.)
 CREATE TABLE cf_circulations
 (
   IdOfCirculation BigSerial NOT NULL,
   IdOfClient bigint NOT NULL,
-  IdOfPublication bigint NOT NULL,
-  IdOfOrg bigint NOT NULL,
+  IdOfParentCirculation bigint,
   IdOfIssuable bigint NOT NULL,
   IssuanceDate bigint NOT NULL DEFAULT 0,
   RefundDate bigint NOT NULL DEFAULT 0,
   RealRefundDate bigint,
-  status integer NOT NULL DEFAULT 0,
-  Version bigint NOT NULL DEFAULT 0,
+  Status integer NOT NULL DEFAULT 0,
   Quantity integer NOT NULL DEFAULT 0,
   GlobalVersion bigint,
   OrgOwner bigint,
@@ -66,22 +72,27 @@ CREATE TABLE cf_circulations
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
   CONSTRAINT cf_circulation_pk PRIMARY KEY (IdOfCirculation ),
   CONSTRAINT cf_circulation_client_fk FOREIGN KEY (IdOfClient)
       REFERENCES cf_clients (IdOfClient),
-  CONSTRAINT cf_circulation_org_fk FOREIGN KEY (IdOfOrg)
-      REFERENCES cf_orgs (IdOfOrg),
-  CONSTRAINT cf_circulation_publication_fk FOREIGN KEY (IdOfPublication)
-      REFERENCES cf_publications (IdOfPublication),
   CONSTRAINT cf_circulation_GUID_key UNIQUE (GUID )
 );
 
+--выдаваемая сущность
+--BarCode - штрихкод
+--Type - можешь просто смотреть, какое из след. двух полей не null
+--IdOfInstance - ид книги
+--IdOfJournalItem - ид журнала
+--Issuance - текущая незакрытая выдача
+--штрихкода уникальны
 CREATE TABLE cf_issuable
 (
   IdOfIssuable BigSerial NOT NULL,
   BarCode bigint,
   TypeOfIssuable character(1) NOT NULL DEFAULT 'i',
-  IdOfPublication bigint NOT NULL,
+  idofinstance bigint,
+  idofjournalitem bigint,
   GlobalVersion bigint,
   OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,
@@ -89,16 +100,15 @@ CREATE TABLE cf_issuable
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  CONSTRAINT cf_issuable_pk PRIMARY KEY (IdOfIssuable ),
-  CONSTRAINT cf_issuable_publication_fkey FOREIGN KEY (IdOfPublication)
-      REFERENCES cf_publications (IdOfPublication)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_issuable_pk PRIMARY KEY (IdOfIssuable )
 );
 
 --тип сопр.документа
 --TypeOfAccompanyingDocumentName - название (акт, накладная, т.п.)
 CREATE TABLE cf_typesofaccompanyingdocuments (
   IdOfTypeOfAccompanyingDocument bigserial NOT NULL,
-  TypeOfAccompanyingDocumentName varchar(45) default NULL;
+  TypeOfAccompanyingDocumentName varchar(45) default NULL,
   GlobalVersion bigint,
   OrgOwner bigint,
   DeletedState boolean NOT NULL DEFAULT false,
@@ -107,7 +117,8 @@ CREATE TABLE cf_typesofaccompanyingdocuments (
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
   HashCode integer NOT NULL,
-  PRIMARY KEY  (IdOfTypeOfAccompanyingDocument)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_typesofaccompanyingdocument_pk PRIMARY KEY (IdOfTypeOfAccompanyingDocument )
 );
 
 --источник поступления книг
@@ -123,7 +134,8 @@ CREATE TABLE cf_sources (
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
   HashCode integer NOT NULL,
-  PRIMARY KEY  (IdOfSource)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_source_pk PRIMARY KEY (IdOfSource )
 );
 
 --сопр.документы
@@ -132,7 +144,7 @@ CREATE TABLE cf_sources (
 --IdOfSource - источник поступления книг можно сразу текстом, вместо связи
 CREATE TABLE cf_accompanyingdocuments (
   IdOfAccompanyingDocument bigserial NOT NULL,
-  IdOfTypeOfAccompanyingDocument bigint NOT NULL REFERENCES cf_typesofaccompanyingdocument(IdOfTypeOfAccompanyingDocument),
+  IdOfTypeOfAccompanyingDocument bigint NOT NULL REFERENCES cf_typesofaccompanyingdocuments(IdOfTypeOfAccompanyingDocument),
   AccompanyingDocumentNumber varchar(32) NOT NULL,
   IdOfSource bigint default NULL REFERENCES cf_sources(IdOfSource),
   GlobalVersion bigint,
@@ -142,7 +154,8 @@ CREATE TABLE cf_accompanyingdocuments (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfAccompanyingDocument)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_accompanyingdocument_pk PRIMARY KEY (IdOfAccompanyingDocument )
 );
 
 --читатель
@@ -156,7 +169,8 @@ CREATE TABLE cf_readers (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfReader)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_reader_pk PRIMARY KEY (IdOfReader )
 );
 
 --фонд
@@ -174,7 +188,8 @@ CREATE TABLE cf_funds (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfFund)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_fund_pk PRIMARY KEY (IdOfFund )
 );
 
 --инвентарная книга
@@ -189,7 +204,8 @@ CREATE TABLE cf_inventorybooks (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfBook)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT  cf_inventorybook_pk PRIMARY KEY (IdOfBook )
 );
 
 --запись КСУ1 (о приходе)
@@ -210,7 +226,8 @@ CREATE TABLE cf_ksu1records (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfKSU1Record)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT  cf_ksu1record_pk PRIMARY KEY (IdOfKSU1Record )
 );
 --причина выбытия из фонда
 --RetirementReasonName - название причины (в макулатуру, потерялось, съели)
@@ -225,7 +242,8 @@ CREATE TABLE cf_retirementreasons (
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
   HashCode integer NOT NULL,
-  PRIMARY KEY  (IdOfRetirementReason)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_retirementreason_pk PRIMARY KEY (IdOfRetirementReason )
 );
 
 --запись КСУ2 (о списании)
@@ -248,8 +266,9 @@ CREATE TABLE cf_ksu2records (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfKSU2Record),
-  UNIQUE (IdOfFund,RecordNumber)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_ksu2records_pkey PRIMARY KEY (idofksu2record ),
+  CONSTRAINT cf_ksu2records_idoffund_recordnumber_key UNIQUE (idoffund , recordnumber )
 );
 
 --книга
@@ -264,13 +283,13 @@ CREATE TABLE cf_ksu2records (
 --в одной инв. книге номера уникальны
 CREATE TABLE cf_instances (
   IdOfInstance bigserial NOT NULL,
-  IdOfPublication bigint NOT NULL REFERENCES cf_publications(idofpubl) ,
+  IdOfPublication bigint NOT NULL,
   InGroup boolean NOT NULL DEFAULT false,
-  IdOfFund bigint default NULL REFERENCES cf_funds(IdOfFund),
+  IdOfFund bigint default NULL,
   InvNumber varchar(10) default NULL,
-  InvBook bigint default NULL REFERENCES cf_inventorybooks(IdOfBook),
-  IdOfKSU1Record bigint default NULL REFERENCES cf_ksu1records(IdOfKSU1Record),
-  IdOfKSU2Record bigint default NULL REFERENCES cf_ksu2records(IdOfKSU2Record),
+  InvBook bigint default NULL,
+  IdOfKSU1Record bigint default NULL,
+  IdOfKSU2Record bigint default NULL,
   Cost int NOT NULL default '0',
   GlobalVersion bigint,
   OrgOwner bigint,
@@ -279,8 +298,17 @@ CREATE TABLE cf_instances (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfInstance),
-  UNIQUE (InvBook,InvNumber)
+  SendAll integer DEFAULT 0,
+  CONSTRAINT cf_instances_pkey PRIMARY KEY (idofinstance ),
+  CONSTRAINT cf_instances_idoffund_fkey FOREIGN KEY (idoffund)
+      REFERENCES cf_funds (idoffund),
+  CONSTRAINT cf_instances_idofksu1record_fkey FOREIGN KEY (idofksu1record)
+      REFERENCES cf_ksu1records (idofksu1record),
+  CONSTRAINT cf_instances_idofksu2record_fkey FOREIGN KEY (idofksu2record)
+      REFERENCES cf_ksu2records (idofksu2record),
+  CONSTRAINT cf_instances_invbook_fkey FOREIGN KEY (invbook)
+      REFERENCES cf_inventorybooks (idofbook),
+  CONSTRAINT cf_instances_invbook_invnumber_key UNIQUE (invbook , invnumber )
 );
 
 --журналы(тип)
@@ -293,7 +321,7 @@ CREATE TABLE cf_journals (
   IdOfJournal bigserial NOT NULL,
   IdOfFund bigint default NULL REFERENCES cf_funds(IdOfFund),
   IsNewspaper boolean NOT NULL DEFAULT false,
-  IdOfPublication bigint NOT NULL REFERENCES cf_publications(idofpubl),
+  IdOfPublication bigint NOT NULL REFERENCES cf_publications(idofpublication),
   MonthCount int NOT NULL default '0',
   Count int NOT NULL default '0',
   GlobalVersion bigint,
@@ -303,6 +331,7 @@ CREATE TABLE cf_journals (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
   PRIMARY KEY  (IdOfJournal)
 );
 
@@ -330,6 +359,7 @@ CREATE TABLE cf_journalitems (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
   PRIMARY KEY  (IdOfJournalItem)
 );
 
@@ -347,6 +377,7 @@ CREATE TABLE cf_readerreg (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
   PRIMARY KEY  (IdOfReg)
 );
 
@@ -366,75 +397,8 @@ CREATE TABLE cf_libvisits (
   LastUpdate bigint,
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
   PRIMARY KEY  (IdOfLibVisit)
 );
---выдаваемая сущность
---BarCode - штрихкод
---Type - можешь просто смотреть, какое из след. двух полей не null
---IdOfInstance - ид книги
---IdOfJournalItem - ид журнала
---Issuance - текущая незакрытая выдача
---штрихкода уникальны
-CREATE TABLE cf_issuable (
-  IdOfIssuable bigserial NOT NULL,
-  BarCode bigint default NULL,
-  Type char(1) NOT NULL default 'i',
-  IdOfInstance bigint default NULL REFERENCES cf_instances(IdOfInstance),
-  IdOfJournalItem bigint default NULL REFERENCES cf_journalitems(IdOfJournalItem),
-  Issuance bigint default NULL,
-  GlobalVersion bigint,
-  OrgOwner bigint,
-  DeletedState boolean NOT NULL DEFAULT false,
-  GUID character varying(36) NOT NULL,
-  LastUpdate bigint,
-  DeleteDate bigint,
-  CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfIssuable),
-  UNIQUE  (BarCode)
-);
-
---книговыдача
---IdOfParentCirculation - родительская выдача (древовидная структура для продления выдач)
---IdOfReader - читатель --можно выкинуть Readers, тогда связь будет сразу на client
---IdOfIssuable - книга/журнал
---IssuanceDate - дата выдачи
---RefundDate - дата возврата(срок)
---RealRefundDate - дата возврата
---Status - статус(выдано, возвращено, т.п.)
-CREATE TABLE cf_circulations (
-  IdOfCirculation bigserial NOT NULL,
-  IdOfParentCirculation bigint default NULL REFERENCES cf_circulations(IdOfCirculation),
-  IdOfReader bigint NOT NULL REFERENCES cf_readers(IdOfReader),
-  IdOfIssuable bigint NOT NULL REFERENCES cf_issuable(IdOfIssuable),
-  IssuanceDate timestamp NOT NULL,
-  RefundDate timestamp NOT NULL,
-  RealRefundDate timestamp NULL default NULL,
-  Status int NOT NULL default '0',
-  GlobalVersion bigint,
-  OrgOwner bigint,
-  DeletedState boolean NOT NULL DEFAULT false,
-  GUID character varying(36) NOT NULL,
-  LastUpdate bigint,
-  DeleteDate bigint,
-  CreatedDate bigint NOT NULL,
-  PRIMARY KEY  (IdOfCirculation)
-);
-
-ALTER TABLE cf_accompanyingdocuments ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_circulations ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_funds ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_instances ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_inventorybooks ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_issuable ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_journalitems ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_journals ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_ksu1records ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_ksu2records ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_libvisits ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_readerreg ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_readers ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_retirementreasons ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_sources ADD COLUMN SendAll integer DEFAULT 0;
-ALTER TABLE cf_typesofaccompanyingdocument ADD COLUMN SendAll integer DEFAULT 0;
 
 ALTER TABLE cf_staffs ADD COLUMN HashCode integer NOT NULL DEFAULT 0;
