@@ -352,6 +352,7 @@
     </orderEntry>
     <orderEntry type="library" name="cryptopro" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Java EE 6-3.1" level="project" />
+    <orderEntry type="library" name="barcode" level="project" />
   </component>
 </module>
 
