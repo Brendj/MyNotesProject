@@ -9,20 +9,11 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.Menu;
-import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -34,7 +25,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 
-public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob {
+public class OrderDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob {
 
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
     }
@@ -49,12 +40,12 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
             values.put(10,"Закупленное");
         }
 
-        public static class MenuDetailsItem{
+        public static class OrderDetailsItem {
             private String menuOrigin;
             private Float  price;
             private Long count;
 
-            public MenuDetailsItem(String menuOrigin, Float price, Long count) {
+            public OrderDetailsItem(String menuOrigin, Float price, Long count) {
                 this.menuOrigin = menuOrigin;
                 this.price = price;
                 this.count = count;
@@ -105,39 +96,39 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new MenuDetailsGroupByMenuOriginReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new OrderDetailsGroupByMenuOriginReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime);
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
                 Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
 
-            Query query = session.createSQLQuery("SELECT cf_menudetails.menuorigin,  count(*),"
-                    + "  sum(cf_menudetails.price) as price FROM  public.cf_menu, "
-                    + "  public.cf_menudetails WHERE (cf_menu.createddate>=:startTime AND cf_menu.createddate<=:endTime) group by cf_menudetails.menuorigin;");
+            Query query = session.createSQLQuery("SELECT cf_orderdetails.menuorigin,  count(*),"
+                    + "  sum(cf_orderdetails.rprice) as price FROM  public.cf_orders, "
+                    + "  public.cf_orderdetails WHERE (cf_order.createddate>=:startTime AND cf_order.createddate<=:endTime) group by cf_orderdetails.menuorigin;");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
             List list = query.list();
-            List<MenuDetailsItem> menuDetailsItems = new LinkedList<MenuDetailsItem>();
+            List<OrderDetailsItem> menuDetailsItems = new LinkedList<OrderDetailsItem>();
             for (Object result : list) {
                 Object[] sale = (Object[]) result;
                 Integer menuOrigin = (Integer) sale[0];
                 Long count = Long.parseLong(sale[1].toString());
                 Float price = Float.parseFloat(sale[2].toString()) / 100;
-                menuDetailsItems.add(new MenuDetailsItem(values.get(menuOrigin), price, count));
+                menuDetailsItems.add(new OrderDetailsItem(values.get(menuOrigin), price, count));
             }
             return new JRBeanCollectionDataSource(menuDetailsItems);
         }
 
     }
 
-    private final static Logger logger = LoggerFactory.getLogger(MenuDetailsGroupByMenuOriginReport.class);
+    private final static Logger logger = LoggerFactory.getLogger(OrderDetailsGroupByMenuOriginReport.class);
 
-    public MenuDetailsGroupByMenuOriginReport() {}
+    public OrderDetailsGroupByMenuOriginReport() {}
 
     @Override
     public BasicReportForAllOrgJob createInstance() {
-        return new MenuDetailsGroupByMenuOriginReport();
+        return new OrderDetailsGroupByMenuOriginReport();
     }
 
     @Override
@@ -150,8 +141,8 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
         return logger;
     }
 
-    public MenuDetailsGroupByMenuOriginReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime) {
+    public OrderDetailsGroupByMenuOriginReport(Date generateTime, long generateDuration, JasperPrint print,
+            Date startTime, Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
