@@ -53,14 +53,13 @@ public class Circulation extends DistributedObject {
     protected Circulation parseAttributes(Node node) throws Exception {
 
         guidClient = getStringAttributeValue(node, "GuidClient", 36);
-        idOfClient = getLongAttributeValue(node, "IdOfClient");
 
         guidParentCirculation = getStringAttributeValue(node, "GuidParentCirculation", 36);
         guidReader = getStringAttributeValue(node, "GuidReader", 36);
         guidIssuable = getStringAttributeValue(node, "GuidIssuable", 36);
 
         issuanceDate = getDateTimeAttributeValue(node, "IssuanceDate");
-        refundDate = getDateTimeAttributeValue(node, "RefundDate");
+        refundDate = getDateOnlyAttributeValue(node, "RefundDate");
         realRefundDate = getDateTimeAttributeValue(node, "RealRefundDate");
         status = getIntegerAttributeValue(node, "Status");
         return this;

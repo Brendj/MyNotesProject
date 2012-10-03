@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
- */
-
 package ru.axetta.ecafe.processor.core.utils.rusmarc;
 
 import java.io.DataInput;
@@ -256,7 +252,7 @@ public class RecordMarker {
 
         try {
             recordLength = Integer.parseInt(fullMarker.substring(0, 5));
-        } catch (NumberFormatException ignored) {
+        } catch (java.lang.NumberFormatException ignored) {
             recordLength = -1;
         }
 
@@ -267,7 +263,7 @@ public class RecordMarker {
 
         try {
             dataAddress = Integer.parseInt(fullMarker.substring(12, 17));
-        } catch (NumberFormatException ignored) {
+        } catch (java.lang.NumberFormatException ignored) {
             dataAddress = -1;
         }
 

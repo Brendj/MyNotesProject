@@ -104,10 +104,6 @@ public class Base64AndZip {
         return decode(unzip(data));
     }
 
-    public static String zipAndEncode(byte[] data) throws IOException {
-        return enCode(zip(data));
-    }
-
     public static byte[] decodeAndUnzip(byte[] data) throws IOException {
         return unzip(decode(data));
     }

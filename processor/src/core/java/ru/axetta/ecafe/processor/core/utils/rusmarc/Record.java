@@ -1,12 +1,9 @@
-/*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
- */
-
 package ru.axetta.ecafe.processor.core.utils.rusmarc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -352,11 +349,12 @@ public class Record {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] tmp;
         for (RecordField rf : fields) {
-            tmp = Charset.forName("UTF8").encode(rf.getStringData().toString()).array();
+            ByteBuffer byteBuffer = Charset.forName("UTF8").encode(rf.getStringData().toString());
+            tmp = byteBuffer.array();
             refer.append(rf.tag);
-            refer.append(numberToString(tmp.length, 4));
+            refer.append(numberToString(byteBuffer.limit(), 4));
             refer.append(numberToString(outputStream.size(), 5));
-            outputStream.write(tmp, 0, tmp.length);
+            outputStream.write(tmp, 0, byteBuffer.limit());
         }
         outputStream.write(RECORD_TERMINATOR);
         try {
@@ -366,14 +364,15 @@ public class Record {
         byte[] data = outputStream.toByteArray();
         outputStream = new ByteArrayOutputStream();
 
-        tmp = Charset.forName("UTF8").encode(refer.append(FIELD_SEPARATOR).toString()).array();
+        ByteBuffer buffer = Charset.forName("UTF8").encode(refer.append(FIELD_SEPARATOR).toString());
+        tmp = buffer.array();
 
 
-        marker.recordLength = data.length + tmp.length + 24;
-        marker.dataAddress = 24 + tmp.length;
+        marker.recordLength = data.length + buffer.limit() + 24;
+        marker.dataAddress = 24 + buffer.limit();
 
         outputStream.write(marker.getFullMarkerRaw(), 0, 24);
-        outputStream.write(tmp, 0, tmp.length);
+        outputStream.write(tmp, 0, buffer.limit());
         outputStream.write(data, 0, data.length);
         data = outputStream.toByteArray();
         try {
@@ -872,9 +871,9 @@ public class Record {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ru.axetta.rusmarc.Record))
+        if (!(obj instanceof Record))
             return false;
-        ru.axetta.rusmarc.Record r = (ru.axetta.rusmarc.Record) obj;
+        Record r = (Record) obj;
         return fields.equals(r.fields) && marker.equals(r.marker);
     }
 }

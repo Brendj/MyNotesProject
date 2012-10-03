@@ -100,12 +100,7 @@ public class Publication extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        String decodedString = null;
-        try {
-            decodedString = Base64AndZip.zipAndEncode(data);
-        } catch (IOException e) {
-            setDistributedObjectException(new DistributedObjectException("BUILD_DATA_PUBLICATION_VALUE"));
-        }
+        String decodedString = Base64AndZip.enCode(data);
         setAttribute(element, "Data", decodedString);
     }
 
@@ -115,7 +110,7 @@ public class Publication extends DistributedObject {
         String data = getStringAttributeValue(node, "Data", 65536);
         //String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
         DataInputStream dataInputStream = new DataInputStream(
-                new ByteArrayInputStream(Base64AndZip.decodeAndUngzip(data.getBytes())));
+                new ByteArrayInputStream(Base64AndZip.decode(data.getBytes())));
         Record record = new Record(dataInputStream);
 
         setData(record.getRUSMARCRecord());

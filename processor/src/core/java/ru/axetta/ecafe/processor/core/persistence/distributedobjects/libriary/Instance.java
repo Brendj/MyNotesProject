@@ -39,14 +39,14 @@ public class Instance extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "GuidFund", fund.getGuid());
-        setAttribute(element, "GuidPublication", publication.getGuid());
-        setAttribute(element, "GuidInventaryBook", inventoryBook.getGuid());
-        setAttribute(element, "GuidKsu1Record", ksu1Record.getGuid());
-        setAttribute(element, "GuidKsu2Record", ksu2Record.getGuid());
-        setAttribute(element, "InGroup", inGroup);
-        setAttribute(element, "InvNumber", invNumber);
-        setAttribute(element, "Cost", cost);
+        //setAttribute(element, "GuidFund", fund.getGuid());
+        //setAttribute(element, "GuidPublication", publication.getGuid());
+        //setAttribute(element, "GuidInventaryBook", inventoryBook.getGuid());
+        //setAttribute(element, "GuidKsu1Record", ksu1Record.getGuid());
+        //setAttribute(element, "GuidKsu2Record", ksu2Record.getGuid());
+        //setAttribute(element, "InGroup", inGroup);
+        //setAttribute(element, "InvNumber", invNumber);
+        //setAttribute(element, "Cost", cost);
     }
 
     @Override
@@ -58,9 +58,11 @@ public class Instance extends DistributedObject {
         guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);
         guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 36);
 
-        inGroup = (getIntegerAttributeValue(node, "InGroup") == 1);
+        inGroup = getBollAttributeValue(node, "InGroup");
         invNumber = getStringAttributeValue(node, "InvNumber", 10);
         cost = getIntegerAttributeValue(node, "Cost");
+
+        setSendAll(true);
         return this;
     }
 

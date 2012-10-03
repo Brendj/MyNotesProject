@@ -265,7 +265,7 @@ CREATE TABLE cf_ksu2records (
 CREATE TABLE cf_instances (
   IdOfInstance bigserial NOT NULL,
   IdOfPublication bigint NOT NULL REFERENCES cf_publications(idofpubl) ,
-  InGroup bit(1) NOT NULL default '0',
+  InGroup boolean NOT NULL DEFAULT false,
   IdOfFund bigint default NULL REFERENCES cf_funds(IdOfFund),
   InvNumber varchar(10) default NULL,
   InvBook bigint default NULL REFERENCES cf_inventorybooks(IdOfBook),
@@ -292,7 +292,7 @@ CREATE TABLE cf_instances (
 CREATE TABLE cf_journals (
   IdOfJournal bigserial NOT NULL,
   IdOfFund bigint default NULL REFERENCES cf_funds(IdOfFund),
-  IsNewspaper bit(1) NOT NULL default '0',
+  IsNewspaper boolean NOT NULL DEFAULT false,
   IdOfPublication bigint NOT NULL REFERENCES cf_publications(idofpubl),
   MonthCount int NOT NULL default '0',
   Count int NOT NULL default '0',

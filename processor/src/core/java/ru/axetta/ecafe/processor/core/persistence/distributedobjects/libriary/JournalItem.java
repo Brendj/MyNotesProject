@@ -52,9 +52,10 @@ public class JournalItem extends DistributedObject {
         guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);
         guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 36);
 
-        date = getDateTimeAttributeValue(node, "Date");
+        date = getDateOnlyAttributeValue(node, "Date");
         number = getStringAttributeValue(node, "Number", 10);
         cost = getIntegerAttributeValue(node, "Cost");
+        setSendAll(true);
         return this;
     }
 
