@@ -180,12 +180,12 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>SyncROServlet</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.SyncROServlet</servlet-class>
+        <servlet-name>IntegroServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.IntegroServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>SyncROServlet</servlet-name>
-        <url-pattern>/syncro</url-pattern>
+        <servlet-name>IntegroServlet</servlet-name>
+        <url-pattern>/integro</url-pattern>
     </servlet-mapping>
 
     <filter-mapping>
