@@ -9,13 +9,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +26,7 @@ import java.util.*;
  * Time: 13:46
  * To change this template use File | Settings | File Templates.
  */
-public class ClientMenuDetailsGroupByMenuOriginReport extends BasicReportForOrgJob {
+public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
@@ -140,7 +137,7 @@ public class ClientMenuDetailsGroupByMenuOriginReport extends BasicReportForOrgJ
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new ClientMenuDetailsGroupByMenuOriginReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new ClientOrderDetailsByOneOrgReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
@@ -173,18 +170,18 @@ public class ClientMenuDetailsGroupByMenuOriginReport extends BasicReportForOrgJ
     }
 
 
-    public ClientMenuDetailsGroupByMenuOriginReport(Date generateTime, long generateDuration, JasperPrint print,
-            Date startTime, Date endTime, Long idOfOrg) {
+    public ClientOrderDetailsByOneOrgReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime, Long idOfOrg) {
         super(generateTime, generateDuration, print, startTime, endTime,
                 idOfOrg);
     }
-    private static final Logger logger = LoggerFactory.getLogger(ClientMenuDetailsGroupByMenuOriginReport.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientOrderDetailsByOneOrgReport.class);
 
-    public ClientMenuDetailsGroupByMenuOriginReport() {}
+    public ClientOrderDetailsByOneOrgReport() {}
 
     @Override
     public BasicReportForOrgJob createInstance() {
-        return new ClientMenuDetailsGroupByMenuOriginReport();
+        return new ClientOrderDetailsByOneOrgReport();
     }
 
     @Override

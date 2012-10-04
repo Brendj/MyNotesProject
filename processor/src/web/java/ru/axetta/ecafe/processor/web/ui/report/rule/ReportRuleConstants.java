@@ -125,7 +125,8 @@ public class ReportRuleConstants {
             new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25}),
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(ClientMenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{})
     };
 
