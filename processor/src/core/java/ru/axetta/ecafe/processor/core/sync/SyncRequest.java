@@ -2758,7 +2758,7 @@ MenuGroups menuGroups;
         private final EnterEvents.Builder enterEventsBuilder;
         private final LibraryData.Builder libraryDataBuilder;
         private final LibraryData2.Builder libraryData2Builder;
-        private final Manager manager;
+        private Manager manager;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2780,7 +2780,6 @@ MenuGroups menuGroups;
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.libraryDataBuilder = new LibraryData.Builder();
             this.libraryData2Builder = new LibraryData2.Builder();
-            this.manager = new Manager(dateOnlyFormat, timeFormat);
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2912,9 +2911,9 @@ MenuGroups menuGroups;
 
             /*  Универсальный модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
-            manager.setIdOfOrg(org.getIdOfOrg());
             if(roNode != null){
+                manager = new Manager(dateOnlyFormat, timeFormat);
+                manager.setIdOfOrg(org.getIdOfOrg());
                 Node itemNode = roNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
