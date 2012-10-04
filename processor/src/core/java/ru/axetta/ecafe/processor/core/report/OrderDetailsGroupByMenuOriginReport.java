@@ -103,9 +103,9 @@ public class OrderDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
                 Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
 
-            Query query = session.createSQLQuery("SELECT cf_orderdetails.menuorigin,  count(*),"
-                    + "  sum(cf_orderdetails.rprice) as price FROM  public.cf_orders, "
-                    + "  public.cf_orderdetails WHERE (cf_order.createddate>=:startTime AND cf_order.createddate<=:endTime) group by cf_orderdetails.menuorigin;");
+            Query query = session.createSQLQuery("SELECT cf_orderdetails.menuorigin,  count(*), sum(cf_orders.rsum)"
+                    + "  FROM public.cf_orders, public.cf_orderdetails"
+                    + "  WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforder = cf_orderdetails.idoforder) group by cf_orderdetails.menuorigin;");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
             List list = query.list();

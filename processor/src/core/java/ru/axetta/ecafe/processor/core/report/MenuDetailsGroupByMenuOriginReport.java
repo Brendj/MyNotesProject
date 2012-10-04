@@ -114,7 +114,7 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
 
             Query query = session.createSQLQuery("SELECT cf_menudetails.menuorigin,  count(*),"
                     + "  sum(cf_menudetails.price) as price FROM  public.cf_menu, "
-                    + "  public.cf_menudetails WHERE (cf_menu.createddate>=:startTime AND cf_menu.createddate<=:endTime) group by cf_menudetails.menuorigin;");
+                    + "  public.cf_menudetails WHERE (cf_menu.createddate>=:startTime AND cf_menu.createddate<=:endTime AND cf_menu.idofmenu = cf_menudetails.idofmenu) group by cf_menudetails.menuorigin;");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
             List list = query.list();
