@@ -121,6 +121,7 @@ public class MainPage {
     private final ContragentCreatePage contragentCreatePage = new ContragentCreatePage();
     private final ContragentClientPaymentReportPage contragentClientPaymentReportPage = new ContragentClientPaymentReportPage();
     private final BasicWorkspacePage caOpsGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage clientOpsGroupPage = new BasicWorkspacePage();
 
     // Contragent client account manipulation
     private final BasicWorkspacePage ccAccountGroupPage = new BasicWorkspacePage();
@@ -195,6 +196,7 @@ public class MainPage {
     // baybikov 23.11.2011
     private final BasicWorkspacePage complexGroupPage = new BasicWorkspacePage();
 
+    private final BasicWorkspacePage uosGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
 
     // baybikov (06.10.2011)
@@ -3401,9 +3403,18 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         updateSelectedMainMenu();
         return null;
     }
+    public Object showClientOpsGroupPage() {
+        currentWorkspacePage = clientOpsGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public BasicWorkspacePage getCaOpsGroupPage() {
         return caOpsGroupPage;
+    }
+
+    public BasicWorkspacePage getClientOpsGroupPage() {
+        return clientOpsGroupPage;
     }
 
     public CCAccountListPage getCcAccountListPage() {
@@ -4714,6 +4725,9 @@ public Long getSelectedIdOfReportRule() {
     public BasicWorkspacePage getNsiGroupPage() {
         return nsiGroupPage;
     }
+    public BasicWorkspacePage getUosGroupPage() {
+        return uosGroupPage;
+    }
 
     // baybikov (22.11.2011)
     public Object showComplexGroupPage() {
@@ -4725,6 +4739,11 @@ public Long getSelectedIdOfReportRule() {
     // baybikov (22.11.2011)
     public Object showNSIGroupPage() {
         currentWorkspacePage = nsiGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+    public Object showUOSGroupPage() {
+        currentWorkspacePage = uosGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -6317,7 +6336,7 @@ public Long getSelectedIdOfReportRule() {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if (categoryOrgFilterOfSelectCategoryOrgListSelectPage.length() == 0) {
+                if (StringUtils.isEmpty(categoryOrgFilterOfSelectCategoryOrgListSelectPage)) {
                     categoryOrgListSelectPage.fill(persistenceSession);
                 } else {
                     categoryOrgListSelectPage

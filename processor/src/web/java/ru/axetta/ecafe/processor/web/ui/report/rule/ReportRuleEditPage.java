@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -26,30 +27,17 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
 
     private static String DELIMETER = ";";
 
-    public static class ReportParamHint {
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
-        private final String typeName;
-        private final List<ReportRuleConstants.ParamHint> paramHints;
-
-        public ReportParamHint(ReportRuleConstants.ReportHint reportHint) {
-            this.typeName = reportHint.getTypeName();
-            this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
-            for (int i : reportHint.getParamHints()) {
-                this.paramHints.add(ReportRuleConstants.PARAM_HINTS[i]);
-            }
-        }
-
-        public String getTypeName() {
-            return typeName;
-        }
-
-        public List<ReportRuleConstants.ParamHint> getParamHints() {
-            return paramHints;
-        }
+    public String getTag() {
+        return tag;
     }
 
     private long idOfReportHandleRule;
     private String ruleName;
+    private String tag;
     private String reportType;
     private int documentFormat;
     private String subject;
@@ -59,12 +47,12 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
     private boolean enabled;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
-    private List<ReportParamHint> reportParamHints = Collections.emptyList();
     private String reportTemplateFileName;
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
 
-    public ReportTemplateFileNameMenu getReportTemplateFileNameMenu() {
-        return reportTemplateFileNameMenu;
+    public SelectItem[] getReportTemplatesFiles() {
+        if (StringUtils.isEmpty(reportType)) return reportTemplateFileNameMenu.getItems();
+        return reportTemplateFileNameMenu.getItemsForReportType(reportType);
     }
 
     public void setReportTemplateFileName(String reportTemplateFileName) {
@@ -80,10 +68,6 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
     }
 
     public ReportRuleEditPage() {
-        this.reportParamHints = new LinkedList<ReportParamHint>();
-        for (ReportRuleConstants.ReportHint reportHint : ReportRuleConstants.REPORT_HINTS) {
-            this.reportParamHints.add(new ReportParamHint(reportHint));
-        }
     }
 
     public boolean isEnabled() {
@@ -94,12 +78,8 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
         this.enabled = enabled;
     }
 
-    public List<ReportParamHint> getReportParamHints() {
-        return reportParamHints;
-    }
-
-    public void setReportParamHints(List<ReportParamHint> reportParamHints) {
-        this.reportParamHints = reportParamHints;
+    public List<ReportRuleConstants.ParamHint> getParamHints() {
+        return ReportRuleConstants.getParamHintsForReportType(reportType);
     }
 
     public ReportTypeMenu getReportTypeMenu() {
@@ -184,6 +164,7 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
         ReportHandleRule reportHandleRule = (ReportHandleRule) session
                 .load(ReportHandleRule.class, idOfReportHandleRule);
         reportHandleRule.setRuleName(this.ruleName);
+        reportHandleRule.setTag(this.tag);
         reportHandleRule.setDocumentFormat(this.documentFormat);
         reportHandleRule.setSubject(this.subject);
         reportHandleRule.setEnabled(this.enabled);
@@ -264,6 +245,7 @@ public class ReportRuleEditPage extends BasicWorkspacePage {
     private void fill(Session session, ReportHandleRule reportHandleRule) throws Exception {
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
+        this.tag = reportHandleRule.getTag();
 
         Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
         this.reportType = reportHandleRule.findType(session);

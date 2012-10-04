@@ -267,6 +267,7 @@
             <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
+            <url-pattern>/repository/download</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>AuthorizedUser</role-name>
@@ -350,10 +351,21 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>services</servlet-name>
         <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <display-name>ReportRepositoryDownloadServlet</display-name>
+        <servlet-name>ReportRepositoryDownloadServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryDownloadServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ReportRepositoryDownloadServlet</servlet-name>
+        <url-pattern>/repository/download</url-pattern>
     </servlet-mapping>
 
     <context-param>

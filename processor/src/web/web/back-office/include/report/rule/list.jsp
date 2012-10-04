@@ -34,6 +34,12 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
+            <h:outputText escape="true" value="Тэг" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.tag}" styleClass="output-text"/>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
             <h:outputText escape="true" value="Включено" />
         </f:facet>
         <h:selectBooleanCheckbox disabled="true" readonly="true" value="#{item.enabled}" styleClass="output-text" />

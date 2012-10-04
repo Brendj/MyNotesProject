@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
 
     @Override

@@ -6,13 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -37,12 +35,6 @@ public class DAOService {
 
     @PersistenceContext
     EntityManager em;
-
-    @Transactional
-    public Contragent getClientOrgDefaultSupplier(Client client) {
-        Org org = em.find(Org.class, client.getOrg().getIdOfOrg());
-        return em.find(Contragent.class, org.getDefaultSupplier().getIdOfContragent());
-    }
 
     @Transactional
     public List<TransactionJournal> fetchTransactionJournal(int nRecs) {
@@ -350,6 +342,44 @@ public class DAOService {
         TypedQuery<Client> query = em.createQuery("from Client where mobile=:mobile", Client.class);
         query.setParameter("mobile", mobilePhone);
         return query.getResultList();
+    }
+
+    @Transactional
+    public Contragent getClientOrgDefaultSupplier(Client client) {
+        client = em.merge(client);
+        Contragent ca = client.getOrg().getDefaultSupplier();
+        ca.getContragentName(); //lazy load
+        return ca;
+    }
+
+    @Transactional
+    public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
+            Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag) {
+        ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime,  startDate, endDate, reportFile, orgNum, idOfOrg, tag);
+        em.persist(ri);
+        return ri;
+    }
+
+    @Transactional
+    public List<String> getReportHandleRuleNames() {
+        TypedQuery<String> query = em.createQuery("select ruleName from ReportHandleRule", String.class);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public void updateLastSuccessfulBalanceSync(long idOfOrg) {
+        Query q  = em.createQuery("update Org set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        q.setParameter("date", new Date());
+        q.setParameter("idOfOrg", idOfOrg);
+        q.executeUpdate();
+    }
+
+    @Transactional
+    public void updateLastUnsuccessfulBalanceSync(long idOfOrg) {
+        Query q  = em.createQuery("update Org set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        q.setParameter("date", new Date());
+        q.setParameter("idOfOrg", idOfOrg);
+        q.executeUpdate();
     }
 
     @Transactional

@@ -27,24 +27,30 @@ public class OrgFilter {
     private String officialName;
     /* идентификатор организации */
     private Long idOfOrg;
+    private String tag;
+    private String city;
+    private String district;
+    private String location;
 
 
     /**
      * производит проверку пустоту полей ввода
-     * @author Kadyrov Damir
-     * @since  2012-02-27
+     *
      * @return true если хотябы одно поле будет не пустым
+     * @author Kadyrov Damir
+     * @since 2012-02-27
      */
     public boolean isEmpty() {
-        return officialName==null && idOfOrg == null;
+        return officialName == null && idOfOrg == null && tag == null;
     }
 
     /**
      * выводид список организаций
-     * @author Kadyrov Damir
-     * @since  2012-02-27
+     *
      * @param session сессия
      * @return List - список организаций производя выборку либо по идентификатору либо по части имени организации
+     * @author Kadyrov Damir
+     * @since 2012-02-27
      */
     public List retrieveOrgs(Session session) {
         Criteria criteria = session.createCriteria(Org.class);
@@ -52,10 +58,23 @@ public class OrgFilter {
                 Restrictions.eq("idOfOrg",idOfOrg),
                 Restrictions.like("officialName",officialName, MatchMode.ANYWHERE).ignoreCase()
         ));*/
-        if(idOfOrg!=null && idOfOrg.compareTo(Long.parseLong("0"))>0){
+        if (idOfOrg != null && idOfOrg.compareTo(Long.parseLong("0")) > 0) {
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-        } else if (officialName!=null) {
-            criteria.add(Restrictions.like("officialName",officialName, MatchMode.ANYWHERE).ignoreCase());
+        } else if (officialName != null) {
+            criteria.add(Restrictions.or(Restrictions.like("shortName", officialName, MatchMode.ANYWHERE).ignoreCase(),
+                    Restrictions.like("officialName", officialName, MatchMode.ANYWHERE).ignoreCase()));
+        }
+        if (tag != null && tag.length() > 0) {
+            criteria.add(Restrictions.like("tag", tag, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (city != null && city.length() > 0) {
+            criteria.add(Restrictions.like("city", tag, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (district != null && district.length() > 0) {
+            criteria.add(Restrictions.like("district", tag, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (location != null && location.length() > 0) {
+            criteria.add(Restrictions.like("location", tag, MatchMode.ANYWHERE).ignoreCase());
         }
 
         criteria.addOrder(Order.asc("idOfOrg"));
@@ -64,9 +83,10 @@ public class OrgFilter {
 
     /**
      * Статус фильтра
-     * @author Kadyrov Damir
-     * @since  2012-02-27
+     *
      * @return String
+     * @author Kadyrov Damir
+     * @since 2012-02-27
      */
     public String getStatus() {
         if (isEmpty()) {
@@ -77,13 +97,15 @@ public class OrgFilter {
 
     /**
      * Очистка полей
-     * @author Kadyrov Damir
-     * @since  2012-02-27
+     *
      * @return void
+     * @author Kadyrov Damir
+     * @since 2012-02-27
      */
     public void clear() {
-        this.officialName=null;
-        this.idOfOrg =null;
+        this.officialName = null;
+        this.idOfOrg = null;
+        this.tag = null;
     }
 
     public String getOfficialName() {
@@ -94,13 +116,48 @@ public class OrgFilter {
         this.officialName = officialName;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public Long getIdOfOrg() {
         return idOfOrg;
     }
 
     public void setIdOfOrg(Long idOfOrg) {
-        if (idOfOrg==null || idOfOrg==0) this.idOfOrg=null;
-        else this.idOfOrg = idOfOrg;
+        if (idOfOrg == null || idOfOrg == 0) {
+            this.idOfOrg = null;
+        } else {
+            this.idOfOrg = idOfOrg;
+        }
     }
 
 }

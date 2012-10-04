@@ -130,7 +130,7 @@ public class SyncServlet extends HttpServlet {
             SyncRequest syncRequest;
             try {
                 SyncRequest.Builder syncRequestBuilder = new SyncRequest.Builder();
-                syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync);
+                syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync, request.getRemoteAddr());
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);

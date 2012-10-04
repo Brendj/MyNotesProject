@@ -18,14 +18,28 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortName}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Тэги" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.tag}" styleClass="input-text long-field" />
+
+    <h:outputText escape="true" value="Город" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.city}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.district}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Локация" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.location}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Широта" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.latitude}" maxlength="12" styleClass="input-text" />
+    <h:outputText escape="true" value="Долгота" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.longitude}" maxlength="12" styleClass="input-text" />
+    <h:outputText escape="true" value="Адрес" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.address}" styleClass="input-text long-field" />
+
 
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.INN}" styleClass="input-text" />
     <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.OGRN}" styleClass="input-text" />
 
-    <h:outputText escape="true" value="Адрес" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.address}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />

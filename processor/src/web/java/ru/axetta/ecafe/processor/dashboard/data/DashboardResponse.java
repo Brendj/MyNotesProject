@@ -18,10 +18,142 @@ import java.util.Map;
  */
 public class DashboardResponse {
 
+    public static class OrgBasicStatItem {
+        long idOfOrg;
+        String orgName;
+        String orgNameNumber;
+        String orgTag;
+        String orgDistrict;
+        String orgLocation;
+        Date lastSuccessfulBalanceSyncTime;
+        long numberOfEnterEvents;
+        long numberOfDiscountOrders;
+        long numberOfPayOrders;
+        long numberOfStudentClients;
+        long numberOfNonStudentClients;
+        private Long numberOfClientsWithoutCard;
+
+        public long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public String getOrgName() {
+            return orgName;
+        }
+
+        public void setOrgName(String orgName) {
+            this.orgName = orgName;
+        }
+
+        public String getOrgTag() {
+            return orgTag;
+        }
+
+        public void setOrgTag(String orgTag) {
+            this.orgTag = orgTag;
+        }
+
+        public String getOrgNameNumber() {
+            return orgNameNumber;
+        }
+
+        public void setOrgNameNumber(String orgNameNumber) {
+            this.orgNameNumber = orgNameNumber;
+        }
+
+        public Date getLastSuccessfulBalanceSyncTime() {
+            return lastSuccessfulBalanceSyncTime;
+        }
+
+        public void setLastSuccessfulBalanceSyncTime(Date lastSuccessfulBalanceSyncTime) {
+            this.lastSuccessfulBalanceSyncTime = lastSuccessfulBalanceSyncTime;
+        }
+
+        public long getNumberOfEnterEvents() {
+            return numberOfEnterEvents;
+        }
+
+        public void setNumberOfEnterEvents(long numberOfEnterEvents) {
+            this.numberOfEnterEvents = numberOfEnterEvents;
+        }
+
+        public long getNumberOfDiscountOrders() {
+            return numberOfDiscountOrders;
+        }
+
+        public void setNumberOfDiscountOrders(long numberOfDiscountOrders) {
+            this.numberOfDiscountOrders = numberOfDiscountOrders;
+        }
+
+        public long getNumberOfPayOrders() {
+            return numberOfPayOrders;
+        }
+
+        public void setNumberOfPayOrders(long numberOfPayOrders) {
+            this.numberOfPayOrders = numberOfPayOrders;
+        }
+
+        public long getNumberOfStudentClients() {
+            return numberOfStudentClients;
+        }
+
+        public void setNumberOfStudentClients(long numberOfStudentClients) {
+            this.numberOfStudentClients = numberOfStudentClients;
+        }
+
+        public long getNumberOfNonStudentClients() {
+            return numberOfNonStudentClients;
+        }
+
+        public void setNumberOfNonStudentClients(long numberOfNonStudentClients) {
+            this.numberOfNonStudentClients = numberOfNonStudentClients;
+        }
+
+        public String getOrgDistrict() {
+            return orgDistrict;
+        }
+
+        public void setOrgDistrict(String orgDistrict) {
+            this.orgDistrict = orgDistrict;
+        }
+
+        public String getOrgLocation() {
+            return orgLocation;
+        }
+
+        public void setOrgLocation(String orgLocation) {
+            this.orgLocation = orgLocation;
+        }
+
+        public void setNumberOfClientsWithoutCard(Long numberOfClientsWithoutCard) {
+            this.numberOfClientsWithoutCard = numberOfClientsWithoutCard;
+        }
+
+        public Long getNumberOfClientsWithoutCard() {
+            return numberOfClientsWithoutCard;
+        }
+    }
+    public static class OrgBasicStats {
+        LinkedList<OrgBasicStatItem> orgBasicStatItems = new LinkedList<OrgBasicStatItem>();
+
+        public LinkedList<OrgBasicStatItem> getOrgBasicStatItems() {
+            return orgBasicStatItems;
+        }
+
+        public void setOrgBasicStatItems(LinkedList<OrgBasicStatItem> orgBasicStatItems) {
+            this.orgBasicStatItems = orgBasicStatItems;
+        }
+    }
+    
     public static class EduInstItemInfo {
 
         long idOfOrg;
         String orgName;
+        String orgNameNumber;
         Date lastFullSyncTime;
         Date firstFullSyncTime;
         Date lastSuccessfulBalanceSyncTime;
@@ -55,6 +187,14 @@ public class DashboardResponse {
 
         public void setOrgName(String orgName) {
             this.orgName = orgName;
+        }
+
+        public String getOrgNameNumber() {
+            return orgNameNumber;
+        }
+
+        public void setOrgNameNumber(String orgNameNumber) {
+            this.orgNameNumber = orgNameNumber;
         }
 
         public Date getLastFullSyncTime() {

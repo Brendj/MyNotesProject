@@ -24,8 +24,8 @@ public class ContractIdFormat {
     }
 
     public static String format(long contractId) {
-        NumberFormat decimalFormat = new DecimalFormat("##00000000");
-        return decimalFormat.format(contractId);
+        //NumberFormat decimalFormat = new DecimalFormat("##00000000");
+        return String.format("%08d", contractId); //decimalFormat.format(contractId);
     }
 
     public static long parse(String contractId) throws Exception {

@@ -18,8 +18,11 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.LinkedList;
@@ -29,6 +32,9 @@ import java.util.Properties;
 @Component
 @Scope("singleton")
 public class FinancialOpsManager {
+    @PersistenceContext
+    EntityManager em;
+    
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -36,9 +42,12 @@ public class FinancialOpsManager {
         return new CurrentPositionsManager(session);
     }
 
-    public void createClientSmsCharge(Session session, Client client, String idOfSms, String phone, Integer contentsType,
+    @Transactional
+    public void createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
 
+        Session session = (Session)em.getDelegate();
+        
         long priceOfSms = client.getOrg().getPriceOfSms();
         //Card card = DAOUtils.findActiveCard(em, client);
         Date currTime = new Date();
@@ -277,5 +286,30 @@ public class FinancialOpsManager {
         session.delete(addPayment);
     }
 
+    @Transactional
+    public void createAccountTransfer(Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
+        Session session = (Session)em.getDelegate();
+        if (sum<=0) throw new Exception("Сумма перевода должна быть больше нуля");
+        if (benefactor.getBalance()<sum) throw new Exception("Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(beneficiary.getBalance())+") для перевода");
+        Date dt = new Date();
+        // регистрируем транзакцию на плательщике
+        AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, benefactor,
+                null, -sum, "",
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt);
+        // регистрируем транзакцию на получателе
+        AccountTransaction accountTransactionOnBeneficiary = ClientAccountManager.processAccountTransaction(session, beneficiary,
+                null, sum, "",
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt);
+        AccountTransfer accountTransfer = new AccountTransfer(dt, benefactor,  beneficiary, reason, createdBy, 
+                accountTransactionOnBenefactor, accountTransactionOnBeneficiary, sum);
+        session.save(accountTransactionOnBenefactor);
+        session.save(accountTransactionOnBeneficiary);
+        session.save(accountTransfer);
+        session.flush();
+        accountTransactionOnBenefactor.updateSource(accountTransfer.getIdOfAccountTransfer() + "");
+        accountTransactionOnBeneficiary.updateSource(accountTransfer.getIdOfAccountTransfer() + "");
+        session.update(accountTransactionOnBenefactor);
+        session.update(accountTransactionOnBeneficiary);
+    }
 
 }

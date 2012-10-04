@@ -31,6 +31,10 @@ public class OrgListPage extends BasicWorkspacePage {
         private final String contractId;
         private final Integer state;
         private final String phone;
+        private final String tag;
+        private final String city;
+        private final String district;
+        private final String location;
 
         public Item(Org org) {
             this.idOfOrg = org.getIdOfOrg();
@@ -38,6 +42,10 @@ public class OrgListPage extends BasicWorkspacePage {
             this.state = org.getState();
             this.contractId = org.getContractId();
             this.phone = org.getPhone();
+            this.tag = org.getTag();
+            this.city = org.getCity();
+            this.location = org.getLocation();
+            this.district = org.getDistrict();
         }
 
         public Long getIdOfOrg() {
@@ -58,6 +66,22 @@ public class OrgListPage extends BasicWorkspacePage {
 
         public String getPhone() {
             return phone;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public String getLocation() {
+            return location;
         }
     }
 

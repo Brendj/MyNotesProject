@@ -45,6 +45,12 @@
         <property name="lastSuccessfulBalanceSync" column="lastSucBalanceSync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
+        <property name="tag" column="Tag" type="string" length="256" not-null="false"/>
+        <property name="city" column="City" type="string" length="128" unique="true" not-null="false"/>
+        <property name="district" column="District" type="string" length="128" unique="true" not-null="false"/>
+        <property name="location" column="Location" type="string" length="128" unique="true" not-null="false"/>
+        <property name="longitude" column="Longitude" type="string" length="12" unique="true" not-null="false"/>
+        <property name="latitude" column="Latitude" type="string" length="12" unique="true" not-null="false"/>
 
         <property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -96,6 +102,11 @@
         <set name="categoriesInternal" table="CF_CategoryOrg_Orgs" cascade="all">
             <key column="IdOfOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
+        </set>
+
+        <set name="sourceMenuOrgs" table="CF_MenuExchangeRules" lazy="true">
+            <key column="IdOfDestOrg"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfSourceOrg"/>
         </set>
 
         <!-- Производственая конфигурация -->

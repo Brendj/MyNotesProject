@@ -18,6 +18,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -33,6 +34,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class OptionPage extends BasicWorkspacePage {
     final Logger logger = LoggerFactory
             .getLogger(BasicWorkspacePage.class);

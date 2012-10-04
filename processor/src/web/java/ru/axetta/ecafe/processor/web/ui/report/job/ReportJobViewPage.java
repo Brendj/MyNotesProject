@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.report.job;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Transaction;
@@ -32,6 +33,7 @@ public class ReportJobViewPage extends BasicWorkspacePage {
     private String cronExpression;
     private boolean enabled;
     private Date generateStartDate;
+    private Date generateEndDate;
 
     public String getPageFilename() {
         return "report/job/view";
@@ -65,12 +67,23 @@ public class ReportJobViewPage extends BasicWorkspacePage {
         this.generateStartDate = generateStartDate;
     }
 
+    public Date getGenerateEndDate() {
+        return generateEndDate;
+    }
+
+    public void setGenerateEndDate(Date generateEndDate) {
+        this.generateEndDate = generateEndDate;
+    }
+
     public Object triggerJob() throws Exception {
         FacesContext fc = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            runtimeContext.getAutoReportGenerator().triggerJob(idOfSchedulerJob, generateStartDate);
+            if (generateStartDate!=null && generateEndDate==null) {
+                generateEndDate = CalendarUtils.addDays(generateStartDate, 1);
+            }
+            runtimeContext.getAutoReportGenerator().triggerJob(idOfSchedulerJob, generateStartDate, generateEndDate);
         } catch (Exception e) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка: "+e.toString(), ""));
         }

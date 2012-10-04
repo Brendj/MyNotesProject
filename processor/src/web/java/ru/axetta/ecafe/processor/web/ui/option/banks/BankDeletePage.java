@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class BankDeletePage{
 
     @Autowired

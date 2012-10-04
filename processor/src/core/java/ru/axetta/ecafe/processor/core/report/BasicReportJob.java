@@ -23,13 +23,6 @@ import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kolpakov
- * Date: 13.03.11
- * Time: 23:22
- * To change this template use File | Settings | File Templates.
- */
 public abstract class BasicReportJob extends BasicJasperReport {
     public final static int REPORT_PERIOD_PREV_MONTH=0, REPORT_PERIOD_PREV_DAY=1, REPORT_PERIOD_TODAY=2, REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4;
     private String BASE_DOCUMENT_FILENAME;
@@ -66,6 +59,8 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
     public static class AutoReportBuildJob extends ExecutorServiceWrappedJob {
 
+        private ExecuteEnvironment executeEnvironment;
+
         public static class ExecuteEnvironment {
 
             private final ExecutorService executorService;
@@ -78,8 +73,9 @@ public abstract class BasicReportJob extends BasicJasperReport {
             private final DateFormat timeFormat;
             private final BasicReportJob reportJob;
             private Date startDate, endDate;
+            private final String jobName;
 
-            public ExecuteEnvironment(BasicReportJob reportJob, ExecutorService executorService, SessionFactory sessionFactory,
+            public ExecuteEnvironment(String jobName, BasicReportJob reportJob, ExecutorService executorService, SessionFactory sessionFactory,
                     AutoReportProcessor autoReportProcessor, String reportPath, String templateFileName,
                     Calendar calendar, DateFormat dateFormat, DateFormat timeFormat) {
                 this.executorService = executorService;
@@ -91,6 +87,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
                 this.dateFormat = dateFormat;
                 this.timeFormat = timeFormat;
                 this.reportJob = reportJob;
+                this.jobName = jobName;
             }
 
             public ExecutorService getExecutorService() {
@@ -157,7 +154,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         }
 
         protected Runnable getRunnable(JobExecutionContext context) {
-            final ExecuteEnvironment executeEnvironment = (ExecuteEnvironment) context.getJobDetail().getJobDataMap()
+            this.executeEnvironment = (ExecuteEnvironment) context.getJobDetail().getJobDataMap()
                     .get(ENVIRONMENT_JOB_PARAM);
             Calendar calendar = executeEnvironment.getCalendar();
             Date endTime, startTime;
@@ -165,8 +162,12 @@ public abstract class BasicReportJob extends BasicJasperReport {
             executeEnvironment.setStartDate(null);
             endTime = executeEnvironment.getEndDate();
             executeEnvironment.setEndDate(null);
+            
+            boolean datesSpecifiedByUser = true;
 
             if (endTime==null) {
+                datesSpecifiedByUser = false;
+
                 if (executeEnvironment.reportJob.getDefaultReportPeriod()==REPORT_PERIOD_PREV_MONTH) {
                     if (startTime==null) startTime = calculateLastMonthFirstDay(calendar, context.getScheduledFireTime());
                     endTime = calculatePlusOneMonth(calendar, startTime);
@@ -191,7 +192,8 @@ public abstract class BasicReportJob extends BasicJasperReport {
                     endTime = calculatePlusOneDay(calendar, startTime);
                 }
             }
-            return new AutoReportBuildTask(executeEnvironment.reportJob.getAutoReportRunner(), executeEnvironment.getExecutorService(),
+            return new AutoReportBuildTask(executeEnvironment.jobName, datesSpecifiedByUser,
+                    executeEnvironment.reportJob.getAutoReportRunner(), executeEnvironment.getExecutorService(),
                     executeEnvironment.getAutoReportProcessor(), executeEnvironment.getSessionFactory(),
                     executeEnvironment.getTemplateFileName(), calendar, startTime, endTime, executeEnvironment.reportJob
                     .createDocumentBuilders(executeEnvironment.getReportPath(), executeEnvironment.getDateFormat(),
@@ -243,16 +245,20 @@ public abstract class BasicReportJob extends BasicJasperReport {
         public final AutoReportProcessor autoReportProcessor;
         public final SessionFactory sessionFactory;
         public final String templateFileName;
+        public final String jobName;
+        public final boolean datesSpecifiedByUser;
         public final Calendar startCalendar;
         public final Date startTime;
         public final Date endTime;
         public final Map<Integer, ReportDocumentBuilder> documentBuilders;
         private final AutoReportRunner reportRunner;
 
-        public AutoReportBuildTask(AutoReportRunner reportRunner, ExecutorService executorService,
+        public AutoReportBuildTask(String jobName, boolean datesSpecifiedByUser, AutoReportRunner reportRunner, ExecutorService executorService,
                 AutoReportProcessor autoReportProcessor, SessionFactory sessionFactory, String templateFileName,
                 Calendar startCalendar, Date startTime, Date endTime,
                 Map<Integer, ReportDocumentBuilder> documentBuilders) {
+            this.jobName = jobName;
+            this.datesSpecifiedByUser = datesSpecifiedByUser;
             this.executorService = executorService;
             this.autoReportProcessor = autoReportProcessor;
             this.sessionFactory = sessionFactory;
@@ -332,8 +338,22 @@ public abstract class BasicReportJob extends BasicJasperReport {
         return startTime;
     }
 
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
     public Date getEndTime() {
         return endTime;
     }
+
+    public void applyDataQueryPeriod(int period) {
+        startTime = CalendarUtils.addDays(endTime, -period);
+    }
+
+
 
 }

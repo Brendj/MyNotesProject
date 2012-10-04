@@ -36,14 +36,18 @@
     <h:panelGrid styleClass="borderless-grid">
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-        <h:panelGroup>
+        <rich:simpleTogglePanel label="Ручной запуск" switchType="client"
+                                opened="false" headerClass="filter-panel-header">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText value="Дата выборки от:"/>
+                <rich:calendar value="#{mainPage.reportJobViewPage.generateStartDate}" popup="true"/>
+                <h:outputText value="Дата выборки до:"/>
+                <rich:calendar value="#{mainPage.reportJobViewPage.generateEndDate}" popup="true"/>
+            </h:panelGrid>
+            <rich:spacer width="20"/>
             <a4j:commandButton value="Запустить сейчас" action="#{mainPage.reportJobViewPage.triggerJob}"
                                reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-            <rich:spacer width="20"/>
-            <h:outputText value="Дата начала (применимо не для всех отчетов):"/>
-            <rich:spacer width="10"/>
-            <rich:calendar value="#{mainPage.reportJobViewPage.generateStartDate}" popup="true"/>
-        </h:panelGroup>
+        </rich:simpleTogglePanel>
         <a4j:commandButton value="Редактировать" action="#{mainPage.showReportJobEditPage}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     </h:panelGrid>

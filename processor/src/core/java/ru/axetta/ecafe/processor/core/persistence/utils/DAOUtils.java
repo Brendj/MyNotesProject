@@ -532,6 +532,9 @@ public class DAOUtils {
     public static void setOptionValue(Session session, long nOption, String value) {
         session.saveOrUpdate(new Option(nOption, value));
     }
+    public static void setOptionValue(EntityManager em, long nOption, String value) {
+        setOptionValue((Session)em.getDelegate(), nOption, value);
+    }
 
     public static int deleteFromTransactionJournal(EntityManager entityManager, long maxIdOfTransactionJournal) {
         javax.persistence.Query q = entityManager.createQuery("delete from TransactionJournal where idOfTransactionJournal<=:maxId");
@@ -803,6 +806,7 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    /*
     public static Set<Long> getFriendlyOrg(Session persistenceSession, Long idOfOrg) {
         Query query = persistenceSession.createQuery("select org.friendlyOrg from Org org where org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
@@ -812,7 +816,7 @@ public class DAOUtils {
             result.add(((Org) object).getIdOfOrg());
         }
         return result;
-    }
+    } */
 
     @SuppressWarnings("unchecked")
     public static List<Org> getAllOrgWithGuid(EntityManager em) {
@@ -847,6 +851,24 @@ public class DAOUtils {
         }
     }
 
+    public static Long getBlockedCardsCount(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("select count(*) from Card where state<>:activeState");
+        q.setParameter("activeState", Card.ACTIVE_STATE);
+        return (Long)q.getSingleResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<AccountTransfer> getAccountTransfersForClient(Session session, Client client, Date startTime,
+            Date endTime) {
+        org.hibernate.Query q = session.createQuery(
+                "from AccountTransfer where (clientBenefactor=:client or clientBeneficiary=:client) and createTime>=:startTime and createTime<=:endTime");
+        q.setLong("startTime", startTime.getTime());
+        q.setLong("endTime", endTime.getTime());
+        q.setParameter("client", client);
+        return (List<AccountTransfer>)q.list();
+    }
+    
+    
     public static Client findClientByRefGUID(Session session, String guid){
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("clientGUID",guid));

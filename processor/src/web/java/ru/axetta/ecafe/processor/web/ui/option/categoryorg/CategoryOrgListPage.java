@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.*;
 
 
 @Component
+@Scope("session")
 public class CategoryOrgListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
 
     private List<CategoryOrg> items;

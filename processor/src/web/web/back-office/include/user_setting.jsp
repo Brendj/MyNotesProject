@@ -8,9 +8,6 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditUsers())
-{ out.println("Недостаточно прав для просмотра страницы"); return; } %>
-
 <h:panelGrid id="userSettingsPanelGrid" binding="#{userSettings.pageComponent}" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
     <h:inputText value="#{userSettings.userName}" maxlength="64" styleClass="input-text" />

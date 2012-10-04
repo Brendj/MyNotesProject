@@ -73,7 +73,7 @@ public class ClientManager {
             new FieldProcessor.Def(14, false, false, "Мобильный", null, FieldId.MOBILE_PHONE, true),
             new FieldProcessor.Def(15, false, false, "E-mail", null, FieldId.EMAIL, true),
             new FieldProcessor.Def(16, false, false, "Платный SMS", "0", FieldId.PAY_FOR_SMS, true),
-            new FieldProcessor.Def(17, false, false, "Уведомление по SMS", "0", FieldId.NOTIFY_BY_SMS, true),
+            new FieldProcessor.Def(17, false, false, "Уведомление по SMS", "1", FieldId.NOTIFY_BY_SMS, true),
             new FieldProcessor.Def(18, false, false, "Уведомление по e-mail", "0", FieldId.NOTIFY_BY_EMAIL, true),
             new FieldProcessor.Def(19, false, false, "Овердрафт", null, FieldId.OVERDRAFT, true),
             new FieldProcessor.Def(20, false, false, "Комментарии", null, FieldId.COMMENTS, true),
@@ -153,8 +153,13 @@ public class ClientManager {
                 client.setPassword(password);
             }
             //tokens[2];
-            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null)
-                client.setContractState(fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE));
+            if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE)!=null) {
+                int contractState=fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE);
+                if (!Client.isValidContractState(contractState)) {
+                    throw new Exception("Ошибочное значение поля: "+fieldConfig.getField(FieldId.CONTRACT_STATE).fieldName+": "+contractState);
+                }
+                client.setContractState(contractState);
+            }
 
             //dateFormat.parse(tokens[3]);
             if(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DATE)!=null)
@@ -334,6 +339,9 @@ public class ClientManager {
             boolean notifyBySms = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS);
             Date contractDate = fieldConfig.getValueDate(ClientManager.FieldId.CONTRACT_DATE);//dateFormat.parse(tokens[3]);
             int contractState = fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE);
+            if (!Client.isValidContractState(contractState)) {
+                throw new Exception("Ошибочное значение поля: "+fieldConfig.getField(FieldId.CONTRACT_STATE).fieldName+": "+contractState);
+            }
             int payForSms = fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS);
             long expenditureLimit = RuntimeContext.getInstance().getOptionValueLong(
                     Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);

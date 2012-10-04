@@ -42,6 +42,7 @@
 	String paySum=(String)request.getParameter("paySum");
 
     Client client = (Client)session.getAttribute("__payform.client");
+    Org org = (Org)session.getAttribute("__payform.org");
     Person person = client.getContractPerson();
     String clientAbbreviation = AbbreviationUtils
                     .buildAbbreviation(person.getFirstName(), person.getSurname(), person.getSecondName());
@@ -263,7 +264,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">За оплату питания</span></td>
+                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org.getShortName()%></span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>
@@ -527,7 +528,7 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">За оплату питания</span></td>
+                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org.getShortName()%></span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>

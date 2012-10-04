@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,6 +65,7 @@ public class Org {
     private String OGRN;
     private String INN;
     private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
+    private Set<Org> sourceMenuOrgs;
     private String mailingListReportsOnNutrition;
     private String mailingListReportsOnVisits;
     private String mailingListReports1;
@@ -74,6 +77,12 @@ public class Org {
     private Date lastSuccessfulBalanceSync;
     private Date lastUnSuccessfulBalanceSync;
     private Set<Org> friendlyOrg;
+    private String tag;
+    private String city; 
+    private String district;
+    private String location;
+    private String longitude;
+    private String latitude;
 
     public Set<Org> getFriendlyOrg() {
         return friendlyOrg;
@@ -82,25 +91,6 @@ public class Org {
     public void setFriendlyOrg(Set<Org> friendlyOrg) {
         this.friendlyOrg = friendlyOrg;
     }
-
-
-    //private Set<Org> friendlyOrgInternal;
-    //
-    //private Set<Org> getFriendlyOrgInternal() {
-    //    return friendlyOrgInternal;
-    //}
-    //
-    //private void setFriendlyOrgInternal(Set<Org> friendlyOrgInternal) {
-    //    this.friendlyOrgInternal = friendlyOrgInternal;
-    //}
-    //
-    //public Set<Org> getFriendlyOrg() {
-    //    return getFriendlyOrgInternal();
-    //}
-    //
-    //public void addFriendlyOrg(Org friendlyOrg) {
-    //    this.friendlyOrgInternal.add(friendlyOrg);
-    //}
 
     public Contract getContract() {
         return contract;
@@ -142,6 +132,13 @@ public class Org {
         this.categoriesInternal = categoriesInternal;
     }
 
+    public Set<Org> getSourceMenuOrgs() {
+        return sourceMenuOrgs;
+    }
+
+    public void setSourceMenuOrgs(Set<Org> sourceMenuOrgs) {
+        this.sourceMenuOrgs = sourceMenuOrgs;
+    }
 
     public String getINN() {
         return INN;
@@ -523,6 +520,54 @@ public class Org {
         return Collections.unmodifiableSet(getDiaryValuesInternal());
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
     /*private Set<EnterEvent> getEnterEventsInternal() {
         // For Hibernate only
         return enterEvents;
@@ -575,6 +620,18 @@ public class Org {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+    
+    static Pattern patterNumber = Pattern.compile("\\d+");
+    public String getOrgNumberInName() {
+        return extractOrgNumberFromName(shortName);
+    }
+    public static String extractOrgNumberFromName(String name) {
+        Matcher m = patterNumber.matcher(name); 
+        if (m.find()) {
+           return m.group();
+        }
+        return "";
     }
 
     @Override

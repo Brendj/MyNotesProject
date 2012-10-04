@@ -44,6 +44,13 @@ public class CalendarUtils {
         truncateToDayOfMonth(c);
         return c.getTime();
     }
+    public static Date truncateToDayOfMonthAndAddDay(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        c.add(Calendar.HOUR, 24);
+        truncateToDayOfMonth(c);
+        return c.getTime();
+    }
 
     static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -79,6 +86,40 @@ public class CalendarUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.add(Calendar.MONTH, -1);
+        return calendar.getTime();
+    }
+
+    public static Date addOneDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        return calendar.getTime();
+    }
+
+    public static Date addDays(Date date, int nDays) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, nDays);
+        return calendar.getTime();
+    }
+
+    public static int getDayOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public static Date setDayOfMonth(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        return calendar.getTime();
+    }
+    public static Date getFirstDayOfNextMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, 1);
+        truncateToMonth(calendar);
         return calendar.getTime();
     }
 }

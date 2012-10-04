@@ -12,7 +12,7 @@
             <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
         </composite-id>
         <property name="enterName" column="EnterName" type="string" length="100" not-null="true"/>
-        <property name="turnstileAddr" column="TurnstileAddr" type="string" length="20" not-null="true"/>
+        <property name="turnstileAddr" column="TurnstileAddr" type="string" length="30" not-null="true"/>
         <property name="passDirection" column="PassDirection" type="integer" not-null="true"/>
         <property name="eventCode" column="EventCode" type="integer" not-null="true"/>
         <property name="idOfCard" column="IdOfCard" type="long" not-null="false"/>

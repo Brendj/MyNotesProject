@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.AccessDiniedException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.PaymentProcessEvent;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
@@ -15,6 +16,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
@@ -188,6 +191,8 @@ public class Processor implements SyncProcessor,
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
         try {
+            setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
+            ////
             if (request.getType() == SyncRequest.TYPE_FULL) {
                 // Generate IdOfPacket
                 idOfPacket = generateIdOfPacket(request.getIdOfOrg());
@@ -218,15 +223,6 @@ public class Processor implements SyncProcessor,
                             e);
                 }
 
-                // Build client registry
-                try {
-                    clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                            request.getClientRegistryRequest());
-                } catch (Exception e) {
-                    logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
-                }
-
                 // Process OrgStructure
                 try {
                     if(request.getOrgStructure()!=null){
@@ -235,6 +231,15 @@ public class Processor implements SyncProcessor,
                 } catch (Exception e) {
                     resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
                     logger.error(String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
+                }
+
+                // Build client registry
+                try {
+                    clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
+                            request.getClientRegistryRequest());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
                 }
 
@@ -354,6 +359,7 @@ public class Processor implements SyncProcessor,
 
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
                 // запрос на получение пополнений
+                boolean bError=false;
                 try {
                     accIncRegistry = getAccIncRegistry(request.getIdOfOrg(),
                             request.getAccIncRegistryRequest().dateTime);
@@ -362,6 +368,7 @@ public class Processor implements SyncProcessor,
                             e);
                     accIncRegistry = new SyncResponse.AccIncRegistry();
                     accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
+                    bError=true;
                 }
 
                 // Process enterEvents
@@ -372,7 +379,10 @@ public class Processor implements SyncProcessor,
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
+                    bError=true;
                 }
+                if (bError) DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+                else DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to perform synchronization, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -852,26 +862,33 @@ public class Processor implements SyncProcessor,
                     .getPayments().iterator();
 
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
-            Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
+            Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
+            Set<Org> orgSet  = org.getFriendlyOrg();
+            //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
             /* совместимость организаций котрое не имеют дружественных организаций */
-            if(orgSet==null || orgSet.isEmpty()){
-                orgSet = new TreeSet<Long>();
-                orgSet.add(idOfOrg);
+            if (orgSet==null || orgSet.isEmpty()){
+                //orgSet = new TreeSet<Long>();
+                //orgSet.add(idOfOrg);
+                orgSet = new TreeSet<Org>();
+                orgSet.add(org);
             }
-            for (Long id: orgSet){
-                List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, id);
+            for (Org o: orgSet){
+                List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
                 HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
                 for(Object object: clientGroups){
                     ClientGroup clientGroup = (ClientGroup) object;
                     nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
                     orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(),nameIdGroupMap);
                 }
-                orgMap.put(id, nameIdGroupMap);
+                orgMap.put(o.getIdOfOrg(), nameIdGroupMap);
             }
             Long version=null;
             if(clientParamItems.hasNext()){
                 version=DAOUtils.updateClientRegistryVersion(persistenceSession);
             }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
             while (clientParamItems.hasNext()) {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
                 /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
@@ -889,8 +906,6 @@ public class Processor implements SyncProcessor,
                 }
             }
 
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -943,8 +958,18 @@ public class Processor implements SyncProcessor,
                 client.setCategories(new HashSet<CategoryDiscount>());
             }
             if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
-            if (clientParamItem.getEmail()!=null) client.setEmail(clientParamItem.getEmail());
-            if (clientParamItem.getMobilePhone()!=null) client.setMobile(clientParamItem.getMobilePhone());
+            if (clientParamItem.getEmail()!=null) {
+                client.setEmail(clientParamItem.getEmail());
+                if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail()==null) {
+                    client.setNotifyViaEmail(true);
+                }
+            }
+            if (clientParamItem.getMobilePhone()!=null) {
+                client.setMobile(clientParamItem.getMobilePhone());
+                if (!StringUtils.isEmpty(clientParamItem.getMobilePhone()) && clientParamItem.getNotifyViaSMS()==null) {
+                    client.setNotifyViaSMS(true);
+                }
+            }
             if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
             if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
             if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
@@ -1121,6 +1146,7 @@ public class Processor implements SyncProcessor,
             persistenceSession.save(clientGroup);
         }
 
+        /* не нужный код - т.к. список клиентов всегда полный, из за него при регистрации с клиента сбрасывался класс после синхронизации
         // Ищем "лишних" клиентов
         List<Client> superfluousClients = new ArrayList<Client>();
         for (Client client : clientGroup.getClients()) {
@@ -1134,7 +1160,7 @@ public class Processor implements SyncProcessor,
             client.setUpdateTime(new Date());
             persistenceSession.update(client);
             clientGroup.removeClient(client);
-        }
+        }*/
 
         // Добавляем в группу клиентов согласно запросу
         Enumeration<Long> reqClients = reqGroup.getClients();
@@ -2301,8 +2327,9 @@ persistenceSession.save(menuDetail);
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
         return new String[]{
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
-                String.valueOf(client.getContractId()), "surname", client.getPerson().getSurname(), "firstName",
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
+                "contractId", ContractIdFormat.format(client.getContractId()),
+                "surname", client.getPerson().getSurname(), "firstName",
                 client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
     }
 
@@ -2319,4 +2346,12 @@ persistenceSession.save(menuDetail);
         return false;
     }
 
+    HashMap<Long, String> orgSyncAddressMap = new HashMap<Long, String>();
+
+    protected void setOrgSyncAddress(Long idOfOrg, String address) {
+        orgSyncAddressMap.put(idOfOrg, address);
+    }
+    public String getOrgSyncAddress(Long idOfOrg) {
+        return orgSyncAddressMap.get(idOfOrg);
+    }
 }

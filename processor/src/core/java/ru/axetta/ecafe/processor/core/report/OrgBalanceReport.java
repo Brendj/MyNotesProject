@@ -714,7 +714,7 @@ public class OrgBalanceReport extends BasicReport {
                         logger.debug(String.format("Building report \"%s\" for org: %s", classPropertyValue, currOrg));
                     }
                     Properties properties = new Properties();
-                    ReportPropertiesUtils.addProperties(properties, OrgBalanceReport.class);
+                    ReportPropertiesUtils.addProperties(properties, OrgBalanceReport.class, null);
                     ReportPropertiesUtils.addProperties(session, properties, currOrg, null);
                     OrgBalanceReport report = new OrgBalanceReport(baseTime, currOrg.getIdOfOrg(), sessionFactory);
                     //OrgBalanceReport report = builder.build(session, baseTime, currOrg);

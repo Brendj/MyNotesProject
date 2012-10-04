@@ -381,7 +381,7 @@ public class OrgBalanceJasperReport extends BasicJasperReport {
                         logger.debug(String.format("Building report \"%s\" for org: %s", classPropertyValue, currOrg));
                     }
                     Properties properties = new Properties();
-                    ReportPropertiesUtils.addProperties(properties, OrgBalanceJasperReport.class);
+                    ReportPropertiesUtils.addProperties(properties, OrgBalanceJasperReport.class, null);
                     ReportPropertiesUtils.addProperties(session, properties, currOrg, null);
                     OrgBalanceJasperReport report = new OrgBalanceJasperReport(baseTime, currOrg.getIdOfOrg(),
                             templateFileName, sessionFactory);

@@ -711,4 +711,9 @@ public class Client {
     public boolean hasEmail() {
         return email!=null && email.length()>0;
     }
+
+    public static boolean isValidContractState(int contractState) {
+        return contractState>=0 && contractState<CONTRACT_STATE_NAMES.length;
+    }
+    
 }

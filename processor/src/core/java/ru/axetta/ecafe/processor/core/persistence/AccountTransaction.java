@@ -23,6 +23,7 @@ public class AccountTransaction {
     public static final int INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE = 10;
     public static final int SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE = 20;
     public static final int CANCEL_TRANSACTION_SOURCE_TYPE = 30;
+    public static final int ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE = 40;
 
     public static String sourceTypeToString(int sourceType) {
         if (sourceType==PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE) return "Платежная система";
@@ -30,6 +31,7 @@ public class AccountTransaction {
         else if (sourceType==INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE) return "Операция";
         else if (sourceType==SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE) return "Плата";
         else if (sourceType==CANCEL_TRANSACTION_SOURCE_TYPE) return "Отмена";
+        else if (sourceType==ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE) return "Перевод между счетами";
         return "Неизвестно";
     }
 
@@ -110,9 +112,13 @@ public class AccountTransaction {
         return source;
     }
 
-    private void setSource(String source) {
+    protected void setSource(String source) {
         // For Hibernate only
         this.source = source;
+    }
+    
+    public void updateSource(String source) {
+        if (sourceType!=ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE) throw new Error("Source update on type: "+getSourceTypeAsString()+" prohibited");
     }
 
     public Integer getSourceType() {

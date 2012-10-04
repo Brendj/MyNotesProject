@@ -37,6 +37,8 @@ public class MaintananceService {
 
     @Transactional
     public void run() {
+        if (!RuntimeContext.getInstance().isMainNode()) return;
+        ////
         if (maintananceHour==null) {
             maintananceHour = runtimeContext.getPropertiesValue(RuntimeContext.PARAM_NAME_DB_MAINTANANCE_HOUR, 22);
             logger.info("DB maintanance hour: "+maintananceHour+", current hour: "+Calendar.getInstance().get(Calendar.HOUR_OF_DAY));

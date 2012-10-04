@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @Component
+@Scope("session")
 public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     @PersistenceContext
     EntityManager entityManager;

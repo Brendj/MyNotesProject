@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @Component
+@Scope("session")
 public class CategoryDiscountEditPage extends BasicWorkspacePage {
     @PersistenceContext
     EntityManager entityManager;

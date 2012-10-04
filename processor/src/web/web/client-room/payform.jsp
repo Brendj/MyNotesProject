@@ -21,6 +21,7 @@
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.Base64" %>
 <%@ page import="java.net.URLDecoder" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
 <html lang="ru">
 <head>
 <%
@@ -55,6 +56,9 @@
             clientCriteria.add(Restrictions.eq("contractId", contractId));
             Client client = (Client) clientCriteria.uniqueResult();
             session.setAttribute("__payform.client", client);
+            Org org = client.getOrg();
+            org.getShortName();
+            session.setAttribute("__payform.org", org);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (RuntimeContext.NotInitializedException e) {

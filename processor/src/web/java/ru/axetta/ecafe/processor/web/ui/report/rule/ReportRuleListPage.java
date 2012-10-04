@@ -26,6 +26,7 @@ public class ReportRuleListPage extends BasicWorkspacePage {
 
         private final long idOfReportHandleRule;
         private final String ruleName;
+        private final String tag;
         private final boolean enabled;
         private final String reportType;
         private final int documentFormat;
@@ -36,6 +37,7 @@ public class ReportRuleListPage extends BasicWorkspacePage {
         public RuleItem(Session session, ReportHandleRule reportHandleRule) throws Exception {
             this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
             this.ruleName = cutRuleName(reportHandleRule.getRuleName());
+            this.tag = reportHandleRule.getTag();
             this.enabled = reportHandleRule.isEnabled();
             Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
             String reportType = reportHandleRule.findType(session);
@@ -128,6 +130,9 @@ public class ReportRuleListPage extends BasicWorkspacePage {
             return ruleConditionItems;
         }
 
+        public String getTag() {
+            return tag;
+        }
     }
 
     private List<RuleItem> items = Collections.emptyList();

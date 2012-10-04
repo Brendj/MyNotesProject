@@ -414,7 +414,7 @@ public class PaymentProcessEvent extends BasicEvent {
             } finally {
                 IOUtils.closeQuietly(outputStream);
             }
-            return new ReportDocument(Collections.singletonList(eventDocumentFile));
+            return new ReportDocument(eventDocumentFile);
         }
 
         private static void writeReportDocumentTo(PaymentProcessEvent event, OutputStream outputStream,

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class MessageConfigurePage extends BasicWorkspacePage {
 
     private String balanceEmailSubject;

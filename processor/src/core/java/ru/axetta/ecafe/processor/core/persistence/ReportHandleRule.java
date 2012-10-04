@@ -28,10 +28,9 @@ public class ReportHandleRule {
 
     public static final String UNKNOWN_FORMAT_NAME = "Неизвестный";
     public static final String[] FORMAT_NAMES = {"HTML", "XLS", "CSV", "PDF"};
-    public static final String[] MAIL_LIST_NAMES = { "{Список рассылки отчетов по питанию}",
-                                                     "{Список рассылки отчетов по посещению}",
-                                                     "{Список рассылки №1}",
-                                                     "{Список рассылки №2}"};
+    public static final String[] MAIL_LIST_NAMES = {
+            "{Список рассылки отчетов по питанию}", "{Список рассылки отчетов по посещению}", "{Список рассылки №1}",
+            "{Список рассылки №2}"};
     public static final int HTML_FORMAT = 0;
     public static final int XLS_FORMAT = 1;
     public static final int CSV_FORMAT = 2;
@@ -54,6 +53,7 @@ public class ReportHandleRule {
     private String remarks;
     private boolean enabled;
     private Set<RuleCondition> ruleConditions = new HashSet<RuleCondition>();
+    private String tag;
 
     ReportHandleRule() {
         // For Hibernate only
@@ -225,6 +225,14 @@ public class ReportHandleRule {
         this.templateFileName = templateFileName;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public String findType(Session session) throws Exception {
         List rules = session.createFilter(getRuleConditionsInternal(),
                 "where this.conditionOperation = ? and this.conditionArgument = ?")
@@ -237,11 +245,11 @@ public class ReportHandleRule {
     }
 
     public static Criteria createAllReportRulesCriteria(Session session) throws Exception {
-        return session.createCriteria(ReportHandleRule.class).createCriteria("ruleConditionsInternal")
+        return session.createCriteria(ReportHandleRule.class).addOrder(org.hibernate.criterion.Order.asc("ruleName")).
+                createCriteria("ruleConditionsInternal")
                 .add(Restrictions.eq("conditionOperation", RuleCondition.EQUAL_OPERTAION))
-                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
-                .add(Restrictions.like("conditionConstant", RuleCondition.REPORT_TYPE_BASE_PART + ".%",
-                        MatchMode.START));
+                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG)).add(Restrictions
+                        .like("conditionConstant", RuleCondition.REPORT_TYPE_BASE_PART + ".%", MatchMode.START));
     }
 
     public static Criteria createEnabledReportRulesCriteria(Session session) throws Exception {
@@ -249,26 +257,23 @@ public class ReportHandleRule {
                 .createCriteria("ruleConditionsInternal")
                 .add(Restrictions.eq("conditionOperation", RuleCondition.EQUAL_OPERTAION))
                 .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
-                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
-                .add(Restrictions.like("conditionConstant", RuleCondition.REPORT_TYPE_BASE_PART + ".%",
-                        MatchMode.START));
+                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG)).add(Restrictions
+                        .like("conditionConstant", RuleCondition.REPORT_TYPE_BASE_PART + ".%", MatchMode.START));
     }
 
     public static Criteria createAllEventNotificationsCriteria(Session session) throws Exception {
         return session.createCriteria(ReportHandleRule.class).createCriteria("ruleConditionsInternal")
                 .add(Restrictions.eq("conditionOperation", RuleCondition.EQUAL_OPERTAION))
-                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
-                .add(Restrictions.like("conditionConstant", RuleCondition.EVENT_TYPE_BASE_PART + ".%",
-                        MatchMode.START));
+                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG)).add(Restrictions
+                        .like("conditionConstant", RuleCondition.EVENT_TYPE_BASE_PART + ".%", MatchMode.START));
     }
 
     public static Criteria createEnabledEventNotificationsCriteria(Session session) throws Exception {
         return session.createCriteria(ReportHandleRule.class).add(Restrictions.eq("enabled", true))
                 .createCriteria("ruleConditionsInternal")
                 .add(Restrictions.eq("conditionOperation", RuleCondition.EQUAL_OPERTAION))
-                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG))
-                .add(Restrictions.like("conditionConstant", RuleCondition.EVENT_TYPE_BASE_PART + ".%",
-                        MatchMode.START));
+                .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG)).add(Restrictions
+                        .like("conditionConstant", RuleCondition.EVENT_TYPE_BASE_PART + ".%", MatchMode.START));
     }
 
     public static Criteria createOrgByIdCriteria(Session session, long id) {
@@ -306,6 +311,15 @@ public class ReportHandleRule {
         for (String name : MAIL_LIST_NAMES) {
             sb.append(name).append(", ");
         }
-        return sb.toString().substring(0, sb.length()-2);
+        return sb.toString().substring(0, sb.length() - 2);
     }
+
+
+    public static String getDocumentFormatAsString(Integer documentFormat) {
+        if (documentFormat >= 0 && documentFormat < FORMAT_NAMES.length) {
+            return FORMAT_NAMES[documentFormat];
+        }
+        return "Неизвестно";
+    }
+
 }

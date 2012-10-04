@@ -52,7 +52,7 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
                     transaction.begin();
 
                     Properties properties = new Properties();
-                    ReportPropertiesUtils.addProperties(properties, getMyClass());
+                    ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
                     BasicReportForAllOrgJob report = createInstance();
                     report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime, autoReportBuildTask.templateFileName,
                             autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);

@@ -26,6 +26,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Scope("session")
 public class BankListPage extends BasicWorkspacePage{
 
     @PersistenceContext

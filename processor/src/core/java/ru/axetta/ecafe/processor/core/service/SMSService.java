@@ -19,7 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,25 +38,42 @@ public class SMSService {
     EntityManager em;
 
     @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
     RuntimeContext runtimeContext;
+
+    public SMSService() {
+    }
+
 
     @Async
     public void sendSMSAsync(long idOfClient, int messageType, String text) throws Exception {
         RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, text);
     }
 
-    @Transactional
     public boolean sendSMS(long idOfClient, int messageType, String text) throws Exception {
-        Client client = em.find(Client.class, idOfClient);
-        if (client == null)
-            throw new Exception ("Client doesn't exist");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(def);
+        Client client = null; String phoneNumber, sender;
+        try {
+            client = em.find(Client.class, idOfClient);
+            if (client == null) {
+                throw new Exception ("Client doesn't exist");
+            }
+            if(!client.isNotifyViaSMS()) return false;
+            phoneNumber = client.getMobile();
+            if (!StringUtils.isNotEmpty(phoneNumber)) return false;
+            phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
+            if (StringUtils.length(phoneNumber) != 11) return false;
+            sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
+            transactionManager.commit(status);
+            status = null;
+        }
+        finally {
+            if (status!=null) transactionManager.rollback(status);
+        }
 
-        if(!client.isNotifyViaSMS()) return false;
-        String phoneNumber = client.getMobile();
-        if (!StringUtils.isNotEmpty(phoneNumber)) return false;
-        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-        if (StringUtils.length(phoneNumber) != 11) return false;
-        String sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
         SendResponse sendResponse = null;
         ISmsService smsService = runtimeContext.getSmsService();
         try {
@@ -69,7 +90,7 @@ public class SMSService {
             }
         }
         if (null != sendResponse && sendResponse.isSuccess()) {
-            RuntimeContext.getFinancialOpsManager().createClientSmsCharge((Session)em.getDelegate(), client, sendResponse.getMessageId(), phoneNumber,
+            RuntimeContext.getFinancialOpsManager().createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber,
                                 messageType, text, new Date());
             return true;
         }

@@ -141,6 +141,8 @@ public class Postman implements AutoReportPostman {
     private static Session createMailSession(MailSettings mailSettings) throws Exception {
         Properties properties = new Properties();
         final SmtpSettings smtpSettings = mailSettings.getSmtpSettings();
+        properties.put("mail.smtp.ssl.checkserveridentity", "false");
+        properties.put("mail.smtp.ssl.trust", "*");
         properties.put("mail.smtp.host", smtpSettings.getHost());
         properties.put("mail.smtp.port", Integer.toString(smtpSettings.getPort()));
         if (smtpSettings.isStartTLS()) {

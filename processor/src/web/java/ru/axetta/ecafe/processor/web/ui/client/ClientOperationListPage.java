@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
-import ru.axetta.ecafe.processor.core.persistence.SubscriptionFee;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -34,6 +32,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private final ClientPaymentList clientPaymentList = new ClientPaymentList();
     private final ClientOrderList clientOrderList = new ClientOrderList();
     private final ClientSmsList clientSmsList = new ClientSmsList();
+    private List<AccountTransfer> accountTransferList = new LinkedList<AccountTransfer>(); 
     private List<AccountTransaction> accountTransactionList = new LinkedList<AccountTransaction>();
 
     public String getPageFilename() {
@@ -86,6 +85,10 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return accountTransactionList;
     }
 
+    public List<AccountTransfer> getAccountTransferList() {
+        return accountTransferList;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
@@ -93,13 +96,23 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         this.clientOrderList.fill(session, client, this.startTime, this.endTime);
         this.clientSmsList.fill(session, client, this.startTime, this.endTime);
         /////
+        accountTransferList = DAOUtils.getAccountTransfersForClient(session,  client, startTime,  endTime);
+        for (AccountTransfer at : accountTransferList) {
+            // lazy load
+            at.getClientBenefactor().getPerson().getFullName();
+            at.getClientBeneficiary().getPerson().getFullName();
+            at.getCreatedBy().getUserName();
+        }
+        /////
         Criteria criteria = session.createCriteria(AccountTransaction.class);
         criteria.add(Restrictions.ge("transactionTime", startTime));
         criteria.add(Restrictions.le("transactionTime", endTime));
         criteria.add(Restrictions.eq("client", client));
         this.accountTransactionList = new LinkedList<AccountTransaction>();
         for (Object o : criteria.list()) {
-            accountTransactionList.add((AccountTransaction)o);
+            AccountTransaction accTrans = (AccountTransaction)o;
+            if (accTrans.getCard()!=null) accTrans.getCard().getCardNo(); // lazy load
+            accountTransactionList.add(accTrans);
         }
 
     }

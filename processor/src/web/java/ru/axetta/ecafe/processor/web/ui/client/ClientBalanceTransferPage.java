@@ -4,17 +4,55 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Component
-public class ClientBalanceTransferPage implements ClientSelectPage.CompleteHandler {
-    public Client fromClient, toClient;
-    public Long sum;
-    public String clientSelectType;
+@Scope("session")
+public class ClientBalanceTransferPage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
+    @PersistenceContext
+    EntityManager em;
 
+
+    @Override
+    public String getPageFilename() {
+        return "client/balance_transfer";
+    }
+
+    public Client fromClient, toClient;
+    public String fromClientName, toClientName;
+    public Long fromClientBalance, toClientBalance;
+    public Long fromClientContractId, toClientContractId;
+    public String clientSelectType;
+    public Long sum;
+    public String reason;
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getClientSelectType() {
+        return clientSelectType;
+    }
+
+    public void setClientSelectType(String clientSelectType) {
+        this.clientSelectType = clientSelectType;
+    }
 
     public Client getFromClient() {
         return fromClient;
@@ -24,12 +62,36 @@ public class ClientBalanceTransferPage implements ClientSelectPage.CompleteHandl
         this.fromClient = fromClient;
     }
 
+    public Long getFromClientContractId() {
+        return fromClientContractId;
+    }
+
+    public Long getToClientContractId() {
+        return toClientContractId;
+    }
+
     public Client getToClient() {
         return toClient;
     }
 
     public void setToClient(Client toClient) {
         this.toClient = toClient;
+    }
+
+    public String getFromClientName() {
+        return fromClientName;
+    }
+
+    public String getToClientName() {
+        return toClientName;
+    }
+
+    public Long getFromClientBalance() {
+        return fromClientBalance;
+    }
+
+    public Long getToClientBalance() {
+        return toClientBalance;
     }
 
     public Long getSum() {
@@ -43,12 +105,65 @@ public class ClientBalanceTransferPage implements ClientSelectPage.CompleteHandl
     @Override
     public void completeClientSelection(Session session, Long idOfClient) throws Exception {
         Client cl = null;
-        if (idOfClient!=null) cl = (Client)session.get(Client.class, idOfClient);
+        if (idOfClient != null) {
+            cl = (Client) session.get(Client.class, idOfClient);
+        }
         if (clientSelectType.equals("from")) {
             fromClient = cl;
-        }
-        else if (clientSelectType.equals("to")) {
+        } else if (clientSelectType.equals("to")) {
             toClient = cl;
         }
+        updateClientInfo(session);
+    }
+
+    @Transactional
+    public void updateClientInfo() {
+        updateClientInfo((Session)em.getDelegate());
+    }
+    
+    private void updateClientInfo(Session session) {
+        fromClientName=null;
+        fromClientBalance=null;
+        toClientName=null;
+        toClientBalance=null;
+        if (fromClient!=null) {
+            fromClient = (Client)session.get(Client.class, fromClient.getIdOfClient());
+            fromClientName = fromClient.getPerson().getFullName();
+            fromClientContractId = fromClient.getContractId();
+            fromClientBalance = fromClient.getBalance();
+        }
+        if (toClient!=null) {
+            toClient = (Client)session.get(Client.class, toClient.getIdOfClient());
+            toClientName = toClient.getPerson().getFullName();
+            toClientContractId = toClient.getContractId();
+            toClientBalance = toClient.getBalance();
+        }
+    }
+
+    public Object registerTransfer() throws Exception {
+        if (fromClient == null) {
+            printError("Не указан плательщик");
+        } else if (toClient == null) {
+            printError("Не указан получатель");
+        } else if (sum == null) {
+            printError("Не указана сумма");
+        } else if (reason == null || reason.length() == 0) {
+            printError("Не указана причина");
+        } else if (sum <= 0) {
+            printError("Сумма должна быть больше нуля");
+        } else if (fromClientBalance<sum) {
+            printError("Недостаточно средств на лицевом счете плательщика");
+        } else {
+            try {
+                RuntimeContext.getFinancialOpsManager().createAccountTransfer(fromClient, toClient, sum, reason,
+                        MainPage.getSessionInstance().getCurrentUser());
+                printMessage("Перевод успешно проведен");
+                RuntimeContext.getAppContext().getBean(ClientBalanceTransferPage.class).updateClientInfo();
+            } catch (Exception e) {
+                logAndPrintMessage("Ошибка при выполнении перевода", e);
+            }
+        }
+
+        return null;
     }
 }

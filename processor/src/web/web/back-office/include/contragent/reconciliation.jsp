@@ -17,8 +17,7 @@
 <h:panelGrid id="reconcilePanel" binding="#{reconciliationPage.pageComponent}" styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Загрузка реестра для квитирования" switchType="client" opened="true"
                             headerClass="filter-panel-header">
-        <h:panelGrid id="reconcileGrid" binding="#{mainPage.orgEditPage.pageComponent}" styleClass="borderless-grid"
-                     columns="2">
+        <h:panelGrid id="reconcileGrid" styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Агент" styleClass="output-text required-field" />
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{reconciliationPage.caAgentName}" readonly="true" styleClass="input-text"

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -23,6 +24,16 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public class ReportPropertiesUtils {
+    
+    public static String P_ID_OF_ORG="idOfOrg";
+    public static String P_ORG_TAG="orgTag";
+    public static String P_ORG_NUMBER_IN_NAME="orgNumberInName";
+    public static String P_SHORT_NAME="shortName";
+    public static String P_OFFICIAL_NAME="officialName";
+    public static String P_JOB_NAME ="reportJob";
+    public static String P_REPORT_PERIOD="reportPeriod";
+    public static String P_REPORT_CLASS="class";
+    public static String P_DATES_SPECIFIED_BY_USER="datesSpecifiedByUser";
 
     //private static String DELIMETER = ",";
 
@@ -30,15 +41,19 @@ public class ReportPropertiesUtils {
 
     }
 
-    public static void addProperties(Properties properties, Class reportClass) throws Exception {
-        properties.setProperty("class", reportClass.getCanonicalName());
+    public static void addProperties(Properties properties, Class reportClass, BasicReportJob.AutoReportBuildTask autoReportBuildTask) throws Exception {
+        properties.setProperty(P_REPORT_CLASS, reportClass.getCanonicalName());
+        properties.setProperty(P_JOB_NAME, autoReportBuildTask==null?"null":autoReportBuildTask.jobName);
+        properties.setProperty(P_DATES_SPECIFIED_BY_USER, autoReportBuildTask==null?"false":(autoReportBuildTask.datesSpecifiedByUser?"true":"false"));
     }
 
     public static void addProperties(Session session, Properties properties, Org org, String prefix) throws Exception {
         String realPrefix = StringUtils.defaultString(prefix);
-        properties.setProperty(realPrefix.concat("idOfOrg"), org.getIdOfOrg().toString());
-        properties.setProperty(realPrefix.concat("shortName"), org.getShortName());
-        properties.setProperty(realPrefix.concat("officialName"), org.getOfficialName());
+        properties.setProperty(realPrefix.concat(P_ID_OF_ORG), org.getIdOfOrg().toString());
+        properties.setProperty(realPrefix.concat(P_ORG_TAG), org.getTag()==null?"":org.getTag());
+        properties.setProperty(realPrefix.concat(P_ORG_NUMBER_IN_NAME), org.getOrgNumberInName());
+        properties.setProperty(realPrefix.concat(P_SHORT_NAME), org.getShortName());
+        properties.setProperty(realPrefix.concat(P_OFFICIAL_NAME), org.getOfficialName());
         //idOfMenuSourceOrg
         Long idOfMenuSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, org.getIdOfOrg());
         if (idOfMenuSourceOrg != null)

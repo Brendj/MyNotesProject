@@ -8,6 +8,8 @@ import generated.nsiws.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ import java.util.Properties;
 @Component
 @Scope("singleton")
 public class MskNSIService {
+    private static final Logger logger = LoggerFactory.getLogger(MskNSIService.class);
+
     public static class Config {
         private static final String PARAM_BASE = ".nsi.";
         private static final String PARAM_SYNC_SCHEDULE ="sync.schedule";
@@ -115,6 +119,7 @@ public class MskNSIService {
         if (nsiService!=null) return;
         Config config = RuntimeContext.getInstance().getNsiServiceConfig();
         String url = config.url;
+        logger.info("Trying NSI service: "+url);
         nsiServicePort = new NSIServiceService(new URL(url+"?wsdl"), new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
     }

@@ -28,6 +28,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
 
     private long idOfReportHandleRule;
     private String ruleName;
+    private String tag;
     private boolean enabled;
     private String reportType;
     private int documentFormat;
@@ -87,6 +88,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
                 .load(ReportHandleRule.class, idOfReportHandleRule);
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
+        this.tag = reportHandleRule.getTag();
         Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
         this.reportType = reportHandleRule.findType(session);
         if (null == this.reportType) {
@@ -136,5 +138,9 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
 
     public String getReportTemplateFileName() {
         return reportTemplateFileName;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

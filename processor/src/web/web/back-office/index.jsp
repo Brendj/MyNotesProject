@@ -39,6 +39,10 @@
         <c:import url="include/abstractpage/confirm_delete.jsp" />
     </f:subview>
 
+    <f:subview id="confirmDeletePageSubView">
+        <c:import url="include/confirm_delete.jsp" />
+    </f:subview>
+
     <f:subview id="technologicalMapGroupSelectSubView">
         <c:import url="include/option/configuration_provider/technologicalMap/group/select.jsp" />
     </f:subview>

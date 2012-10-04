@@ -14,31 +14,40 @@
              styleClass="borderless-grid">
 
     <rich:extendedDataTable id="distributionRulesTable" value="#{distributionRulesPage.ruleItemList}" var="ruleItem"
-                            columnClasses="left-aligned-column, left-aligned-column, left-aligned-column" rows="15"
-                            sortMode="multi" selectionMode="single" enableContextMenu="false" width="900px" footerClass="data-table-footer">
-        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.contragent.contragentName}"  width="300px">
+                            columnClasses="left-aligned-column, left-aligned-column, left-aligned-column" rows="500"
+                            sortMode="multi" selectionMode="single" width="1200" height="900"
+                            footerClass="data-table-footer">
+        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.contragentLabel}"  width="300px" filterBy="#{ruleItem.contragentLabel}" filterEvent="onkeyup">
             <f:facet name="header">
                 <h:outputText value="Поставщик по умолчанию" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink value="#{ruleItem.contragent.contragentName}" action="#{mainPage.showContragentViewPage}"
+            <h:commandLink value="#{ruleItem.contragentLabel}" action="#{mainPage.showContragentViewPage}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.contragent.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
             </h:commandLink>
         </rich:column>
-        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.distributionOrg.shortName}" width="300px">
+        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.distributionOrgLabel}" width="300px" filterBy="#{ruleItem.distributionOrgLabel}" filterEvent="onkeyup">
             <f:facet name="header">
                 <h:outputText value="Организация - источник меню" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink value="#{ruleItem.distributionOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <h:commandLink value="#{ruleItem.distributionOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.distributionOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </h:commandLink>
         </rich:column>
-        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.sourceOrg.shortName}" width="300px">
+        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.sourceOrgLabel}" width="300px" filterBy="#{ruleItem.sourceOrgLabel}" filterEvent="onkeyup">
             <f:facet name="header">
                 <h:outputText value="Организация" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink value="#{ruleItem.sourceOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <h:commandLink value="#{ruleItem.sourceOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{ruleItem.sourceOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </h:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header" sortable="false" sortBy="#{ruleItem.sourceOrg.shortName}" width="300px" filterBy="#{ruleItem.sourceOrg.orgNumberInName}" filterEvent="onkeyup">
+            <f:facet name="header">
+                <h:outputText value="Организация - номер" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:commandLink value="#{ruleItem.sourceOrg.orgNumberInName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.sourceOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </h:commandLink>
         </rich:column>

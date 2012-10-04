@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.report;
@@ -13,6 +13,6 @@ package ru.axetta.ecafe.processor.core.report;
  */
 public interface ReportDocumentBuilder {
 
-    ReportDocument buildDocument(BasicReport report) throws Exception;
+    ReportDocument buildDocument(String ruleId, BasicReport report) throws Exception;
 
 }

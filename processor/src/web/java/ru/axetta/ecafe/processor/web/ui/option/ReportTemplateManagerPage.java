@@ -36,9 +36,12 @@ import java.util.List;
 public class ReportTemplateManagerPage extends BasicWorkspacePage {
     //private static final Logger logger = LoggerFactory.getLogger(ReportTemplateManagerPage.class);
     private String relativePath;
-    private String reportPath;
 
     public void removeTemplate(String removedReportTemplate) throws Exception {
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        if (reportPath==null || reportPath.isEmpty()) {
+            throw new Exception("Не настроен путь к директории шаблонов отчетов");
+        }
         File file = new File(reportPath+removedReportTemplate);
         if (!file.exists())
             throw new Exception(String.format("Can not find template %s.", removedReportTemplate));
@@ -146,11 +149,15 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
     }
 
     public void checkPath() {
+        if (relativePath==null) {
+            relativePath=""; return;
+        }
         int i = 0;
-        while (relativePath.charAt(i) == '.' ||
+        while (i<relativePath.length() && (relativePath.charAt(i) == '.' ||
                 relativePath.charAt(i) == '/' ||
-                relativePath.charAt(i) == '\\')
+                relativePath.charAt(i) == '\\')) {
             i++;
+        }
         relativePath = relativePath.substring(i);
     }
 

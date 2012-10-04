@@ -22,7 +22,7 @@
     <%-- <h:panelGrid styleClass="borderless-grid" width="100%"> --%>
         <h:outputText escape="true" value="Статус синхронизации" styleClass="output-text" />
         <rich:dataTable id="statusSyncReportTable" value="#{mainPage.statusSyncReportPage.statusSyncReport.syncItems}"
-                        var="statusSync" rowKeyVar="row" rows="15" footerClass="data-table-footer"
+                        var="statusSync" rowKeyVar="row" rows="200" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
             <f:facet name="header">

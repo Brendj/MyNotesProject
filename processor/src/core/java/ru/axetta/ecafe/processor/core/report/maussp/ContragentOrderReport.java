@@ -399,7 +399,7 @@ public class ContragentOrderReport extends BasicJasperReport {
                                 org));
                     }
                     Properties properties = new Properties();
-                    ReportPropertiesUtils.addProperties(properties, ContragentOrderReport.class);
+                    ReportPropertiesUtils.addProperties(properties, ContragentOrderReport.class, null);
                     ReportPropertiesUtils.addProperties(session, properties, org, null);
                     ContragentOrderReport report = new ContragentOrderReport(startTime, endTime,
                             org.getIdOfOrg(), templateFileName, sessionFactory, startCalendar);

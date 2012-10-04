@@ -52,7 +52,8 @@ public class Option {
             OPTION_CHRONOPAY_RATE=1001,
             OPTION_RBK_SECTION=1002,
             OPTION_RBK_RATE=1003,
-            OPTION_NSI_LAST_SYNC_TIME=10001;
+            OPTION_NSI_LAST_SYNC_TIME=10001,
+            OPTION_STOP_LIST_LAST_UPDATE=10010;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, "0",
@@ -69,6 +70,7 @@ public class Option {
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
             OPTION_NSI_LAST_SYNC_TIME, null,
+            OPTION_STOP_LIST_LAST_UPDATE, null
     };
 
     private Long idOfOption;

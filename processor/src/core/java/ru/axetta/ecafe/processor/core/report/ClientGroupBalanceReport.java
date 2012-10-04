@@ -589,7 +589,7 @@ public class ClientGroupBalanceReport extends BasicReport {
                                 currClientGroup));
                     }
                     Properties properties = new Properties();
-                    ReportPropertiesUtils.addProperties(properties, ClientGroupBalanceReport.class);
+                    ReportPropertiesUtils.addProperties(properties, ClientGroupBalanceReport.class, null);
                     ReportPropertiesUtils.addProperties(session, properties, currClientGroup.getOrg(), null);
                     ReportPropertiesUtils.addProperties(properties, currClientGroup, null);
                     ClientGroupBalanceReport report = new ClientGroupBalanceReport(baseTime,

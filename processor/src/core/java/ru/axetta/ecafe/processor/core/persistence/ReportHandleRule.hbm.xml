@@ -31,6 +31,7 @@
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="enabled" column="Enabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="tag" column="Tag" type="string" length="12"/>
         <set name="ruleConditionsInternal" inverse="true" cascade="all">
             <key column="IdOfReportHandleRule"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.RuleCondition"/>

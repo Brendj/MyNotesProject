@@ -32,6 +32,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Long idOfOrg;
     private String shortName;
     private String officialName;
+    private String tag;
     private String address;
     private String phone;
     private Long officialPersonId;
@@ -66,6 +67,11 @@ public class OrgEditPage extends BasicWorkspacePage
     private String configurationProviderName;
     private Set<Org> orgSet = new HashSet<Org>();
     private List<Long> idOfOrgList;
+    private String city;
+    private String district;
+    private String location;
+    private String latitude;
+    private String longitude;
 
     private String filterCategoryOrg;
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
@@ -110,6 +116,12 @@ public class OrgEditPage extends BasicWorkspacePage
         Org org = (Org) session.load(Org.class, idOfOrg);
         org.setShortName(shortName);
         org.setOfficialName(officialName);
+        org.setTag(tag);
+        org.setCity(city);
+        org.setDistrict(district);
+        org.setLocation(location);
+        org.setLongitude(longitude);
+        org.setLatitude(latitude);
         org.setAddress(address);
         org.setPhone(phone);
         Person officialPerson = org.getOfficialPerson();
@@ -196,6 +208,12 @@ public class OrgEditPage extends BasicWorkspacePage
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
         this.officialName = org.getOfficialName();
+        this.tag = org.getTag();
+        this.city = org.getCity();
+        this.district = org.getDistrict();
+        this.location = org.getLocation();
+        this.longitude = org.getLongitude();
+        this.latitude = org.getLatitude();
         this.address = org.getAddress();
         this.phone = org.getPhone();
         Person officialPerson = org.getOfficialPerson();
@@ -412,6 +430,54 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setOfficialName(String officialName) {
         this.officialName = officialName;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     public String getAddress() {

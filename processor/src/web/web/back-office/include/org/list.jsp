@@ -29,6 +29,20 @@
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.officialName}" maxlength="64"
                              styleClass="input-text" />
 
+                <h:outputText escape="true" value="Тэг" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.tag}" maxlength="64"
+                             styleClass="input-text" />
+
+                <h:outputText escape="true" value="Город" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.city}" maxlength="64"
+                             styleClass="input-text" />
+                <h:outputText escape="true" value="Район" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.district}" maxlength="64"
+                             styleClass="input-text" />
+                <h:outputText escape="true" value="Локация" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.location}" maxlength="64"
+                             styleClass="input-text" />
+
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -70,6 +84,30 @@
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
             <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Тэги" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.tag}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Город" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.city}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Район" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Локация" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.location}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

@@ -117,13 +117,17 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String CLIENT_SMS_PARAM_BASE = PROCESSOR_PARAM_BASE + ".client.sms";
     private static final String WS_CRYPTO_BASE=PROCESSOR_PARAM_BASE+".ws.crypto";
     private static final String INSTANCE_NAME=PROCESSOR_PARAM_BASE+".instance";
+    private static final String NODE_INFO_FILE =PROCESSOR_PARAM_BASE+".nodeInfoFile";
 
+    public final static int NODE_ROLE_MAIN=1, NODE_ROLE_PROCESSOR=2;
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
     // Lock for global instance anchor
     private static final Object INSTANCE_LOCK = new Object();
 
     private String instanceName;
+    private int roleNode = NODE_ROLE_MAIN;
+    private String nodeName;
     // Application wide executor service
     private ExecutorService executorService;
     // Application wide job scheduler
@@ -132,6 +136,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private SyncLogger syncLogger;
     private PaymentLogger paymentLogger;
     private PaymentProcessor paymentProcessor;
+    private Processor processor;
 
 
     private OnlinePaymentProcessor onlinePaymentProcessor;
@@ -287,7 +292,7 @@ public class RuntimeContext implements ApplicationContextAware {
         return instanceName;
     }
     public String getInstanceNameDecorated() {
-        return StringUtils.isEmpty(instanceName)?"":(" ("+instanceName+")");
+        return StringUtils.isEmpty(instanceName)?"":(" ("+instanceName+ ")")+(StringUtils.isEmpty(nodeName)?"":"["+nodeName+"]");
     }
 
     ///////////////////////////////////////////////////////////
@@ -361,7 +366,6 @@ public class RuntimeContext implements ApplicationContextAware {
         ProcessLogger processLogger = null;
         RuleProcessor ruleProcessor = null;
         EventNotificator eventNotificator = null;
-        Processor processor = null;
         ISmsService smsService = null;
         //sessionFactory = ((Session)entityManagerFactory.createEntityManager()).getSessionFactory();
         //logger.info("sf = "+sessionFactory);
@@ -370,6 +374,22 @@ public class RuntimeContext implements ApplicationContextAware {
             loadDataFiles();
             
             instanceName = properties.getProperty(INSTANCE_NAME);
+            
+            String nodeRoleFile = properties.getProperty(NODE_INFO_FILE);
+            if (nodeRoleFile!=null) {
+                try {
+                    BufferedReader buf = new BufferedReader(new FileReader(nodeRoleFile));
+                    String role = buf.readLine();
+                    nodeName = buf.readLine();
+                    if (role.equalsIgnoreCase("main")) roleNode = NODE_ROLE_MAIN;
+                    else if (role.equalsIgnoreCase("processor")) roleNode = NODE_ROLE_PROCESSOR;
+                    else throw new Exception("Unknown node role: "+role+" (valid: main, processor)");
+                    logger.info("CLUSTER NODE ROLE: "+role+"; NAME: "+nodeName);
+                } catch (Exception e) {
+                    logger.error("Failed to load node info", e);
+                    throw e;
+                }
+            }
 
             executorService = createExecutorService(properties);
             this.executorService = executorService;
@@ -406,7 +426,7 @@ public class RuntimeContext implements ApplicationContextAware {
             }
             try {
                 this.nsiServiceConfig = new MskNSIService.Config(properties, PROCESSOR_PARAM_BASE);
-                if (this.nsiServiceConfig.syncEnabled) {
+                if (this.nsiServiceConfig.syncEnabled && isMainNode()) {
                     getAppContext().getBean(NSISyncService.class).scheduleSync();
                 }
             } catch (Exception e) {
@@ -448,11 +468,13 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
 
             // Start background activities
-            this.autoReportGenerator.start();
+            if (isMainNode()) {
+                this.autoReportGenerator.start();
+            }
 
             //
             String checkSMSDelivery=properties.getProperty(SMS_SERVICE_PARAM_CHECK_DELIVERY);
-            if (checkSMSDelivery!=null && (checkSMSDelivery.equals("1") || 0==checkSMSDelivery.compareToIgnoreCase("true"))) {
+            if (checkSMSDelivery!=null && (checkSMSDelivery.equals("1") || 0==checkSMSDelivery.compareToIgnoreCase("true")) && isMainNode()) {
                 this.clientSmsDeliveryStatusUpdater.start();
             }
 
@@ -1240,6 +1262,14 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public LinkedList<DataInfo> getDataInfos() {
         return dataInfos;
+    }
+    
+    public Processor getProcessor() {
+        return processor;
+    }
+
+    public boolean isMainNode() {
+        return roleNode==NODE_ROLE_MAIN;
     }
 }
 

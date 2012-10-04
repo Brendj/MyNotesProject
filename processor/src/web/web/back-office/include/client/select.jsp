@@ -27,7 +27,7 @@
                 <td>
                     <rich:simpleTogglePanel id="modalClientSelectorFilterPanel"
                                             label="Фильтр (#{mainPage.clientSelectPage.clientFilter.status})"
-                                            switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
+                                            switchType="client" eventsQueue="mainFormEventsQueue" opened="true"
                                             headerClass="filter-panel-header">
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <h:outputText escape="true" value="Организация" styleClass="output-text" />

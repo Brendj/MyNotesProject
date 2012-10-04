@@ -15,6 +15,10 @@ import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -38,9 +42,11 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
     private String reportTemplateFileName;
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
+    private String tag;
 
-    public ReportTemplateFileNameMenu getReportTemplateFileNameMenu() {
-        return reportTemplateFileNameMenu;
+    public SelectItem[] getReportTemplatesFiles() {
+        if (StringUtils.isEmpty(reportType)) return reportTemplateFileNameMenu.getItems();
+        return reportTemplateFileNameMenu.getItemsForReportType(reportType);
     }
 
     public void setReportTemplateFileName(String reportTemplateFileName) {
@@ -152,6 +158,7 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         reportHandleRule.setRoute7(StringUtils.trim(getString(addressList, 7)));
         reportHandleRule.setRoute8(StringUtils.trim(getString(addressList, 8)));
         reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
+        reportHandleRule.setTag(tag);
 
         reportHandleRule.addRuleCondition(ReportRuleConstants.buildTypeCondition(reportHandleRule, this.reportType));
         String[] textRuleConditions = this.ruleConditionItems.split(DELIMETER);
@@ -175,4 +182,17 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         }
         return null;
     }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public List<ReportRuleConstants.ParamHint> getParamHints() {
+        return ReportRuleConstants.getParamHintsForReportType(reportType);
+    }
+
 }

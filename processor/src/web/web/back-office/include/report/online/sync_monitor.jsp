@@ -12,34 +12,34 @@
 
 
 
-<a4j:jsFunction name="updateList" reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"></a4j:jsFunction>
+<a4j:jsFunction name="updateList" action="#{syncMonitorPage.update}" reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"></a4j:jsFunction>
 <script type="text/javascript">
-var inter = setInterval (updateList, 1000 * 60 * 10);
+var inter = setInterval (updateList, 1000 * 120);
 </script>
 
 <%-- Панель просмотра списка организаций --%>
-<%--@elvariable id="orgSynchMonitorPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgSynchMonitorPage"--%>
+<%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SyncMonitorPage"--%>
 <%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
 <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
-<h:panelGrid id="contractListPanelGrid" binding="#{orgSynchMonitorPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="contractListPanelGrid" binding="#{syncMonitorPage.pageComponent}" styleClass="borderless-grid">
 
 
-    <a4j:commandButton value="Обновить" reRender="orgUnsychMonitorListTable,lastOrgUpdateTime" ></a4j:commandButton>
+    <a4j:commandButton value="Обновить" action="#{syncMonitorPage.update}" reRender="orgUnsychMonitorListTable,lastOrgUpdateTime" ></a4j:commandButton>
     <a4j:status>
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
-    <h:outputText styleClass="output-text" value="Последнее обновление произведено: "  /><h:outputText id="lastOrgUpdateTime" styleClass="output-text" value="#{orgSynchMonitorPage.lastUpdate}" converter="timeConverter" />
-    <rich:dataTable id="orgUnsychMonitorListTable" value="#{orgSynchMonitorPage.itemList}"
+    <h:outputText styleClass="output-text" value="Последнее обновление произведено: "  /><h:outputText id="lastOrgUpdateTime" styleClass="output-text" value="#{syncMonitorPage.lastUpdate}" converter="timeConverter" />
+    <rich:dataTable id="orgUnsychMonitorListTable" value="#{syncMonitorPage.itemList}"
                     var="item" footerClass="data-table-footer"
                     columnClasses="center-aligned-column">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Организация" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.shortName}" styleClass="output-text"
-                          style="#{orgSynchMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10 ? 'color=red' : ''}" />
+            <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text"
+                          style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
         </rich:column>
 
         <rich:column headerClass="column-header">
@@ -47,7 +47,7 @@ var inter = setInterval (updateList, 1000 * 60 * 10);
                 <h:outputText escape="true" value="Последняя успешная синхронизация балансов" />
             </f:facet>
             <h:outputText escape="true" value="#{item.lastSuccessfulBalanceSync}"
-                          style="#{orgSynchMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time  > 1000 * 60 * 10 ? 'color=red' : ''}"
+                          style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                           styleClass="output-text" converter="timeConverter" />
         </rich:column>
 
@@ -56,8 +56,17 @@ var inter = setInterval (updateList, 1000 * 60 * 10);
                 <h:outputText escape="true" value="Последняя неудачная синхронизация балансов" />
             </f:facet>
             <h:outputText escape="true" value="#{item.lastUnSuccessfulBalanceSync}"
-                          style="#{orgSynchMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10 ? 'color=red' : ''}"
+                          style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                           styleClass="output-text" converter="timeConverter" />
+        </rich:column>
+
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="IP-адрес" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.remoteAddr}"
+                          style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                          styleClass="output-text"/>
         </rich:column>
     </rich:dataTable>
 

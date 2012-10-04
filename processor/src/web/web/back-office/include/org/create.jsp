@@ -20,6 +20,18 @@
     <h:inputText value="#{mainPage.orgCreatePage.shortName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Тэги" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.tag}" maxlength="256" styleClass="input-text" />
+    <h:outputText escape="true" value="Город" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.city}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.district}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Локация" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.location}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Широта" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.latitude}" maxlength="12" styleClass="input-text" />
+    <h:outputText escape="true" value="Долгота" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.longitude}" maxlength="12" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.address}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />

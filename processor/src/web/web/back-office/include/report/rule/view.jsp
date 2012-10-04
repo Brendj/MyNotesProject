@@ -18,6 +18,9 @@
         <h:outputText escape="true" value="Название" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.ruleName}" style="width: 600px;"
                      styleClass="input-text" />
+        <h:outputText escape="true" value="Тэг" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.tag}" style="width: 600px;"
+                     styleClass="input-text" />
         <h:outputText escape="true" value="Включено" styleClass="output-text" />
         <h:selectBooleanCheckbox disabled="true" readonly="true" value="#{mainPage.reportRuleViewPage.enabled}"
                                  styleClass="output-text" />

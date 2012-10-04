@@ -189,51 +189,49 @@
         </f:facet>
     </rich:dataTable>
 
-    <c:if test="${!ru.axetta.ecafe.processor.web.ui.MainPage.sessionInstance.eligibleToEditClients}" >
-        <rich:simpleTogglePanel switchType="client" label="Групповые операции" opened="false">
-            <rich:tabPanel switchType="client">
-                <rich:tab label="Изменение лимита овердрафта">
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
-                        <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                        <rich:spacer/>
-                        <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
-                                       reRender="workspaceTogglePanel" styleClass="command-button"/>
-                    </h:panelGrid>
-                </rich:tab>
-                <rich:tab label="Изменение организации">
-                    <h:panelGrid styleClass="borderless-grid" columns="3">
-                        <h:outputText escape="true" value="Организация" styleClass="output-text" />
-                        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                                   styleClass="command-link" style="width: 25px;" />
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
-                        <rich:spacer/>
-                        <rich:spacer/>
-                        <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
-                                       reRender="workspaceTogglePanel" styleClass="command-button" />
-                    </h:panelGrid>
-                </rich:tab>
-                <rich:tab label="Изменение лимита дневных трат">
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Лимит дневных трат" styleClass="output-text"/>
-                        <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                        <rich:spacer/>
-                        <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
-                                       reRender="workspaceTogglePanel" styleClass="command-button" />
-                    </h:panelGrid>
-                </rich:tab>
-                <rich:tab label="SMS-уведомления">
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Включить SMS-уведомления" styleClass="output-text"/>
-                        <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaSMS}" styleClass="output-text" />
-                        <rich:spacer/>
-                        <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaSMS}"
-                                       reRender="workspaceTogglePanel" styleClass="command-button" />
-                    </h:panelGrid>
-                </rich:tab>
-            </rich:tabPanel>
-        </rich:simpleTogglePanel>
-    </c:if>
+    <rich:simpleTogglePanel switchType="client" label="Групповые операции" opened="false" rendered="#{mainPage.eligibleToEditClients}">
+        <rich:tabPanel switchType="client">
+            <rich:tab label="Изменение лимита овердрафта">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
+                    <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button"/>
+                </h:panelGrid>
+            </rich:tab>
+            <rich:tab label="Изменение организации">
+                <h:panelGrid styleClass="borderless-grid" columns="3">
+                    <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;" />
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
+                    <rich:spacer/>
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
+            <rich:tab label="Изменение лимита дневных трат">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Лимит дневных трат" styleClass="output-text"/>
+                    <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
+            <rich:tab label="SMS-уведомления">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Включить SMS-уведомления" styleClass="output-text"/>
+                    <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaSMS}" styleClass="output-text" />
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaSMS}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
+        </rich:tabPanel>
+    </rich:simpleTogglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </h:panelGrid>

@@ -320,4 +320,13 @@
         </navigation-case>
     </navigation-rule>
 
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>downloadReportFile</from-outcome>
+            <to-view-id>/repository/download</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
 </faces-config>

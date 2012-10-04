@@ -55,6 +55,12 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
+    private String tag;
+    private String city;
+    private String district;
+    private String location;
+    private String latitude;
+    private String longitude;
 
     public String getINN() {
         return INN;
@@ -156,6 +162,54 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setOfficialName(String officialName) {
         this.officialName = officialName;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     public String getAddress() {
@@ -301,6 +355,11 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.contractId, this.contractTime, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2);
+        org.setCity(city);
+        org.setDistrict(district);
+        org.setLocation(location);
+        org.setLongitude(longitude);
+        org.setLatitude(latitude);
         org.setGuid(this.guid);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);

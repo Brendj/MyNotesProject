@@ -76,6 +76,7 @@ public class TransactionJournalService {
 
     public void processTransactionJournalQueue() {
         if (!runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP)) return;
+        if (!runtimeContext.isMainNode()) return;
         for (;;) {
             try {
                 if (!RuntimeContext.getAppContext().getBean(TransactionJournalService.class).processTransactionBatch()) break;

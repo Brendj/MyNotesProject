@@ -17,6 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
@@ -69,24 +70,25 @@ public class AutoReportGenerator {
 
     public static Criteria createEnabledReportJobsCriteria(Session session) throws Exception {
         return session.createCriteria(SchedulerJob.class)
-                .add(Restrictions.like("jobClass", REPORT_JOBS_BASE_CLASS_NAME + ".%", MatchMode.START));
+                .add(Restrictions.like("jobClass", REPORT_JOBS_BASE_CLASS_NAME + ".%", MatchMode.START)).addOrder(
+                        Order.asc("jobName"));
     }
 
     private static interface JobDetailCreator {
 
-        public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception;
+        public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception;
     }
 
     static {
         REPORT_DEFS.add(new ReportDef(OrgBalanceReport.class, OrgBalanceReport.BuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = OrgBalanceReport.BuildJob.class;
                 OrgBalanceReport.BuildJob.ExecuteEnvironment executeEnvironment = new OrgBalanceReport.BuildJob.ExecuteEnvironment(
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap().put(OrgBalanceReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
@@ -94,7 +96,7 @@ public class AutoReportGenerator {
 
         REPORT_DEFS.add(new ReportDef(ClientGroupBalanceReport.class, ClientGroupBalanceReport.BuildJob.class,
                 new JobDetailCreator() {
-                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName)
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName)
                             throws Exception {
                         Class jobClass = ClientGroupBalanceReport.BuildJob.class;
                         ClientGroupBalanceReport.BuildJob.ExecuteEnvironment executeEnvironment = new ClientGroupBalanceReport.BuildJob.ExecuteEnvironment(
@@ -102,7 +104,7 @@ public class AutoReportGenerator {
                                 autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
                                 (DateFormat) autoReportGenerator.getDateFormat().clone(),
                                 (DateFormat) autoReportGenerator.getTimeFormat().clone());
-                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                         jobDetail.getJobDataMap()
                                 .put(ClientGroupBalanceReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                         return jobDetail;
@@ -110,7 +112,7 @@ public class AutoReportGenerator {
                 }));
 
         REPORT_DEFS.add(new ReportDef(ContragentOrderReport.class, ContragentOrderReport.BuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 final String CONTRAGENT_ORDER_REPORT_TEMPLATE_KEY = "ContragentOrderReport.template";
 
                 Class jobClass = ContragentOrderReport.BuildJob.class;
@@ -133,14 +135,14 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap().put(ContragentOrderReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));
 
         REPORT_DEFS.add(new ReportDef(ContragentOrderCategoryReport.class, ContragentOrderCategoryReport.BuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 final String CONTRAGENT_ORDER_CATEGORRY_REPORT_TEMPLATE_KEY = "ContragentOrderCategoryReport.template";
 
                 Class jobClass = ContragentOrderCategoryReport.BuildJob.class;
@@ -163,7 +165,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ContragentOrderCategoryReport.BuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -171,7 +173,7 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(OrgOrderCategoryReport.class, OrgOrderCategoryReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 final String REPORT_TEMPLATE_KEY = "OrgOrderCategoryReport.template";
 
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
@@ -188,6 +190,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
                         new OrgOrderCategoryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -195,7 +198,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(OrgOrderCategoryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -203,23 +206,12 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(SalesReport.class, SalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                final String REPORT_TEMPLATE_KEY = "SalesReport.template";
-
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
-
-                //String reportTemplate = autoReportGenerator.getReportProperties()
-                //        .getProperty(REPORT_TEMPLATE_KEY);
-                //if (StringUtils.isEmpty(reportTemplate)) {
-                //    throw new IllegalArgumentException(String.format(
-                //            "Report property \"%s\" not found. Can\'t schedule SalesReport",
-                //            REPORT_TEMPLATE_KEY));
-                //}
-                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
-                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + SalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new SalesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -227,7 +219,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(SalesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -235,23 +227,12 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(MscSalesReport.class, MscSalesReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                final String REPORT_TEMPLATE_KEY = "MscSalesReport.template";
-
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
-
-                //String reportTemplate = autoReportGenerator.getReportProperties()
-                //        .getProperty(REPORT_TEMPLATE_KEY);
-                //if (StringUtils.isEmpty(reportTemplate)) {
-                //    throw new IllegalArgumentException(String.format(
-                //            "Report property \"%s\" not found. Can\'t schedule MscSalesReport",
-                //            REPORT_TEMPLATE_KEY));
-                //}
-                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
-                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MscSalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new MscSalesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -259,7 +240,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(MscSalesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -267,22 +248,11 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(RegisterReport.class, RegisterReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                final String REPORT_TEMPLATE_KEY = "RegisterReport.template";
-
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
-
-                //String reportTemplate = autoReportGenerator.getReportProperties()
-                //        .getProperty(REPORT_TEMPLATE_KEY);
-                //if (StringUtils.isEmpty(reportTemplate)) {
-                //    throw new IllegalArgumentException(String.format(
-                //            "Report property \"%s\" not found. Can\'t schedule RegisterReport",
-                //            REPORT_TEMPLATE_KEY));
-                //}
-                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
-                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + RegisterReport.class.getSimpleName() + ".jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new RegisterReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -290,7 +260,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(RegisterReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -298,23 +268,12 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(ClientsReport.class, ClientsReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                final String REPORT_TEMPLATE_KEY = "ClientsReport.template";
-
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
-
-                //String reportTemplate = autoReportGenerator.getReportProperties()
-                //        .getProperty(REPORT_TEMPLATE_KEY);
-                //if (StringUtils.isEmpty(reportTemplate)) {
-                //    throw new IllegalArgumentException(String.format(
-                //            "Report property \"%s\" not found. Can\'t schedule ClientsReport",
-                //            REPORT_TEMPLATE_KEY));
-                //}
-                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
-                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new ClientsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -322,7 +281,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ClientsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -330,24 +289,12 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(OrgOrderByDaysReport.class, OrgOrderByDaysReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
-                //final String REPORT_TEMPLATE_KEY = "OrgOrderByDaysReport.template";
-
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
-
-                //String reportTemplate = autoReportGenerator.getReportProperties()
-                //        .getProperty(REPORT_TEMPLATE_KEY);
-                //if (StringUtils.isEmpty(reportTemplate)) {
-                //    throw new IllegalArgumentException(String.format(
-                //            "Report property \"%s\" not found. Can\'t schedule OrgOrderByDaysReport",
-                //            REPORT_TEMPLATE_KEY));
-                //}
-                //reportTemplate = restoreFilename(autoReportGenerator.getBasePath(), reportTemplate);
-
-                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderByDaysReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new OrgOrderByDaysReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -355,7 +302,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(OrgOrderByDaysReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -363,12 +310,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(AutoEnterEventReport.class, AutoEnterEventReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new AutoEnterEventReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -376,7 +324,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(AutoEnterEventReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -384,12 +332,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(AutoEnterEventByDaysReport.class, AutoEnterEventByDaysReport.AutoReportBuildJob.class, new JobDetailCreator() {
-                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                         Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                         // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                         String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
 
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                                jobName, 
                                 new AutoEnterEventByDaysReport(),
                                 autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                                 autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -397,7 +346,7 @@ public class AutoReportGenerator {
                                 (DateFormat) autoReportGenerator.getDateFormat().clone(),
                                 (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                         jobDetail.getJobDataMap()
                                 .put(AutoEnterEventByDaysReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                         return jobDetail;
@@ -405,12 +354,13 @@ public class AutoReportGenerator {
                 }));
                            //MenuDetailsGroupByMenuOriginReport
         REPORT_DEFS.add(new ReportDef(DailySalesByGroupsReport.class, DailySalesByGroupsReport.AutoReportBuildJob.class, new JobDetailCreator() {
-                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                         Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                         // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                         String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
 
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                                jobName, 
                                 new DailySalesByGroupsReport(),
                                 autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                                 autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -418,7 +368,7 @@ public class AutoReportGenerator {
                                 (DateFormat) autoReportGenerator.getDateFormat().clone(),
                                 (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                         jobDetail.getJobDataMap()
                                 .put(DailySalesByGroupsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                         return jobDetail;
@@ -426,12 +376,13 @@ public class AutoReportGenerator {
                 }));
 
         REPORT_DEFS.add(new ReportDef(MenuDetailsGroupByMenuOriginReport.class, MenuDetailsGroupByMenuOriginReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MenuDetailsGroupByMenuOriginReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, 
                         new MenuDetailsGroupByMenuOriginReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -439,7 +390,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(MenuDetailsGroupByMenuOriginReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -447,12 +398,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(OrderDetailsGroupByMenuOriginReport.class, OrderDetailsGroupByMenuOriginReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrderDetailsGroupByMenuOriginReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
                         new OrderDetailsGroupByMenuOriginReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -468,12 +420,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(ClientOrderDetailsByOneOrgReport.class, ClientOrderDetailsByOneOrgReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientOrderDetailsByOneOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
                         new ClientOrderDetailsByOneOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -489,12 +442,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(ClientOrderDetailsByAllOrgReport.class, ClientOrderDetailsByAllOrgReport.AutoReportBuildJob.class, new JobDetailCreator() {
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientOrderDetailsByAllOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
                         new ClientOrderDetailsByAllOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -510,12 +464,13 @@ public class AutoReportGenerator {
         }));
 
         REPORT_DEFS.add(new ReportDef(ContragentPaymentReport.class, ContragentPaymentReport.AutoReportBuildJob.class, new  JobDetailCreator(){
-            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobName) throws Exception {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
                         new ContragentPaymentReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -523,7 +478,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ContragentPaymentReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -687,7 +642,7 @@ public class AutoReportGenerator {
         }
     }
 
-    public void triggerJob(long idOfSchedulerJob, Date startDate) throws Exception {
+    public void triggerJob(long idOfSchedulerJob, Date startDate, Date endDate) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -695,7 +650,7 @@ public class AutoReportGenerator {
             persistenceTransaction = BasicReport.createTransaction(persistenceSession);
             persistenceTransaction.begin();
             SchedulerJob schedulerJob = (SchedulerJob) persistenceSession.load(SchedulerJob.class, idOfSchedulerJob);
-            triggerJob(getJobName(schedulerJob), startDate);
+            triggerJob(getJobId(schedulerJob), startDate, endDate);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -732,12 +687,12 @@ public class AutoReportGenerator {
         }
     }
 
-    private JobDetail createJobDetail(Class jobClass, String jobName) throws Exception {
+    private JobDetail createJobDetail(Class jobClass, String jobId, String jobName) throws Exception {
         JobDetailCreator jobDetailCreator = getReportJobDetailCreator(jobClass);
         if (jobClass == null) {
             throw new IllegalArgumentException(String.format("Unknown report job class: %s", jobClass));
         }
-        return jobDetailCreator.createJobDetail(this, jobName);
+        return jobDetailCreator.createJobDetail(this, jobId, jobName);
     }
 
     private JobDetailCreator getReportJobDetailCreator(Class jobClass) {
@@ -748,45 +703,53 @@ public class AutoReportGenerator {
         return null;
     }
 
-    private String getJobName(SchedulerJob schedulerJob) {
+    private String getJobId(SchedulerJob schedulerJob) {
         return schedulerJob.getIdOfSchedulerJob().toString();
     }
 
     private void scheduleNewJob(SchedulerJob schedulerJob) throws Exception {
-        scheduleNewJob(getJobClassForName(schedulerJob.getJobClass()), getJobName(schedulerJob),
+        scheduleNewJob(getJobClassForName(schedulerJob.getJobClass()), getJobId(schedulerJob),
+                schedulerJob.getJobName(),
                 schedulerJob.getCronExpression());
     }
 
     private void cancelScheduledJob(SchedulerJob schedulerJob) throws Exception {
-        cancelScheduledJob(getJobName(schedulerJob));
+        cancelScheduledJob(getJobId(schedulerJob));
     }
 
-    private void scheduleNewJob(Class jobClass, String jobName, String cronExpression) throws Exception {
+    private void scheduleNewJob(Class jobClass, String jobId, String jobName, String cronExpression) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Scheduling new report build job. jobClass: %s, jobName: %s, cronExpression: %s",
                     jobClass.getCanonicalName(), jobName, cronExpression));
         }
-        JobDetail jobDetail = createJobDetail(jobClass, jobName);
-        CronTrigger trigger = new CronTrigger(jobName, Scheduler.DEFAULT_GROUP, cronExpression);
+        JobDetail jobDetail = createJobDetail(jobClass, jobId, jobName);
+        CronTrigger trigger = new CronTrigger(jobId, Scheduler.DEFAULT_GROUP, cronExpression);
         trigger.setTimeZone(this.calendar.getTimeZone());
         trigger.setStartTime(new Date());
-        if (this.scheduler.getTrigger(jobName, Scheduler.DEFAULT_GROUP)!=null) {
-            this.scheduler.deleteJob(jobName, Scheduler.DEFAULT_GROUP);
+        if (this.scheduler.getTrigger(jobId, Scheduler.DEFAULT_GROUP)!=null) {
+            this.scheduler.deleteJob(jobId, Scheduler.DEFAULT_GROUP);
         }
         this.scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    private void cancelScheduledJob(String jobName) throws Exception {
+    private void cancelScheduledJob(String jobId) throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Cancelling scheduled report build job. jobName: %s", jobName));
+            logger.debug(String.format("Cancelling scheduled report build job. jobId: %s", jobId));
         }
-        this.scheduler.deleteJob(jobName, Scheduler.DEFAULT_GROUP);
+        this.scheduler.deleteJob(jobId, Scheduler.DEFAULT_GROUP);
     }
 
-    private void triggerJob(String jobName, Date startDate) throws Exception {
+    private void triggerJob(String jobName, Date startDate, Date endDate) throws Exception {
+        JobDetail jobDetail=this.scheduler.getJobDetail(jobName, Scheduler.DEFAULT_GROUP);
         if (startDate!=null) {
-            JobDetail jobDetail=this.scheduler.getJobDetail(jobName, Scheduler.DEFAULT_GROUP);
-            if (jobDetail!=null) jobDetail.getJobDataMap().put(BasicReport.JOB_PARAM_START_DATE, startDate);
+            if (jobDetail!=null) {
+                Object executeEnvironmentObject = jobDetail.getJobDataMap().put(BasicReportJob.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, startDate);
+                if (executeEnvironmentObject!=null && executeEnvironmentObject instanceof BasicReportJob.AutoReportBuildJob.ExecuteEnvironment) {
+                    BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = (BasicReportJob.AutoReportBuildJob.ExecuteEnvironment)executeEnvironmentObject;
+                    executeEnvironment.setStartDate(startDate);
+                    executeEnvironment.setEndDate(endDate);
+                }
+            }
         }
         this.scheduler.triggerJob(jobName, Scheduler.DEFAULT_GROUP);
     }

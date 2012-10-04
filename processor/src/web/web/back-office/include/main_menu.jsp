@@ -33,7 +33,9 @@
                             action="#{mainPage.showOrgViewPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="editOrgMenuItem" binding="#{mainPage.orgEditPage.mainMenuComponent}"
-                            label="Редактирование" action="#{mainPage.showOrgEditPage}" reRender="workspaceForm" />
+                            label="Редактирование" action="#{mainPage.showOrgEditPage}"
+                            rendered="#{mainPage.eligibleToEditOrgs}"
+                            reRender="workspaceForm" />
 
         <rich:panelMenuItem id="viewOrgMenuExchange" binding="#{mainPage.menuExchangePage.mainMenuComponent}"
                             action="#{mainPage.showMenuExchangePage}" label="Просмотр мастер-меню"
@@ -54,6 +56,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"
+                        rendered="#{mainPage.eligibleToEditOrgs}"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}" label="Правила распространения"
@@ -78,6 +81,7 @@
 
         <rich:panelMenuItem id="editContragentMenuItem" binding="#{mainPage.contragentEditPage.mainMenuComponent}"
                             label="Редактирование" action="#{mainPage.showContragentEditPage}"
+                            rendered="#{mainPage.eligibleToEditContragents}"
                             reRender="workspaceForm" />
 
         <rich:panelMenuItem id="generateContragentClientPaymentReportMenuItem"
@@ -87,7 +91,9 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="createContragentMenuItem" binding="#{mainPage.contragentCreatePage.mainMenuComponent}"
-                        label="Регистрация" action="#{mainPage.showContragentCreatePage}" reRender="workspaceForm" />
+                        label="Регистрация" action="#{mainPage.showContragentCreatePage}"
+                        rendered="#{mainPage.eligibleToEditContragents}"
+                        reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="ccAccountGroupMenu" binding="#{mainPage.ccAccountGroupPage.mainMenuComponent}"
                          label="Счета клиентов">
@@ -174,6 +180,7 @@
 
     </rich:panelMenuGroup>
 
+
     <rich:panelMenuGroup id="contractGroupMenu" label="Контракты"
                          binding="#{contractListPage.groupPage.mainMenuComponent}">
         <a4j:support event="onclick" action="#{contractListPage.groupPage.show}" reRender="workspaceForm" />
@@ -185,6 +192,7 @@
                              binding="#{contractEditPage.selectedEntityGroupPage.mainMenuComponent}" rendered="false">
             <a4j:support event="onclick" action="#{contractEditPage.selectedEntityGroupPage.show}"
                          reRender="workspaceForm" />
+
 
             <rich:panelMenuItem id="viewContractMenuItem" binding="#{contractViewPage.mainMenuComponent}"
                                 label="Просмотр" action="#{contractViewPage.show}" reRender="workspaceForm" />
@@ -254,6 +262,16 @@
     <rich:panelMenuItem id="clientSmsListMenu" label="SMS" binding="#{mainPage.clientSmsListPage.mainMenuComponent}"
                         action="#{mainPage.showClientSmsListPage}" reRender="workspaceForm" />
 
+    <rich:panelMenuGroup id="clientOpsGroupMenu" binding="#{mainPage.clientOpsGroupPage.mainMenuComponent}" label="Операции">
+        <a4j:support event="onclick" action="#{mainPage.showClientOpsGroupPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="clientBalanceTransferPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientBalanceTransferPage"--%>
+        <rich:panelMenuItem id="clientBalanceTransferMenuItem" label="Перевод между счетами"
+                            binding="#{clientBalanceTransferPage.mainMenuComponent}" action="#{clientBalanceTransferPage.show}"
+                            reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="cardGroupMenu" binding="#{mainPage.cardGroupPage.mainMenuComponent}" label="Карты"
@@ -314,9 +332,11 @@
                         rendered="#{mainPage.eligibleToServiceSupport}" />
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
+                        rendered="#{mainPage.eligibleToServiceAdmin}"
                         reRender="workspaceForm" />
 
-    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Реестры">
+    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Реестры"
+                         rendered="#{mainPage.eligibleToServiceAdmin}" >
         <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="nsiOrgCatalogFind" binding="#{orgCatalogFindPage.mainMenuComponent}"
@@ -324,9 +344,17 @@
         <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
                             label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+    <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
+                         rendered="#{mainPage.eligibleToServiceAdmin}" >
+        <a4j:support event="onclick" action="#{mainPage.showUOSGroupPage}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="orgSynchMonitorPage" binding="#{orgSynchMonitorPage.mainMenuComponent}" label="Отчет по синхронизации"
-                        action="#{orgSynchMonitorPage.show}" reRender="workspaceForm" />
+<%--@elvariable id="uosSendBlockPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.UosSendBlockPage"--%>
+<%--@elvariable id="uosStopListPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.UosStopListPage"--%>
+        <rich:panelMenuItem id="uosSendBlock" binding="#{uosSendBlockPage.mainMenuComponent}"
+                            label="Запрос блокировки" action="#{uosSendBlockPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="uosStopList" binding="#{uosStopListPage.mainMenuComponent}"
+                            label="Получение стоп-листов" action="#{uosStopListPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
     <%--reRender="mainMenu, workspaceForm" />
     --%>
@@ -369,6 +397,12 @@
 
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SyncMonitorPage"--%>
+    <rich:panelMenuItem id="syncMonitorItem" binding="#{syncMonitorPage.mainMenuComponent}"
+                        label="Мониторинг синхронизации" action="#{syncMonitorPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="dashboardMenuItem" binding="#{dashboardPage.mainMenuComponent}"
+                        label="Мониторинг активности" action="#{dashboardPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
@@ -394,6 +428,16 @@
                         label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"
                         reRender="workspaceForm" />
 
+</rich:panelMenuGroup>
+
+<%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
+<rich:panelMenuGroup id="reportRepositoryGroupMenu" binding="#{reportRepositoryListPage.groupPage.mainMenuComponent}"
+                     label="Репозиторий отчетов" rendered="#{mainPage.eligibleToWorkOnlineReport}">
+    <a4j:support event="onclick" action="#{reportRepositoryListPage.groupPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="reportRepositoryListMenuItem"
+                        binding="#{reportRepositoryListPage.mainMenuComponent}" label="Просмотр"
+                        action="#{reportRepositoryListPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="eventNotificationGroupMenu" binding="#{mainPage.eventNotificationGroupPage.mainMenuComponent}"
@@ -608,6 +652,7 @@
                                 binding="#{productGroupListPage.mainMenuComponent}"
                                 action="#{productGroupListPage.show}" reRender="workspaceForm" />
 
+
             <rich:panelMenuGroup id="selectedProductGroupGroupMenu"
                                  binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
                                  label="#{selectedProductGroupGroupPage.title}" rendered="false">
@@ -629,6 +674,7 @@
 
 
         </rich:panelMenuGroup>
+
 
         <rich:panelMenuItem id="productListMenuItem" label="Список" binding="#{productListPage.mainMenuComponent}"
                             action="#{productListPage.show}" reRender="workspaceForm" />

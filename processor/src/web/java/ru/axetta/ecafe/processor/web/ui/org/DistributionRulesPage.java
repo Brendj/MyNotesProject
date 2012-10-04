@@ -42,6 +42,24 @@ public class DistributionRulesPage extends BasicWorkspacePage {
 
     @Transactional
     private void reload() throws Exception{
+        TypedQuery<Org> orgList = entityManager.createQuery("select org from Org org LEFT JOIN FETCH org.sourceMenuOrgs LEFT JOIN FETCH org.defaultSupplier",Org.class);
+        for (Org org : orgList.getResultList()) {
+            Org distributionOrg = null;
+            if (!org.getSourceMenuOrgs().isEmpty()) {
+                // может быть только одно правило в сете
+                for (Org sourceMenuOrg : org.getSourceMenuOrgs()) {
+                    distributionOrg = sourceMenuOrg;
+                }
+            }
+            Contragent contragent = org.getDefaultSupplier();
+            RuleItem ruleItem = new RuleItem();
+            ruleItem.setContragent(contragent);
+            ruleItem.setDistributionOrg(distributionOrg);
+            ruleItem.setSourceOrg(org);
+            ruleItemList.add(ruleItem);
+        }
+
+        /*
         TypedQuery<MenuExchangeRule> menuExchangeRuleTypedQuery = entityManager.createQuery("from MenuExchangeRule order by idOfDestOrg",MenuExchangeRule.class);
         List<MenuExchangeRule> menuExchangeRules = menuExchangeRuleTypedQuery.getResultList();
         for (MenuExchangeRule menuExchangeRule: menuExchangeRules){
@@ -54,6 +72,7 @@ public class DistributionRulesPage extends BasicWorkspacePage {
             ruleItem.setSourceOrg(sourceOrg);
             ruleItemList.add(ruleItem);
         }
+        */
     }
 
     public List<RuleItem> getRuleItemList() {
@@ -76,6 +95,7 @@ public class DistributionRulesPage extends BasicWorkspacePage {
 
         public void setContragent(Contragent contragent) {
             this.contragent = contragent;
+            getContragentLabel();
         }
 
         public Org getSourceOrg() {
@@ -84,6 +104,7 @@ public class DistributionRulesPage extends BasicWorkspacePage {
 
         public void setSourceOrg(Org sourceOrg) {
             this.sourceOrg = sourceOrg;
+            getSourceOrgLabel();
         }
 
         public Org getDistributionOrg() {
@@ -92,7 +113,23 @@ public class DistributionRulesPage extends BasicWorkspacePage {
 
         public void setDistributionOrg(Org distributionOrg) {
             this.distributionOrg = distributionOrg;
+            getDistributionOrgLabel();
         }
+        
+        public String getDistributionOrgLabel() {
+            if (distributionOrg==null) return "";
+            return distributionOrg.getShortName()+" - "+distributionOrg.getIdOfOrg();
+        }
+        public String getSourceOrgLabel() {
+            if (sourceOrg==null) return "";
+            return sourceOrg.getShortName()+" - "+sourceOrg.getIdOfOrg();
+        }
+        public String getContragentLabel() {
+            if (contragent==null) return "";
+            return contragent.getContragentName()+" - "+contragent.getIdOfContragent();
+        }
+        
+        
     }
 
 }

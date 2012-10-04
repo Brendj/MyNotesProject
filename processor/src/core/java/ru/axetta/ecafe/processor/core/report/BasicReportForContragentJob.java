@@ -57,7 +57,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                              getLogger().debug(String.format("Building report \"%s\" for contragent: %s", classPropertyValue, contragent));
                         }
                         Properties properties = new Properties();
-                        ReportPropertiesUtils.addProperties(properties,getMyClass());
+                        ReportPropertiesUtils.addProperties(properties,getMyClass(), autoReportBuildTask);
                         ReportPropertiesUtils.addProperties(properties, contragent, null);
                         BasicReportForContragentJob report = createInstance();
                         report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,

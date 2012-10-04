@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.DailyFileCreator;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Transaction;
 import org.hibernate.Session;
@@ -24,8 +25,6 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class BasicReport {
-
-    public static final String JOB_PARAM_START_DATE = "StartDate";
 
     public static interface DocumentBuilderCallback {
 
@@ -55,15 +54,15 @@ public class BasicReport {
             }
         }
 
-        public ReportDocument buildDocument(BasicReport report) throws Exception {
+        public ReportDocument buildDocument(String ruleId, BasicReport report) throws Exception {
             DateFormat timeFormat = getTimeFormat();
             String filename = String
-                    .format("%s-%s-%s", baseFileName, documentBuilderCallback.getReportDistinctText(report),
+                    .format("%s-%s-%s-%s", baseFileName, ruleId, documentBuilderCallback.getReportDistinctText(report),
                             timeFormat.format(report.getGenerateTime()));
             try {
                 File reportDocumentFile = createFile(filename, fileNameSuffix);
                 writeReportDocumentTo(report, reportDocumentFile);
-                return new ReportDocument(Collections.singletonList(reportDocumentFile));
+                return new ReportDocument(reportDocumentFile);
             } catch (Exception e) {
                 logger.error("Failed to create jasperReport document file", e);
                 throw e;

@@ -6,9 +6,12 @@ package ru.axetta.ecafe.processor.dashboard;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,10 +28,7 @@ import javax.ejb.TransactionManagementType;
 import javax.persistence.*;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,6 +40,7 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class DashboardServiceBean {
+    private static final Logger logger = LoggerFactory.getLogger(DashboardServiceBean.class);
 
     private static final int ID_OF_ORG_PARAM_INDEX = 0;
     private static final int ORG_NAME_PARAM_INDEX = ID_OF_ORG_PARAM_INDEX + 1;
@@ -74,27 +75,227 @@ public class DashboardServiceBean {
         dashboardResponse.setPaymentSystemItemInfoList(new LinkedList<DashboardResponse.PaymentSystemItemInfo>());
         return dashboardResponse;
     }
-
-    private DashboardResponse getOrgInfo(DashboardResponse dashboardResponse) throws Exception {
+    
+    public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = txManager.getTransaction(def);
-
+        def.setTimeout(600*1000);
+        DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
-            Query query = entityManager.createQuery(
-                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
-                            + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
-                            + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
-                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
-                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
-                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.visitDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
-                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.visitDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
-                            + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh GROUP BY org");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dt);
+            int month = cal.get(Calendar.MONTH);
+            int year = cal.get(Calendar.YEAR);
+            int dom = cal.get(Calendar.DAY_OF_MONTH);
 
+            Calendar dayStart = Calendar.getInstance();
+            dayStart.set(year, month, dom, 0, 0, 0);
+            Calendar dayEnd = Calendar.getInstance();
+            dayEnd.set(year, month, dom + 1, 0, 0, 0);
+
+            Date dayStartDate = dayStart.getTime();
+            Date dayEndDate = dayEnd.getTime();
+
+            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE state=1";
+            HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
+            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
+            Query query = entityManager.createQuery(queryText);
+            List queryResult = query.getResultList();
+
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                int n=0;
+                Long curIdOfOrg = (Long)result[n++];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) {
+                    statItem = new DashboardResponse.OrgBasicStatItem();
+                    orgStats.put(curIdOfOrg, statItem);
+                }
+                statItem.setIdOfOrg(curIdOfOrg);
+                statItem.setOrgName((String) result[n++]);
+                statItem.setOrgDistrict((String) result[n++]);
+                statItem.setOrgLocation((String) result[n++]);
+                statItem.setOrgTag((String) result[n++]);
+                statItem.setOrgNameNumber(Org.extractOrgNumberFromName(statItem.getOrgName()));
+                statItem.setLastSuccessfulBalanceSyncTime((Date)result[n++]);
+            }
+            ////
+            queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup <:studentsMaxValue GROUP BY cl.org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long)result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfStudentClients((Long)result[1]);
+            }
+            ////
+            queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup>=:nonStudentGroups AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup<:leavingClientGroup GROUP BY cl.org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long)result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfNonStudentClients((Long)result[1]);
+            }
+            ////
+            query = entityManager.createNativeQuery("select cl.idOfOrg, count(*) from CF_Clients cl LEFT JOIN CF_Cards cr ON cr.idOfClient=cl.idOfClient WHERE cl.idOfClientGroup<=:maxStaffGroup AND cr.idOfCard IS NULL GROUP BY cl.idOfOrg");
+            query.setParameter("maxStaffGroup", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = Long.parseLong(""+result[0]);
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfClientsWithoutCard(Long.parseLong(""+result[1]));
+            }
+            ////
+            queryText = "SELECT eev.org.idOfOrg, count(*) FROM EnterEvent eev WHERE eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("dayStart", dayStartDate);
+            query.setParameter("dayEnd", dayEndDate);
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long)result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfEnterEvents((Long)result[1]);
+            }
+            ////
+            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("dayStart", dayStartDate);
+            query.setParameter("dayEnd", dayEndDate);
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long)result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfDiscountOrders((Long)result[1]);
+            }
+            ////
+            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("dayStart", dayStartDate);
+            query.setParameter("dayEnd", dayEndDate);
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long)result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem==null) continue;
+                statItem.setNumberOfPayOrders((Long)result[1]);
+            }
+            ////
+            for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {
+                basicStats.getOrgBasicStatItems().add(e.getValue());
+            }
+
+
+            /*
+            HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
+            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
+            Query query = entityManager.createQuery(queryText);
+            query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
+            List queryResult = query.getResultList();
+
+
+            orgBasicStatItem.setNumberOfClients((Long)result[n++]);
+            orgBasicStatItem.setNumberOfEnterEvents((Long)result[n++]);
+            orgBasicStatItem.setNumberOfDiscountOrders((Long)result[n++]);
+            orgBasicStatItem.setNumberOfPayOrders((Long)result[n++]);
+
+            
+
+            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync, "
+                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState=:contractState) AS numOfClients, "
+                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfEnterEvents, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfSocOrders, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfPayOrders "
+                                                + "FROM Org org";
+            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
+            Query query = entityManager.createQuery(queryText);
+
+            if (idOfOrg!=null) query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dt);
+            int month = cal.get(Calendar.MONTH);
+            int year = cal.get(Calendar.YEAR);
+            int dom = cal.get(Calendar.DAY_OF_MONTH);
+
+            Calendar dayStart = Calendar.getInstance();
+            dayStart.set(year, month, dom, 0, 0, 0);
+            Calendar dayEnd = Calendar.getInstance();
+            dayEnd.set(year, month, dom + 1, 0, 0, 0);
+
+            Date dayStartDate = dayStart.getTime();
+            Date dayEndDate = dayEnd.getTime();
+
+            query.setParameter("dayStart", dayStartDate);
+            query.setParameter("dayEnd", dayEndDate);
+
+            List queryResult = query.getResultList();
+
+            for (Object object : queryResult) {
+                DashboardResponse.OrgBasicStatItem orgBasicStatItem = new DashboardResponse.OrgBasicStatItem();
+                Object[] result = (Object[]) object;
+
+                int n=0;
+                orgBasicStatItem.setIdOfOrg((Long) result[n++]);
+                orgBasicStatItem.setOrgName((String) result[n++]);
+                orgBasicStatItem.setOrgDistrict((String) result[n++]);
+                orgBasicStatItem.setOrgLocation((String) result[n++]);
+                orgBasicStatItem.setOrgTag((String) result[n++]);
+                orgBasicStatItem.setOrgNameNumber(Org.extractOrgNumberFromName(orgBasicStatItem.getOrgName()));
+                orgBasicStatItem.setLastSuccessfulBalanceSyncTime((Date)result[n++]);
+                orgBasicStatItem.setNumberOfClients((Long)result[n++]);
+                orgBasicStatItem.setNumberOfEnterEvents((Long)result[n++]);
+                orgBasicStatItem.setNumberOfDiscountOrders((Long)result[n++]);
+                orgBasicStatItem.setNumberOfPayOrders((Long)result[n++]);
+                basicStats.getOrgBasicStatItems().add(orgBasicStatItem);
+            }*/
+        } catch (Exception e) {
+            txManager.rollback(status);
+            throw e;
+        }
+        txManager.commit(status);
+        return basicStats;
+    }
+
+    public DashboardResponse getOrgInfo(DashboardResponse dashboardResponse, Date dt, Long idOfOrg) throws Exception {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = txManager.getTransaction(def);
+        def.setTimeout(600*1000);
+        try {
+            String queryText = "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
+                                                + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
+                                                + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
+                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
+                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
+                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
+                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
+                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
+                                                + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
+            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
+            queryText+=" GROUP BY org";
+            Query query = entityManager.createQuery(queryText);
+
+            if (idOfOrg!=null) query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
             query.setParameter("studentsMinValue", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
             query.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -102,6 +303,7 @@ public class DashboardServiceBean {
             query.setParameter("staffMaxValue", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
 
             Calendar cal = Calendar.getInstance();
+            cal.setTime(dt);
             int month = cal.get(Calendar.MONTH);
             int year = cal.get(Calendar.YEAR);
             int dom = cal.get(Calendar.DAY_OF_MONTH);
@@ -129,6 +331,7 @@ public class DashboardServiceBean {
 
                     eduInstItemInfo.setIdOfOrg((Long) result[ID_OF_ORG_PARAM_INDEX]);
                     eduInstItemInfo.setOrgName((String) result[ORG_NAME_PARAM_INDEX]);
+                    eduInstItemInfo.setOrgNameNumber(Org.extractOrgNumberFromName(eduInstItemInfo.getOrgName()));
                     eduInstItemInfo.setLastSuccessfulBalanceSyncTime(
                             (Date) result[LAST_SUCCESSFUL_BALANCE_SYNC_TYME_PARAM_INDEX]);
                     eduInstItemInfo.setLastUnSuccessfulBalanceSyncTime(
@@ -138,8 +341,8 @@ public class DashboardServiceBean {
                     SyncHistory syncHistory = (SyncHistory) result[SYNC_HISTORY_PARAM_INDEX];
                     if (syncHistory != null) {
                         eduInstItemInfo.setLastFullSyncTime(syncHistory.getSyncStartTime());
+                        eduInstItemInfo.setLastSyncErrors(syncHistory.getSyncResult() != 0);
                     }
-                    eduInstItemInfo.setLastSyncErrors(syncHistory.getSyncResult() != 0);
 
                     long numOfStudents = (Long) result[NUM_OF_STUDENTS_PARAM_INDEX];
                     long numOfStaff = (Long) result[NUM_OF_STAFF_PARAM_INDEX];
@@ -167,6 +370,7 @@ public class DashboardServiceBean {
                     }
                 } catch (Exception e) {
                     eduInstItemInfo.setError(e.getMessage());
+                    logger.error("Ошибка подготовки данных", e);
                 } finally {
                     eduInstItemInfoList.add(eduInstItemInfo);
                 }
@@ -204,7 +408,7 @@ public class DashboardServiceBean {
         return dayEndDate;
     }
 
-    private DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse) throws Exception {
+    public DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse, Date dt) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = txManager.getTransaction(def);
@@ -217,6 +421,7 @@ public class DashboardServiceBean {
 
 
             Calendar currentTimeStamp = Calendar.getInstance();
+            currentTimeStamp.setTime(dt);
             Date dayStart = getCurrentDayStartTime(currentTimeStamp);
             Date dayEnd = getCurrentDayEndTime(currentTimeStamp);
 
@@ -252,11 +457,15 @@ public class DashboardServiceBean {
     }
 
     public DashboardResponse getInfoForDashboard() throws Exception {
-
         DashboardResponse dashboardResponse = prepareDashboardResponse();
-        dashboardResponse = getOrgInfo(dashboardResponse);
-        dashboardResponse = getPaymentSystemInfo(dashboardResponse);
+        dashboardResponse = getOrgInfo(dashboardResponse, new Date(), null);
+        dashboardResponse = getPaymentSystemInfo(dashboardResponse, new Date());
         return dashboardResponse;
-
+    }
+    public DashboardResponse getInfoForDashboardForDateAndOrg(Date dt, Long idOfOrg) throws Exception {
+        DashboardResponse dashboardResponse = prepareDashboardResponse();
+        dashboardResponse = getOrgInfo(dashboardResponse, dt, idOfOrg);
+        dashboardResponse = getPaymentSystemInfo(dashboardResponse, dt);
+        return dashboardResponse;
     }
 }

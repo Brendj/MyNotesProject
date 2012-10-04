@@ -34,7 +34,7 @@ public class EventNotificationService {
     SMSService smsService;
 
     static final String[] DEFAULT_MESSAGES={
-        NOTIFICATION_ENTER_EVENT+"."+TYPE_SMS, "[eventName] [eventTime] ([surname] [firstName]). Баланс: [balance] р.",
+        NOTIFICATION_ENTER_EVENT+"."+TYPE_SMS, "[eventName] [eventTime] ([contractId] [surname] [firstName]). Баланс: [balance] р.",
         NOTIFICATION_ENTER_EVENT+"."+TYPE_EMAIL_TEXT, "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n" + "\n"
                     + "[eventName] [eventTime] ([surname] [firstName]). <br/>\n"
                     + "Текущий баланс лицевого счета [balance] рублей. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"

@@ -2801,7 +2801,8 @@ MenuGroups menuGroups;
             return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
         }
 
-        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync)
+
+        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
                 throws Exception {
             long version = getLongValue(namedNodeMap, "Version");
             if (3L != version && 4L != version && 5L != version) {
@@ -2924,9 +2925,7 @@ MenuGroups menuGroups;
             }
 
 
-
-
-return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(remoteAddr, version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, libraryData, libraryData2, manager);
         }
@@ -2968,6 +2967,7 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
 
     public final static int TYPE_FULL = 0, TYPE_GET_ACC_INC = 1;
 
+    private final String remoteAddr;
     private final long protoVersion;
     private final long idOfOrg;
     private final Org org;
@@ -2988,12 +2988,13 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
     private final LibraryData2 libraryData2;
     private final Manager manager;
 
-    public SyncRequest(long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
+    public SyncRequest(String remoteAddr, long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
             EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2,
             Manager manager) {
+        this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.type = type;
         this.manager = manager;
@@ -3013,6 +3014,10 @@ return new SyncRequest(version, type, org, syncTime, idOfPacket, paymentRegistry
         this.enterEvents = enterEvents;
         this.libraryData = libraryData;
         this.libraryData2 = libraryData2;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
     }
 
     public long getProtoVersion() {

@@ -205,7 +205,7 @@ public class SyncEvent extends BasicEvent {
             } finally {
                 IOUtils.closeQuietly(outputStream);
             }
-            return new ReportDocument(Collections.singletonList(eventDocumentFile));
+            return new ReportDocument(eventDocumentFile);
         }
 
         private static void writeReportDocumentTo(SyncEvent event, OutputStream outputStream, DateFormat timeFormat)

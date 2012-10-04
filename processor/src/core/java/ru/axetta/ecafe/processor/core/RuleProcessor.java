@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core;
 
-import jxl.common.log.LoggerName;
-
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.event.EventDocumentBuilder;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
@@ -13,12 +11,14 @@ import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.core.utils.RuleExpressionUtil;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.ws.security.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -26,7 +26,10 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,7 +48,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     private static Properties reportProperties;
 
     private static interface BasicBoolExpression {
-
+        public String getComparatorArgument();
+        public String getComparatorValue();
+        
+        
         boolean applicatable(Properties properties);
 
         boolean evaluate(Properties properties);
@@ -53,6 +59,16 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     }
 
     private static class TautologyExpression implements BasicBoolExpression {
+
+        @Override
+        public String getComparatorArgument() {
+            return null;
+        }
+
+        @Override
+        public String getComparatorValue() {
+            return null;
+        }
 
         public boolean applicatable(Properties properties) {
             return true;
@@ -82,18 +98,35 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             return StringUtils.isNotEmpty(properties.getProperty(this.comparatorArgument));
         }
 
+        @Override
+        public String getComparatorArgument() {
+            return comparatorArgument;
+        }
+
+        public String getComparatorValue() {
+            return comparatorValue;
+        }
+
         public boolean evaluate(Properties properties) {
             boolean result = false;
-            String values[] = this.comparatorValue.split(DELIMETER);
+            String values[];
+            if (this.comparatorValue.startsWith("/")) values = new String[]{this.comparatorValue};
+            else values = this.comparatorValue.split(DELIMETER);
             String property[] = properties.getProperty(this.comparatorArgument).split(DELIMETER);
             for (String value : values) {
                 for (String prop : property) {
                     if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
-                        properties.put(this.comparatorArgument, String.format("%s%s%s", properties.get(this.comparatorArgument), value, DELIMETER));
+                        properties.put(this.comparatorArgument, this.comparatorValue);
+                        //properties.put(prop,
+                        //        String.format("%s%s%s", properties.get(prop), value, DELIMETER));
                         result = true;//return true;//continue;
                     }
-                    if (StringUtils.equals(prop.trim(), value.trim()))
+                    if (value.startsWith("/") && value.endsWith("/")) {
+                        return prop.matches(value.substring(1, value.length()-1));
+                    }
+                    if (StringUtils.equals(prop.trim(), value.trim())) {
                         return true;
+                    }
                 }
             }
             return result;
@@ -113,9 +146,15 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         private final List<String> routeAdresses;
         private final List<BasicBoolExpression> boolExpressions;
         private final String templateFileName;
+        private final String ruleName;
+        private String tag;
+        private long ruleId;
         //private final Set<RuleCondition> ruleConditions;
 
         private Rule(ReportHandleRule reportHandleRule) throws Exception {
+            this.ruleId = reportHandleRule.getIdOfReportHandleRule();
+            this.ruleName = reportHandleRule.getRuleName();
+            this.tag = reportHandleRule.getTag();
             this.documentFormat = reportHandleRule.getDocumentFormat();
             this.subject = reportHandleRule.getSubject();
             this.routeAdresses = new LinkedList<String>();
@@ -161,6 +200,23 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             return routeAdresses;
         }
 
+        public String getRuleName() {
+            return ruleName;
+        }
+
+        public long getRuleId() {
+            return ruleId;
+        }
+        
+        public String getExpressionValue(String name) {
+            for (BasicBoolExpression currExpression : this.boolExpressions) {
+                if (currExpression.getComparatorArgument()!=null && currExpression.getComparatorArgument().equals(name)) {
+                    return currExpression.getComparatorValue();
+                }
+            }
+            return null;
+        }
+
         public boolean applicatable(Properties properties) {
             for (BasicBoolExpression currExpression : this.boolExpressions) {
                 if (!currExpression.applicatable(properties)) {
@@ -181,6 +237,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
         public String getTemplateFileName() {
             return templateFileName;
+        }
+
+        public String getTag() {
+            return tag;
         }
     }
 
@@ -222,20 +282,37 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 rulesCopy = this.reportRules;
             }
 
+            Date originalReportStartTime=null, originalReportEndTime=null;
             for (AutoReport report : reports) {
                 reportProperties = report.getProperties();
                 BasicReport basicReport = report.getBasicReport();
                 Map<Integer, ReportDocument> readyReportDocuments = new HashMap<Integer, ReportDocument>();
                 for (Rule currRule : rulesCopy) {
+                    ////
                     if (currRule.applicatable(reportProperties)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(
-                                    String.format("Report \"%s\" is applicatable for discountrule \"%s\"", report, currRule));
+                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD)!=null && 
+                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER)+"").equals("true")
+                                && basicReport instanceof BasicReportJob) {
+                            originalReportStartTime = ((BasicReportJob)basicReport).getStartTime();
+                            originalReportEndTime = ((BasicReportJob)basicReport).getEndTime();
+                            applyRulePeriod(currRule, (BasicReportJob)basicReport);
                         }
-                        if (basicReport instanceof BasicReportJob && currRule.getTemplateFileName()!=null && !currRule.getTemplateFileName().isEmpty()) {
-                                ((BasicReportJob)basicReport).templateFilename = currRule.getTemplateFileName();
+                        ////
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(String.format("Report \"%s\" is applicatable for discountrule \"%s\"", report,
+                                    currRule));
+                        }
+                        if (basicReport instanceof BasicReportJob && currRule.getTemplateFileName() != null && !currRule
+                                .getTemplateFileName().isEmpty()) {
+                            ((BasicReportJob) basicReport).templateFilename = currRule.getTemplateFileName();
                         }
                         ReportDocument reportDocument = readyReportDocuments.get(currRule.getDocumentFormat());
+                        String subject = "";
+                        Long idOfOrg = null;
+                        if (!StringUtils.isEmpty(report.getProperties().getProperty("idOfOrg"))) {
+                            idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
+                        }
+                        
                         if (null == reportDocument) {
                             ReportDocumentBuilder documentBuilder = reportDocumentBuilders
                                     .get(currRule.getDocumentFormat());
@@ -246,14 +323,29 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                             currRule.getDocumentFormat(), report));
                                 }
                             } else {
-                                reportDocument = documentBuilder.buildDocument(basicReport);
+                                subject = fillTemplate(currRule.getSubject(), reportProperties);
+                                reportDocument = documentBuilder.buildDocument(currRule.getRuleId()+"", basicReport);
+
+                                if (basicReport instanceof BasicReportJob) {
+                                    BasicReportJob basicReportJob = (BasicReportJob) basicReport;
+                                    File f = new File(
+                                            RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
+                                    String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
+                                            .substring(f.getAbsolutePath().length());
+                                    DAOService.getInstance()
+                                            .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
+                                                    subject, basicReport.getGenerateTime(),
+                                                    basicReport.getGenerateDuration(), basicReportJob.getStartTime(),
+                                                    basicReportJob.getEndTime(), relativeReportFilePath,
+                                                    report.getProperties()
+                                                            .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
+                                                    idOfOrg, currRule.getTag());
+                                }
+
                                 readyReportDocuments.put(currRule.getDocumentFormat(), reportDocument);
                             }
-                        }
+                        } 
                         if (null != reportDocument) {
-                            String subject = fillTemplate(currRule.getSubject(), reportProperties);
-                            // извлекаем id органиазции
-                            Long idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
                             // загружаем списки рассылок по id
                             Map<String, String> mailListMap = null;
                             if (idOfOrg != null) {
@@ -264,7 +356,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                     String address = fillTemplate(currAddress, reportProperties).trim();
                                     if (StringUtils.isNotEmpty(address)) {
                                         // если указан не конкретный адрес, а наименование списка рассылки
-                                        if (address.startsWith("{") && address.endsWith("}") && mailListMap!=null) {
+                                        if (address.startsWith("{") && address.endsWith("}") && mailListMap != null) {
                                             // излекаем списик адресов рассылки
                                             // address - содержит тип рассылки: {Список рассылки отчетов по питанию}, {Список рассылки отчетов по посещению}, {Список рассылки №1}, {Список рассылки №2}
                                             String addressList = mailListMap.get(address);
@@ -273,13 +365,16 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 String addresses[] = addressList.split(";");
                                                 for (String addrFromList : addresses) {
                                                     try {
-                                                        autoReportPostman.postReport(addrFromList, subject, reportDocument);
+                                                        autoReportPostman
+                                                                .postReport(addrFromList, subject, reportDocument);
                                                     } catch (Exception e) {
                                                         logger.error("Failed to post report", e);
                                                     }
                                                 }
                                             } else {
-                                                logger.error(String.format("Failed to post report. Не определен список рассылки %s для организации с идентификатором %d", address, idOfOrg));
+                                                logger.error(String.format(
+                                                        "Failed to post report. Не определен список рассылки %s для организации с идентификатором %d",
+                                                        address, idOfOrg));
                                             }
                                         } else {
                                             try {
@@ -293,9 +388,54 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                             }
                         }
                     }
+                    if (originalReportStartTime!=null) {
+                        // если изменяли даты
+                        ((BasicReportJob)basicReport).setStartTime(originalReportStartTime);
+                        ((BasicReportJob)basicReport).setEndTime(originalReportEndTime);
+                        originalReportStartTime = originalReportEndTime = null;
+                    }
+                    
                 }
             }
         }
+    }
+
+    Pattern periodMatcher = Pattern.compile("(\\d+)-(L|\\d+)[, ]*");
+    private Date applyRulePeriod(Rule currRule, BasicReportJob reportJob) throws Exception {
+        String sPeriod = currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD);
+        int dayOfReport = CalendarUtils.getDayOfMonth(reportJob.getStartTime());
+        int period;
+
+        Date originalReportStartTime = reportJob.getStartTime();
+        if (sPeriod.indexOf('-')!=-1) {
+            Matcher m = periodMatcher.matcher(sPeriod);
+            while (m.find()) {
+                int dayFrom = Integer.parseInt(m.group(1));
+                int dayTo;
+                Date dateTo;
+                if (m.group(2).equals("L")) {
+                    dateTo = CalendarUtils.getFirstDayOfNextMonth(originalReportStartTime);
+                    dayTo = 31;
+                }
+                else {
+                    dayTo = Integer.parseInt(m.group(2));
+                    dateTo = CalendarUtils.addDays(CalendarUtils.setDayOfMonth(originalReportStartTime, dayTo), 1);
+                }
+
+                if (dayOfReport>=dayFrom && dayOfReport<=dayTo) {
+                    reportJob.setStartTime(CalendarUtils.setDayOfMonth(originalReportStartTime, dayFrom));
+                    reportJob.setEndTime(dateTo);
+                }
+            }
+        } else {
+            try {
+                period = Integer.parseInt(sPeriod);
+            } catch (Exception e) {
+                throw new Exception("Ошибка парсинга периода отчета (требуется число дней): "+sPeriod);
+            }
+            reportJob.applyDataQueryPeriod(period);
+        }
+        return originalReportStartTime;
     }
 
     // Метод для загрузки адресов рассылок
@@ -306,7 +446,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         try {
             transaction = session.beginTransaction();
             Criteria criteria = ReportHandleRule.createOrgByIdCriteria(session, orgId);
-            Org org = (Org)criteria.uniqueResult();
+            Org org = (Org) criteria.uniqueResult();
             mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[0], org.getMailingListReportsOnNutrition());
             mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[1], org.getMailingListReportsOnVisits());
             mailListMap.put(ReportHandleRule.MAIL_LIST_NAMES[2], org.getMailingListReports1());
@@ -393,7 +533,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             RuleProcessor.currRule = currRule;
             if (currRule.applicatable(properties)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug(String.format("Event \"%s\" is applicatable for discountrule \"%s\"", event, currRule));
+                    logger.debug(
+                            String.format("Event \"%s\" is applicatable for discountrule \"%s\"", event, currRule));
                 }
                 ReportDocument eventDocument = readyEventDocuments.get(currRule.getDocumentFormat());
                 if (null == eventDocument) {

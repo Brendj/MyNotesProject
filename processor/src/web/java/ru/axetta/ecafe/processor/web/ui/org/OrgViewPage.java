@@ -28,6 +28,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long idOfOrg;
     private String shortName;
     private String officialName;
+    private String tag;
     private String address;
     private String phone;
     private String officialPersonFirstName;
@@ -57,6 +58,11 @@ public class OrgViewPage extends BasicWorkspacePage {
     private List<Long> idOfOrgList;
     private String filterOrgs = "Не выбрано";
     private String friendlyFilterOrgs = "Не выбрано";
+    private String city;
+    private String district;
+    private String location;
+    private String latitude;
+    private String longitude;
 
     public String getFriendlyFilterOrgs() {
         return friendlyFilterOrgs;
@@ -121,6 +127,30 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public String getOfficialName() {
         return officialName;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
     }
 
     public String getAddress() {
@@ -192,6 +222,12 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
         this.officialName = org.getOfficialName();
+        this.tag = org.getTag();
+        this.city = org.getCity();
+        this.district = org.getDistrict();
+        this.location = org.getLocation();
+        this.longitude = org.getLongitude();
+        this.latitude = org.getLatitude();
         this.address = org.getAddress();
         this.phone = org.getPhone();
         Person officialPerson = org.getOfficialPerson();

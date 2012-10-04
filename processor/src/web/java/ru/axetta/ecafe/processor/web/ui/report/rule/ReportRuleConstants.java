@@ -12,8 +12,13 @@ import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -105,24 +110,29 @@ public class ReportRuleConstants {
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам")
+            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
+            new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"),
+            new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке"),
+            new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
+
     };
 
     public static final ReportHint[] REPORT_HINTS = {
-            new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
-            new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 6, 22, 23}),
-            new ReportHint(OrgBalanceJasperReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
-            new ReportHint(ContragentOrderReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23}),
-            new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
-            new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25}),
+            new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{28, 29, 3, 4, 5, 22, 23}),
+            new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{28, 29, 3, 4, 5, 6, 22, 23}),
+            new ReportHint(OrgBalanceJasperReport.class.getCanonicalName(), new int[]{28, 29, 3, 4, 5, 22, 23}),
+            new ReportHint(ContragentOrderReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(ContragentOrderCategoryReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(OrgOrderCategoryReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(SalesReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(MscSalesReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
+            new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
+            new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 25, 26, 27}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
@@ -146,6 +156,34 @@ public class ReportRuleConstants {
             }
         }
         return null;
+    }
+    
+    public static class ReportParamHint {
+
+        private final String typeName;
+        private final List<ReportRuleConstants.ParamHint> paramHints;
+
+        public ReportParamHint(ReportRuleConstants.ReportHint reportHint) {
+            this.typeName = reportHint.getTypeName();
+            this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
+            for (int i : reportHint.getParamHints()) {
+                this.paramHints.add(ReportRuleConstants.PARAM_HINTS[i]);
+            }
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public List<ReportRuleConstants.ParamHint> getParamHints() {
+            return paramHints;
+        }
+    }
+    
+    public static List<ParamHint> getParamHintsForReportType(String reportType) {
+        ReportHint hint = findReportHint(reportType);
+        if (hint==null) return Collections.emptyList();
+        else return new ReportParamHint(hint).getParamHints();
     }
 
 }

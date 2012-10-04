@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@Scope("session")
 public class CategoryDiscountListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
 
     @PersistenceContext

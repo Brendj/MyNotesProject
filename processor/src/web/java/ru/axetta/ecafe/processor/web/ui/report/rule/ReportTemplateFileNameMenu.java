@@ -30,12 +30,11 @@ public class ReportTemplateFileNameMenu {
 
     private static SelectItem[] readAllItems() {
         String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        File rootFile = new File(reportPath);
-        String fullReportPath="";
-        if (rootFile.exists()) fullReportPath = rootFile.getAbsolutePath();
-
         List<File> templateFilesNameList = new ArrayList<File>();
+        String fullReportPath="";
         if (reportPath!=null) {
+            File rootFile = new File(reportPath);
+            if (rootFile.exists()) fullReportPath = rootFile.getAbsolutePath();
             getTemplateFilesname(reportPath, templateFilesNameList);
         } else {
             logger.error("Report templates path is not specified");
@@ -48,7 +47,7 @@ public class ReportTemplateFileNameMenu {
         }
         return items;
     }
-
+    
     /**
      * рекурсивный поиск файлов отчетов
      * @param dirName - имя директории для поиска
@@ -72,6 +71,17 @@ public class ReportTemplateFileNameMenu {
         if (items==null) items = readAllItems();
         return items;
     }
+    public SelectItem[] getItemsForReportType(String reportType) {
+        String reportSimpleName;
+        int pos = reportType.lastIndexOf('.');
+        if (pos==-1) pos=-1;
+        reportSimpleName = reportType.substring(pos+1);
+        ArrayList<SelectItem> items = new ArrayList<SelectItem>();
+        for (SelectItem si : getItems()) {
+            if (si.getLabel().contains(reportSimpleName)) items.add(si);
+        }
+        return items.toArray(new SelectItem[]{});
+    } 
     public SelectItem[] getItemsWithForcedReload() {
         items = readAllItems();
         return items;

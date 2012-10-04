@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -37,17 +39,21 @@ public class RuleExpressionUtil {
         "category",
         "idOfMenuSourceOrg",
         "enterEventType",
-        "groupByMenuGroup"};
-
-    // Аргементы, которые предназначены не для фильтрации, а для передачи параметров
-    private static int POST_ARGS[] = {23, 24};
+        "orgTag",
+        null, // далее идут параметры для передачи значений
+        DailySalesByGroupsReport.PARAM_GROUP_BY_MENU_GROUP,
+        DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX,
+        DailySalesByGroupsReport.PARAM_MENU_GROUPS,
+        ReportPropertiesUtils.P_REPORT_PERIOD,
+    };
 
     public static boolean isPostArgument(String argName) {
+        boolean isPostArg=false;
         for (int i = 0; i < ARGUMENT_NAMES.length; i++) {
-            if (ARGUMENT_NAMES[i].equals(argName))
-                for (int j = 0; j < POST_ARGS.length; j++)
-                    if (i == POST_ARGS[j])
-                        return true;
+            if (ARGUMENT_NAMES[i]==null) { isPostArg=true; continue; }
+            if (ARGUMENT_NAMES[i].equals(argName)) {
+                return isPostArg;
+            }
         }
         return false;
     }

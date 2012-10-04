@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,13 +17,17 @@ import java.util.List;
  */
 public class ReportDocument {
 
-    private final List<File> files;
+    private final File reportFile;
 
-    public ReportDocument(List<File> files) {
-        this.files = files;
+    public ReportDocument(File file) {
+        this.reportFile = file;
     }
 
+    public File getReportFile() {
+        return reportFile;
+    }
+    
     public List<File> getFiles() {
-        return files;
+        return Collections.singletonList(reportFile);
     }
 }

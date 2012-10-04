@@ -64,6 +64,19 @@
       </map>
     </constructor-arg>
   </bean>
+
+
+
+    <bean id="noRequestSecurity" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+      <constructor-arg>
+        <map>
+          <entry key="action" value="NoSecurity"/>
+        </map>
+      </constructor-arg>
+    </bean>
+
+
+
     <bean id="signResponse" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
         <constructor-arg>
             <map>
@@ -109,6 +122,9 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             id="ClientRoomControllerWS"
             address='http://localhost:8080/processor/soap/client'
             implementor='ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS'>
+        <jaxws:inInterceptors>
+            <bean class="ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor"/>
+        </jaxws:inInterceptors>
     </jaxws:endpoint>
     <jaxws:endpoint
             id="DashboardServiceWS"

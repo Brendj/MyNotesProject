@@ -153,6 +153,82 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+
+<h:outputText value="Переводы:"/>
+<rich:dataTable id="clientTransfersTable" value="#{mainPage.clientOperationListPage.accountTransferList}" var="item"
+                rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
+                footerClass="data-table-footer">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид. транзакции списания" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transactionOnBenefactor.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид. транзакции зачисления" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transactionOnBeneficiary.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время перевода" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.createTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Плательщик" />
+        </f:facet>
+        <h:commandLink value="#{item.clientBenefactor.contractId} (#{item.clientBenefactor.person.fullName})" action="#{mainPage.showClientViewPage}"
+                       styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+        </h:commandLink>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Получатель" />
+        </f:facet>
+        <h:commandLink value="#{item.clientBeneficiary.contractId} (#{item.clientBeneficiary.person.fullName})" action="#{mainPage.showClientViewPage}"
+                       styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+        </h:commandLink>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Сумма" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transferSum}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Причина" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.reason}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Пользователь" />
+        </f:facet>
+        <h:commandLink value="#{item.createdBy.userName}"
+                       action="#{mainPage.showUserViewPage}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
+        </h:commandLink>
+    </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="clientPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
 <h:outputText value="Покупки:"/>
 <rich:dataTable id="clientOrdersTable" value="#{mainPage.clientOperationListPage.clientOrderList.items}" var="item"
                 rows="8"
