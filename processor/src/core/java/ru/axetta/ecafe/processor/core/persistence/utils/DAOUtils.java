@@ -475,6 +475,14 @@ public class DAOUtils {
         return (List<Object[]>)query.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
+        String idOfOrg = idOfOrgs.toString().replaceAll("[^0-9,]","");
+        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in ("+idOfOrg+")");
+        //query.setParameter("idOfOrg", idOfOrg);
+        return (List<Object[]>)query.list();
+    }
+
     public static EnterEvent findEnterEvent(Session persistenceSession, CompositeIdOfEnterEvent compositeIdOfEnterEvent) throws Exception {
         return (EnterEvent) persistenceSession.get(EnterEvent.class, compositeIdOfEnterEvent);
     }
