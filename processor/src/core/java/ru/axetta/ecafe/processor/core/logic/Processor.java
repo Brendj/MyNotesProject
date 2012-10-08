@@ -865,11 +865,11 @@ public class Processor implements SyncProcessor,
             Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet  = org.getFriendlyOrg();
             //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
-            /* совместимость организаций котрое не имеют дружественных организаций */
+            /* совместимость организаций которые не имеют дружественных организаций */
             if (orgSet==null || orgSet.isEmpty()){
                 //orgSet = new TreeSet<Long>();
                 //orgSet.add(idOfOrg);
-                orgSet = new TreeSet<Org>();
+                orgSet = new HashSet<Org>();
                 orgSet.add(org);
             }
             for (Org o: orgSet){
