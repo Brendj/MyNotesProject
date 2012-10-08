@@ -90,8 +90,8 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/rusmarc.jar" />
             <element id="library" level="project" name="barcode" />
+            <element id="library" level="project" name="cryptopro" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -900,7 +900,7 @@
     <resource url="http://www.jboss.org/j2ee/dtd/jboss-ds_5_0.dtd" location="$USER_HOME$/jboss-5.0.1.GA/docs/dtd/jboss-ds_5_0.dtd" />
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="JDK 1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -1120,16 +1120,12 @@
       <jarDirectory url="file://$PROJECT_DIR$/../lib/cryptopro" recursive="false" />
     </library>
     <library name="Java EE 5-Java EE 5">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/javaee.jar!/" />
-      </CLASSES>
+      <CLASSES />
       <JAVADOC />
       <SOURCES />
     </library>
     <library name="Java EE 5-Java EE 5 (2)">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/javaee.jar!/" />
-      </CLASSES>
+      <CLASSES />
       <JAVADOC />
       <SOURCES />
     </library>
