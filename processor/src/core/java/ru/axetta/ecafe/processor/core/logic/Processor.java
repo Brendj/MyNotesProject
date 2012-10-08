@@ -1258,7 +1258,7 @@ public class Processor implements SyncProcessor,
                 orgSet.add(org);
             }
             for (Org o: orgSet){
-                idOfOrgSet.add(org.getIdOfOrg());
+                idOfOrgSet.add(o.getIdOfOrg());
             }
 
             for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet)) {

@@ -71,7 +71,7 @@ public class Org {
     private String mailingListReports1;
     private String mailingListReports2;
     private ConfigurationProvider configurationProvider;
-    private Org thisOrg;
+    //private Org thisOrg;
     private String guid;
     private Contract contract;
     private Date lastSuccessfulBalanceSync;
@@ -100,15 +100,13 @@ public class Org {
         this.contract = contract;
     }
 
-    public Org getThisOrg() {
-        return thisOrg;
-    }
-
-    public void setThisOrg(Org thisOrg) {
-        this.thisOrg = thisOrg;
-    }
-
-
+    //private Org getThisOrg() {
+    //    return thisOrg;
+    //}
+    //
+    //private  void setThisOrg(Org thisOrg) {
+    //    this.thisOrg = thisOrg;
+    //}
 
     public ConfigurationProvider getConfigurationProvider() {
         return configurationProvider;

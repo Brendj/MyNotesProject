@@ -161,14 +161,17 @@ public class OrgEditPage extends BasicWorkspacePage
 
 
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
+            for (Org o: org.getFriendlyOrg()){
+                o.setFriendlyOrg(new HashSet<Org>(0));
+            }
             org.setFriendlyOrg(new HashSet<Org>(0));
         }
         else{
             /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/
             /* принудительно внести в список и текущую организацию */
-            if(!idOfOrgList.contains(org.getIdOfOrg())){
-                idOfOrgList.add(org.getIdOfOrg());
-            }
+            //if(!idOfOrgList.contains(org.getIdOfOrg())){
+            //    idOfOrgList.add(org.getIdOfOrg());
+            //}
             Map<Long,Org> friendlyOrgMap = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
             /* списки не совпали то добавляем */
             Boolean containsOrg = friendlyIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(
@@ -180,6 +183,9 @@ public class OrgEditPage extends BasicWorkspacePage
                     long version = DAOUtils.updateClientRegistryVersion(session);
                     client.setClientRegistryVersion(version);
                     session.update(client);
+                }
+                for (Org o: friendlyOrgMap.values()){
+                    o.getFriendlyOrg().add(org);
                 }
                 org.getFriendlyOrg().addAll(friendlyOrgMap.values());
             }
