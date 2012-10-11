@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
@@ -21,8 +21,7 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 <%@ page import="java.awt.*" %>
 <html lang="ru">
-<head>
-<%   Logger logger=LoggerFactory.getLogger("payform");
+<head> <%   Logger logger=LoggerFactory.getLogger("payform");
     if (StringUtils.isEmpty(request.getCharacterEncoding())) {
         try {
             request.setCharacterEncoding("UTF-8");
@@ -50,20 +49,48 @@
     Long contractId = client.getContractId();
 
     Contragent ca = DAOService.getInstance().getClientOrgDefaultSupplier(client);
-    if (StringUtils.isEmpty(fieldReceiver)) fieldReceiver = ca.getContragentName();
-    if (StringUtils.isEmpty(fieldAccount)) fieldAccount = ca.getAccount();
-    if (StringUtils.isEmpty(fieldINN)) fieldINN = ca.getInn();
-    if (StringUtils.isEmpty(fieldBank)) fieldBank = ca.getBank();
-    if (StringUtils.isEmpty(fieldBIK)) fieldBIK = ca.getBic();
-    if (StringUtils.isEmpty(fieldCorrAcc)) fieldCorrAcc = ca.getCorrAccount();
-    if (fieldINN==null) fieldINN="";
-    while (fieldINN.length()<10) fieldINN+="0";
-    if (fieldAccount==null) fieldAccount="";
-    while (fieldAccount.length()<20) fieldAccount+="0";
-    if (fieldCorrAcc==null) fieldCorrAcc="";
-    while (fieldCorrAcc.length()<20) fieldCorrAcc+="0";
-    if (fieldBIK==null) fieldBIK="";
-    while (fieldBIK.length()<9) fieldBIK+="0";
+        if (StringUtils.isEmpty(fieldReceiver)) {
+            fieldReceiver = ca.getContragentName();
+        }
+        if (StringUtils.isEmpty(fieldAccount)) {
+            fieldAccount = ca.getAccount();
+        }
+        if (StringUtils.isEmpty(fieldINN)) {
+            fieldINN = ca.getInn();
+        }
+        if (StringUtils.isEmpty(fieldBank)) {
+            fieldBank = ca.getBank();
+        }
+        if (StringUtils.isEmpty(fieldBIK)) {
+            fieldBIK = ca.getBic();
+        }
+        if (StringUtils.isEmpty(fieldCorrAcc)) {
+            fieldCorrAcc = ca.getCorrAccount();
+        }
+        if (fieldINN == null) {
+            fieldINN = "";
+        }
+        while (fieldINN.length() < 10) {
+            fieldINN += "0";
+        }
+        if (fieldAccount == null) {
+            fieldAccount = "";
+        }
+        while (fieldAccount.length() < 20) {
+            fieldAccount += "0";
+        }
+        if (fieldCorrAcc == null) {
+            fieldCorrAcc = "";
+        }
+        while (fieldCorrAcc.length() < 20) {
+            fieldCorrAcc += "0";
+        }
+        if (fieldBIK == null) {
+            fieldBIK = "";
+        }
+        while (fieldBIK.length() < 9) {
+            fieldBIK += "0";
+        }
 /////
 /*    if (client!=null && client.getOrg()!=null && client.getOrg().getIdOfOrg()==1) {
         fieldReceiver="ООО &quot;ЕвроШкола-Поволжье&quot;";
@@ -77,8 +104,8 @@
 
         if(inn==null||inn.isEmpty()){%>
 
-<div class="error-output-text">  Ошибка: У контрагента не задан inn  </div>
-        <%
+<div class="error-output-text"> Ошибка: У контрагента не задан inn</div>
+    <%
 
         return;}
       String stringForBarcode=inn+"L"+client.getContractId().toString();
@@ -95,7 +122,7 @@
         <tr>
             <td class="kassir" style="vertical-align: top; letter-spacing: 0.2em;">Извещение</td>
         </tr>
-       <%-- <tr>
+        <%-- <tr>
             <td align="center">
               <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=3"/>
             </td>
@@ -119,10 +146,10 @@
         </table>
     </td>
 </tr>
- <tr>
+<tr>
     <td align="center">
 
-      <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0" />
+        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
 
     </td>
 </tr>
@@ -145,16 +172,26 @@
                 <td width="30%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(0)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(1)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(2)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(3)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(4)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(5)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(6)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(7)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(8)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(9)%></td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(9)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -162,26 +199,46 @@
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(0)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(1)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(2)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(3)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(4)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(5)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(6)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(7)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(8)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(9)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(10)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(11)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(12)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(13)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(14)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(15)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(16)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(17)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(18)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(19)%></td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(9)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(10)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(11)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(12)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(13)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(14)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(15)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(16)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(17)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(18)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(19)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -205,15 +262,24 @@
                 <td width="27%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(0)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(1)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(2)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(3)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(4)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(5)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(6)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(7)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(8)%></td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(8)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -233,26 +299,46 @@
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(0)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(1)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(2)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(3)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(4)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(5)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(6)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(7)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(8)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(9)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(10)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(11)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(12)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(13)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(14)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(15)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(16)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(17)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(18)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(19)%></td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(9)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(10)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(11)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(12)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(13)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(14)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(15)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(16)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(17)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(18)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(19)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -264,7 +350,8 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org.getShortName()%></span></td>
+                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org
+                        .getShortName()%></span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>
@@ -307,9 +394,11 @@
         <table cellspacing="0" width="100%">
             <tr>
                 <td class="stext" width="1%">Сумма&nbsp;платежа&nbsp;</td>
-                <td class="string" width="8%"><%=paySum==null?"&nbsp":paySum%></td>
+                <td class="string" width="8%"><%=paySum == null ? "&nbsp" : paySum%>
+                </td>
                 <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
-                <td class="string" width="8%"><%=paySum==null?"&nbsp":"00"%></td>
+                <td class="string" width="8%"><%=paySum == null ? "&nbsp" : "00"%>
+                </td>
                 <td class="stext" width="1%">&nbsp;коп.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Сумма&nbsp;платы&nbsp;за&nbsp;услуги&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
                 <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
@@ -375,7 +464,8 @@
             <td class="kassir" style="vertical-align: bottom;">Кассир</td>
         </tr>
     </table>--%>
-    Квитанция<br><br>Кассир</td>
+    Квитанция<br><br>Кассир
+</td>
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
@@ -383,9 +473,7 @@
 <tr valign="bottom">
     <td align="center">
 
-
-        <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=0"  />
-
+        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
 
     </td>
 </tr>
@@ -409,16 +497,26 @@
                 <td width="30%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(0)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(1)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(2)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(3)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(4)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(5)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(6)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(7)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(8)%></td>
-                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(9)%></td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 10%;"><%=fieldINN.charAt(9)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -426,26 +524,46 @@
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(0)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(1)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(2)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(3)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(4)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(5)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(6)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(7)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(8)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(9)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(10)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(11)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(12)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(13)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(14)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(15)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(16)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(17)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(18)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(19)%></td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(9)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(10)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(11)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(12)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(13)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(14)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(15)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(16)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(17)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(18)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldAccount.charAt(19)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -469,15 +587,24 @@
                 <td width="27%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(0)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(1)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(2)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(3)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(4)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(5)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(6)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(7)%></td>
-                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(8)%></td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 11%;"><%=fieldBIK.charAt(8)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -497,26 +624,46 @@
                 <td width="60%" class="floor">
                     <table class="cells" cellspacing="0">
                         <tr>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(0)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(1)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(2)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(3)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(4)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(5)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(6)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(7)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(8)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(9)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(10)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(11)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(12)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(13)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(14)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(15)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(16)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(17)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(18)%></td>
-                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(19)%></td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(0)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(1)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(2)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(3)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(4)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(5)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(6)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(7)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(8)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(9)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(10)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(11)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(12)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(13)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(14)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(15)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(16)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(17)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(18)%>
+                            </td>
+                            <td class="cell" style="width: 5%;"><%=fieldCorrAcc.charAt(19)%>
+                            </td>
                         </tr>
                     </table>
                 </td>
@@ -528,7 +675,8 @@
     <td>
         <table cellspacing="0" width="100%">
             <tr>
-                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org.getShortName()%></span></td>
+                <td class="string" width="55%"><span class="nowr">Оплата питания по картам <%=org
+                        .getShortName()%></span></td>
                 <td class="stext7" width="5%">&nbsp;</td>
                 <td class="string" width="40%"><span class="nowr">
                     <%if (null != contractId) {%>
@@ -571,9 +719,11 @@
         <table cellspacing="0" width="100%">
             <tr>
                 <td class="stext" width="1%">Сумма&nbsp;платежа&nbsp;</td>
-                <td class="string" width="8%"><%=paySum==null?"&nbsp":paySum%></td>
+                <td class="string" width="8%"><%=paySum == null ? "&nbsp" : paySum%>
+                </td>
                 <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
-                <td class="string" width="8%"><%=paySum==null?"&nbsp":"00"%></td>
+                <td class="string" width="8%"><%=paySum == null ? "&nbsp" : "00"%>
+                </td>
                 <td class="stext" width="1%">&nbsp;коп.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Сумма&nbsp;платы&nbsp;за&nbsp;услуги&nbsp;</td>
                 <td class="string" width="8%">&nbsp;</td>
                 <td class="stext" width="1%">&nbsp;руб.&nbsp;</td>
