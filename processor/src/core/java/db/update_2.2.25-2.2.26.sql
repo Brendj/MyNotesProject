@@ -402,3 +402,4 @@ CREATE TABLE cf_libvisits (
 );
 
 ALTER TABLE cf_staffs ADD COLUMN HashCode integer NOT NULL DEFAULT 0;
+ALTER TABLE cf_orgs ADD COLUMN RefectoryType integer NULL;

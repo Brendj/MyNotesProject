@@ -33,6 +33,7 @@ public class Org {
 
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
     public static final String UNKNOWN_STATE_NAME = "Неизвестное состояние";
+    public static final String[] REFECTORY_TYPE_NAMES={"Сырьевая столовая", "Столовая-доготовочная", "Буфет-раздаточная"};
 
     private Long idOfOrg;
     private long version;
@@ -83,6 +84,15 @@ public class Org {
     private String location;
     private String longitude;
     private String latitude;
+    private Integer refectoryType;
+
+    public Integer getRefectoryType() {
+        return refectoryType;
+    }
+
+    public void setRefectoryType(Integer refectoryType) {
+        this.refectoryType = refectoryType;
+    }
 
     public Set<Org> getFriendlyOrg() {
         return friendlyOrg;
