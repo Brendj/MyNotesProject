@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -91,9 +92,38 @@ public class IntegroServlet extends HttpServlet {
             try {
                 Document requestDocument = requestData.document;
                 Node dataNode = requestDocument.getFirstChild();
+
+                NamedNodeMap attributes=dataNode.getAttributes();
+                attributes.getLength();
+
+                if(0==attributes.getLength()){
+
+                    throw new Exception("no attribute idOfOrg");
+
+                }
+
+                Node idOfOrgAttribute= attributes.getNamedItem("idOfOrg");
+
+
+                if(null==idOfOrgAttribute){
+                    throw new Exception("no attribute idOfOrg");
+
+                }
+
+                Long idOfOrg=Long.parseLong(idOfOrgAttribute.getTextContent());
+
+                DAOService daoService=DAOService.getInstance();
+                Org org=daoService.getOrg(idOfOrg);
+                if(null==org){
+                    throw new Exception("cannot find org with this id");
+
+                }
+
+
                 Node roNode = dataNode.getFirstChild();
+                roNode=roNode.getNextSibling();
                 /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
-                manager.setIdOfOrg(0L);
+                manager.setIdOfOrg(idOfOrg);
                 if (roNode != null) {
                     Node itemNode = roNode.getFirstChild();
                     while (null != itemNode) {
@@ -103,7 +133,7 @@ public class IntegroServlet extends HttpServlet {
                         itemNode = itemNode.getNextSibling();
                     }
                 }
-                manager.build(roNode);
+                //manager.build(roNode);
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
