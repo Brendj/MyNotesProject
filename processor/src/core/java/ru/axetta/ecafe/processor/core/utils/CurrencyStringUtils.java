@@ -9,7 +9,7 @@ package ru.axetta.ecafe.processor.core.utils;
  */
 public final class CurrencyStringUtils {
 
-    private static final String[] DELIMITERS = {".", ",", "-", "=", " "};
+    private static final String[] DELIMITERS = {".", ",", "=", " "};
     private static final int DEFAULT_DELIMITER = 1;
     private static final int COPECKS_IN_RUBLE = 100;
 

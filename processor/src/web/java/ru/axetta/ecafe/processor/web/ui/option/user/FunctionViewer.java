@@ -24,15 +24,21 @@ public class FunctionViewer {
     public static class Item implements Comparable {
 
         private final String functionName;
+        private final String functionDesc;
         private final Long functionId;
 
         public String getFunctionName() {
             return functionName;
         }
 
+        public String getFunctionDesc() {
+            return functionDesc;
+        }
+
         public Item(Function function) {
             this.functionId = function.getIdOfFunction();
             this.functionName = function.getFunctionName();
+            this.functionDesc = Function.getFunctionDesc(functionName);
         }
 
         public int compareTo(Object o) {

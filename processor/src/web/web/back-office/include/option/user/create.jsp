@@ -34,6 +34,9 @@
         <rich:column>
             <h:outputText escape="true" value="#{item.functionName}" styleClass="output-text" />
         </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
+        </rich:column>
     </rich:dataTable>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

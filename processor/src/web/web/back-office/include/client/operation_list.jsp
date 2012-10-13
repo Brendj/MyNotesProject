@@ -340,6 +340,59 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+
+<h:outputText value="Возвраты:"/>
+<rich:dataTable id="clientRefundTable" value="#{mainPage.clientOperationListPage.accountRefundList}" var="item"
+                rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
+                footerClass="data-table-footer">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид. транзакции" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transaction.idOfTransaction}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.createTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Сумма" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.refundSum}" converter="copeckSumConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Причина" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.reason}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Пользователь" />
+        </f:facet>
+        <h:commandLink value="#{item.createdBy.userName}"
+                       action="#{mainPage.showUserViewPage}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
+        </h:commandLink>
+    </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="clientRefundTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
+
 <h:outputText value="SMS-сообщения:"/>
 <rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"

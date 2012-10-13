@@ -33,6 +33,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private final ClientOrderList clientOrderList = new ClientOrderList();
     private final ClientSmsList clientSmsList = new ClientSmsList();
     private List<AccountTransfer> accountTransferList = new LinkedList<AccountTransfer>(); 
+    private List<AccountRefund> accountRefundList = new LinkedList<AccountRefund>();
     private List<AccountTransaction> accountTransactionList = new LinkedList<AccountTransaction>();
 
     public String getPageFilename() {
@@ -89,6 +90,10 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return accountTransferList;
     }
 
+    public List<AccountRefund> getAccountRefundList() {
+        return accountRefundList;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
@@ -102,6 +107,12 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             at.getClientBenefactor().getPerson().getFullName();
             at.getClientBeneficiary().getPerson().getFullName();
             at.getCreatedBy().getUserName();
+        }
+        /////
+        accountRefundList = DAOUtils.getAccountRefundsForClient(session, client, startTime,  endTime);
+        for (AccountRefund ar : accountRefundList) {
+            // lazy load
+            ar.getCreatedBy().getUserName();
         }
         /////
         Criteria criteria = session.createCriteria(AccountTransaction.class);

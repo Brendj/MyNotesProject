@@ -876,7 +876,18 @@ public class DAOUtils {
         return (List<AccountTransfer>)q.list();
     }
     
-    
+    @SuppressWarnings("unchecked")
+    public static List<AccountRefund> getAccountRefundsForClient(Session session, Client client, Date startTime,
+            Date endTime) {
+        org.hibernate.Query q = session.createQuery(
+                "from AccountRefund where (client=:client) and createTime>=:startTime and createTime<=:endTime");
+        q.setLong("startTime", startTime.getTime());
+        q.setLong("endTime", endTime.getTime());
+        q.setParameter("client", client);
+        return (List<AccountRefund>)q.list();
+    }
+
+
     public static Client findClientByRefGUID(Session session, String guid){
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("clientGUID",guid));

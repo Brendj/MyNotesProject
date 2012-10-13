@@ -270,6 +270,11 @@
                             binding="#{clientBalanceTransferPage.mainMenuComponent}" action="#{clientBalanceTransferPage.show}"
                             reRender="workspaceForm" />
 
+        <%--@elvariable id="clientRefundPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientRefundPage"--%>
+        <rich:panelMenuItem id="clientRefundMenuItem" label="Возврат средств"
+                            binding="#{clientRefundPage.mainMenuComponent}" action="#{clientRefundPage.show}"
+                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>

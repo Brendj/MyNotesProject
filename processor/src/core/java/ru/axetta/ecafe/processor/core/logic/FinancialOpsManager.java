@@ -286,6 +286,7 @@ public class FinancialOpsManager {
         session.delete(addPayment);
     }
 
+    //TODO: добавить изменение текущих позиций
     @Transactional
     public void createAccountTransfer(Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
         Session session = (Session)em.getDelegate();
@@ -310,6 +311,25 @@ public class FinancialOpsManager {
         accountTransactionOnBeneficiary.updateSource(accountTransfer.getIdOfAccountTransfer() + "");
         session.update(accountTransactionOnBenefactor);
         session.update(accountTransactionOnBeneficiary);
+    }
+
+    //TODO: добавить изменение текущих позиций
+    @Transactional
+    public void createAccountRefund(Client client, Long sum, String reason, User createdBy) throws Exception {
+        Session session = (Session)em.getDelegate();
+        if (sum<=0) throw new Exception("Сумма возврата должна быть больше нуля");
+        if (client.getBalance()<sum) throw new Exception("Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(client.getBalance())+") для возврата");
+        Date dt = new Date();
+        // регистрируем транзакцию
+        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+                null, -sum, "",
+                AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE, dt);
+        AccountRefund accountRefund = new AccountRefund(dt, client, reason, createdBy, accountTransaction, sum);
+        session.save(accountTransaction);
+        session.save(accountRefund);
+        session.flush();
+        accountTransaction.updateSource(accountRefund.getIdOfAccountRefund() + "");
+        session.update(accountTransaction);
     }
 
 }
