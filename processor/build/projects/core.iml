@@ -122,25 +122,7 @@
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jasperreports-3.7.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="" scope="PROVIDED">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/iText-2.1.7.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="" scope="PROVIDED">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jasperreports-fonts-3.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -387,6 +369,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/cxf-rt-ws-security-2.4.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/jasperreports-4.7.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

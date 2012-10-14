@@ -98,6 +98,7 @@ public class DBUpdater {
                     BufferedReader bufIn = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
                     String sqlCmd="";
                     StringBuilder commitText = new StringBuilder();
+                    boolean isQuotesOpened=false;
                     for (;;) {
                         String l = bufIn.readLine();
                         if (l==null) break;
@@ -111,10 +112,20 @@ public class DBUpdater {
                         }
                         if (sqlCmd.length()!=0) sqlCmd+=" ";
                         sqlCmd+=l;
-                        if (sqlCmd.endsWith(";")) {
+                        if (hasOddQuotes(l)) {
+                            if (!isQuotesOpened) {
+                                // открылись кавычки для длинной команды
+                                isQuotesOpened = true;
+                                continue;
+                            } else {
+                                isQuotesOpened = false;
+                            }
+                        }
+                        if (!isQuotesOpened && sqlCmd.endsWith(";")) {
                             sqlCmd=sqlCmd.substring(0, sqlCmd.length()-1);
                             try {
-                                em.createNativeQuery(sqlCmd).executeUpdate();
+                                if (sqlCmd.toLowerCase().startsWith("select")) em.createNativeQuery(sqlCmd).getSingleResult();
+                                else em.createNativeQuery(sqlCmd).executeUpdate();
                             } catch (Exception e) {
                                 throw new Exception("ошибка при выполнении сценария: "+sqlFile+" ("+sqlCmd+")", e);
                             }
@@ -135,5 +146,13 @@ public class DBUpdater {
             logger.error("Failed to update DB", e);
             throw e;
         }
+    }
+
+    private boolean hasOddQuotes(String l) {
+        int n=0;
+        for (int i=0;i<l.length();++i) {
+            if (l.charAt(i)=='\'') n++;
+        }
+        return (n%2)==1;
     }
 }

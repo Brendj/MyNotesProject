@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -31,6 +33,9 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
     public abstract BasicReportForContragentJob createInstance();
     protected abstract Builder createBuilder(String templateFilename);
     protected abstract Logger getLogger();
+    protected Integer getContragentSelectClass() {
+        return null;
+    }
 
     @Override
     public AutoReportRunner getAutoReportRunner() {
@@ -50,6 +55,9 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
                     Criteria allContragentCriteria = session.createCriteria(Contragent.class);
+                    if (getContragentSelectClass()!=null) {
+                        allContragentCriteria.add(Restrictions.eq("classId", getContragentSelectClass()));
+                    }
                     List allContragents = allContragentCriteria.list();
                     for (Object object: allContragents){
                         Contragent contragent = (Contragent) object;

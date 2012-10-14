@@ -3685,7 +3685,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: "+e.getMessage(), null));
         }
     }
 

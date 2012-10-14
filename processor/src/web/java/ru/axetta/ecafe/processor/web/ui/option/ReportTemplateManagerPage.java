@@ -172,12 +172,12 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
             File dir = new File(path);
             if (!dir.exists())
                 if (!dir.mkdirs())
-                    throw new Exception(String.format("Can not make directory %s.", dir.getAbsolutePath()));
+                    throw new Exception(String.format("Ошибка при создании директории %s.", dir.getAbsolutePath()));
             if (!item.getFile().renameTo(new File(path, item.getFileName())))
-                throw new Exception(String.format("Can not rename to %s%s.", path, item.getFileName()));
+                throw new Exception(String.format("Ошибка перемеинования файла %s%s.", path, item.getFileName()));
             load();
         } else {
-            throw new Exception(String.format("File  %s already exist.", file.getAbsolutePath()));
+            throw new Exception("Шаблон уже существует.");
         }
     }
 

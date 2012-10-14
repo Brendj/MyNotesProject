@@ -82,14 +82,14 @@
                              transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файла"
                              progressLabel="Загрузка" listHeight="204px" acceptedTypes="jasper"
                              fileUploadListener="#{mainPage.reportTemplateLoadFileListener}" maxFilesQuantity="10">
-                <a4j:support event="onuploadcomplete" reRender="reportTemplateListTable" />
+                <a4j:support event="onuploadcomplete" reRender="reportTemplateListTable, reportTemplateMessages" />
             </rich:fileUpload>
 
         </h:panelGrid>
 
     </rich:simpleTogglePanel>
 
-    <h:panelGrid styleClass="borderless-grid">
+    <h:panelGrid styleClass="borderless-grid" id="reportTemplateMessages">
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
     </h:panelGrid>

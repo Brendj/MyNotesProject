@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -30,6 +31,11 @@ import java.util.*;
  */
 public class ContragentPaymentReport extends BasicReportForContragentJob {
 
+    @Override
+    protected Integer getContragentSelectClass() {
+        return Contragent.PAY_AGENT;
+    }
+
     public static class Builder implements BasicReportForContragentJob.Builder{
 
         public static class ClientPaymentRow implements Comparable<ClientPaymentRow>{
@@ -39,12 +45,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             public  String firstName;
             public  String surName;
             public  String secondName;
-            public  String idDocument;
             public  Long idOfOrg;
             public  String shortName;
             public  Date transactionTime;
-            public Long idOfCard;
-            public Long cardNo;
             public  Long idOfContragentReceiver;
             public  String nameOfContragentReceiver;
             public  Long idOfContragentSender;
@@ -62,25 +65,23 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 this.firstName = person.getFirstName();
                 this.surName = person.getSurname();
                 this.secondName = person.getSecondName();
-                this.idDocument = person.getIdDocument();
                 Org org = client.getOrg();
                 this.idOfOrg = org.getIdOfOrg();
                 this.shortName = org.getShortName();
-                this.transactionTime = accountTransaction.getTransactionTime();
                 Contragent contragentReceiver = clientPayment.getContragentReceiver();
-                this.idOfContragentReceiver = contragentReceiver.getIdOfContragent();
-                this.nameOfContragentReceiver = contragentReceiver.getContragentName();
+                if (contragentReceiver==null) {
+                    this.idOfContragentReceiver = -1L;
+                    this.nameOfContragentReceiver = "";
+                } else {
+                    this.idOfContragentReceiver = contragentReceiver.getIdOfContragent();
+                    this.nameOfContragentReceiver = contragentReceiver.getContragentName();
+                }
                 Contragent contragentSender = clientPayment.getContragent();
                 this.idOfContragentSender = contragentSender.getIdOfContragent();
                 this.nameOfContragentSender = contragentSender.getContragentName();
                 this.paySum = clientPayment.getPaySum();
                 this.createTime = clientPayment.getCreateTime();
                 this.idOfPayment = clientPayment.getIdOfPayment();
-                Card card = accountTransaction.getCard();
-                if (card!=null) {
-                    this.idOfCard = card.getIdOfCard();
-                    this.cardNo = card.getCardNo();
-                }
             }
 
             @Override
@@ -92,8 +93,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 return idOfClient;
             }
 
-            public Long getContractId() {
-                return contractId;
+            public String getContractId() {
+                return ContractIdFormat.format(contractId);
             }
 
             public String getFirstName() {
@@ -108,28 +109,12 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 return secondName;
             }
 
-            public String getIdDocument() {
-                return idDocument;
-            }
-
             public Long getIdOfOrg() {
                 return idOfOrg;
             }
 
-            public String getShortName() {
+            public String getOrgName() {
                 return shortName;
-            }
-
-            public Date getTransactionTime() {
-                return transactionTime;
-            }
-
-            public Long getIdOfCard() {
-                return idOfCard;
-            }
-
-            public Long getCardNo() {
-                return cardNo;
             }
 
             public Long getIdOfContragentReceiver() {
@@ -148,8 +133,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 return nameOfContragentSender;
             }
 
-            public long getPaySum() {
-                return paySum;
+            public Float getPaySum() {
+                return (float)paySum/100;
             }
 
             public Date getCreateTime() {
@@ -188,7 +173,6 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, contragent, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            parameterMap.put("total", totalSum);
             return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, contragent.getIdOfContragent());
         }
@@ -208,8 +192,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 ClientPayment currClientPayment = (ClientPayment) currObject;
                 ClientPaymentRow newClientPaymentItem = new ClientPaymentRow(currClientPayment);
                 clientPaymentItems.add(newClientPaymentItem);
-                totalSum += newClientPaymentItem.getPaySum();
+                totalSum += newClientPaymentItem.paySum;
             }
+            parameterMap.put("totalSum", (float)totalSum/100);
             return new JRBeanCollectionDataSource(clientPaymentItems);
         }
     }

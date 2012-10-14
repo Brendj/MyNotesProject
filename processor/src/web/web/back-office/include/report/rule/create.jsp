@@ -49,7 +49,7 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
-<rich:dataTable id="paramHints" value="#{mainPage.reportRuleEditPage.paramHints}" var="item"
+<rich:dataTable id="paramHints" value="#{mainPage.reportRuleCreatePage.paramHints}" var="item"
                 columnClasses="left-aligned-column, left-aligned-column">
     <f:facet name="header">
         <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="output-text" />
