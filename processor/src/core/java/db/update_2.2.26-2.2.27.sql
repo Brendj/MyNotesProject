@@ -400,3 +400,5 @@ CREATE TABLE cf_libvisits (
   SendAll integer DEFAULT 0,
   PRIMARY KEY  (IdOfLibVisit)
 );
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 121015) НЕ МЕНЯТЬ
