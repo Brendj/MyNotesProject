@@ -1,25 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Contragent" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Transaction" %>
-<%@ page import="org.hibernate.Session" %>
-<%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.net.URI" %>
-<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
-<%@ page import="java.util.Arrays" %>
-<%@ page import="java.nio.charset.Charset" %>
-<%@ page import="org.apache.commons.lang.CharEncoding" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
-<%@ page import="java.awt.*" %>
 <html lang="ru">
 <head> <%   Logger logger=LoggerFactory.getLogger("payform");
     if (StringUtils.isEmpty(request.getCharacterEncoding())) {
@@ -108,7 +99,7 @@
     <%
 
         return;}
-      String stringForBarcode=inn+"L"+client.getContractId().toString();
+      String stringForBarcode=inn+"L"+String.format("%08d",client.getContractId());
      // logger.info("inn: "+ca.getInn());
 
 

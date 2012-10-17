@@ -1,20 +1,18 @@
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.ClientGroup" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfClientGroup" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
+<%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.util.List" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%@ page import="java.net.URI" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <html lang="ru">
 <head>
@@ -47,7 +45,7 @@
         persistenceTransaction = persistenceSession.beginTransaction();
         CompositeIdOfClientGroup cgId=new CompositeIdOfClientGroup(idOfOrg, idOfClientGroup);
         ClientGroup clientGroup = (ClientGroup) persistenceSession.get(ClientGroup.class, cgId);
-
+        session.setAttribute("__payform.org", (Org) persistenceSession.get(Org.class,idOfOrg));
         Criteria clientsCriteria = persistenceSession.createCriteria(Client.class);
         clientsCriteria.add(Restrictions.eq("clientGroup", clientGroup));
         if (bOnlyDebtors) {
