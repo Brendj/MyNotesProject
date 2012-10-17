@@ -327,15 +327,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/rusmarc.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="cryptopro" level="project" />
     <orderEntry type="library" name="cryptopro" level="project" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
@@ -374,10 +365,10 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="PROVIDED">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jasperreports-4.7.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/jasperreports-3.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
