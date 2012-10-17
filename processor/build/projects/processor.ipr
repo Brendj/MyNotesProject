@@ -90,7 +90,7 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
-            <element id="library" level="project" name="barcode" />
+            <element id="library" level="project" name="barcode4j" />
             <element id="library" level="project" name="cryptopro" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
@@ -1073,9 +1073,9 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
-    <library name="barcode">
+    <library name="barcode4j">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/barcode.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/barcode/barbecue-1.5-beta1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

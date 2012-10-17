@@ -12,9 +12,12 @@ package ru.axetta.ecafe.processor.web.partner.barcode;
  * To change this template use File | Settings | File Templates.
  */
 
-import com.onbarcode.barcode.AbstractBarcode;
-import com.onbarcode.barcode.Code128;
-import com.onbarcode.barcode.IBarcode;
+//import com.onbarcode.barcode.AbstractBarcode;
+//import com.onbarcode.barcode.Code128;
+//import com.onbarcode.barcode.IBarcode;
+
+import net.sourceforge.barbecue.Barcode;
+import net.sourceforge.barbecue.BarcodeFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,39 +48,30 @@ public class BarcodeServlet extends HttpServlet {
             ServletOutputStream servletoutputstream = response.getOutputStream();
 
             try {
-
-
                 String data = request.getParameter("data");
-
                 String set = request.getParameter("SET");
-
                 int rotate = Integer.parseInt(request.getParameter("rotate"));
-
-                int SET;
-                if (set == null) {
-                    SET = Code128.SET_B;
-                } else {
-
-                    SET = Integer.parseInt(set);
-                }
-
-
-                Code128 barcode = new Code128();
-
-
-                barcode.setCodeSet(SET);
-
-
-                if (data != null) {
-                    barcode.setData(data);
-                } else {
-                    throw new Exception("no data");
-                }
-
-
-                barcode.setRotate(rotate);
-
-                barcode.drawBarcode(servletoutputstream);
+                Barcode barcode  = BarcodeFactory.createCode128B(data);
+                BufferedImage image = new BufferedImage(515, 44, BufferedImage.TYPE_INT_RGB);
+                // We need to cast the Graphics from the Image to a Graphics2D - this is OK
+                Graphics2D g = (Graphics2D) image.getGraphics();
+                barcode.draw(g, 0, 0);
+                ImageIO.write(image, "jpeg", servletoutputstream);
+                //int SET;
+                //if (set == null) {
+                //    SET = Code128.SET_B;
+                //} else {
+                //    SET = Integer.parseInt(set);
+                //}
+                //Code128 barcode = new Code128();
+                //barcode.setCodeSet(SET);
+                //if (data != null) {
+                //    barcode.setData(data);
+                //} else {
+                //    throw new Exception("no data");
+                //}
+                //barcode.setRotate(rotate);
+                //barcode.drawBarcode(servletoutputstream);
 
             } catch (Exception e) {
 
