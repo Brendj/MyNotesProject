@@ -1119,16 +1119,6 @@
       <SOURCES />
       <jarDirectory url="file://$PROJECT_DIR$/../lib/cryptopro" recursive="false" />
     </library>
-    <library name="Java EE 5-Java EE 5">
-      <CLASSES />
-      <JAVADOC />
-      <SOURCES />
-    </library>
-    <library name="Java EE 5-Java EE 5 (2)">
-      <CLASSES />
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="Java EE 6-3.1">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.annotation.jar!/" />
