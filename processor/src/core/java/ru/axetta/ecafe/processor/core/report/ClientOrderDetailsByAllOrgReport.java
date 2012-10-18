@@ -125,7 +125,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
                 throws Exception {
 
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -143,7 +143,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
-                Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
 
             Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
                     + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice"

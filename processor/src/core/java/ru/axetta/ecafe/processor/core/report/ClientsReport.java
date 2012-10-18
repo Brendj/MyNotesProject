@@ -90,7 +90,7 @@ public class ClientsReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgName", org.getOfficialName());
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
@@ -101,7 +101,7 @@ public class ClientsReport extends BasicReportForOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
-                Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             HashMap<Integer, ClientsReportItem> mapItems = new HashMap<Integer, ClientsReportItem>(31);
             List<ClientsReportItem> resultRows = new LinkedList<ClientsReportItem>();
             Calendar c = Calendar.getInstance();

@@ -84,7 +84,7 @@ public class MscSalesReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
             parameterMap.put("orgName", org.getOfficialName());
 
@@ -108,7 +108,7 @@ public class MscSalesReport extends BasicReportForOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
-                Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<MealRow> mealRows = new LinkedList<MealRow>();
 
             //// горячее питание

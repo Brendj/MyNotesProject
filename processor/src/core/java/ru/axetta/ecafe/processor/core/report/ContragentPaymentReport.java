@@ -158,7 +158,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
        public BasicReportJob build(Session session, Contragent contragent, Date startTime, Date endTime,
                 Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             //parameterMap.put("idOfContragent", contragent.getIdOfContragent());
             //parameterMap.put("contragentName", contragent.getContragentName());
             calendar.setTime(startTime);
@@ -178,7 +178,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                Calendar clone, Map<Object, Object> parameterMap) {
+                Calendar clone, Map<String, Object> parameterMap) {
             Date generateTime = new Date();
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
             clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));

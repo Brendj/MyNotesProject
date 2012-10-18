@@ -177,7 +177,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
             parameterMap.put("orgName", org.getOfficialName());
             calendar.setTime(startTime);
@@ -191,7 +191,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
-                Calendar calendar, Map<Object, Object> parameterMap, List<String> daysOfMonth) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap, List<String> daysOfMonth) throws Exception {
             // хешмап для хранения записей отчета по айди клиенту
             HashMap<Long, ReportItem> mapItems = new HashMap<Long, ReportItem>();
             // лист для хранения результата

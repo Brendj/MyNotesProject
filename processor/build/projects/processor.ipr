@@ -1075,7 +1075,8 @@
   <component name="libraryTable">
     <library name="barcode4j">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/barcode/barbecue-1.5-beta1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/barcode/javase.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/barcode/core.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

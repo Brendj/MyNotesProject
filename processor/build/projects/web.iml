@@ -344,24 +344,6 @@
     <orderEntry type="library" name="cryptopro" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Java EE 6-3.1" level="project" />
     <orderEntry type="library" name="barcode4j" level="project" />
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jasperreports-3.7.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/jasperreports-fonts-3.7.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
   </component>
 </module>
 

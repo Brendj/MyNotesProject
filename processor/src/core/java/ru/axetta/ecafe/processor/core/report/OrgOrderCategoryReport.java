@@ -183,7 +183,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
         public OrgOrderCategoryReport build(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
             parameterMap.put("orgName", org.getOfficialName());
             calendar.setTime(startTime);

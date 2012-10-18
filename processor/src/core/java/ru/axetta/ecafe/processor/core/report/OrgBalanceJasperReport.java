@@ -170,7 +170,7 @@ public class OrgBalanceJasperReport extends BasicJasperReport {
         public OrgBalanceJasperReport build(RuntimeContext runtimeContext, Session session, Org org, Date baseTime)
                 throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgOfficialName", org.getOfficialName());
             parameterMap.put("baseTime", baseTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,

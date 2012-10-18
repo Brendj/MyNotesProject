@@ -92,7 +92,7 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
                 throws Exception {
 
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -110,7 +110,7 @@ public class MenuDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob 
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
-                Calendar calendar, Map<Object, Object> parameterMap) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
 
             Query query = session.createSQLQuery("SELECT cf_menudetails.menuorigin,  count(*),"
                     + "  sum(cf_menudetails.price) as price FROM  public.cf_menu, "

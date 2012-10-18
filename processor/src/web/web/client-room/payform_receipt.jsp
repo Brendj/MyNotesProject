@@ -113,11 +113,6 @@
         <tr>
             <td class="kassir" style="vertical-align: top; letter-spacing: 0.2em;">Извещение</td>
         </tr>
-        <%-- <tr>
-            <td align="center">
-              <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=3"/>
-            </td>
-        </tr>--%>
         <tr>
             <td class="kassir" style="vertical-align: bottom;">Кассир</td>
         </tr>
@@ -141,7 +136,7 @@
     <td align="center">
 
         <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
-
+        <p align="center"><%=stringForBarcode%></p>
     </td>
 </tr>
 <tr>
@@ -441,31 +436,17 @@
 </tr>
 <tr>
 <td style="width: 50mm; height: 80mm; vertical-align: bottom;" class="kassir">
-    <%--<table style="width: 50mm; height: 100%;" cellspacing="0">
-        <tr>
-            <td align="center">
-                <img src="http://localhost:8080/processor/barcode?data=<%=stringForBarcode%>&rotate=3"/>
-            </td>
-        </tr>
-        <tr>
-            <td class="kassir" style="vertical-align: top; letter-spacing: 0.2em;">Квитанция</td>
-        </tr>
 
-        <tr>
-            <td class="kassir" style="vertical-align: bottom;">Кассир</td>
-        </tr>
-    </table>--%>
     Квитанция<br><br>Кассир
 </td>
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
 
-<tr valign="bottom">
+<tr>
     <td align="center">
-
         <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
-
+         <p align="center"><%=stringForBarcode%></p>
     </td>
 </tr>
 

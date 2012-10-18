@@ -167,7 +167,7 @@ public class ContragentOrderReport extends BasicJasperReport {
         public ContragentOrderReport build(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("month", month + 1);
