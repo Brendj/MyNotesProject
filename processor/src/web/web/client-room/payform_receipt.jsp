@@ -445,6 +445,7 @@
 
 <tr>
     <td align="center">
+        <br/>
         <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
          <p align="center"><%=stringForBarcode%></p>
     </td>

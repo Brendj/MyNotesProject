@@ -1,30 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.net.URI" %>
-<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
-<%@ page import="java.util.Arrays" %>
-<%@ page import="org.apache.commons.lang.CharEncoding" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.Base64" %>
-<%@ page import="java.net.URLDecoder" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
 <html lang="ru">
 <head>
-<%
+        <%
 
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.payform_jsp");
     //if (StringUtils.isEmpty(request.getCharacterEncoding())) {
@@ -98,8 +86,21 @@
 <meta http-equiv="Content-Language" content="ru">
 <jsp:include page="payform_css.jsp"/>
 <body>
-
+<div id="toolbox">
+    <p>Прежде чем отправлять документ на печать, воспользуйтесь предварительным просмотром (<i>Print preview</i>)
+        и убедитесь в корректном отображении документа.
+        Обычно квитанция формы «№&nbsp;ПД-4» свободно располагается
+        на&nbsp;листе формата А4 и&nbsp;не&nbsp;требует особых настроек
+        печати. В&nbsp;редких случаях может потребоваться уменьшить
+        боковые поля листа до&nbsp;10–15&nbsp;мм или&nbsp;изменить
+        ориентацию страницы на&nbsp;горизонтальную (<i>landscape</i>), чтобы квитанция полностью поместилась в&nbsp;печатное
+        поле.</p>
+    <input value="Напечатать" onclick="window.print();" type="button" />
+    <input value="Закрыть" onclick="window.close();" type="button" />
+    <center><span style="font-size: 80%;">информационный блок от начала страницы до пунктирной линии на печать не выводится</span>
+    </center>
+</div>
 <jsp:include page="payform_receipt.jsp"/>
-
+<p style="page-break-before: always"/>
 </body>
 </html>
