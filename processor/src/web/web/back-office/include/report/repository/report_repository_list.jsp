@@ -9,6 +9,9 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToWorkOnlineReport())
+      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+
 <%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
 <h:panelGrid id="reportRepListPanelGrid" binding="#{reportRepositoryListPage.pageComponent}"
              styleClass="borderless-grid">
@@ -115,6 +118,19 @@
             <a4j:commandLink value="#{item.reportFile}" action="#{reportRepositoryListPage.downloadReportFile}"
                              styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}" />
+            </a4j:commandLink>
+        </rich:column>
+
+        <rich:column style="text-align:center" rendered="#{reportRepositoryListPage.canDelete}">
+            <f:facet name="header">
+                <h:outputText value="Удалить" escape="true"/>
+            </f:facet>
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             reRender="uvDeleteConfirmPanel"
+                             action="#{uvDeletePage.show}"
+                             oncomplete="#{rich:component('uvDeleteConfirmPanel')}.show()">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}" target="#{uvDeletePage.currentEntityItem}" />
             </a4j:commandLink>
         </rich:column>
 

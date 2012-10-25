@@ -105,16 +105,17 @@ public class ReportRuleConstants {
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
-            new ParamHint("idOfContragent", "Идентификатор контрагента"),
+            new ParamHint("idOfContragent", "Идентификатор контрагента"), //20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
+            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"), //25
             new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"),
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке"),
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
+            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Идентификатор контрагента-получателя"), //30
 
     };
 
@@ -137,7 +138,7 @@ public class ReportRuleConstants {
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{20, 21})
+            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{20, 21, 30})
     };
 
     private ReportRuleConstants() {

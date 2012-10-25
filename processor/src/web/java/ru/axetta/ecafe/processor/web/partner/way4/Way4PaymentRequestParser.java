@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
+    final static String TERMID_PREFIX_INTERNET_ACQUIRING="2";
+    
     boolean bPayRequest;
     String rrn;
 
@@ -33,8 +35,10 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         if (!currency.equals("RUR") && !currency.equals("RUB")) throw new Exception("Invalid currency: "+currency);
         String termId = parseResult.getParam("TERMINAL");
 
-        //todo: уточнить какой будет termId при оплате через интернет
         int paymentMethod=ClientPayment.ATM_PAYMENT_METHOD;
+        if (termId!=null && termId.startsWith(TERMID_PREFIX_INTERNET_ACQUIRING)) {
+            paymentMethod=ClientPayment.INTERNET_ACQUIRING_METHOD;
+        }
         if (function.equals("bank_account")) {
             return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
                     linkConfig.idOfContragent, null, paymentMethod, clientId,

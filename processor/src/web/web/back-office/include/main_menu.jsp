@@ -432,6 +432,16 @@
                         binding="#{mainPage.currentPositionsReportPage.mainMenuComponent}"
                         label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"
                         reRender="workspaceForm" />
+    <%--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"--%>
+    <rich:panelMenuItem id="commonStatsMenuItem"
+                        binding="#{commonStatsPage.mainMenuComponent}"
+                        label="Общая статистика" action="#{commonStatsPage.show}"
+                        reRender="workspaceForm" />
+    <%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PayStatsPage"--%>
+    <rich:panelMenuItem id="payStatsMenuItem"
+                        binding="#{payStatsPage.mainMenuComponent}"
+                        label="Отчет по агентам" action="#{payStatsPage.show}"
+                        reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
 

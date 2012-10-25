@@ -28,8 +28,6 @@ import java.util.List;
  */
 public class ReportRuleCreatePage extends BasicWorkspacePage {
 
-    private static String DELIMETER = ",";
-
     private String ruleName;
     private boolean enabled;
     private String reportType;
@@ -143,7 +141,7 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
     }
 
     public void createReportRule(Session session) throws Exception {
-        String[] addressList = this.routeAddresses.split(DELIMETER);
+        String[] addressList = this.routeAddresses.split(ReportRuleEditPage.DELIMETER);
 
         ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject, addressList[0],
                 this.enabled);
@@ -161,7 +159,7 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         reportHandleRule.setTag(tag);
 
         reportHandleRule.addRuleCondition(ReportRuleConstants.buildTypeCondition(reportHandleRule, this.reportType));
-        String[] textRuleConditions = this.ruleConditionItems.split(DELIMETER);
+        String[] textRuleConditions = this.ruleConditionItems.split(ReportRuleEditPage.DELIMETER);
         for (String textRuleCondition : textRuleConditions) {
             String trimmedTextRuleCondition = StringUtils.trim(textRuleCondition);
             if (StringUtils.isNotEmpty(trimmedTextRuleCondition)) {

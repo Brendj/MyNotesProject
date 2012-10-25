@@ -84,4 +84,8 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
     public ReportRepositoryItem getSelectedItem() {
         return selectedItem;
     }
+
+    public boolean isCanDelete() throws Exception {
+        return ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditReports();
+    }
 }

@@ -8,6 +8,9 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToViewReports())
+      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+
 <%-- Панель просмотра правила обработки автоматических отчетов --%>
 <h:panelGrid id="reportJobViewGrid" binding="#{mainPage.reportJobViewPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">

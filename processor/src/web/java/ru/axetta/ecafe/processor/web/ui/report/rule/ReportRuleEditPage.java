@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class ReportRuleEditPage extends BasicWorkspacePage {
 
-    private static String DELIMETER = ";";
+    public static String DELIMETER = ";";
 
     public void setTag(String tag) {
         this.tag = tag;

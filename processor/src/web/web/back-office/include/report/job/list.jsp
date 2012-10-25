@@ -8,6 +8,9 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToViewReports())
+      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+
 <%-- Панель посмотра списка правил обработки автоматических отчетов --%>
 <rich:dataTable id="reportJobTable" binding="#{mainPage.reportJobListPage.pageComponent}"
                 footerClass="data-table-footer" value="#{mainPage.reportJobListPage.items}" var="item" rows="20"
