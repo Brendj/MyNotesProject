@@ -79,20 +79,6 @@ drop function inline_0();
 create or replace function inline_0() returns integer as '
 declare v_exists integer;
 begin
- select into v_exists count(*) from pg_class where relname = ''cf_clientsms_idofclient_idx'';
- if v_exists = 0 then
-  create index cf_clientsms_idofclient_idx on cf_clientsms(idofclient);
- end if;
-return null;
-end;' language 'plpgsql';
-
-select inline_0();
-drop function inline_0();
-
-
-create or replace function inline_0() returns integer as '
-declare v_exists integer;
-begin
  select into v_exists count(*) from pg_class where relname = ''cf_clientpayments_idofca_idx'';
  if v_exists = 0 then
   create index cf_clientpayments_idofca_idx on cf_clientpayments(idofcontragent);
