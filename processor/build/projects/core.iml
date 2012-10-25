@@ -8,7 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/core/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/core/test" isTestSource="true" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="JDK 1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
@@ -327,8 +327,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="cryptopro" level="project" />
-    <orderEntry type="library" name="cryptopro" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="cryptopro" level="project" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
         <CLASSES>
@@ -365,7 +364,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/jasperreports-4.7.1.jar!/" />

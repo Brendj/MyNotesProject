@@ -341,7 +341,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="cryptopro" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="cryptopro" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Java EE 6-3.1" level="project" />
     <orderEntry type="library" name="barcode4j" level="project" />
   </component>
