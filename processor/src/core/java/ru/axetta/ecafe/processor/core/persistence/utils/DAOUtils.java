@@ -920,4 +920,5 @@ public class DAOUtils {
         }
         return resultList;
     }
+
 }

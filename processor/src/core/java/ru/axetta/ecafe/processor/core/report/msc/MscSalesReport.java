@@ -34,7 +34,7 @@ public class MscSalesReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         public static class MealRow {
             private final String menuGroup;
@@ -81,12 +81,13 @@ public class MscSalesReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("idOfOrg", org.getIdOfOrg());
-            parameterMap.put("orgName", org.getOfficialName());
+            parameterMap.put("idOfOrg", getOrg().getIdOfOrg());
+            parameterMap.put("orgName", getOrg().getOfficialName());
 
             // set date for test
             //TODO delete
@@ -101,10 +102,10 @@ public class MscSalesReport extends BasicReportForOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+                    createDataSource(session, getOrg(), startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
             return new MscSalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                    jasperPrint, startTime, endTime, org.getIdOfOrg());
+                    jasperPrint, startTime, endTime, getOrg().getIdOfOrg());
         }
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,

@@ -51,7 +51,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
         return new Builder(templateFilename);
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         private static class OrderCategory {
 
@@ -180,7 +180,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public OrgOrderCategoryReport build(Session session, Org org, Date startTime, Date endTime,
+        public OrgOrderCategoryReport build(Session session, Date startTime, Date endTime,
                 Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();

@@ -31,7 +31,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         public static class ReportItem {
             private Integer id = null; // порядковый номер строки в отчете
@@ -109,7 +109,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();

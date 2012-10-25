@@ -30,7 +30,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
 
         public static class MealRow implements Comparable<MealRow> {
@@ -94,7 +94,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
@@ -122,7 +123,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             Object[] vals;
 
-            String includeComplexParam = (String) RuleProcessor.getReportProperties().get(PARAM_INCLUDE_COMPLEX);
+            String includeComplexParam = (String) getReportProperties().get(PARAM_INCLUDE_COMPLEX);
             boolean includeComplex = true;
             if (includeComplexParam!=null) {
                 includeComplex = includeComplexParam.trim().equalsIgnoreCase("true");
@@ -201,12 +202,12 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             String groupByField = "MenuOrigin";
             boolean groupByMenuOrigin = true;
             String menuGroupsCondition = null;
-            String typeConditionsValue = (String) RuleProcessor.getReportProperties().get(PARAM_GROUP_BY_MENU_GROUP);
+            String typeConditionsValue = (String)getReportProperties().get(PARAM_GROUP_BY_MENU_GROUP);
             if (typeConditionsValue != null && typeConditionsValue.replace(",", "").trim().equalsIgnoreCase("true")) {
                 groupByField = "MenuGroup";
                 groupByMenuOrigin = false;
 
-                String menuGroups = (String) RuleProcessor.getReportProperties().get(PARAM_MENU_GROUPS);
+                String menuGroups = (String)getReportProperties().get(PARAM_MENU_GROUPS);
                 if (menuGroups!=null && menuGroups.length()>0) {
                     menuGroupsCondition = "";
                     String[] g = menuGroups.split(",");

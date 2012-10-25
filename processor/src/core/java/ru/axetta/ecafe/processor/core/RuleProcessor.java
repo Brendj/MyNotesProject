@@ -44,8 +44,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     public static final String DELIMETER = ",";
 
-    private static Rule currRule;
-    private static Properties reportProperties;
+    private Rule currRule;
+    private Properties reportProperties;
 
     private static interface BasicBoolExpression {
         public String getComparatorArgument();
@@ -284,17 +284,25 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
             Date originalReportStartTime=null, originalReportEndTime=null;
             for (AutoReport report : reports) {
-                reportProperties = report.getProperties();
                 BasicReport basicReport = report.getBasicReport();
-                Map<Integer, ReportDocument> readyReportDocuments = new HashMap<Integer, ReportDocument>();
                 for (Rule currRule : rulesCopy) {
+                    Properties reportProperties = copyProperties(report.getProperties());
                     ////
                     if (currRule.applicatable(reportProperties)) {
-                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD)!=null && 
+                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE)!=null &&
                                 !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER)+"").equals("true")
                                 && basicReport instanceof BasicReportJob) {
                             originalReportStartTime = ((BasicReportJob)basicReport).getStartTime();
                             originalReportEndTime = ((BasicReportJob)basicReport).getEndTime();
+                            applyRulePeriodType(currRule, (BasicReportJob) basicReport);
+                        }
+                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD)!=null &&
+                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER)+"").equals("true")
+                                && basicReport instanceof BasicReportJob) {
+                            if (originalReportStartTime==null) {
+                                originalReportStartTime = ((BasicReportJob)basicReport).getStartTime();
+                                originalReportEndTime = ((BasicReportJob)basicReport).getEndTime();
+                            }
                             applyRulePeriod(currRule, (BasicReportJob)basicReport);
                         }
                         ////
@@ -306,45 +314,43 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 .getTemplateFileName().isEmpty()) {
                             ((BasicReportJob) basicReport).templateFilename = currRule.getTemplateFileName();
                         }
-                        ReportDocument reportDocument = readyReportDocuments.get(currRule.getDocumentFormat());
                         String subject = "";
                         Long idOfOrg = null;
                         if (!StringUtils.isEmpty(report.getProperties().getProperty("idOfOrg"))) {
                             idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
                         }
                         
-                        if (null == reportDocument) {
-                            ReportDocumentBuilder documentBuilder = reportDocumentBuilders
-                                    .get(currRule.getDocumentFormat());
-                            if (null == documentBuilder) {
-                                if (logger.isWarnEnabled()) {
-                                    logger.warn(String.format(
-                                            "Can't build document with format = %s for report %s - apropriate document builder not found",
-                                            currRule.getDocumentFormat(), report));
-                                }
-                            } else {
-                                subject = fillTemplate(currRule.getSubject(), reportProperties);
-                                reportDocument = documentBuilder.buildDocument(currRule.getRuleId()+"", basicReport);
-
-                                if (basicReport instanceof BasicReportJob) {
-                                    BasicReportJob basicReportJob = (BasicReportJob) basicReport;
-                                    File f = new File(
-                                            RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
-                                    String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
-                                            .substring(f.getAbsolutePath().length());
-                                    DAOService.getInstance()
-                                            .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
-                                                    subject, basicReport.getGenerateTime(),
-                                                    basicReport.getGenerateDuration(), basicReportJob.getStartTime(),
-                                                    basicReportJob.getEndTime(), relativeReportFilePath,
-                                                    report.getProperties()
-                                                            .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                    idOfOrg, currRule.getTag());
-                                }
-
-                                readyReportDocuments.put(currRule.getDocumentFormat(), reportDocument);
+                        ReportDocumentBuilder documentBuilder = reportDocumentBuilders
+                                .get(currRule.getDocumentFormat());
+                        ReportDocument reportDocument=null;
+                        if (null == documentBuilder) {
+                            if (logger.isWarnEnabled()) {
+                                logger.warn(String.format(
+                                        "Can't build document with format = %s for report %s - apropriate document builder not found",
+                                        currRule.getDocumentFormat(), report));
                             }
-                        } 
+                        } else {
+                            subject = fillTemplate(currRule.getSubject(), reportProperties);
+                            basicReport.setReportProperties(reportProperties);
+                            reportDocument = documentBuilder.buildDocument(currRule.getRuleId()+"", basicReport);
+
+                            if (basicReport instanceof BasicReportJob) {
+                                BasicReportJob basicReportJob = (BasicReportJob) basicReport;
+                                File f = new File(
+                                        RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
+                                String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
+                                        .substring(f.getAbsolutePath().length());
+                                DAOService.getInstance()
+                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
+                                                subject, basicReport.getGenerateTime(),
+                                                basicReport.getGenerateDuration(), basicReportJob.getStartTime(),
+                                                basicReportJob.getEndTime(), relativeReportFilePath,
+                                                report.getProperties()
+                                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
+                                                idOfOrg, currRule.getTag());
+                            }
+
+                        }
                         if (null != reportDocument) {
                             // загружаем списки рассылок по id
                             Map<String, String> mailListMap = null;
@@ -387,6 +393,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 }
                             }
                         }
+                        if (basicReport instanceof BasicReportJob) {
+                            ((BasicReportJob)basicReport).setPrint(null);
+                        }
                     }
                     if (originalReportStartTime!=null) {
                         // если изменяли даты
@@ -398,6 +407,35 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 }
             }
         }
+    }
+
+    private Properties copyProperties(Properties properties) {
+        Properties p = new Properties();
+        p.putAll(properties);
+        return p;
+    }
+
+    private void applyRulePeriodType(Rule currRule, BasicReportJob reportJob) throws Exception {
+        String sType = currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE);
+        int type=BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
+        if (sType.equalsIgnoreCase("prevMonth")) {
+            type=BasicReportJob.REPORT_PERIOD_PREV_MONTH;
+        }
+        else if (sType.equalsIgnoreCase("prevDay")) {
+            type=BasicReportJob.REPORT_PERIOD_PREV_DAY;
+        }
+        else if (sType.equalsIgnoreCase("prevPrevDay")) {
+            type=BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
+        }
+        else if (sType.equalsIgnoreCase("prevPrevPrevDay")) {
+            type=BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY;
+        }
+        else if (sType.equalsIgnoreCase("today")) {
+            type=BasicReportJob.REPORT_PERIOD_TODAY;
+        }
+        Date[] dates = BasicReportJob.calculateDatesForPeriodType(Calendar.getInstance(), null, new Date(), type);
+        reportJob.setStartTime(dates[0]);
+        reportJob.setEndTime(dates[1]);
     }
 
     Pattern periodMatcher = Pattern.compile("(\\d+)-(L|\\d+)[, ]*");
@@ -530,7 +568,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
         Map<Integer, ReportDocument> readyEventDocuments = new HashMap<Integer, ReportDocument>();
         for (Rule currRule : rulesCopy) {
-            RuleProcessor.currRule = currRule;
+            this.currRule = currRule;
             if (currRule.applicatable(properties)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(
@@ -599,11 +637,11 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
     }
 
-    public static Rule getCurrRule() {
+    public Rule getCurrRule() {
         return currRule;
     }
 
-    public static Properties getReportProperties() {
+    public Properties getReportProperties() {
         return reportProperties;
     }
 }

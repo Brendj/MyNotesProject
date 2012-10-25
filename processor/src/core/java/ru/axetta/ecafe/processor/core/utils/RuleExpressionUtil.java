@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
 
 /**
@@ -45,6 +46,8 @@ public class RuleExpressionUtil {
         DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX,
         DailySalesByGroupsReport.PARAM_MENU_GROUPS,
         ReportPropertiesUtils.P_REPORT_PERIOD,
+        ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
+        ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID
     };
 
     public static boolean isPostArgument(String argName) {

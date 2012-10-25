@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.CurrentPosition" table="CF_CurrentPositions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.CurrentPosition" table="CF_CurrentPositions" dynamic-update="true">
         <id name="idOfPosition" column="IdOfPosition" type="long">
             <generator class="hilo">
                 <param name="table">CF_Generators</param>

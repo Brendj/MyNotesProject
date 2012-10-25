@@ -44,7 +44,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         public class Event implements Comparable<Event>{
             private Long time;
@@ -174,7 +174,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
@@ -205,7 +205,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             // "все", "учащиеся", "все_без_учащихся". typeCondition содержит соответствующее улосвие для sql-запроса
             String typeCondition = "";
             // извлекаем значение, которое было указано при создании правила
-            String typeConditionsValue = (String)RuleProcessor.getReportProperties().get("enterEventType");
+            String typeConditionsValue = (String)getReportProperties().get("enterEventType");
             if (typeConditionsValue != null) {
                 // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
                 String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);

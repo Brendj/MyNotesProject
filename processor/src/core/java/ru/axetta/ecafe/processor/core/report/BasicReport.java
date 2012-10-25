@@ -16,6 +16,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,6 +26,9 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class BasicReport {
+
+
+
 
     public static interface DocumentBuilderCallback {
 
@@ -73,6 +77,7 @@ public class BasicReport {
 
     }
 
+    private Properties reportProperties;
     private Date generateTime;
     private long generateDuration;
 
@@ -121,5 +126,13 @@ public class BasicReport {
 
     public static String longToMoney(Long money) {
         return String.format("%d.%02d", money/100, Math.abs(money%100));
+    }
+
+    public Properties getReportProperties() {
+        return reportProperties;
+    }
+
+    public void setReportProperties(Properties reportProperties) {
+        this.reportProperties = reportProperties;
     }
 }

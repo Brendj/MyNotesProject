@@ -148,7 +148,7 @@ public class BasicJasperReport extends BasicReport {
         return print != null;
     }
 
-    protected void setPrint(JasperPrint print) {
+    public void setPrint(JasperPrint print) {
         this.print = print;
     }
 

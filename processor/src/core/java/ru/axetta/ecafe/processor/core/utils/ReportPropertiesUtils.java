@@ -32,6 +32,7 @@ public class ReportPropertiesUtils {
     public static String P_OFFICIAL_NAME="officialName";
     public static String P_JOB_NAME ="reportJob";
     public static String P_REPORT_PERIOD="reportPeriod";
+    public static String P_REPORT_PERIOD_TYPE="reportPeriodType";
     public static String P_REPORT_CLASS="class";
     public static String P_DATES_SPECIFIED_BY_USER="datesSpecifiedByUser";
 

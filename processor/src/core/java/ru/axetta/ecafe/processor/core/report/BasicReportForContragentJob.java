@@ -101,11 +101,6 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
         return Long.toString(idOfContragent);
     }
 
-    public interface Builder {
-        public BasicReportJob build(Session session, Contragent contragent, Date startTime, Date endTime, Calendar calendar)
-                throws Exception;
-    }
-
     public void initialize(Date startTime, Date endTime, Long idOfContragent, String templateFilename,
             SessionFactory sessionFactory, Calendar calendar) {
         super.initialize(startTime, endTime, templateFilename, sessionFactory, calendar);
@@ -119,7 +114,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                 + sessionFactory + "} " + super.toString();
     }
 
-    private Long idOfContragent;
+    protected Long idOfContragent;
 
     protected void prepare() {
         if (!hasPrint() && idOfContragent != null && templateFilename != null && sessionFactory != null) {
@@ -135,7 +130,9 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                 transaction = BasicReport.createTransaction(session);
                 transaction.begin();
                 Contragent contragent = (Contragent) session.get(Contragent.class, this.idOfContragent);
-                BasicReportJob report = builder.build(session, contragent, startTime, endTime, calendar);
+                builder.setReportProperties(getReportProperties());
+                builder.setContragent(contragent);
+                BasicReportJob report = builder.build(session, startTime, endTime, calendar);
                 setGenerateTime(report.getGenerateTime());
                 setGenerateDuration(report.getGenerateDuration());
                 setPrint(report.getPrint());

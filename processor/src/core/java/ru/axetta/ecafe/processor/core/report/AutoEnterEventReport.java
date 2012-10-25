@@ -41,7 +41,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         public class Event implements Comparable<Event>{
             private Long time; // время события
@@ -197,7 +197,8 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
             this.templateFilename = templateFilename;
         }
 
-        public BasicReportJob build(Session session, Org org, Date startTime, Date endTime, Calendar calendar)
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
@@ -217,7 +218,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
             Calendar c = Calendar.getInstance();
 
             String typeCondition = "";
-            String typeConditionsValue = (String)RuleProcessor.getReportProperties().get("enterEventType");
+            String typeConditionsValue = (String)getReportProperties().get("enterEventType");
             if (typeConditionsValue != null) {
                 String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
                 if (typeConditionsValues.length > 1)
