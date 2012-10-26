@@ -71,11 +71,21 @@
                    </f:facet>
                    <h:inputText value="#{bank.name}" styleClass="input-text" size="30"/>
                </rich:column>
+
                <rich:column headerClass="column-header">
                    <f:facet name="header">
                        <h:outputText value="URL логотипа" styleClass="output-text" escape="true"/>
                    </f:facet>
-                   <h:inputText value="#{bank.logoUrl}" styleClass="input-text" size="20"/>
+                   <h:inputText id="logourl" value="#{bank.logoUrl}" styleClass="input-text" size="20" />
+               </rich:column>
+               <rich:column headerClass="column-header">
+                   <a4j:commandButton value=">" title="Превью изображения" reRender="logourl, logoimage" styleClass="command-button"/>
+               </rich:column>
+               <rich:column headerClass="column-header">
+                   <f:facet name="header">
+                       <h:outputText value="Логотип" styleClass="output-text" escape="true"/>
+                   </f:facet>
+                   <h:graphicImage id="logoimage" style="width: 128px;" value="#{bank.logoUrl}" url="#{bank.logoUrl}" />
                </rich:column>
                <rich:column headerClass="column-header">
                    <f:facet name="header">
@@ -104,10 +114,9 @@
                        <h:outputText value="Тип зачисления" styleClass="output-text" escape="true"/>
                    </f:facet>
                    <h:selectOneMenu value="#{bank.enrollmentType}" styleClass="input-text" style="width: 100px;">
-                       <f:selectItem itemLabel="Онлайн" itemValue="Онлайн" />
-                       <f:selectItem itemLabel="Оффлайн" itemValue="Оффлайн" />
+                       <f:selectItem itemLabel="Онлайн" itemValue="онлайн" />
+                       <f:selectItem itemLabel="Оффлайн" itemValue="оффлайн" />
                    </h:selectOneMenu>
-                   <%--<h:inputText value="#{bank.enrollmentType}" styleClass="input-text" size="20"/>--%>
                </rich:column>
                <rich:column style="text-align:center">
                    <f:facet name="header">
