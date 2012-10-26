@@ -69,7 +69,7 @@
                    <f:facet name="header">
                        <h:outputText value="Наименование" styleClass="output-text" escape="true"/>
                    </f:facet>
-                   <h:inputText value="#{bank.name}" styleClass="input-text" size="20"/>
+                   <h:inputText value="#{bank.name}" styleClass="input-text" size="30"/>
                </rich:column>
                <rich:column headerClass="column-header">
                    <f:facet name="header">
@@ -87,19 +87,27 @@
                    <f:facet name="header">
                        <h:outputText value="Комиссия" styleClass="output-text" escape="true"/>
                    </f:facet>
-                   <h:inputText value="#{bank.rate}" styleClass="input-text" size="20"/>
+                   <h:inputText value="#{bank.rate}" styleClass="input-text" size="20">
+                       <f:convertNumber pattern="#0.00" />
+                   </h:inputText>
                </rich:column>
                <rich:column headerClass="column-header">
                    <f:facet name="header">
-                       <h:outputText value="Минимальная комиссия" styleClass="output-text" escape="true"/>
+                       <h:outputText value="Минимальная сумма платежа" styleClass="output-text" escape="true"/>
                    </f:facet>
-                   <h:inputText value="#{bank.minRate}" styleClass="input-text" size="20"/>
+                   <h:inputText value="#{bank.minRate}" styleClass="input-text" size="20">
+                       <f:convertNumber pattern="#0.00" locale="en_GB" />
+                   </h:inputText>
                </rich:column>
                <rich:column headerClass="column-header">
                    <f:facet name="header">
                        <h:outputText value="Тип зачисления" styleClass="output-text" escape="true"/>
                    </f:facet>
-                   <h:inputText value="#{bank.enrollmentType}" styleClass="input-text" size="20"/>
+                   <h:selectOneMenu value="#{bank.enrollmentType}" styleClass="input-text" style="width: 100px;">
+                       <f:selectItem itemLabel="Онлайн" itemValue="Онлайн" />
+                       <f:selectItem itemLabel="Оффлайн" itemValue="Оффлайн" />
+                   </h:selectOneMenu>
+                   <%--<h:inputText value="#{bank.enrollmentType}" styleClass="input-text" size="20"/>--%>
                </rich:column>
                <rich:column style="text-align:center">
                    <f:facet name="header">
