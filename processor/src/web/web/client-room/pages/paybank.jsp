@@ -5,11 +5,54 @@
 
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.hibernate.Transaction" %>
+<%@ page import="org.hibernate.Session" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Bank" %>
+<%@ page import="org.hibernate.Criteria" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.hibernate.criterion.Order" %>
 
 <%
+    final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.paybank_jsp");
     ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
+    RuntimeContext runtimeContext = null;
+    Session persistenceSession = null;
+    Transaction persistenceTransaction = null;
+    List<Bank> bankList;
+    try {
+        runtimeContext = new RuntimeContext();
+        persistenceSession = runtimeContext.createPersistenceSession();
+        persistenceTransaction = persistenceSession.beginTransaction();
+
+        Criteria cr = persistenceSession.createCriteria(Bank.class);
+        bankList = (List<Bank>) cr.list();
+        Collections.sort(bankList, new Comparator<Bank>() {
+
+            public int compare(Bank o1, Bank o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+
+        });
+
+        persistenceTransaction.commit();
+        persistenceTransaction = null;
+    } catch (RuntimeContext.NotInitializedException e) {
+        throw new UnavailableException(e.getMessage());
+    } catch (Exception e) {
+        logger.error("Failed to build page", e);
+        throw new ServletException(e);
+    } finally {
+        HibernateUtils.rollback(persistenceTransaction, logger);
+        HibernateUtils.close(persistenceSession, logger);
+    }
 %>
 <table class="borderless-grid">
     <tr>
@@ -32,50 +75,30 @@
                         <div class="output-text">Размер комиссии</div>
                     </td>
                 </tr>
+<%
+    for (Bank bank : bankList) {
+%>
                 <tr>
                     <td>
-                        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/banks/sber.png"))%>"
-                             alt="Сбербанк России" />
+                        <img src="<%=StringEscapeUtils.escapeHtml(bank.getLogoUrl())%>"
+                             alt="<%=StringEscapeUtils.escapeHtml(bank.getName())%>" />
 
                         <div class="output-text"></div>
                     </td>
                     <td>
-                        <div class="output-text"><b>Сбербанк России (Татарстан)</b><br /><a class="command-link"
-                                                                            href="http://sberbank.ru/tatarstan/ru/about/branch/list_branch/">Адреса
+                        <div class="output-text"><b><%=StringEscapeUtils.escapeHtml(bank.getName())%></b><br /><a class="command-link"
+                                                                            href="<%=StringEscapeUtils.escapeHtml(bank.getTerminalsUrl())%>">Адреса
                             филиалов и банкоматов</a></div>
                     </td>
                     <td>
-                        <div class="output-text">0.5%, но не менее 10 руб. (при оплате в банкомате <font color="red">онлайн-зачисление средств</font>)</div>
+                        <div class="output-text"><%=StringEscapeUtils.escapeHtml(String.valueOf(bank.getRate()))%>%, но не менее <%=StringEscapeUtils.escapeHtml(String.valueOf(
+                                bank.getMinRate()))%> руб. (<font color="red"><%=StringEscapeUtils.escapeHtml(
+                                bank.getEnrollmentType())%></font>-зачисление средств)</div>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/banks/tfb.png"))%>"
-                             alt="Татфондбанк" />
-                    </td>
-                    <td>
-                        <div class="output-text"><b>Татфондбанк</b><br><a class="command-link"
-                                                                          href="http://tfb.ru/index.php?page=content&id=2513">Адреса
-                            филиалов</a></div>
-                    </td>
-                    <td>
-                        <div class="output-text">1.5%, но не менее 20 руб.</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/banks/abb.png"))%>"
-                             alt="Ак барс Банк" />
-                    </td>
-                    <td>
-                        <div class="output-text"><b>Ак Барс Банк</b><br><a class="command-link"
-                                                                           href="http://www.akbars.ru/about/branches/rt/kazan/">Адреса
-                            филиалов</a></div>
-                    </td>
-                    <td>
-                        <div class="output-text">2%, но не менее 25 руб.</div>
-                    </td>
-                </tr>
+<%
+    }
+%>
             </table>
         </td>
     </tr>
