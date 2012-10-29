@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
@@ -1336,12 +1335,12 @@ public class SyncRequest {
                     this.reqAssortmentBuilder = new ReqAssortment.Builder();
                 }
 
-                public Item build(Node itemNode, LoadContext loadContext, HashMap<Long, ReqMenuDetail> reqMenuDetailMap) throws Exception {
+                public Item build(Node itemNode, LoadContext loadContext) throws Exception {
                     NamedNodeMap namedNodeMap = itemNode.getAttributes();
                     Date date = loadContext.dateOnlyFormat.parse(namedNodeMap.getNamedItem("Value").getTextContent());
                     ////// process ML items (menu list)
                     List<ReqMenuDetail> reqMenuDetails = new LinkedList<ReqMenuDetail>();
-                    //HashMap<Long, ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, ReqMenuDetail>();
+                    HashMap<Long, ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, ReqMenuDetail>();
                     List<ReqAssortment> reqAssortments = new LinkedList<ReqAssortment>();
                     Node childNode = itemNode.getFirstChild();
                     while (null != childNode) {
@@ -1436,14 +1435,13 @@ public class SyncRequest {
 
             public ReqMenu build(Node menuNode, LoadContext loadContext) throws Exception {
                 List<Item> items = new LinkedList<Item>();
-                HashMap<Long, Item.ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, Item.ReqMenuDetail>();
                 Node itemNode = menuNode.getFirstChild();
                 String settingsSectionRawXML = null;
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Settings")) {
                         settingsSectionRawXML = ru.axetta.ecafe.processor.core.utils.XMLUtils.nodeToString(itemNode);
                     } else if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Date")) {
-                        items.add(itemBuilder.build(itemNode, loadContext, reqMenuDetailMap));
+                        items.add(itemBuilder.build(itemNode, loadContext));
                     }
                     itemNode = itemNode.getNextSibling();
                 }

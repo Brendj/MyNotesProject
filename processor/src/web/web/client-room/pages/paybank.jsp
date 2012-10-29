@@ -66,6 +66,9 @@
                 бланка перейдите по <a class="command-link"
                                        href="<%=StringEscapeUtils.escapeHtml(String.format("/processor/client-room/payform.jsp?contractId=%s", ContractIdFormat.format(clientAuthToken.getContractId())))%>">ссылке
                     - сформировать квитанцию</a></div>
+            <%
+                if(!(bankList==null || bankList.isEmpty())){
+            %>
             <table class="borderless-grid">
                 <tr>
                     <td align="center" colspan="2">
@@ -75,9 +78,9 @@
                         <div class="output-text">Размер комиссии</div>
                     </td>
                 </tr>
-<%
-    for (Bank bank : bankList) {
-%>
+                <%
+                    for (Bank bank : bankList) {
+                %>
                 <tr>
                     <td>
                         <img src="<%=StringEscapeUtils.escapeHtml(bank.getLogoUrl())%>"
@@ -87,7 +90,7 @@
                     </td>
                     <td>
                         <div class="output-text"><b><%=StringEscapeUtils.escapeHtml(bank.getName())%></b><br /><a class="command-link"
-                                                                            href="<%=StringEscapeUtils.escapeHtml(bank.getTerminalsUrl())%>">Адреса
+                                                                                                                  href="<%=StringEscapeUtils.escapeHtml(bank.getTerminalsUrl())%>">Адреса
                             филиалов и банкоматов</a></div>
                     </td>
                     <td>
@@ -96,10 +99,14 @@
                                 bank.getEnrollmentType())%></font>-зачисление средств)</div>
                     </td>
                 </tr>
-<%
-    }
-%>
+                <%
+                    }
+                %>
             </table>
+            <%
+                }
+            %>
+
         </td>
     </tr>
 </table>
