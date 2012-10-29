@@ -197,7 +197,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_PREV_DAY;
+        return REPORT_PERIOD_TODAY;
     }
 }
 
