@@ -99,7 +99,7 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
 
     @Override
     public String getReportDistinctText() {
-        return "";
+        return String.valueOf(new Date().hashCode());
     }
 
     public interface Builder {
