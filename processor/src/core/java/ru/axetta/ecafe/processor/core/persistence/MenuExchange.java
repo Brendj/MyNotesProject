@@ -6,14 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.utils.CompressUtils;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 public class MenuExchange {
     public final static int FLAG_NONE=0, FLAG_ANCHOR_MENU=1, FLAG_SETTINGS=2;
 
-    final static int MAX_MENU_DATA_LENGTH = 29650;
+    final static int MAX_MENU_DATA_LENGTH = 59650;
 
     private CompositeIdOfMenuExchange compositeIdOfMenuExchange;
     private String menuData;
