@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.Configurati
 
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -73,6 +74,9 @@ public class OrgEditPage extends BasicWorkspacePage
     private String latitude;
     private String longitude;
 
+    private Integer refectoryType;
+    private SelectItem[] refectoryTypeComboMenuItems;
+
     private String filterCategoryOrg;
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private List<Long> friendlyIdOfOrgList = new ArrayList<Long>();
@@ -114,6 +118,7 @@ public class OrgEditPage extends BasicWorkspacePage
     public void updateOrg(Session session, Long idOfOrg) throws Exception {
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
         Org org = (Org) session.load(Org.class, idOfOrg);
+        org.setRefectoryType(refectoryType);
         org.setShortName(shortName);
         org.setOfficialName(officialName);
         org.setTag(tag);
@@ -245,6 +250,23 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
+
+        this.refectoryType = org.getRefectoryType();
+        // Добавление элементов в выпадающий список для типа пищеблока
+        SelectItem[] items;
+        int i_first = 0;
+        if (this.refectoryType == null) {
+            items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length + 1];
+            items[i_first] = new SelectItem(-1, "-- не выставлено --");
+            i_first++;
+        } else {
+            items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
+        }
+        for (int i = i_first; i < Org.REFECTORY_TYPE_NAMES.length + i_first; i++) {
+            items[i] = new SelectItem((i - i_first), Org.REFECTORY_TYPE_NAMES[i - i_first]);
+        }
+        this.refectoryTypeComboMenuItems = items;
+
         idOfCategoryOrgList.clear();
         this.filterCategoryOrg ="Не выбрано";
         if(org.getCategories()!=null && !org.getCategories().isEmpty()){
@@ -681,4 +703,26 @@ public class OrgEditPage extends BasicWorkspacePage
     public void setGuid(String guid) {
         this.guid = guid;
     }
+
+    public Integer getRefectoryType() {
+        return refectoryType;
+    }
+
+    public void setRefectoryType(Integer refectoryType) {
+        if (refectoryType != -1) {
+            SelectItem[] items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
+            for (int i = 1; i < refectoryTypeComboMenuItems.length; i++) {
+                items[i - 1] = refectoryTypeComboMenuItems[i];
+            }
+            refectoryTypeComboMenuItems = items;
+            this.refectoryType = refectoryType;
+        } else {
+            this.refectoryType = null;
+        }
+    }
+
+    public SelectItem[] getRefectoryTypeComboMenuItems() {
+        return refectoryTypeComboMenuItems;
+    }
+
 }

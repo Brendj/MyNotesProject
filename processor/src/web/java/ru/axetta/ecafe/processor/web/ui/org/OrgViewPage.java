@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import com.sun.faces.taglib.jsf_core.SelectItemsTag;
+
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -14,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.Configurati
 
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
@@ -63,6 +66,9 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String location;
     private String latitude;
     private String longitude;
+    private Integer refectoryType;
+    private SelectItem[] refectoryTypeComboMenuItems;
+    private String refectoryTypeStringRepresentation;
 
     public String getFriendlyFilterOrgs() {
         return friendlyFilterOrgs;
@@ -217,6 +223,31 @@ public class OrgViewPage extends BasicWorkspacePage {
         return defaultSupplierName;
     }
 
+    public Integer getRefectoryType() {
+        return refectoryType;
+    }
+
+    public void setRefectoryType(Integer refectoryType) {
+        this.refectoryType = refectoryType;
+    }
+
+    public SelectItem[] getRefectoryTypeComboMenuItems() {
+        return refectoryTypeComboMenuItems;
+    }
+
+    public String getRefectoryTypeStringRepresentation() {
+        discoverCurrentRefectoryType();
+        return refectoryTypeStringRepresentation;
+    }
+
+    private void discoverCurrentRefectoryType() {
+        if (refectoryType == null) {
+            refectoryTypeStringRepresentation = "";
+            return;
+        }
+        refectoryTypeStringRepresentation = refectoryTypeComboMenuItems[refectoryType].getLabel();
+    }
+
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         this.idOfOrg = org.getIdOfOrg();
@@ -254,6 +285,16 @@ public class OrgViewPage extends BasicWorkspacePage {
                this.categoryOrg.add(co);
            }
         }
+
+        this.refectoryType = org.getRefectoryType();
+        // Добавление элементов в выпадающий список для типа пищеблока
+        SelectItem[] items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
+        for (int i = 0; i < Org.REFECTORY_TYPE_NAMES.length; i++) {
+            items[i] = new SelectItem(i, Org.REFECTORY_TYPE_NAMES[i]);
+        }
+        this.refectoryTypeComboMenuItems = items;
+        discoverCurrentRefectoryType();
+
 
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);

@@ -1,3 +1,4 @@
+<%@ page import="ru.axetta.ecafe.processor.web.ui.org.OrgEditPage" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
@@ -58,6 +59,10 @@
                                              target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
+    <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgEditPage.refectoryType}" styleClass="input-text" style="width: 250px;">
+        <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.contractId}" maxlength="50" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />

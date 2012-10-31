@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String location;
     private String latitude;
     private String longitude;
+    private Integer refectoryType;
+    private SelectItem[] refectoryTypeComboMenuItems = readRefectoryTypeComboMenuItems();
 
     public String getINN() {
         return INN;
@@ -210,6 +213,31 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+
+    public Integer getRefectoryType() {
+        return refectoryType;
+    }
+
+    public void setRefectoryType(Integer refectoryType) {
+        if (refectoryType == -1) {
+            this.refectoryType = null;
+        } else {
+            this.refectoryType = refectoryType;
+        }
+    }
+
+    private static SelectItem[] readRefectoryTypeComboMenuItems() {
+        SelectItem[] items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
+        for (int i = 0; i < Org.REFECTORY_TYPE_NAMES.length; i++) {
+            items[i] = new SelectItem(i, Org.REFECTORY_TYPE_NAMES[i]);
+        }
+        return items;
+    }
+
+    public SelectItem[] getRefectoryTypeComboMenuItems() {
+        return refectoryTypeComboMenuItems;
     }
 
     public String getAddress() {
@@ -366,6 +394,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         if (StringUtils.isNotEmpty(plainSsoPassword)) {
             org.setSsoPassword(plainSsoPassword);
         }
+        org.setRefectoryType(refectoryType);
         session.save(org);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());

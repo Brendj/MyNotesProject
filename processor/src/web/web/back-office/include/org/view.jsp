@@ -1,3 +1,4 @@
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
@@ -46,6 +47,9 @@
     <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.defaultSupplierName}" readonly="true"
                      styleClass="input-text" />
+    <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true"
+                 styleClass="input-text" />
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.contractId}" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
