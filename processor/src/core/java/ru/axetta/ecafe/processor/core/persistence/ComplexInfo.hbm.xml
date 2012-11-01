@@ -24,6 +24,9 @@
         <property name="modeFree" column="ModeFree" type="int" not-null="true" update="true"/>
         <property name="modeGrant" column="ModeGrant" type="int" not-null="true" update="true"/>
         <property name="modeOfAdd" column="ModeOfAdd" type="int" not-null="true" update="true"/>
+        <property name="useTrDiscount" column="UseTrDiscount" type="int" not-null="true" update="true" />
+        <many-to-one name="discountDetail" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDiscountDetail"
+                     column="IdOfDiscountDetail" not-null="false" lazy="proxy" update="false" />
 
     </class>
 </hibernate-mapping>

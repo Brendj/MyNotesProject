@@ -910,7 +910,7 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
 
-}
+    }
 
     private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
             SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
@@ -1406,6 +1406,9 @@ public class Processor implements SyncProcessor,
             ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
                     reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
                     reqComplexInfo.getComplexMenuName());
+            if (reqComplexInfo.getUseTrDiscount() != -1) {
+                complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
+            }
             persistenceSession.save(complexInfo);
 
             for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDetail reqComplexInfoDetail : reqComplexInfo
@@ -1419,6 +1422,23 @@ public class Processor implements SyncProcessor,
                 }
                 ComplexInfoDetail complexInfoDetail = new ComplexInfoDetail(complexInfo, menuDetail);
                 persistenceSession.save(complexInfoDetail);
+            }
+
+            if (reqComplexInfo.getComplexInfoDiscountDetails() != null) {
+                for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail : reqComplexInfo.getComplexInfoDiscountDetails()) {
+                    double size = reqComplexInfoDiscountDetail.getSize();
+                    int isAllGroups = reqComplexInfoDiscountDetail.getIsAllGroups();
+                    int maxCount = reqComplexInfoDiscountDetail.getMaxCount();
+                    long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
+                    ComplexInfoDiscountDetail complexInfoDiscountDetail = new ComplexInfoDiscountDetail(size, isAllGroups, maxCount, organization);
+                    if (idOfClientGroup != -1) {
+                        CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(), idOfClientGroup);
+                        ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
+                        complexInfoDiscountDetail.setClientGroup(clientGroup);
+                    }
+
+                    persistenceSession.save(complexInfoDiscountDetail);
+                }
             }
         }
     }
@@ -1460,7 +1480,7 @@ public class Processor implements SyncProcessor,
                 menuDetail.setMinMg(reqMenuDetail.getMinMg());
                 menuDetail.setMinFe(reqMenuDetail.getMinFe());
 
-persistenceSession.save(menuDetail);
+                persistenceSession.save(menuDetail);
                 menu.addMenuDetail(menuDetail);
             }
         }
@@ -1767,10 +1787,10 @@ persistenceSession.save(menuDetail);
 
 
 
-   /* private static String createKey(String author, String title, String title2, String publisher)
-            throws NoSuchAlgorithmException {
-        return CryptoUtils.MD5(author + title + title2 + publisher);
-    } */
+    /* private static String createKey(String author, String title, String title2, String publisher)
+           throws NoSuchAlgorithmException {
+       return CryptoUtils.MD5(author + title + title2 + publisher);
+   } */
 
     private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
         Session persistenceSession = null;

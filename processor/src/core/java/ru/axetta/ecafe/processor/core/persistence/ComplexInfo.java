@@ -15,8 +15,10 @@ public class ComplexInfo {
     private int modeFree;
     private int modeGrant;
     private int modeOfAdd;
+    private int useTrDiscount;
     private String complexName;
     private Date menuDate;
+    private ComplexInfoDiscountDetail discountDetail;
 
     public Date getMenuDate() {
         return menuDate;
@@ -73,12 +75,28 @@ public class ComplexInfo {
         this.modeFree = modeFree;
     }
 
+    public int getUseTrDiscount() {
+        return useTrDiscount;
+    }
+
+    public void setUseTrDiscount(int useTrDiscount) {
+        this.useTrDiscount = useTrDiscount;
+    }
+
     public Org getOrg() {
         return org;
     }
 
     public void setOrg(Org org) {
         this.org = org;
+    }
+
+    public ComplexInfoDiscountDetail getDiscountDetail() {
+        return discountDetail;
+    }
+
+    public void setDiscountDetail(ComplexInfoDiscountDetail discountDetail) {
+        this.discountDetail = discountDetail;
     }
 
     public int getIdOfComplex() {
@@ -123,6 +141,7 @@ public class ComplexInfo {
     @Override
     public String toString() {
         return "ComplexInfo{" + "idOfComplexInfo=" + idOfComplexInfo + ", idOfComplex=" + idOfComplex + ", org=" + org
-                + ", modeFree=" + modeFree + ", modeGrant=" + modeGrant + ", modeOfAdd=" + modeOfAdd +'}';
+                + ", modeFree=" + modeFree + ", modeGrant=" + modeGrant + ", modeOfAdd=" + modeOfAdd + ", useTrDiscount=" + useTrDiscount
+                + ", discountDetail:" + discountDetail + '}';
     }
 }

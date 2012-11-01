@@ -831,10 +831,84 @@ public class SyncRequest {
                     }
                 }
 
+                public static class ReqComplexInfoDiscountDetail {
+
+                    public static class Builder {
+
+                        public ReqComplexInfoDiscountDetail build(Node itemNode) throws Exception {
+                            NamedNodeMap namedNodeMap = itemNode.getAttributes();
+
+                            double size = Double.parseDouble(namedNodeMap.getNamedItem("Size").getTextContent());
+                            int isAllGroups = getIntValue(namedNodeMap, "IsAllGroups");
+                            int maxCount = getIntValue(namedNodeMap, "MaxCount");
+                            Node idOfClientGroupNode = namedNodeMap.getNamedItem("IdOfClientGroup");
+                            if (idOfClientGroupNode != null) {
+                                long idOfClientGroup = getLongValue(namedNodeMap, "IdOfClientGroup");
+                                return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount, idOfClientGroup);
+                            } else {
+                                return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount);
+                            }
+                        }
+
+                    }
+
+                    double size;
+                    int isAllGroups;
+                    int maxCount;
+                    long idOfClientGroup = -1;
+
+                    public ReqComplexInfoDiscountDetail(double size, int allGroups, int maxCount,
+                            long idOfClientGroup) {
+                        this.size = size;
+                        isAllGroups = allGroups;
+                        this.maxCount = maxCount;
+                        this.idOfClientGroup = idOfClientGroup;
+                    }
+
+                    public ReqComplexInfoDiscountDetail(double size, int allGroups, int maxCount) {
+                        this.size = size;
+                        isAllGroups = allGroups;
+                        this.maxCount = maxCount;
+                    }
+
+                    public double getSize() {
+                        return size;
+                    }
+
+                    public int getIsAllGroups() {
+                        return isAllGroups;
+                    }
+
+                    public int getMaxCount() {
+                        return maxCount;
+                    }
+
+                    public long getIdOfClientGroup() {
+                        return idOfClientGroup;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "ReqComplexInfoDiscountDetail{" +
+                                "size=" + size +
+                                ", isAllGroups=" + isAllGroups +
+                                ", maxCount=" + maxCount +
+                                ", idOfClientGroup=" + idOfClientGroup +
+                                '}';
+                    }
+
+                }
+
                 public static class Builder {
 
                     public ReqComplexInfo build(Node node, HashMap<Long, ReqMenuDetail> reqMenuDetailMap)
                             throws Exception {
+                        // Выбор вызываемого конструктора:
+                        // если нет атрибутов useTrDiscount и списка скидок - 0
+                        //      есть useTrDiscount - 1
+                        //      есть useTrDiscount и список скидок - 2
+                        int constructMode = 0;
+
                         NamedNodeMap namedNodeMap = node.getAttributes();
                         int complexId = Integer.parseInt(namedNodeMap.getNamedItem("ComplexId").getTextContent());
                         String complexMenuName = StringUtils
@@ -843,27 +917,51 @@ public class SyncRequest {
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
+                        Node useTrDiscountNode = namedNodeMap.getNamedItem("UseTrDiscount");
+                        int useTrDiscount = 0;
+                        if (useTrDiscountNode != null) {
+                            constructMode = 1;
+                            useTrDiscount = Integer.parseInt(useTrDiscountNode.getTextContent());
+                        }
                         Node childNode = node.getFirstChild();
                         ReqComplexInfoDetail.Builder reqComplexInfoDetailBuilder = new ReqComplexInfoDetail.Builder();
                         LinkedList<ReqComplexInfoDetail> reqComplexInfoDetailLinkedList = new LinkedList<ReqComplexInfoDetail>();
+                        ReqComplexInfoDiscountDetail.Builder reqComplexInfoDiscountDetailBuilder = new ReqComplexInfoDiscountDetail.Builder();
+                        LinkedList<ReqComplexInfoDiscountDetail> reqComplexInfoDiscountDetailLinkedList = new LinkedList<ReqComplexInfoDiscountDetail>();
                         while (null != childNode) {
-                            if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("CMI")) {
-                                ReqComplexInfoDetail reqComplexInfoDetail = reqComplexInfoDetailBuilder
-                                        .build(childNode, reqMenuDetailMap);
-                                reqComplexInfoDetailLinkedList.add(reqComplexInfoDetail);
+                            if (Node.ELEMENT_NODE == childNode.getNodeType()) {
+                                if (childNode.getNodeName().equals("CMI")) {
+                                    ReqComplexInfoDetail reqComplexInfoDetail = reqComplexInfoDetailBuilder
+                                            .build(childNode, reqMenuDetailMap);
+                                    reqComplexInfoDetailLinkedList.add(reqComplexInfoDetail);
+                                } else if (childNode.getNodeName().equals("TRD")) {
+                                    constructMode = 2;
+                                    ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail = reqComplexInfoDiscountDetailBuilder.build(childNode);
+                                    reqComplexInfoDiscountDetailLinkedList.add(reqComplexInfoDiscountDetail);
+                                }
                             }
                             childNode = childNode.getNextSibling();
                         }
-                        return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                reqComplexInfoDetailLinkedList);
+                        switch (constructMode) {
+                            case 2: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqComplexInfoDiscountDetailLinkedList);
+                            case 1: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
+                                    reqComplexInfoDetailLinkedList, useTrDiscount);
+                            default:return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
+                                    reqComplexInfoDetailLinkedList);
+                        }
                     }
 
                 }
 
                 private final int complexId;
                 private final String complexMenuName;
-                private final int modeFree, modeGrant, modeOfAdd;
+                private final int modeFree;
+                private final int modeGrant;
+                private final int modeOfAdd;
+                private int useTrDiscount = -1;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
+                private List<ReqComplexInfoDiscountDetail> complexInfoDiscountDetails = null;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         List<ReqComplexInfoDetail> complexInfoDetails) {
@@ -873,6 +971,30 @@ public class SyncRequest {
                     this.modeGrant = modeGrant;
                     this.modeOfAdd = modeOfAdd;
                     this.complexInfoDetails = complexInfoDetails;
+                }
+
+                public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
+                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount) {
+                    this.complexId = complexId;
+                    this.complexMenuName = complexMenuName;
+                    this.modeFree = modeFree;
+                    this.modeGrant = modeGrant;
+                    this.modeOfAdd = modeOfAdd;
+                    this.complexInfoDetails = complexInfoDetails;
+                    this.useTrDiscount = useTrDiscount;
+                }
+
+                public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
+                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount,
+                        List<ReqComplexInfoDiscountDetail> complexInfoDiscountDetails) {
+                    this.complexId = complexId;
+                    this.complexMenuName = complexMenuName;
+                    this.modeFree = modeFree;
+                    this.modeGrant = modeGrant;
+                    this.modeOfAdd = modeOfAdd;
+                    this.complexInfoDetails = complexInfoDetails;
+                    this.useTrDiscount = useTrDiscount;
+                    this.complexInfoDiscountDetails = complexInfoDiscountDetails;
                 }
 
                 public int getComplexId() {
@@ -895,9 +1017,18 @@ public class SyncRequest {
                     return modeOfAdd;
                 }
 
+                public int getUseTrDiscount() {
+                    return useTrDiscount;
+                }
+
                 public List<ReqComplexInfoDetail> getComplexInfoDetails() {
                     return complexInfoDetails;
                 }
+
+                public List<ReqComplexInfoDiscountDetail> getComplexInfoDiscountDetails() {
+                    return complexInfoDiscountDetails;
+                }
+
             }
 
             public static class ReqMenuDetail {
@@ -1363,7 +1494,8 @@ public class SyncRequest {
                         childNode = itemNode.getFirstChild();
                         while (null != childNode) {
                             if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("CML")) {
-                                ReqComplexInfo reqComplexInfo = reqComplexInfoBuilder.build(childNode, reqMenuDetailMap);
+                                ReqComplexInfo reqComplexInfo = reqComplexInfoBuilder
+                                        .build(childNode, reqMenuDetailMap);
                                 reqComplexInfos.add(reqComplexInfo);
                             }
                             childNode = childNode.getNextSibling();
@@ -2584,7 +2716,7 @@ public class SyncRequest {
                         }
 
                         int quantity = Integer.parseInt(circulationNode.getAttributes().getNamedItem("Quantity").getTextContent());
-                        
+
                         Boolean delete = null;
                         if (circulationNode.getAttributes().getNamedItem("Delete") != null) {
                             Boolean.parseBoolean(circulationNode.getAttributes().getNamedItem("Delete").getTextContent());
@@ -2736,7 +2868,7 @@ public class SyncRequest {
 
     public static class LoadContext {
 
-MenuGroups menuGroups;
+        MenuGroups menuGroups;
         public long protoVersion;
         DateFormat timeFormat, dateOnlyFormat;
     }

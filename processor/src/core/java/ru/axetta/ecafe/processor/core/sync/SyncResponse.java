@@ -711,7 +711,7 @@ public class SyncResponse {
                 }
 
                 @Override
-                public String toString() {
+                 public String toString() {
                     return "ResMenuDetail{" + "name='" + name + '\'' + ", group='" + group + '\'' + ", output='"
                             + output + '\'' + ", price=" + price + ", protein=" + protein + ", fat=" + fat
                             + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1
