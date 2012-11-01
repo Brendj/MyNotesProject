@@ -3,14 +3,12 @@
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
   --%>
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDetail" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
@@ -34,7 +32,7 @@
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
 <!--Include YUI Loader: -->
-<!--script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js"></script-->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js"></script>
 
 <!--Use YUI Loader to bring in your other dependencies: -->
 <script type="text/javascript">
@@ -104,39 +102,39 @@
         Date prevWeekEndDate = DateUtils.addWeeks(thisWeekEndDate, -1);
 
 
-        String todayUri;
-        String tomorrowUri;
-        String afterTomorrowUri;
-        String thisWeeekUri;
-        String prevWeeekUri;
-        String nextWeekUri;
-        try {
-            todayUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(currentTime)), END_DATE_PARAM,
-                    utcDateFormat.format(currentTime)), PROCESS_PARAM, Boolean.toString(true)).toString();
-            tomorrowUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(tomorrowDate)), END_DATE_PARAM,
-                    utcDateFormat.format(tomorrowDate)), PROCESS_PARAM, Boolean.toString(true)).toString();
-            afterTomorrowUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)),
-                    END_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)), PROCESS_PARAM, Boolean.toString(true))
-                    .toString();
-            thisWeeekUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(thisWeekStartDate)),
-                    END_DATE_PARAM, utcDateFormat.format(thisWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
-                    .toString();
-            prevWeeekUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(prevWeekStartDate)),
-                    END_DATE_PARAM, utcDateFormat.format(prevWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
-                    .toString();
-            nextWeekUri = UriUtils.putParam(UriUtils.putParam(
-                    UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(nextWeekStartDate)),
-                    END_DATE_PARAM, utcDateFormat.format(nextWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
-                    .toString();
-        } catch (Exception e) {
-            logger.error("Error during URI building", e);
-            throw new ServletException(e);
-        }
+        //String todayUri;
+        //String tomorrowUri;
+        //String afterTomorrowUri;
+        //String thisWeeekUri;
+        //String prevWeeekUri;
+        //String nextWeekUri;
+        //try {
+        //    todayUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(currentTime)), END_DATE_PARAM,
+        //            utcDateFormat.format(currentTime)), PROCESS_PARAM, Boolean.toString(true)).toString();
+        //    tomorrowUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(tomorrowDate)), END_DATE_PARAM,
+        //            utcDateFormat.format(tomorrowDate)), PROCESS_PARAM, Boolean.toString(true)).toString();
+        //    afterTomorrowUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)),
+        //            END_DATE_PARAM, utcDateFormat.format(afterTomorrowDate)), PROCESS_PARAM, Boolean.toString(true))
+        //            .toString();
+        //    thisWeeekUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(thisWeekStartDate)),
+        //            END_DATE_PARAM, utcDateFormat.format(thisWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+        //            .toString();
+        //    prevWeeekUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(prevWeekStartDate)),
+        //            END_DATE_PARAM, utcDateFormat.format(prevWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+        //            .toString();
+        //    nextWeekUri = UriUtils.putParam(UriUtils.putParam(
+        //            UriUtils.putParam(formAction, START_DATE_PARAM, utcDateFormat.format(nextWeekStartDate)),
+        //            END_DATE_PARAM, utcDateFormat.format(nextWeekEndDate)), PROCESS_PARAM, Boolean.toString(true))
+        //            .toString();
+        //} catch (Exception e) {
+        //    logger.error("Error during URI building", e);
+        //    throw new ServletException(e);
+        //}
 
         boolean haveDataToProcess = StringUtils.isNotEmpty(request.getParameter(PROCESS_PARAM));
         boolean dataToProcessVerified = true;
@@ -258,29 +256,27 @@
     }
 </script>
 
-<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script>
     // скрипт для схлопывания строк таблицы по дням
     $(document).ready(function(){
-        if ($("form").attr("name") === "menu-view") {
-            $("table.day th").click(function () {
-                $(this).parents('table.day').children('tbody').toggle();
-                var $img = $(this).children('div').children(".dayIco");
-                var $tmp = $img.attr("src");
-                $img.attr("src", $img.attr("src2"));
-                $img.attr("src2", $tmp);
-            });
-            $("table.day th").click(); // для начального схлопывания
-        };
+        $("table.day th").click(function () {
+            $(this).parents('table.day').children('tbody').toggle();
+            var $img = $(this).children('div').children(".dayIco");
+            var $tmp = $img.attr("src");
+            $img.attr("src", $img.attr("src2"));
+            $img.attr("src2", $tmp);
+        });
+        $("table.day th").click(); // для начального схлопывания
     });
 </script>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
-      enctype="application/x-www-form-urlencoded" class="borderless-form" name="menu-view">
-        <%if (!dataToProcessVerified) {%>
+      enctype="application/x-www-form-urlencoded" class="borderless-form">
+    <%if (!dataToProcessVerified) {%>
     <div class="output-text">Ошибка: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
     </div>
-        <%}%>
+    <%}%>
     <table>
         <tr>
             <td>
@@ -328,8 +324,45 @@
             </td>
         </tr>
     </table>
+    <%--<table>--%>
+        <%--<tr>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(todayUri))%>"--%>
+                   <%--class="command-link">Сегодня</a>--%>
+            <%--</td>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(thisWeeekUri))%>" class="command-link">На--%>
+                    <%--этой--%>
+                    <%--неделе</a>--%>
+            <%--</td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(tomorrowUri))%>"--%>
+                   <%--class="command-link">Завтра</a>--%>
+            <%--</td>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(prevWeeekUri))%>" class="command-link">На--%>
+                    <%--прошлой неделе</a>--%>
+            <%--</td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(afterTomorrowUri))%>" class="command-link">Послезавтра</a>--%>
+            <%--</td>--%>
+            <%--<td>--%>
+                <%--<a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(nextWeekUri))%>" class="command-link">На--%>
+                    <%--следующей неделе</a>--%>
+            <%--</td>--%>
+        <%--</tr>--%>
+    <%--</table>--%>
 </form>
+
 <%if (haveDataToProcess && dataToProcessVerified) {%>
+<table>
+<tr>
+<td valign="top">
+    <%--<div style="margin-top: 0px">--%>
     <table>
         <tr>
             <td colspan="4">
@@ -338,7 +371,6 @@
                 </div>
             </td>
         </tr>
-
         <%
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -361,7 +393,9 @@
                     HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
                     HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
                     List menuDetails = menuDetailCriteria.list();
-                    if (!menuDetails.isEmpty()) {
+                    if (!menuDetails.isEmpty())
+                    //if(false)
+                    {
         %>
         <tr>
             <td>   <!--Added row for the nested table-->
@@ -388,7 +422,7 @@
                         <td><div class="column-header">Наименование</div></td>
                         <td><div class="column-header">Цена</div></td>
                     </tr>
-                <%
+                    <%
                         //boolean firstGroup = true;
                         String currGroupName = null;
                         for (Object currMenuDetailObject : menuDetails) {
@@ -403,14 +437,14 @@
                             //if (firstInCurrGroup && !firstGroup) {
                             if (firstInCurrGroup) {
 
-                %>  <tr>
+                    %>  <tr>
                         <td>
                             <div class="menu-group-name">
                                 <%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(currGroupName))%>
                             </div>
                         </td>
-                <%
-                            } else {
+                            <%
+                        } else {
                 %>
                     <tr>
                         <td>
@@ -433,25 +467,232 @@
                     </tr>
                     <%
                             //firstGroup = false;
-                            }
+                        }
                     %>
                     </tbody>
                 </table>
             </td>
         </tr>
-        <%          }
+        <%      }
+        }%>
+
+    </table>
+
+</td>
+<td valign="top">
+    <%--<div style="margin-top: 0px">--%>
+    <table>
+        <tr>
+            <td colspan="4">
+                <div class="output-text">Комплексы с <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(startDate))%>
+                    по <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(endDate))%>
+                </div>
+            </td>
+        </tr>
+        <%
+
+            Criteria complexInfoCriteria = persistenceSession.createCriteria(ComplexInfo.class);
+            complexInfoCriteria.add(Restrictions.eq("org.idOfOrg", MenuViewPage.getIdOfOrg()));
+            complexInfoCriteria.add(Restrictions.ge("menuDate", startDate));
+            complexInfoCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 2)));
+            //  complexInfoCriteria.add(Restrictions.lt("menuDate", endDate));
+
+            // HibernateUtils.addAscOrder(complexInfoCriteria,"menuDate");
+
+            List complexes=complexInfoCriteria.list();
+
+            ArrayList<ArrayList<ComplexInfo>> sortedComplexes=new ArrayList<ArrayList<ComplexInfo>>();
+
+            Date currDate=null;
+            ArrayList<ComplexInfo>currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+
+            for(Object complexObject:complexes){
+
+                ComplexInfo currComplex=(ComplexInfo)complexObject;
+
+                if(currDate==null){
+                    currComplexListWithSameDate.add(currComplex);
+                    currDate=currComplex.getMenuDate();
+                    continue;
                 }
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed to build page", e);
-                throw new ServletException(e);
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+
+                if(currComplex.getMenuDate().equals(currDate)){
+                    currComplexListWithSameDate.add(currComplex);
+
+                }else{
+
+                    ArrayList<ComplexInfo>newComplexes=new ArrayList<ComplexInfo>();
+                    newComplexes.addAll(currComplexListWithSameDate);
+
+                    sortedComplexes.add(newComplexes);
+
+                    currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+                    currComplexListWithSameDate.add(currComplex);
+                    currDate=currComplex.getMenuDate();
+
+                }
+
+
+            }
+
+            currDate=null;
+
+            for(ArrayList<ComplexInfo> complexesWithSameDate:sortedComplexes){
+                boolean emptyComplexes=true;
+                ComplexInfo currComplex=complexesWithSameDate.get(0);
+
+                currDate=currComplex.getMenuDate();
+
+
+                // for(Object complexObject:complexes){
+                ArrayList<ArrayList<ComplexInfoDetail>> complexDetailsWithSameDate =new ArrayList<ArrayList<ComplexInfoDetail>>();
+
+                for(ComplexInfo complex:complexesWithSameDate){
+                    Criteria complexDetailsCriteria=persistenceSession.createCriteria(ComplexInfoDetail.class);
+                    complexDetailsCriteria.add(Restrictions.eq("complexInfo",complex));
+
+
+                    List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();
+                    if(!complexDetails.isEmpty()) {emptyComplexes=false;
+                        logger.info("complexName: "+complex.getComplexName());
+
+                    }
+
+                    ArrayList<ComplexInfoDetail>complexDetailList=new ArrayList<ComplexInfoDetail>();
+                    complexDetailList.addAll(complexDetails);
+                    complexDetailsWithSameDate.add(complexDetailList);
+
+
+                }
+
+                //boolean emptyDetailList;
+                //for(ArrayList){}
+
+
+                /*Criteria complexDetailsCriteria=persistenceSession.createCriteria(ComplexInfoDetail.class);
+               complexDetailsCriteria.add(Restrictions.eq("complexInfo",currComplex));
+
+               List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();*/
+
+                //if(true)
+                if(!emptyComplexes)
+                {
+
+
+        %>
+        <tr>
+            <td>   <!--Added row for the nested table-->
+                <table class="day">     <!--Start of the nested table-->
+                    <thead>
+                    <tr>
+                        <th>
+                            <div class="column-header menu-date">
+                                <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
+                                     src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
+                                <%
+
+                                    // logger.info("currDate: "+currDate);
+
+                                    utcCalendar.setTime(currDate);
+
+                                    // logger.info("utcCalendar.setTime(): "+);
+                                    int dayOfWeek = utcCalendar.get(Calendar.DAY_OF_WEEK);
+                                %>
+                                <%=StringEscapeUtils.escapeHtml(DAY_OF_WEEK_NAMES[dayOfWeek - 1])%>
+                                <%=StringEscapeUtils.escapeHtml(utcDateFormat.format(currDate))%>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr>
+                        <td><div class="column-header">Комплекс</div></td>
+                        <td><div class="column-header">Содержание</div></td>
+                        <%--<td><div class="column-header">Цена</div></td>--%>
+                    </tr>
+                    <%
+                        //boolean firstGroup = true;
+                        for(ArrayList<ComplexInfoDetail>complexDetails:complexDetailsWithSameDate) {
+
+                            String currComplexName = null;
+                            if(!complexDetails.isEmpty()){
+                                for (int index=0;index<complexDetails.size();index++) {
+
+                                    ComplexInfoDetail currComplexDetail=complexDetails.get(index);
+                                    logger.info("currComplexDetail: "+currComplexDetail.getComplexInfo().getComplexName());
+
+                                    if (index==0) {
+
+                    %>  <tr>
+                        <td>
+                            <div class="menu-group-name">
+                                <%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(currComplexDetail.getComplexInfo().getComplexName()))%>
+                            </div>
+                        </td>
+                            <%
+                       } else {
+                %>
+                    <tr>
+                        <td>
+                            <div class="menu-group-name">
+                            </div>
+                        </td>
+                        <%
+                            }
+                        %>
+                        <td>
+                            <div class="output-text">
+                                <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailName())%>
+                            </div>
+                        </td>
+                        <%--<td>
+                            <div class="output-text">
+                                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currComplexDetail.getMenuDetail().getPrice()))%>
+                            </div>
+                        </td>--%>
+                    </tr>
+                    <%
+                                    //firstGroup = false;
+                                } } }
+                    %>
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+
+
+
+
+
+        <%
+
+
+
+                }
+
+
+
             }
         %>
     </table>
+</td>
+</tr>
+</table>
+
+<%
+        persistenceTransaction.commit();
+        persistenceTransaction = null;
+    } catch (Exception e) {
+        logger.error("Failed to build page", e);
+        throw new ServletException(e);
+    } finally {
+        HibernateUtils.rollback(persistenceTransaction, logger);
+        HibernateUtils.close(persistenceSession, logger);
+    }
+%>
+
 <%
         }
     } catch (RuntimeContext.NotInitializedException e) {
