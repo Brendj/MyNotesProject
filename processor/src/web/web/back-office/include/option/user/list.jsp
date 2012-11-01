@@ -47,10 +47,13 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Удалить" />
         </f:facet>
-        <h:commandLink action="#{mainPage.removeUser}" styleClass="command-link">
+
+        <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                         oncomplete="#{rich:component('removedUserDeletePanel')}.show()" reRender="removedUserDeletePanel">
             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfUser}" target="#{mainPage.removedIdOfUser}" />
-        </h:commandLink>
+        </a4j:commandLink>
+
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="userListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
@@ -64,3 +67,31 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+
+<rich:modalPanel id="removedUserDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <f:facet name="header">
+        <h:outputText value="Удаление пользователя" styleClass="output-text" />
+    </f:facet>
+    <a4j:form styleClass="borderless-form">
+        <table class="borderless-grid" width="100%">
+            <tr>
+                <td style="text-align: center;">
+                    <h:outputText value="Вы уверены в том, что хотите удалить этого пользователя?" styleClass="output-text" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeUser}"
+                                           oncomplete="#{rich:component('removedUserDeletePanel')}.hide();"
+                                           reRender="mainMenu, userListTable, #{mainPage.topMostPage.pageComponent.id}"
+                                           styleClass="command-button">
+                        </a4j:commandButton>
+                        <a4j:commandButton value="Отмена" styleClass="command-button"
+                                           onclick="#{rich:component('removedUserDeletePanel')}.hide();return false;" />
+                    </h:panelGroup>
+                </td>
+            </tr>
+        </table>
+    </a4j:form>
+</rich:modalPanel>
