@@ -4,7 +4,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DashboardPage"--%>
+<%--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"--%>
 <h:panelGrid id="dashboardPanelGrid" binding="#{dashboardPage.pageComponent}" styleClass="borderless-grid">
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
@@ -115,98 +115,10 @@
                  </rich:column>
              </rich:extendedDataTable>
          </rich:tab>
-         <rich:tab label="Организации (детальная)">
-             <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}" reRender="dashboardPanelGrid"/>
-
-             <rich:extendedDataTable id="orgStatusTable" value="#{dashboardPage.orgStatus.eduInstItemInfoList}" var="item"
-                                     rows="500"
-                                     sortMode="multi" selectionMode="single" width="1500" height="900"
-                                     footerClass="data-table-footer">
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfOrg}"  width="35px" filterBy="#{item.idOfOrg}" filterEvent="onkeyup">
-                     <f:facet name="header">
-                         <h:outputText value="Ид." styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.idOfOrg}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgName}"  width="60px" filterBy="#{item.orgName}" filterEvent="onkeyup">
-                     <f:facet name="header">
-                         <h:outputText value="Номер" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.orgNameNumber}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgNameNumber}"  width="200px" filterBy="#{item.orgNameNumber}" filterEvent="onkeyup">
-                     <f:facet name="header">
-                         <h:outputText value="Наименование" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.orgName}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" width="100px">
-                     <f:facet name="header">
-                         <h:outputText value="Первая схр." styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.firstFullSyncTime}" converter="dateConverter"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" width="150px">
-                     <f:facet name="header">
-                         <h:outputText value="Посл. схр." styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.lastFullSyncTime}" converter="timeMinuteConverter"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" width="80px">
-                     <f:facet name="header">
-                         <h:outputText value="Ошибки схр." styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.lastSyncErrors}" styleClass="#{item.lastSyncErrors?'error-messages':'info-messages'}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="false" width="150px">
-                     <f:facet name="header">
-                         <h:outputText value="После. синхр. бал." styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.lastSuccessfulBalanceSyncTime}" converter="timeMinuteConverter"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="false" width="70px">
-                     <f:facet name="header">
-                         <h:outputText value="Пл. заказов (сотр.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfPaidMealsPerNumOfStaff}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="false" width="70px">
-                     <f:facet name="header">
-                         <h:outputText value="Пл. заказов (уч.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfPaidMealsPerNumOfStudents}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" width="70px">
-                     <f:facet name="header">
-                         <h:outputText value="Лгт. заказов (сотр.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfReducedPriceMealsPerNumOfStaff}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" width="70px">
-                     <f:facet name="header">
-                         <h:outputText value="Лгт. заказов (уч.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfReducedPriceMealsPerNumOfStudents}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" width="50px">
-                     <f:facet name="header">
-                         <h:outputText value="Прхд. (сотр.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfPassagesPerNumOfStaff}"/>
-                 </rich:column>
-                 <rich:column headerClass="column-header" width="70px">
-                     <f:facet name="header">
-                         <h:outputText value="Прхд. (уч.)" styleClass="output-text" escape="true"/>
-                     </f:facet>
-                     <h:outputText value="#{item.numberOfPassagesPerNumOfStudents}"/>
-                 </rich:column>
-             </rich:extendedDataTable>
-
-         </rich:tab>
          <rich:tab label="Платежные системы">
-             <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}" reRender="dashboardPanelGrid"/>
+             <a4j:commandButton value="Обновить" action="#{dashboardPage.updatePaySysStatus}" reRender="dashboardPanelGrid"/>
 
-             <rich:extendedDataTable id="paySysStatusTable" value="#{dashboardPage.psStatus.paymentSystemItemInfoList}" var="item"
+             <rich:extendedDataTable id="paySysStatusTable" value="#{dashboardPage.psStatus.paymentSystemItemInfos}" var="item"
                                      rows="500"
                                      sortMode="multi" selectionMode="single" width="1500" height="900"
                                      footerClass="data-table-footer">

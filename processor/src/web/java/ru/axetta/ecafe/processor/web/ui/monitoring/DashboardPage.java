@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online;
+package ru.axetta.ecafe.processor.web.ui.monitoring;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceBean;
@@ -24,9 +24,9 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
     @Autowired
     DashboardServiceBean dashboardServiceBean;
 
-    DashboardResponse psStatus = new DashboardResponse();
+    DashboardResponse.PaymentSystemStats psStatus;
     DashboardResponse orgStatus = new DashboardResponse();
-    DashboardResponse.OrgBasicStats orgBasicStats = new DashboardResponse.OrgBasicStats();
+    DashboardResponse.OrgBasicStats orgBasicStats;
 
     Date reportDate = new Date();
     Org filterOrg;
@@ -34,7 +34,7 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
 
     @Override
     public String getPageFilename() {
-        return "report/online/dashboard";
+        return "monitoring/dashboard";
     }
 
     @Override
@@ -57,13 +57,13 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
     }
     public void updatePaySysStatus() {
         try {
-            psStatus = dashboardServiceBean.getPaymentSystemInfo(new DashboardResponse(), reportDate);
+            psStatus = dashboardServiceBean.getPaymentSystemInfo(reportDate);
         } catch (Exception e) {
             logAndPrintMessage("Ошибка подготовки данных", e);
         }
     }
 
-    public DashboardResponse getPsStatus() {
+    public DashboardResponse.PaymentSystemStats getPsStatus() {
         return psStatus;
     }
 

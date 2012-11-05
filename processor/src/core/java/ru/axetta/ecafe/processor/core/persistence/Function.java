@@ -75,6 +75,8 @@ public class Function {
     public static final String FUNCD_RULE_VIEW = "Просмотр правил";
     public static final String FUNC_RULE_EDIT = "ruleEdit";
     public static final String FUNCD_RULE_EDIT = "Редактирование правил";
+    public static final String FUNC_MONITORING = "monitor";
+    public static final String FUNCD_MONITORING = "Мониторинг";
 
     private Long idOfFunction;
     private String functionName;

@@ -375,7 +375,7 @@ public class DAOService {
 
     @Transactional
     public List<String> getReportHandleRuleNames() {
-        TypedQuery<String> query = em.createQuery("select ruleName from ReportHandleRule", String.class);
+        TypedQuery<String> query = em.createQuery("select ruleName from ReportHandleRule order by ruleName", String.class);
         return query.getResultList();
     }
 
@@ -455,4 +455,21 @@ public class DAOService {
         q.setParameter("toDate", toDate.getTime());
         return (List<Object[]>) q.getResultList();
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getMonitoringPayLastTransactionStats() {
+        Query q = em.createNativeQuery(
+                "select cp.idOfContragent, cc.contragentName, max(cp.createddate) from cf_clientpayments cp, cf_contragents cc where cp.idOfContragent=cc.idOfContragent and cc.classid=1 group by cp.idOfContragent, cc.contragentName");
+        return (List<Object[]>) q.getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getMonitoringPayDayTransactionsStats(Date fromDate, Date toDate) {
+        Query q = em.createNativeQuery(
+                "select cp.idOfContragent, cc.contragentName, count(*) from cf_clientpayments cp, cf_contragents cc where cp.idOfContragent=cc.idOfContragent and cc.classid=1 and cp.createdDate>=:fromDate and cp.createdDate<:toDate group by cp.idOfContragent, cc.contragentName");
+        q.setParameter("fromDate", fromDate.getTime());
+        q.setParameter("toDate", toDate.getTime());
+        return (List<Object[]>) q.getResultList();
+    }
+
 }

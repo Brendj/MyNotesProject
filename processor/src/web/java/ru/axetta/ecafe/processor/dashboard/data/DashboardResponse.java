@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.dashboard.data;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -148,7 +147,130 @@ public class DashboardResponse {
             this.orgBasicStatItems = orgBasicStatItems;
         }
     }
-    
+
+
+    public static class PaymentSystemStatItem {
+
+        long idOfContragent;
+        String contragentName;
+        Date lastOperationTime;
+        long numOfOperations;
+
+        String error;
+        Date timestamp;
+
+        public long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public void setIdOfContragent(long idOfContragent) {
+            this.idOfContragent = idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
+
+        public void setContragentName(String contragentName) {
+            this.contragentName = contragentName;
+        }
+
+        public Date getLastOperationTime() {
+            return lastOperationTime;
+        }
+
+        public void setLastOperationTime(Date lastOperationTime) {
+            this.lastOperationTime = lastOperationTime;
+        }
+
+        public long getNumOfOperations() {
+            return numOfOperations;
+        }
+
+        public void setNumOfOperations(long numOfOperations) {
+            this.numOfOperations = numOfOperations;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
+        }
+    }
+
+    public static class PaymentSystemStats {
+        LinkedList<PaymentSystemStatItem> paymentSystemItemInfos = new LinkedList<PaymentSystemStatItem>();
+
+        public LinkedList<PaymentSystemStatItem> getPaymentSystemItemInfos() {
+            return paymentSystemItemInfos;
+        }
+
+        public void setPaymentSystemItemInfos(LinkedList<PaymentSystemStatItem> paymentSystemItemInfos) {
+            this.paymentSystemItemInfos = paymentSystemItemInfos;
+        }
+    }
+
+
+    public static class OrgSyncStatItem {
+
+        private String orgName;
+        private Date lastSuccessfulBalanceSync;
+        private Date lastUnSuccessfulBalanceSync;
+        private String remoteAddr;
+
+        public OrgSyncStatItem(String orgName, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
+                String remoteAddr) {
+            this.orgName = orgName;
+            this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
+            this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
+            this.remoteAddr = remoteAddr;
+        }
+
+        public String getOrgName() {
+            return orgName;
+        }
+
+        public Date getLastSuccessfulBalanceSync() {
+            return lastSuccessfulBalanceSync;
+        }
+
+        public Date getLastUnSuccessfulBalanceSync() {
+            return lastUnSuccessfulBalanceSync;
+        }
+
+        public String getRemoteAddr() {
+            return remoteAddr;
+        }
+    }
+    public static class OrgSyncStats {
+        LinkedList<OrgSyncStatItem> orgSyncStatItems;
+
+        public LinkedList<OrgSyncStatItem> getOrgSyncStatItems() {
+            return orgSyncStatItems;
+        }
+
+        public void setOrgSyncStatItems(LinkedList<OrgSyncStatItem> orgSyncStatItems) {
+            this.orgSyncStatItems = orgSyncStatItems;
+        }
+    }
+
+
+
+
+
+
+
+
     public static class EduInstItemInfo {
 
         long idOfOrg;
@@ -302,68 +424,11 @@ public class DashboardResponse {
         }
     }
 
-    public static class PaymentSystemItemInfo {
-
-        long idOfContragent;
-        String contragentName;
-        Date lastOperationTime;
-        long numOfOperations;
-        
-        String error;
-        Date timestamp;
-
-        public long getIdOfContragent() {
-            return idOfContragent;
-        }
-
-        public void setIdOfContragent(long idOfContragent) {
-            this.idOfContragent = idOfContragent;
-        }
-
-        public String getContragentName() {
-            return contragentName;
-        }
-
-        public void setContragentName(String contragentName) {
-            this.contragentName = contragentName;
-        }
-
-        public Date getLastOperationTime() {
-            return lastOperationTime;
-        }
-
-        public void setLastOperationTime(Date lastOperationTime) {
-            this.lastOperationTime = lastOperationTime;
-        }
-
-        public long getNumOfOperations() {
-            return numOfOperations;
-        }
-
-        public void setNumOfOperations(long numOfOperations) {
-            this.numOfOperations = numOfOperations;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
-
-        public Date getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(Date timestamp) {
-            this.timestamp = timestamp;
-        }
-    }
-
     private List<EduInstItemInfo> eduInstItemInfoList = new LinkedList<EduInstItemInfo>();
 
-    private List<PaymentSystemItemInfo> paymentSystemItemInfoList = new LinkedList<PaymentSystemItemInfo>();
+    private PaymentSystemStats paymentSystemStats;
+
+
 
 
     public List<EduInstItemInfo> getEduInstItemInfoList() {
@@ -374,11 +439,11 @@ public class DashboardResponse {
         this.eduInstItemInfoList = eduInstItemInfoList;
     }
 
-    public List<PaymentSystemItemInfo> getPaymentSystemItemInfoList() {
-        return paymentSystemItemInfoList;
+    public PaymentSystemStats getPaymentSystemStats() {
+        return paymentSystemStats;
     }
 
-    public void setPaymentSystemItemInfoList(List<PaymentSystemItemInfo> paymentSystemItemInfoList) {
-        this.paymentSystemItemInfoList = paymentSystemItemInfoList;
+    public void setPaymentSystemStats(PaymentSystemStats paymentSystemStats) {
+        this.paymentSystemStats = paymentSystemStats;
     }
 }

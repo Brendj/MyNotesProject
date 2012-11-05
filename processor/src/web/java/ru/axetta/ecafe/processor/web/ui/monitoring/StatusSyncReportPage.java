@@ -2,9 +2,10 @@
  * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online;
+package ru.axetta.ecafe.processor.web.ui.monitoring;
 
 import ru.axetta.ecafe.processor.core.report.StatusSyncReport;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 
@@ -19,7 +20,7 @@ public class StatusSyncReportPage extends OnlineReportPage {
     private StatusSyncReport statusSyncReport;
 
     public String getPageFilename() {
-        return "report/online/status_sync_report";
+        return "monitoring/status_sync_report";
     }
 
     public StatusSyncReport getStatusSyncReport() {

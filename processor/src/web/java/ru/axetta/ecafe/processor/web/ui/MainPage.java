@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
@@ -20,6 +19,8 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
+import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
+import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.*;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.*;
@@ -60,7 +61,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -188,6 +188,7 @@ public class MainPage {
 
     // Report online manipulation (baybikov 05.10.2011)
     private final BasicWorkspacePage reportOnlineGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage monitoringGroupPage = new BasicWorkspacePage();
 
     // baybikov 23.11.2011
     private final FreeComplexReportPage freeComplexReportPage = new FreeComplexReportPage();
@@ -4710,9 +4711,19 @@ public Long getSelectedIdOfReportRule() {
         return reportOnlineGroupPage;
     }
 
+    public BasicWorkspacePage getMonitoringGroupPage() {
+        return monitoringGroupPage;
+    }
+
     // baybikov (05.10.2011)
     public Object showReportOnlineGroupPage() {
         currentWorkspacePage = reportOnlineGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showMonitoringGroupPage() {
+        currentWorkspacePage = monitoringGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -6889,6 +6900,10 @@ public User getCurrentUser() throws Exception {
 
     public boolean isEligibleToWorkOnlineReport() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT);
+    }
+
+    public boolean isEligibleToMonitor() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_MONITORING);
     }
 
     public boolean isEligibleToCountCurrentPositions() throws Exception {

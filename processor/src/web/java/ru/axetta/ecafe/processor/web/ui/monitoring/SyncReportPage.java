@@ -2,9 +2,10 @@
  * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online;
+package ru.axetta.ecafe.processor.web.ui.monitoring;
 
 import ru.axetta.ecafe.processor.core.report.SyncReport;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 
@@ -12,7 +13,7 @@ public class SyncReportPage extends OnlineReportPage {
     private SyncReport syncReport;
 
     public String getPageFilename() {
-        return "report/online/sync_report";
+        return "monitoring/sync_report";
     }
 
     public SyncReport getSyncReport() {

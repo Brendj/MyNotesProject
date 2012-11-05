@@ -4,10 +4,13 @@
 
 package ru.axetta.ecafe.processor.dashboard;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
 import org.slf4j.Logger;
@@ -20,14 +23,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
 import javax.persistence.*;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
 import java.util.*;
 
 /**
@@ -66,13 +62,15 @@ public class DashboardServiceBean {
     @Autowired
     PlatformTransactionManager txManager;
 
+    @Autowired
+    DAOService daoService;
+
     @PersistenceContext
     EntityManager entityManager;
 
     private DashboardResponse prepareDashboardResponse() {
         DashboardResponse dashboardResponse = new DashboardResponse();
         dashboardResponse.setEduInstItemInfoList(new LinkedList<DashboardResponse.EduInstItemInfo>());
-        dashboardResponse.setPaymentSystemItemInfoList(new LinkedList<DashboardResponse.PaymentSystemItemInfo>());
         return dashboardResponse;
     }
     
@@ -408,64 +406,66 @@ public class DashboardServiceBean {
         return dayEndDate;
     }
 
-    public DashboardResponse getPaymentSystemInfo(DashboardResponse dashboardResponse, Date dt) throws Exception {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus status = txManager.getTransaction(def);
-        try {
-            Query query = entityManager.createQuery(
-                    "SELECT DISTINCT contragent.idOfContragent, contragent.contragentName, "
-                            + "max(clientPayment.createTime), "
-                            + "(SELECT count(clientPayment) FROM clientPayment WHERE clientPayment.createTime BETWEEN :dayStart AND :dayEnd) "
-                            + "FROM Contragent contragent LEFT OUTER JOIN contragent.clientPaymentsInternal clientPayment GROUP BY contragent.idOfContragent");
-
-
-            Calendar currentTimeStamp = Calendar.getInstance();
-            currentTimeStamp.setTime(dt);
-            Date dayStart = getCurrentDayStartTime(currentTimeStamp);
-            Date dayEnd = getCurrentDayEndTime(currentTimeStamp);
-
-            query.setParameter("dayStart", dayStart);
-            query.setParameter("dayEnd", dayEnd);
-
-            List queryResult = query.getResultList();
-            Date timestamp = new Date();
-
-            List<DashboardResponse.PaymentSystemItemInfo> paymentSystemItemInfoList = dashboardResponse
-                    .getPaymentSystemItemInfoList();
-            for (Object object : queryResult) {
-                DashboardResponse.PaymentSystemItemInfo paymentSystemItemInfo = new DashboardResponse.PaymentSystemItemInfo();
-                try {
-                    paymentSystemItemInfo.setTimestamp(timestamp);
-                    Object[] result = (Object[]) object;
-                    paymentSystemItemInfo.setIdOfContragent((Long) result[ID_OF_CONTRAGENT_PARAM_INDEX]);
-                    paymentSystemItemInfo.setContragentName((String) result[CONTRAGENT_NAME_PARAM_INDEX]);
-                    paymentSystemItemInfo.setLastOperationTime((Date) result[LAST_OPERATION_TIME_PARAM_INDEX]);
-                    paymentSystemItemInfo.setNumOfOperations((Long) result[NUM_OF_OPERATIONS_PARAM_INDEX]);
-                } catch (Exception e) {
-                    paymentSystemItemInfo.setError(e.getMessage());
-                } finally {
-                    paymentSystemItemInfoList.add(paymentSystemItemInfo);
+    public DashboardResponse.PaymentSystemStats getPaymentSystemInfo(Date dt) {
+        DashboardResponse.PaymentSystemStats paymentSystemStats = new DashboardResponse.PaymentSystemStats();
+        //// получение данных по платежам
+        List<Object[]> lastTransactionStats = daoService.getMonitoringPayLastTransactionStats();
+        LinkedList<DashboardResponse.PaymentSystemStatItem> payStatItems = new LinkedList<DashboardResponse.PaymentSystemStatItem>();
+        for (Object[] r : lastTransactionStats) {
+            DashboardResponse.PaymentSystemStatItem psi = new DashboardResponse.PaymentSystemStatItem();
+            psi.setIdOfContragent(Long.parseLong("" + r[0]));
+            psi.setContragentName((String) r[1]);
+            psi.setLastOperationTime(new Date(Long.parseLong(""+r[2])));
+            payStatItems.add(psi);
+        }
+        List<Object[]> monitoringPayDayTransactionsStats = daoService.getMonitoringPayDayTransactionsStats(
+                CalendarUtils.truncateToDayOfMonth(dt), CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(dt, 1)));
+        for (Object[] r : monitoringPayDayTransactionsStats) {
+            Long caId = Long.parseLong(""+r[0]);
+            DashboardResponse.PaymentSystemStatItem psi = null;
+            for (DashboardResponse.PaymentSystemStatItem psiCursor : payStatItems) {
+                if (psiCursor.getIdOfContragent()==caId) {
+                    psi = psiCursor; break;
                 }
             }
-        } catch (Exception e) {
-            txManager.rollback(status);
-            throw e;
+            if (psi==null) {
+                psi = new DashboardResponse.PaymentSystemStatItem();
+                psi.setIdOfContragent(caId);
+                psi.setContragentName((String)r[1]);
+                payStatItems.add(psi);
+            }
+            psi.setNumOfOperations(Long.parseLong(r[2] + ""));
         }
-        txManager.commit(status);
-        return dashboardResponse;
+        paymentSystemStats.setPaymentSystemItemInfos(payStatItems);
+        return paymentSystemStats;
     }
+
+    public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
+        DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
+        ///// получение данных по сихронизации
+        List<Org> orgs = daoService.getOrderedSynchOrgsList();
+        LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        for (Org org : orgs) {
+            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
+                    org.getLastUnSuccessfulBalanceSync(),
+                    runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
+        }
+        orgSyncStats.setOrgSyncStatItems(items);
+        return orgSyncStats;
+    }
+
 
     public DashboardResponse getInfoForDashboard() throws Exception {
         DashboardResponse dashboardResponse = prepareDashboardResponse();
         dashboardResponse = getOrgInfo(dashboardResponse, new Date(), null);
-        dashboardResponse = getPaymentSystemInfo(dashboardResponse, new Date());
+        dashboardResponse.setPaymentSystemStats(getPaymentSystemInfo(new Date()));
         return dashboardResponse;
     }
     public DashboardResponse getInfoForDashboardForDateAndOrg(Date dt, Long idOfOrg) throws Exception {
         DashboardResponse dashboardResponse = prepareDashboardResponse();
         dashboardResponse = getOrgInfo(dashboardResponse, dt, idOfOrg);
-        dashboardResponse = getPaymentSystemInfo(dashboardResponse, dt);
+        dashboardResponse.setPaymentSystemStats(getPaymentSystemInfo(dt));
         return dashboardResponse;
     }
 }

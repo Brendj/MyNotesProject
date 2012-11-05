@@ -365,6 +365,27 @@
     --%>
 </rich:panelMenuGroup>
 
+
+<rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
+                     label="Мониторинг" rendered="#{mainPage.eligibleToMonitor}">
+    <a4j:support event="onclick" action="#{mainPage.showMonitoringGroupPage}" reRender="workspaceForm" />
+    <%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SyncMonitorPage"--%>
+    <rich:panelMenuItem id="syncMonitorItem" binding="#{syncMonitorPage.mainMenuComponent}"
+                        label="Мониторинг синхронизации" action="#{syncMonitorPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="dashboardMenuItem" binding="#{dashboardPage.mainMenuComponent}"
+                        label="Мониторинг активности" action="#{dashboardPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="syncReportMenuItem" binding="#{mainPage.syncReportPage.mainMenuComponent}"
+                        label="Отчет по синхронизации" action="#{mainPage.showSyncReportPage}"
+                        reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="statusSyncReportMenuItem" binding="#{mainPage.statusSyncReportPage.mainMenuComponent}"
+                        label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
+                        reRender="workspaceForm" />
+</rich:panelMenuGroup>
+
+
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />
@@ -402,13 +423,6 @@
 
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SyncMonitorPage"--%>
-    <rich:panelMenuItem id="syncMonitorItem" binding="#{syncMonitorPage.mainMenuComponent}"
-                        label="Мониторинг синхронизации" action="#{syncMonitorPage.show}" reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="dashboardMenuItem" binding="#{dashboardPage.mainMenuComponent}"
-                        label="Мониторинг активности" action="#{dashboardPage.show}" reRender="workspaceForm" />
-
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
 
@@ -417,14 +431,6 @@
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" />
     <!-- внесено изменние -->
-
-    <rich:panelMenuItem id="syncReportMenuItem" binding="#{mainPage.syncReportPage.mainMenuComponent}"
-                        label="Отчет по синхронизации" action="#{mainPage.showSyncReportPage}"
-                        reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="statusSyncReportMenuItem" binding="#{mainPage.statusSyncReportPage.mainMenuComponent}"
-                        label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
-                        reRender="workspaceForm" />
 
     <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                         label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
