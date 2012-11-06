@@ -806,13 +806,19 @@ public class SyncRequest {
                 public static class ReqComplexInfoDetail {
 
                     ReqMenuDetail reqMenuDetail;
+                    Long idOfItem;
 
-                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail) {
+                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem) {
                         this.reqMenuDetail = reqMenuDetail;
+                        this.idOfItem = idOfItem;
                     }
 
                     public ReqMenuDetail getReqMenuDetail() {
                         return reqMenuDetail;
+                    }
+
+                    public Long getIdOfItem() {
+                        return idOfItem;
                     }
 
                     public static class Builder {
@@ -826,7 +832,13 @@ public class SyncRequest {
                             if (reqMenuDetail == null) {
                                 throw new Exception("Menu detail not found by refIdOfMenu: " + refIdOfMenu);
                             }
-                            return new ReqComplexInfoDetail(reqMenuDetail);
+                            Long idOfItem = null;
+                            try {
+                                idOfItem = Long.parseLong(namedNodeMap.getNamedItem("IdOfItem").getTextContent());
+                            } catch (Exception e) {
+                                throw new Exception("Menu detail doesn't containt ifOfItem field");
+                            }
+                            return new ReqComplexInfoDetail(reqMenuDetail, idOfItem);
                         }
                     }
                 }
@@ -844,7 +856,7 @@ public class SyncRequest {
                             //      нет данных атрибутов - 3
                             int constructMode = 3;
 
-                            Double size = ReqMenuDetail.Builder.getDoubleValue(namedNodeMap, "Size");
+                            Double size = getDoubleValue(namedNodeMap, "Size");
                             Integer isAllGroups = getIntValue(namedNodeMap, "IsAllGroups");
                             Node maxCountNode = namedNodeMap.getNamedItem("MaxCount");
                             int maxCount = -1;
@@ -868,6 +880,19 @@ public class SyncRequest {
                                 case 2: return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount);
                                 default:return new ReqComplexInfoDiscountDetail(size, isAllGroups);
                             }
+                        }
+
+                        private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
+                            Node node = namedNodeMap.getNamedItem(name);
+                            if (null == node) {
+                                return null;
+                            }
+                            String calString = node.getTextContent();
+                            if (calString.equals("")) {
+                                return null;
+                            }
+                            String replacedString = calString.replaceAll(",", ".");
+                            return Double.parseDouble(replacedString);
                         }
 
                     }
@@ -1296,6 +1321,83 @@ public class SyncRequest {
                 }
             }
 
+            public static class ReqMenuDetailCatalog {
+
+                public static class Builder {
+
+                    public ReqMenuDetailCatalog build(Node menuDetailCatalogNode, MenuGroups menuGroups) throws Exception {
+                        NamedNodeMap namedNodeMap = menuDetailCatalogNode.getAttributes();
+
+                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 90);
+
+                        String path = getTextContent(namedNodeMap.getNamedItem("Path"));
+                        if (path == null) {
+                            path = "";
+                        }
+
+                        String idOfMenuStr = getTextContent(namedNodeMap.getNamedItem("IdOfMenu"));
+                        Long idOfMenu = null;
+                        if (idOfMenuStr != null) {
+                            idOfMenu = Long.parseLong(idOfMenuStr);
+                        }
+
+                        return new ReqMenuDetailCatalog(idOfMenu, path, name);
+                    }
+
+                    private static String getTextContent(Node node) throws Exception {
+                        if (null == node) {
+                            return null;
+                        }
+                        return node.getTextContent();
+                    }
+
+                    private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
+                        Node node = namedNodeMap.getNamedItem(name);
+                        if (null == node) {
+                            return null;
+                        }
+                        String calString = node.getTextContent();
+                        if (calString.equals("")) {
+                            return null;
+                        }
+                        String replacedString = calString.replaceAll(",", ".");
+                        return Double.parseDouble(replacedString);
+                    }
+                }
+
+                private final Long idOfMenu;
+                private final String path;
+                private final String name;
+
+                public ReqMenuDetailCatalog(Long idOfMenu, String path, String name) {
+                    this.idOfMenu = idOfMenu;
+                    this.path = path;
+                    this.name = name;
+                }
+
+                public Long getIdOfMenu() {
+                    return idOfMenu;
+                }
+
+                public String getPath() {
+                    return path;
+                }
+
+                public String getName() {
+                    return name;
+                }
+
+                @Override
+                public String toString() {
+                    return "ReqMenuDetailCatalog{" +
+                            "idOfMenu=" + idOfMenu +
+                            ", path='" + path + '\'' +
+                            ", name='" + name + '\'' +
+                            '}';
+                }
+
+            }
+
             public static class ReqAssortment {
 
                 public static class Builder {
@@ -1489,11 +1591,13 @@ public class SyncRequest {
             public static class Builder {
 
                 private final ReqMenuDetail.Builder reqMenuDetailBuilder;
+                private final ReqMenuDetailCatalog.Builder reqMenuDetailCatalogBuilder;
                 private final ReqComplexInfo.Builder reqComplexInfoBuilder;
                 private final ReqAssortment.Builder reqAssortmentBuilder;
 
                 public Builder() {
                     this.reqMenuDetailBuilder = new ReqMenuDetail.Builder();
+                    reqMenuDetailCatalogBuilder = new ReqMenuDetailCatalog.Builder();
                     this.reqComplexInfoBuilder = new ReqComplexInfo.Builder();
                     this.reqAssortmentBuilder = new ReqAssortment.Builder();
                 }
@@ -1504,14 +1608,27 @@ public class SyncRequest {
                     ////// process ML items (menu list)
                     List<ReqMenuDetail> reqMenuDetails = new LinkedList<ReqMenuDetail>();
                     HashMap<Long, ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, ReqMenuDetail>();
+                    List<ReqMenuDetailCatalog> reqMenuDetailsCatalog = new LinkedList<ReqMenuDetailCatalog>();
+                    HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailCatalogMap = new HashMap<Long, ReqMenuDetailCatalog>();
                     List<ReqAssortment> reqAssortments = new LinkedList<ReqAssortment>();
                     Node childNode = itemNode.getFirstChild();
                     while (null != childNode) {
                         if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("ML")) {
                             ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.menuGroups);
-                            reqMenuDetails.add(reqMenuDetail);
-                            if (reqMenuDetail.idOfMenu != null) {
-                                reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
+                            if (reqMenuDetailCatalogMap.get(reqMenuDetail.idOfMenu) == null) {
+                                reqMenuDetails.add(reqMenuDetail);
+                                if (reqMenuDetail.idOfMenu != null) {
+                                    reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
+                                }
+                            }
+                        } else if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName()
+                                .equals("MLF")) {
+                            ReqMenuDetailCatalog reqMenuDetailCatalog = reqMenuDetailCatalogBuilder.build(childNode, loadContext.menuGroups);
+                            if (reqMenuDetailMap.get(reqMenuDetailCatalog.idOfMenu) == null) {
+                                reqMenuDetailsCatalog.add(reqMenuDetailCatalog);
+                                if (reqMenuDetailCatalog.idOfMenu != null) {
+                                    reqMenuDetailCatalogMap.put(reqMenuDetailCatalog.idOfMenu, reqMenuDetailCatalog);
+                                }
                             }
                         } else if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName()
                                 .equals("AMI")) {
@@ -1536,7 +1653,8 @@ public class SyncRequest {
                     ////////
                     String rawXML = ru.axetta.ecafe.processor.core.utils.XMLUtils.nodeToString(itemNode);
                     ////////
-                    return new Item(date, reqMenuDetails, reqMenuDetailMap, reqComplexInfos, reqAssortments, rawXML);
+                    return new Item(date, reqMenuDetails, reqMenuDetailMap, reqMenuDetailsCatalog, reqMenuDetailCatalogMap,
+                            reqComplexInfos, reqAssortments, rawXML);
                 }
 
             }
@@ -1545,15 +1663,20 @@ public class SyncRequest {
             private final Date date;
             private final List<ReqMenuDetail> reqMenuDetails;
             private final HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu;
+            private final List<ReqMenuDetailCatalog> reqMenuDetailsCatalog;
+            private final HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailsCatalogByIdOfMenu;
             private final List<ReqComplexInfo> reqComplexInfos;
             private final List<ReqAssortment> reqAssortments;
 
             public Item(Date date, List<ReqMenuDetail> reqMenuDetails,
-                    HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu, List<ReqComplexInfo> reqComplexInfos,
-                    List<ReqAssortment> reqAssortments, String rawXmlText) {
+                    HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu, List<ReqMenuDetailCatalog> reqMenuDetailsCatalog,
+                    HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailsCatalogByIdOfMenu,
+                    List<ReqComplexInfo> reqComplexInfos, List<ReqAssortment> reqAssortments, String rawXmlText) {
                 this.date = date;
                 this.reqMenuDetails = reqMenuDetails;
                 this.reqMenuDetailsByIdOfMenu = reqMenuDetailsByIdOfMenu;
+                this.reqMenuDetailsCatalog = reqMenuDetailsCatalog;
+                this.reqMenuDetailsCatalogByIdOfMenu = reqMenuDetailsCatalogByIdOfMenu;
                 this.reqComplexInfos = reqComplexInfos;
                 this.reqAssortments = reqAssortments;
                 this.rawXmlText = rawXmlText;
@@ -1571,6 +1694,10 @@ public class SyncRequest {
                 return reqMenuDetailsByIdOfMenu.get(refIdOfMenu);
             }
 
+            private ReqMenuDetailCatalog findMenuDetailCatalog(long refIdOfMenu) {
+                return reqMenuDetailsCatalogByIdOfMenu.get(refIdOfMenu);
+            }
+
             public Date getDate() {
                 return date;
             }
@@ -1579,14 +1706,23 @@ public class SyncRequest {
                 return Collections.enumeration(reqMenuDetails);
             }
 
+            public Enumeration<ReqMenuDetailCatalog> getReqMenuDetailsCatalog() {
+                return Collections.enumeration(reqMenuDetailsCatalog);
+            }
+
             public String getRawXmlText() {
                 return rawXmlText;
             }
 
             @Override
             public String toString() {
-                return "Item{" + "date=" + date + ", reqMenuDetails=" + reqMenuDetails + '}';
+                return "Item{" +
+                        "date=" + date +
+                        ", reqMenuDetails=" + reqMenuDetails +
+                        ", reqMenuDetailsCatalog=" + reqMenuDetailsCatalog +
+                        '}';
             }
+
         }
 
         public static class Builder {

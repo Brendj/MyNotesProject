@@ -62,3 +62,31 @@ ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idofclientgroup SET NULL;
 
 ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount SET NULL;
 
+-- Column: idofitem
+
+-- ALTER TABLE cf_complexinfodetail DROP COLUMN idofitem;
+
+ALTER TABLE cf_complexinfodetail ADD COLUMN idofitem bigint;
+
+-- Table: cf_menudetails_catalog
+
+-- DROP TABLE cf_menudetails_catalog;
+
+CREATE TABLE cf_menudetails_catalog
+(
+  idofmenudetailscatalog bigserial NOT NULL,
+  name character varying(90) NOT NULL,
+  idofmenu bigint NOT NULL,
+  path character varying NOT NULL,
+  localidofmenu bigint,
+  CONSTRAINT cf_menudetails_catalog_pk PRIMARY KEY (idofmenudetailscatalog ),
+  CONSTRAINT cf_menudetails_catalog_idofmenu_fk FOREIGN KEY (idofmenu)
+      REFERENCES cf_menu (idofmenu) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE cf_menudetails_catalog
+  OWNER TO postgres;
+

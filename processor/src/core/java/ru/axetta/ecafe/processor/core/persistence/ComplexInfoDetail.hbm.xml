@@ -20,5 +20,6 @@
         <many-to-one name="menuDetail" class="ru.axetta.ecafe.processor.core.persistence.MenuDetail" column="IdOfMenuDetail"
                      not-null="true" lazy="proxy"
                      update="false"/>
+        <property name="idOfItem" column="IdOfItem" type="long" update="true" />
     </class>
 </hibernate-mapping>

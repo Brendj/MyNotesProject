@@ -16,6 +16,7 @@ public class ComplexInfoDetail {
     private Long idOfComplexInfoDetail;
     private ComplexInfo complexInfo;
     private MenuDetail menuDetail;
+    private Long idOfItem;
 
     protected ComplexInfoDetail() {
 
@@ -48,6 +49,14 @@ public class ComplexInfoDetail {
 
     public void setIdOfComplexInfoDetail(Long idOfComplexInfoDetail) {
         this.idOfComplexInfoDetail = idOfComplexInfoDetail;
+    }
+
+    public Long getIdOfItem() {
+        return idOfItem;
+    }
+
+    public void setIdOfItem(Long idOfItem) {
+        this.idOfItem = idOfItem;
     }
 
     @Override

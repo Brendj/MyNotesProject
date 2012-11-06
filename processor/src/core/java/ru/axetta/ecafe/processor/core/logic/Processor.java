@@ -1385,6 +1385,7 @@ public class Processor implements SyncProcessor,
                     processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
                     processReqMenuDetails(persistenceSession, organization, menuDate, menu, item,
                             item.getReqMenuDetails());
+                    processReqMenuDetailsCatalog(persistenceSession, menu, item.getReqMenuDetailsCatalog());
                     processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos());
                     bFirstMenuItem = false;
                 }
@@ -1444,6 +1445,10 @@ public class Processor implements SyncProcessor,
                                     .getReqMenuDetail().getIdOfMenu());
                 }
                 ComplexInfoDetail complexInfoDetail = new ComplexInfoDetail(complexInfo, menuDetail);
+                Long idOfItem = reqComplexInfoDetail.getIdOfItem();
+                if (idOfItem != null) {
+                    complexInfoDetail.setIdOfItem(idOfItem);
+                }
                 persistenceSession.save(complexInfoDetail);
             }
         }
@@ -1501,6 +1506,24 @@ public class Processor implements SyncProcessor,
         for (MenuDetail menuDetail : superfluousMenuDetails) {
             menu.removeMenuDetail(menuDetail);
             persistenceSession.delete(menuDetail);
+        }
+
+        // TODO Нужно сделать что-то со структурой Menu. Например, наследовать MenuDetail
+        // TODO от MenuDetailCatalog
+
+    }
+
+    private void processReqMenuDetailsCatalog(Session persistenceSession, Menu menu, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetailCatalog> reqMenuDetailsCatalog)
+            throws Exception {
+        while (reqMenuDetailsCatalog.hasMoreElements()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetailCatalog reqMenuDetailCatalog = reqMenuDetailsCatalog.nextElement();
+            if (null == DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetailCatalog.getIdOfMenu())) {
+                MenuDetailCatalog menuDetailCatalog = new MenuDetailCatalog(menu, reqMenuDetailCatalog.getName(),
+                        reqMenuDetailCatalog.getPath());
+                menuDetailCatalog.setLocalIdOfMenu(reqMenuDetailCatalog.getIdOfMenu());
+
+                persistenceSession.save(menuDetailCatalog);
+            }
         }
 
     }
