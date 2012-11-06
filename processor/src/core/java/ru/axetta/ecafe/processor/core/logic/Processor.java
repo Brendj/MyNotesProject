@@ -1402,12 +1402,35 @@ public class Processor implements SyncProcessor,
     private void processReqComplexInfos(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos) throws Exception {
         DAOUtils.deleteComplexInfoForDate(persistenceSession, organization, menuDate);
+
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
             ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
                     reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
                     reqComplexInfo.getComplexMenuName());
             if (reqComplexInfo.getUseTrDiscount() != -1) {
                 complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
+            }
+            SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail =
+                    reqComplexInfo.getComplexInfoDiscountDetail();
+            if (reqComplexInfoDiscountDetail != null) {
+                double size = reqComplexInfoDiscountDetail.getSize();
+                int isAllGroups = reqComplexInfoDiscountDetail.getIsAllGroups();
+                int maxCount = reqComplexInfoDiscountDetail.getMaxCount();
+                long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
+                ComplexInfoDiscountDetail complexInfoDiscountDetail = new ComplexInfoDiscountDetail(size, isAllGroups);
+                if (idOfClientGroup != -1) {
+                    CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(), idOfClientGroup);
+                    ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
+                    complexInfoDiscountDetail.setClientGroup(clientGroup);
+                    complexInfoDiscountDetail.setOrg(clientGroup.getOrg());
+                }
+                if (maxCount != -1) {
+                    complexInfoDiscountDetail.setMaxCount(maxCount);
+                }
+
+                persistenceSession.save(complexInfoDiscountDetail);
+
+                complexInfo.setDiscountDetail(complexInfoDiscountDetail);
             }
             persistenceSession.save(complexInfo);
 
@@ -1422,23 +1445,6 @@ public class Processor implements SyncProcessor,
                 }
                 ComplexInfoDetail complexInfoDetail = new ComplexInfoDetail(complexInfo, menuDetail);
                 persistenceSession.save(complexInfoDetail);
-            }
-
-            if (reqComplexInfo.getComplexInfoDiscountDetails() != null) {
-                for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail : reqComplexInfo.getComplexInfoDiscountDetails()) {
-                    double size = reqComplexInfoDiscountDetail.getSize();
-                    int isAllGroups = reqComplexInfoDiscountDetail.getIsAllGroups();
-                    int maxCount = reqComplexInfoDiscountDetail.getMaxCount();
-                    long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
-                    ComplexInfoDiscountDetail complexInfoDiscountDetail = new ComplexInfoDiscountDetail(size, isAllGroups, maxCount, organization);
-                    if (idOfClientGroup != -1) {
-                        CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(), idOfClientGroup);
-                        ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
-                        complexInfoDiscountDetail.setClientGroup(clientGroup);
-                    }
-
-                    persistenceSession.save(complexInfoDiscountDetail);
-                }
             }
         }
     }

@@ -19,11 +19,9 @@ public class ComplexInfoDiscountDetail {
 
     }
 
-    public ComplexInfoDiscountDetail(Double size, int allGroups, int maxCount, Org org) {
+    public ComplexInfoDiscountDetail(Double size, int allGroups) {
         this.size = size;
         isAllGroups = allGroups;
-        this.maxCount = maxCount;
-        this.org = org;
     }
 
     public Long getIdOfDiscountDetail() {

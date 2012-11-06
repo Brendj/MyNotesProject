@@ -837,25 +837,45 @@ public class SyncRequest {
 
                         public ReqComplexInfoDiscountDetail build(Node itemNode) throws Exception {
                             NamedNodeMap namedNodeMap = itemNode.getAttributes();
+                            // Выбор вызываемого конструктора
+                            // если есть оба атрибута id группы клиентов и макс.кол-ва применений - 0
+                            //      есть только id группы клиентов - 1
+                            //      есть только макс.кол-во применений - 2
+                            //      нет данных атрибутов - 3
+                            int constructMode = 3;
 
-                            double size = Double.parseDouble(namedNodeMap.getNamedItem("Size").getTextContent());
-                            int isAllGroups = getIntValue(namedNodeMap, "IsAllGroups");
-                            int maxCount = getIntValue(namedNodeMap, "MaxCount");
+                            Double size = ReqMenuDetail.Builder.getDoubleValue(namedNodeMap, "Size");
+                            Integer isAllGroups = getIntValue(namedNodeMap, "IsAllGroups");
+                            Node maxCountNode = namedNodeMap.getNamedItem("MaxCount");
+                            int maxCount = -1;
+                            if (maxCountNode != null) {
+                                constructMode = 2;
+                                maxCount = getIntValue(namedNodeMap, "MaxCount");
+                            }
                             Node idOfClientGroupNode = namedNodeMap.getNamedItem("IdOfClientGroup");
+                            long idOfClientGroup = -1;
                             if (idOfClientGroupNode != null) {
-                                long idOfClientGroup = getLongValue(namedNodeMap, "IdOfClientGroup");
-                                return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount, idOfClientGroup);
-                            } else {
-                                return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount);
+                                if (constructMode == 2) {
+                                    constructMode = 0;
+                                } else {
+                                    constructMode = 1;
+                                }
+                                idOfClientGroup = getLongValue(namedNodeMap, "IdOfClientGroup");
+                            }
+                            switch (constructMode) {
+                                case 0: return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount, idOfClientGroup);
+                                case 1: return new ReqComplexInfoDiscountDetail(size, isAllGroups, idOfClientGroup);
+                                case 2: return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount);
+                                default:return new ReqComplexInfoDiscountDetail(size, isAllGroups);
                             }
                         }
 
                     }
 
-                    double size;
-                    int isAllGroups;
-                    int maxCount;
-                    long idOfClientGroup = -1;
+                    private final double size;
+                    private final int isAllGroups;
+                    private int maxCount = -1;
+                    private long idOfClientGroup = -1;
 
                     public ReqComplexInfoDiscountDetail(double size, int allGroups, int maxCount,
                             long idOfClientGroup) {
@@ -865,10 +885,21 @@ public class SyncRequest {
                         this.idOfClientGroup = idOfClientGroup;
                     }
 
+                    public ReqComplexInfoDiscountDetail(double size, int allGroups, long idOfClientGroup) {;
+                        this.size = size;
+                        isAllGroups = allGroups;
+                        this.idOfClientGroup = idOfClientGroup;
+                    }
+
                     public ReqComplexInfoDiscountDetail(double size, int allGroups, int maxCount) {
                         this.size = size;
                         isAllGroups = allGroups;
                         this.maxCount = maxCount;
+                    }
+
+                    public ReqComplexInfoDiscountDetail(double size, int allGroups) {
+                        this.size = size;
+                        isAllGroups = allGroups;
                     }
 
                     public double getSize() {
@@ -918,7 +949,7 @@ public class SyncRequest {
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
                         Node useTrDiscountNode = namedNodeMap.getNamedItem("UseTrDiscount");
-                        int useTrDiscount = 0;
+                        int useTrDiscount = -1;
                         if (useTrDiscountNode != null) {
                             constructMode = 1;
                             useTrDiscount = Integer.parseInt(useTrDiscountNode.getTextContent());
@@ -927,7 +958,7 @@ public class SyncRequest {
                         ReqComplexInfoDetail.Builder reqComplexInfoDetailBuilder = new ReqComplexInfoDetail.Builder();
                         LinkedList<ReqComplexInfoDetail> reqComplexInfoDetailLinkedList = new LinkedList<ReqComplexInfoDetail>();
                         ReqComplexInfoDiscountDetail.Builder reqComplexInfoDiscountDetailBuilder = new ReqComplexInfoDiscountDetail.Builder();
-                        LinkedList<ReqComplexInfoDiscountDetail> reqComplexInfoDiscountDetailLinkedList = new LinkedList<ReqComplexInfoDiscountDetail>();
+                        ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail = null;
                         while (null != childNode) {
                             if (Node.ELEMENT_NODE == childNode.getNodeType()) {
                                 if (childNode.getNodeName().equals("CMI")) {
@@ -935,16 +966,17 @@ public class SyncRequest {
                                             .build(childNode, reqMenuDetailMap);
                                     reqComplexInfoDetailLinkedList.add(reqComplexInfoDetail);
                                 } else if (childNode.getNodeName().equals("TRD")) {
-                                    constructMode = 2;
-                                    ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail = reqComplexInfoDiscountDetailBuilder.build(childNode);
-                                    reqComplexInfoDiscountDetailLinkedList.add(reqComplexInfoDiscountDetail);
+                                    if (constructMode != 2) {
+                                        constructMode = 2;
+                                        reqComplexInfoDiscountDetail = reqComplexInfoDiscountDetailBuilder.build(childNode);
+                                    }
                                 }
                             }
                             childNode = childNode.getNextSibling();
                         }
                         switch (constructMode) {
                             case 2: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqComplexInfoDiscountDetailLinkedList);
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqComplexInfoDiscountDetail);
                             case 1: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
                                     reqComplexInfoDetailLinkedList, useTrDiscount);
                             default:return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
@@ -961,7 +993,7 @@ public class SyncRequest {
                 private final int modeOfAdd;
                 private int useTrDiscount = -1;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
-                private List<ReqComplexInfoDiscountDetail> complexInfoDiscountDetails = null;
+                private ReqComplexInfoDiscountDetail complexInfoDiscountDetail = null;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         List<ReqComplexInfoDetail> complexInfoDetails) {
@@ -986,7 +1018,7 @@ public class SyncRequest {
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount,
-                        List<ReqComplexInfoDiscountDetail> complexInfoDiscountDetails) {
+                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -994,7 +1026,7 @@ public class SyncRequest {
                     this.modeOfAdd = modeOfAdd;
                     this.complexInfoDetails = complexInfoDetails;
                     this.useTrDiscount = useTrDiscount;
-                    this.complexInfoDiscountDetails = complexInfoDiscountDetails;
+                    this.complexInfoDiscountDetail = complexInfoDiscountDetail;
                 }
 
                 public int getComplexId() {
@@ -1025,8 +1057,8 @@ public class SyncRequest {
                     return complexInfoDetails;
                 }
 
-                public List<ReqComplexInfoDiscountDetail> getComplexInfoDiscountDetails() {
-                    return complexInfoDiscountDetails;
+                public ReqComplexInfoDiscountDetail getComplexInfoDiscountDetail() {
+                    return complexInfoDiscountDetail;
                 }
 
             }

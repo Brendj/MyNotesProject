@@ -55,3 +55,10 @@ ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idoforg SET NULL;
 -- ALTER TABLE cf_complexinfo_discountdetail DROP COLUMN idofclientgroup;
 --idofclientgroup id группы клиентов
 ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idofclientgroup SET NULL;
+
+-- Column: maxcount
+
+-- ALTER TABLE cf_complexinfo_discountdetail DROP COLUMN maxcount;
+
+ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount SET NULL;
+
