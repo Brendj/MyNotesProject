@@ -21,6 +21,10 @@ public class MenuDetailCatalog {
     private String path;
     private Long localIdOfMenu;
 
+    MenuDetailCatalog() {
+        // For Hibernate only
+    }
+
     public MenuDetailCatalog(Menu menu, String name, String path) {
         this.menu = menu;
         this.name = name;

@@ -19,6 +19,7 @@ public class ComplexInfo {
     private String complexName;
     private Date menuDate;
     private ComplexInfoDiscountDetail discountDetail;
+    private MenuDetail menuDetail;
 
     public Date getMenuDate() {
         return menuDate;
@@ -113,6 +114,14 @@ public class ComplexInfo {
 
     public void setIdOfComplexInfo(Long idOfComplexInfo) {
         this.idOfComplexInfo = idOfComplexInfo;
+    }
+
+    public MenuDetail getMenuDetail() {
+        return menuDetail;
+    }
+
+    public void setMenuDetail(MenuDetail menuDetail) {
+        this.menuDetail = menuDetail;
     }
 
     @Override

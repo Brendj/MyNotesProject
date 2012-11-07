@@ -48,19 +48,19 @@ ALTER TABLE cf_complexinfo ADD COLUMN idofdiscountdetail bigint;
 
 -- ALTER TABLE cf_complexinfo_discountdetail DROP COLUMN idoforg;
 --idoforg id организации (нужен только для создания foreign key на cf_clientgroups)
-ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idoforg SET NULL;
+ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idoforg DROP NOT NULL;
 
 -- Column: idofclientgroup
 
 -- ALTER TABLE cf_complexinfo_discountdetail DROP COLUMN idofclientgroup;
 --idofclientgroup id группы клиентов
-ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idofclientgroup SET NULL;
+ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN idofclientgroup DROP NOT NULL;
 
 -- Column: maxcount
 
 -- ALTER TABLE cf_complexinfo_discountdetail DROP COLUMN maxcount;
 
-ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount SET NULL;
+ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount DROP  NOT NULL;
 
 -- Column: idofitem
 
@@ -89,4 +89,15 @@ WITH (
 );
 ALTER TABLE cf_menudetails_catalog
   OWNER TO postgres;
+
+-- Column: idofmenudetail
+
+-- ALTER TABLE cf_complexinfo DROP COLUMN idofmenudetail;
+
+ALTER TABLE cf_complexinfo ADD COLUMN idofmenudetail bigint;
+
+-- New FK to cf_menudetail
+ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofmenudetail_fk FOREIGN KEY (idofmenudetail)
+      REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
 

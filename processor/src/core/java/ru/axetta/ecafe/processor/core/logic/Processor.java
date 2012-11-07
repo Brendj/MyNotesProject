@@ -1356,7 +1356,7 @@ public class Processor implements SyncProcessor,
                 boolean bOrgIsMenuExchangeSource = isOrgMenuExchangeSource(persistenceSession, idOfOrg);
 
                 /// сохраняем секцию Settings
-                if (bOrgIsMenuExchangeSource && reqMenu.getSettingsSectionRawXML() != null) {
+                if (bOrgIsMenuExchangeSource && (reqMenu.getSettingsSectionRawXML() != null)) {
                     MenuExchange menuExchangeSettings = new MenuExchange(new Date(0), idOfOrg,
                             reqMenu.getSettingsSectionRawXML(), MenuExchange.FLAG_SETTINGS);
                     persistenceSession.saveOrUpdate(menuExchangeSettings);
@@ -1411,6 +1411,15 @@ public class Processor implements SyncProcessor,
             if (reqComplexInfo.getUseTrDiscount() != -1) {
                 complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
             }
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
+            if (reqMenuDetail != null) {
+                MenuDetail menuDetailOptional = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
+                        reqComplexInfo.getReqMenuDetail().getIdOfMenu());
+                if (menuDetailOptional != null) {
+                    complexInfo.setMenuDetail(menuDetailOptional);
+                }
+            }
+
             SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail =
                     reqComplexInfo.getComplexInfoDiscountDetail();
             if (reqComplexInfoDiscountDetail != null) {
@@ -1508,9 +1517,6 @@ public class Processor implements SyncProcessor,
             persistenceSession.delete(menuDetail);
         }
 
-        // TODO Нужно сделать что-то со структурой Menu. Например, наследовать MenuDetail
-        // TODO от MenuDetailCatalog
-
     }
 
     private void processReqMenuDetailsCatalog(Session persistenceSession, Menu menu, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetailCatalog> reqMenuDetailsCatalog)
@@ -1523,6 +1529,7 @@ public class Processor implements SyncProcessor,
                 menuDetailCatalog.setLocalIdOfMenu(reqMenuDetailCatalog.getIdOfMenu());
 
                 persistenceSession.save(menuDetailCatalog);
+                menu.addMenuDetailCatalog(menuDetailCatalog);
             }
         }
 

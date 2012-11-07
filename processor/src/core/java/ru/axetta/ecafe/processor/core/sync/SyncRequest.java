@@ -979,6 +979,11 @@ public class SyncRequest {
                             constructMode = 1;
                             useTrDiscount = Integer.parseInt(useTrDiscountNode.getTextContent());
                         }
+                        ReqMenuDetail reqMenuDetail = null;
+                        if (namedNodeMap.getNamedItem("refIdOfMenu") != null) {
+                            long refIdOfMenu = Long.parseLong(namedNodeMap.getNamedItem("refIdOfMenu").getTextContent());
+                            reqMenuDetail = reqMenuDetailMap.get(refIdOfMenu);
+                        }
                         Node childNode = node.getFirstChild();
                         ReqComplexInfoDetail.Builder reqComplexInfoDetailBuilder = new ReqComplexInfoDetail.Builder();
                         LinkedList<ReqComplexInfoDetail> reqComplexInfoDetailLinkedList = new LinkedList<ReqComplexInfoDetail>();
@@ -1001,11 +1006,11 @@ public class SyncRequest {
                         }
                         switch (constructMode) {
                             case 2: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqComplexInfoDiscountDetail);
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail);
                             case 1: return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount);
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail);
                             default:return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList);
+                                    reqComplexInfoDetailLinkedList, reqMenuDetail);
                         }
                     }
 
@@ -1017,21 +1022,23 @@ public class SyncRequest {
                 private final int modeGrant;
                 private final int modeOfAdd;
                 private int useTrDiscount = -1;
+                private ReqMenuDetail reqMenuDetail;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
                 private ReqComplexInfoDiscountDetail complexInfoDiscountDetail = null;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
-                        List<ReqComplexInfoDetail> complexInfoDetails) {
+                        List<ReqComplexInfoDetail> complexInfoDetails, ReqMenuDetail reqMenuDetail) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
                     this.modeGrant = modeGrant;
                     this.modeOfAdd = modeOfAdd;
                     this.complexInfoDetails = complexInfoDetails;
+                    this.reqMenuDetail = reqMenuDetail;
                 }
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
-                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount) {
+                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount, ReqMenuDetail reqMenuDetail) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -1039,10 +1046,11 @@ public class SyncRequest {
                     this.modeOfAdd = modeOfAdd;
                     this.complexInfoDetails = complexInfoDetails;
                     this.useTrDiscount = useTrDiscount;
+                    this.reqMenuDetail = reqMenuDetail;
                 }
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
-                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount,
+                        List<ReqComplexInfoDetail> complexInfoDetails, int useTrDiscount, ReqMenuDetail reqMenuDetail,
                         ReqComplexInfoDiscountDetail complexInfoDiscountDetail) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
@@ -1052,6 +1060,7 @@ public class SyncRequest {
                     this.complexInfoDetails = complexInfoDetails;
                     this.useTrDiscount = useTrDiscount;
                     this.complexInfoDiscountDetail = complexInfoDiscountDetail;
+                    this.reqMenuDetail = reqMenuDetail;
                 }
 
                 public int getComplexId() {
@@ -1076,6 +1085,10 @@ public class SyncRequest {
 
                 public int getUseTrDiscount() {
                     return useTrDiscount;
+                }
+
+                public ReqMenuDetail getReqMenuDetail() {
+                    return reqMenuDetail;
                 }
 
                 public List<ReqComplexInfoDetail> getComplexInfoDetails() {

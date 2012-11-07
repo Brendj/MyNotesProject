@@ -356,7 +356,8 @@ public class DAOUtils {
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("nullDate", new Date(0));
-        return (List<MenuExchange>)query.list();
+        List<MenuExchange> mEList = (List<MenuExchange>)query.list();
+        return mEList;
         //Criteria criteria = persistenceSession.createCriteria(MenuExchange.class);
         //criteria.add(Restrictions.eq("compositeIdOfMenuExchange.idOfOrg", idOfSourceOrg));
         //criteria.add(Restrictions.ge("compositeIdOfMenuExchange.menuDate", startDate));
@@ -373,7 +374,8 @@ public class DAOUtils {
         query.setMaxResults(1);
         List l=query.list();
         if (l.isEmpty()) return null;
-        return (MenuExchange)l.get(0);
+        MenuExchange mE = (MenuExchange)l.get(0);
+        return mE;
     }
 
     public static void updateMenuExchangeLink(Session persistenceSession, Long idOfSourceOrg, Long idOfDestOrg) {

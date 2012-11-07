@@ -28,6 +28,7 @@ public class Menu {
     private Date createTime;
     private Integer menuSource;
     private Set<MenuDetail> menuDetails = new HashSet<MenuDetail>();
+    private Set<MenuDetailCatalog> menuDetailsCatalog = new HashSet<MenuDetailCatalog>();
     private int flags;
 
     public int getFlags() {
@@ -115,6 +116,28 @@ public class Menu {
 
     public void removeMenuDetail(MenuDetail menuDetail) {
         getMenuDetailsInternal().remove(menuDetail);
+    }
+
+    private Set<MenuDetailCatalog> getMenuDetailsCatalogInternal() {
+        // For Hibernate only
+        return menuDetailsCatalog;
+    }
+
+    private void setMenuDetailsCatalogInternal(Set<MenuDetailCatalog> menuDetailsCatalog) {
+        // For Hibernate only
+        this.menuDetailsCatalog = menuDetailsCatalog;
+    }
+
+    public Set<MenuDetailCatalog> getMenuDetailsCatalog() {
+        return Collections.unmodifiableSet(getMenuDetailsCatalogInternal());
+    }
+
+    public void addMenuDetailCatalog(MenuDetailCatalog menuDetailCatalog) {
+        getMenuDetailsCatalogInternal().add(menuDetailCatalog);
+    }
+
+    public void removeMenuDetailCatalog(MenuDetailCatalog menuDetailCatalog) {
+        getMenuDetailsCatalogInternal().remove(menuDetailCatalog);
     }
 
     @Override

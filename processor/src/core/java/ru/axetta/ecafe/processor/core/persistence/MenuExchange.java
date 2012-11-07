@@ -18,7 +18,7 @@ import java.util.Date;
 public class MenuExchange {
     public final static int FLAG_NONE=0, FLAG_ANCHOR_MENU=1, FLAG_SETTINGS=2;
 
-    final static int MAX_MENU_DATA_LENGTH = 59650;
+    final static int MAX_MENU_DATA_LENGTH = 1000000;
 
     private CompositeIdOfMenuExchange compositeIdOfMenuExchange;
     private String menuData;
@@ -36,7 +36,7 @@ public class MenuExchange {
         // For Hibernate only
     }
     final static char COMPRESS_MARKER='@';
-    final static int MIN_LENGTH_FOR_COMPRESSION = 10*1024;
+    final static int MIN_LENGTH_FOR_COMPRESSION = 50 * 1024;
 
     public MenuExchange(Date menuDate, Long idOfOrg, String menuData, int flags) throws Exception {
         compositeIdOfMenuExchange = new CompositeIdOfMenuExchange(menuDate, idOfOrg);
