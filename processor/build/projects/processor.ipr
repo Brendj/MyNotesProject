@@ -91,6 +91,7 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
             <element id="library" level="project" name="barcode4j" />
+            <element id="library" level="project" name="axetta_charset" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -139,6 +140,15 @@
       <output-path>$PROJECT_DIR$/../../target/out/artifacts/client_room_war</output-path>
       <root id="archive" name="client-room_war.war">
         <element id="artifact" artifact-name="client-room:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="jar" name="axetta_smpp">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/axetta_smpp</output-path>
+      <root id="archive" name="axetta_smpp.jar">
+        <element id="module-output" name="smpp" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/smpp/java/META-INF/MANIFEST.MF" />
+        </element>
       </root>
     </artifact>
   </component>
@@ -422,6 +432,7 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
       <entry name="*.sql" />
+      <entry name="*.CharsetProvider" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
@@ -888,6 +899,7 @@
       <module fileurl="file://$PROJECT_DIR$/j2ee.iml" filepath="$PROJECT_DIR$/j2ee.iml" />
       <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smpp/smpp.iml" filepath="$PROJECT_DIR$/smpp/smpp.iml" />
       <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/util.iml" filepath="$PROJECT_DIR$/util.iml" />
       <module fileurl="file://$PROJECT_DIR$/web.iml" filepath="$PROJECT_DIR$/web.iml" />
@@ -1072,6 +1084,16 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
+    <library name="axetta_charset">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/myOTA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/opentoolsutil.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../target/out/artifacts/axetta_smpp/axetta_smpp.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="barcode4j">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/barcode/javase.jar!/" />

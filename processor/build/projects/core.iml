@@ -373,6 +373,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="axetta_charset" level="project" />
   </component>
 </module>
 
