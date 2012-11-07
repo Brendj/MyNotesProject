@@ -370,6 +370,25 @@ public class Processor implements SyncProcessor,
                     bError=true;
                 }
 
+                // Process paymentRegistry
+                try {
+                    if(request.getPaymentRegistry()!=null){
+                        if(request.getPaymentRegistry().getPayments() !=null){
+                            if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+                                if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                                    throw new Exception("no license slots available");
+                                }
+                            }
+                            resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
+                                    request.getPaymentRegistry());
+                        }
+                    }
+                } catch (Exception e){
+                    logger.error(
+                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
+                }
+
                 // Process enterEvents
                 try {
                     if (request.getEnterEvents() != null) {
