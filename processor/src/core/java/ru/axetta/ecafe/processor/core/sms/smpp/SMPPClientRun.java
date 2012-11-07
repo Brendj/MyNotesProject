@@ -42,7 +42,7 @@ public class SMPPClientRun extends ISmsService {
 
     @Override
     public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
-        String s = new String(new byte[10],"x-hex");
+       // String s = new String(new byte[10],"x-hex");
         int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
         if (err != 0) {
             logger.error("connecting error");
@@ -51,6 +51,7 @@ public class SMPPClientRun extends ISmsService {
         }
         logger.info("start sending: " + text);
         long destination = Long.parseLong(phoneNumber);
+
         SendResult sr = client.send(text, destination);
         if (sr.err != 0) {
             logger.error("sending error");
@@ -73,7 +74,6 @@ public class SMPPClientRun extends ISmsService {
     public SMPPClientRun(Config config, Properties properties, String PATH) {
         super(config);
         PATH = ".smpp.";
-        Client.setLowLevelDebugToFile("C:\\path","smpp.log");
         client = new Client(new SMPPListener(), "CMD Processor");
         client.ussd_mapping = USSD_MAPPINGS.NOWSMS_SCHEME_ITS;
         smscIPAddress = properties.getProperty(PATH+"ip-address", "127.0.0.1");
