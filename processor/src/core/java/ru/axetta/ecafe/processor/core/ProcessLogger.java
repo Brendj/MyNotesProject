@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
+import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -28,20 +29,56 @@ import java.io.OutputStream;
  * Time: 15:51:14
  * To change this template use File | Settings | File Templates.
  */
-public class ProcessLogger implements SyncLogger, PaymentLogger {
+public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessLogger.class);
     private final String syncRequestLogPath;
     private final String syncResponseLogPath;
     private final String paymentRequestLogPath;
     private final String paymentResponseLogPath;
+    private final String intgeroRequestLogPath;
+    private final String intgeroResponseLogPath;
 
     public ProcessLogger(String syncRequestLogPath, String syncResponseLogPath, String paymentRequestLogPath,
-            String paymentResponseLogPath) {
+            String paymentResponseLogPath, String intgeroRequestLogPath, String intgeroResponseLogPath) {
         this.syncRequestLogPath = syncRequestLogPath;
         this.syncResponseLogPath = syncResponseLogPath;
         this.paymentRequestLogPath = paymentRequestLogPath;
         this.paymentResponseLogPath = paymentResponseLogPath;
+        this.intgeroRequestLogPath = intgeroRequestLogPath;
+        this.intgeroResponseLogPath = intgeroResponseLogPath;
+    }
+
+    @Override
+    public void registerIntegroRequest(Document requestDocument, long idOfOrg) {
+        try {
+            File file = createFile(intgeroRequestLogPath, idOfOrg, "--", "in");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            try {
+                writeDocument(requestDocument, outputStream);
+            } finally {
+                close(outputStream);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to save intgero request, idOfOrg == %s", idOfOrg),
+                    e);
+        }
+    }
+
+    @Override
+    public void registerIntegroResponse(Document responseDocument, long idOfOrg) {
+        try {
+            File file = createFile(intgeroResponseLogPath, idOfOrg, "--", "out");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            try {
+                writeDocument(responseDocument, outputStream);
+            } finally {
+                close(outputStream);
+            }
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to save intgero response, idOfOrg == %s", idOfOrg), e);
+        }
     }
 
     public void registerSyncRequest(Document requestDocument, long idOfOrg, String idOfSync) {

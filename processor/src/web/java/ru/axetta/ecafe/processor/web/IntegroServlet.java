@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -78,6 +79,9 @@ public class IntegroServlet extends HttpServlet {
             }
 
             logger.info(String.format("Starting synchronization with %s", request.getRemoteAddr()));
+
+            IntegroLogger integroLogger = runtimeContext.getIntegroLogger();
+            Org org = null;
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
             DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -113,12 +117,14 @@ public class IntegroServlet extends HttpServlet {
                 Long idOfOrg=Long.parseLong(idOfOrgAttribute.getTextContent());
 
                 DAOService daoService=DAOService.getInstance();
-                Org org=daoService.getOrg(idOfOrg);
+                org=daoService.getOrg(idOfOrg);
                 if(null==org){
                     throw new Exception("cannot find org with this id");
 
                 }
 
+                // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
+                integroLogger.registerIntegroRequest(requestData.document, org.getIdOfOrg());
 
                 Node roNode = dataNode.getFirstChild();
                 roNode=roNode.getNextSibling();
@@ -164,6 +170,7 @@ public class IntegroServlet extends HttpServlet {
             }
             // Send XML response
             try {
+                integroLogger.registerIntegroResponse(responseDocument, org.getIdOfOrg());
                 writeResponse(response, true, responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);

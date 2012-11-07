@@ -35,9 +35,11 @@ import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.altarix.AltarixSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
+import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClientRun;
 import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
+import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.updater.DBUpdater;
 import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -136,6 +138,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private SyncLogger syncLogger;
     private PaymentLogger paymentLogger;
     private PaymentProcessor paymentProcessor;
+    private IntegroLogger integroLogger;
     private Processor processor;
 
 
@@ -232,6 +235,14 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public SyncLogger getSyncLogger() {
         return syncLogger;
+    }
+
+    public IntegroLogger getIntegroLogger() {
+        return integroLogger;
+    }
+
+    public void setIntegroLogger(IntegroLogger integroLogger) {
+        this.integroLogger = integroLogger;
     }
 
     public PrivateKey getSyncPrivateKey() {
@@ -440,6 +451,7 @@ public class RuntimeContext implements ApplicationContextAware {
             processLogger = createProcessLogger(basePath, properties);
             this.syncLogger = processLogger;
             this.paymentLogger = processLogger;
+            this.integroLogger = processLogger;
 
             eventNotificator = createEventNotificator(properties, executorService, sessionFactory, ruleProcessor);
 
@@ -678,8 +690,12 @@ public class RuntimeContext implements ApplicationContextAware {
                 properties.getProperty(PROCESSOR_PARAM_BASE + ".client.payment.in.log.path"));
         String paymentResponsePath = restoreFilename(basePath,
                 properties.getProperty(PROCESSOR_PARAM_BASE + ".client.payment.out.log.path"));
+        String intgeroRequestLogPath = restoreFilename(basePath,
+                properties.getProperty(PROCESSOR_PARAM_BASE + ".org.intgero.in.log.path"));
+        String intgeroResponseLogPath = restoreFilename(basePath,
+                properties.getProperty(PROCESSOR_PARAM_BASE + ".org.intgero.out.log.path"));
         ProcessLogger processLogger = new ProcessLogger(syncRequsetPath, syncResponsePath, paymentRequsetPath,
-                paymentResponsePath);
+                paymentResponsePath, intgeroRequestLogPath, intgeroResponseLogPath);
         if (logger.isDebugEnabled()) {
             logger.debug("Process logger created.");
         }
@@ -904,7 +920,8 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = new TeralectSmsServiceImpl(config);
         } else if(serviceType.equalsIgnoreCase("altarix")){
             smsService = new AltarixSmsServiceImpl(config,userServiceId);
-
+        } else if(serviceType.equalsIgnoreCase("smpp")){
+            smsService = new SMPPClientRun(config,properties,SMS_SERVICE_PARAM_BASE);
         }else {
             throw new Exception("Invalid SMS service type: "+serviceType);
         }
