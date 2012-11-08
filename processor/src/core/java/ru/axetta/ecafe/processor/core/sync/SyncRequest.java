@@ -1151,15 +1151,21 @@ public class SyncRequest {
                             availableNow = Integer.parseInt(availableNowStr);
                         }
 
-                        String flagsStr = getTextContent(namedNodeMap.getNamedItem("Flags"));
                         int flags = 1;
-                        if (flagsStr != null) {
-                            flags = Integer.parseInt(flagsStr);
+                        Node flagsNode = namedNodeMap.getNamedItem("Flags");
+                        if (flagsNode != null) {
+                            String flagsStr = getTextContent(flagsNode);
+                            if (flagsStr != null) {
+                                flags = Integer.parseInt(flagsStr);
+                            }
                         }
-                        String priorityStr = getTextContent(namedNodeMap.getNamedItem("Priority"));
                         int priority = 0;
-                        if (priorityStr != null) {
-                            priority = Integer.parseInt(priorityStr);
+                        Node priorityNode = namedNodeMap.getNamedItem("Priority");
+                        if (priceNode != null) {
+                            String priorityStr = getTextContent(priorityNode);
+                            if (priorityStr != null) {
+                                priority = Integer.parseInt(priorityStr);
+                            }
                         }
 
                         Double protein = getDoubleValue(namedNodeMap, "Protein");
@@ -1229,8 +1235,8 @@ public class SyncRequest {
                 private final Double minFe;
                 private final int menuOrigin;
                 private final int availableNow;
-                private final int flags;
-                private final int priority;
+                private int flags = 1;
+                private int priority = 0;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, long price,
                         int menuOrigin, int availableNow, int flags, int priority, Double protein, Double fat,
