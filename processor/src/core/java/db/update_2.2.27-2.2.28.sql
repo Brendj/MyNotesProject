@@ -78,3 +78,12 @@ ALTER TABLE cf_complexinfo ADD COLUMN idofmenudetail bigint;
 ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofmenudetail_fk FOREIGN KEY (idofmenudetail)
       REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+-- Changes to cf_menudetails
+ALTER TABLE cf_menudetails ALTER COLUMN menudetailoutput DROP NOT NULL;
+ALTER TABLE cf_menudetails ALTER COLUMN price DROP NOT NULL;
+ALTER TABLE cf_menudetails ADD COLUMN flags integer;
+ALTER TABLE cf_menudetails ALTER COLUMN flags SET NOT NULL;
+ALTER TABLE cf_menudetails ALTER COLUMN flags SET DEFAULT 1;
+ALTER TABLE cf_menudetails ADD COLUMN priority integer;
+ALTER TABLE cf_menudetails ALTER COLUMN priority SET DEFAULT 0;
