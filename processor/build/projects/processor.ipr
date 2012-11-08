@@ -1086,10 +1086,9 @@
   <component name="libraryTable">
     <library name="axetta_charset">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/smpp/myOTA.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/smpp/opentoolsutil.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_charset.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/smpp/smpp.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../target/out/artifacts/axetta_smpp/axetta_smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_smpp.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
