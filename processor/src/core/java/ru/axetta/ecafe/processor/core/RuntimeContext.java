@@ -35,7 +35,7 @@ import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.altarix.AltarixSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClientRun;
+import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
 import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
@@ -921,7 +921,7 @@ public class RuntimeContext implements ApplicationContextAware {
         } else if(serviceType.equalsIgnoreCase("altarix")){
             smsService = new AltarixSmsServiceImpl(config,userServiceId);
         } else if(serviceType.equalsIgnoreCase("smpp")){
-            smsService = new SMPPClientRun(config,properties,SMS_SERVICE_PARAM_BASE);
+            smsService = new SMPPClient(config,properties,SMS_SERVICE_PARAM_BASE);
         }else {
             throw new Exception("Invalid SMS service type: "+serviceType);
         }

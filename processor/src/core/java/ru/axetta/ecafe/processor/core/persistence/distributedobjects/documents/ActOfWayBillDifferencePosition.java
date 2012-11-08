@@ -29,11 +29,19 @@ public class ActOfWayBillDifferencePosition extends DistributedObject {
     public void preProcess(Session session) throws DistributedObjectException {
         //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
         Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
-        if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(g==null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_GOOD");
+            distributedObjectException.setData(guidOfG);
+            throw distributedObjectException;
+        }
         setGood(g);
         //ActOfWayBillDifference awd = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfWayBillDifference.class, guidOfAWD);
         ActOfWayBillDifference awd  = (ActOfWayBillDifference) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAWD);
-        if(awd==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(awd==null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_"+actOfWayBillDifference.getClass().getSimpleName().toUpperCase());
+            distributedObjectException.setData(guidOfG);
+            throw distributedObjectException;
+        }
         setActOfWayBillDifference(awd);
     }
 

@@ -8,6 +8,10 @@ import ru.axetta.smpp.client.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smpp.Data;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,30 +23,45 @@ import org.slf4j.LoggerFactory;
 public class SMPPListener implements Listener{
 
     private final static Logger logger = LoggerFactory.getLogger(SMPPListener.class);
+    private HashMap<String, Boolean> messageStack = new LinkedHashMap<String, Boolean>();
+
+    public HashMap<String, Boolean> getMessageStack() {
+        return messageStack;
+    }
 
     public void received(MSG message, long receiveTime, long processTime) {
         switch (message.getType()) {
             case Text:{
                 Text msg = (Text)message;
-                //System.err.println("message(coding="+msg.getDataCoding()+"): "+ Client.toStr(msg.getTextBytes()));
-                logger.error("message(coding="+msg.getDataCoding()+"): "+ Client.toStr(msg.getTextBytes()));
+                try {
+                    switch (msg.getDataCoding()) {
+                        case 0: logger.info(
+                                "message(coding=" + msg.getDataCoding() + "): " + new String(msg.getTextBytes(),
+                                        Data.ENC_GSM7BIT));break;
+                        case 8: logger.info(
+                                "message(coding=" + msg.getDataCoding() + "): " + new String(msg.getTextBytes(),
+                                        Data.ENC_UTF16_BE)); break;
+                        default: logger.info(
+                                "message(coding=" + msg.getDataCoding() + "): " + Client.toStr(msg.getTextBytes()));
+                    }
+                    messageStack.put(msg.getMsisdn(),msg.isDeliveryReport());
+                } catch (Exception ex) {
+                    logger.error("Error:", ex);
+                }
             }
             break;
             case PoR:{
                 PoR msg = (PoR)message;
-                //System.err.println("PoR message: "+ Client.toStr(msg.getBody()));
                 logger.error("PoR message: "+ Client.toStr(msg.getBody()));
             }
             break;
             case Ticket: {
                 Ticket msg = (Ticket)message;
-                //System.err.println("Ticket message: "+ Client.toStr(msg.getBody()));
                 logger.error("Ticket message: "+ Client.toStr(msg.getBody()));
             }
             break;
             case Empty: {
                 Empty msg = (Empty)message;
-                //System.err.println("Empty message (error)");
                 logger.error("Empty message (error)");
             }
             break;
@@ -51,7 +70,7 @@ public class SMPPListener implements Listener{
 
     public void error() {
         //System.err.println("aaaa!!! error!!! client disconnected");
-        logger.error("aaaa!!! error!!! client disconnected");
+        logger.error("client disconnected");
     }
 
     //private static IvParameterSpec iv = new IvParameterSpec(new byte[]{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0});
