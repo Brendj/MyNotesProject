@@ -796,7 +796,6 @@ public class SyncRequest {
         }
     }
 
-
     public static class ReqMenu {
 
         public static class Item {
@@ -1117,27 +1116,30 @@ public class SyncRequest {
                             path = "";
                         }
 
-                        String group = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Group")), 0, 60);
-                        if (StringUtils.isEmpty(group)) {
-                            String refIdOfMenuGroup = getTextContent(namedNodeMap.getNamedItem("refIdOfMG"));
+                        String group = MenuDetail.DEFAULT_GROUP_NAME;
+                        Node refIdOfMGNode = namedNodeMap.getNamedItem("refIdOfMG");
+                        if (refIdOfMGNode != null) {
+                            String refIdOfMenuGroup = getTextContent(refIdOfMGNode);
                             if (refIdOfMenuGroup != null) {
                                 group = menuGroups.findMenuGroup(Long.parseLong(refIdOfMenuGroup));
                             }
-                            if (StringUtils.isEmpty(group)) {
-                                group = MenuDetail.DEFAULT_GROUP_NAME;
-                            }
                         }
-                        String output = StringUtils
-                                .substring(getTextContent(namedNodeMap.getNamedItem("Output")), 0, 32);
-                        if (output == null) {
-                            output = "";
+                        String output = null;
+                        Node outputNode = namedNodeMap.getNamedItem("Output");
+                        if (outputNode != null) {
+                            output = StringUtils
+                                    .substring(getTextContent(outputNode), 0, 32);
                         }
                         String idOfMenuStr = getTextContent(namedNodeMap.getNamedItem("IdOfMenu"));
                         Long idOfMenu = null;
                         if (idOfMenuStr != null) {
                             idOfMenu = Long.parseLong(idOfMenuStr);
                         }
-                        long price = Long.parseLong(namedNodeMap.getNamedItem("Price").getTextContent());
+                        Long price = null;
+                        Node priceNode = namedNodeMap.getNamedItem("Price");
+                        if (priceNode != null) {
+                            price = Long.parseLong(priceNode.getTextContent());
+                        }
                         String menuOriginStr = getTextContent(namedNodeMap.getNamedItem("MenuOrigin"));
                         int menuOrigin = 0; // собственное прозводство
                         if (menuOriginStr != null) {
@@ -1148,6 +1150,18 @@ public class SyncRequest {
                         if (availableNowStr != null) {
                             availableNow = Integer.parseInt(availableNowStr);
                         }
+
+                        String flagsStr = getTextContent(namedNodeMap.getNamedItem("Flags"));
+                        int flags = 1;
+                        if (flagsStr != null) {
+                            flags = Integer.parseInt(flagsStr);
+                        }
+                        String priorityStr = getTextContent(namedNodeMap.getNamedItem("Priority"));
+                        int priority = 0;
+                        if (priorityStr != null) {
+                            priority = Integer.parseInt(priorityStr);
+                        }
+
                         Double protein = getDoubleValue(namedNodeMap, "Protein");
                         Double fat = getDoubleValue(namedNodeMap, "Fat");
                         Double carbohydrates = getDoubleValue(namedNodeMap, "Carbohydrates");
@@ -1162,8 +1176,8 @@ public class SyncRequest {
                         Double minMg = getDoubleValue(namedNodeMap, "MinMg");
                         Double minFe = getDoubleValue(namedNodeMap, "MinFe");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
-                                protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg,
-                                minFe);
+                                flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE,
+                                minCa, minP, minMg, minFe);
                     }
 
                     private static Double getMinorComponent(NamedNodeMap namedNodeMap, String name) throws Exception {
@@ -1200,7 +1214,7 @@ public class SyncRequest {
                 private final String name;
                 private final String group;
                 private final String output;
-                private final long price;
+                private final Long price;
                 private final Double protein;
                 private final Double fat;
                 private final Double carbohydrates;
@@ -1215,12 +1229,13 @@ public class SyncRequest {
                 private final Double minFe;
                 private final int menuOrigin;
                 private final int availableNow;
-
+                private final int flags;
+                private final int priority;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, long price,
-                        int menuOrigin, int availableNow, Double protein, Double fat, Double carbohydrates,
-                        Double calories, Double vitB1, Double vitC, Double vitA, Double vitE, Double minCa, Double minP,
-                        Double minMg, Double minFe) {
+                        int menuOrigin, int availableNow, int flags, int priority, Double protein, Double fat,
+                        Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
+                        Double minCa, Double minP, Double minMg, Double minFe) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1229,6 +1244,8 @@ public class SyncRequest {
                     this.price = price;
                     this.menuOrigin = menuOrigin;
                     this.availableNow = availableNow;
+                    this.flags = flags;
+                    this.priority = priority;
                     this.protein = protein;
                     this.fat = fat;
                     this.carbohydrates = carbohydrates;
@@ -1273,6 +1290,14 @@ public class SyncRequest {
 
                 public long getPrice() {
                     return price;
+                }
+
+                public int getFlags() {
+                    return flags;
+                }
+
+                public int getPriority() {
+                    return priority;
                 }
 
                 public Double getProtein() {
@@ -1330,85 +1355,9 @@ public class SyncRequest {
                             + ", protein=" + protein + ", fat=" + fat + ", carbohydrates=" + carbohydrates
                             + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitC=" + vitC + ", vitA=" + vitA
                             + ", vitE=" + vitE + ", minCa=" + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe="
-                            + minFe + ", menuOrigin=" + menuOrigin + ", availableNow=" + availableNow + '}';
+                            + minFe + ", menuOrigin=" + menuOrigin + ", availableNow=" + availableNow
+                            + ", flags=" + flags + ", priority=" + priority + '}';
                 }
-            }
-
-            public static class ReqMenuDetailCatalog {
-
-                public static class Builder {
-
-                    public ReqMenuDetailCatalog build(Node menuDetailCatalogNode, MenuGroups menuGroups) throws Exception {
-                        NamedNodeMap namedNodeMap = menuDetailCatalogNode.getAttributes();
-
-                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 90);
-
-                        String path = getTextContent(namedNodeMap.getNamedItem("Path"));
-                        if (path == null) {
-                            path = "";
-                        }
-
-                        String idOfMenuStr = getTextContent(namedNodeMap.getNamedItem("IdOfMenu"));
-                        Long idOfMenu = null;
-                        if (idOfMenuStr != null) {
-                            idOfMenu = Long.parseLong(idOfMenuStr);
-                        }
-
-                        return new ReqMenuDetailCatalog(idOfMenu, path, name);
-                    }
-
-                    private static String getTextContent(Node node) throws Exception {
-                        if (null == node) {
-                            return null;
-                        }
-                        return node.getTextContent();
-                    }
-
-                    private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
-                        Node node = namedNodeMap.getNamedItem(name);
-                        if (null == node) {
-                            return null;
-                        }
-                        String calString = node.getTextContent();
-                        if (calString.equals("")) {
-                            return null;
-                        }
-                        String replacedString = calString.replaceAll(",", ".");
-                        return Double.parseDouble(replacedString);
-                    }
-                }
-
-                private final Long idOfMenu;
-                private final String path;
-                private final String name;
-
-                public ReqMenuDetailCatalog(Long idOfMenu, String path, String name) {
-                    this.idOfMenu = idOfMenu;
-                    this.path = path;
-                    this.name = name;
-                }
-
-                public Long getIdOfMenu() {
-                    return idOfMenu;
-                }
-
-                public String getPath() {
-                    return path;
-                }
-
-                public String getName() {
-                    return name;
-                }
-
-                @Override
-                public String toString() {
-                    return "ReqMenuDetailCatalog{" +
-                            "idOfMenu=" + idOfMenu +
-                            ", path='" + path + '\'' +
-                            ", name='" + name + '\'' +
-                            '}';
-                }
-
             }
 
             public static class ReqAssortment {
@@ -1604,13 +1553,11 @@ public class SyncRequest {
             public static class Builder {
 
                 private final ReqMenuDetail.Builder reqMenuDetailBuilder;
-                private final ReqMenuDetailCatalog.Builder reqMenuDetailCatalogBuilder;
                 private final ReqComplexInfo.Builder reqComplexInfoBuilder;
                 private final ReqAssortment.Builder reqAssortmentBuilder;
 
                 public Builder() {
                     this.reqMenuDetailBuilder = new ReqMenuDetail.Builder();
-                    reqMenuDetailCatalogBuilder = new ReqMenuDetailCatalog.Builder();
                     this.reqComplexInfoBuilder = new ReqComplexInfo.Builder();
                     this.reqAssortmentBuilder = new ReqAssortment.Builder();
                 }
@@ -1621,27 +1568,14 @@ public class SyncRequest {
                     ////// process ML items (menu list)
                     List<ReqMenuDetail> reqMenuDetails = new LinkedList<ReqMenuDetail>();
                     HashMap<Long, ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, ReqMenuDetail>();
-                    List<ReqMenuDetailCatalog> reqMenuDetailsCatalog = new LinkedList<ReqMenuDetailCatalog>();
-                    HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailCatalogMap = new HashMap<Long, ReqMenuDetailCatalog>();
                     List<ReqAssortment> reqAssortments = new LinkedList<ReqAssortment>();
                     Node childNode = itemNode.getFirstChild();
                     while (null != childNode) {
                         if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("ML")) {
                             ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.menuGroups);
-                            if (reqMenuDetailCatalogMap.get(reqMenuDetail.idOfMenu) == null) {
-                                reqMenuDetails.add(reqMenuDetail);
-                                if (reqMenuDetail.idOfMenu != null) {
-                                    reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
-                                }
-                            }
-                        } else if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName()
-                                .equals("MLF")) {
-                            ReqMenuDetailCatalog reqMenuDetailCatalog = reqMenuDetailCatalogBuilder.build(childNode, loadContext.menuGroups);
-                            if (reqMenuDetailMap.get(reqMenuDetailCatalog.idOfMenu) == null) {
-                                reqMenuDetailsCatalog.add(reqMenuDetailCatalog);
-                                if (reqMenuDetailCatalog.idOfMenu != null) {
-                                    reqMenuDetailCatalogMap.put(reqMenuDetailCatalog.idOfMenu, reqMenuDetailCatalog);
-                                }
+                            reqMenuDetails.add(reqMenuDetail);
+                            if (reqMenuDetail.idOfMenu != null) {
+                                reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
                             }
                         } else if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName()
                                 .equals("AMI")) {
@@ -1666,8 +1600,7 @@ public class SyncRequest {
                     ////////
                     String rawXML = ru.axetta.ecafe.processor.core.utils.XMLUtils.nodeToString(itemNode);
                     ////////
-                    return new Item(date, reqMenuDetails, reqMenuDetailMap, reqMenuDetailsCatalog, reqMenuDetailCatalogMap,
-                            reqComplexInfos, reqAssortments, rawXML);
+                    return new Item(date, reqMenuDetails, reqMenuDetailMap, reqComplexInfos, reqAssortments, rawXML);
                 }
 
             }
@@ -1676,20 +1609,15 @@ public class SyncRequest {
             private final Date date;
             private final List<ReqMenuDetail> reqMenuDetails;
             private final HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu;
-            private final List<ReqMenuDetailCatalog> reqMenuDetailsCatalog;
-            private final HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailsCatalogByIdOfMenu;
             private final List<ReqComplexInfo> reqComplexInfos;
             private final List<ReqAssortment> reqAssortments;
 
             public Item(Date date, List<ReqMenuDetail> reqMenuDetails,
-                    HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu, List<ReqMenuDetailCatalog> reqMenuDetailsCatalog,
-                    HashMap<Long, ReqMenuDetailCatalog> reqMenuDetailsCatalogByIdOfMenu,
-                    List<ReqComplexInfo> reqComplexInfos, List<ReqAssortment> reqAssortments, String rawXmlText) {
+                    HashMap<Long, ReqMenuDetail> reqMenuDetailsByIdOfMenu, List<ReqComplexInfo> reqComplexInfos,
+                    List<ReqAssortment> reqAssortments, String rawXmlText) {
                 this.date = date;
                 this.reqMenuDetails = reqMenuDetails;
                 this.reqMenuDetailsByIdOfMenu = reqMenuDetailsByIdOfMenu;
-                this.reqMenuDetailsCatalog = reqMenuDetailsCatalog;
-                this.reqMenuDetailsCatalogByIdOfMenu = reqMenuDetailsCatalogByIdOfMenu;
                 this.reqComplexInfos = reqComplexInfos;
                 this.reqAssortments = reqAssortments;
                 this.rawXmlText = rawXmlText;
@@ -1707,20 +1635,12 @@ public class SyncRequest {
                 return reqMenuDetailsByIdOfMenu.get(refIdOfMenu);
             }
 
-            private ReqMenuDetailCatalog findMenuDetailCatalog(long refIdOfMenu) {
-                return reqMenuDetailsCatalogByIdOfMenu.get(refIdOfMenu);
-            }
-
             public Date getDate() {
                 return date;
             }
 
             public Enumeration<ReqMenuDetail> getReqMenuDetails() {
                 return Collections.enumeration(reqMenuDetails);
-            }
-
-            public Enumeration<ReqMenuDetailCatalog> getReqMenuDetailsCatalog() {
-                return Collections.enumeration(reqMenuDetailsCatalog);
             }
 
             public String getRawXmlText() {
@@ -1732,7 +1652,6 @@ public class SyncRequest {
                 return "Item{" +
                         "date=" + date +
                         ", reqMenuDetails=" + reqMenuDetails +
-                        ", reqMenuDetailsCatalog=" + reqMenuDetailsCatalog +
                         '}';
             }
 

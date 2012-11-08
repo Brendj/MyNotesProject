@@ -1404,7 +1404,6 @@ public class Processor implements SyncProcessor,
                     processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
                     processReqMenuDetails(persistenceSession, organization, menuDate, menu, item,
                             item.getReqMenuDetails());
-                    processReqMenuDetailsCatalog(persistenceSession, menu, item.getReqMenuDetailsCatalog());
                     processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos());
                     bFirstMenuItem = false;
                 }
@@ -1503,9 +1502,13 @@ public class Processor implements SyncProcessor,
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
             if (null == DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu())) {
                 MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                        reqMenuDetail.getGroup(), reqMenuDetail.getOutput(), reqMenuDetail.getPrice(),
-                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow());
+                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
+                        reqMenuDetail.getFlags());
                 menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
+                menuDetail.setGroupName(reqMenuDetail.getGroup());
+                menuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
+                menuDetail.setPrice(reqMenuDetail.getPrice());
+                menuDetail.setPriority(reqMenuDetail.getPriority());
                 menuDetail.setProtein(reqMenuDetail.getProtein());
                 menuDetail.setFat(reqMenuDetail.getFat());
                 menuDetail.setCarbohydrates(reqMenuDetail.getCarbohydrates());
@@ -1534,22 +1537,6 @@ public class Processor implements SyncProcessor,
         for (MenuDetail menuDetail : superfluousMenuDetails) {
             menu.removeMenuDetail(menuDetail);
             persistenceSession.delete(menuDetail);
-        }
-
-    }
-
-    private void processReqMenuDetailsCatalog(Session persistenceSession, Menu menu, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetailCatalog> reqMenuDetailsCatalog)
-            throws Exception {
-        while (reqMenuDetailsCatalog.hasMoreElements()) {
-            SyncRequest.ReqMenu.Item.ReqMenuDetailCatalog reqMenuDetailCatalog = reqMenuDetailsCatalog.nextElement();
-            if (null == DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetailCatalog.getIdOfMenu())) {
-                MenuDetailCatalog menuDetailCatalog = new MenuDetailCatalog(menu, reqMenuDetailCatalog.getName(),
-                        reqMenuDetailCatalog.getPath());
-                menuDetailCatalog.setLocalIdOfMenu(reqMenuDetailCatalog.getIdOfMenu());
-
-                persistenceSession.save(menuDetailCatalog);
-                menu.addMenuDetailCatalog(menuDetailCatalog);
-            }
         }
 
     }

@@ -21,13 +21,14 @@
                   update="false"/>
         <property name="menuDetailName" column="MenuDetailName" type="string" length="256" not-null="true"
                   update="false"/>
-        <property name="groupName" column="GroupName" type="string" length="60" not-null="true" update="false"/>
-        <property name="menuDetailOutput" column="MenuDetailOutput" type="string" length="32" not-null="true"
-                  update="false"/>
+        <property name="menuDetailOutput" column="MenuDetailOutput" type="string" length="32" update="false"/>
         <property name="menuOrigin" column="MenuOrigin" type="int" not-null="true"/>
         <property name="localIdOfMenu" column="LocalIdOfMenu" type="long"/>
         <property name="availableNow" column="AvailableNow" type="int" not-null="true"/>
-        <property name="price" column="Price" type="long" not-null="true" update="false"/>
+        <property name="flags" column="Flags" type="int" not-null="true"/>
+        <property name="priority" column="Priority" type="int"/>
+        <property name="groupName" column="GroupName" type="string" length="60"/>
+        <property name="price" column="Price" type="long" update="false"/>
         <property name="fat" column="Fat" type="double" update="false"/>
         <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
         <property name="calories" column="Calories" type="double" update="false"/>

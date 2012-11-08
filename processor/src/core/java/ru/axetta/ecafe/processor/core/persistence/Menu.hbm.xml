@@ -26,10 +26,6 @@
             <key column="IdOfMenu"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"/>
         </set>
-        <set name="menuDetailsCatalogInternal" inverse="true" cascade="all">
-            <key column="IdOfMenu"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MenuDetailCatalog"/>
-        </set>
     </class>
 </hibernate-mapping>
 

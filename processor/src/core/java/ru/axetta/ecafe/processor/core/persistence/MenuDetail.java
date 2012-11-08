@@ -18,7 +18,6 @@ public class MenuDetail {
     private Long idOfMenuDetail;
     private Menu menu;
     private String menuDetailName;
-    private String groupName;
     private String menuDetailOutput;
     private Long price;
     private Double protein;
@@ -37,6 +36,34 @@ public class MenuDetail {
     private Long localIdOfMenu;
     private int availableNow;
     private String menuPath;
+    private int flags;
+    private int priority;
+    private String groupName;
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
 
     public String getMenuPath() {
         return menuPath;
@@ -74,16 +101,14 @@ public class MenuDetail {
         // For Hibernate only
     }
 
-    public MenuDetail(Menu menu, String menuPath, String menuDetailName, String groupName, String menuDetailOutput,
-            long price, int menuOrigin, int availableNow) {
+    public MenuDetail(Menu menu, String menuPath, String menuDetailName, int menuOrigin,
+            int availableNow, int flags) {
         this.menuPath = menuPath;
         this.menu = menu;
         this.menuDetailName = menuDetailName;
-        this.groupName = groupName;
-        this.menuDetailOutput = menuDetailOutput;
-        this.price = price;
         this.menuOrigin = menuOrigin;
         this.availableNow = availableNow;
+        this.flags = flags;
     }
 
     public Long getIdOfMenuDetail() {
@@ -113,21 +138,11 @@ public class MenuDetail {
         this.menuDetailName = menuDetailName;
     }
 
-    public String getGroupName() {
-        return groupName;
-    }
-
-    private void setGroupName(String groupName) {
-        // For Hibernate only
-        this.groupName = groupName;
-    }
-
     public String getMenuDetailOutput() {
         return menuDetailOutput;
     }
 
-    private void setMenuDetailOutput(String menuDetailOutput) {
-        // For Hibernate only
+    public void setMenuDetailOutput(String menuDetailOutput) {
         this.menuDetailOutput = menuDetailOutput;
     }
 
@@ -135,7 +150,7 @@ public class MenuDetail {
         return price;
     }
 
-    private void setPrice(Long price) {
+    public void setPrice(Long price) {
         // For Hibernate only
         this.price = price;
     }
@@ -256,10 +271,10 @@ public class MenuDetail {
     @Override
     public String toString() {
         return "MenuDetail{" + "idOfMenuDetail=" + idOfMenuDetail + ", menu=" + menu + ", menuDetailName='"
-                + menuDetailName + '\'' + ", groupName='" + groupName + '\'' + ", menuDetailOutput='" + menuDetailOutput
+                + menuDetailName + ", menuDetailOutput='" + menuDetailOutput
                 + '\'' + ", price=" + price + ", protein=" + protein + ", fat=" + fat + ", carbohydrates="
                 + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitC=" + vitC + ", vitA=" + vitA
                 + ", vitE=" + vitE + ", minCa=" + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe=" + minFe
-                + ", menuOrigin=" + menuOrigin + '}';
+                + ", menuOrigin=" + menuOrigin + ", flags=" + flags + ", priority=" + priority + '}';
     }
 }

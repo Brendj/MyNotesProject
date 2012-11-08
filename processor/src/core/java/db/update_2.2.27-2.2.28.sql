@@ -68,28 +68,6 @@ ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount DROP  NOT NULL;
 
 ALTER TABLE cf_complexinfodetail ADD COLUMN idofitem bigint;
 
--- Table: cf_menudetails_catalog
-
--- DROP TABLE cf_menudetails_catalog;
-
-CREATE TABLE cf_menudetails_catalog
-(
-  idofmenudetailscatalog bigserial NOT NULL,
-  name character varying(90) NOT NULL,
-  idofmenu bigint NOT NULL,
-  path character varying NOT NULL,
-  localidofmenu bigint,
-  CONSTRAINT cf_menudetails_catalog_pk PRIMARY KEY (idofmenudetailscatalog ),
-  CONSTRAINT cf_menudetails_catalog_idofmenu_fk FOREIGN KEY (idofmenu)
-      REFERENCES cf_menu (idofmenu) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE cf_menudetails_catalog
-  OWNER TO postgres;
-
 -- Column: idofmenudetail
 
 -- ALTER TABLE cf_complexinfo DROP COLUMN idofmenudetail;
@@ -100,4 +78,3 @@ ALTER TABLE cf_complexinfo ADD COLUMN idofmenudetail bigint;
 ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofmenudetail_fk FOREIGN KEY (idofmenudetail)
       REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
-
