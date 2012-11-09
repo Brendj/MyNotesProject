@@ -658,8 +658,12 @@ public class Processor implements SyncProcessor,
                 }
             }
             // If client is specified - check if client is registered for the specified organization
+            // or for one of friendly organizations of specified one
+            Set<Org> friendlyOrgsSet = organization.getFriendlyOrg();
             if (null != client) {
-                if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
+                Org clientOrg = client.getOrg();
+                if (!clientOrg.getIdOfOrg().equals(idOfOrg)
+                        || (friendlyOrgsSet != null && !friendlyOrgsSet.isEmpty() && !friendlyOrgsSet.contains(clientOrg))) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
                             "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
