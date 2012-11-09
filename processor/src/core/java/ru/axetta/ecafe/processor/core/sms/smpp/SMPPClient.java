@@ -17,6 +17,7 @@ import ru.axetta.smpp.client.USSD_MAPPINGS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -73,79 +74,41 @@ public class SMPPClient extends ISmsService {
         smppListener = new SMPPListener();
         client = new Client(smppListener, "CMD Processor");
         client.ussd_mapping = USSD_MAPPINGS.NOWSMS_SCHEME_ITS;
-        smscIPAddress = properties.getProperty(PATH+"ip-address", "127.0.0.1");
-        smscPort = Integer.parseInt(properties.getProperty(PATH+"port", "9500"));
+        smscIPAddress = properties.getProperty(PATH + "ip-address", "127.0.0.1");
+        smscPort = Integer.parseInt(properties.getProperty(PATH + "port", "9500"));
         systemId = properties.getProperty(PATH+"system-id", "user1");
         password = properties.getProperty(PATH+"password", "1234");
         serviceType = properties.getProperty(PATH+"service-type", "");
         systemType = properties.getProperty(PATH+"system-type", "test");
-        sourceAddress = properties.getProperty(PATH+"source-address", "8080");
-        serviceStatus = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMPP_CLIENT_STATUS);
+        sourceAddress = properties.getProperty(PATH + "source-address", "5223");
+        serviceStatus = properties.getProperty(PATH+"service-status", "0").equals("1");
         startService();
     }
 
-    public Status startService(){
+    public void startService(){
         if(serviceStatus){
             int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
             if (err != 0) {
-                logger.error("connecting error");
-                return new Status(false, "connecting error");
+                logger.error("SMPP Client connecting error");
             } else {
-                logger.info("connected");
-                return new Status(true, "connected");
+                logger.info("SMPP Client connected");
             }
         } else {
-            logger.error("connecting error");
-            return new Status(false, "connecting error");
+            logger.info("SMPP Client does not connect");
         }
     }
 
-    public Status stopService(){
+    @PreDestroy
+    public void stopService(){
         if(serviceStatus){
             if (client.getStatus() != Client.STATE_OFFLINE) {
                 client.stop();
-                return new Status(false,"Client stopped");
             } else {
                 logger.info("Client already stopped");
-                return new Status(false, "Client already stopped");
             }
         } else {
             logger.error("connecting error");
-            return new Status(false, "connecting error");
         }
     }
 
-    public Boolean getServiceStatus() {
-        return serviceStatus;
-    }
-
-    public void setServiceStatus(Boolean serviceStatus) {
-        this.serviceStatus = serviceStatus;
-    }
-
-    public static class Status{
-        private Boolean status;
-        private String message;
-
-        public Status(Boolean status, String message) {
-            this.status = status;
-            this.message = message;
-        }
-
-        public Boolean getStatus() {
-            return status;
-        }
-
-        public void setStatus(Boolean status) {
-            this.status = status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
 }
