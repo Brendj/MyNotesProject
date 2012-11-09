@@ -12,8 +12,8 @@ IF EXISTS (
 THEN
     RAISE NOTICE 'Column % already exists in %.', _col, _tbl;
 ELSE
+    EXECUTE 'ALTER TABLE ' || _tbl || ' ADD COLUMN ' || quote_ident(_col) || ' ' || _type || ' ' || _params;
     success := TRUE;
-    EXECUTE 'ALTER TABLE ' || _tbl || ' ADD COLUMN ' || quote_ident(_col) || ' ' || _type || ' ' || quote_ident(_params);
 END IF;
 
 END
