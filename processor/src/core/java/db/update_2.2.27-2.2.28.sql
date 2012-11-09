@@ -1,3 +1,24 @@
+-- Function of adding column if it doesn't already exist
+CREATE OR REPLACE FUNCTION add_column(_tbl regclass, _col text, _type regtype, _params text, OUT success bool) LANGUAGE 'plpgsql' AS
+$func$
+BEGIN
+
+success := FALSE;
+IF EXISTS (
+    SELECT 1 FROM pg_attribute
+    WHERE attrelid = _tbl
+    AND attname = _col
+    AND NOT attisdropped)
+THEN
+    RAISE NOTICE 'Column % already exists in %.', _col, _tbl;
+ELSE
+    success := TRUE;
+    EXECUTE 'ALTER TABLE ' || _tbl || ' ADD COLUMN ' || quote_ident(_col) || ' ' || _type || ' ' || quote_ident(_params);
+END IF;
+
+END
+$func$;
+
 -- Table: cf_complexinfo_discountdetail
 
 -- DROP TABLE cf_complexinfo_discountdetail;
@@ -9,7 +30,7 @@
 --idofclientgroup id группы клиентов
 --maxcount Максимальное количество применений скидки: -1 – не ограничено,--  >=0 указанное число раз
 --idoforg id организации (нужен только для создания foreign key на cf_clientgroups)
-CREATE TABLE cf_complexinfo_discountdetail
+CREATE TABLE IF NOT EXISTS cf_complexinfo_discountdetail
 (
   idofdiscountdetail bigserial NOT NULL,
   size double precision NOT NULL,
@@ -35,14 +56,16 @@ ALTER TABLE cf_complexinfo_discountdetail
 
 -- ALTER TABLE cf_complexinfo DROP COLUMN usetrdiscount;
 -- userdiscount 0 – торговые скидки не применяются, 1 – торговые скидки применяются (только для динамических комплексов)
-ALTER TABLE cf_complexinfo ADD COLUMN usetrdiscount integer;
-ALTER TABLE cf_complexinfo ALTER COLUMN usetrdiscount SET DEFAULT 0;
+SELECT add_column('cf_complexinfo', 'usetrdiscount', 'integer', 'DEFAULT 0');
+--ALTER TABLE cf_complexinfo ADD COLUMN usetrdiscount integer;
+--ALTER TABLE cf_complexinfo ALTER COLUMN usetrdiscount SET DEFAULT 0;
 
 -- Column: idofdiscountdetail
 
 -- ALTER TABLE cf_complexinfo DROP COLUMN idofdiscountdetail;
 -- idofdiscountdetail ссылка на элемент торговой скидки
-ALTER TABLE cf_complexinfo ADD COLUMN idofdiscountdetail bigint;
+SELECT add_column('cf_complexinfo', 'idofdiscountdetail', 'bigint', '');
+--ALTER TABLE cf_complexinfo ADD COLUMN idofdiscountdetail bigint;
 
 -- Column: idoforg
 
@@ -65,16 +88,17 @@ ALTER TABLE cf_complexinfo_discountdetail ALTER COLUMN maxcount DROP  NOT NULL;
 -- Column: idofitem
 
 -- ALTER TABLE cf_complexinfodetail DROP COLUMN idofitem;
-
-ALTER TABLE cf_complexinfodetail ADD COLUMN idofitem bigint;
+SELECT add_column('cf_complexinfodetail', 'idofitem', 'bigint', '');
+--ALTER TABLE cf_complexinfodetail ADD COLUMN idofitem bigint;
 
 -- Column: idofmenudetail
 
 -- ALTER TABLE cf_complexinfo DROP COLUMN idofmenudetail;
-
-ALTER TABLE cf_complexinfo ADD COLUMN idofmenudetail bigint;
+SELECT add_column('cf_complexinfo', 'idofmenudetail', 'bigint', '');
+--ALTER TABLE cf_complexinfo ADD COLUMN idofmenudetail bigint;
 
 -- New FK to cf_menudetail
+ALTER TABLE cf_complexinfo DROP CONSTRAINT IF EXISTS cf_complexinfo_idofmenudetail_fk;
 ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofmenudetail_fk FOREIGN KEY (idofmenudetail)
       REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
@@ -82,8 +106,7 @@ ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofmenudetail_fk FOREI
 -- Changes to cf_menudetails
 ALTER TABLE cf_menudetails ALTER COLUMN menudetailoutput DROP NOT NULL;
 ALTER TABLE cf_menudetails ALTER COLUMN price DROP NOT NULL;
-ALTER TABLE cf_menudetails ADD COLUMN flags integer;
-ALTER TABLE cf_menudetails ALTER COLUMN flags SET NOT NULL;
-ALTER TABLE cf_menudetails ALTER COLUMN flags SET DEFAULT 1;
-ALTER TABLE cf_menudetails ADD COLUMN priority integer;
-ALTER TABLE cf_menudetails ALTER COLUMN priority SET DEFAULT 0;
+SELECT add_column('cf_menudetails', 'flags', 'integer', 'NOT NULL DEFAULT 1');
+--ALTER TABLE cf_menudetails ADD COLUMN flags integer NOT NULL DEFAULT 1;
+SELECT add_column('cf_menudetails', 'priority', 'integer', 'DEFAULT 0');
+--ALTER TABLE cf_menudetails ADD COLUMN priority integer DEFAULT 0;
