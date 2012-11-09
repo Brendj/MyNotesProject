@@ -15,7 +15,7 @@ public class ComplexInfo {
     private int modeFree;
     private int modeGrant;
     private int modeOfAdd;
-    private int useTrDiscount;
+    private Integer useTrDiscount;
     private String complexName;
     private Date menuDate;
     private ComplexInfoDiscountDetail discountDetail;
@@ -76,11 +76,11 @@ public class ComplexInfo {
         this.modeFree = modeFree;
     }
 
-    public int getUseTrDiscount() {
+    public Integer getUseTrDiscount() {
         return useTrDiscount;
     }
 
-    public void setUseTrDiscount(int useTrDiscount) {
+    public void setUseTrDiscount(Integer useTrDiscount) {
         this.useTrDiscount = useTrDiscount;
     }
 

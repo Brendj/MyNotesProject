@@ -11,7 +11,7 @@ public class ComplexInfoDiscountDetail {
     private Long idOfDiscountDetail;
     private Double size;
     private int isAllGroups;
-    private int maxCount;
+    private Integer maxCount;
     private ClientGroup clientGroup;
     private Org org;
 
@@ -48,11 +48,11 @@ public class ComplexInfoDiscountDetail {
         isAllGroups = allGroups;
     }
 
-    public int getMaxCount() {
+    public Integer getMaxCount() {
         return maxCount;
     }
 
-    public void setMaxCount(int maxCount) {
+    public void setMaxCount(Integer maxCount) {
         this.maxCount = maxCount;
     }
 
