@@ -67,9 +67,9 @@
             <f:facet name="header">
                 <h:outputText value="Наименование группы" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink value="#{productGroup.nameOfGroup}" action="#{productGroupViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productGroup.nameOfGroup}" action="#{productGroupViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{productGroup}" target="#{selectedProductGroupGroupPage.currentProductGroup}"/>
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -87,10 +87,10 @@
             <f:facet name="header">
                 <h:outputText value="Редактировать" escape="true" styleClass="output-text"/>
             </f:facet>
-            <h:commandLink action="#{productGroupEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{productGroupEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{productGroup}" target="#{selectedProductGroupGroupPage.currentProductGroup}"/>
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column style="text-align:center">
             <f:facet name="header">

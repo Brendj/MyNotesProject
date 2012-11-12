@@ -18,15 +18,15 @@
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:commandLink value="#{productViewPage.configurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productViewPage.configurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{productViewPage.configurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
-        </h:commandLink>
+        </a4j:commandLink>
 
         <h:outputText escape="true" value="Группа продуктов" styleClass="output-text" />
-        <h:commandLink value="#{productViewPage.currentProduct.productGroup.nameOfGroup}" action="#{productGroupViewPage.show}" styleClass="command-link"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productViewPage.currentProduct.productGroup.nameOfGroup}" action="#{productGroupViewPage.show}" styleClass="command-link"
                        style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px;">
             <f:setPropertyActionListener value="#{productViewPage.currentProduct.productGroup}" target="#{selectedProductGroupGroupPage.currentProductGroup}" />
-        </h:commandLink>
+        </a4j:commandLink>
 
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{productViewPage.currentProduct.deletedState}" readonly="true" disabled="true"/>

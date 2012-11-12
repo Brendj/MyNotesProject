@@ -48,11 +48,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
-            <h:commandLink value="#{item.contragent.contragentName}" action="#{mainPage.showContragentViewPage}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragent.contragentName}" action="#{mainPage.showContragentViewPage}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.contragent.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
@@ -99,10 +99,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showPosEditPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showPosEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfPos}" target="#{mainPage.selectedIdOfPos}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}"
                      style="text-align:center">

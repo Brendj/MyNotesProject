@@ -17,21 +17,21 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор" />
         </f:facet>
-        <h:commandLink value="#{item.idOfReportHandleRule}" action="#{mainPage.showEventNotificationViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.idOfReportHandleRule}" action="#{mainPage.showEventNotificationViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfReportHandleRule}"
                                          target="#{mainPage.selectedIdOfEventNotification}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Название" />
         </f:facet>
-        <h:commandLink value="#{item.ruleName}" action="#{mainPage.showEventNotificationViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.ruleName}" action="#{mainPage.showEventNotificationViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfReportHandleRule}"
                                          target="#{mainPage.selectedIdOfEventNotification}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -69,11 +69,11 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showEventNotificationEditPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showEventNotificationEditPage}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfReportHandleRule}"
                                          target="#{mainPage.selectedIdOfEventNotification}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">

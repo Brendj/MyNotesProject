@@ -48,21 +48,21 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Карта" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.card.cardNo}" converter="cardNoConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.card.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.card.client.shortName}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.card.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="cardExpireBatchEditResultTable" renderIfSinglePage="false" maxPages="5"

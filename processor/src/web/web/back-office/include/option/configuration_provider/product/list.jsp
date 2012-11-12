@@ -80,9 +80,9 @@
             <f:facet name="header">
                 <h:outputText value="Товарное наименование" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink value="#{product.productName}" action="#{productViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{product.productName}" action="#{productViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{product}" target="#{selectedProductGroupPage.currentProduct}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -112,10 +112,10 @@
             <f:facet name="header">
                 <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:commandLink action="#{productEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{productEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{product}" target="#{selectedProductGroupPage.currentProduct}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column style="text-align:center">
             <f:facet name="header">

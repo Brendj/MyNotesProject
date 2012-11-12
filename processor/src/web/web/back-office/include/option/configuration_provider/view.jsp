@@ -29,16 +29,16 @@
     <h:inputText readonly="true" value="Данная конфигурация не привязана ни к одной организации." styleClass="input-text long-field" rendered="#{configurationProviderViewPage.currentConfigurationProvider.orgEmpty}"/>
     <h:dataTable value="#{configurationProviderViewPage.currentConfigurationProvider.orgs}" border="0" var="org" rendered="#{!configurationProviderViewPage.currentConfigurationProvider.orgEmpty}">
         <h:column>
-            <h:commandLink value="#{org.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{org.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </h:column>
     </h:dataTable>
     <h:outputText escape="true" value="Продукты" styleClass="output-text" />
-    <h:commandLink value="Перейти к списку" action="#{configurationProviderViewPage.showProducts}" styleClass="command-link"/>
+    <a4j:commandLink reRender="mainMenu, workspaceForm" value="Перейти к списку" action="#{configurationProviderViewPage.showProducts}" styleClass="command-link"/>
 
     <h:outputText escape="true" value="Технологической карты" styleClass="output-text" />
-    <h:commandLink value="Перейти к списку" action="#{configurationProviderViewPage.showTechnologicalMaps}" styleClass="command-link"/>
+    <a4j:commandLink reRender="mainMenu, workspaceForm" value="Перейти к списку" action="#{configurationProviderViewPage.showTechnologicalMaps}" styleClass="command-link"/>
 
     <a4j:commandButton value="Редактировать" action="#{configurationProviderEditPage.show}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />

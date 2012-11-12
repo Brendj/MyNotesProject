@@ -18,19 +18,19 @@
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
         <h:inputTextarea value="#{productGroupViewPage.currentProductGroup.nameOfGroup}" cols="128" rows="4" styleClass="input-text long-field" readonly="true" />
         <h:outputText escape="true" value="Организация поставщик" styleClass="output-text" />
-        <h:commandLink value="#{productGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{productGroupViewPage.currentOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-        </h:commandLink>
+        </a4j:commandLink>
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:commandLink value="#{productGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{productGroupViewPage.currentConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
-        </h:commandLink>
+        </a4j:commandLink>
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{productGroupViewPage.currentProductGroup.deletedState}" readonly="true" disabled="true"/>
         <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
         <h:inputText value="#{productGroupViewPage.currentProductGroup.сlassificationCode}" readonly="true" maxlength="32" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Продукты (количество)" styleClass="output-text" />
-        <h:commandLink value="#{productGroupViewPage.countProducts}" action="#{productGroupViewPage.showProducts}" styleClass="command-link"/>
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productGroupViewPage.countProducts}" action="#{productGroupViewPage.showProducts}" styleClass="command-link"/>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

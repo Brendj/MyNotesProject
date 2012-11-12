@@ -165,11 +165,11 @@
                         <h:panelGroup style="text-align: right; float: right;">
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
                                           styleClass="output-text" /><br />
-                            <h:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"
-                                           action="#{userSettings.show}" styleClass="command-link"/>
+                            <a4j:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"
+                                           action="#{userSettings.show}" styleClass="command-link" reRender="mainMenu, workspaceForm"/>
                             &nbsp;&nbsp;&nbsp;
                             <h:outputText escape="true" value="#{request.remoteUser} - " styleClass="output-text" />
-                            <h:commandLink value="Выход" action="#{mainPage.logout}" styleClass="command-link" />
+                            <a4j:commandLink value="Выход" action="#{mainPage.logout}" styleClass="command-link" />
                         </h:panelGroup>
                         <h:panelGroup style="text-align: left;">
                             <h:graphicImage value="/images/ecafe-favicon.png"

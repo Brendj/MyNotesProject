@@ -35,10 +35,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Имя" styleClass="output-text"/>
             </f:facet>
-            <h:commandLink value="#{configurationProvider.name}" action="#{configurationProviderViewPage.show}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{configurationProvider.name}" action="#{configurationProviderViewPage.show}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{configurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}"/>
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
 
         <rich:column headerClass="column-header" width="50px">

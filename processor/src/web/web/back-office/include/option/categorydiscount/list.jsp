@@ -41,10 +41,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <h:commandLink action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfCategoryDiscount}" target="#{categoryDiscountEditPage.idOfCategoryDiscount}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                      style="text-align:center">

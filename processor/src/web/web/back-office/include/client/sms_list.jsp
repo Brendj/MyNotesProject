@@ -91,11 +91,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showClientViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.client.shortName}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

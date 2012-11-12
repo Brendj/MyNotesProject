@@ -94,21 +94,21 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер лицевого счета" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -162,19 +162,21 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientEditPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showClientEditPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Исключить" />
             </f:facet>
-            <h:commandLink action="#{mainPage.removeClientFromList}" styleClass="command-link">
+            <!-- TODO -->
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             oncomplete="#{rich:component('removedClientDeletePanel')}.show()" reRender="removedClientDeletePanel">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="clientListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
@@ -235,3 +237,31 @@
     </rich:simpleTogglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </h:panelGrid>
+
+<rich:modalPanel id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <f:facet name="header">
+        <h:outputText value="Удаление клиента" styleClass="output-text" />
+    </f:facet>
+    <a4j:form styleClass="borderless-form">
+        <table class="borderless-grid" width="100%">
+            <tr>
+                <td style="text-align: center;">
+                    <h:outputText value="Вы уверены в том, что хотите удалить этого клиента?" styleClass="output-text" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeClientFromList}"
+                                           oncomplete="#{rich:component('removedClientDeletePanel')}.hide();"
+                                           reRender="mainMenu, clientListTable, #{mainPage.topMostPage.pageComponent.id}"
+                                           styleClass="command-button">
+                        </a4j:commandButton>
+                        <a4j:commandButton value="Отмена" styleClass="command-button"
+                                           onclick="#{rich:component('removedClientDeletePanel')}.hide();return false;" />
+                    </h:panelGroup>
+                </td>
+            </tr>
+        </table>
+    </a4j:form>
+</rich:modalPanel>

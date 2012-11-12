@@ -81,12 +81,12 @@
                               styleClass="output-text" converter="timeConverter" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showClientViewPage}" styleClass="command-link">
                     <h:outputText escape="true" value="#{clientPayment.client.contractId}"
                                   converter="contractIdConverter" styleClass="output-text" />
                     <f:setPropertyActionListener value="#{clientPayment.client.idOfClient}"
                                                  target="#{mainPage.selectedIdOfClient}" />
-                </h:commandLink>
+                </a4j:commandLink>
             </rich:column>
             <rich:column styleClass="left-aligned-column">
                 <h:outputText escape="true" value="#{clientPayment.client.person.surname}" styleClass="output-text" />
@@ -99,12 +99,12 @@
                               styleClass="output-text" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
                     <h:outputText escape="true" value="#{clientPayment.card.cardNo}" converter="cardNoConverter"
                                   styleClass="output-text" />
                     <f:setPropertyActionListener value="#{clientPayment.card.idOfCard}"
                                                  target="#{mainPage.selectedIdOfCard}" />
-                </h:commandLink>
+                </a4j:commandLink>
             </rich:column>
             <rich:column styleClass="right-aligned-column">
                 <h:outputText escape="true" value="#{clientPayment.paySum}" styleClass="output-text"

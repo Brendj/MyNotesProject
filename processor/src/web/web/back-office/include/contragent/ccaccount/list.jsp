@@ -53,11 +53,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
-            <h:commandLink value="#{item.contragent.contragentName}" action="#{mainPage.showContragentViewPage}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragent.contragentName}" action="#{mainPage.showContragentViewPage}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.contragent.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -69,11 +69,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <h:commandLink value="#{item.client.shortName}" action="#{mainPage.showClientViewPage}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.client.shortName}" action="#{mainPage.showClientViewPage}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}">
             <f:facet name="header">

@@ -35,9 +35,9 @@
         <h:outputText value="#{menuExchange.menuDate}" styleClass="output-text"  converter="timeConverter"/>
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <h:commandLink action="#{mainPage.showMenuDataXML}" styleClass="command-link" value="Просмотреть" target="_blink">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showMenuDataXML}" styleClass="command-link" value="Просмотреть" target="_blink">
             <f:setPropertyActionListener value="#{menuExchange.menuData}" target="#{mainPage.selectedMenuDataXML}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="menuExchangeListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"

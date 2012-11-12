@@ -25,10 +25,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <h:commandLink action="#{categoryOrgEditPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryOrgEditPage.show}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item}" target="#{categoryOrgEditPage.entity}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                  style="text-align:center">

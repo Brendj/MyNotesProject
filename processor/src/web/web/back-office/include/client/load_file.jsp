@@ -88,10 +88,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор клиента в БД (IdOfClient)" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
 
         <f:facet name="footer">

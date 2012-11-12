@@ -19,18 +19,18 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор" />
         </f:facet>
-        <h:commandLink value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Название" />
         </f:facet>
-        <h:commandLink value="#{item.jobName}" action="#{mainPage.showReportJobViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.jobName}" action="#{mainPage.showReportJobViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -54,10 +54,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showReportJobEditPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showReportJobEditPage}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditReports}">
         <f:facet name="header">

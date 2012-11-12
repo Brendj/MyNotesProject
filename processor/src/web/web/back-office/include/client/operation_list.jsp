@@ -37,10 +37,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Карта" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+        <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
             <h:outputText escape="true" value="#{(item.card==null)?(null):item.card.cardNo}" converter="cardNoConverter" />
             <f:setPropertyActionListener value="#{item.card.cardNo}" target="#{mainPage.selectedIdOfCard}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -106,10 +106,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Контрагент" />
         </f:facet>
-        <h:commandLink value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -181,19 +181,19 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Плательщик" />
         </f:facet>
-        <h:commandLink value="#{item.clientBenefactor.contractId} (#{item.clientBenefactor.person.fullName})" action="#{mainPage.showClientViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.clientBenefactor.contractId} (#{item.clientBenefactor.person.fullName})" action="#{mainPage.showClientViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Получатель" />
         </f:facet>
-        <h:commandLink value="#{item.clientBeneficiary.contractId} (#{item.clientBeneficiary.person.fullName})" action="#{mainPage.showClientViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.clientBeneficiary.contractId} (#{item.clientBeneficiary.person.fullName})" action="#{mainPage.showClientViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -211,10 +211,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Пользователь" />
         </f:facet>
-        <h:commandLink value="#{item.createdBy.userName}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.createdBy.userName}"
                        action="#{mainPage.showUserViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
@@ -244,10 +244,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Организация" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
             <h:outputText escape="true" value="#{item.org.shortName}" />
             <f:setPropertyActionListener value="#{item.org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -259,10 +259,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Карта" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
             <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter" />
             <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -374,10 +374,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Пользователь" />
         </f:facet>
-        <h:commandLink value="#{item.createdBy.userName}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.createdBy.userName}"
                        action="#{mainPage.showUserViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientRefundTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"

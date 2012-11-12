@@ -79,10 +79,10 @@
         <f:facet name="header">
             <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
         </f:facet>
-        <h:commandLink action="#{mainPage.showRuleEditPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showRuleEditPage}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfRule}" target="#{mainPage.selectedIdOfRule}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column style="text-align:center" breakBefore="false">
         <f:facet name="header">
@@ -218,10 +218,10 @@
             <h:outputText styleClass="output-text" value="#{item.complex9}" />
         </rich:column>
         <rich:column>
-            <h:commandLink action="#{ruleEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.entity}" target="#{ruleEditPage.entity}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
        <rich:column style="text-align:center">
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"

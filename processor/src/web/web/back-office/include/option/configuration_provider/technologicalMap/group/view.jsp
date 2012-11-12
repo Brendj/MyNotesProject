@@ -18,17 +18,17 @@
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text" />
         <h:inputText value="#{technologicalMapGroupViewPage.currentTechnologicalMapGroup.nameOfGroup}" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Организация поставщик" styleClass="output-text" />
-        <h:commandLink value="#{technologicalMapGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{technologicalMapGroupViewPage.currentOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-        </h:commandLink>
+        </a4j:commandLink>
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:commandLink value="#{technologicalMapGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{technologicalMapGroupViewPage.currentConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
-        </h:commandLink>
+        </a4j:commandLink>
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{technologicalMapGroupViewPage.currentTechnologicalMapGroup.deletedState}" readonly="true" disabled="true"/>
         <h:outputText escape="true" value="Технологической карты" styleClass="output-text" />
-        <h:commandLink value="#{technologicalMapGroupViewPage.countTechnologicalMaps}" action="#{technologicalMapGroupViewPage.showTechnologicalMaps}" styleClass="command-link"/>
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapGroupViewPage.countTechnologicalMaps}" action="#{technologicalMapGroupViewPage.showTechnologicalMaps}" styleClass="command-link"/>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

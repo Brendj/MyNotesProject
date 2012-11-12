@@ -55,12 +55,12 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showContragentViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showContragentViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.createResult.ccAccount.contragent.contragentName}"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.createResult.ccAccount.contragent.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -72,12 +72,12 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showClientViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.createResult.ccAccount.client.shortName}"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.createResult.ccAccount.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="ccAccountLoadResultTable" renderIfSinglePage="false" maxPages="5"

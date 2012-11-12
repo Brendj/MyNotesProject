@@ -12,10 +12,10 @@
 <h:panelGrid id="clientViewGrid" styleClass="borderless-grid" columns="2"
              binding="#{mainPage.clientViewPage.pageComponent}">
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
-    <h:commandLink value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
+    <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
                    action="#{mainPage.showOrgViewPage}">
         <f:setPropertyActionListener value="#{mainPage.clientViewPage.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
-    </h:commandLink>
+    </a4j:commandLink>
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.contractId}" readonly="true" styleClass="input-text"
                  converter="contractIdConverter" />
@@ -134,11 +134,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер карты" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -163,10 +163,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showCardEditPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="clientCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"

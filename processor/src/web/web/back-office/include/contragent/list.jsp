@@ -22,10 +22,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Контрагент" />
         </f:facet>
-        <h:commandLink value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -37,10 +37,10 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <h:commandLink action="#{mainPage.showContragentEditPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showContragentEditPage}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
-        </h:commandLink>
+        </a4j:commandLink>
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="contragentTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"

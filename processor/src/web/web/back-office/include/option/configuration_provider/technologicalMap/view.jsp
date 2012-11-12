@@ -19,15 +19,15 @@
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-        <h:commandLink value="#{technologicalMapViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{technologicalMapViewPage.currentConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
-        </h:commandLink>
+        </a4j:commandLink>
 
         <h:outputText escape="true" value="Группа" styleClass="output-text" />
-        <h:commandLink value="#{technologicalMapViewPage.currentTechnologicalMapGroup.nameOfGroup}" action="#{technologicalMapGroupViewPage.show}" styleClass="command-link"
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapViewPage.currentTechnologicalMapGroup.nameOfGroup}" action="#{technologicalMapGroupViewPage.show}" styleClass="command-link"
                        style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px;">
             <f:setPropertyActionListener value="#{technologicalMapViewPage.currentTechnologicalMapGroup}" target="#{selectedTechnologicalMapGroupGroupPage.currentTechnologicalMapGroup}" />
-        </h:commandLink>
+        </a4j:commandLink>
 
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{technologicalMapViewPage.currentTechnologicalMap.deletedState}" readonly="true" disabled="true"/>
@@ -59,9 +59,9 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column>
-            <h:commandLink value="#{technologicalMapProduct.product.productName}" action="#{productViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapProduct.product.productName}" action="#{productViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{technologicalMapProduct.product}" target="#{selectedProductGroupPage.currentProduct}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column>
             <h:inputText value="#{technologicalMapProduct.grossWeight}" readonly="true"/>

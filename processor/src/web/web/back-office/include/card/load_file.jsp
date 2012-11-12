@@ -69,10 +69,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор карты в БД (IdOfCard)" />
             </f:facet>
-            <h:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link">
+            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfCard}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
 
         <f:facet name="footer">

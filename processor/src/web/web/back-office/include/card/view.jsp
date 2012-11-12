@@ -12,11 +12,11 @@
 <h:panelGrid id="cardViewGrid" binding="#{mainPage.cardViewPage.pageComponent}" styleClass="borderless-grid"
              columns="2">
     <h:outputText escape="true" value="Клиент" styleClass="output-text" />
-    <h:commandLink value="#{mainPage.cardViewPage.client.shortName}" styleClass="command-link"
-                   action="#{mainPage.showClientViewPage}">
+    <a4j:commandLink value="#{mainPage.cardViewPage.client.shortName}" styleClass="command-link"
+                   action="#{mainPage.showClientViewPage}" reRender="mainMenu, workspaceForm">
         <f:setPropertyActionListener value="#{mainPage.cardViewPage.client.idOfClient}"
                                      target="#{mainPage.selectedIdOfClient}" />
-    </h:commandLink>
+    </a4j:commandLink>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardViewPage.cardNo}" converter="cardNoConverter" readonly="true"
                  styleClass="input-text" />

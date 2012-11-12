@@ -36,11 +36,11 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
-            <h:commandLink value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
-                           styleClass="command-link">
+            <a4j:commandLink value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
+                           styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <f:setPropertyActionListener value="#{item.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
-            </h:commandLink>
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
