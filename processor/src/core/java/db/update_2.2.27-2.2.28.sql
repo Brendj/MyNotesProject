@@ -112,7 +112,7 @@ SELECT add_column('cf_menudetails', 'priority', 'integer', 'DEFAULT 0');
 --ALTER TABLE cf_menudetails ADD COLUMN priority integer DEFAULT 0;
 
 -- Настройки ECafe администратора
-CREATE TABLE cf_ECafeSettings
+CREATE TABLE IF NOT EXISTS cf_ECafeSettings
 (
   IdOfECafeSetting bigserial NOT NULL,
   GlobalVersion bigint,
@@ -129,9 +129,9 @@ CREATE TABLE cf_ECafeSettings
 );
 
 -- Увиличена размерность полей меню
-ALTER TABLE cf_menudetails ADD COLUMN menupath character varying(512);
-ALTER TABLE cf_menudetails ADD COLUMN menudetailname character varying(512);
-ALTER TABLE cf_menuexchange ADD COLUMN menudata character varying(52650);
+ALTER TABLE cf_menudetails ALTER COLUMN menupath SET DATA TYPE character varying(512);
+ALTER TABLE cf_menudetails ALTER COLUMN menudetailname SET DATA TYPE character varying(512);
+ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varying(52650);
 
 -- Хитрое ограничение уникальности на таблицу комплексных скидок
 -- Index: cf_complexinfo_discountdetail_2col_uni_idx
