@@ -132,3 +132,31 @@ CREATE TABLE cf_ECafeSettings
 ALTER TABLE cf_menudetails ADD COLUMN menupath character varying(512);
 ALTER TABLE cf_menudetails ADD COLUMN menudetailname character varying(512);
 ALTER TABLE cf_menuexchange ADD COLUMN menudata character varying(52650);
+
+-- Хитрое ограничение уникальности на таблицу комплексных скидок
+-- Index: cf_complexinfo_discountdetail_2col_uni_idx
+
+DROP INDEX cf_complexinfo_discountdetail_2col_uni_idx;
+CREATE UNIQUE INDEX cf_complexinfo_discountdetail_2col_uni_idx
+  ON cf_complexinfo_discountdetail
+  USING btree
+  (size , isallgroups )
+  WHERE maxcount IS NULL AND idofclientgroup IS NULL AND idoforg IS NULL;
+
+-- Index: cf_complexinfo_discountdetail_3col_uni_idx
+
+DROP INDEX cf_complexinfo_discountdetail_3col_uni_idx;
+CREATE UNIQUE INDEX cf_complexinfo_discountdetail_3col_uni_idx
+  ON cf_complexinfo_discountdetail
+  USING btree
+  (size , isallgroups , maxcount )
+  WHERE maxcount IS NOT NULL AND idofclientgroup IS NULL AND idoforg IS NULL;
+
+-- Index: cf_complexinfo_discountdetail_5col_uni_idx
+
+DROP INDEX cf_complexinfo_discountdetail_5col_uni_idx;
+CREATE UNIQUE INDEX cf_complexinfo_discountdetail_5col_uni_idx
+  ON cf_complexinfo_discountdetail
+  USING btree
+  (size , isallgroups , maxcount , idofclientgroup , idoforg )
+  WHERE maxcount IS NOT NULL AND idofclientgroup IS NOT NULL AND idoforg IS NOT NULL;
