@@ -123,7 +123,6 @@ CREATE TABLE cf_ECafeSettings
   DeleteDate bigint,
   CreatedDate bigint NOT NULL,
   SendAll integer DEFAULT 0,
-  DeletedState boolean NOT NULL DEFAULT false,
   SettingValue character varying(128),
   Identificator bigint,
   CONSTRAINT cf_ECafeSetting_pk PRIMARY KEY (IdOfECafeSetting)
