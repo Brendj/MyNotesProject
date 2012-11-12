@@ -36,8 +36,8 @@ public class MenuDetail {
     private Long localIdOfMenu;
     private int availableNow;
     private String menuPath;
-    private int flags;
-    private int priority;
+    private Integer flags;
+    private Integer priority;
     private String groupName;
 
     public String getGroupName() {
@@ -48,19 +48,19 @@ public class MenuDetail {
         this.groupName = groupName;
     }
 
-    public int getFlags() {
+    public Integer getFlags() {
         return flags;
     }
 
-    public void setFlags(int flags) {
+    public void setFlags(Integer flags) {
         this.flags = flags;
     }
 
-    public int getPriority() {
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(Integer priority) {
         this.priority = priority;
     }
 
