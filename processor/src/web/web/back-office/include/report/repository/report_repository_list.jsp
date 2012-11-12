@@ -20,7 +20,7 @@
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название правила" styleClass="output-text" />
-            <rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="250px" styleClass="input-text">
+            <rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="400px" styleClass="input-text">
                 <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}" />
             </rich:comboBox>
             <h:outputText escape="true" value="Тэг" styleClass="output-text" />
