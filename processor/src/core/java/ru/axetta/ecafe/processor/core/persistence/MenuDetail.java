@@ -102,7 +102,7 @@ public class MenuDetail {
     }
 
     public MenuDetail(Menu menu, String menuPath, String menuDetailName, int menuOrigin,
-            int availableNow, int flags) {
+            int availableNow, Integer flags) {
         this.menuPath = menuPath;
         this.menu = menu;
         this.menuDetailName = menuDetailName;
