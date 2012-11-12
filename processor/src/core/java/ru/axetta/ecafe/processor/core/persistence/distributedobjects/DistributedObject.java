@@ -115,7 +115,7 @@ public abstract class DistributedObject{
         setDeletedState(status != null);
         tagName = node.getNodeName();
         /* End required params */
-        if(deletedState){
+        if(getDeletedState()){
             return this;
         }
         //Boolean boolSendAll = getBollAttributeValue(node,"SendAll");

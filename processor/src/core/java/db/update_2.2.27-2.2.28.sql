@@ -110,3 +110,26 @@ SELECT add_column('cf_menudetails', 'flags', 'integer', 'NOT NULL DEFAULT 1');
 --ALTER TABLE cf_menudetails ADD COLUMN flags integer NOT NULL DEFAULT 1;
 SELECT add_column('cf_menudetails', 'priority', 'integer', 'DEFAULT 0');
 --ALTER TABLE cf_menudetails ADD COLUMN priority integer DEFAULT 0;
+
+-- Настройки ECafe администратора
+CREATE TABLE cf_ECafeSettings
+(
+  IdOfECafeSetting bigserial NOT NULL,
+  GlobalVersion bigint,
+  OrgOwner bigint,
+  DeletedState boolean NOT NULL DEFAULT false,
+  GUID character varying(36) NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
+  CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
+  DeletedState boolean NOT NULL DEFAULT false,
+  SettingValue character varying(128),
+  Identificator bigint,
+  CONSTRAINT cf_ECafeSetting_pk PRIMARY KEY (IdOfECafeSetting)
+);
+
+-- Увиличена размерность полей меню
+ALTER TABLE cf_menudetails ADD COLUMN menupath character varying(512);
+ALTER TABLE cf_menudetails ADD COLUMN menudetailname character varying(512);
+ALTER TABLE cf_menuexchange ADD COLUMN menudata character varying(52650);

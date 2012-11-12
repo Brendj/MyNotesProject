@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,6 +41,8 @@ public enum DistributedObjectsEnum {
     TechnologicalMap(TechnologicalMap.class, 1),
     TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
     TradeMaterialGood(TradeMaterialGood.class,3),
+    // настойки
+    ECafeSettings(ECafeSettings.class,0),
     // библиоткека
     Publication(Publication.class, 0),
     Source(Source.class,0),

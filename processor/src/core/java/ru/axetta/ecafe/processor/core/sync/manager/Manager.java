@@ -92,35 +92,39 @@ public class Manager {
             } else {
                 DistributedObjectsEnum currentObject = null;
                 currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RO parse '"+currentObject.name()+"' node XML section");
-                }
-                currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
-                node = node.getFirstChild();
-                while (node != null) {
-                    if (Node.ELEMENT_NODE == node.getNodeType()) {
-                        DistributedObject distributedObject = createDistributedObject(currentObject);
-                        distributedObject.setTimeFormat(timeFormat);
-                        distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                        try{
-                            distributedObject = distributedObject.build(node);
-                        } catch (DistributedObjectException e){
-                            distributedObject.setDistributedObjectException(e);
-                            logger.error(distributedObject.toString(), e);
-                        } catch (Exception e){
-                            //distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
-                            distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
-                            logger.error(distributedObject.toString(), e);
-                        }
-                        if (!distributedObjectsListMap.containsKey(currentObject)) {
-                            distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
-                        }
-                        distributedObjectsListMap.get(currentObject).add(distributedObject);
+                if(currentObject != null){
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("RO parse '"+currentObject.name()+"' node XML section");
                     }
-                    node = node.getNextSibling();
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RO end parse '"+currentObject.name()+"' node XML section");
+                    currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
+                    node = node.getFirstChild();
+                    while (node != null) {
+                        if (Node.ELEMENT_NODE == node.getNodeType()) {
+                            DistributedObject distributedObject = createDistributedObject(currentObject);
+                            distributedObject.setTimeFormat(timeFormat);
+                            distributedObject.setDateOnlyFormat(dateOnlyFormat);
+                            try{
+                                distributedObject = distributedObject.build(node);
+                            } catch (DistributedObjectException e){
+                                distributedObject.setDistributedObjectException(e);
+                                logger.error(distributedObject.toString(), e);
+                            } catch (Exception e){
+                                //distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
+                                distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+                                logger.error(distributedObject.toString(), e);
+                            }
+                            if (!distributedObjectsListMap.containsKey(currentObject)) {
+                                distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
+                            }
+                            distributedObjectsListMap.get(currentObject).add(distributedObject);
+                        }
+                        node = node.getNextSibling();
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("RO end parse '"+currentObject.name()+"' node XML section");
+                    }
+                } else {
+                    logger.warn(String.format("Section '%s' processing is not known",node.getNodeName()));
                 }
             }
             if (logger.isDebugEnabled()) {

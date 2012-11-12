@@ -69,18 +69,7 @@ public class SMPPListener implements Listener{
     }
 
     public void error() {
-        //System.err.println("aaaa!!! error!!! client disconnected");
         logger.error("client disconnected");
     }
-
-    //private static IvParameterSpec iv = new IvParameterSpec(new byte[]{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0});
-    //
-    //private static byte[] decrypt(byte[] data, String kc) throws Exception {
-    //    byte[] kb = Main.hexToByte(kc + kc.substring(0, 16));
-    //    SecretKeySpec key = new SecretKeySpec(kb,"DESede");
-    //    Cipher dec = Cipher.getInstance("DESede/CBC/NoPadding");
-    //    dec.init(Cipher.DECRYPT_MODE, key, iv);
-    //    return dec.doFinal(data);
-    //}
 
 }
