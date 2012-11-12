@@ -1430,7 +1430,7 @@ public class Processor implements SyncProcessor,
             ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
                     reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
                     reqComplexInfo.getComplexMenuName());
-            if (reqComplexInfo.getUseTrDiscount() != -1) {
+            if (reqComplexInfo.getUseTrDiscount() != null) {
                 complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
             }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
@@ -1447,16 +1447,16 @@ public class Processor implements SyncProcessor,
             if (reqComplexInfoDiscountDetail != null) {
                 double size = reqComplexInfoDiscountDetail.getSize();
                 int isAllGroups = reqComplexInfoDiscountDetail.getIsAllGroups();
-                int maxCount = reqComplexInfoDiscountDetail.getMaxCount();
-                long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
+                Integer maxCount = reqComplexInfoDiscountDetail.getMaxCount();
+                Long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
                 ComplexInfoDiscountDetail complexInfoDiscountDetail = new ComplexInfoDiscountDetail(size, isAllGroups);
-                if (idOfClientGroup != -1) {
+                if (idOfClientGroup != null) {
                     CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(), idOfClientGroup);
                     ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
                     complexInfoDiscountDetail.setClientGroup(clientGroup);
                     complexInfoDiscountDetail.setOrg(clientGroup.getOrg());
                 }
-                if (maxCount != -1) {
+                if (maxCount != null) {
                     complexInfoDiscountDetail.setMaxCount(maxCount);
                 }
 
