@@ -53,16 +53,16 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                // Тип производсва
                private String menuOrigin;
                // Cумма
-               private Float  price;
+               private Float totalDetailSum;
 
                public ClientReportItem(Long idOfOrderDetail, Long contracId, String fio, String menuName,
-                       String menuOrigin, Float price) {
+                       String menuOrigin, Float totalDetailSum) {
                    this.idOfOrderDetail = idOfOrderDetail;
                    this.contractId = contracId;
                    this.fio = fio;
                    this.menuName = menuName;
                    this.menuOrigin = menuOrigin;
-                   this.price = price;
+                   this.totalDetailSum = totalDetailSum;
                }
 
                public Long getIdOfOrderDetail() {
@@ -105,12 +105,12 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                    this.menuOrigin = menuOrigin;
                }
 
-               public Float getPrice() {
-                   return price;
+               public Float getTotalDetailSum() {
+                   return totalDetailSum;
                }
 
-               public void setPrice(Float price) {
-                   this.price = price;
+               public void setTotalDetailSum(Float totalDetailSum) {
+                   this.totalDetailSum = totalDetailSum;
                }
            }
 
@@ -146,7 +146,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<ClientReportItem> resultRows = new LinkedList<ClientReportItem>();
             Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
-                    + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice"
+                    + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice, cf_orderdetails.discount, cf_orderdetails.qty"
                     + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
                     + " WHERE (cf_orderdetails.idoforg=:idoforg AND cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND "
                     + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson );"
@@ -163,7 +163,10 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                 Integer menuOrigin = (Integer) sale[3];
                 String menuName = sale[4].toString();
                 Float price = Float.parseFloat(sale[5].toString()) / 100;
-                resultRows.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, values.get(menuOrigin), price));
+                Float discount = Float.parseFloat(sale[6].toString()) / 100;
+                Integer quantity = (Integer) sale[7];
+                Float totalDetailSum = (price - discount) * quantity;
+                resultRows.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, values.get(menuOrigin), totalDetailSum));
             }
             return new JRBeanCollectionDataSource(resultRows);
         }
