@@ -136,7 +136,7 @@ ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varyin
 -- Хитрое ограничение уникальности на таблицу комплексных скидок
 -- Index: cf_complexinfo_discountdetail_2col_uni_idx
 
-DROP INDEX cf_complexinfo_discountdetail_2col_uni_idx;
+DROP INDEX IF EXISTS cf_complexinfo_discountdetail_2col_uni_idx;
 CREATE UNIQUE INDEX cf_complexinfo_discountdetail_2col_uni_idx
   ON cf_complexinfo_discountdetail
   USING btree
@@ -145,7 +145,7 @@ CREATE UNIQUE INDEX cf_complexinfo_discountdetail_2col_uni_idx
 
 -- Index: cf_complexinfo_discountdetail_3col_uni_idx
 
-DROP INDEX cf_complexinfo_discountdetail_3col_uni_idx;
+DROP INDEX IF EXISTS cf_complexinfo_discountdetail_3col_uni_idx;
 CREATE UNIQUE INDEX cf_complexinfo_discountdetail_3col_uni_idx
   ON cf_complexinfo_discountdetail
   USING btree
@@ -154,7 +154,7 @@ CREATE UNIQUE INDEX cf_complexinfo_discountdetail_3col_uni_idx
 
 -- Index: cf_complexinfo_discountdetail_5col_uni_idx
 
-DROP INDEX cf_complexinfo_discountdetail_5col_uni_idx;
+DROP INDEX IF EXISTS cf_complexinfo_discountdetail_5col_uni_idx;
 CREATE UNIQUE INDEX cf_complexinfo_discountdetail_5col_uni_idx
   ON cf_complexinfo_discountdetail
   USING btree
