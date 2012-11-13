@@ -408,7 +408,7 @@
                     <thead>
                     <tr>
                         <th>
-                            <div >ss="column-header menu-date">
+                            <div class="column-header menu-date">
                                 <img class="dayIco" src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a2.png"))%>"
                                      src2="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "images/a1.png"))%>"/>
                                 <%
