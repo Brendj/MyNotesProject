@@ -53,7 +53,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                // Тип производсва
                private String menuOrigin;
                // Cумма
-               private Float totalDetailSum;
+               private Float price;
 
                public ClientReportItem(Long idOfOrderDetail, Long contracId, String fio, String menuName,
                        String menuOrigin, Float totalDetailSum) {
@@ -62,7 +62,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                    this.fio = fio;
                    this.menuName = menuName;
                    this.menuOrigin = menuOrigin;
-                   this.totalDetailSum = totalDetailSum;
+                   this.price = totalDetailSum;
                }
 
                public Long getIdOfOrderDetail() {
@@ -105,12 +105,12 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                    this.menuOrigin = menuOrigin;
                }
 
-               public Float getTotalDetailSum() {
-                   return totalDetailSum;
+               public Float getPrice() {
+                   return price;
                }
 
-               public void setTotalDetailSum(Float totalDetailSum) {
-                   this.totalDetailSum = totalDetailSum;
+               public void setPrice(Float price) {
+                   this.price = price;
                }
            }
 

@@ -53,16 +53,16 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
             // Тип производсва
             private String menuOrigin;
             // Cумма
-            private Float totalDetailSum;
+            private Float price;
 
             public ClientReportItem(Long idOfOrderDetail, Long contracId, String fio, String menuName,
-                    String menuOrigin, Float totalDetailSum) {
+                    String menuOrigin, Float price) {
                 this.idOfOrderDetail = idOfOrderDetail;
                 this.contractId = contracId;
                 this.fio = fio;
                 this.menuName = menuName;
                 this.menuOrigin = menuOrigin;
-                this.totalDetailSum = totalDetailSum;
+                this.price = price;
             }
 
             public Long getIdOfOrderDetail() {
@@ -105,12 +105,12 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
                 this.menuOrigin = menuOrigin;
             }
 
-            public Float getTotalDetailSum() {
-                return totalDetailSum;
+            public Float getPrice() {
+                return price;
             }
 
-            public void setTotalDetailSum(Float totalDetailSum) {
-                this.totalDetailSum = totalDetailSum;
+            public void setPrice(Float price) {
+                this.price = price;
             }
         }
 
@@ -149,7 +149,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
                     + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice, cf_orderdetails.discount, cf_orderdetails.qty"
                     + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
                     + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND "
-                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson );"
+                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson and cf_orders.sumbycash=0);"
                     + " ");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());

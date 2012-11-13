@@ -26,7 +26,7 @@ end;' language 'plpgsql';
 --idofclientgroup id группы клиентов
 --maxcount Максимальное количество применений скидки: -1 – не ограничено,--  >=0 указанное число раз
 --idoforg id организации (нужен только для создания foreign key на cf_clientgroups)
-CREATE TABLE IF NOT EXISTS cf_complexinfo_discountdetail
+CREATE TABLE cf_complexinfo_discountdetail
 (
   idofdiscountdetail bigserial NOT NULL,
   size double precision NOT NULL,
@@ -108,7 +108,7 @@ SELECT add_column('cf_menudetails', 'priority', 'integer', 'DEFAULT 0');
 --ALTER TABLE cf_menudetails ADD COLUMN priority integer DEFAULT 0;
 
 -- Настройки ECafe администратора
-CREATE TABLE IF NOT EXISTS cf_ECafeSettings
+CREATE TABLE cf_ECafeSettings
 (
   IdOfECafeSetting bigserial NOT NULL,
   GlobalVersion bigint,
@@ -156,3 +156,5 @@ CREATE UNIQUE INDEX cf_complexinfo_discountdetail_5col_uni_idx
   USING btree
   (size , isallgroups , maxcount , idofclientgroup , idoforg )
   WHERE maxcount IS NOT NULL AND idofclientgroup IS NOT NULL AND idoforg IS NOT NULL;
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 121113) НЕ МЕНЯТЬ
