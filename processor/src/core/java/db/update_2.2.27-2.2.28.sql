@@ -1,23 +1,19 @@
--- Function of adding column if it doesn't already exist
-CREATE OR REPLACE FUNCTION add_column(_tbl regclass, _col text, _type regtype, _params text, OUT success bool) LANGUAGE 'plpgsql' AS
-$func$
-BEGIN
-
-success := FALSE;
-IF EXISTS (
+create or replace function add_column(_tbl regclass, _col text, _type regtype, _params text) returns bool as '
+declare success bool;
+begin
+success := true;
+if exists (
     SELECT 1 FROM pg_attribute
     WHERE attrelid = _tbl
     AND attname = _col
     AND NOT attisdropped)
-THEN
-    RAISE NOTICE 'Column % already exists in %.', _col, _tbl;
-ELSE
-    EXECUTE 'ALTER TABLE ' || _tbl || ' ADD COLUMN ' || quote_ident(_col) || ' ' || _type || ' ' || _params;
-    success := TRUE;
-END IF;
-
-END
-$func$;
+then
+    RAISE NOTICE ''Column % already exists in %.'', _col, _tbl;
+else
+    EXECUTE ''ALTER TABLE '' || _tbl || '' ADD COLUMN '' || quote_ident(_col) || '' '' || _type || '' '' || _params;
+end if;
+return success;
+end;' language 'plpgsql';
 
 -- Table: cf_complexinfo_discountdetail
 
