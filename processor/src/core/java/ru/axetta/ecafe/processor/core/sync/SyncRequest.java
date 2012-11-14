@@ -1166,7 +1166,7 @@ public class SyncRequest {
                 private final Integer flags;
                 private final Integer priority;
 
-                public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, long price,
+                public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
                         Double minCa, Double minP, Double minMg, Double minFe) {
@@ -1222,7 +1222,7 @@ public class SyncRequest {
                     return output;
                 }
 
-                public long getPrice() {
+                public Long getPrice() {
                     return price;
                 }
 
