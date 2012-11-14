@@ -61,5 +61,23 @@
     <task:scheduler id="myScheduler" pool-size="5"/>
 
 
+    <task:scheduled-tasks scheduler="msrStoplistPeriodScheduler">
+        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="msrStoplistPeriodScheduler" pool-size="5"/>
+
+
+    <task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
+        <task:scheduled ref="MSRStopListLoader" method="parseCards" fixed-delay="15000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="msrStoplistLoadScheduler" pool-size="5"/>
+
+
+    <!--<task:scheduled-tasks scheduler="projectStateScheduler">
+        <task:scheduled ref="projectStateReportService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="projectStateScheduler" pool-size="5"/>-->
+
+
 
 </beans>

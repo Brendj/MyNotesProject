@@ -54,6 +54,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>ProjectStateReportServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.ProjectStateReportServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>PaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.PaymentServlet</servlet-class>
     </servlet>
@@ -95,6 +100,11 @@
     <servlet-mapping>
         <servlet-name>SyncServlet</servlet-name>
         <url-pattern>/sync</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ProjectStateReportServlet</servlet-name>
+        <url-pattern>/prj-state</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
