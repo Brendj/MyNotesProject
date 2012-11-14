@@ -449,6 +449,9 @@
                         label="Отчет по агентам" action="#{payStatsPage.show}"
                         reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}" label="Свод по услугам"
+                        action="#{totalServicesReportPage.show}" reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
