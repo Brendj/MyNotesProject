@@ -54,7 +54,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private Set<CategoryDiscount> categoryDiscountSet;
 
     public String getIdOfCategoryOrgListString() {
-        return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+        return idOfCategoryOrgList.toString().replaceAll("[^(0-9-),]","");
+    }
+
+    public String getIdOfCategoryListString() {
+        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
     }
 
     public Set<CategoryDiscount> getCategoryDiscountSet() {
@@ -257,6 +261,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         //entity.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         entity.getCategoriesDiscounts().clear();
+        //if (this.idOfCategoryList.isEmpty()) {
+        //    for (CategoryDiscount categoryDiscount: entity.getCategoriesDiscounts()){
+        //        this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+        //    }
+        //}
         if(!this.idOfCategoryList.isEmpty()){
             List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
             StringBuilder stringBuilder = new StringBuilder();
@@ -297,11 +306,14 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.complex8 = discountRule.getComplex8()>0;
         this.complex9 = discountRule.getComplex9()>0;
         this.priority = discountRule.getPriority();
+
+        this.idOfCategoryList.clear();
         if (!discountRule.getCategoriesDiscounts().isEmpty()){
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
                 stringBuilder.append(categoryDiscount.getCategoryName());
                 stringBuilder.append("; ");
+                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
             }
             this.categoryDiscounts=stringBuilder.toString();
         }
@@ -310,8 +322,8 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){
                  stringBuilder.append(categoryOrg.getCategoryName());
-                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
                  stringBuilder.append("; ");
+                 this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
         }
         this.operationor=discountRule.isOperationOr();

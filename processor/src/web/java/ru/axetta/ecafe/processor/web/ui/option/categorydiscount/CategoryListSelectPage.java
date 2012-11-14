@@ -98,6 +98,20 @@ public class CategoryListSelectPage extends BasicPage {
         this.filter = filter;
     }
 
+    public void fill(Session session, boolean flag, String categoryFilter) throws Exception {
+        List<Item> items = new LinkedList<Item>();
+        List categoryDiscounts = retrieveCategory(session, flag);
+        String[] idOfDiscounts = categoryFilter.split(",");
+        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfDiscounts));
+        for (Object object : categoryDiscounts) {
+            CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+            Item item = new Item(categoryDiscount);
+            if(longSet.contains(String.valueOf(categoryDiscount.getIdOfCategoryDiscount()).trim())) item.setSelected(true);
+            items.add(item);
+        }
+        this.items = items;
+    }
+
     public void fill(Session session, boolean flag) throws Exception {
         List<Item> items = new LinkedList<Item>();
         List categoryDiscounts = retrieveCategory(session, flag);

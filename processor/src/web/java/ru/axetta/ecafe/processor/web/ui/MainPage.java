@@ -6437,6 +6437,17 @@ public Long getSelectedIdOfReportRule() {
         return categoryListSelectPage;
     }
 
+    String categoryFilterOfSelectCategoryListSelectPage;
+
+    public String getCategoryFilterOfSelectCategoryListSelectPage() {
+        return categoryFilterOfSelectCategoryListSelectPage;
+    }
+
+    public void setCategoryFilterOfSelectCategoryListSelectPage(
+            String categoryFilterOfSelectCategoryListSelectPage) {
+        this.categoryFilterOfSelectCategoryListSelectPage = categoryFilterOfSelectCategoryListSelectPage;
+    }
+
     // Kadyrov (18.01.2012)
     public Object showCategoryListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
@@ -6450,10 +6461,15 @@ public Long getSelectedIdOfReportRule() {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                boolean flag = true;
                 if (params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")) {
-                    categoryListSelectPage.fill(persistenceSession, false);
+                    flag = false;
+                }
+                if (StringUtils.isEmpty(categoryFilterOfSelectCategoryListSelectPage)) {
+                    categoryListSelectPage.fill(persistenceSession, flag);
                 } else {
-                    categoryListSelectPage.fill(persistenceSession, true);
+                    categoryListSelectPage
+                            .fill(persistenceSession, flag, categoryFilterOfSelectCategoryListSelectPage);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -6485,11 +6501,11 @@ public Long getSelectedIdOfReportRule() {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            boolean flag = true;
             if (params.get("fullList") != null && params.get("fullList").equalsIgnoreCase("false")) {
-                categoryListSelectPage.fill(persistenceSession, false);
-            } else {
-                categoryListSelectPage.fill(persistenceSession, true);
+                flag = false;
             }
+            categoryListSelectPage.fill(persistenceSession, flag);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

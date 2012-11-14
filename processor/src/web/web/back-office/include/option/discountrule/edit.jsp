@@ -20,7 +20,9 @@
         <h:panelGroup>
             <a4j:commandButton id="categoryAjaxButton" value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryListString}" target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}"/>
+            </a4j:commandButton>
             <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{ruleEditPage.filter}}" />
         </h:panelGroup>
 
