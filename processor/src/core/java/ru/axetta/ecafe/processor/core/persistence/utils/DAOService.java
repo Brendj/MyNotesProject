@@ -472,4 +472,24 @@ public class DAOService {
         return (List<Object[]>) q.getResultList();
     }
 
+
+    public void setCardStatus (long idOfCard, int state, String reason)
+        {
+        try
+            {
+            Query q = em.createQuery ("from Card where idOfCard = :idOfCard");
+            q.setParameter ("idOfCard", idOfCard);
+            List l = q.getResultList ();
+            if (l.size () == 0)
+                {
+                return;
+                }
+            Card card = (Card) l.get (0);
+            card.setState (state);
+            card.setLockReason (reason);
+            }
+        catch (Exception e)
+            {
+            }
+        }
 }

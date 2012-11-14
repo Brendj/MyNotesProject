@@ -1,0 +1,1582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MSR" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0000000000000029"/>
+	<property name="ireport.x" value="718"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table" isDefault="false" fill="Solid">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="data" isDefault="false" fill="Solid">
+		<pen lineWidth="1.0" lineColor="#000000"/>
+	</style>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="generateDate" class="java.lang.String"/>
+	<parameter name="Month0" class="java.lang.String"/>
+	<parameter name="Month1" class="java.lang.String"/>
+	<parameter name="Month2" class="java.lang.String"/>
+	<parameter name="Month3" class="java.lang.String"/>
+	<parameter name="Month4" class="java.lang.String"/>
+	<parameter name="Month5" class="java.lang.String"/>
+	<field name="props" class="java.lang.Object"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="186" splitType="Stretch">
+			<textField>
+				<reportElement x="-21" y="0" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[String.format("Общий отчет за: %s", $P{generateDate})]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement x="196" y="35" width="71" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement x="102" y="35" width="81" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="183" y="35" width="13" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-21" y="35" width="123" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Период отчета:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="-21" y="76" width="164" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Номер образовательного учреждения]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="143" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Номер образовательного учреждения]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="222" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[тип пищеблока]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="301" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество обуч-ся, воспитанников ВСЕГО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество льготных завтраков]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="696" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество нельготников ВСЕГО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="76" width="237" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество льготников ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="538" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Оплата услуги (руб)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="538" y="92" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="92" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="92" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1 полугодие]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="76" width="79" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платные обеды]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="92" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество платных обедов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="380" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество уч/дней в 1 полугодии]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="854" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="933" y="76" width="79" height="88"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1012" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1170" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1249" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1328" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1407" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1486" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1565" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1644" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1723" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1723" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1565" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1328" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1881" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2039" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2118" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2197" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2276" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1960" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2197" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2039" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="854" y="76" width="79" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-21" y="55" width="83" height="21"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3066" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3540" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3540" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2592" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3066" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3303" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2908" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2355" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2513" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2671" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3382" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2829" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2671" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3224" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2908" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3382" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2987" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3619" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2750" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3461" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="1012" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month0}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="2355" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4409" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4330" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4883" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3856" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4646" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4567" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4804" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4725" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4172" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4093" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4725" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4014" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3935" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4409" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4014" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4251" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="3698" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4251" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4962" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="3698" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4883" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5752" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5673" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6226" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5199" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5989" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5910" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6147" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6068" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5515" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5436" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6068" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5357" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5278" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5752" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5357" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5594" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="5041" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5594" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6305" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5041" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6226" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7095" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7016" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7569" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6542" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7332" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7253" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7490" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7411" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6858" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6779" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7411" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6700" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6621" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7095" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6700" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6937" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="6384" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month4}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6937" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7648" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="6384" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7569" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="92" width="553" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в день]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Льготники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8438" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8359" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8912" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма/ср.обед  руб.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7885" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8675" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8596" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8833" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8754" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8201" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="92" width="711" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[в месяц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8122" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ст-ть]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8754" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8043" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7964" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1-4 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8438" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8043" y="105" width="237" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5-11 классы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8280" y="105" width="158" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Платники]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="table" stretchType="RelativeToBandHeight" x="7727" y="76" width="1343" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month5}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8280" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8991" y="105" width="79" height="59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="7727" y="92" width="79" height="72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Кол-во уч/дней]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8912" y="105" width="79" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Буфет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="118" width="79" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[кол-во]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="75" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="92" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1091" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1802" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="538" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitPaymentsSum")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1644" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1249" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2197" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="301" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("studentsCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1960" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="143" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("no")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2276" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="854" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("canteenDailySum")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1486" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="380" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("studyDays")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="696" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("payerTotalCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1565" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1012" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1881" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="775" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("payerDailyLunchCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="933" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("doNotEatCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1407" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="617" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitDailyCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2039" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2118" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1170" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1328" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="222" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("type")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="1723" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="459" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitBreakfastsCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="-21" y="0" width="164" height="13"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("name")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3382" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2513" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3303" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3461" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2355" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2592" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2829" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2671" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3224" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3619" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3066" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3145" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2434" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2908" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2987" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="2750" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3540" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4567" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4725" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4488" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3698" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3777" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4804" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4962" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4251" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4014" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4093" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4409" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3935" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4330" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="3856" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4646" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4172" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="4883" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5278" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5357" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6147" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5120" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5910" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5989" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6068" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6226" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6305" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5199" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5436" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5515" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5673" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5752" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5594" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5041" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="5831" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6542" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7253" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7332" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7016" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6858" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6700" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6463" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7411" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6621" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7174" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7095" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7490" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6937" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7648" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6779" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7569" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="6384" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7806" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8833" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payersSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8122" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8596" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_benefitSummDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7727" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_daysCount")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7964" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8280" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8201" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11SummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8754" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payersCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8991" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_doNotEatDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8438" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_canteenSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="7885" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4AvgMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8517" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_benefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8043" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11CountMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8675" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_noBenefitCountDaily")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8359" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payerSummMonthly")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="data" stretchType="RelativeToBandHeight" x="8912" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_canteenAvgDaily")]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

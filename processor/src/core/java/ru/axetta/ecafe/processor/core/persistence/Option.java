@@ -54,7 +54,8 @@ public class Option {
             OPTION_RBK_SECTION=1002,
             OPTION_RBK_RATE=1003,
             OPTION_NSI_LAST_SYNC_TIME=10001,
-            OPTION_STOP_LIST_LAST_UPDATE=10010;
+            OPTION_STOP_LIST_LAST_UPDATE=10010,
+            OPTION_MSR_STOPLIST_UPD_TIME=10011;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, "0",

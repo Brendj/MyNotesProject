@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
+import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
+import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -138,7 +140,9 @@ public class ReportRuleConstants {
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{20, 21, 30})
+            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{20, 21, 30}),
+            new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{})
     };
 
     private ReportRuleConstants() {

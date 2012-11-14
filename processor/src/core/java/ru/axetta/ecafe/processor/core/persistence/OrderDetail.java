@@ -37,6 +37,7 @@ public class OrderDetail {
     public static final int TYPE_COMPLEX_ITEM_7 = 157;
     public static final int TYPE_COMPLEX_ITEM_8 = 158;
     public static final int TYPE_COMPLEX_ITEM_9 = 159;
+    public static final int TYPE_COMPLEX_LAST = 160;           // неодбходи мо обновлять, если добавится новый комплекс! Используется в BeneficiarySummaryReport
 
     private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
     private Long idOfOrder;
