@@ -1433,6 +1433,9 @@ public class Processor implements SyncProcessor,
             if (reqComplexInfo.getUseTrDiscount() != null) {
                 complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
             }
+            if (reqComplexInfo.getCurrentPrice() != null) {
+                complexInfo.setCurrentPrice(reqComplexInfo.getCurrentPrice());
+            }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
                 MenuDetail menuDetailOptional = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
@@ -1479,6 +1482,10 @@ public class Processor implements SyncProcessor,
                 Long idOfItem = reqComplexInfoDetail.getIdOfItem();
                 if (idOfItem != null) {
                     complexInfoDetail.setIdOfItem(idOfItem);
+                }
+                Integer menuItemCount = reqComplexInfoDetail.getCount();
+                if (menuItemCount != null) {
+                    complexInfoDetail.setCount(menuItemCount);
                 }
                 persistenceSession.save(complexInfoDetail);
             }

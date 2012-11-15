@@ -21,5 +21,6 @@
                      not-null="true" lazy="proxy"
                      update="false"/>
         <property name="idOfItem" column="IdOfItem" type="long" update="true" />
+        <property name="count" column="Count" type="int" update="true"/>
     </class>
 </hibernate-mapping>

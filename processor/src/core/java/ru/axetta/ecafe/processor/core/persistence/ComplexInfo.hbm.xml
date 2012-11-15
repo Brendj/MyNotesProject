@@ -30,6 +30,6 @@
                      update="false"/>
         <many-to-one name="discountDetail" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDiscountDetail"
                      column="idOfDiscountDetail" not-null="false" lazy="proxy" update="false" />
-
+        <property name="currentPrice" column="CurrentPrice" type="long" update="true"/>
     </class>
 </hibernate-mapping>

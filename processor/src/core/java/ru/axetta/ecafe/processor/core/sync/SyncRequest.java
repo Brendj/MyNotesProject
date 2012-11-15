@@ -806,10 +806,12 @@ public class SyncRequest {
 
                     ReqMenuDetail reqMenuDetail;
                     Long idOfItem;
+                    Integer count;
 
-                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem) {
+                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem, Integer count) {
                         this.reqMenuDetail = reqMenuDetail;
                         this.idOfItem = idOfItem;
+                        this.count = count;
                     }
 
                     public ReqMenuDetail getReqMenuDetail() {
@@ -819,6 +821,11 @@ public class SyncRequest {
                     public Long getIdOfItem() {
                         return idOfItem;
                     }
+
+                    public Integer getCount() {
+                        return count;
+                    }
+
 
                     public static class Builder {
 
@@ -832,12 +839,24 @@ public class SyncRequest {
                                 throw new Exception("Menu detail not found by refIdOfMenu: " + refIdOfMenu);
                             }
                             Long idOfItem = null;
-                            try {
-                                idOfItem = Long.parseLong(namedNodeMap.getNamedItem("IdOfItem").getTextContent());
-                            } catch (Exception e) {
-                                throw new Exception("Menu detail doesn't containt ifOfItem field");
+                            Node idOfItemNode = namedNodeMap.getNamedItem("IdOfItem");
+                            if (idOfItemNode != null) {
+                                try {
+                                    idOfItem = Long.parseLong(idOfItemNode.getTextContent());
+                                } catch (NumberFormatException e) {
+                                    throw new Exception("Attribute IdOfItem contains value of type different from Float");
+                                }
                             }
-                            return new ReqComplexInfoDetail(reqMenuDetail, idOfItem);
+                            Integer menuItemCount = null;
+                            Node menuItemCountNode = namedNodeMap.getNamedItem("Count");
+                            if (menuItemCountNode != null) {
+                                try {
+                                    menuItemCount = Integer.parseInt(menuItemCountNode.getTextContent());
+                                } catch (NumberFormatException e) {
+                                    throw new Exception("Attribute MenuItemCount contains value of type different from Integer");
+                                }
+                            }
+                            return new ReqComplexInfoDetail(reqMenuDetail, idOfItem, menuItemCount);
                         }
                     }
                 }
@@ -929,7 +948,14 @@ public class SyncRequest {
                         int complexId = Integer.parseInt(namedNodeMap.getNamedItem("ComplexId").getTextContent());
                         String complexMenuName = StringUtils
                                 .substring(namedNodeMap.getNamedItem("ComplexMenuName").getTextContent(), 0, 60);
+                        // фиксированная цена, не сохраняется в БД
                         long price = Long.parseLong(namedNodeMap.getNamedItem("pr").getTextContent());
+                        // текущая цена
+                        Node currentPriceNode = namedNodeMap.getNamedItem("CurrentPrice");
+                        Long currentPrice = null;
+                        if (currentPriceNode != null) {
+                            currentPrice = Long.parseLong(currentPriceNode.getTextContent());
+                        }
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
@@ -961,7 +987,7 @@ public class SyncRequest {
                             childNode = childNode.getNextSibling();
                         }
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail);
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice);
                     }
 
                 }
@@ -975,10 +1001,11 @@ public class SyncRequest {
                 private final ReqMenuDetail reqMenuDetail;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
                 private final ReqComplexInfoDiscountDetail complexInfoDiscountDetail;
+                private final Long currentPrice;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
-                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail) {
+                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -988,6 +1015,7 @@ public class SyncRequest {
                     this.useTrDiscount = useTrDiscount;
                     this.complexInfoDiscountDetail = complexInfoDiscountDetail;
                     this.reqMenuDetail = reqMenuDetail;
+                    this.currentPrice = currentPrice;
                 }
 
                 public int getComplexId() {
@@ -1024,6 +1052,10 @@ public class SyncRequest {
 
                 public ReqComplexInfoDiscountDetail getComplexInfoDiscountDetail() {
                     return complexInfoDiscountDetail;
+                }
+
+                public Long getCurrentPrice() {
+                    return currentPrice;
                 }
 
             }

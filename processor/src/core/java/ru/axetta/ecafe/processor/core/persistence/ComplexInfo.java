@@ -20,6 +20,7 @@ public class ComplexInfo {
     private Date menuDate;
     private ComplexInfoDiscountDetail discountDetail;
     private MenuDetail menuDetail;
+    private Long currentPrice;
 
     public Date getMenuDate() {
         return menuDate;
@@ -124,6 +125,14 @@ public class ComplexInfo {
         this.menuDetail = menuDetail;
     }
 
+    public Long getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(Long currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -151,6 +160,6 @@ public class ComplexInfo {
     public String toString() {
         return "ComplexInfo{" + "idOfComplexInfo=" + idOfComplexInfo + ", idOfComplex=" + idOfComplex + ", org=" + org
                 + ", modeFree=" + modeFree + ", modeGrant=" + modeGrant + ", modeOfAdd=" + modeOfAdd + ", useTrDiscount=" + useTrDiscount
-                + ", discountDetail:" + discountDetail + '}';
+                + ", discountDetail:" + discountDetail + ", currentPrice=" + currentPrice + '}';
     }
 }

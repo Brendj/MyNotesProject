@@ -424,6 +424,7 @@
                         <td><div class="column-header">Группа</div></td>
                         <td><div class="column-header">Наименование</div></td>
                         <td><div class="column-header">Цена</div></td>
+                        <td><div class="column-header">Выход</div></td>
                     </tr>
                 <%
                         //boolean firstGroup = true;
@@ -463,10 +464,21 @@
                             </div>
                         </td>
                         <td>
+                            <% String elementPrice = "-";
+                                if (currMenuDetail.getPrice() != null) {
+                                    elementPrice = CurrencyStringUtils.copecksToRubles(currMenuDetail.getPrice());
+                                }
+                            %>
                             <div class="output-text">
-                                <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currMenuDetail.getPrice()))%>
+                                <%=StringEscapeUtils.escapeHtml(elementPrice)%>
                             </div>
                         </td>
+                        <td>
+                            <div class="output-text">
+                                <%=StringEscapeUtils.escapeHtml(currMenuDetail.getMenuDetailOutput())%>
+                            </div>
+                        </td>
+
                     </tr>
                 <%
                         //firstGroup = false;
@@ -611,8 +623,10 @@
                 <tbody>
                 <tr>
                     <td><div class="column-header">Комплекс</div></td>
+                    <td><div class="column-header">Цена комплекса</div></td>
                     <td><div class="column-header">Содержание</div></td>
-                    <%--<td><div class="column-header">Цена</div></td>--%>
+                    <td><div class="column-header">Цена</div></td>
+                    <td><div class="column-header">Выход</div></td>
                 </tr>
                 <%
                     //boolean firstGroup = true;
@@ -641,19 +655,41 @@
                         <div class="menu-group-name">
                         </div>
                     </td>
+                    <td>
+                        <div class="menu-group-name">
+                        </div>
+                    </td>
                     <%
                         }
                     %>
                     <td>
                         <div class="output-text">
-                            <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailName())%>
+                            <%
+                                Integer count = currComplexDetail.getCount();
+                                if (count == null) {
+                                    count = 1;
+                                }
+                                String menuDetailName = currComplexDetail.getMenuDetail().getMenuDetailName();
+                                menuDetailName += " (" + String.valueOf(count) + ")";
+                            %>
+                            <%=StringEscapeUtils.escapeHtml(menuDetailName)%>
                         </div>
                     </td>
-                    <%--<td>
+                    <td>
+                        <% String elementPrice = "-";
+                            if (currComplexDetail.getMenuDetail().getPrice() != null) {
+                                elementPrice = CurrencyStringUtils.copecksToRubles(currComplexDetail.getMenuDetail().getPrice());
+                            }
+                        %>
                         <div class="output-text">
-                            <%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(currComplexDetail.getMenuDetail().getPrice()))%>
+                            <%=StringEscapeUtils.escapeHtml(elementPrice)%>
                         </div>
-                    </td>--%>
+                    </td>
+                    <td>
+                        <div class="output-text">
+                            <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailOutput())%>
+                        </div>
+                    </td>
                 </tr>
                 <%
                         //firstGroup = false;

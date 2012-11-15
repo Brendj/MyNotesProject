@@ -17,6 +17,7 @@ public class ComplexInfoDetail {
     private ComplexInfo complexInfo;
     private MenuDetail menuDetail;
     private Long idOfItem;
+    private Integer count;
 
     protected ComplexInfoDetail() {
 
@@ -59,6 +60,14 @@ public class ComplexInfoDetail {
         this.idOfItem = idOfItem;
     }
 
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,6 +94,6 @@ public class ComplexInfoDetail {
     @Override
     public String toString() {
         return "ComplexInfoDetail{" + "idOfComplexInfoDetail=" + idOfComplexInfoDetail + ", complexInfo=" + complexInfo
-                + ", menuDetail=" + menuDetail + '}';
+                + ", menuDetail=" + menuDetail + ", count=" + count + '}';
     }
 }
