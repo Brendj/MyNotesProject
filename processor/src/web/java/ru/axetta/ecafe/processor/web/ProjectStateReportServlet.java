@@ -16,8 +16,11 @@ import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,7 +37,7 @@ public class ProjectStateReportServlet extends DataSourceServlet
 
 
     @Override
-    public DataTable generateDataTable (Query query, HttpServletRequest request)
+    public DataTable generateDataTable (Query query, HttpServletRequest request) throws TypeMismatchException
         {
         RuntimeContext runtimeContext = null;
         ProjectStateReportService.Type t = null;
@@ -45,8 +48,12 @@ public class ProjectStateReportServlet extends DataSourceServlet
             t = ProjectStateReportService.TYPES.get (reportType);
             if (runtimeContext == null || t == null)
                 {
-                return null;
+                throw new TypeMismatchException ("Incorrect type of report was required: '" + reportType + "'");
                 }
+            }
+        catch (TypeMismatchException tme)
+            {
+            throw tme;
             }
         catch (Exception e)
             {
@@ -54,10 +61,40 @@ public class ProjectStateReportServlet extends DataSourceServlet
             return null;
             }
 
-        // Create a data table.
-        Calendar cal = Calendar.getInstance ();
 
-        DataTable data = ProjectStateReportService.generateReport (runtimeContext, cal, t);
+        Calendar dateAt  = new GregorianCalendar ();
+        dateAt.setTimeInMillis (System.currentTimeMillis ());
+        String inDate = request.getParameter ("dateAt");
+        try
+            {
+            if (inDate != null && inDate.trim ().length () > 0)
+                {
+                Date d = new SimpleDateFormat("dd.MM.yyyy").parse (inDate.trim ());
+                    dateAt.setTime (d);
+                }
+            }
+        catch (Exception e)
+            {
+            dateAt = ProjectStateReportService.getStartDate ();
+            }
+
+        Calendar dateTo = new GregorianCalendar ();
+        dateTo.setTimeInMillis (System.currentTimeMillis ());
+        inDate = request.getParameter ("dateTo");
+            try
+            {
+            if (inDate != null && inDate.trim ().length () > 0)
+                {
+                Date d = new SimpleDateFormat("dd.MM.yyyy").parse (inDate.trim ());
+                dateTo.setTime (d);
+                }
+            }
+        catch (Exception e)
+            {
+            dateTo = ProjectStateReportService.getStartDate ();
+            }
+
+        DataTable data = ProjectStateReportService.generateReport (runtimeContext, dateAt, dateTo, t);
         return data;
         }
 
