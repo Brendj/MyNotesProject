@@ -70,18 +70,19 @@ public class SMPPClient extends ISmsService {
 
     public SMPPClient(Config config, Properties properties, String PATH) {
         super(config);
-        PATH = ".smpp.";
+        PATH = PATH+".smpp.";
         smppListener = new SMPPListener();
         client = new Client(smppListener, "CMD Processor");
         client.ussd_mapping = USSD_MAPPINGS.NOWSMS_SCHEME_ITS;
         smscIPAddress = properties.getProperty(PATH + "ip-address", "127.0.0.1");
         smscPort = Integer.parseInt(properties.getProperty(PATH + "port", "9500"));
-        systemId = properties.getProperty(PATH+"system-id", "user1");
-        password = properties.getProperty(PATH+"password", "1234");
+        systemId = properties.getProperty(PATH+"system-id", "user");
+        password = properties.getProperty(PATH+"password", "user");
         serviceType = properties.getProperty(PATH+"service-type", "");
         systemType = properties.getProperty(PATH+"system-type", "test");
         sourceAddress = properties.getProperty(PATH + "source-address", "5223");
         serviceStatus = properties.getProperty(PATH+"service-status", "0").equals("1");
+        //serviceStatus = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMPP_CLIENT_STATUS);
         startService();
     }
 

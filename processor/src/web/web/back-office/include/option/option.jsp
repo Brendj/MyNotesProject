@@ -18,8 +18,6 @@
                 <h:selectBooleanCheckbox value="#{optionPage.withOperator}" styleClass="output-text" />
                 <h:outputText escape="true" value="Отпралять СМС-уведомление о событиях входа-выхода" styleClass="output-text" />
                 <h:selectBooleanCheckbox value="#{optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
-                <h:outputText escape="true" value="Запустить SMPP клиент" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{optionPage.smppClientStatus}" styleClass="output-text" />
             </h:panelGrid>
             <h:panelGroup styleClass="borderless-grid">
                 <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
