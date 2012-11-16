@@ -158,3 +158,18 @@ CREATE UNIQUE INDEX cf_complexinfo_discountdetail_5col_uni_idx
   WHERE maxcount IS NOT NULL AND idofclientgroup IS NOT NULL AND idoforg IS NOT NULL;
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 121113) НЕ МЕНЯТЬ
+
+--! Если уже были удалены внешние ключи из таблицы cf_complexinfo_discountdetail
+
+--! ALTER TABLE cf_complexinfo_discountdetail DROP CONSTRAINT IF EXISTS cf_complexinfo_discountdetail_idoforg_fk;
+--! ALTER TABLE cf_complexinfo_discountdetail ADD CONSTRAINT cf_complexinfo_discountdetail_idoforg_fk FOREIGN KEY (idoforg)
+--! REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+--! ON UPDATE NO ACTION ON DELETE NO ACTION
+
+--! Требуется изменить сопоставление для составного внешнего ключа (MATCH SIMPLE на MATCH FULL)
+
+--! ALTER TABLE cf_complexinfo_discountdetail DROP CONSTRAINT IF EXISTS cf_complexinfo_discountdetail_idofclientgroup_fk;
+--! ALTER TABLE cf_complexinfo_discountdetail ADD CONSTRAINT cf_complexinfo_discountdetail_idofclientgroup_fk
+--! FOREIGN KEY (idoforg, idofclientgroup)
+--! REFERENCES cf_clientgroups (idoforg, idofclientgroup) MATCH FULL
+--! ON UPDATE NO ACTION ON DELETE NO ACTION,
