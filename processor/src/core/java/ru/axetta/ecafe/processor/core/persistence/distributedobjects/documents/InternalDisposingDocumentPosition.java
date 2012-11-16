@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -23,15 +24,29 @@ import org.w3c.dom.Node;
  */
 public class InternalDisposingDocumentPosition extends DistributedObject {
 
+    private Good good;
+
+    public Good getGood() {
+        return good;
+    }
+
+    public void setGood(Good good) {
+        this.good = good;
+    }
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
         InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
-        if(idd==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(idd==null) throw new DistributedObjectException("NOT_FOUND_InternalDisposingDocument");
         setInternalDisposingDocument(idd);
         //TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class,guidOfTMG);
         TradeMaterialGood tmg  = (TradeMaterialGood) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
         if(tmg!=null) setTradeMaterialGood(tmg);
+
+        Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
+        if(g==null)  throw new DistributedObjectException("NOT_FOUND_Good");
+        setGood(g);
     }
 
     @Override
@@ -44,6 +59,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setAttribute(element, "NDS", nds);
         setAttribute(element, "GuidOfInternalDisposingDocument", internalDisposingDocument.getGuid());
         if(tradeMaterialGood!=null) setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        setAttribute(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
@@ -62,6 +78,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         if(longNDS!=null) setNds(longNDS);
         guidOfIDD = getStringAttributeValue(node,"GuidOfInternalDisposingDocument",36);
         guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
+        guidOfGood = getStringAttributeValue(node,"GuidOfGoods",36);
         return this;
     }
 
@@ -84,6 +101,15 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
     private String guidOfIDD;
     private TradeMaterialGood tradeMaterialGood;
     private String guidOfTMG;
+    private String guidOfGood;
+
+    public String getGuidOfGood() {
+        return guidOfGood;
+    }
+
+    public void setGuidOfGood(String guidOfGood) {
+        this.guidOfGood = guidOfGood;
+    }
 
     public String getGuidOfIDD() {
         return guidOfIDD;

@@ -36,7 +36,7 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Создать продукт" action="#{configurationProviderCreatePage.save}"
+        <a4j:commandButton value="Создать" action="#{configurationProviderCreatePage.save}"
                            reRender="configurationProviderCreatePanelGrid" styleClass="command-button" />
     </h:panelGrid>
 
