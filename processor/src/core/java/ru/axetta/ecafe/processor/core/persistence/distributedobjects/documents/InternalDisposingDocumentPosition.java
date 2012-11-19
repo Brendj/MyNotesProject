@@ -24,23 +24,11 @@ import org.w3c.dom.Node;
  */
 public class InternalDisposingDocumentPosition extends DistributedObject {
 
-    private Good good;
-
-    public Good getGood() {
-        return good;
-    }
-
-    public void setGood(Good good) {
-        this.good = good;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
         InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
         if(idd==null) throw new DistributedObjectException("NOT_FOUND_InternalDisposingDocument");
         setInternalDisposingDocument(idd);
-        //TradeMaterialGood tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TradeMaterialGood.class,guidOfTMG);
         TradeMaterialGood tmg  = (TradeMaterialGood) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
         if(tmg!=null) setTradeMaterialGood(tmg);
 
@@ -102,6 +90,15 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
     private TradeMaterialGood tradeMaterialGood;
     private String guidOfTMG;
     private String guidOfGood;
+    private Good good;
+
+    public Good getGood() {
+        return good;
+    }
+
+    public void setGood(Good good) {
+        this.good = good;
+    }
 
     public String getGuidOfGood() {
         return guidOfGood;

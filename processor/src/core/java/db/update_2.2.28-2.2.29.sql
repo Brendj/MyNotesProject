@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS cf_projectstate_data
   StringKey character varying(128),
   StringValue character varying(128),
   generationdate bigint NOT NULL,
-
   CONSTRAINT cf_projectstate_data_pk PRIMARY KEY (Period, Type, StringKey)
   );
 
