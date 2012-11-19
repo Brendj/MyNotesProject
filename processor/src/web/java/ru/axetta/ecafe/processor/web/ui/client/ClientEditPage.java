@@ -473,9 +473,12 @@ public class ClientEditPage extends BasicWorkspacePage
                     categoryDiscount.getCategoryName()));
         }
 
+        idOfCategoryList.clear();
+        categoryDiscountList.clear();
         if(!client.getCategories().isEmpty()){
             for(CategoryDiscount categoryDiscount: client.getCategories()){
-                String name=categoryDiscount.getCategoryName();
+                //String name=categoryDiscount.getCategoryName();
+                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }
