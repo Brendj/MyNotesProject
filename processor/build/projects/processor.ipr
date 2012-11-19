@@ -92,7 +92,7 @@
             <element id="library" level="project" name="javamelody-monitoring" />
             <element id="library" level="project" name="barcode4j" />
             <element id="library" level="project" name="axetta_charset" />
-            <element id="library" level="project" name="google-visualization" />
+            <element id="library" level="project" name="guava-r07" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -1141,7 +1141,7 @@
       <SOURCES />
       <jarDirectory url="file://$PROJECT_DIR$/../lib/cryptopro" recursive="false" />
     </library>
-    <library name="google-visualization">
+    <library name="guava-r07">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/guava-r07.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/icu4j-4_0_1.jar!/" />
