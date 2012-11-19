@@ -88,11 +88,11 @@
     </a4j:status>
 
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" >
             <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор" />
+                <h:outputText escape="true" value="Ид." />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
@@ -102,7 +102,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Номер лицевого счета" />
+                <h:outputText escape="true" value="Л/с" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.contractId}" converter="contractIdConverter"
@@ -135,6 +135,13 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+               <h:outputText escape="true" value="Организация" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.org.shortName}"
+                          styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Текущий баланс" />
             </f:facet>
             <h:outputText escape="true" value="#{item.balance}" converter="copeckSumConverter"
@@ -151,6 +158,12 @@
                 <h:outputText escape="true" value="Лимит расходов" />
             </f:facet>
             <h:outputText escape="true" value="#{item.expenditureLimit}" converter="copeckSumConverter" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Льгота" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.discountAsString}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

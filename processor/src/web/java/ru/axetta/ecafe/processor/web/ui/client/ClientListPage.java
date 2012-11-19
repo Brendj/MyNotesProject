@@ -106,6 +106,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private Long limit;
         private Long expenditureLimit;
         private final Integer discountMode;
+        private final String discountAsString;
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -135,6 +136,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return discountMode;
         }
 
+        public String getDiscountAsString() {
+            return discountAsString;
+        }
+
         public Item(Client client) {
             this.idOfClient = client.getIdOfClient();
             this.org = new OrgItem(client.getOrg());
@@ -161,6 +166,11 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.clientGroupName = null;
             } else {
                 this.clientGroupName = clientGroup.getGroupName();
+            }
+            if (discountMode != null) {
+                this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
+            } else {
+                this.discountAsString = "";
             }
         }
 
