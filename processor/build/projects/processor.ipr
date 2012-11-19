@@ -1132,6 +1132,13 @@
         <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-xjc.jar!/1.0" />
       </SOURCES>
     </library>
+    <library name="commons-net-3.1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/commons-net-3.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="cryptopro">
       <CLASSES>
         <root url="file://$PROJECT_DIR$/../lib/cryptopro" />
