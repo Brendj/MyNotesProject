@@ -345,6 +345,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Java EE 6-3.1" level="project" />
     <orderEntry type="library" name="barcode4j" level="project" />
     <orderEntry type="library" name="axetta_charset" level="project" />
+    <orderEntry type="library" name="google-visualization" level="project" />
   </component>
 </module>
 

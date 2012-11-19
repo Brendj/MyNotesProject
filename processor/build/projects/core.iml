@@ -374,6 +374,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="axetta_charset" level="project" />
+    <orderEntry type="library" name="google-visualization" level="project" />
   </component>
 </module>
 
