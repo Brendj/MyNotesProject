@@ -725,6 +725,14 @@ public class DAOUtils {
         return minId-1;
     }
 
+    public static ClientGroup createClientGroup(Session persistenceSession, Long idOfOrg, ClientGroup.Predefined predefined) {
+        Long idOfClientGroup =null;
+        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,predefined.getValue());
+        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, predefined.getNameOfGroup());
+        persistenceSession.save(clientGroup);
+        return clientGroup;
+    }
+
     public static ClientGroup createClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
         ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(clientGroupName);
         Long idOfClientGroup =null;
