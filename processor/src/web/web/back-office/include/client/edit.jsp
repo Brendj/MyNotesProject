@@ -131,6 +131,7 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.clientEditPage.discountModeIsCategory}">
              <f:param name="fullList" value="false" />
+             <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}" target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
         </a4j:commandButton>
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
     </h:panelGroup>

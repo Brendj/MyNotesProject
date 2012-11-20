@@ -460,6 +460,10 @@ public class ClientEditPage extends BasicWorkspacePage
         this.clientGUID = clientGUID;
     }
 
+    public String getIdOfCategoryListString() {
+        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));

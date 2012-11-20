@@ -13,6 +13,7 @@
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель редактирования правила --%>
+<%--@elvariable id="ruleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleEditPage"--%>
 <h:panelGrid id="ruleEditPanel" binding="#{ruleEditPage.pageComponent}"
              styleClass="borderless-grid" columns="2">
 
