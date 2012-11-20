@@ -254,11 +254,11 @@ CREATE TABLE CF_Menu (
 CREATE TABLE CF_MenuDetails (
   IdOfMenuDetail          BIGINT            NOT NULL,
   IdOfMenu                BIGINT            NOT NULL,
-  MenuPath                VARCHAR(128)      NOT NULL,
-  MenuDetailName          VARCHAR(128)       NOT NULL,
+  MenuPath                VARCHAR(512)      NOT NULL,
+  MenuDetailName          VARCHAR(512)       NOT NULL,
   GroupName               VARCHAR(60)       NOT NULL,
-  MenuDetailOutput        VARCHAR(32)       NOT NULL,
-  Price                   BIGINT            NOT NULL,
+  MenuDetailOutput        VARCHAR(32)      ,
+  Price                   BIGINT           ,
   MenuOrigin              INT               NOT NULL,
   AvailableNow            INT               NOT NULL,
   LocalIdOfMenu           BIGINT,
@@ -274,6 +274,8 @@ CREATE TABLE CF_MenuDetails (
   MinP                    DECIMAL(5, 2),
   MinMg                   DECIMAL(5, 2),
   MinFe                   DECIMAL(5, 2),
+  Flags                   INT              NOT NULL DEFAULT 1,
+  Priority                INT              NOT NULL DEFAULT 0,
   CONSTRAINT CF_MenuDetail_pk PRIMARY KEY (IdOfMenuDetail),
   CONSTRAINT CF_MenuDetail_IdOfMenu_fk FOREIGN KEY (IdOfMenu) REFERENCES CF_Menu (IdOfMenu)
 );
@@ -288,13 +290,17 @@ CREATE TABLE CF_ComplexInfo (
   IdOfComplexInfo         BIGINT            NOT NULL,
   IdOfComplex             INT               NOT NULL,
   IdOfOrg                 BIGINT            NOT NULL,
+  IdOfDiscountDetail      BIGINT            ,
+  IdOfMenuDetail          BIGINT            ,
   ComplexName             VARCHAR(60)       NOT NULL,
   MenuDate                BIGINT            NOT NULL,
-  ModeFree                int               NOT NULL,
-  ModeGrant               int               NOT NULL,
-  ModeOfAdd               int               NOT NULL,
+  ModeFree                INT               NOT NULL,
+  ModeGrant               INT               NOT NULL,
+  ModeOfAdd               INT               NOT NULL,
+  UseTrDiscount           INT               DEFAULT 0,
   CONSTRAINT CF_ComplexInfo_pk PRIMARY KEY (IdOfComplexInfo),
-  CONSTRAINT CF_ComplexInfo_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg)
+  CONSTRAINT CF_ComplexInfo_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
+  CONSTRAINT CF_ComplexInfo_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES Cf_MenuDetails (IdOfMenuDetail)
 );
 
 CREATE TABLE CF_ComplexInfoDetail (
@@ -660,7 +666,7 @@ CREATE TABLE CF_SubscriptionFee (
 CREATE TABLE CF_MenuExchange (
   MenuDate                BIGINT            NOT NULL,
   IdOfOrg                 BIGINT            NOT NULL,
-  MenuData			VARCHAR(32650)		    NOT NULL,
+  MenuData			VARCHAR(52650)		    NOT NULL,
   Flags                   INT               NOT NULL,
   CONSTRAINT CF_MenuExchange_pk PRIMARY KEY (MenuDate, IdOfOrg),
   CONSTRAINT CF_MenuExchange_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg) ON DELETE CASCADE
@@ -1933,6 +1939,34 @@ CREATE TABLE cf_libvisits (
   PRIMARY KEY  (IdOfLibVisit)
 );
 
+
+CREATE TABLE CF_ComplexInfo_DiscountDetail
+(
+    IdOfDiscountDetail bigserial NOT NULL,
+    Size double precision NOT NULL,
+    IsAllGroups integer NOT NULL,
+    IdOfClientGroup bigint,
+    MaxCount integer,
+    IdOfOrg bigint,
+    CONSTRAINT CF_ComplexInfo_DiscountDetail_pk PRIMARY KEY (IdOfDiscountDetail)
+);
+
+-- Настройки ECafe администратора
+CREATE TABLE cf_ECafeSettings
+(
+  IdOfECafeSetting bigserial NOT NULL,
+  GlobalVersion bigint,
+  OrgOwner bigint,
+  DeletedState boolean NOT NULL DEFAULT false,
+  GUID character varying(36) NOT NULL,
+  LastUpdate bigint,
+  DeleteDate bigint,
+  CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 0,
+  SettingValue character varying(128),
+  Identificator bigint,
+  CONSTRAINT cf_ECafeSetting_pk PRIMARY KEY (IdOfECafeSetting)
+);
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
