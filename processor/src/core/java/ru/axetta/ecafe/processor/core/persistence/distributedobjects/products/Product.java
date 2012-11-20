@@ -61,13 +61,21 @@ public class Product extends DistributedObject implements IConfigProvider {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringCode = getStringAttributeValue(node,"Code",16);
-        if(stringCode!=null) setCode(stringCode);
+        if(stringCode!=null) {
+            setCode(stringCode);
+        } else {
+            throw new DistributedObjectException("Code column is not null");
+        }
         String stringFullName= getStringAttributeValue(node,"FullName",1024);
         if(stringFullName!=null) setFullName(stringFullName);
         String stringOkpCode= getStringAttributeValue(node,"OkpCode",128);
         if(stringOkpCode!=null) setOkpCode(stringOkpCode);
         String stringProductName= getStringAttributeValue(node,"ProductName",512);
-        if(stringProductName!=null) setProductName(stringProductName);
+        if(stringProductName!=null) {
+            setProductName(stringProductName);
+        } else {
+            throw new DistributedObjectException("ProductName column is not null");
+        }
         String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
         if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
         Float floatDensity = getFloatAttributeValue(node,"Density");
