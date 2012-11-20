@@ -460,10 +460,6 @@ public class ClientEditPage extends BasicWorkspacePage
         this.clientGUID = clientGUID;
     }
 
-    public String getIdOfCategoryListString() {
-        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
-    }
-
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
@@ -477,12 +473,9 @@ public class ClientEditPage extends BasicWorkspacePage
                     categoryDiscount.getCategoryName()));
         }
 
-        idOfCategoryList.clear();
-        categoryDiscountList.clear();
         if(!client.getCategories().isEmpty()){
             for(CategoryDiscount categoryDiscount: client.getCategories()){
-                //String name=categoryDiscount.getCategoryName();
-                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                String name=categoryDiscount.getCategoryName();
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }
@@ -538,6 +531,7 @@ public class ClientEditPage extends BasicWorkspacePage
         persistenceSession.update(contractPerson);
 
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
+        Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(this.org.getIdOfOrg()));
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
@@ -597,9 +591,15 @@ public class ClientEditPage extends BasicWorkspacePage
         }
         client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
         client.setCategories(categoryDiscountSet);
-
-        if(this.idOfClientGroup != null){
+        if(isReplaceOrg){
+            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+            if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
+            this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             client.setIdOfClientGroup(this.idOfClientGroup);
+        } else{
+            if(this.idOfClientGroup != null){
+                client.setIdOfClientGroup(this.idOfClientGroup);
+            }
         }
 
         persistenceSession.update(client);
