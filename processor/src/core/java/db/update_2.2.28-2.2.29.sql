@@ -30,3 +30,7 @@ SELECT add_column('cf_complexinfo', 'currentprice', 'bigint', '');
 
 -- Добавление колонки count к таблице cf_complexinfodetail
 SELECT add_column('cf_complexinfodetail', 'count', 'integer', '');
+
+-- Добавленна свяска к документу
+ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN IdOfGood bigint NOT NULL;
+ALTER TABLE cf_internal_disposing_document_positions ADD CONSTRAINT cf_internal_disposing_document_positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES cf_goods (IdOfGood);
