@@ -106,7 +106,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private Long limit;
         private Long expenditureLimit;
         private final Integer discountMode;
-        private final String discountAsString;
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -136,10 +135,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return discountMode;
         }
 
-        public String getDiscountAsString() {
-            return discountAsString;
-        }
-
         public Item(Client client) {
             this.idOfClient = client.getIdOfClient();
             this.org = new OrgItem(client.getOrg());
@@ -166,11 +161,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.clientGroupName = null;
             } else {
                 this.clientGroupName = clientGroup.getGroupName();
-            }
-            if (discountMode != null) {
-                this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
-            } else {
-                this.discountAsString = "";
             }
         }
 
@@ -358,8 +348,9 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     /**
      * Устанавливаем организацию для выбранного списка клиентов
      * @param session
+     * @throws Exception
      */
-    public void setOrg(Session session) throws Exception {
+    public void setNewOrg(Session session) throws Exception {
         if (this.items.isEmpty())
             return;
         Org org = null;
@@ -388,6 +379,27 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             q.executeUpdate();
         }
         printMessage("Данные обновлены.");
+    }
+
+    public void setOrg(Session session) throws Exception{
+        Org org = null;
+        if (this.getClientFilter().getOrg().getIdOfOrg() != null) {
+            org = (Org) session.load(Org.class, this.getClientFilter().getOrg().getIdOfOrg());
+        }
+        if (!(this.items.isEmpty() || org==null)){
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+            if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
+            for (Item item : this.items) {
+                org.hibernate.Query query = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
+                query.setLong("newOrg", org.getIdOfOrg());
+                query.setLong("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                query.setLong("idOfClient", item.getIdOfClient());
+                query.setLong("clientRegistryVersion", clientRegistryVersion);
+                query.executeUpdate();
+            }
+            printMessage("Данные обновлены.");
+        }
     }
 
     /**
