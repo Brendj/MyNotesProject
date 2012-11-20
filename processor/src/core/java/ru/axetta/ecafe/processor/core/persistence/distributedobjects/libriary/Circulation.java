@@ -67,28 +67,16 @@ public class Circulation extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        //DAOService daoService = DAOService.getInstance();
-        //Issuable iss = daoService.findDistributedObjectByRefGUID(Issuable.class, guidIssuable);
-        //if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
-
         Issuable iss = (Issuable) DAOUtils.findDistributedObjectByRefGUID(session, guidIssuable);
         if(iss==null) throw new DistributedObjectException("Issuable NOT_FOUND_VALUE");
         setIssuable(iss);
 
-        //Circulation parentCirculation = daoService.findDistributedObjectByRefGUID(Circulation.class, guidParentCirculation);
         Circulation parentCirculation = (Circulation) DAOUtils.findDistributedObjectByRefGUID(session, guidParentCirculation);
-       // if(parentCirculation==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(parentCirculation!=null) setParentCirculation(parentCirculation);
 
-        //Reader read = daoService.findDistributedObjectByRefGUID(Reader.class, guidReader);
         Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
         if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
         setClient(cl);
-        //Reader read = (Reader) DAOUtils.findDistributedObjectByRefGUID(session, guidReader);
-        //if(read==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
-        //setReader(read);
-
-
 
     }
 
@@ -101,7 +89,6 @@ public class Circulation extends DistributedObject {
         setParentCirculation(((Circulation) distributedObject).getParentCirculation());
         setIssuable(((Circulation) distributedObject).getIssuable());
         setClient(((Circulation) distributedObject).getClient());
-        //setReader(((Circulation) distributedObject).getReader());
     }
 
     public Circulation getParentCirculation() {
