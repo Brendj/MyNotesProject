@@ -1696,20 +1696,20 @@ CREATE TABLE cf_accompanyingdocuments (
   CONSTRAINT cf_accompanyingdocument_pk PRIMARY KEY (IdOfAccompanyingDocument )
 );
 
---читатель
-CREATE TABLE cf_readers (
-  IdOfReader bigserial NOT NULL,
-  IdOfClient bigint NOT NULL REFERENCES cf_clients(idofclient),
-  GlobalVersion bigint,
-  OrgOwner bigint,
-  DeletedState boolean NOT NULL DEFAULT false,
-  GUID character varying(36) NOT NULL,
-  LastUpdate bigint,
-  DeleteDate bigint,
-  CreatedDate bigint NOT NULL,
-  SendAll integer DEFAULT 0,
-  CONSTRAINT cf_reader_pk PRIMARY KEY (IdOfReader )
-);
+-- --читатель
+-- CREATE TABLE cf_readers (
+--   IdOfReader bigserial NOT NULL,
+--   IdOfClient bigint NOT NULL REFERENCES cf_clients(idofclient),
+--   GlobalVersion bigint,
+--   OrgOwner bigint,
+--   DeletedState boolean NOT NULL DEFAULT false,
+--   GUID character varying(36) NOT NULL,
+--   LastUpdate bigint,
+--   DeleteDate bigint,
+--   CreatedDate bigint NOT NULL,
+--   SendAll integer DEFAULT 0,
+--   CONSTRAINT cf_reader_pk PRIMARY KEY (IdOfReader )
+-- );
 
 --фонд
 --FundName - название
@@ -1903,21 +1903,21 @@ CREATE TABLE cf_journalitems (
 
 --регистрация читателя (перерег. после перехода в другой класс)
 --IdOfClientGroupHist - ссылка на историю переходов по классам
-CREATE TABLE cf_readerreg (
-  IdOfReg bigserial NOT NULL,
-  IdOfReader bigint NOT NULL REFERENCES cf_readers(IdOfReader),
-  IdOfClientGroupHist bigint default NULL,
-  Date date NOT NULL,
-  GlobalVersion bigint,
-  OrgOwner bigint,
-  DeletedState boolean NOT NULL DEFAULT false,
-  GUID character varying(36) NOT NULL,
-  LastUpdate bigint,
-  DeleteDate bigint,
-  CreatedDate bigint NOT NULL,
-  SendAll integer DEFAULT 0,
-  PRIMARY KEY  (IdOfReg)
-);
+-- CREATE TABLE cf_readerreg (
+--   IdOfReg bigserial NOT NULL,
+--   IdOfReader bigint NOT NULL REFERENCES cf_readers(IdOfReader),
+--   IdOfClientGroupHist bigint default NULL,
+--   Date date NOT NULL,
+--   GlobalVersion bigint,
+--   OrgOwner bigint,
+--   DeletedState boolean NOT NULL DEFAULT false,
+--   GUID character varying(36) NOT NULL,
+--   LastUpdate bigint,
+--   DeleteDate bigint,
+--   CreatedDate bigint NOT NULL,
+--   SendAll integer DEFAULT 0,
+--   PRIMARY KEY  (IdOfReg)
+-- );
 
 --посещение бибилотеки
 --IdOfClient bigint - читатель (тут сразу клиент)
@@ -1969,7 +1969,7 @@ CREATE TABLE cf_ECafeSettings
 );
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
-insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime)
-VALUES(2, 2, 26, 121015, 0, "");
+insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
+        VALUES(2, 2, 28, 121122, 0, '');
 
 
