@@ -66,7 +66,6 @@ public class IntegroServlet extends HttpServlet {
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-
             RequestData requestData = new RequestData();
             // Read XML request
             try {
@@ -82,6 +81,8 @@ public class IntegroServlet extends HttpServlet {
 
             IntegroLogger integroLogger = runtimeContext.getIntegroLogger();
             Org org = null;
+            Long idOfOrg = null;
+            String  idOfSync = null;
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
             DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -96,35 +97,25 @@ public class IntegroServlet extends HttpServlet {
             try {
                 Document requestDocument = requestData.document;
                 Node dataNode = requestDocument.getFirstChild();
-
-                NamedNodeMap attributes=dataNode.getAttributes();
-                attributes.getLength();
-
-                if(0==attributes.getLength()){
-
-                    throw new Exception("no attribute idOfOrg");
-
-                }
-
-                Node idOfOrgAttribute= attributes.getNamedItem("idOfOrg");
-
-
-                if(null==idOfOrgAttribute){
-                    throw new Exception("no attribute idOfOrg");
-
-                }
-
-                Long idOfOrg=Long.parseLong(idOfOrgAttribute.getTextContent());
-
+                NamedNodeMap namedNodeMap=dataNode.getAttributes();
+                //attributes.getLength();
+                //if(0==attributes.getLength()){
+                //    throw new Exception("no attribute idOfOrg");
+                //}
+                //Node idOfOrgAttribute= attributes.getNamedItem("idOfOrg");
+                //if(null==idOfOrgAttribute){
+                //    throw new Exception("no attribute idOfOrg");
+                //}
+                //Long idOfOrg=Long.parseLong(idOfOrgAttribute.getTextContent());
+                idOfOrg = getIdOfOrg(namedNodeMap);
+                idOfSync = getIdOfSync(namedNodeMap);
                 DAOService daoService=DAOService.getInstance();
                 org=daoService.getOrg(idOfOrg);
                 if(null==org){
                     throw new Exception("cannot find org with this id");
-
                 }
-
                 // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
-                integroLogger.registerIntegroRequest(requestData.document, org.getIdOfOrg());
+                integroLogger.registerIntegroRequest(requestData.document, org.getIdOfOrg(), idOfSync);
 
                 Node roNode = dataNode.getFirstChild();
                 roNode=roNode.getNextSibling();
@@ -170,7 +161,7 @@ public class IntegroServlet extends HttpServlet {
             }
             // Send XML response
             try {
-                integroLogger.registerIntegroResponse(responseDocument, org.getIdOfOrg());
+                integroLogger.registerIntegroResponse(responseDocument, org.getIdOfOrg(), idOfSync);
                 writeResponse(response, true, responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);
@@ -227,5 +218,19 @@ public class IntegroServlet extends HttpServlet {
             ((GZIPOutputStream) outputStream).finish();
         }
     }
+
+    public static String getIdOfSync(NamedNodeMap namedNodeMap) throws Exception {
+        return namedNodeMap.getNamedItem("Date").getTextContent();
+    }
+
+    public static long getIdOfOrg(NamedNodeMap namedNodeMap) throws Exception {
+        return getLongValue(namedNodeMap, "IdOfOrg");
+    }
+
+    private static long getLongValue(NamedNodeMap namedNodeMap, String name) throws Exception {
+        Node n = namedNodeMap.getNamedItem(name);
+        return Long.parseLong(n.getTextContent());
+    }
+
 
 }

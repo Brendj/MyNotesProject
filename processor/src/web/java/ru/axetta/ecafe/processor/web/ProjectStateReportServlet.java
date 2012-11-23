@@ -31,76 +31,57 @@ import javax.servlet.http.HttpServletRequest;
  * Time: 14:10
  * To change this template use File | Settings | File Templates.
  */
-public class ProjectStateReportServlet extends DataSourceServlet
-    {
+public class ProjectStateReportServlet extends DataSourceServlet {
+
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProjectStateReportServlet.class);
 
 
     @Override
-    public DataTable generateDataTable (Query query, HttpServletRequest request) throws TypeMismatchException
-        {
+    public DataTable generateDataTable(Query query, HttpServletRequest request) throws TypeMismatchException {
         RuntimeContext runtimeContext = null;
         ProjectStateReportService.Type t = null;
-        try
-            {
-            runtimeContext = RuntimeContext.getInstance ();
-            String reportType = request.getParameter ("type");
-            t = ProjectStateReportService.TYPES.get (reportType);
-            if (runtimeContext == null || t == null)
-                {
-                throw new TypeMismatchException ("Incorrect type of report was required: '" + reportType + "'");
-                }
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            String reportType = request.getParameter("type");
+            t = ProjectStateReportService.TYPES.get(reportType);
+            if (runtimeContext == null || t == null) {
+                throw new TypeMismatchException("Incorrect type of report was required: '" + reportType + "'");
             }
-        catch (TypeMismatchException tme)
-            {
+        } catch (TypeMismatchException tme) {
             throw tme;
-            }
-        catch (Exception e)
-            {
-            logger.error ("Failed to build report " + request.getParameter ("type"), e);
+        } catch (Exception e) {
+            logger.error("Failed to build report " + request.getParameter("type"), e);
             return null;
-            }
-
-
-        Calendar dateAt  = new GregorianCalendar ();
-        dateAt.setTimeInMillis (System.currentTimeMillis ());
-        String inDate = request.getParameter ("dateAt");
-        try
-            {
-            if (inDate != null && inDate.trim ().length () > 0)
-                {
-                Date d = new SimpleDateFormat("dd.MM.yyyy").parse (inDate.trim ());
-                    dateAt.setTime (d);
-                }
-            }
-        catch (Exception e)
-            {
-            dateAt = ProjectStateReportService.getStartDate ();
-            }
-
-        Calendar dateTo = new GregorianCalendar ();
-        dateTo.setTimeInMillis (System.currentTimeMillis ());
-        inDate = request.getParameter ("dateTo");
-            try
-            {
-            if (inDate != null && inDate.trim ().length () > 0)
-                {
-                Date d = new SimpleDateFormat("dd.MM.yyyy").parse (inDate.trim ());
-                dateTo.setTime (d);
-                }
-            }
-        catch (Exception e)
-            {
-            dateTo = ProjectStateReportService.getStartDate ();
-            }
-
-        DataTable data = ProjectStateReportService.generateReport (runtimeContext, dateAt, dateTo, t);
-        return data;
         }
+        Calendar dateAt = new GregorianCalendar();
+        dateAt.setTimeInMillis(System.currentTimeMillis());
+        String inDate = request.getParameter("dateAt");
+        try {
+            if (inDate != null && inDate.trim().length() > 0) {
+                Date d = new SimpleDateFormat("dd.MM.yyyy").parse(inDate.trim());
+                dateAt.setTime(d);
+            }
+        } catch (Exception e) {
+            dateAt = ProjectStateReportService.getStartDate();
+        }
+        Calendar dateTo = new GregorianCalendar();
+        dateTo.setTimeInMillis(System.currentTimeMillis());
+        inDate = request.getParameter("dateTo");
+        try {
+            if (inDate != null && inDate.trim().length() > 0) {
+                Date d = new SimpleDateFormat("dd.MM.yyyy").parse(inDate.trim());
+                dateTo.setTime(d);
+            }
+        } catch (Exception e) {
+            dateTo = ProjectStateReportService.getStartDate();
+        }
+
+        DataTable data = ProjectStateReportService.generateReport(runtimeContext, dateAt, dateTo, t);
+        return data;
+    }
 
     @Override
-    protected boolean isRestrictedAccessMode ()
-        {
+    protected boolean isRestrictedAccessMode() {
         return false;
-        }
     }
+}
