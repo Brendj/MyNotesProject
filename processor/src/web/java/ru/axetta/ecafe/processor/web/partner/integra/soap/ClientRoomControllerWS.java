@@ -1377,7 +1377,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         IntegraPartnerConfig.LinkConfig partnerLinkConfig = null;
         //logger.info("init authorizeClient");
         partnerLinkConfig = authenticateRequest(null);
-        //logger.info("begin authorizeClient");
+        if (logger.isDebugEnabled()) {
+            logger.debug("begin authorizeClient");
+        }
         try {
 
             DAOService daoService = DAOService.getInstance();
@@ -1386,6 +1388,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             //logger.info("find client");
             if (client==null){
                 //logger.info("find client == null");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Client not found");
+                }
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
             //logger.info("find client != null");
@@ -1398,11 +1403,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 byte[] hash = md.digest(bytesOfMessage);
                 BigInteger bigInt = new BigInteger(1, hash);
-                String md5HashString = bigInt.toString(16);
-
-                //logger.info("token    md5: "+token.toUpperCase());
-                //logger.info("generate md5: "+md5HashString.toUpperCase());
-
+                //String md5HashString = bigInt.toString(16);
+                String md5HashString = String.format("%0" + (hash.length << 1) + "X", bigInt);
+                if (logger.isDebugEnabled()) {
+                    logger.info("token    md5: "+token.toUpperCase());
+                    logger.info("generate md5: "+md5HashString.toUpperCase());
+                }
                 if (md5HashString.toUpperCase().compareTo(token.toUpperCase())==0) {
                     authorized = true;
                     if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
@@ -1411,13 +1417,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
             if (client.hasEncryptedPasswordSHA1(token)) {
-                //logger.info("hasEncryptedPassword");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("hasEncryptedPassword");
+                }
                 authorized = true;
                 if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                     daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
                 }
             }
-            //logger.info("authorized"+String.valueOf(authorized));
+            if (logger.isDebugEnabled()) {
+                logger.debug("authorized"+String.valueOf(authorized));
+            }
             if (authorized) {
                 return new Result(RC_OK, RC_OK_DESC);
             } else {
