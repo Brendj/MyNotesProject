@@ -15,7 +15,7 @@ import org.w3c.dom.Document;
  */
 public interface IntegroLogger {
 
-    void registerIntegroRequest(Document requestDocument, long idOfOrg);
-    void registerIntegroResponse(Document responseDocument, long idOfOrg);
+    void registerIntegroRequest(Document requestDocument, long idOfOrg, String idOfSync);
+    void registerIntegroResponse(Document responseDocument, long idOfOrg, String idOfSync);
 
 }

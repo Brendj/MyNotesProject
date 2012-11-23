@@ -690,10 +690,21 @@ public class RuntimeContext implements ApplicationContextAware {
                 properties.getProperty(PROCESSOR_PARAM_BASE + ".client.payment.in.log.path"));
         String paymentResponsePath = restoreFilename(basePath,
                 properties.getProperty(PROCESSOR_PARAM_BASE + ".client.payment.out.log.path"));
-        String intgeroRequestLogPath = restoreFilename(basePath,
-                properties.getProperty(PROCESSOR_PARAM_BASE + ".org.intgero.in.log.path"));
-        String intgeroResponseLogPath = restoreFilename(basePath,
-                properties.getProperty(PROCESSOR_PARAM_BASE + ".org.intgero.out.log.path"));
+        String intgeroRequestLogPath = null;
+        String intgeroResponseLogPath = null;
+        try {
+            intgeroRequestLogPath = restoreFilename(basePath,
+                    properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.in.log.path"));
+        }   catch (Exception e){
+            logger.error("IntegRO input files not saved.");
+        }
+        try {
+            intgeroRequestLogPath = restoreFilename(basePath,
+                    properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.in.log.path"));
+        }   catch (Exception e){
+            logger.error("IntegRO output files not saved.");
+        }
+
         ProcessLogger processLogger = new ProcessLogger(syncRequsetPath, syncResponsePath, paymentRequsetPath,
                 paymentResponsePath, intgeroRequestLogPath, intgeroResponseLogPath);
         if (logger.isDebugEnabled()) {

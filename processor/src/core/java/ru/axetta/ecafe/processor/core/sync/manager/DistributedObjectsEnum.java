@@ -58,8 +58,6 @@ public enum DistributedObjectsEnum {
     JournalItem(JournalItem.class,3),
     Issuable(Issuable.class, 4),
     Circulation(Circulation.class, 5);
-    //LibVisit(LibVisit.class,13),
-    //Reader(Reader.class, 14),
 
     private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */

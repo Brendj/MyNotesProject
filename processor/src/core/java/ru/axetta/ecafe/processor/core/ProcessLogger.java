@@ -50,9 +50,10 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
     }
 
     @Override
-    public void registerIntegroRequest(Document requestDocument, long idOfOrg) {
+    public void registerIntegroRequest(Document requestDocument, long idOfOrg, String idOfSync) {
+        if (intgeroRequestLogPath==null) return;
         try {
-            File file = createFile(intgeroRequestLogPath, idOfOrg, "--", "in");
+            File file = createFile(intgeroRequestLogPath, idOfOrg, idOfSync, "in");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(requestDocument, outputStream);
@@ -66,9 +67,10 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
     }
 
     @Override
-    public void registerIntegroResponse(Document responseDocument, long idOfOrg) {
+    public void registerIntegroResponse(Document responseDocument, long idOfOrg, String idOfSync) {
+        if (intgeroResponseLogPath==null) return;
         try {
-            File file = createFile(intgeroResponseLogPath, idOfOrg, "--", "out");
+            File file = createFile(intgeroResponseLogPath, idOfOrg, idOfSync, "out");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(responseDocument, outputStream);
