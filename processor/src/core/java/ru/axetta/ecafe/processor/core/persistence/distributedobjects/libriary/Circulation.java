@@ -28,7 +28,6 @@ public class Circulation extends DistributedObject {
     public final static int ISSUED = 0, EXTENDED = 1, LOST = 2, REFUNDED = 3;
 
     private Circulation parentCirculation;
-    private Reader reader;
     private Issuable issuable;
     private Date issuanceDate;
     private Date refundDate;
@@ -36,10 +35,8 @@ public class Circulation extends DistributedObject {
     private int status;
 
     private String guidClient;
-    private Long idOfClient;
 
     private String guidParentCirculation;
-    private String guidReader;
     private String guidIssuable;
     private Client client;
 
@@ -55,7 +52,6 @@ public class Circulation extends DistributedObject {
         guidClient = getStringAttributeValue(node, "GuidClient", 36);
 
         guidParentCirculation = getStringAttributeValue(node, "GuidParentCirculation", 36);
-        guidReader = getStringAttributeValue(node, "GuidReader", 36);
         guidIssuable = getStringAttributeValue(node, "GuidIssuable", 36);
 
         issuanceDate = getDateTimeAttributeValue(node, "IssuanceDate");
@@ -97,14 +93,6 @@ public class Circulation extends DistributedObject {
 
     public void setParentCirculation(Circulation parentCirculation) {
         this.parentCirculation = parentCirculation;
-    }
-
-    public Reader getReader() {
-        return reader;
-    }
-
-    public void setReader(Reader reader) {
-        this.reader = reader;
     }
 
     public Issuable getIssuable() {

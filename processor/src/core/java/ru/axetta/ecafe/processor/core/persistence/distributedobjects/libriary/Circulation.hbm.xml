@@ -30,9 +30,6 @@
         <many-to-one name="parentCirculation" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" not-null="false"
         column="IdOfParentCirculation"/>
 
-        <!--<many-to-one name="reader" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.Reader" not-null="true"-->
-        <!--column="IdOfReader"/>-->
-
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" update="false" fetch="join"/>
 
