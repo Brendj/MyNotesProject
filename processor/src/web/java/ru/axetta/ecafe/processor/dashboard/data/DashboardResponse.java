@@ -30,26 +30,10 @@ public class DashboardResponse {
         long numberOfPayOrders;
         long numberOfStudentClients;
         long numberOfNonStudentClients;
-        double numberOfStudentClientsPercent;
-        double numberOfNonStudentClientsPercent;
+        double numberOfStudentEnterEventsPercent;
+        double numberOfEmployeeEnterEventsPercent;
+        double numberOfPayedOrdersPercent;
         private Long numberOfClientsWithoutCard;
-
-
-        public double getNumberOfStudentClientsPercent() {
-            return numberOfStudentClientsPercent;
-        }
-
-        public void setNumberOfStudentClientsPercent(double numberOfStudentClientsPercent) {
-            this.numberOfStudentClientsPercent = numberOfStudentClientsPercent;
-        }
-
-        public double getNumberOfNonStudentClientsPercent() {
-            return numberOfNonStudentClientsPercent;
-        }
-
-        public void setNumberOfNonStudentClientsPercent(double numberOfNonStudentClientsPercent) {
-            this.numberOfNonStudentClientsPercent = numberOfNonStudentClientsPercent;
-        }
 
         public long getIdOfOrg() {
             return idOfOrg;
@@ -153,6 +137,30 @@ public class DashboardResponse {
 
         public Long getNumberOfClientsWithoutCard() {
             return numberOfClientsWithoutCard;
+        }
+
+        public double getNumberOfStudentEnterEventsPercent() {
+            return numberOfStudentEnterEventsPercent;
+        }
+
+        public void setNumberOfStudentEnterEventsPercent(double numberOfStudentEnterEventsPercent) {
+            this.numberOfStudentEnterEventsPercent = numberOfStudentEnterEventsPercent;
+        }
+
+        public double getNumberOfEmployeeEnterEventsPercent() {
+            return numberOfEmployeeEnterEventsPercent;
+        }
+
+        public void setNumberOfEmployeeEnterEventsPercent(double numberOfEmployeeEnterEventsPercent) {
+            this.numberOfEmployeeEnterEventsPercent = numberOfEmployeeEnterEventsPercent;
+        }
+
+        public double getNumberOfPayedOrdersPercent() {
+            return numberOfPayedOrdersPercent;
+        }
+
+        public void setNumberOfPayedOrdersPercent(double numberOfPayedOrdersPercent) {
+            this.numberOfPayedOrdersPercent = numberOfPayedOrdersPercent;
         }
     }
     public static class OrgBasicStats {

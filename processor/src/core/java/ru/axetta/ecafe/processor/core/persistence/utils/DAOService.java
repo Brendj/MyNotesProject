@@ -22,10 +22,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -494,49 +491,82 @@ public class DAOService {
         }
 
 
-    public long getStudentsCountOfOrg (long idoforg)
+    public Map <Long, Integer> getOrgEntersCount (Date at, Date to, int type)
         {
+        String sql = "";
+        if (type == 0)
+            {
+            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
+                  "from cf_enterevents " +
+                  "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient " +
+                  "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
+                  "group by cf_enterevents.idoforg";
+            }
+        else
+            {
+            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
+                  "from cf_enterevents " +
+                  "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient " +
+                  "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                  "group by cf_enterevents.idoforg";
+            }
+
         try
             {
-            Query q = em.createNativeQuery ("select count(*) " +
-                                            "from cf_clients " +
-                                            "where cf_clients.idoforg=:idoforg and cf_clients.idofclientgroup<:studentsMaxValue"); //CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<>0
-            q.setParameter ("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            q.setParameter ("idoforg", idoforg);
-            List <Object> l = q.getResultList();
-            if (l.size () > 0)
+            Map <Long, Integer> res = new HashMap <Long, Integer> ();
+            Query q = em.createNativeQuery (sql);
+            q.setParameter ("dateAt", at.getTime ());
+            q.setParameter ("dateTo", to.getTime ());
+            if (type == 0)
                 {
-                return ((BigInteger) l.get (0)).longValue ();
+                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 }
+            else
+                {
+                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                }
+            List resultList = q.getResultList ();
+
+            for (Object entry : resultList)
+                {
+                Object e [] = (Object []) entry;
+                res.put (((BigInteger) e [0]).longValue (), ((BigInteger) e [1]).intValue ());
+                }
+            return res;
             }
         catch (Exception e)
             {
             logger.error ("Failed to load data", e);
             }
-        return 0L;
-    }
+        return Collections.EMPTY_MAP;
+        }
 
 
-    public long getNonStudentsCountOfOrg (long idoforg)
+    public Map <Long, Integer> getOrgOrdersCount (Date at, Date to)
         {
         try
             {
-            Query q = em.createNativeQuery ("select count(*) " +
-                                            "from cf_clients " +
-                                            "where cf_clients.idoforg=:idoforg and cf_clients.idofclientgroup>=:nonStudentGroups AND cf_clients.idofclientgroup<:leavingClientGroup");
-            q.setParameter ("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            q.setParameter ("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            q.setParameter ("idoforg", idoforg);
-            List <Object> l = q.getResultList();
-            if (l.size () > 0)
+            Map <Long, Integer> res = new HashMap <Long, Integer> ();
+            Query q = em.createNativeQuery ("select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+                                            "from cf_orders " +
+                                            "where cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
+                                            "group by cf_orders.idoforg");
+            q.setParameter ("dateAt", at.getTime ());
+            q.setParameter ("dateTo", to.getTime ());
+            List resultList = q.getResultList ();
+
+            for (Object entry : resultList)
                 {
-                return ((BigInteger) l.get (0)).longValue ();
+                Object e [] = (Object []) entry;
+                res.put (((BigInteger) e [0]).longValue (), ((BigInteger) e [1]).intValue ());
                 }
+            return res;
             }
         catch (Exception e)
             {
             logger.error ("Failed to load data", e);
             }
-        return 0L;
-    }
+        return Collections.EMPTY_MAP;
+        }
 }

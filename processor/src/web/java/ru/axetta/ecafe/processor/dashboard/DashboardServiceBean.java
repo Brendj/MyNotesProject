@@ -144,24 +144,6 @@ public class DashboardServiceBean {
                 if (statItem==null) continue;
                 statItem.setNumberOfNonStudentClients((Long)result[1]);
             }
-            for (Long orgID : orgStats.keySet ())
-                {
-                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
-                double sCount         = (double)daoService.getStudentsCountOfOrg (orgID);
-                double nsCount        = (double)daoService.getNonStudentsCountOfOrg (orgID);
-                double studentsPer    = 0D;
-                double nonStudentsPer = 0D;
-                if (statItem.getNumberOfNonStudentClients () != 0 && sCount != 0)
-                    {
-                    studentsPer = (double) statItem.getNumberOfStudentClients() / sCount;
-                    }
-                if (statItem.getNumberOfNonStudentClients () != 0 && nsCount != 0)
-                    {
-                    nonStudentsPer = (double) statItem.getNumberOfNonStudentClients () / nsCount;
-                    }
-                statItem.setNumberOfStudentClientsPercent (new BigDecimal (studentsPer).setScale (2, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                statItem.setNumberOfNonStudentClientsPercent (new BigDecimal (nonStudentsPer).setScale (2, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                }
             ////
             query = entityManager.createNativeQuery("select cl.idOfOrg, count(*) from CF_Clients cl LEFT JOIN CF_Cards cr ON cr.idOfClient=cl.idOfClient WHERE cl.idOfClientGroup<=:maxStaffGroup AND cr.idOfCard IS NULL GROUP BY cl.idOfOrg");
             query.setParameter("maxStaffGroup", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
@@ -212,6 +194,35 @@ public class DashboardServiceBean {
                 if (statItem==null) continue;
                 statItem.setNumberOfPayOrders((Long)result[1]);
             }
+            Map <Long, Integer> orders = daoService.getOrgOrdersCount (dayStartDate, dayEndDate);
+            Map <Long, Integer> studentEnters  = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 0);
+            Map <Long, Integer> employeeEnters = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 1);
+            for (Long orgID : orgStats.keySet ())
+                {
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
+                if (statItem==null) continue;
+                Integer studentsCount  = studentEnters.get (orgID);
+                Integer employeesCount = employeeEnters.get (orgID);
+                Integer ordersCount = orders.get (orgID);
+                double per1 = 0D;
+                double per2 = 0D;
+                double per3 = 0D;
+                if (studentsCount != null && studentsCount != 0 && statItem.getNumberOfStudentClients () != 0)
+                    {
+                    per1 = (double) studentsCount / (double) statItem.getNumberOfStudentClients ();
+                    }
+                if (employeesCount != null && employeesCount != 0 && statItem.getNumberOfStudentClients () != 0)
+                    {
+                    per2 = (double) employeesCount / (double) statItem.getNumberOfStudentClients ();
+                    }
+                if (ordersCount != null && ordersCount != 0 && statItem.getNumberOfPayOrders () != 0)
+                    {
+                    per3 = (double) statItem.getNumberOfPayOrders () / (double) ordersCount;
+                    }
+                statItem.setNumberOfStudentEnterEventsPercent (new BigDecimal (per1).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                statItem.setNumberOfEmployeeEnterEventsPercent (new BigDecimal (per2).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                statItem.setNumberOfPayedOrdersPercent (new BigDecimal (per3).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                }
             ////
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {
                 basicStats.getOrgBasicStatItems().add(e.getValue());
