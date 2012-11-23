@@ -38,6 +38,7 @@ public class ActOfInventarization extends DistributedObject {
         if(stringNumber != null) setNumber(stringNumber);
         String stringCommission = getStringAttributeValue(node, "Commission",512);
         if(stringCommission != null) setCommission(stringCommission);
+        setSendAll(false);
         return this;
     }
 
