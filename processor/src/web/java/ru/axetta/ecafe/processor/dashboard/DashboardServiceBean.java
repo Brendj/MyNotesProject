@@ -24,6 +24,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -143,6 +144,24 @@ public class DashboardServiceBean {
                 if (statItem==null) continue;
                 statItem.setNumberOfNonStudentClients((Long)result[1]);
             }
+            for (Long orgID : orgStats.keySet ())
+                {
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
+                double sCount         = (double)daoService.getStudentsCountOfOrg (orgID);
+                double nsCount        = (double)daoService.getNonStudentsCountOfOrg (orgID);
+                double studentsPer    = 0D;
+                double nonStudentsPer = 0D;
+                if (statItem.getNumberOfNonStudentClients () != 0 && sCount != 0)
+                    {
+                    studentsPer = (double) statItem.getNumberOfStudentClients() / sCount;
+                    }
+                if (statItem.getNumberOfNonStudentClients () != 0 && nsCount != 0)
+                    {
+                    nonStudentsPer = (double) statItem.getNumberOfNonStudentClients () / nsCount;
+                    }
+                statItem.setNumberOfStudentClientsPercent (new BigDecimal (studentsPer).setScale (2, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                statItem.setNumberOfNonStudentClientsPercent (new BigDecimal (nonStudentsPer).setScale (2, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                }
             ////
             query = entityManager.createNativeQuery("select cl.idOfOrg, count(*) from CF_Clients cl LEFT JOIN CF_Cards cr ON cr.idOfClient=cl.idOfClient WHERE cl.idOfClientGroup<=:maxStaffGroup AND cr.idOfCard IS NULL GROUP BY cl.idOfOrg");
             query.setParameter("maxStaffGroup", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());

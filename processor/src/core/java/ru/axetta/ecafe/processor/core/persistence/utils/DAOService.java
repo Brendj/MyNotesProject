@@ -492,4 +492,51 @@ public class DAOService {
             {
             }
         }
+
+
+    public long getStudentsCountOfOrg (long idoforg)
+        {
+        try
+            {
+            Query q = em.createNativeQuery ("select count(*) " +
+                                            "from cf_clients " +
+                                            "where cf_clients.idoforg=:idoforg and cf_clients.idofclientgroup<:studentsMaxValue"); //CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<>0
+            q.setParameter ("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter ("idoforg", idoforg);
+            List <Object> l = q.getResultList();
+            if (l.size () > 0)
+                {
+                return ((BigInteger) l.get (0)).longValue ();
+                }
+            }
+        catch (Exception e)
+            {
+            logger.error ("Failed to load data", e);
+            }
+        return 0L;
+    }
+
+
+    public long getNonStudentsCountOfOrg (long idoforg)
+        {
+        try
+            {
+            Query q = em.createNativeQuery ("select count(*) " +
+                                            "from cf_clients " +
+                                            "where cf_clients.idoforg=:idoforg and cf_clients.idofclientgroup>=:nonStudentGroups AND cf_clients.idofclientgroup<:leavingClientGroup");
+            q.setParameter ("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter ("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            q.setParameter ("idoforg", idoforg);
+            List <Object> l = q.getResultList();
+            if (l.size () > 0)
+                {
+                return ((BigInteger) l.get (0)).longValue ();
+                }
+            }
+        catch (Exception e)
+            {
+            logger.error ("Failed to load data", e);
+            }
+        return 0L;
+    }
 }

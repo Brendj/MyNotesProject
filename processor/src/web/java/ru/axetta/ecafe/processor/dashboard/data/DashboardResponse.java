@@ -30,7 +30,26 @@ public class DashboardResponse {
         long numberOfPayOrders;
         long numberOfStudentClients;
         long numberOfNonStudentClients;
+        double numberOfStudentClientsPercent;
+        double numberOfNonStudentClientsPercent;
         private Long numberOfClientsWithoutCard;
+
+
+        public double getNumberOfStudentClientsPercent() {
+            return numberOfStudentClientsPercent;
+        }
+
+        public void setNumberOfStudentClientsPercent(double numberOfStudentClientsPercent) {
+            this.numberOfStudentClientsPercent = numberOfStudentClientsPercent;
+        }
+
+        public double getNumberOfNonStudentClientsPercent() {
+            return numberOfNonStudentClientsPercent;
+        }
+
+        public void setNumberOfNonStudentClientsPercent(double numberOfNonStudentClientsPercent) {
+            this.numberOfNonStudentClientsPercent = numberOfNonStudentClientsPercent;
+        }
 
         public long getIdOfOrg() {
             return idOfOrg;

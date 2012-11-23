@@ -59,17 +59,17 @@
                      </f:facet>
                      <h:outputText value="#{item.lastSuccessfulBalanceSyncTime}" converter="timeMinuteConverter"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfNonStudentClients}" width="120px">
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfStudentClients}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Учащихся" styleClass="output-text" escape="true"/>
                      </f:facet>
-                     <h:outputText value="#{item.numberOfStudentClients}"/>
+                     <h:outputText value="#{item.numberOfStudentClients}"/> (<h:outputText value="#{item.numberOfStudentClientsPercent}"><f:convertNumber type="percent"/></h:outputText>)
                  </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfNonStudentClients}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Сотруд. и др." styleClass="output-text" escape="true"/>
                      </f:facet>
-                     <h:outputText value="#{item.numberOfNonStudentClients}"/>
+                     <h:outputText value="#{item.numberOfNonStudentClients}"/> (<h:outputText value="#{item.numberOfNonStudentClientsPercent}"><f:convertNumber type="percent"/></h:outputText>)
                  </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfClientsWithoutCard}" width="120px">
                      <f:facet name="header">
