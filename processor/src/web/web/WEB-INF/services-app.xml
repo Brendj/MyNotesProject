@@ -79,5 +79,11 @@
     <task:scheduler id="projectStateScheduler" pool-size="5"/>-->
 
 
+    <!--<task:scheduled-tasks scheduler="biDataExporterSchedule">
+        <task:scheduled ref="BIDataExportService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="biDataExporterSchedule" pool-size="5"/>-->
+
+
 
 </beans>
