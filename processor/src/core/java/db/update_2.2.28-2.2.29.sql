@@ -15,7 +15,7 @@ ALTER TABLE cf_complexinfo ADD COLUMN currentprice bigint;
 ALTER TABLE cf_complexinfodetail ADD COLUMN count integer;
 
 -- Добавленна свяска к документу
-ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN IdOfGood bigint NOT NULL;
-ALTER TABLE cf_internal_disposing_document_positions ADD CONSTRAINT cf_internal_disposing_document_positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES cf_goods (IdOfGood);
+-- ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN IdOfGood bigint NOT NULL;
+-- ALTER TABLE cf_internal_disposing_document_positions ADD CONSTRAINT cf_internal_disposing_document_positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES cf_goods (IdOfGood);
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 121123) НЕ МЕНЯТЬ

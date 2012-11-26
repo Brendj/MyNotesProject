@@ -473,12 +473,15 @@ public class ClientEditPage extends BasicWorkspacePage
                     categoryDiscount.getCategoryName()));
         }
 
+        idOfCategoryList.clear();
+        categoryDiscountList.clear();
         if(!client.getCategories().isEmpty()){
             for(CategoryDiscount categoryDiscount: client.getCategories()){
-                String name=categoryDiscount.getCategoryName();
+                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
                 this.categoryDiscountList.add(categoryDiscount);
             }
         }
+
         this.selectItemList = new LinkedList<SelectItem>();
         /* если у клиента уже выбрана льгота то она будет первой */
         if(null!=client.getDiscountMode() && client.getDiscountMode()>0){
@@ -656,6 +659,10 @@ public class ClientEditPage extends BasicWorkspacePage
             categoriesFilter.append("Не выбрано");
         }
         this.filter=categoriesFilter.toString();
+    }
+
+    public String getIdOfCategoryListString() {
+        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
     }
 
     private String filter = "Не выбрано";
