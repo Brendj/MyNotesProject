@@ -2,10 +2,6 @@
 ALTER TABLE cf_menudetails ADD COLUMN idofgood bigint;
 ALTER TABLE cf_menudetails ADD CONSTRAINT cf_menudetail_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods(idofgood);
 
--- Выставление ссылок на продукты и технокарты таблице товаров
-ALTER TABLE cf_goods ADD CONSTRAINT cf_goods_idoftechnologicalmaps_fk FOREIGN KEY (idoftechnologicalmaps) REFERENCES cf_technological_map (idoftechnologicalmaps);
-ALTER TABLE cf_goods ADD CONSTRAINT cf_goods_idofproducts_fk FOREIGN KEY (idofproducts) REFERENCES cf_products (idofproducts);
-
 -- Таблица родительских запретов на определенные блюда
 CREATE TABLE cf_dish_prohibitions
 (
