@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -52,7 +53,7 @@ public class Journal extends DistributedObject {
         isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
         monthCount = getIntegerAttributeValue(node, "MonthCount");
         count = getIntegerAttributeValue(node, "Count");
-        setSendAll(true);
+        setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

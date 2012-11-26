@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
@@ -56,7 +57,7 @@ public class ECafeSettings extends DistributedObject{
     private Date lastUpdate;
     private Date deleteDate;
     private Date createdDate;
-    private Boolean sendAll;
+    private SendToAssociatedOrgs sendAll;
     private Boolean deletedState;
     private String settingValue;
     private Long orgOwner;
@@ -96,11 +97,11 @@ public class ECafeSettings extends DistributedObject{
         this.deletedState = deletedState;
     }
 
-    public Boolean getSendAll() {
+    public SendToAssociatedOrgs getSendAll() {
         return sendAll;
     }
 
-    public void setSendAll(Boolean sendAll) {
+    public void setSendAll(SendToAssociatedOrgs sendAll) {
         this.sendAll = sendAll;
     }
 

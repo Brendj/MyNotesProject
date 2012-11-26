@@ -47,7 +47,7 @@ public abstract class DistributedObject{
     protected String guid;
     /* Идентификатор организации */
     protected Long orgOwner;
-    protected Boolean sendAll;
+    protected SendToAssociatedOrgs sendAll;
 
     private DateFormat dateOnlyFormat;
 
@@ -359,11 +359,11 @@ public abstract class DistributedObject{
     //    return timeFormat1;
     //}
 
-    public Boolean getSendAll() {
+    public SendToAssociatedOrgs getSendAll() {
         return sendAll;
     }
 
-    public void setSendAll(Boolean sendAll) {
+    public void setSendAll(SendToAssociatedOrgs sendAll) {
         this.sendAll = sendAll;
     }
 

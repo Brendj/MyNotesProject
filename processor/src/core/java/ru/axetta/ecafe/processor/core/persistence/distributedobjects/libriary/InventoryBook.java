@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,7 +34,7 @@ public class InventoryBook extends DistributedObject {
             setBookName(bookName);
         }
 
-        setSendAll(false);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

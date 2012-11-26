@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -64,7 +65,7 @@ public class Ksu1Record extends DistributedObject {
         guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
         incomeDate = getDateOnlyAttributeValue(node, "IncomeDate");
         recordNumber = getIntegerAttributeValue(node, "RecordNumber");
-        setSendAll(true);
+        setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

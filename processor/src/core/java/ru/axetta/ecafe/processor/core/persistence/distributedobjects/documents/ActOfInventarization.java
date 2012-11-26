@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,7 +39,7 @@ public class ActOfInventarization extends DistributedObject {
         if(stringNumber != null) setNumber(stringNumber);
         String stringCommission = getStringAttributeValue(node, "Commission",512);
         if(stringCommission != null) setCommission(stringCommission);
-        setSendAll(false);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
