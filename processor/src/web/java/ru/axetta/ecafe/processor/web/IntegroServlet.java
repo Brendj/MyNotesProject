@@ -98,15 +98,6 @@ public class IntegroServlet extends HttpServlet {
                 Document requestDocument = requestData.document;
                 Node dataNode = requestDocument.getFirstChild();
                 NamedNodeMap namedNodeMap=dataNode.getAttributes();
-                //attributes.getLength();
-                //if(0==attributes.getLength()){
-                //    throw new Exception("no attribute idOfOrg");
-                //}
-                //Node idOfOrgAttribute= attributes.getNamedItem("idOfOrg");
-                //if(null==idOfOrgAttribute){
-                //    throw new Exception("no attribute idOfOrg");
-                //}
-                //Long idOfOrg=Long.parseLong(idOfOrgAttribute.getTextContent());
                 idOfOrg = getIdOfOrg(namedNodeMap);
                 idOfSync = getIdOfSync(namedNodeMap);
                 DAOService daoService=DAOService.getInstance();
