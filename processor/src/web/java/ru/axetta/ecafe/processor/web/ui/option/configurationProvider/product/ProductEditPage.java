@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -95,7 +96,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
 
             p.setProductGroup(currentProductGroup);
             p.setGlobalVersion(daoService.updateVersionByDistributedObjects(Product.class.getSimpleName()));
-            daoService.persistEntity(p);
+            daoService.mergeDistributedObject(p, p.getGlobalVersion()+1);
             currentProduct = entityManager.find(Product.class, currentProduct.getGlobalId());
             selectedProductGroupPage.setCurrentProduct(currentProduct);
             printMessage("Продукт сохранен успешно.");
@@ -109,7 +110,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
     @Transactional
     public void remove(){
         if(!currentProduct.getDeletedState()) {
-            printError("Группа не может быть удален.");
+            printError("Продукт не может быть удален.");
             return;
         }
         try{
