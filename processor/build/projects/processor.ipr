@@ -90,10 +90,7 @@
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
             <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
-            <element id="library" level="project" name="barcode4j" />
-            <element id="library" level="project" name="axetta_charset" />
-            <element id="library" level="project" name="guava-r07" />
-            <element id="library" level="project" name="commons-net-3.1" />
+            <element id="library" level="project" name="axetta_smpp" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -951,6 +948,19 @@
             </SvnBranchConfiguration>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../../src/client-room">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="svn://crep.axetta.ru/dwc/ecafe/branches" />
+                  <option value="svn://crep.axetta.ru/dwc/ecafe/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="svn://crep.axetta.ru/dwc/ecafe/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../../src/core">
           <value>
             <SvnBranchConfiguration>
@@ -1095,6 +1105,17 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="axetta_smpp">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/opentoolsutil.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/myOTA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/exprescd.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="barcode4j">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/barcode/javase.jar!/" />
@@ -1151,9 +1172,9 @@
     </library>
     <library name="guava-r07">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/guava-r07.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/icu4j-4_0_1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/guava-10.0.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

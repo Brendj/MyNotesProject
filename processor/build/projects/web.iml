@@ -343,9 +343,9 @@
     </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="cryptopro" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Java EE 6-3.1" level="project" />
-    <orderEntry type="library" name="barcode4j" level="project" />
-    <orderEntry type="library" name="axetta_charset" level="project" />
-    <orderEntry type="library" name="guava-r07" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="barcode4j" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="axetta_charset" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="guava-r07" level="project" />
   </component>
 </module>
 
