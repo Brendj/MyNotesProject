@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
@@ -83,6 +84,7 @@ public class IntegroServlet extends HttpServlet {
             Org org = null;
             Long idOfOrg = null;
             String  idOfSync = null;
+            Node dataNode = null;
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
             DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -93,20 +95,42 @@ public class IntegroServlet extends HttpServlet {
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             dateFormat.setTimeZone(localTimeZone);
             timeFormat.setTimeZone(localTimeZone);
-            Manager manager = new Manager(dateFormat, timeFormat);
-            try {
+
+            try{
                 Document requestDocument = requestData.document;
-                Node dataNode = requestDocument.getFirstChild();
+                dataNode = requestDocument.getFirstChild();
                 NamedNodeMap namedNodeMap=dataNode.getAttributes();
                 idOfOrg = getIdOfOrg(namedNodeMap);
                 idOfSync = getIdOfSync(namedNodeMap);
-                DAOService daoService=DAOService.getInstance();
-                org=daoService.getOrg(idOfOrg);
-                if(null==org){
-                    throw new Exception("cannot find org with this id");
+                integroLogger.registerIntegroRequest(requestData.document, idOfOrg, idOfSync);
+            } catch (Exception e){
+                logger.error("",e);
+                return;
+            }
+
+            PublicKey publicKey;
+            try {
+                org = findOrg(runtimeContext, idOfOrg);
+                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+            } catch (Exception e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            /* Must be commented for testing!!!  */
+            try {
+                if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
+                    logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
+            } catch (Exception e) {
+                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            Manager manager = new Manager(dateFormat, timeFormat);
+            try {
                 // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
-                integroLogger.registerIntegroRequest(requestData.document, org.getIdOfOrg(), idOfSync);
 
                 Node roNode = dataNode.getFirstChild();
                 roNode=roNode.getNextSibling();
@@ -223,5 +247,26 @@ public class IntegroServlet extends HttpServlet {
         return Long.parseLong(n.getTextContent());
     }
 
-
+    private Org findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
+        PublicKey publicKey;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            // Start data model transaction
+            persistenceTransaction = persistenceSession.beginTransaction();
+            // Find given org
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            if (null == org) {
+                logger.error(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
+                throw new NullPointerException(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return org;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
 }
