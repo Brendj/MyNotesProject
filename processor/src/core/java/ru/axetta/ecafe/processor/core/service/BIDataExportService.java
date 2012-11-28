@@ -30,617 +30,495 @@ import java.util.*;
  */
 @Component
 @Scope("singleton")
-public class BIDataExportService
-    {
-    private static boolean USE_FTP_AS_STORAGE    = false;
-    private static final DateFormat FILES_FORMAT = new SimpleDateFormat ("yyyyMMdd");
-    private static final DateFormat DB_DATE_FORMAT = new SimpleDateFormat ("yyyy-MM-dd");
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger (BIDataExportService.class);
-    private static final String FTP_ADDRESS      = "";
-    private static final String FTP_LOGIN        = "";
-    private static final String FTP_PASSWORD     = "";
-    private static final String FTP_WORKDIR      = "";
-    private String LOCAL_DIRECTORY               = null;
+public class BIDataExportService {
+
+    private static boolean USE_FTP_AS_STORAGE = false;
+    private static final DateFormat FILES_FORMAT = new SimpleDateFormat("yyyyMMdd");
+    private static final DateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
+    private static final String FTP_ADDRESS = "";
+    private static final String FTP_LOGIN = "";
+    private static final String FTP_PASSWORD = "";
+    private static final String FTP_WORKDIR = "";
+    private String LOCAL_DIRECTORY = null;
     private FTPClient client;
-    private static final Map <String, BIDataExportType> TYPES;
-    static
-        {
-        TYPES = new HashMap <String, BIDataExportType> ();
-        TYPES.put ("orders",
-                   new BIDataExportType ("select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "  +
-                                         "       grp1.idofclientgroup, grp2.groupname as grade_class, cf_clients.categoriesdiscounts as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount " +
-                                         "from cf_orders " +
-                                         "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg " +
-                                         "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard " +
-                                         "left join cf_clientgroups grp1 on cf_clients.idofclientgroup=grp1.idofclientgroup and cf_clients.idoforg=grp1.idoforg " +
-                                         "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and " +
-                                         "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 " +
-                                         "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '2012-09-12') * 1000  and " +
-                                         "                                                                EXTRACT(EPOCH FROM TIMESTAMP '2012-09-13') * 1000 " +
-                                         "order by createddate",
-                                         new String [] { "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient", "idofclientgroup", "grade_class", "idofcategorydiscount", "cardtype", "rsum", "socdiscount" }));
+    private static final Map<String, BIDataExportType> TYPES;
 
-        TYPES.put ("events",
-                   new BIDataExportType ("select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_enterevents.evtdatetime, cf_enterevents.idofenterevent, cf_enterevents.idoforg, " +
-                                         "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type " +
-                                         "from cf_enterevents " +
-                                         "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and idofclient<>0 and " +
-                                         "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
-                                         "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
-                                         "order by cf_enterevents.evtdatetime",
-                                        new String [] { "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "idofclient", "action_type" }));
+    static {
+        TYPES = new HashMap<String, BIDataExportType>();
+        TYPES.put("orders", new BIDataExportType(
+                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
+                        +
+                        "       grp1.idofclientgroup, grp2.groupname as grade_class, cf_clients.categoriesdiscounts as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                        +
+                        "from cf_orders " +
+                        "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
+                        +
+                        "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard " +
+                        "left join cf_clientgroups grp1 on cf_clients.idofclientgroup=grp1.idofclientgroup and cf_clients.idoforg=grp1.idoforg "
+                        +
+                        "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and "
+                        +
+                        "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 " +
+                        "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '2012-09-12') * 1000  and "
+                        +
+                        "                                                                EXTRACT(EPOCH FROM TIMESTAMP '2012-09-13') * 1000 "
+                        +
+                        "order by createddate", new String[]{
+                "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient", "idofclientgroup",
+                "grade_class", "idofcategorydiscount", "cardtype", "rsum", "socdiscount"}));
 
-        TYPES.put ("orgs",
-                    new BIDataExportType ("select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
-                                          "from cf_orgs " +
-                                          "where cf_orgs.officialname<>'' " +
-                                          "order by cf_orgs.officialname",
-                                          new String [] { "idoforg", "officialname", "address" }));
+        TYPES.put("events", new BIDataExportType(
+                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_enterevents.evtdatetime, cf_enterevents.idofenterevent, cf_enterevents.idoforg, "
+                        +
+                        "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
+                        +
+                        "from cf_enterevents " +
+                        "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and idofclient<>0 and "
+                        +
+                        "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        +
+                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        +
+                        "order by cf_enterevents.evtdatetime", new String[]{
+                "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "idofclient", "action_type"}));
 
-        TYPES.put ("contagents",
-                    new BIDataExportType ("select cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn " +
-                                          "from cf_contragents " +
-                                          "where cf_contragents.idofcontragent=4 or cf_contragents.idofcontragent=16 or cf_contragents.idofcontragent=17 or cf_contragents.idofcontragent=18 " +
-                                          "order by cf_contragents.idofcontragent",
-                                          new String [] { "idofcontragent", "contragentname", "inn" }));
+        TYPES.put("orgs", new BIDataExportType("select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
+                "from cf_orgs " +
+                "where cf_orgs.officialname<>'' " +
+                "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
 
-        TYPES.put ("clientgroups",
-                   new BIDataExportType ("select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
-                                         "from cf_clientgroups " +
-                                         "where cf_clientgroups.idofclientgroup > 0 "+
-                                         "order by cf_clientgroups.idofclientgroup",
-                                         new String [] { "idoforg", "idofclientgroup", "groupname" }));
+        TYPES.put("contagents", new BIDataExportType(
+                "select cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn " +
+                        "from cf_contragents " +
+                        "where cf_contragents.idofcontragent=4 or cf_contragents.idofcontragent=16 or cf_contragents.idofcontragent=17 or cf_contragents.idofcontragent=18 "
+                        +
+                        "order by cf_contragents.idofcontragent",
+                new String[]{"idofcontragent", "contragentname", "inn"}));
 
-        TYPES.put ("discounts",
-                    new BIDataExportType ("select idofcategorydiscount, categoryname " +
-                                          "from cf_categorydiscounts " +
-                                          "order by idofcategorydiscount",
-                                          new String [] { "idofcategorydiscount", "categoryname" }));
+        TYPES.put("clientgroups", new BIDataExportType(
+                "select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
+                        "from cf_clientgroups " +
+                        "where cf_clientgroups.idofclientgroup > 0 " +
+                        "order by cf_clientgroups.idofclientgroup",
+                new String[]{"idoforg", "idofclientgroup", "groupname"}));
+
+        TYPES.put("discounts", new BIDataExportType("select idofcategorydiscount, categoryname " +
+                "from cf_categorydiscounts " +
+                "order by idofcategorydiscount", new String[]{"idofcategorydiscount", "categoryname"}));
+    }
+
+
+    public static boolean isOn() {
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_EXPORT_BI_DATA_ON);
+    }
+
+
+    public static void setOn(boolean on) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_EXPORT_BI_DATA_ON, "" + (on ? "1" : "0"));
+    }
+
+
+    public static String getLocalDirectory() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_EXPORT_BI_DATA_DIR);
+    }
+
+
+    public static void setLocalDirectory(String dirName) throws IOException {
+        File dir = new File(dirName);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new IOException("Failed to find directory called '" + dirName + "'");
         }
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_EXPORT_BI_DATA_DIR, dir.getAbsolutePath());
+    }
 
 
-
-    public static boolean isOn ()
-        {
-        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_EXPORT_BI_DATA_ON);
-        }
-
-
-    public static void setOn (boolean on)
-        {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_ON, "" + (on ? "1" : "0"));
-        }
-
-
-    public static String getLocalDirectory ()
-        {
-        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_EXPORT_BI_DATA_DIR);
-        }
-
-
-    public static void setLocalDirectory (String dirName) throws IOException
-        {
-        File dir = new File (dirName);
-        if (!dir.exists () && !dir.mkdirs ())
-            {
-            throw new IOException ("Failed to find directory called '" + dirName + "'");
-            }
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_DIR, dir.getAbsolutePath ());
-        }
-
-
-    public void run () throws IOException
-        {
-        if (!RuntimeContext.getInstance ().isMainNode () || !isOn ())
-            {
+    public void run() throws IOException {
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             //logger.info ("BI data export is turned off. You have to activate this tool using common Settings");
             return;
-            }
-        LOCAL_DIRECTORY = getLocalDirectory ();
-        if (LOCAL_DIRECTORY == null || LOCAL_DIRECTORY.length () < 1)
-            {
+        }
+        LOCAL_DIRECTORY = getLocalDirectory();
+        if (LOCAL_DIRECTORY == null || LOCAL_DIRECTORY.length() < 1) {
             //logger.error ("You had turn BI data export on but didn't setup local storage directory. Please, check settings.");
             return;
-            }
-
-
-        buildFiles ();
         }
 
 
-    private boolean isTodayFileExists ()
-        {
+        buildFiles();
+    }
+
+
+    private boolean isTodayFileExists() {
         return false;
-        }
+    }
 
 
-    private boolean buildFiles () throws IOException
-        {
-        List <String> typesToUpdate = new ArrayList <String> ();
-        Calendar last    = getStartDate ();
-        Calendar now     = new GregorianCalendar ();
-        now.setTimeInMillis (System.currentTimeMillis ());
-        clearCalendar (now);
-
-        /*Calendar cals [] = null;
-        if (USE_FTP_AS_STORAGE)
-            {
-            cals = getUpdatePeriodsViaFTP (typesToUpdate);
-            }
-        else
-            {
-            cals = getUpdatePeriodsViaLocal (typesToUpdate);
-            }
-        if (typesToUpdate.size () < 1)
-            {
-            return true;
-            }
-        last = cals [0];
-        now  = cals [1];*/
+    private boolean buildFiles() throws IOException {
+        List<String> typesToUpdate = new ArrayList<String>();
+        Calendar last = getStartDate();
+        Calendar now = new GregorianCalendar();
+        now.setTimeInMillis(System.currentTimeMillis());
+        clearCalendar(now);
 
 
-        try
-            {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance ();
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session session = runtimeContext.createPersistenceSession();
-            for (long ts=last.getTimeInMillis (); ts<now.getTimeInMillis(); ts+=86400000)
-                {
-                Calendar start = new GregorianCalendar ();
-                Calendar end   = new GregorianCalendar ();
-                start.setTimeInMillis (ts);
-                end.setTimeInMillis (ts + 86400000);
+            for (long ts = last.getTimeInMillis(); ts < now.getTimeInMillis(); ts += 86400000) {
+                Calendar start = new GregorianCalendar();
+                Calendar end = new GregorianCalendar();
+                start.setTimeInMillis(ts);
+                end.setTimeInMillis(ts + 86400000);
 
-                getUnfinishedTypes (LOCAL_DIRECTORY, typesToUpdate, start);
-                for (String t : typesToUpdate)
-                    {
-                    updateFiles (client, session, t, end, start);
-                    }
+                getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, start);
+                for (String t : typesToUpdate) {
+                    updateFiles(client, session, t, end, start);
                 }
+            }
             return true;
-            }
-        catch (Exception e)
-            {
-            logger.error ("Failed to export BI data", e);
+        } catch (Exception e) {
+            logger.error("Failed to export BI data", e);
             return false;
-            }
         }
+    }
 
 
-    private void getUnfinishedTypes (String dir, List <String> typesToUpdate, Calendar now)
-        {
-        typesToUpdate.clear ();
+    private void getUnfinishedTypes(String dir, List<String> typesToUpdate, Calendar now) {
+        typesToUpdate.clear();
         File check = null;
-        for (String tName : TYPES.keySet ())
-            {
-            check = new File (LOCAL_DIRECTORY, parseFileName (now, tName));
-            if (!check.exists () && check.length () < 1)
-                {
-                typesToUpdate.add (tName);
-                }
+        for (String tName : TYPES.keySet()) {
+            check = new File(LOCAL_DIRECTORY, parseFileName(now, tName));
+            if (!check.exists() && check.length() < 1) {
+                typesToUpdate.add(tName);
             }
         }
+    }
 
 
-    private void updateFiles (FTPClient client, Session session, String t, Calendar now, Calendar last)
-        {
-        try
-            {
+    private void updateFiles(FTPClient client, Session session, String t, Calendar now, Calendar last) {
+        try {
             // Запись во временный файл
-            BIDataExportType type = TYPES.get (t);
-            File tempFile = new File (LOCAL_DIRECTORY, parseFileName (now, t));
-            if (!USE_FTP_AS_STORAGE)
-                {
-                if (tempFile.exists ())
-                    {
-                    tempFile.delete ();
-                    }
-                tempFile.createNewFile ();
+            BIDataExportType type = TYPES.get(t);
+            File tempFile = new File(LOCAL_DIRECTORY, parseFileName(now, t));
+            if (!USE_FTP_AS_STORAGE) {
+                if (tempFile.exists()) {
+                    tempFile.delete();
                 }
-            BufferedWriter output = new BufferedWriter (new OutputStreamWriter(new FileOutputStream (tempFile), "UTF-8"));
-                    //new BufferedWriter (new FileWriter (tempFile), "");
+                tempFile.createNewFile();
+            }
+            BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+            //new BufferedWriter (new FileWriter (tempFile), "");
 
 
-            org.hibernate.Query q = session.createSQLQuery (applyMacroReplace (type.getSQL (), last, now));
-            List resultList = q.list ();
-            StringBuilder builder = new StringBuilder ();
+            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(type.getSQL(), last, now));
+            List resultList = q.list();
+            StringBuilder builder = new StringBuilder();
             //  Составляем шапку для CSV
-            for (String col : type.getColumns ())
-                {
-                if (builder.length () > 0)
-                    {
-                    builder.append (";");
-                    }
-                builder.append ("\"" + col + "\"");
+            for (String col : type.getColumns()) {
+                if (builder.length() > 0) {
+                    builder.append(";");
                 }
-            output.write (builder.toString () + "\n");
-            builder.delete (0, builder.length ());
+                builder.append("\"" + col + "\"");
+            }
+            output.write(builder.toString() + "\n");
+            builder.delete(0, builder.length());
             //  Составляем таблицу с данными в CSV
-            for (Object entry : resultList)
-                {
+            for (Object entry : resultList) {
 
 
                 //  Обрабатываем данные
-                Object e []  = (Object []) entry;
-                for (Object o : e)
-                    {
-                    if (builder.length () > 0)
-                        {
-                        builder.append (";");
-                        }
-
-                    if (o instanceof String)
-                        {
-                        builder.append ("\"" + ((String) o).trim () + "\"");
-                        }
-                    else if (o instanceof BigDecimal)
-                        {
-                        builder.append (((BigDecimal) o).doubleValue ());
-                        }
-                    else if (o instanceof BigInteger)
-                        {
-                        builder.append (((BigInteger) o).intValue ());
-                        }
-                    else if (o instanceof Double)
-                        {
-                        builder.append (((Double) o).doubleValue ());
-                        }
-                    else if (o instanceof Integer)
-                        {
-                        builder.append (((Integer) o).intValue ());
-                        }
+                Object e[] = (Object[]) entry;
+                for (Object o : e) {
+                    if (builder.length() > 0) {
+                        builder.append(";");
                     }
-                output.write (wrap (builder.toString ()) + "\n");
-                output.flush ();
-                builder.delete (0, builder.length ());
+
+                    if (o instanceof String) {
+                        builder.append("\"" + ((String) o).trim() + "\"");
+                    } else if (o instanceof BigDecimal) {
+                        builder.append(((BigDecimal) o).doubleValue());
+                    } else if (o instanceof BigInteger) {
+                        builder.append(((BigInteger) o).intValue());
+                    } else if (o instanceof Double) {
+                        builder.append(((Double) o).doubleValue());
+                    } else if (o instanceof Integer) {
+                        builder.append(((Integer) o).intValue());
+                    }
                 }
-            output.close ();
+                output.write(builder.toString() + "\n");
+                output.flush();
+                builder.delete(0, builder.length());
+            }
+            output.close();
 
 
             //  Записываем файл на FTP сервер
-            if (USE_FTP_AS_STORAGE)
-                {
-                client.deleteFile (parseFileName (now, t) + ".csv");
-                FileInputStream fis = new FileInputStream (tempFile);
-                boolean fileStatus = client.storeFile (parseFileName (now, t), fis);
-                }
+            if (USE_FTP_AS_STORAGE) {
+                client.deleteFile(parseFileName(now, t) + ".csv");
+                FileInputStream fis = new FileInputStream(tempFile);
+                boolean fileStatus = client.storeFile(parseFileName(now, t), fis);
             }
-        catch (Exception e)
-            {
-            logger.error ("Failed to build query for " + t, e);
-            }
+        } catch (Exception e) {
+            logger.error("Failed to build query for " + t, e);
         }
+    }
 
 
-    private String wrap (String src)
-        {
-        try
-            {
-            /*byte[] asciiBytes = src.getBytes ();
-            String unicode    = new String (asciiBytes, "US-ASCII");
-            byte[] utfBytes   = unicode.getBytes ("UTF-8");*/
-            //return new String (src.getBytes (), "UTF-8");
-            return src;
-            }
-        catch (Exception e)
-            {
-            logger.error ("Failed to convert to charset UTF8 '" + src + "'", e);
-            return src;
-            }
-        }
-
-
-    private Calendar getLastBuildedPeriod (File localDir) throws IOException
-        {
-        File content [] = localDir.listFiles();
+    private Calendar getLastBuildedPeriod(File localDir) throws IOException {
+        File content[] = localDir.listFiles();
         Calendar last = null;
-        for (File f : content)
-            {
-            if (!f.isFile ())
-                {
+        for (File f : content) {
+            if (!f.isFile()) {
                 continue;
-                }
+            }
 
-            try
-                {
-                String date = f.getName ().substring (0, f.getName ().indexOf ("_"));
-                Calendar that = new GregorianCalendar ();
-                that.setTimeInMillis (FILES_FORMAT.parse (date).getTime ());
+            try {
+                String date = f.getName().substring(0, f.getName().indexOf("_"));
+                Calendar that = new GregorianCalendar();
+                that.setTimeInMillis(FILES_FORMAT.parse(date).getTime());
 
-                if (last == null || last.getTimeInMillis () < that.getTimeInMillis ())
-                    {
+                if (last == null || last.getTimeInMillis() < that.getTimeInMillis()) {
                     last = that;
-                    }
                 }
-            catch (Exception e)
-                {
-                logger.error ("Wrong file found: " + f.getName (), e);
-                }
+            } catch (Exception e) {
+                logger.error("Wrong file found: " + f.getName(), e);
             }
-        if (last == null)
-            {
-            last = getStartDate ();
-            }
-        return last;
         }
+        if (last == null) {
+            last = getStartDate();
+        }
+        return last;
+    }
 
 
-    private Calendar getLastBuildedPeriod (FTPClient client) throws IOException
-        {
-        FTPFile content [] = getDirectories (client);
-        Calendar last   = null;
-        for (FTPFile f : content)
-            {
-            if (!f.isFile())
-                {
+    private Calendar getLastBuildedPeriod(FTPClient client) throws IOException {
+        FTPFile content[] = getDirectories(client);
+        Calendar last = null;
+        for (FTPFile f : content) {
+            if (!f.isFile()) {
                 continue;
-                }
+            }
 
-            try
-                {
-                String date = f.getName ().substring (0, f.getName ().indexOf ("_"));
-                Calendar that = new GregorianCalendar ();
-                that.setTimeInMillis (FILES_FORMAT.parse (date).getTime ());
+            try {
+                String date = f.getName().substring(0, f.getName().indexOf("_"));
+                Calendar that = new GregorianCalendar();
+                that.setTimeInMillis(FILES_FORMAT.parse(date).getTime());
 
-                if (last == null || last.getTimeInMillis () < that.getTimeInMillis ())
-                    {
+                if (last == null || last.getTimeInMillis() < that.getTimeInMillis()) {
                     last = that;
-                    }
                 }
-            catch (Exception e)
-                {
-                logger.error ("Wrong file found: " + f.getName (), e);
-                }
+            } catch (Exception e) {
+                logger.error("Wrong file found: " + f.getName(), e);
             }
-        if (last == null)
-            {
-            last = getStartDate ();
-            }
-        return last;
         }
+        if (last == null) {
+            last = getStartDate();
+        }
+        return last;
+    }
 
 
-    private FTPClient openConnection () throws IOException
-        {
-        FTPClient client = new FTPClient ();
-        try
-            {
-            client.connect (FTP_ADDRESS);
-            client.login (FTP_LOGIN, FTP_PASSWORD);
-            client.changeWorkingDirectory (FTP_WORKDIR);
+    private FTPClient openConnection() throws IOException {
+        FTPClient client = new FTPClient();
+        try {
+            client.connect(FTP_ADDRESS);
+            client.login(FTP_LOGIN, FTP_PASSWORD);
+            client.changeWorkingDirectory(FTP_WORKDIR);
             return client;
-            }
-        catch (IOException e)
-            {
-            e.printStackTrace ();
+        } catch (IOException e) {
+            e.printStackTrace();
             throw e;
-            }
         }
+    }
 
 
-    public FTPFile [] getDirectories (FTPClient client) throws IOException
-        {
+    public FTPFile[] getDirectories(FTPClient client) throws IOException {
         return getDirectories(client, "");
-        }
+    }
 
 
-    public FTPFile [] getDirectories (FTPClient client, String dir) throws IOException
-        {
-        try
-            {
-            if (dir.length () > 1)
-                {
-                client.changeWorkingDirectory (dir);
-                }
-            return client.listDirectories ();
+    public FTPFile[] getDirectories(FTPClient client, String dir) throws IOException {
+        try {
+            if (dir.length() > 1) {
+                client.changeWorkingDirectory(dir);
             }
-        catch (IOException e)
-            {
-            logger.error ("Failed to get directories list from " + dir, e);
+            return client.listDirectories();
+        } catch (IOException e) {
+            logger.error("Failed to get directories list from " + dir, e);
             throw e;
-            }
         }
+    }
 
 
-    public FTPFile [] getFiles (FTPClient client) throws IOException
-        {
-        return getFiles (client, "");
-        }
+    public FTPFile[] getFiles(FTPClient client) throws IOException {
+        return getFiles(client, "");
+    }
 
 
-    public FTPFile [] getFiles (FTPClient client, String dir) throws IOException
-        {
-        try
-            {
-            if (dir.length () > 1)
-                {
-                client.changeWorkingDirectory (dir);
-                }
-            return client.listFiles ();
+    public FTPFile[] getFiles(FTPClient client, String dir) throws IOException {
+        try {
+            if (dir.length() > 1) {
+                client.changeWorkingDirectory(dir);
             }
-        catch (IOException e)
-            {
+            return client.listFiles();
+        } catch (IOException e) {
             logger.error("Failed to get files list from " + dir, e);
             throw e;
-            }
         }
+    }
 
 
-    private static void clearCalendar (Calendar cal)
-        {
-        if (cal == null)
-            {
+    private static void clearCalendar(Calendar cal) {
+        if (cal == null) {
             return;
-            }
-        cal.set (Calendar.AM_PM, Calendar.AM);
-        cal.set (Calendar.HOUR, 0);
-        cal.set (Calendar.MINUTE, 0);
-        cal.set (Calendar.SECOND, 0);
-        cal.set (Calendar.MILLISECOND, 0);
         }
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+    }
 
 
-    public String applyMacroReplace (String sql)
-        {
-        Calendar min = getStartDate ();
+    public String applyMacroReplace(String sql) {
+        Calendar min = getStartDate();
         Calendar max = getToday();
-        return applyMacroReplace (sql, min, max);
-        }
+        return applyMacroReplace(sql, min, max);
+    }
 
 
-    public static String applyMacroReplace (String sql, Calendar min, Calendar max)
-        {
-        if (sql.indexOf ("%MINIMUM_DATE%") > -1)
-            {
+    public static String applyMacroReplace(String sql, Calendar min, Calendar max) {
+        if (sql.indexOf("%MINIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MINIMUM_DATE%", DB_DATE_FORMAT.format(min.getTime()));
-            }
-        if (sql.indexOf ("%MAXIMUM_DATE%") > -1)
-            {
-            sql = sql.replaceAll ("%MAXIMUM_DATE%", DB_DATE_FORMAT.format (max.getTime ()));
-            }
+        }
+        if (sql.indexOf("%MAXIMUM_DATE%") > -1) {
+            sql = sql.replaceAll("%MAXIMUM_DATE%", DB_DATE_FORMAT.format(max.getTime()));
+        }
         return sql;
-        }
+    }
 
 
-    public static Calendar getStartDate ()
-        {
-        Calendar cal = new GregorianCalendar ();
+    public static Calendar getStartDate() {
+        Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
-        cal.set (Calendar.YEAR, 2012);
-        cal.set (Calendar.MONTH, Calendar.NOVEMBER);
-        cal.set (Calendar.DAY_OF_MONTH, 1);
-        clearCalendar (cal);
+        cal.set(Calendar.YEAR, 2012);
+        cal.set(Calendar.MONTH, Calendar.NOVEMBER);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        clearCalendar(cal);
         return cal;
-        }
+    }
 
 
-    public static Calendar getToday ()
-        {
-        Calendar cal = new GregorianCalendar ();
+    public static Calendar getToday() {
+        Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        cal.set (Calendar.MILLISECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         clearCalendar(cal);
         return cal;
-        }
+    }
 
 
-    public Calendar [] getUpdatePeriodsViaLocal (List <String> typesToUpdate) throws IOException
-        {
-        File dir      = new File (LOCAL_DIRECTORY);
+    public Calendar[] getUpdatePeriodsViaLocal(List<String> typesToUpdate) throws IOException {
+        File dir = new File(LOCAL_DIRECTORY);
         Calendar last = getLastBuildedPeriod(dir);
-        Calendar now  = new GregorianCalendar ();
-        clearCalendar (last);
-        clearCalendar (now);
+        Calendar now = new GregorianCalendar();
+        clearCalendar(last);
+        clearCalendar(now);
 
 
         //  Если хотя бы один файл есть, то необзодимо проверить наличие всех файлов
-        if (last != null && last.getTimeInMillis () == now.getTimeInMillis ())
-            {
-            File files [] = dir.listFiles ();
+        if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
+            File files[] = dir.listFiles();
 
-            for (String t : TYPES.keySet ())
-                {
-                String fileName = parseFileName (now, t);
+            for (String t : TYPES.keySet()) {
+                String fileName = parseFileName(now, t);
                 boolean doAdd = true;
-                for (File f : files)
-                    {
-                    if (f.getName ().toLowerCase ().equals (fileName) && f.length () > 0)
-                        {
+                for (File f : files) {
+                    if (f.getName().toLowerCase().equals(fileName) && f.length() > 0) {
                         doAdd = false;
                         break;
-                        }
-                    }
-                if (doAdd)
-                    {
-                    last.setTimeInMillis (last.getTimeInMillis () - 86400000);  //  Если необходимо добавлять хотябы одну запись,
-                                                                                //  данные выбираем с предыдущего дня по сегодняшний
-                    typesToUpdate.add (t);
                     }
                 }
+                if (doAdd) {
+                    last.setTimeInMillis(
+                            last.getTimeInMillis() - 86400000);  //  Если необходимо добавлять хотябы одну запись,
+                    //  данные выбираем с предыдущего дня по сегодняшний
+                    typesToUpdate.add(t);
+                }
             }
-        else
-            {
-            dir.mkdirs ();
-            typesToUpdate.addAll (TYPES.keySet ());
-            }
-
-        return new Calendar [] { last, now };
+        } else {
+            dir.mkdirs();
+            typesToUpdate.addAll(TYPES.keySet());
         }
 
+        return new Calendar[]{last, now};
+    }
 
-    public Calendar [] getUpdatePeriodsViaFTP (List <String> typesToUpdate) throws IOException
-        {
-        client = openConnection ();
 
-        Calendar last = getLastBuildedPeriod (client);
-        Calendar now = new GregorianCalendar ();
-        now.setTimeInMillis (System.currentTimeMillis ());
-        clearCalendar (last);
-        clearCalendar (now);
+    public Calendar[] getUpdatePeriodsViaFTP(List<String> typesToUpdate) throws IOException {
+        client = openConnection();
+
+        Calendar last = getLastBuildedPeriod(client);
+        Calendar now = new GregorianCalendar();
+        now.setTimeInMillis(System.currentTimeMillis());
+        clearCalendar(last);
+        clearCalendar(now);
         // Проверяем наличие директории
-        if (last != null && last.getTimeInMillis () == now.getTimeInMillis ())
-            {
+        if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
             //  Если директория существует, проверяем все ли в ней файлы
-            FTPFile files [] = getFiles (client, FILES_FORMAT.format (now.getTime ()));
-            for (String t : TYPES.keySet ())
-                {
-                String fileName = parseFileName (now, t);
+            FTPFile files[] = getFiles(client, FILES_FORMAT.format(now.getTime()));
+            for (String t : TYPES.keySet()) {
+                String fileName = parseFileName(now, t);
                 boolean doAdd = true;
-                for (FTPFile f : files)
-                    {
-                    if (f.getName ().toLowerCase ().equals (fileName) && f.getSize() > 0)
-                        {
+                for (FTPFile f : files) {
+                    if (f.getName().toLowerCase().equals(fileName) && f.getSize() > 0) {
                         doAdd = false;
                         break;
-                        }
-                    }
-                if (doAdd)
-                    {
-                    last.setTimeInMillis (last.getTimeInMillis () - 86400000);  //  Если необходимо добавлять хотябы одну запись,
-                                                                                //  данные выбираем с предыдущего дня по сегодняшний
-                    typesToUpdate.add (t);
                     }
                 }
+                if (doAdd) {
+                    last.setTimeInMillis(
+                            last.getTimeInMillis() - 86400000);  //  Если необходимо добавлять хотябы одну запись,
+                    //  данные выбираем с предыдущего дня по сегодняшний
+                    typesToUpdate.add(t);
+                }
             }
-        else
-            {
+        } else {
             //  Указываем, что загружать необходимо все данные
-            typesToUpdate.addAll (TYPES.keySet ());
-            }
-
-        return new Calendar [] { last, now };
+            typesToUpdate.addAll(TYPES.keySet());
         }
 
+        return new Calendar[]{last, now};
+    }
 
-    public String parseFileName (Calendar cal, String type)
-        {
-        String date = FILES_FORMAT.format (cal.getTime ());
+
+    public String parseFileName(Calendar cal, String type) {
+        String date = FILES_FORMAT.format(cal.getTime());
         return date + "_" + type + ".csv";
-        }
+    }
 
 
-    public static class BIDataExportType
-        {
+    public static class BIDataExportType {
+
         private String sql;
-        private String cols [];
+        private String cols[];
 
 
-        public BIDataExportType (String sql, String cols [])
-            {
+        public BIDataExportType(String sql, String cols[]) {
             this.sql = sql;
             this.cols = cols;
-            }
+        }
 
-        public String getSQL ()
-            {
+        public String getSQL() {
             return sql;
-            }
+        }
 
-        public String [] getColumns ()
-            {
+        public String[] getColumns() {
             return cols;
-            }
         }
     }
+}
