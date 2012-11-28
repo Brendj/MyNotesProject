@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
@@ -106,6 +107,57 @@ public class BIDataExportService {
         TYPES.put("discounts", new BIDataExportType("select idofcategorydiscount, categoryname " +
                 "from cf_categorydiscounts " +
                 "order by idofcategorydiscount", new String[]{"idofcategorydiscount", "categoryname"}));
+
+        TYPES.put("cardtypes", new BIDataExportType (new String[]{"card_type_id", "categoryname"}).setSpecificExporter ("cartTypesExporter"));
+    }
+
+
+    public static void cartTypesExporter (String LOCAL_DIRECTORY, String t, Calendar now) throws IOException
+        {
+        BIDataExportType type = TYPES.get (t);
+        File tempFile = new File(LOCAL_DIRECTORY, parseFileName(now, t));
+        if (!USE_FTP_AS_STORAGE) {
+            if (tempFile.exists()) {
+                tempFile.delete();
+            }
+            tempFile.createNewFile();
+        }
+        BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+
+        StringBuilder builder = new StringBuilder();
+        //  Составляем шапку для CSV
+        for (String col : type.getColumns()) {
+            if (builder.length() > 0) {
+                builder.append(";");
+            }
+            builder.append("\"" + col + "\"");
+        }
+        output.write(builder.toString() + "\n");
+        builder.delete(0, builder.length());
+
+        output.write("0;\"Неизвестный тип карты\"\n");
+        for (int i=1; i< Card.TYPE_NAMES.length; i++)
+            {
+            output.write(i + ";\"" + Card.TYPE_NAMES [i] + "\"\n");
+            }
+        output.close();
+        }
+
+
+    public static void executeExporterMethod(String dir, String t, Calendar now, BIDataExportType type)
+        {
+        if (type == null)
+            {
+            return;
+            }
+
+        java.lang.reflect.Method meth;
+        try {
+            meth = BIDataExportService.class.getDeclaredMethod (type.getSpecificExporter(), String.class, String.class, Calendar.class);
+            meth.invoke(null, dir, t, now);
+        } catch (Exception e) {
+            logger.error("Failed to execute exporter method " + type.getSpecificExporter(), e);
+        }
     }
 
 
@@ -168,10 +220,10 @@ public class BIDataExportService {
             for (long ts = last.getTimeInMillis(); ts < now.getTimeInMillis(); ts += 86400000) {
                 Calendar start = new GregorianCalendar();
                 Calendar end = new GregorianCalendar();
-                start.setTimeInMillis(ts);
-                end.setTimeInMillis(ts + 86400000);
+                start.setTimeInMillis(ts - 86400000);
+                end.setTimeInMillis(ts);
 
-                getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, start);
+                getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, end);
                 for (String t : typesToUpdate) {
                     updateFiles(client, session, t, end, start);
                 }
@@ -200,6 +252,11 @@ public class BIDataExportService {
         try {
             // Запись во временный файл
             BIDataExportType type = TYPES.get(t);
+            if (type.useSpecificExporter ())
+                {
+                executeExporterMethod (LOCAL_DIRECTORY, t, now, type);
+                return;
+                }
             File tempFile = new File(LOCAL_DIRECTORY, parseFileName(now, t));
             if (!USE_FTP_AS_STORAGE) {
                 if (tempFile.exists()) {
@@ -403,7 +460,7 @@ public class BIDataExportService {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
         cal.set(Calendar.YEAR, 2012);
-        cal.set(Calendar.MONTH, Calendar.NOVEMBER);
+        cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
         cal.set(Calendar.DAY_OF_MONTH, 1);
         clearCalendar(cal);
         return cal;
@@ -496,7 +553,7 @@ public class BIDataExportService {
     }
 
 
-    public String parseFileName(Calendar cal, String type) {
+    public static String parseFileName(Calendar cal, String type) {
         String date = FILES_FORMAT.format(cal.getTime());
         return date + "_" + type + ".csv";
     }
@@ -506,7 +563,12 @@ public class BIDataExportService {
 
         private String sql;
         private String cols[];
+        private String exporterMethod;
 
+
+        public BIDataExportType(String cols []) {
+            this.cols = cols;
+        }
 
         public BIDataExportType(String sql, String cols[]) {
             this.sql = sql;
@@ -520,5 +582,21 @@ public class BIDataExportService {
         public String[] getColumns() {
             return cols;
         }
+
+        public boolean useSpecificExporter ()
+            {
+            return exporterMethod != null && exporterMethod.length () > 0;
+            }
+
+        public BIDataExportType setSpecificExporter (String exporterMethod)
+            {
+            this.exporterMethod = exporterMethod;
+            return this;
+            }
+
+        public String getSpecificExporter ()
+            {
+                return exporterMethod;
+            }
     }
 }
