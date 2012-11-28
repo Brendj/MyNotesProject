@@ -17,12 +17,14 @@ import com.google.visualization.datasource.query.Query;
 import com.google.visualization.datasource.render.JsonRenderer;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -71,12 +73,11 @@ public class ProjectStateReportService
     private static final DateFormat DATE_FORMAT    = new SimpleDateFormat ("dd.MM");
     private static final DateFormat DB_DATE_FORMAT = new SimpleDateFormat ("yyyy-MM-dd");
     private static final org.slf4j.Logger logger   = LoggerFactory.getLogger (ProjectStateReportService.class);
-    private ServletConfig config;
     public static final Map<String, Type> TYPES;
     static
         {
         TYPES = new HashMap<String, Type>();
-        /*TYPES.put ("ActiveChart",
+        TYPES.put ("ActiveChart",
                 new ComplexType (new Type [] { new SimpleType ("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                                                                "from (select distinct cf_enterevents.idoforg as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d " +
                                                                "from cf_enterevents " +
@@ -136,30 +137,30 @@ public class ProjectStateReportService
                                                                "order by 1", UNIQUE_CHART_1_DATA).setIncremental (true),
 
                                               new SimpleType ("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                                                           "from (select distinct cf_enterevents.idofclient as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d " +
-                                                           "from cf_enterevents " +
-                                                           "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
-                                                           "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000) as oo " +
-                                                           "group by d " +
-                                                           "order by 1", UNIQUE_CHART_2_DATA).setIncremental (true),
+                                                               "from (select distinct cf_enterevents.idofclient as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d " +
+                                                               "from cf_enterevents " +
+                                                               "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
+                                                               "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000) as oo " +
+                                                               "group by d " +
+                                                               "order by 1", UNIQUE_CHART_2_DATA).setIncremental (true),
 
                                               new SimpleType ("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                                                           "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
-                                                           "from cf_orders " +
-                                                           "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
-                                                           "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND " +
-                                                           "      cf_orders.socdiscount=0) as oo " +
-                                                           "group by d " +
-                                                           "order by 1", UNIQUE_CHART_3_DATA).setIncremental (true),
+                                                               "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
+                                                               "from cf_orders " +
+                                                               "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
+                                                               "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND " +
+                                                               "      cf_orders.socdiscount=0) as oo " +
+                                                               "group by d " +
+                                                               "order by 1", UNIQUE_CHART_3_DATA).setIncremental (true),
 
                                               new SimpleType ("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                                                           "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
-                                                           "from cf_orders " +
-                                                           "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
-                                                           "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND " +
-                                                           "      cf_orders.socdiscount<>0) as oo " +
-                                                           "group by d " +
-                                                           "order by 1", UNIQUE_CHART_4_DATA).setIncremental (true)},
+                                                               "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
+                                                               "from cf_orders " +
+                                                               "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
+                                                               "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND " +
+                                                               "      cf_orders.socdiscount<>0) as oo " +
+                                                               "group by d " +
+                                                               "order by 1", UNIQUE_CHART_4_DATA).setIncremental (true)},
                         new Object [][] { { ValueType.DATE, "Год" },
                                           { ValueType.NUMBER, "Число уникальных пользователей в день" },
                                           { ValueType.NUMBER, "Число уникальных пользователей услуги ПРОХОД" },
@@ -176,7 +177,7 @@ public class ProjectStateReportService
                                 "group by cf_orderdetails.menugroup",
                                 new Object [][] { { ValueType.TEXT, "Группа меню" },
                                                   { ValueType.NUMBER, "Покупок" } },
-                                CONTENTS_CHART_DATA).setPostReportMethod ("parseContentsChart"));*/
+                                CONTENTS_CHART_DATA).setPostReportMethod ("parseContentsChart"));
         TYPES.put ("RefillChart",
                 new SimpleType ("select cf_contragents.contragentname, count(cf_clientpayments.idofclientpayment) " +
                                 "from cf_contragents " +
@@ -187,7 +188,7 @@ public class ProjectStateReportService
                                 new Object [][] { { ValueType.TEXT, "Способ пополнения" },
                                                   { ValueType.NUMBER, "Количество пополнений" } },
                                 REFILL_CHART_DATA).setPostReportMethod ("parseRefillChart"));
-        /*TYPES.put ("InformingChart",
+        TYPES.put ("InformingChart",
                 new SimpleType ("select 'Не предоставлены данные для информирования', count(cf_clients.idofclient) " +
                                 "from cf_clients " +
                                 "left join cf_cards on cf_clients.idofclient=cf_cards.idofclient " +
@@ -302,20 +303,39 @@ public class ProjectStateReportService
                                     new Object [][] { { ValueType.DATE, "Дата" },
                                                       { ValueType.NUMBER, "1-4 класс" },
                                                       { ValueType.NUMBER, "5-11 класс" } },
-                                    VISITORS_CHART_DATA));*/
+                                    VISITORS_CHART_DATA));
         }
-    private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Type, StringKey, StringValue) VALUES (?, ?, ?, ?, ?)";
-    private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=?";
-    private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? order by Period DESC, StringKey";
+    private static final String INSERT_SQL          = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Type, StringKey, StringValue) VALUES (?, ?, ?, ?, ?)";
+    private static final String DELETE_SQL          = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=?";
+    private static final String SELECT_SQL          = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? order by Period DESC, StringKey";
     private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND Type=? order by StringKey";
-    private static final String CHECK_SQL  = "SELECT Period FROM cf_projectstate_data WHERE Type=? order by Period DESC";
+    private static final String CHECK_SQL           = "SELECT Period FROM cf_projectstate_data WHERE Type=? order by Period DESC";
 
 
+
+
+    public static boolean isOn ()
+        {
+            return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_PROJECT_STATE_REPORT_ON);
+        }
+
+
+    public static void setOn (boolean on)
+        {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_PROJECT_STATE_REPORT_ON, "" + (on ? "1" : "0"));
+        }
 
 
     public void run ()
         {
-        logger.debug ("Start Project State Reports execution");
+            setOn (false);
+        if (!RuntimeContext.getInstance ().isMainNode () || !isOn ())
+            {
+            //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
+            return;
+            }
+
+
         RuntimeContext runtimeContext = null;
         try
             {
@@ -329,7 +349,6 @@ public class ProjectStateReportService
         catch (Exception e)
             {
             }
-        logger.debug ("Project State Reports execution completed");
         }
 
 
@@ -364,6 +383,7 @@ public class ProjectStateReportService
         }
 
 
+    @Transactional
     public void saveData (Session session, Map <String, String> data, Type t)
         {
         try
@@ -564,7 +584,7 @@ public class ProjectStateReportService
 
 
     public static DataTable generateReport (RuntimeContext runtimeContext,
-                                            Calendar dateAt, Calendar dateTo, Type t) throws IllegalArgumentException
+            Calendar dateAt, Calendar dateTo, Type t) throws IllegalArgumentException
         {
         if (runtimeContext == null || dateTo == null || dateAt == null || t == null)
             {
@@ -628,7 +648,7 @@ public class ProjectStateReportService
 
 
     private static Map <String, List <String>> loadReportData (Session session, Calendar dateAt, Calendar dateTo,
-                                                               Type t, Map <String, List <String>> result)
+            Type t, Map <String, List <String>> result)
         {
         try
             {
@@ -741,18 +761,24 @@ public class ProjectStateReportService
                 Object col [] = t.getColumns() [i];
                 if ((ValueType) col [0] == ValueType.TEXT)
                     {
-                        if (i - 1 >= vals.size()) {
-                            r.addCell("");
-                        } else {
-                            r.addCell(vals.get(i - 1));
+                    if (i - 1 >= vals.size())
+                        {
+                        r.addCell("");
+                        }
+                    else
+                        {
+                        r.addCell(vals.get(i - 1));
                         }
                     }
                 else if ((ValueType) col [0] == ValueType.NUMBER)
                     {
-                        if (i - 1 >= vals.size()) {
-                            r.addCell(0);
-                        } else {
-                            r.addCell(Integer.parseInt(vals.get(i - 1)));
+                    if (i - 1 >= vals.size())
+                        {
+                        r.addCell(0);
+                        }
+                    else
+                        {
+                        r.addCell(Integer.parseInt(vals.get(i - 1)));
                         }
                     }
                 }
