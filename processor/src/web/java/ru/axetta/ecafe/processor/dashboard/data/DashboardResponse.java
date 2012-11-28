@@ -18,6 +18,7 @@ import java.util.List;
 public class DashboardResponse {
 
     public static class OrgBasicStatItem {
+
         long idOfOrg;
         String orgName;
         String orgNameNumber;
@@ -172,7 +173,9 @@ public class DashboardResponse {
             this.numberOfEmployeePayedOrdersPercent = numberOfEmployeePayedOrdersPercent;
         }
     }
+
     public static class OrgBasicStats {
+
         LinkedList<OrgBasicStatItem> orgBasicStatItems = new LinkedList<OrgBasicStatItem>();
 
         public LinkedList<OrgBasicStatItem> getOrgBasicStatItems() {
@@ -245,6 +248,7 @@ public class DashboardResponse {
     }
 
     public static class PaymentSystemStats {
+
         LinkedList<PaymentSystemStatItem> paymentSystemItemInfos = new LinkedList<PaymentSystemStatItem>();
 
         public LinkedList<PaymentSystemStatItem> getPaymentSystemItemInfos() {
@@ -288,7 +292,9 @@ public class DashboardResponse {
             return remoteAddr;
         }
     }
+
     public static class OrgSyncStats {
+
         LinkedList<OrgSyncStatItem> orgSyncStatItems;
 
         public LinkedList<OrgSyncStatItem> getOrgSyncStatItems() {
@@ -299,12 +305,6 @@ public class DashboardResponse {
             this.orgSyncStatItems = orgSyncStatItems;
         }
     }
-
-
-
-
-
-
 
 
     public static class EduInstItemInfo {
@@ -463,8 +463,6 @@ public class DashboardResponse {
     private List<EduInstItemInfo> eduInstItemInfoList = new LinkedList<EduInstItemInfo>();
 
     private PaymentSystemStats paymentSystemStats;
-
-
 
 
     public List<EduInstItemInfo> getEduInstItemInfoList() {

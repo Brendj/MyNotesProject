@@ -372,7 +372,8 @@ public class DAOService {
 
     @Transactional
     public List<String> getReportHandleRuleNames() {
-        TypedQuery<String> query = em.createQuery("select ruleName from ReportHandleRule order by ruleName", String.class);
+        TypedQuery<String> query = em
+                .createQuery("select ruleName from ReportHandleRule order by ruleName", String.class);
         return query.getResultList();
     }
 
@@ -470,127 +471,108 @@ public class DAOService {
     }
 
 
-    public void setCardStatus (long idOfCard, int state, String reason)
-        {
-        try
-            {
-            Query q = em.createQuery ("from Card where idOfCard = :idOfCard");
-            q.setParameter ("idOfCard", idOfCard);
-            List l = q.getResultList ();
-            if (l.size () == 0)
-                {
+    public void setCardStatus(long idOfCard, int state, String reason) {
+        try {
+            Query q = em.createQuery("from Card where idOfCard = :idOfCard");
+            q.setParameter("idOfCard", idOfCard);
+            List l = q.getResultList();
+            if (l.size() == 0) {
                 return;
-                }
-            Card card = (Card) l.get (0);
-            card.setState (state);
-            card.setLockReason (reason);
             }
-        catch (Exception e)
-            {
-            }
+            Card card = (Card) l.get(0);
+            card.setState(state);
+            card.setLockReason(reason);
+        } catch (Exception e) {
+        }
+    }
+
+
+    public Map<Long, Integer> getOrgEntersCount(Date at, Date to, int type) {
+        String sql = "";
+        if (type == 0) {
+            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
+                    "from cf_enterevents " +
+                    "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
+                    +
+                    "group by cf_enterevents.idoforg";
+        } else {
+            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
+                    "from cf_enterevents " +
+                    "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "group by cf_enterevents.idoforg";
         }
 
-
-    public Map <Long, Integer> getOrgEntersCount (Date at, Date to, int type)
-        {
-        String sql = "";
-        if (type == 0)
-            {
-            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
-                  "from cf_enterevents " +
-                  "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient " +
-                  "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
-                  "group by cf_enterevents.idoforg";
-            }
-        else
-            {
-            sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
-                  "from cf_enterevents " +
-                  "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient " +
-                  "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
-                  "group by cf_enterevents.idoforg";
-            }
-
-        try
-            {
-            Map <Long, Integer> res = new HashMap <Long, Integer> ();
-            Query q = em.createNativeQuery (sql);
-            q.setParameter ("dateAt", at.getTime ());
-            q.setParameter ("dateTo", to.getTime ());
-            if (type == 0)
-                {
+        try {
+            Map<Long, Integer> res = new HashMap<Long, Integer>();
+            Query q = em.createNativeQuery(sql);
+            q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());
+            if (type == 0) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                }
-            else
-                {
+            } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                }
-            List resultList = q.getResultList ();
+            }
+            List resultList = q.getResultList();
 
-            for (Object entry : resultList)
-                {
-                Object e [] = (Object []) entry;
-                res.put (((BigInteger) e [0]).longValue (), ((BigInteger) e [1]).intValue ());
-                }
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
             return res;
-            }
-        catch (Exception e)
-            {
-            logger.error ("Failed to load data", e);
-            }
-        return Collections.EMPTY_MAP;
+        } catch (Exception e) {
+            logger.error("Failed to load data", e);
         }
+        return Collections.EMPTY_MAP;
+    }
 
 
-    public Map <Long, Integer> getOrgOrdersCount (Date at, Date to, int type)
-        {
+    public Map<Long, Integer> getOrgOrdersCount(Date at, Date to, int type) {
         String sql = "";
-        if (type == 0)
-            {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
-                  "from cf_orders " +
-                  "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient " +
-                  "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
-                  "group by cf_orders.idoforg";
-            }
-            else
-            {
+        if (type == 0) {
             sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
                     "from cf_orders " +
-                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient " +
-                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient "
+                    +
+                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
+                    +
                     "group by cf_orders.idoforg";
-            }
+        } else {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+                    "from cf_orders " +
+                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient "
+                    +
+                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "group by cf_orders.idoforg";
+        }
 
-        try
-            {
-            Map <Long, Integer> res = new HashMap <Long, Integer> ();
-            Query q = em.createNativeQuery (sql);
-            q.setParameter ("dateAt", at.getTime ());
-            q.setParameter ("dateTo", to.getTime ());
-            if (type == 0)
-                {
+        try {
+            Map<Long, Integer> res = new HashMap<Long, Integer>();
+            Query q = em.createNativeQuery(sql);
+            q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());
+            if (type == 0) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                }
-                else
-                {
+            } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                }
-            List resultList = q.getResultList ();
+            }
+            List resultList = q.getResultList();
 
-            for (Object entry : resultList)
-                {
-                Object e [] = (Object []) entry;
-                res.put (((BigInteger) e [0]).longValue (), ((BigInteger) e [1]).intValue ());
-                }
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
             return res;
-            }
-        catch (Exception e)
-            {
-            logger.error ("Failed to load data", e);
-            }
-        return Collections.EMPTY_MAP;
+        } catch (Exception e) {
+            logger.error("Failed to load data", e);
         }
+        return Collections.EMPTY_MAP;
+    }
 }

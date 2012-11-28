@@ -37,6 +37,7 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class DashboardServiceBean {
+
     private static final Logger logger = LoggerFactory.getLogger(DashboardServiceBean.class);
 
     private static final int ID_OF_ORG_PARAM_INDEX = 0;
@@ -74,12 +75,12 @@ public class DashboardServiceBean {
         dashboardResponse.setEduInstItemInfoList(new LinkedList<DashboardResponse.EduInstItemInfo>());
         return dashboardResponse;
     }
-    
+
     public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = txManager.getTransaction(def);
-        def.setTimeout(600*1000);
+        def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
             Calendar cal = Calendar.getInstance();
@@ -98,16 +99,18 @@ public class DashboardServiceBean {
 
             String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE state=1";
             HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
-            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
+            if (idOfOrg != null) {
+                queryText += " WHERE org.idOfOrg=:idOfOrg";
+            }
             Query query = entityManager.createQuery(queryText);
             List queryResult = query.getResultList();
 
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                int n=0;
-                Long curIdOfOrg = (Long)result[n++];
+                int n = 0;
+                Long curIdOfOrg = (Long) result[n++];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) {
+                if (statItem == null) {
                     statItem = new DashboardResponse.OrgBasicStatItem();
                     orgStats.put(curIdOfOrg, statItem);
                 }
@@ -117,7 +120,7 @@ public class DashboardServiceBean {
                 statItem.setOrgLocation((String) result[n++]);
                 statItem.setOrgTag((String) result[n++]);
                 statItem.setOrgNameNumber(Org.extractOrgNumberFromName(statItem.getOrgName()));
-                statItem.setLastSuccessfulBalanceSyncTime((Date)result[n++]);
+                statItem.setLastSuccessfulBalanceSyncTime((Date) result[n++]);
             }
             ////
             queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup <:studentsMaxValue GROUP BY cl.org.idOfOrg";
@@ -126,10 +129,12 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long)result[0];
+                Long curIdOfOrg = (Long) result[0];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfStudentClients((Long)result[1]);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfStudentClients((Long) result[1]);
             }
             ////
             queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup>=:nonStudentGroups AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup<:leavingClientGroup GROUP BY cl.org.idOfOrg";
@@ -139,21 +144,26 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long)result[0];
+                Long curIdOfOrg = (Long) result[0];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfNonStudentClients((Long)result[1]);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfNonStudentClients((Long) result[1]);
             }
             ////
-            query = entityManager.createNativeQuery("select cl.idOfOrg, count(*) from CF_Clients cl LEFT JOIN CF_Cards cr ON cr.idOfClient=cl.idOfClient WHERE cl.idOfClientGroup<=:maxStaffGroup AND cr.idOfCard IS NULL GROUP BY cl.idOfOrg");
+            query = entityManager.createNativeQuery(
+                    "select cl.idOfOrg, count(*) from CF_Clients cl LEFT JOIN CF_Cards cr ON cr.idOfClient=cl.idOfClient WHERE cl.idOfClientGroup<=:maxStaffGroup AND cr.idOfCard IS NULL GROUP BY cl.idOfOrg");
             query.setParameter("maxStaffGroup", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = Long.parseLong(""+result[0]);
+                Long curIdOfOrg = Long.parseLong("" + result[0]);
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfClientsWithoutCard(Long.parseLong(""+result[1]));
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfClientsWithoutCard(Long.parseLong("" + result[1]));
             }
             ////
             queryText = "SELECT eev.org.idOfOrg, count(*) FROM EnterEvent eev WHERE eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
@@ -163,10 +173,12 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long)result[0];
+                Long curIdOfOrg = (Long) result[0];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfEnterEvents((Long)result[1]);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfEnterEvents((Long) result[1]);
             }
             ////
             queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
@@ -176,10 +188,12 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long)result[0];
+                Long curIdOfOrg = (Long) result[0];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfDiscountOrders((Long)result[1]);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfDiscountOrders((Long) result[1]);
             }
             ////
             queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
@@ -189,48 +203,51 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long)result[0];
+                Long curIdOfOrg = (Long) result[0];
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-                if (statItem==null) continue;
-                statItem.setNumberOfPayOrders((Long)result[1]);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfPayOrders((Long) result[1]);
             }
-            Map <Long, Integer> studentPays = daoService.getOrgOrdersCount (dayStartDate, dayEndDate, 0);
-            Map <Long, Integer> employeePays = daoService.getOrgOrdersCount (dayStartDate, dayEndDate, 1);
-            Map <Long, Integer> studentEnters  = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 0);
-            Map <Long, Integer> employeeEnters = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 1);
-            for (Long orgID : orgStats.keySet ())
-                {
+            Map<Long, Integer> studentPays = daoService.getOrgOrdersCount(dayStartDate, dayEndDate, 0);
+            Map<Long, Integer> employeePays = daoService.getOrgOrdersCount(dayStartDate, dayEndDate, 1);
+            Map<Long, Integer> studentEnters = daoService.getOrgEntersCount(dayStartDate, dayEndDate, 0);
+            Map<Long, Integer> employeeEnters = daoService.getOrgEntersCount(dayStartDate, dayEndDate, 1);
+            for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
-                if (statItem==null) continue;
-                Integer studentsCount  = studentEnters.get (orgID);
-                Integer employeesCount = employeeEnters.get (orgID);
-                Integer studentsPaysCount = studentPays.get (orgID);
-                Integer employeesPaysCount = employeePays.get (orgID);
+                if (statItem == null) {
+                    continue;
+                }
+                Integer studentsCount = studentEnters.get(orgID);
+                Integer employeesCount = employeeEnters.get(orgID);
+                Integer studentsPaysCount = studentPays.get(orgID);
+                Integer employeesPaysCount = employeePays.get(orgID);
                 double per1 = 0D;
                 double per2 = 0D;
                 double per3 = 0D;
                 double per4 = 0D;
-                if (studentsCount != null && studentsCount != 0 && statItem.getNumberOfStudentClients () != 0)
-                    {
-                    per1 = (double) studentsCount / (double) statItem.getNumberOfStudentClients ();
-                    }
-                if (employeesCount != null && employeesCount != 0 && statItem.getNumberOfStudentClients () != 0)
-                    {
-                    per2 = (double) employeesCount / (double) statItem.getNumberOfStudentClients ();
-                    }
-                if (studentsPaysCount != null && studentsPaysCount != 0 && statItem.getNumberOfPayOrders () != 0)
-                    {
-                    per3 = (double) studentsPaysCount / (double) statItem.getNumberOfPayOrders ();
-                    }
-                if (employeesPaysCount != null && employeesPaysCount != 0 && statItem.getNumberOfPayOrders () != 0)
-                    {
-                    per4 = (double) employeesPaysCount / (double) statItem.getNumberOfPayOrders ();
-                    }
-                statItem.setNumberOfStudentEnterEventsPercent (new BigDecimal (per1).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                statItem.setNumberOfEmployeeEnterEventsPercent (new BigDecimal (per2).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                statItem.setNumberOfStudentPayedOrdersPercent (new BigDecimal (per3).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                statItem.setNumberOfStudentPayedOrdersPercent (new BigDecimal (per4).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                if (studentsCount != null && studentsCount != 0 && statItem.getNumberOfStudentClients() != 0) {
+                    per1 = (double) studentsCount / (double) statItem.getNumberOfStudentClients();
                 }
+                if (employeesCount != null && employeesCount != 0 && statItem.getNumberOfStudentClients() != 0) {
+                    per2 = (double) employeesCount / (double) statItem.getNumberOfStudentClients();
+                }
+                if (studentsPaysCount != null && studentsPaysCount != 0 && statItem.getNumberOfPayOrders() != 0) {
+                    per3 = (double) studentsPaysCount / (double) statItem.getNumberOfPayOrders();
+                }
+                if (employeesPaysCount != null && employeesPaysCount != 0 && statItem.getNumberOfPayOrders() != 0) {
+                    per4 = (double) employeesPaysCount / (double) statItem.getNumberOfPayOrders();
+                }
+                statItem.setNumberOfStudentEnterEventsPercent(
+                        new BigDecimal(per1).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue());
+                statItem.setNumberOfEmployeeEnterEventsPercent(
+                        new BigDecimal(per2).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue());
+                statItem.setNumberOfStudentPayedOrdersPercent(
+                        new BigDecimal(per3).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue());
+                statItem.setNumberOfStudentPayedOrdersPercent(
+                        new BigDecimal(per4).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue());
+            }
             ////
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {
                 basicStats.getOrgBasicStatItems().add(e.getValue());
@@ -313,25 +330,30 @@ public class DashboardServiceBean {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = txManager.getTransaction(def);
-        def.setTimeout(600*1000);
+        def.setTimeout(600 * 1000);
         try {
-            String queryText = "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
-                                                + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
-                                                + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
-                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
-                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
-                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
-                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
-                                                + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
-            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
-            queryText+=" GROUP BY org";
+            String queryText =
+                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
+                            + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
+                            + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
+                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
+                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
+                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
+                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
+                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
+                            + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
+            if (idOfOrg != null) {
+                queryText += " WHERE org.idOfOrg=:idOfOrg";
+            }
+            queryText += " GROUP BY org";
             Query query = entityManager.createQuery(queryText);
 
-            if (idOfOrg!=null) query.setParameter("idOfOrg", idOfOrg);
+            if (idOfOrg != null) {
+                query.setParameter("idOfOrg", idOfOrg);
+            }
             query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
             query.setParameter("studentsMinValue", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
             query.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -453,23 +475,25 @@ public class DashboardServiceBean {
             DashboardResponse.PaymentSystemStatItem psi = new DashboardResponse.PaymentSystemStatItem();
             psi.setIdOfContragent(Long.parseLong("" + r[0]));
             psi.setContragentName((String) r[1]);
-            psi.setLastOperationTime(new Date(Long.parseLong(""+r[2])));
+            psi.setLastOperationTime(new Date(Long.parseLong("" + r[2])));
             payStatItems.add(psi);
         }
-        List<Object[]> monitoringPayDayTransactionsStats = daoService.getMonitoringPayDayTransactionsStats(
-                CalendarUtils.truncateToDayOfMonth(dt), CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(dt, 1)));
+        List<Object[]> monitoringPayDayTransactionsStats = daoService
+                .getMonitoringPayDayTransactionsStats(CalendarUtils.truncateToDayOfMonth(dt),
+                        CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(dt, 1)));
         for (Object[] r : monitoringPayDayTransactionsStats) {
-            Long caId = Long.parseLong(""+r[0]);
+            Long caId = Long.parseLong("" + r[0]);
             DashboardResponse.PaymentSystemStatItem psi = null;
             for (DashboardResponse.PaymentSystemStatItem psiCursor : payStatItems) {
-                if (psiCursor.getIdOfContragent()==caId) {
-                    psi = psiCursor; break;
+                if (psiCursor.getIdOfContragent() == caId) {
+                    psi = psiCursor;
+                    break;
                 }
             }
-            if (psi==null) {
+            if (psi == null) {
                 psi = new DashboardResponse.PaymentSystemStatItem();
                 psi.setIdOfContragent(caId);
-                psi.setContragentName((String)r[1]);
+                psi.setContragentName((String) r[1]);
                 payStatItems.add(psi);
             }
             psi.setNumOfOperations(Long.parseLong(r[2] + ""));
@@ -500,6 +524,7 @@ public class DashboardServiceBean {
         dashboardResponse.setPaymentSystemStats(getPaymentSystemInfo(new Date()));
         return dashboardResponse;
     }
+
     public DashboardResponse getInfoForDashboardForDateAndOrg(Date dt, Long idOfOrg) throws Exception {
         DashboardResponse dashboardResponse = prepareDashboardResponse();
         dashboardResponse = getOrgInfo(dashboardResponse, dt, idOfOrg);
