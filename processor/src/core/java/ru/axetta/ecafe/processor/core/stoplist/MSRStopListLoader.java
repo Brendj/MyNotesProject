@@ -43,316 +43,262 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
  */
 @Component
 @Scope("singleton")
-public class MSRStopListLoader
-{
+public class MSRStopListLoader {
+
     private String WS_LOGIN = null;
     private String WS_PASSWORD = null;
     private String WS_END_POINT = null;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger (MSRStopListLoader.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MSRStopListLoader.class);
     private boolean loggingEnabled = false;
     private DatatypeFactory df;
-    private DateFormat dateFormat = new SimpleDateFormat ("dd.MM.yyyy HH:mm:ss");
-    private DAOService daoService = DAOService.getInstance ();
+    private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private DAOService daoService = DAOService.getInstance();
 
     private Date updateDate;
     private LongRunningStopListService port = null;
     private String wsUID = ""; // ID сессис web-службы
 
 
-
-    public boolean getLogging ()
-    {
-        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_MSR_STOPLIST_LOGGING);
+    public boolean getLogging() {
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
     }
 
 
-    public static void setLogging (boolean on)
-    {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_LOGGING, "" + (on ? "1" : "0"));
+    public static void setLogging(boolean on) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_LOGGING, "" + (on ? "1" : "0"));
     }
 
 
-    public static boolean isOn ()
-        {
-        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_MSR_STOPLIST_ON);
-        }
+    public static boolean isOn() {
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSR_STOPLIST_ON);
+    }
 
 
-    public static void setOn (boolean on)
-        {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_ON, "" + (on ? "1" : "0"));
-        }
+    public static void setOn(boolean on) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_ON, "" + (on ? "1" : "0"));
+    }
 
 
-    private void setLastUpdateDate (Date date)
-        {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_UPD_TIME,
-                                                              dateFormat.format(date));
-        }
+    private void setLastUpdateDate(Date date) {
+        RuntimeContext.getInstance()
+                .setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_UPD_TIME, dateFormat.format(date));
+    }
 
 
-    private Date getLastUpdateDate ()
-    {
-        try
-        {
-            String d = RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_UPD_TIME);
-            if (d == null || d.length () < 1)
-            {
-                return new Date (0);
+    private Date getLastUpdateDate() {
+        try {
+            String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSR_STOPLIST_UPD_TIME);
+            if (d == null || d.length() < 1) {
+                return new Date(0);
             }
-            return dateFormat.parse (d);
+            return dateFormat.parse(d);
+        } catch (Exception e) {
+            log("Failed to parse date from options");
         }
-        catch (Exception e)
-        {
-            log ("Failed to parse date from options");
-        }
-        return new Date (0);
+        return new Date(0);
     }
 
 
-    public static String getLogin ()
-    {
-        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_USER);
+    public static String getLogin() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSR_STOPLIST_USER);
     }
 
 
-    public static void setLogin (String login)
-    {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_USER, login);
+    public static void setLogin(String login) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_USER, login);
     }
 
 
-    public static String getPassword ()
-    {
-        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_PSWD);
+    public static String getPassword() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSR_STOPLIST_PSWD);
     }
 
 
-    public static void setPassword (String password)
-    {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_PSWD, password);
+    public static void setPassword(String password) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_PSWD, password);
     }
 
 
-    public static String getURL ()
-    {
-        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_URL);
+    public static String getURL() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSR_STOPLIST_URL);
     }
 
 
-    public static void setURL (String url)
-    {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_URL, url);
+    public static void setURL(String url) {
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSR_STOPLIST_URL, url);
     }
 
 
-    private Date getNowUpdateDate ()
-    {
-        return new Date ();
+    private Date getNowUpdateDate() {
+        return new Date();
     }
 
 
-    private void init ()
-    {
-        WS_LOGIN = getLogin ();
-        WS_PASSWORD = getPassword ();
-        WS_END_POINT = getURL ();
-        loggingEnabled = getLogging ();
+    private void init() {
+        WS_LOGIN = getLogin();
+        WS_PASSWORD = getPassword();
+        WS_END_POINT = getURL();
+        loggingEnabled = getLogging();
 
-        log ("Start stoplist updating. Logging in using login: " + WS_LOGIN + " and pwsd: " + WS_PASSWORD + "...");
+        log("Start stoplist updating. Logging in using login: " + WS_LOGIN + " and pwsd: " + WS_PASSWORD + "...");
         LongRunningStopListService_Service service = new LongRunningStopListService_Service();
-        service.setHandlerResolver (new HandlerResolver ()
-        {
-            public List <Handler> getHandlerChain (PortInfo portInfo)
-            {
-                List <Handler> handlerList = new ArrayList <Handler> ();
-                handlerList.add (new AuthenticationHandler (WS_LOGIN, WS_PASSWORD));
+        service.setHandlerResolver(new HandlerResolver() {
+            public List<Handler> getHandlerChain(PortInfo portInfo) {
+                List<Handler> handlerList = new ArrayList<Handler>();
+                handlerList.add(new AuthenticationHandler(WS_LOGIN, WS_PASSWORD));
                 return handlerList;
-            } });
+            }
+        });
         port = service.getLongRunningStopListServicePort();
         Map context = ((BindingProvider) port).getRequestContext();
         context.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, WS_END_POINT);
     }
 
 
-    public void initCards () throws Exception
-    {
-        if (!RuntimeContext.getInstance ().isMainNode () && !isOn ())
-            {
+    public void initCards() throws Exception {
+        if (!RuntimeContext.getInstance().isMainNode() && !isOn()) {
             return;
-            }
+        }
 
-        try
-        {
-            if (port == null)
-            {
-                init ();
+        try {
+            if (port == null) {
+                init();
             }
-            Date last = getLastUpdateDate ();
-            Date now = getNowUpdateDate ();
-            if (now.compareTo (last) <= 0)
-            {
+            Date last = getLastUpdateDate();
+            Date now = getNowUpdateDate();
+            if (now.compareTo(last) <= 0) {
                 return;
             }
-            log ("Get from [" + last + "] to [" + now + "]");
-            wsUID = port.submitCardsTask (createCardsTaskRequest (last, now)).getUid();
+            log("Get from [" + last + "] to [" + now + "]");
+            wsUID = port.submitCardsTask(createCardsTaskRequest(last, now)).getUid();
             updateDate = now;
-            log ("Authorisation success, received UID: " + wsUID);
-        }
-        catch (Exception e)
-        {
-            logger.error (e.toString());
+            log("Authorisation success, received UID: " + wsUID);
+        } catch (Exception e) {
+            logger.error(e.toString());
         }
     }
 
 
-    public void parseCards ()
-    {
-        setOn (false);
-        if (!RuntimeContext.getInstance ().isMainNode () || !isOn ())
-            {
+    public void parseCards() {
+        setOn(false);
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             //logger.info ("MSR Stop List importer is turned off. You have to activate this tool using common Settings");
             return;
-            }
+        }
 
-        if (wsUID == null || wsUID.length () < 1)
-        {
+        if (wsUID == null || wsUID.length() < 1) {
             return;
         }
 
 
-        String uid = new String (wsUID);
+        String uid = new String(wsUID);
         wsUID = null;
-        try
-        {
-            log ("Receiving out previous [" + uid + "] task completion state...");
-            String state = port.getTaskState (createTaskStateRequest (uid)).getTaskState ().value ();
-            while (!state.equalsIgnoreCase ("done"))
-            {
-                log ("Our task is not finished yet [" + state + "]. Wait for 10 seconds and retry...");
-                wsUID = new String (uid);
+        try {
+            log("Receiving out previous [" + uid + "] task completion state...");
+            String state = port.getTaskState(createTaskStateRequest(uid)).getTaskState().value();
+            while (!state.equalsIgnoreCase("done")) {
+                log("Our task is not finished yet [" + state + "]. Wait for 10 seconds and retry...");
+                wsUID = new String(uid);
                 return;
             }
-            log ("Our task is finished");
+            log("Our task is finished");
 
 
             log("Receiving count of cards...");
-            int count = port.getTaskCount (createTaskCountRequest (uid)).getCount ();
+            int count = port.getTaskCount(createTaskCountRequest(uid)).getCount();
             log("There are " + count + " since last revise");
 
 
             log("Receiving a list of cards...");
-            List <StopListCardReply> cards = port.getCards (createCardsRequest(uid, 0, count)).getCards();
+            List<StopListCardReply> cards = port.getCards(createCardsRequest(uid, 0, count)).getCards();
             log("There are blocked cards bellow: ");
-            for (StopListCardReply card : cards)
-            {
-                if (card.getCurrentState ().trim ().equals ("11") ||
-                        card.getCurrentState ().trim ().equals ("12") ||
-                        card.getCurrentState ().trim ().equals ("13") ||
-                        card.getCurrentState ().trim ().equals ("14") ||
-                        card.getCurrentState ().trim ().equals ("21") ||
-                        card.getCurrentState ().trim ().equals ("22"))
-                {
-                    log (card.getIdentifier () + " is blocked. Update it's status...");
-                    daoService.setCardStatus (Long.parseLong (card.getIdentifier ()),
-                            Card.LOCKED_STATE,
+            for (StopListCardReply card : cards) {
+                if (card.getCurrentState().trim().equals("11") ||
+                        card.getCurrentState().trim().equals("12") ||
+                        card.getCurrentState().trim().equals("13") ||
+                        card.getCurrentState().trim().equals("14") ||
+                        card.getCurrentState().trim().equals("21") ||
+                        card.getCurrentState().trim().equals("22")) {
+                    log(card.getIdentifier() + " is blocked. Update it's status...");
+                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), Card.LOCKED_STATE,
                             "Заблокировано МСР");
                 }
-                if (card.getCurrentState ().trim ().equals ("5"))
-                {
-                    log (card.getIdentifier () + " is unlocked. Update it's status...");
-                    daoService.setCardStatus (Long.parseLong (card.getIdentifier ()),
-                            Card.ACTIVE_STATE,
-                            "");
+                if (card.getCurrentState().trim().equals("5")) {
+                    log(card.getIdentifier() + " is unlocked. Update it's status...");
+                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), Card.ACTIVE_STATE, "");
                 }
             }
-            log ("Operations are finished. Update uploading history in database...");
-            setLastUpdateDate (updateDate);
-            log ("DB updating complete.");
-        }
-        catch (Exception e)
-        {
-            logger.error (e.toString());
+            log("Operations are finished. Update uploading history in database...");
+            setLastUpdateDate(updateDate);
+            log("DB updating complete.");
+        } catch (Exception e) {
+            logger.error(e.toString());
         }
     }
 
 
-    private CardsTaskRequest createCardsTaskRequest (Date dateFrom, Date dateTo) throws Exception
-    {
-        CardsTaskRequest req = new CardsTaskRequest ();
-        req.setFromDate (toGregorean (dateFrom));
-        req.setToDate (toGregorean (dateTo));
-        req.setIdentityType (IdentityType.MUID);
+    private CardsTaskRequest createCardsTaskRequest(Date dateFrom, Date dateTo) throws Exception {
+        CardsTaskRequest req = new CardsTaskRequest();
+        req.setFromDate(toGregorean(dateFrom));
+        req.setToDate(toGregorean(dateTo));
+        req.setIdentityType(IdentityType.MUID);
         return req;
     }
 
 
-    private TaskStateRequest createTaskStateRequest (String uid)
-    {
-        TaskStateRequest req = new TaskStateRequest ();
-        req.setUid (uid);
+    private TaskStateRequest createTaskStateRequest(String uid) {
+        TaskStateRequest req = new TaskStateRequest();
+        req.setUid(uid);
         return req;
     }
 
 
-    private TaskCountRequest createTaskCountRequest (String uid)
-    {
-        TaskCountRequest req = new TaskCountRequest ();
-        req.setUid (uid);
+    private TaskCountRequest createTaskCountRequest(String uid) {
+        TaskCountRequest req = new TaskCountRequest();
+        req.setUid(uid);
         return req;
     }
 
 
-    private CardsRequest createCardsRequest (String uid, int first, int count)
-    {
-        CardsRequest req = new CardsRequest ();
-        req.setUid (uid);
-        req.setFirst (first);
-        req.setCount (count);
+    private CardsRequest createCardsRequest(String uid, int first, int count) {
+        CardsRequest req = new CardsRequest();
+        req.setUid(uid);
+        req.setFirst(first);
+        req.setCount(count);
         return req;
     }
 
 
-    private XMLGregorianCalendar toGregorean (Date date) throws Exception
-    {
-        if (df == null)
-        {
-            try
-            {
-                df = DatatypeFactory.newInstance ();
-            }
-            catch (Exception e)
-            {
-                throw new Exception ("Failed to intiate datetype factory");
+    private XMLGregorianCalendar toGregorean(Date date) throws Exception {
+        if (df == null) {
+            try {
+                df = DatatypeFactory.newInstance();
+            } catch (Exception e) {
+                throw new Exception("Failed to intiate datetype factory");
             }
         }
 
-        if (date == null)
-        {
-            throw new Exception ("Failed to conver date, cause: input parameter is NULL");
+        if (date == null) {
+            throw new Exception("Failed to conver date, cause: input parameter is NULL");
         }
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTimeInMillis(date.getTime());
-        return df.newXMLGregorianCalendar (cal);
+        return df.newXMLGregorianCalendar(cal);
     }
 
 
-    private void log (String str)
-    {
-        if (loggingEnabled)
-            {
-            logger.info (str);
-            if (logger.isDebugEnabled())
-                {
-                logger.debug (str);
-                }
+    private void log(String str) {
+        if (loggingEnabled) {
+            logger.info(str);
+            if (logger.isDebugEnabled()) {
+                logger.debug(str);
             }
+        }
     }
 
 
+    class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
-    class AuthenticationHandler implements SOAPHandler<SOAPMessageContext>
-    {
         public static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
         public static final String PASSWORD_TEXT_TYPE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText";
         public static final String WSSE_SECURITY_LNAME = "Security";
@@ -363,38 +309,29 @@ public class MSRStopListLoader
         private String password;
 
 
-        public AuthenticationHandler (String username, String password)
-        {
+        public AuthenticationHandler(String username, String password) {
             this.username = username;
             this.password = password;
         }
 
 
-        public Set<QName> getHeaders()
-        {
-            return new TreeSet ();
+        public Set<QName> getHeaders() {
+            return new TreeSet();
         }
 
-        public boolean handleFault(SOAPMessageContext context)
-        {
+        public boolean handleFault(SOAPMessageContext context) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        public void close(MessageContext context)
-        {
+        public void close(MessageContext context) {
         }
 
-        public boolean handleMessage(SOAPMessageContext context)
-        {
+        public boolean handleMessage(SOAPMessageContext context) {
             Boolean outboundProperty = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-            if (outboundProperty.booleanValue())
-            {
-                try
-                {
-                    addSecurityHeader (context);
-                }
-                catch (Exception e)
-                {
+            if (outboundProperty.booleanValue()) {
+                try {
+                    addSecurityHeader(context);
+                } catch (Exception e) {
                     System.out.println("Exception in handler: " + e);
                     return false;
                 }
@@ -403,18 +340,16 @@ public class MSRStopListLoader
         }
 
 
-        private void addSecurityHeader(SOAPMessageContext messageContext) throws SOAPException
-        {
-            SOAPFactory sf = SOAPFactory.newInstance ();
-            SOAPHeader header = messageContext.getMessage ().getSOAPPart ().getEnvelope ().getHeader ();
-            if (header == null)
-            {
+        private void addSecurityHeader(SOAPMessageContext messageContext) throws SOAPException {
+            SOAPFactory sf = SOAPFactory.newInstance();
+            SOAPHeader header = messageContext.getMessage().getSOAPPart().getEnvelope().getHeader();
+            if (header == null) {
                 header = messageContext.getMessage().getSOAPPart().getEnvelope().addHeader();
             }
 
             Name securityName = sf.createName(WSSE_SECURITY_LNAME, WSSE_NS_PREFIX, WSSE_NS);
             SOAPHeaderElement securityElem = header.addHeaderElement(securityName);
-            securityElem.setMustUnderstand (mustUnderstand);
+            securityElem.setMustUnderstand(mustUnderstand);
 
             Name usernameTokenName = sf.createName("UsernameToken", WSSE_NS_PREFIX, WSSE_NS);
             SOAPElement usernameTokenMsgElem = sf.createElement(usernameTokenName);
