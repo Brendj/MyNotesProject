@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.apache.commons.net.ftp.*;
 import org.hibernate.Session;
@@ -35,11 +36,11 @@ public class BIDataExportService
     private static final DateFormat FILES_FORMAT = new SimpleDateFormat ("yyyyMMdd");
     private static final DateFormat DB_DATE_FORMAT = new SimpleDateFormat ("yyyy-MM-dd");
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger (BIDataExportService.class);
-    private static final String FTP_ADDRESS      = "dchirikov.RadiusHosting.ru";
-    private static final String FTP_LOGIN        = "dchirikov";
-    private static final String FTP_PASSWORD     = "1YuCRPzC";
-    private static final String FTP_WORKDIR      = "www/dchirikov.ru/111";
-    private static final String LOCAL_DIRECTORY  = "D:/1/";
+    private static final String FTP_ADDRESS      = "";
+    private static final String FTP_LOGIN        = "";
+    private static final String FTP_PASSWORD     = "";
+    private static final String FTP_WORKDIR      = "";
+    private String LOCAL_DIRECTORY               = null;
     private FTPClient client;
     private static final Map <String, BIDataExportType> TYPES;
     static
@@ -98,15 +99,52 @@ public class BIDataExportService
         }
 
 
-    public void run ()
+
+    public static boolean isOn ()
         {
-        try
+        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_EXPORT_BI_DATA_ON);
+        }
+
+
+    public static void setOn (boolean on)
+        {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_ON, "" + (on ? "1" : "0"));
+        }
+
+
+    public static String getLocalDirectory ()
+        {
+        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_EXPORT_BI_DATA_DIR);
+        }
+
+
+    public static void setLocalDirectory (String dirName) throws IOException
+        {
+        File dir = new File (dirName);
+        if (!dir.exists () && !dir.mkdirs ())
             {
-            buildFiles ();
+            throw new IOException ("Failed to find directory called '" + dirName + "'");
             }
-        catch (Exception e)
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_DIR, dir.getAbsolutePath ());
+        }
+
+
+    public void run () throws IOException
+        {
+        if (!RuntimeContext.getInstance ().isMainNode () || !isOn ())
             {
+            //logger.info ("BI data export is turned off. You have to activate this tool using common Settings");
+            return;
             }
+        LOCAL_DIRECTORY = getLocalDirectory ();
+        if (LOCAL_DIRECTORY == null || LOCAL_DIRECTORY.length () < 1)
+            {
+            //logger.error ("You had turn BI data export on but didn't setup local storage directory. Please, check settings.");
+            return;
+            }
+
+
+        buildFiles ();
         }
 
 
@@ -119,10 +157,12 @@ public class BIDataExportService
     private boolean buildFiles () throws IOException
         {
         List <String> typesToUpdate = new ArrayList <String> ();
-        Calendar last    = null;
-        Calendar now     = null;
-        Calendar cals [] = null;
+        Calendar last    = getStartDate ();
+        Calendar now     = new GregorianCalendar ();
+        now.setTimeInMillis (System.currentTimeMillis ());
+        clearCalendar (now);
 
+        /*Calendar cals [] = null;
         if (USE_FTP_AS_STORAGE)
             {
             cals = getUpdatePeriodsViaFTP (typesToUpdate);
@@ -136,7 +176,7 @@ public class BIDataExportService
             return true;
             }
         last = cals [0];
-        now  = cals [1];
+        now  = cals [1];*/
 
 
         try
@@ -172,7 +212,7 @@ public class BIDataExportService
         File check = null;
         for (String tName : TYPES.keySet ())
             {
-            check = new File (LOCAL_DIRECTORY + parseFileName (now, tName));
+            check = new File (LOCAL_DIRECTORY, parseFileName (now, tName));
             if (!check.exists () && check.length () < 1)
                 {
                 typesToUpdate.add (tName);
@@ -187,7 +227,7 @@ public class BIDataExportService
             {
             // Запись во временный файл
             BIDataExportType type = TYPES.get (t);
-            File tempFile = new File (LOCAL_DIRECTORY + parseFileName (now, t));
+            File tempFile = new File (LOCAL_DIRECTORY, parseFileName (now, t));
             if (!USE_FTP_AS_STORAGE)
                 {
                 if (tempFile.exists ())

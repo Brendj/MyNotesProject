@@ -45,10 +45,11 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 @Scope("singleton")
 public class MSRStopListLoader
 {
-    private static final String WS_LOGIN = "i-teco";
-    private static final String WS_PASSWORD = "s4529qp2";
-    private static final String WS_END_POINT = "http://10.126.216.2:2000/gateway/services/SID0003025?wsdl";
+    private String WS_LOGIN = null;
+    private String WS_PASSWORD = null;
+    private String WS_END_POINT = null;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger (MSRStopListLoader.class);
+    private boolean loggingEnabled = false;
     private DatatypeFactory df;
     private DateFormat dateFormat = new SimpleDateFormat ("dd.MM.yyyy HH:mm:ss");
     private DAOService daoService = DAOService.getInstance ();
@@ -58,11 +59,36 @@ public class MSRStopListLoader
     private String wsUID = ""; // ID сессис web-службы
 
 
-    private void setLastUpdateDate (Date date)
+
+    public boolean getLogging ()
     {
-        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_UPD_TIME,
-                dateFormat.format(date));
+        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_MSR_STOPLIST_LOGGING);
     }
+
+
+    public static void setLogging (boolean on)
+    {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_LOGGING, "" + (on ? "1" : "0"));
+    }
+
+
+    public static boolean isOn ()
+        {
+        return  RuntimeContext.getInstance().getOptionValueBool (Option.OPTION_MSR_STOPLIST_ON);
+        }
+
+
+    public static void setOn (boolean on)
+        {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_ON, "" + (on ? "1" : "0"));
+        }
+
+
+    private void setLastUpdateDate (Date date)
+        {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_UPD_TIME,
+                                                              dateFormat.format(date));
+        }
 
 
     private Date getLastUpdateDate ()
@@ -84,6 +110,42 @@ public class MSRStopListLoader
     }
 
 
+    public static String getLogin ()
+    {
+        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_USER);
+    }
+
+
+    public static void setLogin (String login)
+    {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_USER, login);
+    }
+
+
+    public static String getPassword ()
+    {
+        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_PSWD);
+    }
+
+
+    public static void setPassword (String password)
+    {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_PSWD, password);
+    }
+
+
+    public static String getURL ()
+    {
+        return RuntimeContext.getInstance().getOptionValueString (Option.OPTION_MSR_STOPLIST_URL);
+    }
+
+
+    public static void setURL (String url)
+    {
+        RuntimeContext.getInstance ().setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_URL, url);
+    }
+
+
     private Date getNowUpdateDate ()
     {
         return new Date ();
@@ -92,6 +154,11 @@ public class MSRStopListLoader
 
     private void init ()
     {
+        WS_LOGIN = getLogin ();
+        WS_PASSWORD = getPassword ();
+        WS_END_POINT = getURL ();
+        loggingEnabled = getLogging ();
+
         log ("Start stoplist updating. Logging in using login: " + WS_LOGIN + " and pwsd: " + WS_PASSWORD + "...");
         LongRunningStopListService_Service service = new LongRunningStopListService_Service();
         service.setHandlerResolver (new HandlerResolver ()
@@ -110,6 +177,11 @@ public class MSRStopListLoader
 
     public void initCards () throws Exception
     {
+        if (!RuntimeContext.getInstance ().isMainNode () && !isOn ())
+            {
+            return;
+            }
+
         try
         {
             if (port == null)
@@ -136,6 +208,13 @@ public class MSRStopListLoader
 
     public void parseCards ()
     {
+        setOn (false);
+        if (!RuntimeContext.getInstance ().isMainNode () || !isOn ())
+            {
+            //logger.info ("MSR Stop List importer is turned off. You have to activate this tool using common Settings");
+            return;
+            }
+
         if (wsUID == null || wsUID.length () < 1)
         {
             return;
@@ -260,11 +339,14 @@ public class MSRStopListLoader
 
     private void log (String str)
     {
-        logger.info (str);
-        if (logger.isDebugEnabled())
-        {
-            logger.debug (str);
-        }
+        if (loggingEnabled)
+            {
+            logger.info (str);
+            if (logger.isDebugEnabled())
+                {
+                logger.debug (str);
+                }
+            }
     }
 
 

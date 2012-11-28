@@ -73,16 +73,16 @@
     <task:scheduler id="msrStoplistLoadScheduler" pool-size="5"/>
 
 
-    <!--<task:scheduled-tasks scheduler="projectStateScheduler">
+    <task:scheduled-tasks scheduler="projectStateScheduler">
         <task:scheduled ref="projectStateReportService" method="run" fixed-delay="86400000" />
     </task:scheduled-tasks>
-    <task:scheduler id="projectStateScheduler" pool-size="5"/>-->
+    <task:scheduler id="projectStateScheduler" pool-size="5"/>
 
 
-    <!--<task:scheduled-tasks scheduler="biDataExporterSchedule">
+    <task:scheduled-tasks scheduler="biDataExporterSchedule">
         <task:scheduled ref="BIDataExportService" method="run" fixed-delay="86400000" />
     </task:scheduled-tasks>
-    <task:scheduler id="biDataExporterSchedule" pool-size="5"/>-->
+    <task:scheduler id="biDataExporterSchedule" pool-size="5"/>
 
 
 

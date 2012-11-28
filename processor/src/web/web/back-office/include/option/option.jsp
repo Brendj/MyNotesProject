@@ -148,6 +148,27 @@
                               styleClass="command-button"/>
 
        </rich:tab>
+
+       <rich:tab label="Импорт/Экспорт">
+           <h:panelGrid styleClass="borderless-grid" columns="2">
+               <h:outputText escape="true" value="Экспортировать данные в BI" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.exportBIData}" styleClass="output-text" />
+               <h:outputText escape="true" value="Расположение файлов для BI" styleClass="output-text" />
+               <h:inputText value="#{optionPage.exportBIDataDirectory}" styleClass="input-text" size="100"/>
+               <h:outputText escape="true" value="Экспортировать данные для отображения графиков статуса проекта" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.exportProjectStateData}" styleClass="output-text" />
+               <h:outputText escape="true" value="Импортировать данные стоп-листов" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.importMSRData}" styleClass="output-text" />
+               <h:outputText escape="true" value="Удаленный узел для импортирования стоп-листов" styleClass="output-text" />
+               <h:inputText value="#{optionPage.importMSRURL}" styleClass="input-text" size="100"/>
+               <h:outputText escape="true" value="Логин для импортирования стоп-листов" styleClass="output-text" />
+               <h:inputText value="#{optionPage.importMSRLogin}" styleClass="input-text" size="40"/>
+               <h:outputText escape="true" value="Пароль для импортирования стоп-листов" styleClass="output-text" />
+               <h:inputText value="#{optionPage.importMSRPassword}" styleClass="input-text" size="40"/>
+               <h:outputText escape="true" value="Журналировать импортирование стоп-листов" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.importMSRLogging}" styleClass="output-text" />
+           </h:panelGrid>
+       </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">

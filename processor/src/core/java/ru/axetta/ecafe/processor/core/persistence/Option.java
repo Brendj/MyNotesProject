@@ -55,7 +55,16 @@ public class Option {
             OPTION_RBK_RATE=1003,
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
-            OPTION_MSR_STOPLIST_UPD_TIME=10011;
+            OPTION_MSR_STOPLIST_UPD_TIME=10011,
+            OPTION_MSR_STOPLIST_ON=10012,
+            OPTION_EXPORT_BI_DATA_ON=10013,
+            OPTION_EXPORT_BI_DATA_DIR=10014,
+            OPTION_MSR_STOPLIST_URL=10015,
+            OPTION_MSR_STOPLIST_USER=10016,
+            OPTION_MSR_STOPLIST_PSWD=10017,
+            OPTION_MSR_STOPLIST_LOGGING=10018,
+            OPTION_PROJECT_STATE_REPORT_ON=10019
+    ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, "0",
@@ -73,7 +82,15 @@ public class Option {
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
             OPTION_NSI_LAST_SYNC_TIME, null,
-            OPTION_STOP_LIST_LAST_UPDATE, null
+            OPTION_STOP_LIST_LAST_UPDATE, null,
+            OPTION_MSR_STOPLIST_ON, "0",
+            OPTION_EXPORT_BI_DATA_ON, "0",
+            OPTION_EXPORT_BI_DATA_DIR, null,
+            OPTION_MSR_STOPLIST_URL, "http://10.126.216.2:2000/gateway/services/SID0003025?wsdl",
+            OPTION_MSR_STOPLIST_USER, "i-teco",
+            OPTION_MSR_STOPLIST_PSWD, "s4529qp2",
+            OPTION_MSR_STOPLIST_LOGGING, "0",
+            OPTION_PROJECT_STATE_REPORT_ON, "0",
     };
 
     private Long idOfOption;
