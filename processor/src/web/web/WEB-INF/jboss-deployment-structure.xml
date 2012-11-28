@@ -3,11 +3,20 @@
         <dependencies>
             <module name="org.apache.commons.logging"/>
             <module name="org.apache.commons.collections"/>
+            <module name="org.apache.commons.net"/>
             <module name="org.hibernate"/>
             <module name="org.slf4j"/>
             <module name="org.apache.cxf"/>
             <module name="javax.servlet.api"/>
             <module name="ecafe"/>
+            <module name="com.google.zxing"/>
+            <module name="com.google.guava"/>
+            <module name="com.google.visualization.datasource">
+                <imports>
+                    <include path="**"/>
+                </imports>
+            </module>
+            <module name="com.ibm.icu"/>
             <module name="org.apache.ws.security"/>
             <module name="org.springframework.spring">
                 <imports>
