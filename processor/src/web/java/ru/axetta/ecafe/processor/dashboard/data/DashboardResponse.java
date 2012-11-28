@@ -32,7 +32,8 @@ public class DashboardResponse {
         long numberOfNonStudentClients;
         double numberOfStudentEnterEventsPercent;
         double numberOfEmployeeEnterEventsPercent;
-        double numberOfPayedOrdersPercent;
+        double numberOfStudentPayedOrdersPercent;
+        double numberOfEmployeePayedOrdersPercent;
         private Long numberOfClientsWithoutCard;
 
         public long getIdOfOrg() {
@@ -155,12 +156,20 @@ public class DashboardResponse {
             this.numberOfEmployeeEnterEventsPercent = numberOfEmployeeEnterEventsPercent;
         }
 
-        public double getNumberOfPayedOrdersPercent() {
-            return numberOfPayedOrdersPercent;
+        public double getNumberOfStudentPayedOrdersPercent() {
+            return numberOfStudentPayedOrdersPercent;
         }
 
-        public void setNumberOfPayedOrdersPercent(double numberOfPayedOrdersPercent) {
-            this.numberOfPayedOrdersPercent = numberOfPayedOrdersPercent;
+        public void setNumberOfStudentPayedOrdersPercent(double numberOfStudentPayedOrdersPercent) {
+            this.numberOfStudentPayedOrdersPercent = numberOfStudentPayedOrdersPercent;
+        }
+
+        public double getNumberOfEmployeePayedOrdersPercent() {
+            return numberOfEmployeePayedOrdersPercent;
+        }
+
+        public void setNumberOfEmployeePayedOrdersPercent(double numberOfEmployeePayedOrdersPercent) {
+            this.numberOfEmployeePayedOrdersPercent = numberOfEmployeePayedOrdersPercent;
         }
     }
     public static class OrgBasicStats {

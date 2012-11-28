@@ -543,17 +543,41 @@ public class DAOService {
         }
 
 
-    public Map <Long, Integer> getOrgOrdersCount (Date at, Date to)
+    public Map <Long, Integer> getOrgOrdersCount (Date at, Date to, int type)
         {
+        String sql = "";
+        if (type == 0)
+            {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+                  "from cf_orders " +
+                  "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient " +
+                  "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
+                  "group by cf_orders.idoforg";
+            }
+            else
+            {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+                    "from cf_orders " +
+                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient " +
+                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    "group by cf_orders.idoforg";
+            }
+
         try
             {
             Map <Long, Integer> res = new HashMap <Long, Integer> ();
-            Query q = em.createNativeQuery ("select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
-                                            "from cf_orders " +
-                                            "where cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
-                                            "group by cf_orders.idoforg");
+            Query q = em.createNativeQuery (sql);
             q.setParameter ("dateAt", at.getTime ());
             q.setParameter ("dateTo", to.getTime ());
+            if (type == 0)
+                {
+                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                }
+                else
+                {
+                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                }
             List resultList = q.getResultList ();
 
             for (Object entry : resultList)

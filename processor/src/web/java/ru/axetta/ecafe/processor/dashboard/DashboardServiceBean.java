@@ -194,7 +194,8 @@ public class DashboardServiceBean {
                 if (statItem==null) continue;
                 statItem.setNumberOfPayOrders((Long)result[1]);
             }
-            Map <Long, Integer> orders = daoService.getOrgOrdersCount (dayStartDate, dayEndDate);
+            Map <Long, Integer> studentPays = daoService.getOrgOrdersCount (dayStartDate, dayEndDate, 0);
+            Map <Long, Integer> employeePays = daoService.getOrgOrdersCount (dayStartDate, dayEndDate, 1);
             Map <Long, Integer> studentEnters  = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 0);
             Map <Long, Integer> employeeEnters = daoService.getOrgEntersCount (dayStartDate, dayEndDate, 1);
             for (Long orgID : orgStats.keySet ())
@@ -203,10 +204,12 @@ public class DashboardServiceBean {
                 if (statItem==null) continue;
                 Integer studentsCount  = studentEnters.get (orgID);
                 Integer employeesCount = employeeEnters.get (orgID);
-                Integer ordersCount = orders.get (orgID);
+                Integer studentsPaysCount = studentPays.get (orgID);
+                Integer employeesPaysCount = employeePays.get (orgID);
                 double per1 = 0D;
                 double per2 = 0D;
                 double per3 = 0D;
+                double per4 = 0D;
                 if (studentsCount != null && studentsCount != 0 && statItem.getNumberOfStudentClients () != 0)
                     {
                     per1 = (double) studentsCount / (double) statItem.getNumberOfStudentClients ();
@@ -215,13 +218,18 @@ public class DashboardServiceBean {
                     {
                     per2 = (double) employeesCount / (double) statItem.getNumberOfStudentClients ();
                     }
-                if (ordersCount != null && ordersCount != 0 && statItem.getNumberOfPayOrders () != 0)
+                if (studentsPaysCount != null && studentsPaysCount != 0 && statItem.getNumberOfPayOrders () != 0)
                     {
-                    per3 = (double) statItem.getNumberOfPayOrders () / (double) ordersCount;
+                    per3 = (double) studentsPaysCount / (double) statItem.getNumberOfPayOrders ();
+                    }
+                if (employeesPaysCount != null && employeesPaysCount != 0 && statItem.getNumberOfPayOrders () != 0)
+                    {
+                    per4 = (double) employeesPaysCount / (double) statItem.getNumberOfPayOrders ();
                     }
                 statItem.setNumberOfStudentEnterEventsPercent (new BigDecimal (per1).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
                 statItem.setNumberOfEmployeeEnterEventsPercent (new BigDecimal (per2).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
-                statItem.setNumberOfPayedOrdersPercent (new BigDecimal (per3).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                statItem.setNumberOfStudentPayedOrdersPercent (new BigDecimal (per3).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
+                statItem.setNumberOfStudentPayedOrdersPercent (new BigDecimal (per4).setScale (1, BigDecimal.ROUND_HALF_UP).doubleValue ());
                 }
             ////
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {

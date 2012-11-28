@@ -51,6 +51,14 @@ public class OptionPage extends BasicWorkspacePage {
     private Double rbkRate;
     private Long defaultOverdraftLimit, defaultExpenditureLimit;
     private Boolean smppClientStatus;
+    private Boolean exportBIData;
+    private String exportBIDataDirectory;
+    private Boolean exportProjectStateData;
+    private Boolean importMSRData;
+    private String importMSRURL;
+    private String importMSRLogin;
+    private String importMSRPassword;
+    private Boolean importMSRLogging;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -178,6 +186,69 @@ public class OptionPage extends BasicWorkspacePage {
         this.defaultOverdraftLimit = defaultOverdraftLimit;
     }
 
+    public Boolean getExportBIData() {
+        return exportBIData;
+    }
+
+    public void setExportBIData(Boolean exportBIData) {
+        this.exportBIData = exportBIData;
+    }
+
+    public String getExportBIDataDirectory() {
+        return exportBIDataDirectory;
+    }
+
+    public void setExportBIDataDirectory(String exportBIDataDirectory) {
+        this.exportBIDataDirectory = exportBIDataDirectory;
+    }
+
+    public Boolean getExportProjectStateData() {
+        return exportProjectStateData;
+    }
+
+    public void setExportProjectStateData(Boolean exportProjectStateData) {
+        this.exportProjectStateData = exportProjectStateData;
+    }
+
+    public Boolean getImportMSRData() {
+        return importMSRData;
+    }
+
+    public void setImportMSRData(Boolean importMSRData) {
+        this.importMSRData = importMSRData;
+    }
+
+    public String getImportMSRURL() {
+        return importMSRURL;
+    }
+
+    public void setImportMSRURL(String importMSRURL) {
+        this.importMSRURL = importMSRURL;
+    }
+
+    public String getImportMSRLogin() {
+        return importMSRLogin;
+    }
+
+    public void setImportMSRLogin(String importMSRLogin) {
+        this.importMSRLogin = importMSRLogin;
+    }
+
+    public String getImportMSRPassword() {
+        return importMSRPassword;
+    }
+
+    public void setImportMSRPassword(String importMSRPassword) {
+        this.importMSRPassword = importMSRPassword;
+    }
+
+    public Boolean getImportMSRLogging() {
+        return importMSRLogging;
+    }
+
+    public void setImportMSRLogging(Boolean importMSRLogging) {
+        this.importMSRLogging = importMSRLogging;
+    }
 
     public String getPageFilename() {
         return "option/option";
@@ -203,6 +274,14 @@ public class OptionPage extends BasicWorkspacePage {
         rbkRate = runtimeContext.getOptionValueDouble(Option.OPTION_RBK_RATE);
         chronopayRate = runtimeContext.getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE);
         smppClientStatus = runtimeContext.getOptionValueBool(Option.OPTION_SMPP_CLIENT_STATUS);
+        exportBIData = runtimeContext.getOptionValueBool(Option.OPTION_EXPORT_BI_DATA_ON);
+        exportBIDataDirectory = runtimeContext.getOptionValueString(Option.OPTION_EXPORT_BI_DATA_DIR);
+        exportProjectStateData = runtimeContext.getOptionValueBool(Option.OPTION_PROJECT_STATE_REPORT_ON);
+        importMSRData = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_ON);
+        importMSRLogin = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_USER);
+        importMSRPassword = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_PSWD);
+        importMSRURL = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_URL);
+        importMSRLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
 
         bankListPage.onShow();
 
@@ -267,6 +346,25 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.getPartnerChronopayConfig().setRate(chronopayRate);
             runtimeContext.getPartnerRbkMoneyConfig().setRate(rbkRate);
+
+
+            /*runtimeContext.setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_ON, exportBIData);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_DIR, exportBIDataDirectory);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_PROJECT_STATE_REPORT_ON, exportProjectStateData);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_ON, importMSRData);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_USER, importMSRLogin);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_PSWD, importMSRPassword);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
+            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);*/
+            runtimeContext.setOptionValue(Option.OPTION_EXPORT_BI_DATA_ON, exportBIData);
+            runtimeContext.setOptionValue(Option.OPTION_EXPORT_BI_DATA_DIR, exportBIDataDirectory);
+            runtimeContext.setOptionValue(Option.OPTION_PROJECT_STATE_REPORT_ON, exportProjectStateData);
+            runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_ON, importMSRData);
+            runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_USER, importMSRLogin);
+            runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_PSWD, importMSRPassword);
+            runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
+            runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);
+
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {

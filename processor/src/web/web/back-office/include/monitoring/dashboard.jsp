@@ -78,7 +78,19 @@
                      <f:facet name="header">
                          <h:outputText value="Событий проходов" styleClass="output-text" escape="true"/>
                      </f:facet>
-                     <h:outputText value="#{item.numberOfEnterEvents}"/> (<h:outputText value="#{item.numberOfStudentEnterEventsPercent}"><f:convertNumber type="percent"/></h:outputText>У - <h:outputText value="#{item.numberOfEmployeeEnterEventsPercent}"><f:convertNumber type="percent"/></h:outputText>С)
+                     <h:outputText value="#{item.numberOfEnterEvents}"/>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfEnterEvents}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%У" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfStudentEnterEventsPercent}"><f:convertNumber type="percent"/></h:outputText>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfEnterEvents}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%С" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfEmployeeEnterEventsPercent}"><f:convertNumber type="percent"/></h:outputText>
                  </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="120px">
                      <f:facet name="header">
@@ -90,7 +102,19 @@
                      <f:facet name="header">
                          <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
                      </f:facet>
-                     <h:outputText value="#{item.numberOfPayOrders}"/> (<h:outputText value="#{item.numberOfPayedOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>)
+                     <h:outputText value="#{item.numberOfPayOrders}"/>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%У" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfStudentPayedOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%С" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfEmployeePayedOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
                  </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgDistrict}" width="70px">
                      <f:facet name="header">
