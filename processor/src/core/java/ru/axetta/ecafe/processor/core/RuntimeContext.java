@@ -1111,7 +1111,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     @Transactional
     public void saveOptionValues() {
-        for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
+            for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
             Option o = new Option((long)e.getKey(), e.getValue());
             o = em.merge(o);
             em.persist(o);
