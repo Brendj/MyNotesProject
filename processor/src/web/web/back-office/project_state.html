@@ -122,7 +122,7 @@
         var period = document.getElementById('select_period_01');
         var container = document.getElementById('activeChart');
         var chart = new google.visualization.LineChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=ActiveChart&period=' + period.value);
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=ActiveChart&period=' + period.value);
         var options = { title: 'Количество активных ОУ по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
             chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
         var queryWrapper = new QueryWrapper(query, chart, options, container);
@@ -136,7 +136,7 @@
         var period = document.getElementById('select_period_01');
         var container = document.getElementById('uniqueChart');
         var chart = new google.visualization.LineChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=UniqueChart&period=' + period.value);
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=UniqueChart&period=' + period.value);
         var options = { title: 'Количество уникальных пользователей по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
             chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
         var queryWrapper = new QueryWrapper(query, chart, options, container);
@@ -149,7 +149,7 @@
 
         var container = document.getElementById('contentsChart');
         var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=ContentsChart');
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=ContentsChart');
         var options = { title: 'Состав потребления питания в ОУ', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
@@ -161,7 +161,7 @@
 
         var container = document.getElementById('refillChart');
         var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=RefillChart');
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=RefillChart');
         var options = { title: 'Обеспечение пополнения лицевых счетов учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
@@ -173,7 +173,7 @@
 
         var container = document.getElementById('informingChart');
         var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=InformingChart');
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=InformingChart');
         var options = { title: 'Организация информирования родителей', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
@@ -185,7 +185,7 @@
 
         var container = document.getElementById('benefitPartChart');
         var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=BenefitPartChart');
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=BenefitPartChart');
         var options = { title: 'Льготные категории по питанию в общем составе учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
@@ -197,7 +197,7 @@
 
         var container = document.getElementById('benefitsChart');
         var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=BenefitsChart');
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=BenefitsChart');
         var options = { title: 'Детализация льготных категорий кроме 1-4 класса', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
@@ -210,7 +210,7 @@
         var period = document.getElementById('select_period_02');
         var container = document.getElementById('visitorsChart');
         var chart = new google.visualization.AreaChart(container);
-        var query = new google.visualization.Query ('https://31.13.60.140:8181/processor/prj-state?type=VisitorsChart&period=' + period.value);
+        var query = new google.visualization.Query ('http://31.13.60.141:8080/processor/prj-state?type=VisitorsChart&period=' + period.value);
         var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
             chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
         var queryWrapper = new QueryWrapper(query, chart, options, container);
