@@ -473,15 +473,11 @@ public class DAOService {
 
     public void setCardStatus(long idOfCard, int state, String reason) {
         try {
-            Query q = em.createQuery("from Card where idOfCard = :idOfCard");
+            Query q = em.createNativeQuery("UPDATE cf_cards set state=:state, lockreason=:reason where idofCard=:idOfCard");
+            q.setParameter("state", state);
+            q.setParameter("reason", reason);
             q.setParameter("idOfCard", idOfCard);
-            List l = q.getResultList();
-            if (l.size() == 0) {
-                return;
-            }
-            Card card = (Card) l.get(0);
-            card.setState(state);
-            card.setLockReason(reason);
+            q.executeUpdate ();
         } catch (Exception e) {
         }
     }
