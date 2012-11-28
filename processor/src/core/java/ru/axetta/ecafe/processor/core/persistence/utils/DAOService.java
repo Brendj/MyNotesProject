@@ -471,15 +471,13 @@ public class DAOService {
     }
 
 
-    public void setCardStatus(long idOfCard, int state, String reason) {
-        try {
-            Query q = em.createNativeQuery("UPDATE cf_cards set state=:state, lockreason=:reason where idofCard=:idOfCard");
-            q.setParameter("state", state);
-            q.setParameter("reason", reason);
-            q.setParameter("idOfCard", idOfCard);
-            q.executeUpdate ();
-        } catch (Exception e) {
-        }
+    @Transactional
+    public boolean setCardStatus(long idOfCard, int state, String reason) {
+        Query q = em.createNativeQuery("UPDATE cf_cards set state=:state, lockreason=:reason where idofCard=:idOfCard");
+        q.setParameter("state", state);
+        q.setParameter("reason", reason);
+        q.setParameter("idOfCard", idOfCard);
+        return q.executeUpdate () > 0;
     }
 
 
