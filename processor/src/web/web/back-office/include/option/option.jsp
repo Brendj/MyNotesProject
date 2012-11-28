@@ -169,6 +169,13 @@
                <h:selectBooleanCheckbox value="#{optionPage.importMSRLogging}" styleClass="output-text" />
            </h:panelGrid>
        </rich:tab>
+
+       <rich:tab label="Глобальные">
+           <h:panelGrid styleClass="borderless-grid" columns="2">
+               <h:outputText escape="true" value="URL адрес для внешнего пользования" styleClass="output-text" />
+               <h:inputText value="#{optionPage.externalURL}" styleClass="output-text" />
+           </h:panelGrid>
+       </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">

@@ -59,6 +59,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String importMSRLogin;
     private String importMSRPassword;
     private Boolean importMSRLogging;
+    private String externalURL;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -242,6 +243,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.importMSRPassword = importMSRPassword;
     }
 
+    public String getExternalURL() {
+        return externalURL;
+    }
+
+    public void setExternalURL(String externalURL) {
+        this.externalURL = externalURL;
+    }
+
     public Boolean getImportMSRLogging() {
         return importMSRLogging;
     }
@@ -282,6 +291,7 @@ public class OptionPage extends BasicWorkspacePage {
         importMSRPassword = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_PSWD);
         importMSRURL = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_URL);
         importMSRLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
+        externalURL = runtimeContext.getOptionValueString(Option.OPTION_EXTERNAL_URL);
 
         bankListPage.onShow();
 
@@ -335,6 +345,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_RBK_RATE, rbkRate);
             runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_RATE, chronopayRate);
             runtimeContext.setOptionValue(Option.OPTION_SMPP_CLIENT_STATUS, smppClientStatus);
+            runtimeContext.setOptionValue(Option.OPTION_EXTERNAL_URL, externalURL);
 
             bankListPage.save();
 

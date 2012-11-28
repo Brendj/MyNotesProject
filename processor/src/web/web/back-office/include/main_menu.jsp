@@ -8,6 +8,8 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
 
 <%-- Главное меню --%>
 <a4j:form id="mainMenuForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
@@ -385,7 +387,7 @@
                         reRender="workspaceForm" />
 
     <rich:panelMenuItem id="projectStateMenuItem" label="Статус проекта"
-                        onclick="window.open('http://31.13.60.140:8080/processor/back-office/project_state.html', 'Статус проекта')"/>
+                        onclick="window.open('/processor/back-office/project_state.jsp', 'Статус проекта')"/>
 </rich:panelMenuGroup>
 
 
