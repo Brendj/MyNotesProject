@@ -64,13 +64,16 @@ public class ProductItemsPanel extends BasicPage {
     }
 
     public void reload(List<TechnologicalMapProduct> technologicalMapProductList) throws Exception {
+        pr.clear();
         for (TechnologicalMapProduct tmp: technologicalMapProductList){
             pr.add(tmp.getProduct());
         }
         List<Product> productList = retrieveProduct();//= DAOService.getInstance().getDistributedObjects(Product.class);
         productItems.clear();
         for (Product product: productList){
-            productItems.add(new ProductItem(pr.contains(product), product));
+            if (!pr.contains(product)) {
+                productItems.add(new ProductItem(pr.contains(product), product));
+            }
         }
     }
 
@@ -78,7 +81,9 @@ public class ProductItemsPanel extends BasicPage {
         List<Product> productList = retrieveProduct();
         productItems.clear();
         for (Product product: productList){
-            productItems.add(new ProductItem(pr.contains(product), product));
+            if (!pr.contains(product)) {
+                productItems.add(new ProductItem(pr.contains(product), product));
+            }
         }
         return null;
     }

@@ -142,4 +142,30 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DistributedObject)) {
+            return false;
+        }
+
+        DistributedObject that = (DistributedObject) o;
+
+        if (guid != null ? !guid.equals(that.getGuid()) : that.getGuid() != null) {
+            return false;
+        }
+
+        // Когда объектам не назначены guid-ы, однако указаны ссылки на базовые продукты и тех.карты
+        if (((guid == null) && (that.getGuid() == null))
+                && (that instanceof TechnologicalMapProduct)
+                && !(((TechnologicalMapProduct) that).getProduct().equals(getProduct())
+                && ((TechnologicalMapProduct) that).getTechnologicalMap().equals(getTechnologicalMap()))) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
