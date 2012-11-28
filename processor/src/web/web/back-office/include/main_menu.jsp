@@ -383,6 +383,9 @@
     <rich:panelMenuItem id="statusSyncReportMenuItem" binding="#{mainPage.statusSyncReportPage.mainMenuComponent}"
                         label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
                         reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="projectStateMenuItem" label="Статус проекта"
+                        onclick="window.open('http://31.13.60.140:8080/processor/back-office/project_state.html', 'Статус проекта')"/>
 </rich:panelMenuGroup>
 
 
