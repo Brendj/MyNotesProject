@@ -131,8 +131,8 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         var container = document.getElementById('activeChart');
         var chart = new google.visualization.LineChart(container);
         var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=ActiveChart&period=' + period.value);
-        var options = { title: 'Количество активных ОУ по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
-            chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
+        var options = { title: 'Количество активных ОУ по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'}, 
+						chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
     }
@@ -145,8 +145,8 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         var container = document.getElementById('uniqueChart');
         var chart = new google.visualization.LineChart(container);
         var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=UniqueChart&period=' + period.value);
-        var options = { title: 'Количество уникальных пользователей по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
-            chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
+        var options = { title: 'Количество уникальных пользователей по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'}, 
+						chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
     }
@@ -158,7 +158,7 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         var container = document.getElementById('contentsChart');
         var chart = new google.visualization.PieChart(container);
         var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=ContentsChart');
-        var options = { title: 'Состав потребления питания в ОУ', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
+        var options = { title: 'Состав потребления питания в ОУ', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
     }
@@ -187,18 +187,6 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         queryWrapper.sendAndDraw();
     }
 
-    function drawBenefitPartChart()
-    {
-        clearInterval (inter2);
-
-        var container = document.getElementById('benefitPartChart');
-        var chart = new google.visualization.PieChart(container);
-        var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=BenefitPartChart');
-        var options = { title: 'Льготные категории по питанию в общем составе учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
-        var queryWrapper = new QueryWrapper(query, chart, options, container);
-        queryWrapper.sendAndDraw();
-    }
-
     function drawBenefitsChart()
     {
         clearInterval (inter);
@@ -211,16 +199,28 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         queryWrapper.sendAndDraw();
     }
 
+    function drawBenefitPartChart()
+    {
+        clearInterval (inter2);
+
+        var container = document.getElementById('benefitPartChart');
+        var chart = new google.visualization.PieChart(container);
+        var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=BenefitPartChart');
+        var options = { title: 'Льготные категории по питанию в общем составе учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
+        var queryWrapper = new QueryWrapper(query, chart, options, container);
+        queryWrapper.sendAndDraw();
+    }
+
     function drawVisitorsChart()
     {
         clearInterval (inter);
 
         var period = document.getElementById('select_period_02');
         var container = document.getElementById('visitorsChart');
-        var chart = new google.visualization.AreaChart(container);
+        var chart = new google.visualization.LineChart(container);
         var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=VisitorsChart&period=' + period.value);
-        var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
-            chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
+        var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {minValue: 0, maxValue: 100, gridlines: {color: 'black', count: 2}, minorGridlines: {color: 'eeeeee', count: 2}}, width: '100%', height: '100%', legend: {position: 'bottom'}, 
+						chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11, };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
     }
