@@ -61,9 +61,9 @@ public class BIDataExportService {
                         "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and "
                         +
                         "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 " +
-                        "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '2012-09-12') * 1000  and "
+                        "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000  and "
                         +
-                        "                                                                EXTRACT(EPOCH FROM TIMESTAMP '2012-09-13') * 1000 "
+                        "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
                         +
                         "order by createddate", new String[]{
                 "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient", "idofclientgroup",
@@ -296,7 +296,7 @@ public class BIDataExportService {
                     } else if (o instanceof BigDecimal) {
                         builder.append(((BigDecimal) o).doubleValue());
                     } else if (o instanceof BigInteger) {
-                        builder.append(((BigInteger) o).intValue());
+                        builder.append(((BigInteger) o).longValue());
                     } else if (o instanceof Double) {
                         builder.append(((Double) o).doubleValue());
                     } else if (o instanceof Integer) {
