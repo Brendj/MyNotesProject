@@ -78,6 +78,19 @@ public class GoodRequest extends DistributedObject {
     private String comment;
     private String guidOfStaff;
     private Staff staff;
+    public static final String[] GOOD_REQUEST_STATES = {"Создан", "К исполнению", "Выполнен"};
+
+    public String getStateSelect() {
+        if (state != null) {
+            return GOOD_REQUEST_STATES[state];
+        } else {
+            return "";
+        }
+    }
+
+    public String[] getGoodRequestStates() {
+        return GOOD_REQUEST_STATES;
+    }
 
     public String getGuidOfStaff() {
         return guidOfStaff;
