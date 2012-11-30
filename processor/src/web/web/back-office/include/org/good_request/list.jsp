@@ -12,7 +12,7 @@
 <h:panelGrid id="goodRequestListPage" binding="#{goodRequestListPage.pageComponent}"
              styleClass="borderless-grid">
     <h:column>
-        <rich:simpleTogglePanel label="Фильтр (#{goodRequestListPage.pageTitle})" switchType="client"
+        <rich:simpleTogglePanel label="Фильтр (#{goodRequestListPage.filter})" switchType="client"
                                 eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
             <h:panelGrid columns="2" styleClass="borderless-grid">
 
@@ -24,18 +24,14 @@
                 <rich:calendar value="#{goodRequestListPage.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-                <%--<h:outputText value="Показывать удаленные элементы" styleClass="output-text" escape="true"/>--%>
-                <%--<h:selectOneMenu value="#{goodRequestListPage.deletedFlag}" styleClass="input-text long-field">--%>
-                    <%--<f:selectItem itemLabel="" itemValue=""/>--%>
-                    <%--<f:selectItem itemLabel="Скрыть" itemValue="false"/>--%>
-                    <%--<f:selectItem itemLabel="Показать" itemValue="true"/>--%>
-                <%--</h:selectOneMenu>--%>
+                <h:outputText value="Выводить удаленные заявки" styleClass="output-text" escape="true"/>
+                <h:selectBooleanCheckbox value="#{goodRequest.deletedState}"/>
 
-                <h:outputText value="Статус" styleClass="output-text" escape="true"/>
-                <h:selectOneMenu value="#{goodRequestListPage.state}" styleClass="input-text long-field">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{goodRequestListPage.stateSelectItemArray}"/>
-                </h:selectOneMenu>
+                <%--<h:outputText value="Выводить с указанными статусами" styleClass="output-text" escape="true"/>--%>
+                <%--<h:selectManyListbox value="#{goodRequestListPage.stateList}"--%>
+                                     <%--size="#{goodRequestListPage.maxPickedStatesNumber}" converter="javax.faces.Integer">--%>
+                    <%--<f:selectItems value="#{goodRequestListPage.stateSelectItemList}}"/>--%>
+                <%--</h:selectManyListbox>--%>
 
             </h:panelGrid>
 

@@ -12,6 +12,8 @@ import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,11 +25,14 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private static Long idOfOrg;
     private Date baseDate = DateUtils.addMonths(new Date(), -1);
     private Date endDate = new Date();
-    private Boolean deletedFlag;
-    private Integer state;
+    private Boolean deletedFlag = false;
+    private List<Integer> stateList;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public void onShow() {}
 
     public Object onSearch() throws Exception{
         reload();
@@ -37,8 +42,12 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     public Object onClear() throws Exception {
         baseDate = DateUtils.addMonths(new Date(), -1);
         endDate = new Date();
-        deletedFlag = null;
-        state = null;
+        deletedFlag = false;
+        if (stateList != null) {
+            stateList.clear();
+        } else {
+            stateList = new ArrayList<Integer>();
+        }
         return null;
     }
 
@@ -49,8 +58,14 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         if (deletedFlag != null) {
             where = (where.equals("")?"":where + " and ") + "deletedstate=" + deletedFlag;
         }
-        if (state != null) {
-            where = (where.equals("")?"":where + " and ") + "state=" + state;
+        if (stateList != null) {
+            where = (where.equals("")?"":where + " and ");
+            for (Integer state : stateList) {
+                if (state != null) {
+                    where += "state=" + state + "and";
+                }
+                where.substring(0,where.length() - 4);
+            }
         }
 
         where = (where.equals("")?"":" where ") + where;
@@ -70,12 +85,35 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         return  this.goodRequestList == null || this.goodRequestList.isEmpty();
     }
 
-    public SelectItem[] getStateSelectItemArray() {
-        SelectItem[] items = new SelectItem[GoodRequest.GOOD_REQUEST_STATES.length];
+    public List<SelectItem> getStateSelectItemList() {
+        List<SelectItem> itemsList = new ArrayList<SelectItem>();
         for (int i = 0; i < GoodRequest.GOOD_REQUEST_STATES.length; i++) {
-            items[i] = new SelectItem(i, GoodRequest.GOOD_REQUEST_STATES[i]);
+            itemsList.add(new SelectItem(i, GoodRequest.GOOD_REQUEST_STATES[i]));
         }
-        return items;
+        return itemsList;
+    }
+
+    public String getFilter() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        StringBuffer filter = new StringBuffer();
+        filter.append(sdf.format(baseDate));
+        filter.append(" - ");
+        filter.append(sdf.format(endDate));
+        if (deletedFlag != null && deletedFlag) {
+            filter.append(", включая удаленные");
+        }
+        if (stateList != null && stateList.size() > 0 && stateList.size() <= GoodRequest.GOOD_REQUEST_STATES.length) {
+            if (stateList.size() == 1) {
+                filter.append(", только с состоянием ");
+            } else {
+                filter.append(", только с состояниями ");
+            }
+            for (Integer state : stateList) {
+                filter.append(GoodRequest.GOOD_REQUEST_STATES[state] + ", ");
+            }
+            filter.substring(0, filter.length() - 3);
+        }
+        return filter.toString();
     }
 
     public static Long getIdOfOrg() {
@@ -118,12 +156,16 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         this.deletedFlag = deletedFlag;
     }
 
-    public Integer getState() {
-        return state;
+    public List<Integer> getStateList() {
+        return stateList;
     }
 
-    public void setState(Integer state) {
-        this.state = state;
+    public void setStateList(List<Integer> stateList) {
+        this.stateList = stateList;
+    }
+
+    public int getMaxPickedStatesNumber() {
+        return GoodRequest.GOOD_REQUEST_STATES.length;
     }
 
 }

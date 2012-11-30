@@ -107,7 +107,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     }
 
     public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", (productList==null?"нет":productList.size()));
+        return super.getPageTitle() + String.format(" (%d)", (productList==null?0:productList.size()));
     }
 
     public String getPageFilename() {

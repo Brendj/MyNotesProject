@@ -46,8 +46,8 @@
         <rich:panelMenuItem id="viewOrgMenuView" binding="#{mainPage.menuViewPage.mainMenuComponent}"
                             action="#{mainPage.showMenuViewPage}" label="Просмотр меню" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="viewGoodRequestView" binding="#{goodRequestListPage.mainMenuComponent}"
-                            action="#{mainPage.showRequestListPage}" label="Просмотр заявок" reRender="workspaceForm" />
+        <rich:panelMenuItem id="viewGoodRequestView" binding="#{mainPage.goodRequestListPage.mainMenuComponent}"
+                            action="#{mainPage.showGoodRequestListPage}" label="Просмотр заявок" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="generateOrgBalanceReportMenuItem"
                             binding="#{mainPage.orgBalanceReportPage.mainMenuComponent}" label="Отчет по балансу"

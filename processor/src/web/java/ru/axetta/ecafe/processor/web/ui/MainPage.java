@@ -1129,11 +1129,11 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    public GoodRequestListPage getRequestListPage() {
+    public GoodRequestListPage getGoodRequestListPage() {
         return goodRequestListPage;
     }
 
-    public Object showRequestListPage() {
+    public Object showGoodRequestListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             goodRequestListPage.setIdOfOrg(selectedIdOfOrg);
