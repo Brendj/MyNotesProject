@@ -481,9 +481,12 @@ public class DAOService {
     }
 
 
-    public Map<Long, Integer> getOrgEntersCount(Date at, Date to, int type) {
+    public final static int GROUP_TYPE_STUDENTS = 0, GROUP_TYPE_NON_STUDENTS = 1;
+
+    @SuppressWarnings("unchecked")
+    public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
-        if (type == 0) {
+        if (groupType == GROUP_TYPE_STUDENTS) {
             sql = "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
                     "from cf_enterevents " +
                     "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient "
@@ -506,7 +509,7 @@ public class DAOService {
             Query q = em.createNativeQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
-            if (type == 0) {
+            if (groupType == GROUP_TYPE_STUDENTS) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -526,21 +529,20 @@ public class DAOService {
     }
 
 
-    public Map<Long, Integer> getOrgOrdersCount(Date at, Date to, int type) {
+    @SuppressWarnings("unchecked")
+    public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
-        if (type == 0) {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+        if (groupType == GROUP_TYPE_STUDENTS) {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
                     "from cf_orders " +
-                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient "
-                    +
+                    "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
                     "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
                     +
                     "group by cf_orders.idoforg";
         } else {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
                     "from cf_orders " +
-                    "left join cf_clients on cf_orders.idoforg=cf_clients.idoforg and cf_orders.idofclient=cf_clients.idofclient "
-                    +
+                    "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
                     "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
                     +
                     "group by cf_orders.idoforg";
@@ -551,12 +553,34 @@ public class DAOService {
             Query q = em.createNativeQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
-            if (type == 0) {
+            if (groupType == GROUP_TYPE_STUDENTS) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             }
+            List resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            return res;
+        } catch (Exception e) {
+            logger.error("Failed to load data", e);
+        }
+        return Collections.EMPTY_MAP;
+    }
+
+    public Map<Long, Integer> getOrgOrdersCount(Date at, Date to) {
+        try {
+            Map<Long, Integer> res = new HashMap<Long, Integer>();
+            Query q = em.createNativeQuery("select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
+                    "from cf_orders " +
+                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
+                    "group by cf_orders.idoforg");
+            q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());
             List resultList = q.getResultList();
 
             for (Object entry : resultList) {
