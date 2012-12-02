@@ -32,24 +32,6 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
 
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
-    /**
-     * A google.visualization.Query Wrapper. Sends a
-     * query and draws the visualization with the returned data or outputs an
-     * error message.
-     *
-     * DISCLAIMER: This is an example code which you can copy and change as
-     * required. It is used with the google visualization API which is assumed to
-     * be loaded to the page. For more info see:
-     * https://developers.google.com/chart/interactive/docs/reference#Query
-     */
-
-
-    /**
-     * Constructs a new query wrapper with the given query, visualization,
-     * visualization options, and error message container. The visualization
-     * should support the draw(dataTable, options) method.
-     * @constructor
-     */
     var QueryWrapper = function(query, visualization, visOptions, errorContainer) {
 
         this.query = query;
@@ -219,8 +201,8 @@ String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OP
         var container = document.getElementById('visitorsChart');
         var chart = new google.visualization.LineChart(container);
         var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=VisitorsChart&period=' + period.value);
-        var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {minValue: 0, maxValue: 100, gridlines: {color: 'black', count: 2}, minorGridlines: {color: 'eeeeee', count: 2}}, width: '100%', height: '100%', legend: {position: 'bottom'}, 
-						chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11, };
+        var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {minValue: 0, maxValue: 100, gridlines: {color: 'black', count: 3}, minorGridlines: {color: 'eeeeee', count: 1}}, width: '100%', height: '100%', legend: {position: 'bottom'},
+						chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11 };
         var queryWrapper = new QueryWrapper(query, chart, options, container);
         queryWrapper.sendAndDraw();
     }

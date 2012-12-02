@@ -9,6 +9,7 @@
 	<resource-root path="commons-httpclient-3.1.jar"/>
 	<resource-root path="commons-io-1.4.jar"/>
 	<resource-root path="commons-lang-2.4.jar"/>
+	<resource-root path="commons-net-3.1.jar"/>
 	<resource-root path="iText-2.1.7.jar"/>
 	<resource-root path="jasperreports-4.7.1.jar"/>
 	<resource-root path="jasperreports-fonts-4.7.1.jar"/>

@@ -28,6 +28,7 @@ public class ClientGroup {
         CLIENT_PARENTS (1100000030L,"Родители"),
         CLIENT_VISITORS (1100000040L,"Посетители"),
         CLIENT_OTHERS ( 1100000050L,"Другое"),
+        // все группы не-учащиеся и не-выбывшие должны быть до CLIENT_OTHERS
         CLIENT_LEAVING ( 1100000060L,"Выбывшие"),
         CLIENT_DELETED ( 1100000070L,"Удаленные"),
         CLIENT_DISPLACED ( 1100000080L,"Перемещенные");
@@ -124,14 +125,6 @@ public class ClientGroup {
 
     public Set<Client> getClients() {
         return Collections.unmodifiableSet(getClientsInternal());
-    }
-
-    public void addClient(Client client) {
-        getClientsInternal().add(client);
-    }
-
-    public void removeClient(Client client) {
-        getClientsInternal().remove(client);
     }
 
     private Set<DiaryTimesheet> getDiaryTimesheetsInternal() {

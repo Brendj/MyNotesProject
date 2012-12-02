@@ -87,12 +87,12 @@ public class Option {
             OPTION_MSR_STOPLIST_ON, "0",
             OPTION_EXPORT_BI_DATA_ON, "0",
             OPTION_EXPORT_BI_DATA_DIR, null,
-            OPTION_MSR_STOPLIST_URL, "http://10.126.216.2:2000/gateway/services/SID0003025?wsdl",
-            OPTION_MSR_STOPLIST_USER, "i-teco",
-            OPTION_MSR_STOPLIST_PSWD, "s4529qp2",
+            OPTION_MSR_STOPLIST_URL, "http://localhost:2000/gateway/services/SID0003025?wsdl",
+            OPTION_MSR_STOPLIST_USER, "user",
+            OPTION_MSR_STOPLIST_PSWD, "password",
             OPTION_MSR_STOPLIST_LOGGING, "0",
             OPTION_PROJECT_STATE_REPORT_ON, "0",
-            OPTION_EXTERNAL_URL, "http://31.13.60.141:8080"
+            OPTION_EXTERNAL_URL, "http://localhost:8080"
     };
 
     private Long idOfOption;

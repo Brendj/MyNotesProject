@@ -6863,6 +6863,10 @@ public User getCurrentUser() throws Exception {
         return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
     }
 
+    public String getUserRole() throws Exception {
+        return (isEligibleToEditOrgs() && isEligibleToEditClients())?"администратор":"поставщик питания";
+    }
+
     public boolean isEligibleToViewOrgs() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_ORG_VIEW);
     }

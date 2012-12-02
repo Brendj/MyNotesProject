@@ -6,8 +6,6 @@ import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import generated.nsiws.*;
 
-import ru.axetta.ecafe.processor.core.persistence.Option;
-
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;

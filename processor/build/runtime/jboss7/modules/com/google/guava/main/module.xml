@@ -23,10 +23,6 @@
   -->
 
 <module xmlns="urn:jboss:module:1.1" name="com.google.guava">
-    <properties>
-        <property name="jboss.api" value="private"/>
-    </properties>
-
     <resources>
         <resource-root path="guava-10.0.1.jar"/>
         <!-- Insert resources here -->

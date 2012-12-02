@@ -250,7 +250,7 @@ public class Client {
         return clientGroup;
     }
 
-    private void setClientGroup(ClientGroup clientGroup) {
+    public void setClientGroup(ClientGroup clientGroup) {
         // For Hibernate only
         this.clientGroup = clientGroup;
     }

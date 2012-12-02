@@ -3,7 +3,6 @@
         <dependencies>
             <module name="org.apache.commons.logging"/>
             <module name="org.apache.commons.collections"/>
-            <module name="org.apache.commons.net"/>
             <module name="org.hibernate"/>
             <module name="org.slf4j"/>
             <module name="org.apache.cxf"/>

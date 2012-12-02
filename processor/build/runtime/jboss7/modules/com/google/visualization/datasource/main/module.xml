@@ -23,10 +23,6 @@
   -->
 
 <module xmlns="urn:jboss:module:1.1" name="com.google.visualization.datasource">
-    <properties>
-        <property name="jboss.api" value="private"/>
-    </properties>
-
     <resources>
         <resource-root path="visualization-datasource-1.1.1.jar"/>
         <!-- Insert resources here -->
@@ -35,5 +31,8 @@
     <dependencies>
 	   <module name="javax.servlet.api"/>
 	   <module name="com.google.guava"/>
+	   <module name="org.apache.commons.logging"/>
+	   <module name="com.ibm.icu"/>
+	   <module name="org.apache.commons.lang"/>
     </dependencies>
 </module>

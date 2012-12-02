@@ -75,7 +75,6 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
 
-            logger.info(String.format("Starting synchronization with %s", request.getRemoteAddr()));
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             long idOfOrg;
             String idOfSync;
@@ -89,10 +88,11 @@ public class SyncServlet extends HttpServlet {
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
             } catch (Exception e) {
-                logger.error("Failed to extract required packet attribute", e);
+                logger.error("Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
+            logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg+""));
 
             boolean bLogPackets = (syncType==SyncRequest.TYPE_FULL);
 

@@ -2,7 +2,6 @@
  * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
  */
 
-import ru.axetta.ecafe.processor.core.persistence.MenuExchange;
 import ru.axetta.ecafe.processor.core.utils.CompressUtils;
 
 import org.junit.Test;

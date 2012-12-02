@@ -163,7 +163,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Льгота" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.discountAsString}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.discountMode}" converter="clientDiscountModeConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

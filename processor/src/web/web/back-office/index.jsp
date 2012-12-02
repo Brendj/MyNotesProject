@@ -13,7 +13,7 @@
 
 <html>
 <head>
-    <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}: администрирование"/></title>
+    <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}: #{mainPage.userRole}"/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="ru">
     <link rel="icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
@@ -174,7 +174,7 @@
                         <h:panelGroup style="text-align: left;">
                             <h:graphicImage value="/images/ecafe-favicon.png"
                                             style="border: 0; margin: 0 8px 0 0; vertical-align: middle; " />
-                            <h:outputText escape="true" id="headerText" value="Новая школа#{runtimeContext.instanceNameDecorated}: администрирование"
+                            <h:outputText escape="true" id="headerText" value="Новая школа#{runtimeContext.instanceNameDecorated}: #{mainPage.userRole}"
                                           styleClass="page-header-text" />
                         </h:panelGroup>
                     </rich:panel>

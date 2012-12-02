@@ -388,8 +388,8 @@
                         label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
                         reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="projectStateMenuItem" label="Статус проекта"
-                        onclick="window.open('/processor/back-office/project_state.jsp', 'Статус проекта')"/>
+    <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
+                        onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')"/>
 </rich:panelMenuGroup>
 
 

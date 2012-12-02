@@ -465,21 +465,22 @@ public class DAOUtils {
     }
 
     public static List getClientsByOrgList(Session session, Set<Long> orgSet){
-        String idOfOrgs = orgSet.toString().replaceAll("[^0-9,]","");
+        String idOfOrgs = orgSet.toString().replaceAll("[^0-9,]", "");
         Query query = session.createQuery("from Client cl where cl.org.idOfOrg in ("+idOfOrgs+")");
         return query.list();
     }
 
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrg(Session persistenceSession, Long idOfOrg) {
-        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg=:idOfOrg");
+        Query query = persistenceSession.createQuery(
+                "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         return (List<Object[]>)query.list();
     }
 
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
-        String idOfOrg = idOfOrgs.toString().replaceAll("[^0-9,]","");
+        String idOfOrg = idOfOrgs.toString().replaceAll("[^0-9,]", "");
         Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in ("+idOfOrg+")");
         //query.setParameter("idOfOrg", idOfOrg);
         return (List<Object[]>)query.list();
@@ -494,6 +495,24 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.add(Restrictions.eq("classId", classId));
         return !criteria.list().isEmpty();
+    }
+
+    public static boolean existOrder(Session persistenceSession, long idOfOrg, long idOfOrder)
+            throws Exception {
+        Query q = persistenceSession.createQuery(
+                "select count(*) from Order o where o.id.idOfOrg=:idOfOrg and o.id.idOfOrder=:idOfOrder");
+        q.setParameter("idOfOrg", idOfOrg);
+        q.setParameter("idOfOrder", idOfOrder);
+        return ((Long)q.uniqueResult())!=0;
+    }
+
+    public static boolean existEnterEvent(Session persistenceSession, long idOfOrg, long idOfEnterEvent)
+            throws Exception {
+        Query q = persistenceSession.createQuery(
+                "select count(*) from EnterEvent ee where ee.id.idOfOrg=:idOfOrg and ee.id.idOfEnterEvent=:idOfEnterEvent");
+        q.setParameter("idOfOrg", idOfOrg);
+        q.setParameter("idOfEnterEvent", idOfEnterEvent);
+        return ((Long)q.uniqueResult())!=0;
     }
 
     @SuppressWarnings("unchecked")
@@ -931,4 +950,15 @@ public class DAOUtils {
         return resultList;
     }
 
+    public static Long getClientGroup(Session persistenceSession, Long idOfClient, Long idOfOrg) {
+        Query q = persistenceSession.createQuery(
+                "select idOfClientGroup from Client where idOfClient=:idOfClient and org.idOfOrg=:idOfOrg");
+        q.setParameter("idOfClient", idOfClient);
+        q.setParameter("idOfOrg", idOfOrg);
+        try {
+            return (Long)q.uniqueResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

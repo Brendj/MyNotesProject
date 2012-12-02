@@ -586,9 +586,9 @@ public class Processor implements SyncProcessor,
                                 payment.getIdOfOrder()));
             }
             // Check order existence
-            Order order = DAOUtils
-                    .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()));
-            if (null != order) {
+            if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
+                Order order = DAOUtils
+                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()));
                 // if order == payment (may be last sync result was not transferred to client)
                 Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
                 if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
@@ -1106,6 +1106,7 @@ public class Processor implements SyncProcessor,
                 // Удаляем из группы всех ее клиентов
                 for (Client client : clientGroup.getClients()) {
                     client.setIdOfClientGroup(null);
+                    client.setClientGroup(null);
                     client.setUpdateTime(new Date());
                     persistenceSession.update(client);
                 }
@@ -1161,8 +1162,10 @@ public class Processor implements SyncProcessor,
                 reqGroup.getIdOfGroup());
         ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compositeIdOfClientGroup);
         if (null != clientGroup) {
-            clientGroup.setGroupName(reqGroup.getName());
-            persistenceSession.update(clientGroup);
+            if (!StringUtils.equals(reqGroup.getName(), clientGroup.getGroupName())) {
+                clientGroup.setGroupName(reqGroup.getName());
+                persistenceSession.update(clientGroup);
+            }
         } else {
             clientGroup = new ClientGroup(compositeIdOfClientGroup, reqGroup.getName());
             persistenceSession.save(clientGroup);
@@ -1188,6 +1191,12 @@ public class Processor implements SyncProcessor,
         Enumeration<Long> reqClients = reqGroup.getClients();
         while (reqClients.hasMoreElements()) {
             Long idOfClient = reqClients.nextElement();
+            Long idOfClientGroup = DAOUtils.getClientGroup(persistenceSession, idOfClient, organization.getIdOfOrg());
+            if (idOfClientGroup!=null &&
+                    (idOfClientGroup.longValue() == clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue())) {
+                continue;
+            }
+            ////
             Client client = DAOUtils.findClient(persistenceSession, idOfClient);
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
@@ -1196,15 +1205,16 @@ public class Processor implements SyncProcessor,
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
                         idOfClient, client, organization.getIdOfOrg()));
             } else {
-                ClientGroup curClientGroup = client.getClientGroup();
-                if (null == curClientGroup || !curClientGroup.getCompositeIdOfClientGroup()
-                        .equals(clientGroup.getCompositeIdOfClientGroup())) {
-                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                    client.setUpdateTime(new Date());
-                    clientGroup.addClient(client);
-                    persistenceSession.update(client);
-                    persistenceSession.update(clientGroup);
-                }
+                //ClientGroup curClientGroup = client.getClientGroup();
+                //if (null == curClientGroup || !curClientGroup.getCompositeIdOfClientGroup()
+                //        .equals(clientGroup.getCompositeIdOfClientGroup())) {
+                client.setClientGroup(clientGroup);
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                client.setUpdateTime(new Date());
+                //clientGroup.addClient(client);
+                persistenceSession.update(client);
+                //persistenceSession.update(clientGroup);
+                //}
             }
         }
     }
@@ -1702,9 +1712,9 @@ public class Processor implements SyncProcessor,
 
             for (SyncRequest.EnterEvents.EnterEvent e : enterEvents.getEvents()) {
                 // Check enter event existence
-                EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
-                        new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
-                if (null != ee) {
+                if (DAOUtils.existEnterEvent(persistenceSession, e.getIdOfOrg(), e.getIdOfEnterEvent())) {
+                    EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
+                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
                     // if enter event exists (may be last sync result was not transferred to client)
                     if (((ee.getClient() == null && e.getIdOfClient() == null) || (ee.getClient() != null && ee
                             .getClient().getIdOfClient().equals(e.getIdOfClient()))) && ee.getEvtDateTime()
