@@ -57,14 +57,11 @@
     <task:scheduled-tasks scheduler="myScheduler">
         <task:scheduled ref="maintananceService" method="run" fixed-delay="15000" />
         <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="10000"/>
+        <task:scheduled ref="projectStateReportService" method="run" cron="0 20 4 ? * *"/>
+        <!--        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />
+        <task:scheduled ref="BIDataExportService" method="run" cron="0 5 1 ? * *" />-->
     </task:scheduled-tasks>
     <task:scheduler id="myScheduler" pool-size="5"/>
-
-
-    <task:scheduled-tasks scheduler="msrStoplistPeriodScheduler">
-        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />
-    </task:scheduled-tasks>
-    <task:scheduler id="msrStoplistPeriodScheduler" pool-size="5"/>
 
 
     <task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
@@ -72,17 +69,6 @@
     </task:scheduled-tasks>
     <task:scheduler id="msrStoplistLoadScheduler" pool-size="5"/>
 
-
-    <task:scheduled-tasks scheduler="projectStateScheduler">
-        <task:scheduled ref="projectStateReportService" method="run" fixed-delay="86400000" />
-    </task:scheduled-tasks>
-    <task:scheduler id="projectStateScheduler" pool-size="5"/>
-
-
-    <task:scheduled-tasks scheduler="biDataExporterSchedule">
-        <task:scheduled ref="BIDataExportService" method="run" fixed-delay="86400000" />
-    </task:scheduled-tasks>
-    <task:scheduler id="biDataExporterSchedule" pool-size="5"/>
 
 
 
