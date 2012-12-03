@@ -43,14 +43,14 @@ public class BIDataExportService {
     private static final String FTP_WORKDIR = "";
     private String LOCAL_DIRECTORY = null;
     private FTPClient client;
-    private static final Map<String, BIDataExportType> TYPES;
+    private static final List<BIDataExportType> TYPES;
 
     static {
-        TYPES = new HashMap<String, BIDataExportType>();
-        TYPES.put("orders", new BIDataExportType(
+        TYPES = new ArrayList<BIDataExportType>();
+        TYPES.add(new BIDataExportType("orders",
                 "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
                         +
-                        "       grp1.idofclientgroup, grp2.groupname as grade_class, cf_clients.categoriesdiscounts as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                        "       grp1.idofclientgroup, grp2.groupname as grade_class, replace(cf_discountrules.categoriesdiscounts, ' ', '') as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
                         +
                         "from cf_orders " +
                         "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
@@ -61,6 +61,12 @@ public class BIDataExportService {
                         "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and "
                         +
                         "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 " +
+
+                        "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient = cf_clients.idofclient "
+                        + "left join cf_categorydiscounts on cf_clients_categorydiscounts.idofcategorydiscount = cf_categorydiscounts.idofcategorydiscount "
+                        + "left join cf_discountrules_categorydiscounts on cf_discountrules_categorydiscounts.idofcategorydiscount = cf_categorydiscounts.idofcategorydiscount "
+                        + "left join cf_discountrules on cf_discountrules_categorydiscounts.idofrule = cf_discountrules.idofrule "+
+
                         "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000  and "
                         +
                         "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
@@ -69,27 +75,31 @@ public class BIDataExportService {
                 "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient", "idofclientgroup",
                 "grade_class", "idofcategorydiscount", "cardtype", "rsum", "socdiscount"}));
 
-        TYPES.put("events", new BIDataExportType(
+        TYPES.add(new BIDataExportType("events",
                 "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_enterevents.evtdatetime, cf_enterevents.idofenterevent, cf_enterevents.idoforg, "
                         +
-                        "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
+                        "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type, " +
+                        "       cf_clientgroups.idofclientgroup, cf_clientgroups.groupname as grade_class "
                         +
                         "from cf_enterevents " +
-                        "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and idofclient<>0 and "
+                        "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "+
+
+                        "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
                         +
                         "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
                         +
                         "order by cf_enterevents.evtdatetime", new String[]{
-                "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "idofclient", "action_type"}));
+                "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "action_type", "idofclientgroup", "grade_class"}));
 
-        TYPES.put("orgs", new BIDataExportType("select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
+        TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
                 "from cf_orgs " +
                 "where cf_orgs.officialname<>'' " +
                 "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
 
-        TYPES.put("contagents", new BIDataExportType(
+        TYPES.add(new BIDataExportType("contagents",
                 "select cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn " +
                         "from cf_contragents " +
                         "where cf_contragents.idofcontragent=4 or cf_contragents.idofcontragent=16 or cf_contragents.idofcontragent=17 or cf_contragents.idofcontragent=18 "
@@ -97,25 +107,38 @@ public class BIDataExportService {
                         "order by cf_contragents.idofcontragent",
                 new String[]{"idofcontragent", "contragentname", "inn"}));
 
-        TYPES.put("clientgroups", new BIDataExportType(
+        TYPES.add(new BIDataExportType("clientgroups",
                 "select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
                         "from cf_clientgroups " +
                         "where cf_clientgroups.idofclientgroup > 0 " +
                         "order by cf_clientgroups.idofclientgroup",
                 new String[]{"idoforg", "idofclientgroup", "groupname"}));
 
-        TYPES.put("discounts", new BIDataExportType("select idofcategorydiscount, categoryname " +
+        TYPES.add(new BIDataExportType("discounts", "select idofcategorydiscount, categoryname " +
                 "from cf_categorydiscounts " +
                 "order by idofcategorydiscount", new String[]{"idofcategorydiscount", "categoryname"}));
 
-        TYPES.put("cardtypes", new BIDataExportType (new String[]{"card_type_id", "categoryname"}).setSpecificExporter ("cartTypesExporter"));
+        TYPES.add(new BIDataExportType ("cardtypes", new String[]{"card_type_id", "categoryname"}).setSpecificExporter ("cartTypesExporter"));
     }
 
 
-    public static void cartTypesExporter (String LOCAL_DIRECTORY, String t, Calendar now) throws IOException
+    public static BIDataExportType getTypeByName (String reportName)
         {
-        BIDataExportType type = TYPES.get (t);
-        File tempFile = new File(LOCAL_DIRECTORY, parseFileName(now, t));
+        for (BIDataExportType t : TYPES)
+            {
+            if (t.getReportName ().equals (reportName))
+                {
+                return t;
+                }
+            }
+        return null;
+        }
+
+
+    public static void cartTypesExporter (String LOCAL_DIRECTORY, String t, Calendar last) throws IOException
+        {
+        BIDataExportType type = getTypeByName (t);
+        File tempFile = new File(LOCAL_DIRECTORY, parseFileName(last, t));
         if (!USE_FTP_AS_STORAGE) {
             if (tempFile.exists()) {
                 tempFile.delete();
@@ -220,12 +243,16 @@ public class BIDataExportService {
             for (long ts = last.getTimeInMillis(); ts < now.getTimeInMillis(); ts += 86400000) {
                 Calendar start = new GregorianCalendar();
                 Calendar end = new GregorianCalendar();
-                start.setTimeInMillis(ts - 86400000);
-                end.setTimeInMillis(ts);
+                start.setTimeInMillis(ts);
+                end.setTimeInMillis(ts + 86400000);
 
-                getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, end);
+                 getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, end);
                 for (String t : typesToUpdate) {
-                    updateFiles(client, session, t, end, start);
+                    if (!updateFiles(client, session, t, end, start)) // Если файл не удалось создать, то пропускаем
+                                                                      // создание всех остальных файлов
+                        {
+                        break;
+                        }
                 }
             }
             return true;
@@ -239,7 +266,8 @@ public class BIDataExportService {
     private void getUnfinishedTypes(String dir, List<String> typesToUpdate, Calendar now) {
         typesToUpdate.clear();
         File check = null;
-        for (String tName : TYPES.keySet()) {
+        for (BIDataExportType t : TYPES) {
+            String tName = t.getReportName ();
             check = new File(LOCAL_DIRECTORY, parseFileName(now, tName));
             if (!check.exists() && check.length() < 1) {
                 typesToUpdate.add(tName);
@@ -248,40 +276,52 @@ public class BIDataExportService {
     }
 
 
-    private void updateFiles(FTPClient client, Session session, String t, Calendar now, Calendar last) {
+    private boolean updateFiles(FTPClient client, Session session, String t, Calendar now, Calendar last) {
         try {
             // Запись во временный файл
-            BIDataExportType type = TYPES.get(t);
+            BIDataExportType type = getTypeByName(t);
             if (type.useSpecificExporter ())
                 {
-                executeExporterMethod (LOCAL_DIRECTORY, t, now, type);
-                return;
+                executeExporterMethod (LOCAL_DIRECTORY, t, last, type);
+                return true;
                 }
-            File tempFile = new File(LOCAL_DIRECTORY, parseFileName(now, t));
-            if (!USE_FTP_AS_STORAGE) {
-                if (tempFile.exists()) {
-                    tempFile.delete();
-                }
-                tempFile.createNewFile();
-            }
-            BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
-            //new BufferedWriter (new FileWriter (tempFile), "");
+            File tempFile = null;
+            BufferedWriter output = null;
 
 
             org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(type.getSQL(), last, now));
             List resultList = q.list();
             StringBuilder builder = new StringBuilder();
-            //  Составляем шапку для CSV
-            for (String col : type.getColumns()) {
-                if (builder.length() > 0) {
-                    builder.append(";");
-                }
-                builder.append("\"" + col + "\"");
-            }
-            output.write(builder.toString() + "\n");
-            builder.delete(0, builder.length());
+            boolean fileCreated = false;
+            boolean dataExists = false;
             //  Составляем таблицу с данными в CSV
             for (Object entry : resultList) {
+
+                dataExists = true;
+                if (!fileCreated)
+                    {
+                    tempFile = new File(LOCAL_DIRECTORY, parseFileName(last, t));
+                    if (!USE_FTP_AS_STORAGE) {
+                        if (tempFile.exists()) {
+                            tempFile.delete();
+                        }
+                        tempFile.createNewFile();
+                    }
+                    output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+
+
+                    //  Составляем шапку для CSV
+                    for (String col : type.getColumns()) {
+                        if (builder.length() > 0) {
+                            builder.append(";");
+                        }
+                        builder.append("\"" + col + "\"");
+                    }
+                    output.write(builder.toString() + "\n");
+                    builder.delete(0, builder.length());
+
+                    fileCreated = true;
+                    }
 
 
                 //  Обрабатываем данные
@@ -307,7 +347,10 @@ public class BIDataExportService {
                 output.flush();
                 builder.delete(0, builder.length());
             }
-            output.close();
+            if (output != null)
+                {
+                output.close();
+                }
 
 
             //  Записываем файл на FTP сервер
@@ -316,8 +359,10 @@ public class BIDataExportService {
                 FileInputStream fis = new FileInputStream(tempFile);
                 boolean fileStatus = client.storeFile(parseFileName(now, t), fis);
             }
+            return dataExists;
         } catch (Exception e) {
             logger.error("Failed to build query for " + t, e);
+            return false;
         }
     }
 
@@ -491,7 +536,8 @@ public class BIDataExportService {
         if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
             File files[] = dir.listFiles();
 
-            for (String t : TYPES.keySet()) {
+            for (BIDataExportType type : TYPES) {
+                String t = type.getReportName();
                 String fileName = parseFileName(now, t);
                 boolean doAdd = true;
                 for (File f : files) {
@@ -509,7 +555,10 @@ public class BIDataExportService {
             }
         } else {
             dir.mkdirs();
-            typesToUpdate.addAll(TYPES.keySet());
+            for (BIDataExportType type : TYPES)
+                {
+                typesToUpdate.add(type.getReportName ());
+                }
         }
 
         return new Calendar[]{last, now};
@@ -528,7 +577,8 @@ public class BIDataExportService {
         if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
             //  Если директория существует, проверяем все ли в ней файлы
             FTPFile files[] = getFiles(client, FILES_FORMAT.format(now.getTime()));
-            for (String t : TYPES.keySet()) {
+            for (BIDataExportType type : TYPES) {
+                String t = type.getReportName();
                 String fileName = parseFileName(now, t);
                 boolean doAdd = true;
                 for (FTPFile f : files) {
@@ -546,7 +596,10 @@ public class BIDataExportService {
             }
         } else {
             //  Указываем, что загружать необходимо все данные
-            typesToUpdate.addAll(TYPES.keySet());
+            for (BIDataExportType type : TYPES)
+            {
+            typesToUpdate.add(type.getReportName ());
+            }
         }
 
         return new Calendar[]{last, now};
@@ -564,15 +617,18 @@ public class BIDataExportService {
         private String sql;
         private String cols[];
         private String exporterMethod;
+        private String reportName;
 
 
-        public BIDataExportType(String cols []) {
+        public BIDataExportType(String reportName, String cols []) {
+            this.reportName = reportName;
             this.cols = cols;
         }
 
-        public BIDataExportType(String sql, String cols[]) {
+        public BIDataExportType(String reportName, String sql, String cols[]) {
             this.sql = sql;
             this.cols = cols;
+            this.reportName = reportName;
         }
 
         public String getSQL() {
@@ -597,6 +653,11 @@ public class BIDataExportService {
         public String getSpecificExporter ()
             {
                 return exporterMethod;
+            }
+
+        public String getReportName ()
+            {
+                return reportName;
             }
     }
 }
