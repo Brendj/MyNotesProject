@@ -24,14 +24,24 @@
                 <rich:calendar value="#{goodRequestListPage.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-                <h:outputText value="Выводить удаленные заявки" styleClass="output-text" escape="true"/>
-                <h:selectBooleanCheckbox value="#{goodRequest.deletedState}"/>
+                <h:panelGroup styleClass="borderless-div">
+                    <h:outputText value="Выводить удаленные заявки" styleClass="output-text" escape="true"/>
+                    <h:selectBooleanCheckbox value="#{goodRequestListPage.useDeletedFilter}"/>
+                </h:panelGroup>
+                <h:selectOneMenu id="selectDeletedMenu" value="#{goodRequestListPage.deletedState}"
+                                 converter="javax.faces.Boolean" styleClass="input-text" style="width: 250px;">
+                    <f:selectItem itemValue="false" itemLabel="Не показывать"/>
+                    <f:selectItem itemValue="true" itemLabel="Показывать"/>
+                </h:selectOneMenu>
 
-                <%--<h:outputText value="Выводить с указанными статусами" styleClass="output-text" escape="true"/>--%>
-                <%--<h:selectManyListbox value="#{goodRequestListPage.stateList}"--%>
-                                     <%--size="#{goodRequestListPage.maxPickedStatesNumber}" converter="javax.faces.Integer">--%>
-                    <%--<f:selectItems value="#{goodRequestListPage.stateSelectItemList}}"/>--%>
-                <%--</h:selectManyListbox>--%>
+                <h:panelGroup styleClass="borderless-div">
+                    <h:outputText value="Выводить только со статусами" styleClass="output-text" escape="true"/>
+                    <h:selectBooleanCheckbox value="#{goodRequestListPage.useStateFilter}"/>
+                </h:panelGroup>
+                <h:selectManyListbox id="selectStateMenu" size="#{goodRequestListPage.statesListSize}"
+                                     converter="javax.faces.Integer" value="#{goodRequestListPage.stateList}">
+                    <f:selectItems value="#{goodRequestListPage.stateSelectItemList}"/>
+                </h:selectManyListbox>
 
             </h:panelGrid>
 
