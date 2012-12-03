@@ -45,6 +45,8 @@ public class GoodRequest extends DistributedObject {
 
     @Override
     protected GoodRequest parseAttributes(Node node) throws Exception {
+        Long idOfGoodRequest = getLongAttributeValue(node, "IdOfGoodsRequest");
+        if(idOfGoodRequest != null) setIdOfGoodRequest(idOfGoodRequest);
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Date dateDateOfGoodsRequest = getDateTimeAttributeValue(node, "Date");
@@ -63,6 +65,7 @@ public class GoodRequest extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setIdOfGoodRequest(((GoodRequest) distributedObject).getIdOfGoodRequest());
         setOrgOwner(((GoodRequest) distributedObject).getOrgOwner());
         setDateOfGoodsRequest(((GoodRequest) distributedObject).getDateOfGoodsRequest());
         setNumber(((GoodRequest) distributedObject).getNumber());
@@ -71,6 +74,7 @@ public class GoodRequest extends DistributedObject {
         setComment(((GoodRequest) distributedObject).getComment());
     }
 
+    private Long idOfGoodRequest;
     private Date dateOfGoodsRequest;
     private String number;
     private Integer state;
@@ -90,6 +94,14 @@ public class GoodRequest extends DistributedObject {
 
     public String[] getGoodRequestStates() {
         return GOOD_REQUEST_STATES;
+    }
+
+    public Long getIdOfGoodRequest() {
+        return idOfGoodRequest;
+    }
+
+    public void setIdOfGoodRequest(Long idOfGoodRequest) {
+        this.idOfGoodRequest = idOfGoodRequest;
     }
 
     public String getGuidOfStaff() {

@@ -64,7 +64,9 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     @Transactional
     public void reload() throws Exception{
         String where = "(createdDate between " +  baseDate.getTime() + " and " + endDate.getTime() + ")";
-        where += " and orgowner=" + idOfOrg;
+        if (idOfOrg != null) {
+            where = (where.equals("")?"":where + " and ") + "orgowner=" + idOfOrg;
+        }
         if ((useDeletedFilter != null) && useDeletedFilter) {
             where = (where.equals("")?"":where + " and ") + "deletedstate=" + deletedState;
         }
@@ -78,7 +80,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
             where = where.substring(0,where.length() - 4);
         }
         where = (where.equals("")?"":" where ") + where;
-        TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequest " + where, GoodRequest.class);
+        TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequest" + where, GoodRequest.class);
         goodRequestList = query.getResultList();
     }
 
@@ -104,7 +106,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         filter.append(sdf.format(baseDate));
         filter.append(" - ");
         filter.append(sdf.format(endDate));
-        if (deletedState != null) {
+        if ((useDeletedFilter != null) && useDeletedFilter && deletedState != null) {
             if (deletedState) {
                 filter.append(", включая удаленные");
             } else {
@@ -120,8 +122,9 @@ public class GoodRequestListPage extends BasicWorkspacePage {
             for (int i = 0; i < stateList.size(); i++) {
                 filter.append("\"" + GoodRequest.GOOD_REQUEST_STATES[stateList.get(i)] + "\", ");
             }
+            filter = new StringBuffer().append(filter.substring(0, filter.length() - 2));
         }
-        return filter.substring(0, filter.length() - 2);
+        return filter.toString();
     }
 
     public Long getIdOfOrg() {
