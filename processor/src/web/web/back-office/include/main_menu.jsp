@@ -60,7 +60,7 @@
 
         <%--@elvariable id="goodRequestPositionListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.goodRequestPosition.GoodRequestPositionListPage"--%>
         <rich:panelMenuItem id="viewGoodRequestPositionView" binding="#{goodRequestPositionListPage.mainMenuComponent}"
-        action="#{goodRequestPositionListPage.show}" label="Выбранная заявка" reRender="workspaceForm"/>
+        action="#{goodRequestPositionListPage.show}" label="Выбранная заявка" reRender="workspaceForm" rendered="false"/>
 
 
         <rich:panelMenuItem id="generateOrgBalanceReportMenuItem"
@@ -332,7 +332,8 @@
 
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="serviceGroupMenu" binding="#{mainPage.serviceGroupPage.mainMenuComponent}" label="Сервис">
+<rich:panelMenuGroup id="serviceGroupMenu" binding="#{mainPage.serviceGroupPage.mainMenuComponent}" label="Сервис"
+        rendered="#{mainPage.eligibleToServiceAdmin || mainPage.eligibleToServiceSupport}">
     <a4j:support event="onclick" action="#{mainPage.showServiceGroupPage}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="removeOrderMenuItem" binding="#{mainPage.orderRemovePage.mainMenuComponent}"

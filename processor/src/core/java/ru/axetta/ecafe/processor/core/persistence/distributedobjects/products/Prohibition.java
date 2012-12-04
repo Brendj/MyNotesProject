@@ -28,17 +28,26 @@ public class Prohibition extends DistributedObject {
         if (c == null) throw distributedObjectException;
 
         Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProduct);
-        if(p == null) throw new DistributedObjectException("Product NOT_FOUND_VALUE");
-        setProduct(p);
         ProductGroup pg = (ProductGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProductGroup);
-        if(pg == null) throw new DistributedObjectException("ProductGroup NOT_FOUND_VALUE");
-        setProductGroup(pg);
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
-        if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
-        setGood(g);
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodGroup);
-        if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
-        setGoodGroup(gg);
+        if(pg != null) {
+            setProductGroup(pg);
+            return;
+        }
+        if(gg != null) {
+            setGoodGroup(gg);
+            return;
+        }
+        if(p != null) {
+            setProduct(p);
+            return;
+        }
+        if(g != null) {
+            setGood(g);
+            return;
+        }
+        throw new DistributedObjectException("NOT_FOUND_VALUE");
     }
 
     @Override
