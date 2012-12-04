@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="goodRequestListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestListPage"--%>
+<%--@elvariable id="goodRequestPositionListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.goodRequestPosition.GoodRequestPositionListPage"--%>
 <h:panelGrid id="goodRequestListPage" binding="#{goodRequestListPage.pageComponent}"
              styleClass="borderless-grid">
     <h:column>
@@ -74,8 +75,9 @@
             <f:facet name="header">
                 <h:outputText value="Версия" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalVersion}" action="#{goodRequestPositionListPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{goodRequest.idOfGoodRequest}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalVersion}"
+                             action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">

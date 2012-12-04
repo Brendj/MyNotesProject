@@ -31,6 +31,7 @@ public class GoodRequestPositionListPage extends BasicWorkspacePage {
 
     public Object onSearch() throws Exception {
         reload();
+        show();
         return null;
     }
 
