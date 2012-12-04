@@ -32,7 +32,7 @@
             <f:facet name="header">
                 <h:outputText value="Товар" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="---" />
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.good.nameOfGood}" />
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">
