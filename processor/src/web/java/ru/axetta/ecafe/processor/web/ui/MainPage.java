@@ -112,6 +112,9 @@ public class MainPage {
     private Long selectedIdOfMenu;
     private String selectedMenuDataXML;
 
+    // Good requests manipulation
+    private final GoodRequestListPage goodRequestListPage = new GoodRequestListPage();
+
     // Contragent manipulation
     private final BasicWorkspacePage contragentGroupPage = new BasicWorkspacePage();
     private final ContragentListPage contragentListPage = new ContragentListPage();
@@ -1122,6 +1125,23 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
+        }
+        return null;
+    }
+
+    public GoodRequestListPage getGoodRequestListPage() {
+        return goodRequestListPage;
+    }
+
+    public Object showGoodRequestListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            goodRequestListPage.setIdOfOrg(selectedIdOfOrg);
+            currentWorkspacePage = goodRequestListPage;
+        } catch (Exception e) {
+            logger.error("Failed to load good requests from table", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по запросам продуктов", null));
         }
         return null;
     }

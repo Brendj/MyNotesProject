@@ -44,7 +44,13 @@
                             reRender="workspaceForm" />
 
         <rich:panelMenuItem id="viewOrgMenuView" binding="#{mainPage.menuViewPage.mainMenuComponent}"
-                            action="#{mainPage.showMenuViewPage}" label="Просмотр меню" reRender="workspaceForm" />
+        action="#{mainPage.showMenuViewPage}" label="Просмотр меню" reRender="workspaceForm" />
+
+        <%--@elvariable id="menuLoadPage" type="ru.axetta.ecafe.processor.web.ui.org.menu.MenuLoadPage"--%>
+        <rich:panelMenuItem id="loadOrgMenuView" binding="#{menuLoadPage.mainMenuComponent}"
+                            action="#{menuLoadPage.show}" label="Загрузка меню" reRender="workspaceForm">
+            <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{menuLoadPage.idOfOrg}" />
+        </rich:panelMenuItem>
 
         <%--@elvariable id="goodRequestListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestListPage"--%>
         <rich:panelMenuItem id="viewGoodRequestView" binding="#{goodRequestListPage.mainMenuComponent}"
@@ -55,6 +61,12 @@
         <%--@elvariable id="goodRequestPositionListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestPositionListPage"--%>
         <rich:panelMenuItem id="viewGoodRequestPositionView" binding="#{goodRequestPositionListPage.mainMenuComponent}"
                             action="#{goodRequestPositionListPage.show}" label="Выбранная заявка" reRender="workspaceForm"/>
+
+        <%--@elvariable id="goodRequestListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestListPage"--%>
+        <rich:panelMenuItem id="viewGoodRequestView" binding="#{goodRequestListPage.mainMenuComponent}"
+                            action="#{goodRequestListPage.show}" label="Просмотр заявок" reRender="workspaceForm">
+            <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{goodRequestListPage.idOfOrg}" />
+        </rich:panelMenuItem>
 
         <rich:panelMenuItem id="generateOrgBalanceReportMenuItem"
                             binding="#{mainPage.orgBalanceReportPage.mainMenuComponent}" label="Отчет по балансу"
