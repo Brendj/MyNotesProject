@@ -133,3 +133,5 @@ WITH (
 );
 ALTER TABLE cf_dish_prohibition_exclusions
   OWNER TO postgres;
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 121204) НЕ МЕНЯТЬ
