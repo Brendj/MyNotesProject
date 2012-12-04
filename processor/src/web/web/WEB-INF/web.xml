@@ -211,6 +211,7 @@
             <web-resource-name>Restrict direct access to JSFs</web-resource-name>
             <url-pattern>/back-office/login.jsp</url-pattern>
             <url-pattern>/back-office/index.jsp</url-pattern>
+            <url-pattern>/back-office/menu_load_result_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/client_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/client_org_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>

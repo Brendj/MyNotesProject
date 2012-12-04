@@ -33,7 +33,7 @@
         </f:facet>
         <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
+    <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}">
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>

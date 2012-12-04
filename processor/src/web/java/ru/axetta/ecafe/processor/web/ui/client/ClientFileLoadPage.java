@@ -126,7 +126,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         return lineResults;
     }
 
-    public int getLineResultSize() {
+    public int getshowClientLoadResultCSVListize() {
         return lineResults.size();
     }
 

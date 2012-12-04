@@ -2934,9 +2934,9 @@ public class SyncRequest {
 
     public static class LoadContext {
 
-        MenuGroups menuGroups;
+        public MenuGroups menuGroups;
         public long protoVersion;
-        DateFormat timeFormat, dateOnlyFormat;
+        public DateFormat timeFormat, dateOnlyFormat;
     }
 
     public static class Builder {

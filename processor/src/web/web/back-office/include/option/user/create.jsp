@@ -26,6 +26,20 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.userCreatePage.email}" maxlength="128" styleClass="input-text"/>
+    <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.userCreatePage.contragentItem.contragentName}" readonly="true"
+                     styleClass="input-text" style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                           reRender="modalContragentSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="0"
+                                         target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2"
+                                         target="#{mainPage.classTypes}" />
+        </a4j:commandButton>
+    </h:panelGroup>
     <h:outputText escape="true" value="Права пользователя" styleClass="output-text" />
     <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.items}" var="item">
         <rich:column>

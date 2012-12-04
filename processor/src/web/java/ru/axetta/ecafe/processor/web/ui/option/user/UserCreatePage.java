@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 
@@ -18,7 +21,7 @@ import java.util.Date;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class UserCreatePage extends BasicWorkspacePage {
+public class UserCreatePage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler{
 
     private Long idOfUser;
     private String userName;
@@ -26,6 +29,7 @@ public class UserCreatePage extends BasicWorkspacePage {
     private String plainPasswordConfirmation;
     private String phone;
     private String email;
+    private ContragentItem contragentItem;
     private final FunctionSelector functionSelector = new FunctionSelector();
 
     public String getPageFilename() {
@@ -80,6 +84,14 @@ public class UserCreatePage extends BasicWorkspacePage {
         this.email = email;
     }
 
+    public ContragentItem getContragentItem() {
+        return contragentItem;
+    }
+
+    public void setContragentItem(ContragentItem contragentItem) {
+        this.contragentItem = contragentItem;
+    }
+
     public FunctionSelector getFunctionSelector() {
         return functionSelector;
     }
@@ -94,4 +106,36 @@ public class UserCreatePage extends BasicWorkspacePage {
         user.setEmail(email);
         session.save(user);
     }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        if (null != idOfContragent) {
+            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            this.contragentItem = new ContragentItem(contragent);
+        }
+    }
+
+    public static class ContragentItem {
+
+        private final Long idOfContragent;
+        private final String contragentName;
+
+        public ContragentItem(Contragent contragent) {
+            this.idOfContragent = contragent.getIdOfContragent();
+            this.contragentName = contragent.getContragentName();
+        }
+
+        public ContragentItem() {
+            this.idOfContragent = null;
+            this.contragentName = null;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
+    }
+
 }

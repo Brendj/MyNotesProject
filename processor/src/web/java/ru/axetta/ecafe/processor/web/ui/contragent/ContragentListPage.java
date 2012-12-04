@@ -11,10 +11,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -197,15 +194,22 @@ public class ContragentListPage extends BasicWorkspacePage {
         return items;
     }
 
+    public void setContragent(Contragent contragent){
+        items = new ArrayList<Item>();
+        items.add(new Item(contragent));
+    }
+
     public void fill(Session session) throws Exception {
-        List<Item> items = new LinkedList<Item>();
-        Criteria criteria = session.createCriteria(Contragent.class);
-        List contragents = criteria.list();
-        for (Object object : contragents) {
-            Contragent contragent = (Contragent) object;
-            items.add(new Item(contragent));
+        if(items==null || items.isEmpty()){
+            List<Item> items = new LinkedList<Item>();
+            Criteria criteria = session.createCriteria(Contragent.class);
+            List contragents = criteria.list();
+            for (Object object : contragents) {
+                Contragent contragent = (Contragent) object;
+                items.add(new Item(contragent));
+            }
+            this.items = items;
         }
-        this.items = items;
     }
 
 }

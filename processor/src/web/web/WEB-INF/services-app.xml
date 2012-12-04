@@ -64,11 +64,11 @@
     <task:scheduler id="myScheduler" pool-size="5"/>
 
 
-    <task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
+    <!--<task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
         <task:scheduled ref="MSRStopListLoader" method="parseCards" fixed-delay="15000" />
     </task:scheduled-tasks>
     <task:scheduler id="msrStoplistLoadScheduler" pool-size="5"/>
-
+-->
 
 
 
