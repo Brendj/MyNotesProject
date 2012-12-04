@@ -38,8 +38,8 @@ ALTER TABLE cf_trade_material_goods ADD UNIQUE(guid);
 ALTER TABLE cf_ECafeSettings ADD UNIQUE(guid);
 
 -- Добавление ссылки на таблицу товаров
-ALTER TABLE cf_menudetails ADD COLUMN guidofgood character varying(36);
-ALTER TABLE cf_menudetails ADD CONSTRAINT cf_menudetail_guidofgood_fk FOREIGN KEY (guidofgood) REFERENCES cf_goods(guid);
+ALTER TABLE cf_menudetails ADD COLUMN idofgood character varying(36);
+ALTER TABLE cf_menudetails ADD CONSTRAINT cf_menudetail_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods(idofgood);
 
 -- Таблица родительских запретов на определенные блюда
 CREATE TABLE cf_dish_prohibitions
@@ -54,42 +54,42 @@ CREATE TABLE cf_dish_prohibitions
   deletedate bigint,
   sendall integer DEFAULT 0,
   idofclient bigint NOT NULL,
-  guidofproducts character varying(36),
-  guidofproductgroups character varying(36),
-  guidofgood character varying(36),
-  guidofgoodsgroup character varying(36),
+  idofproducts bigint,
+  idofproductgroups bigint,
+  idofgood bigint,
+  idofgoodsgroup bigint,
   CONSTRAINT cf_dish_prohibitions_pk PRIMARY KEY (idofprohibition),
   CONSTRAINT cf_dish_prohibitions_idofclient_fk FOREIGN KEY (idofclient)
       REFERENCES cf_clients (idofclient) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_guidofgood_fk FOREIGN KEY (guidofgood)
-      REFERENCES cf_goods (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibitions_idofgood_fk FOREIGN KEY (idofgood)
+      REFERENCES cf_goods (idofgood) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_guidofgoodsgroup_fk FOREIGN KEY (guidofgoodsgroup)
-      REFERENCES cf_goods_groups (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibitions_idofgoodsgroup_fk FOREIGN KEY (idofgoodsgroup)
+      REFERENCES cf_goods_groups (idofgoodsgroup) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_guidofproductgroups_fk FOREIGN KEY (guidofproductgroups)
-      REFERENCES cf_product_groups (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibitions_idofproductgroups_fk FOREIGN KEY (idofproductgroups)
+      REFERENCES cf_product_groups (idofproductgroups) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_guidofproducts_fk FOREIGN KEY (guidofproducts)
-      REFERENCES cf_products (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibitions_idofproducts_fk FOREIGN KEY (idofproducts)
+      REFERENCES cf_products (idofproducts) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT cf_dish_prohibitions_guid_key UNIQUE (guid),
   CONSTRAINT cf_dish_prohibitions_check_onlyoneisnotnull CHECK ((
 CASE
-    WHEN guidofproducts IS NOT NULL THEN 1
+    WHEN idofproducts IS NOT NULL THEN 1
     ELSE 0
 END +
 CASE
-    WHEN guidofproductgroups IS NOT NULL THEN 1
+    WHEN idofproductgroups IS NOT NULL THEN 1
     ELSE 0
 END +
 CASE
-    WHEN guidofgood IS NOT NULL THEN 1
+    WHEN idofgood IS NOT NULL THEN 1
     ELSE 0
 END +
 CASE
-    WHEN guidofgoodsgroup IS NOT NULL THEN 1
+    WHEN idofgoodsgroup IS NOT NULL THEN 1
     ELSE 0
 END) = 1)
 )
@@ -111,22 +111,22 @@ CREATE TABLE cf_dish_prohibition_exclusions
   lastupdate bigint,
   deletedate bigint,
   sendall integer DEFAULT 0,
-  guidofprohibition character varying(36) NOT NULL,
-  guidofgood character varying(36),
-  guidofgoodsgroup character varying(36),
+  idofprohibition bigint NOT NULL,
+  idofgood bigint,
+  idofgoodsgroup bigint,
   CONSTRAINT cf_dish_prohibition_exclusions_pk PRIMARY KEY (idofexclusion),
-  CONSTRAINT cf_dish_prohibition_exclusions_guidofprohibition_fk FOREIGN KEY (guidofprohibition)
-      REFERENCES cf_dish_prohibitions (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibition_exclusions_idofprohibition_fk FOREIGN KEY (idofprohibition)
+      REFERENCES cf_dish_prohibitions (idofprohibition) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-    CONSTRAINT cf_dish_prohibitions_exclusions_guidofgood_fk FOREIGN KEY (guidofgood)
-      REFERENCES cf_goods (guid) MATCH SIMPLE
+    CONSTRAINT cf_dish_prohibitions_exclusions_idofgood_fk FOREIGN KEY (idofgood)
+      REFERENCES cf_goods (idofgood) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_exclusions_guidofgoodsgroup_fk FOREIGN KEY (guidofgoodsgroup)
-      REFERENCES cf_goods_groups (guid) MATCH SIMPLE
+  CONSTRAINT cf_dish_prohibitions_exclusions_idofgoodsgroup_fk FOREIGN KEY (idofgoodsgroup)
+      REFERENCES cf_goods_groups (idofgoodsgroup) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_dish_prohibitions_exclusions_guid_key UNIQUE (guid),
-  CONSTRAINT cf_dish_prohibition_exclusions_check_oneisnotnull CHECK (COALESCE(guidofgood, guidofgoodsgroup) IS NOT NULL),
-  CONSTRAINT cf_dish_prohibition_exclusions_check_oneisnull CHECK ((guidofgood || guidofgoodsgroup) IS NULL)
+  CONSTRAINT cf_dish_prohibitions_exclusions_id_key UNIQUE (guid),
+  CONSTRAINT cf_dish_prohibition_exclusions_check_oneisnotnull CHECK (COALESCE(idofgood, idofgoodsgroup) IS NOT NULL),
+  CONSTRAINT cf_dish_prohibition_exclusions_check_oneisnull CHECK ((idofgood + idofgoodsgroup) IS NULL)
 )
 WITH (
   OIDS=FALSE
