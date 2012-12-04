@@ -370,4 +370,9 @@ public class OrgViewPage extends BasicWorkspacePage {
     public void setGuid(String guid) {
         this.guid = guid;
     }
+
+    public Object updateBalance(){
+        for (int i=0;i<10000000;i++);
+        return null;
+    }
 }

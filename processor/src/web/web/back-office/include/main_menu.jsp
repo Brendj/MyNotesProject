@@ -58,15 +58,10 @@
             <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{goodRequestListPage.idOfOrg}" />
         </rich:panelMenuItem>
 
-        <%--@elvariable id="goodRequestPositionListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestPositionListPage"--%>
+        <%--@elvariable id="goodRequestPositionListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.goodRequestPosition.GoodRequestPositionListPage"--%>
         <rich:panelMenuItem id="viewGoodRequestPositionView" binding="#{goodRequestPositionListPage.mainMenuComponent}"
-                            action="#{goodRequestPositionListPage.show}" label="Выбранная заявка" reRender="workspaceForm"/>
+        action="#{goodRequestPositionListPage.show}" label="Выбранная заявка" reRender="workspaceForm"/>
 
-        <%--@elvariable id="goodRequestListPage" type="ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestListPage"--%>
-        <rich:panelMenuItem id="viewGoodRequestView" binding="#{goodRequestListPage.mainMenuComponent}"
-                            action="#{goodRequestListPage.show}" label="Просмотр заявок" reRender="workspaceForm">
-            <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{goodRequestListPage.idOfOrg}" />
-        </rich:panelMenuItem>
 
         <rich:panelMenuItem id="generateOrgBalanceReportMenuItem"
                             binding="#{mainPage.orgBalanceReportPage.mainMenuComponent}" label="Отчет по балансу"

@@ -121,7 +121,13 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReports2}" styleClass="input-text long-field" />
 
 </h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
+<h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Синхронизация балансов" action="#{mainPage.orgViewPage.updateBalance}" styleClass="command-button" />
 </h:panelGrid>
+<a4j:status id="sOrgViewStatus">
+    <f:facet name="start">
+        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+    </f:facet>
+</a4j:status>
