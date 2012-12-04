@@ -41,6 +41,8 @@ public enum DistributedObjectsEnum {
     TechnologicalMap(TechnologicalMap.class, 1),
     TechnologicalMapProduct(TechnologicalMapProduct.class, 2),
     TradeMaterialGood(TradeMaterialGood.class,3),
+    Prohibition(Prohibition.class, 3),
+    ProhibitionExclusion(ProhibitionExclusion.class, 4),
     // настойки
     ECafeSettings(ECafeSettings.class,0),
     // библиоткека
