@@ -38,7 +38,7 @@ ALTER TABLE cf_trade_material_goods ADD UNIQUE(guid);
 ALTER TABLE cf_ECafeSettings ADD UNIQUE(guid);
 
 -- Добавление ссылки на таблицу товаров
-ALTER TABLE cf_menudetails ADD COLUMN idofgood character varying(36);
+ALTER TABLE cf_menudetails ADD COLUMN idofgood bigint;
 ALTER TABLE cf_menudetails ADD CONSTRAINT cf_menudetail_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods(idofgood);
 
 -- Таблица родительских запретов на определенные блюда
