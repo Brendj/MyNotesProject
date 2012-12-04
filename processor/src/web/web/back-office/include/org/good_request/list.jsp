@@ -74,7 +74,9 @@
             <f:facet name="header">
                 <h:outputText value="Версия" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.globalVersion}" />
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalVersion}" action="#{goodRequestPositionListPage.show}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{goodRequest.idOfGoodRequest}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
