@@ -46,13 +46,13 @@
             </f:facet>
             <h:outputText styleClass="output-text" value="#{goodRequestPosition.unitsScaleValue}" />
         </rich:column>
-        <f:facet name="footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Масса нетто (в граммах)" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{goodRequestPosition.netWeight}" />
         </rich:column>
+        <f:facet name="footer">
             <rich:datascroller for="goodRequestPositionListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
