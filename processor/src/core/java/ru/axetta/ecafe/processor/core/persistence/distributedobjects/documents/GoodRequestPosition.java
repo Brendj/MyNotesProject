@@ -24,6 +24,8 @@ import org.w3c.dom.Node;
  */
 public class GoodRequestPosition extends DistributedObject {
 
+    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
        // GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class, guidOfGR);
@@ -153,6 +155,22 @@ public class GoodRequestPosition extends DistributedObject {
 
     public void setUnitsScale(Integer unitsScale) {
         this.unitsScale = unitsScale;
+    }
+
+    public String getUnitsScaleValue() {
+        if ((unitsScale != null) && (unitsScale >= 0) && (unitsScale <= UNIT_SCALES.length)) {
+            return UNIT_SCALES[unitsScale];
+        } else {
+            return "";
+        }
+    }
+
+    public String getCurrentElementValue() {
+        if (product != null) {
+            return product.getProductName();
+        } else {
+            return good.getNameOfGood();
+        }
     }
 
 }

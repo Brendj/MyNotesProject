@@ -20,19 +20,19 @@
             </f:facet>
             <h:outputText styleClass="output-text" value="#{row+1}" />
         </rich:column>
+        <%--<rich:column  headerClass="column-header">--%>
+            <%--<f:facet name="header">--%>
+                <%--<h:outputText value="Продукт" styleClass="output-text" escape="true"/>--%>
+            <%--</f:facet>--%>
+            <%--<a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequestPosition.product.productName}" action="#{productViewPage.show}" styleClass="command-link">--%>
+                <%--<f:setPropertyActionListener value="#{goodRequestPosition.product}" target="#{selectedProductGroupPage.currentProduct}" />--%>
+            <%--</a4j:commandLink>--%>
+        <%--</rich:column>--%>
         <rich:column  headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Продукт" styleClass="output-text" escape="true"/>
+                <h:outputText value="Товар | Базовый продукт" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequestPosition.product.productName}" action="#{productViewPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{goodRequestPosition.product}" target="#{selectedProductGroupPage.currentProduct}" />
-            </a4j:commandLink>
-        </rich:column>
-        <rich:column  headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Товар" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequestPosition.good.nameOfGood}" />
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.currentElementValue}" />
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">
@@ -42,17 +42,17 @@
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Масса нетто" styleClass="output-text" escape="true"/>
+                <h:outputText value="Единица измерения" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.unitsScaleValue}" />
+        </rich:column>
+        <f:facet name="footer">
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Масса нетто (в граммах)" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{goodRequestPosition.netWeight}" />
         </rich:column>
-        <rich:column  headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Масштаб" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequestPosition.unitsScale}" />
-        </rich:column>
-        <f:facet name="footer">
             <rich:datascroller for="goodRequestPositionListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">

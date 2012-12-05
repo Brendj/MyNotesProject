@@ -69,13 +69,7 @@
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{row+1}" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Версия" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalVersion}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{row+1}"
                              action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
             </a4j:commandLink>
@@ -84,13 +78,13 @@
             <f:facet name="header">
                 <h:outputText value="Дата создания" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.createdDate}" />
+            <h:outputText styleClass="output-text" value="#{goodRequest.createdDateFormatted}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Дата последнего обновления" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.lastUpdate}" />
+            <h:outputText styleClass="output-text" value="#{goodRequest.lastUpdateFormatted}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -102,7 +96,7 @@
             <f:facet name="header">
                 <h:outputText value="Дата удаления" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.deleteDate}" />
+            <h:outputText styleClass="output-text" value="#{goodRequest.deleteDateFormatted}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -114,7 +108,7 @@
             <f:facet name="header">
                 <h:outputText value="Дата исполнения заявки" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.doneDate}" />
+            <h:outputText styleClass="output-text" value="#{goodRequest.doneDateFormatted}" />
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="goodRequestListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
