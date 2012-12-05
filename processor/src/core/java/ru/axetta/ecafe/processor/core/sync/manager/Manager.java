@@ -308,6 +308,8 @@ public class Manager {
                         ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
                         ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
                     }
+                    distributedObject.setDateOnlyFormat(dateOnlyFormat);
+                    distributedObject.setTimeFormat(timeFormat);
                     distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
                 } else {
                     String tagName = distributedObject.getTagName();
@@ -334,27 +336,6 @@ public class Manager {
         }
         return distributedObject;
     }
-
-    //private List<Long> getListIdOfOrgList(Session session){
-    //    List<Long> resultList = new LinkedList<Long>();
-    //    Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
-    //    query.setParameter("idOfOrg",idOfOrg);
-    //    List list = query.list();
-    //    if(!(list==null || list.isEmpty())){
-    //        for (Object object: list){
-    //            resultList.add((Long) object);
-    //        }
-    //    }
-    //    query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
-    //    query.setParameter("idOfOrg",idOfOrg);
-    //    list = query.list();
-    //    if(!(list==null || list.isEmpty())){
-    //        for (Object object: list){
-    //            resultList.add((Long) object);
-    //        }
-    //    }
-    //    return resultList;
-    //}
 
     private ConfigurationProvider getConfigurationProvider(Session session, Class<? extends DistributedObject> clazz) throws Exception{
         List classList = Arrays.asList(clazz.getInterfaces());
@@ -638,6 +619,8 @@ public class Manager {
     private String createStringElement(Document document, DistributedObject distributedObject)
             throws TransformerException {
         Element element = document.createElement("O");
+        distributedObject.setDateOnlyFormat(dateOnlyFormat);
+        distributedObject.setTimeFormat(timeFormat);
         element = distributedObject.toElement(element);
         TransformerFactory transFactory = TransformerFactory.newInstance();
         Transformer transformer = transFactory.newTransformer();
