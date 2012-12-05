@@ -2,20 +2,15 @@
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%--<%@ page import="Person" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
 <%@ page import="java.util.StringTokenizer" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="windows-1251" %>
 <%--
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
@@ -60,6 +55,8 @@
         fieldINN="1656045695";
     } */
 /////
+        String stringForBarcode=fieldINN+"L"+String.format("%08d",contractId);
+
 %>
 
 <table class="ramka" cellspacing="0" style="width: 180mm;">
@@ -87,6 +84,13 @@
                     од-4</i></td>
             </tr>
         </table>
+    </td>
+</tr>
+<tr>
+    <td align="center">
+
+        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
+        <p align="center"><%=stringForBarcode%></p>
     </td>
 </tr>
 <tr>
@@ -327,6 +331,13 @@
 <td style="width: 130mm; height: 80mm; padding: 0mm 4mm 0mm 3mm; border-left: black 1.5px solid;">
 
 <table cellspacing="0" align="center" style="width: 123mm; height: 100%">
+<tr>
+    <td align="center">
+        <br/>
+        <img src="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "/processor", "barcode?data="+stringForBarcode+"&rotate=0"))%>" />
+        <p align="center"><%=stringForBarcode%></p>
+    </td>
+</tr>
 <tr>
     <td style="height: 8mm;">
         <table style="width: 100%; height: 100%;" cellspacing="0">
