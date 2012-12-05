@@ -29,8 +29,8 @@ public class Prohibition extends DistributedObject {
 
         Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProduct);
         ProductGroup pg = (ProductGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProductGroup);
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodGroup);
+        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
+        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
         if(pg != null) {
             setProductGroup(pg);
             return;
@@ -67,8 +67,8 @@ public class Prohibition extends DistributedObject {
         idOfClient = getLongAttributeValue(node, "IdOfClient");
         guidOfProduct = getStringAttributeValue(node,"GuidOfProducts",36);
         guidOfProductGroup = getStringAttributeValue(node,"GuidOfProductGroups",36);
-        guidOfGood = getStringAttributeValue(node,"GuidOfGood",36);
-        guidOfGoodGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
+        guidOfGoods = getStringAttributeValue(node,"GuidOfGood",36);
+        guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
         return this;
     }
 
@@ -84,9 +84,9 @@ public class Prohibition extends DistributedObject {
     private ProductGroup productGroup;
     private String guidOfProductGroup;
     private Good good;
-    private String guidOfGood;
+    private String guidOfGoods;
     private GoodGroup goodGroup;
-    private String guidOfGoodGroup;
+    private String guidOfGoodsGroup;
 
     public Long getIdOfClient() {
         return idOfClient;
@@ -145,12 +145,12 @@ public class Prohibition extends DistributedObject {
         this.good = good;
     }
 
-    public String getGuidOfGood() {
-        return guidOfGood;
+    public String getGuidOfGoods() {
+        return guidOfGoods;
     }
 
-    public void setGuidOfGood(String guidOfGood) {
-        this.guidOfGood = guidOfGood;
+    public void setGuidOfGoods(String guidOfGoods) {
+        this.guidOfGoods = guidOfGoods;
     }
 
     public GoodGroup getGoodGroup() {
@@ -161,12 +161,12 @@ public class Prohibition extends DistributedObject {
         this.goodGroup = goodGroup;
     }
 
-    public String getGuidOfGoodGroup() {
-        return guidOfGoodGroup;
+    public String getGuidOfGoodsGroup() {
+        return guidOfGoodsGroup;
     }
 
-    public void setGuidOfGoodGroup(String guidOfGoodGroup) {
-        this.guidOfGoodGroup = guidOfGoodGroup;
+    public void setGuidOfGoodsGroup(String guidOfGoodsGroup) {
+        this.guidOfGoodsGroup = guidOfGoodsGroup;
     }
 
 

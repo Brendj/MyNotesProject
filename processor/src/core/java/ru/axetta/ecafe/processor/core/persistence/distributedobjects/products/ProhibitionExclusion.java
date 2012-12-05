@@ -19,11 +19,11 @@ public class ProhibitionExclusion extends DistributedObject {
         Prohibition p = (Prohibition) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProhibition);
         if (p == null) throw new DistributedObjectException("Prohibition NOT_FOUND_VALUE");
 
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodGroup);
+        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
+        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
 
         if(gg != null) {
-            setGoodGroup(gg);
+            setGoodsGroup(gg);
             return;
         }
         if(g != null) {
@@ -32,12 +32,12 @@ public class ProhibitionExclusion extends DistributedObject {
         }
         throw new DistributedObjectException("NOT_FOUND_VALUE");
 
-        //Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
+        //Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
         //if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
         //setGood(g);
-        //GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodGroup);
+        //GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
         //if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
-        //setGoodGroup(gg);
+        //setGoodsGroup(gg);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ProhibitionExclusion extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfProhibition", prohibition.getGuid());
         if(good != null) setAttribute(element,"GuidOfGood", good.getGuid());
-        if(goodGroup != null) setAttribute(element, "GuidOfGoodsGroup", goodGroup.getGuid());
+        if(goodsGroup != null) setAttribute(element, "GuidOfGoodsGroup", goodsGroup.getGuid());
     }
 
     @Override
@@ -53,8 +53,8 @@ public class ProhibitionExclusion extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         guidOfProhibition = getStringAttributeValue(node, "GuidOfProhibition",36);
-        guidOfGood = getStringAttributeValue(node,"GuidOfGood",36);
-        guidOfGoodGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
+        guidOfGoods = getStringAttributeValue(node,"GuidOfGood",36);
+        guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
         return this;
     }
 
@@ -66,9 +66,9 @@ public class ProhibitionExclusion extends DistributedObject {
     private Prohibition prohibition;
     private String guidOfProhibition;
     private Good good;
-    private String guidOfGood;
-    private GoodGroup goodGroup;
-    private String guidOfGoodGroup;
+    private String guidOfGoods;
+    private GoodGroup goodsGroup;
+    private String guidOfGoodsGroup;
 
     public Prohibition getProhibition() {
         return prohibition;
@@ -94,28 +94,28 @@ public class ProhibitionExclusion extends DistributedObject {
         this.good = good;
     }
 
-    public String getGuidOfGoodGroup() {
-        return guidOfGoodGroup;
+    public String getGuidOfGoodsGroup() {
+        return guidOfGoodsGroup;
     }
 
-    public void setGuidOfGoodGroup(String guidOfGoodGroup) {
-        this.guidOfGoodGroup = guidOfGoodGroup;
+    public void setGuidOfGoodsGroup(String guidOfGoodsGroup) {
+        this.guidOfGoodsGroup = guidOfGoodsGroup;
     }
 
-    public String getGuidOfGood() {
-        return guidOfGood;
+    public String getGuidOfGoods() {
+        return guidOfGoods;
     }
 
-    public void setGuidOfGood(String guidOfGood) {
-        this.guidOfGood = guidOfGood;
+    public void setGuidOfGoods(String guidOfGoods) {
+        this.guidOfGoods = guidOfGoods;
     }
 
-    public GoodGroup getGoodGroup() {
-        return goodGroup;
+    public GoodGroup getGoodsGroup() {
+        return goodsGroup;
     }
 
-    public void setGoodGroup(GoodGroup goodGroup) {
-        this.goodGroup = goodGroup;
+    public void setGoodsGroup(GoodGroup goodsGroup) {
+        this.goodsGroup = goodsGroup;
     }
 
 }
