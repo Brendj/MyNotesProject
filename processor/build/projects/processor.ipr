@@ -1126,32 +1126,28 @@
     </library>
     <library name="client-room">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/activation.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/FastInfoset.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/hibernate-commons-annotations-4.0.1.Final.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/hibernate-core-4.0.0.Final.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/hibernate-entitymanager-4.0.0.Final.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/http.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-impl.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-rt.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-tools.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr173_api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr181-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr250-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/resolver.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/saaj-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/saaj-impl.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/sjsxp.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/stax-ex.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/streambuffer.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-xjc.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/activation.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/FastInfoset.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/http.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-impl.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-tools.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr173_api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr181-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr250-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/resolver.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/saaj-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/saaj-impl.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/sjsxp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/stax-ex.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/streambuffer.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-xjc.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-xjc.jar!/1.0" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-xjc.jar!/1.0" />
       </SOURCES>
     </library>
     <library name="commons-net-3.1">
@@ -1179,6 +1175,16 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="hibernate-commons-annotations-4.0.1.Final">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate-commons-annotations-4.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate-core-4.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate-entitymanager-4.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate-jpa-2.0-api-1.0.1.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="Java EE 6-3.1">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.annotation.jar!/" />
@@ -1202,32 +1208,6 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="jsr181-api">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr181-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/saaj-impl.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/saaj-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr173_api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/activation.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-impl.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jsr250-api.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-rt.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/streambuffer.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/FastInfoset.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/resolver.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/stax-ex.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxws-tools.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/sjsxp.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/http.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-xjc.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES>
-        <root url="jar://$PROJECT_DIR$/../../src/client-room/lib/jaxb-xjc.jar!/1.0" />
-      </SOURCES>
-    </library>
     <library name="junit">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/junit-4.10.jar!/" />
@@ -1242,7 +1222,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-impl-3.3.2.SR1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/glassX-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/darkX-3.3.2.SR1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
