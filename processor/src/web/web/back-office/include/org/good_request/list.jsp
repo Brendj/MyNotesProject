@@ -57,7 +57,7 @@
         </rich:simpleTogglePanel>
     </h:column>
 
-    <a4j:status id="sReportGenerateStatus">
+    <a4j:status id="sGoodRequestStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
         </f:facet>
