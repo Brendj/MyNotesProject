@@ -44,7 +44,7 @@ public class ProhibitionExclusion extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfProhibition", prohibition.getGuid());
-        if(good != null) setAttribute(element,"GuidOfGood", good.getGuid());
+        if(good != null) setAttribute(element,"GuidOfGoods", good.getGuid());
         if(goodsGroup != null) setAttribute(element, "GuidOfGoodsGroup", goodsGroup.getGuid());
     }
 
@@ -53,7 +53,7 @@ public class ProhibitionExclusion extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         guidOfProhibition = getStringAttributeValue(node, "GuidOfProhibition",36);
-        guidOfGoods = getStringAttributeValue(node,"GuidOfGood",36);
+        guidOfGoods = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
         return this;
     }

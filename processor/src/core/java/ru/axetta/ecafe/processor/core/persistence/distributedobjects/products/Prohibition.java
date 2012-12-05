@@ -54,9 +54,9 @@ public class Prohibition extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "IdOfClient", client.getIdOfClient());
-        if(product != null) setAttribute(element,"GuidOfProducts", product.getGuid());
-        if(productGroup != null) setAttribute(element,"GuidOfProductGroups", productGroup.getGuid());
-        if(good != null) setAttribute(element,"GuidOfGood", good.getGuid());
+        if(product != null) setAttribute(element,"GuidOfProduct", product.getGuid());
+        if(productGroup != null) setAttribute(element,"GuidOfProductGroup", productGroup.getGuid());
+        if(good != null) setAttribute(element,"GuidOfGoods", good.getGuid());
         if(goodGroup != null) setAttribute(element,"GuidOfGoodsGroup", goodGroup.getGuid());
     }
 
@@ -65,9 +65,9 @@ public class Prohibition extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         idOfClient = getLongAttributeValue(node, "IdOfClient");
-        guidOfProduct = getStringAttributeValue(node,"GuidOfProducts",36);
-        guidOfProductGroup = getStringAttributeValue(node,"GuidOfProductGroups",36);
-        guidOfGoods = getStringAttributeValue(node,"GuidOfGood",36);
+        guidOfProduct = getStringAttributeValue(node,"GuidOfProduct",36);
+        guidOfProductGroup = getStringAttributeValue(node,"GuidOfProductGroup",36);
+        guidOfGoods = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
         return this;
     }
