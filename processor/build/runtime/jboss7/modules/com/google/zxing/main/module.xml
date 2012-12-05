@@ -30,5 +30,6 @@
     </resources>
 
     <dependencies>
+	    <module name="javax.imageio.api"/>
     </dependencies>
 </module>

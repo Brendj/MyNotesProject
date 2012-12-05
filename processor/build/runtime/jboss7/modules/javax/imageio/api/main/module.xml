@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="javax.imageio.api">
+    <dependencies>
+        <system export="true">
+            <paths>
+                <path name="javax/imageio"/>
+                <path name="javax/imageio/event"/>
+                <path name="javax/imageio/metadata"/>
+                <path name="javax/imageio/plugins/bmp"/>
+                <path name="javax/imageio/plugins/jpeg"/>
+                <path name="javax/imageio/spi"/>
+                <path name="javax/imageio/stream"/>
+            </paths>
+        </system>
+    </dependencies>
+</module>
