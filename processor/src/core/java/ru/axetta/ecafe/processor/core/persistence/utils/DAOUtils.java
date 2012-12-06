@@ -95,6 +95,7 @@ public class DAOUtils {
         return ((Long)l.get(0));
     }
 
+    /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Set<Org> organizations, long clientRegistryVersion)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -103,6 +104,7 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -478,6 +480,7 @@ public class DAOUtils {
         return (List<Object[]>)query.list();
     }
 
+    /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
         String idOfOrg = idOfOrgs.toString().replaceAll("[^0-9,]", "");
