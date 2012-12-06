@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -93,7 +94,10 @@ public class ProhibitionsListExt {
     }
 
     public List<ProhibitionExclusionsList> getExclusions() {
-        return exclusions;
+        if (exclusions == null) {
+            exclusions = new ArrayList<ProhibitionExclusionsList>();
+        }
+        return this.exclusions;
     }
 
     public void setExclusions(List<ProhibitionExclusionsList> exclusions) {

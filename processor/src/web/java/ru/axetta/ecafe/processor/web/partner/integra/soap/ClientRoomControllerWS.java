@@ -145,10 +145,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     prohibitionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(prohibition.getCreatedDate()));
                     prohibitionsListExt.setContactId(client.getContractId());
-                    prohibitionsListExt.setGuidOfProducts(prohibition.getProduct().getGuid());
-                    prohibitionsListExt.setGuidOfProductGroups(prohibition.getProductGroup().getGuid());
-                    prohibitionsListExt.setGuidOfGood(prohibition.getGood().getGuid());
-                    prohibitionsListExt.setGuidOfGoodsGroup(prohibition.getGoodGroup().getGuid());
+                    Product bannedProduct = prohibition.getProduct();
+                    ProductGroup bannedProductGroup = prohibition.getProductGroup();
+                    Good bannedGood = prohibition.getGood();
+                    GoodGroup bannedGoodGroup = prohibition.getGoodGroup();
+                    if (bannedProduct != null) {
+                        prohibitionsListExt.setGuidOfProducts(bannedProduct.getGuid());
+                    } else if (bannedProductGroup != null) {
+                        prohibitionsListExt.setGuidOfProductGroups(bannedProductGroup.getGuid());
+                    } else if (bannedGood != null) {
+                        prohibitionsListExt.setGuidOfGood(bannedGood.getGuid());
+                    } else if (bannedGoodGroup != null) {
+                        prohibitionsListExt.setGuidOfGoodsGroup(bannedGoodGroup.getGuid());
+                    }
 
                     ProhibitionExclusionsList exclusionsList = new ProhibitionExclusionsList();
                     prohibitionsListExt.getExclusions().add(exclusionsList);
@@ -157,14 +166,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     exclusionCriteria.add(Restrictions.eq("prohibition", prohibition));
                     List exclusionObjects = exclusionCriteria.list();
                     if (!exclusionObjects.isEmpty()) {
-                        for (Object exclusionObject : objects) {
+                        for (Object exclusionObject : exclusionObjects) {
                             ProhibitionExclusion exclusion = (ProhibitionExclusion) exclusionObject;
                             ProhibitionExclusionsListExt prohibitionExclusionsListExt = objectFactory.createProhibitionExclusionsListExt();
                             prohibitionExclusionsListExt.setGuid(exclusion.getGuid());
                             prohibitionExclusionsListExt.setDeletedState(exclusion.getDeletedState());
                             prohibitionExclusionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(exclusion.getCreatedDate()));
-                            prohibitionExclusionsListExt.setGuidOfGood(exclusion.getGood().getGuid());
-                            prohibitionExclusionsListExt.setGuidOfGoodsGroup(exclusion.getGoodsGroup().getGuid());
+                            Good excludedGood = exclusion.getGood();
+                            GoodGroup excludedGoodGroup = exclusion.getGoodsGroup();
+                            if (excludedGood != null) {
+                                prohibitionExclusionsListExt.setGuidOfGood(excludedGood.getGuid());
+                            } else if (excludedGoodGroup != null) {
+                                prohibitionExclusionsListExt.setGuidOfGoodsGroup(excludedGoodGroup.getGuid());
+                            }
 
                             exclusionsList.getE().add(prohibitionExclusionsListExt);
                         }
