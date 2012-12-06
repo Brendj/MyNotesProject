@@ -18,6 +18,7 @@ import java.util.List;
 public class DashboardResponse {
 
     public static class OrgBasicStatItem {
+
         long idOfOrg;
         String orgName;
         String orgNameNumber;
@@ -32,6 +33,8 @@ public class DashboardResponse {
         long numberOfNonStudentClients;
         double numberOfStudentsWithEnterEventsPercent;
         double numberOfEmployeesWithEnterEventsPercent;
+        double numberOfStudentsWithDiscountOrdersPercent;
+        double numberOfEmployeesWithDiscountOrdersPercent;
         double numberOfStudentsWithPayedOrdersPercent;
         double numberOfEmployeesWithPayedOrdersPercent;
         private Long numberOfClientsWithoutCard;
@@ -171,8 +174,26 @@ public class DashboardResponse {
         public void setNumberOfEmployeesWithPayedOrdersPercent(double numberOfEmployeesWithPayedOrdersPercent) {
             this.numberOfEmployeesWithPayedOrdersPercent = numberOfEmployeesWithPayedOrdersPercent;
         }
+
+        public double getNumberOfStudentsWithDiscountOrdersPercent() {
+            return numberOfStudentsWithDiscountOrdersPercent;
+        }
+
+        public void setNumberOfStudentsWithDiscountOrdersPercent(double numberOfStudentsWithDiscountOrdersPercent) {
+            this.numberOfStudentsWithDiscountOrdersPercent = numberOfStudentsWithDiscountOrdersPercent;
+        }
+
+        public double getNumberOfEmployeesWithDiscountOrdersPercent() {
+            return numberOfEmployeesWithDiscountOrdersPercent;
+        }
+
+        public void setNumberOfEmployeesWithDiscountOrdersPercent(double numberOfEmployeesWithDiscountOrdersPercent) {
+            this.numberOfEmployeesWithDiscountOrdersPercent = numberOfEmployeesWithDiscountOrdersPercent;
+        }
     }
+
     public static class OrgBasicStats {
+
         LinkedList<OrgBasicStatItem> orgBasicStatItems = new LinkedList<OrgBasicStatItem>();
 
         public LinkedList<OrgBasicStatItem> getOrgBasicStatItems() {
@@ -245,6 +266,7 @@ public class DashboardResponse {
     }
 
     public static class PaymentSystemStats {
+
         LinkedList<PaymentSystemStatItem> paymentSystemItemInfos = new LinkedList<PaymentSystemStatItem>();
 
         public LinkedList<PaymentSystemStatItem> getPaymentSystemItemInfos() {
@@ -288,7 +310,9 @@ public class DashboardResponse {
             return remoteAddr;
         }
     }
+
     public static class OrgSyncStats {
+
         LinkedList<OrgSyncStatItem> orgSyncStatItems;
 
         public LinkedList<OrgSyncStatItem> getOrgSyncStatItems() {
@@ -299,12 +323,6 @@ public class DashboardResponse {
             this.orgSyncStatItems = orgSyncStatItems;
         }
     }
-
-
-
-
-
-
 
 
     public static class EduInstItemInfo {
@@ -463,8 +481,6 @@ public class DashboardResponse {
     private List<EduInstItemInfo> eduInstItemInfoList = new LinkedList<EduInstItemInfo>();
 
     private PaymentSystemStats paymentSystemStats;
-
-
 
 
     public List<EduInstItemInfo> getEduInstItemInfoList() {

@@ -572,6 +572,99 @@ public class DAOService {
         return Collections.EMPTY_MAP;
     }
 
+
+    @SuppressWarnings("unchecked")
+    public Map <Long, Integer> getProposalOrgDiscounsCountByGroupType (Date at, Date to, int groupType)
+    {
+        String sql = "";
+        if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+            sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
+                    "from cf_clients " +
+                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
+                    "where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
+                    "group by idoforg " +
+                    "having count(cf_clientscomplexdiscounts.idofclient)<>0";
+        } else {
+            sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
+                    "from cf_clients " +
+                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
+                    "where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    "group by idoforg " +
+                    "having count(cf_clientscomplexdiscounts.idofclient)<>0";
+        }
+        try
+        {
+            Map<Long, Integer> res = new HashMap<Long, Integer>();
+            Query q = em.createNativeQuery (sql);
+            q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());
+            if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            } else {
+                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            }
+            List resultList = q.getResultList();
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            return res;
+        } catch (Exception e) {
+            logger.error("Failed to load data", e);
+        }
+        return Collections.EMPTY_MAP;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Map <Long, Integer> getOrgUniqueOrdersCountByGroupType (Date at, Date to, int groupType)
+        {
+        String sql = "";
+        if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) "+
+                  "from cf_orders "+
+                  "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient "+
+                  "where createddate between :dateAt and :dateTo and "+
+                        "cf_clients.idOfClientGroup<:studentsMaxValue and cf_orders.socdiscount<>0 "+
+                  "group by cf_orders.idoforg";
+            }
+        else
+            {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) "+
+                    "from cf_orders "+
+                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient "+
+                    "where createddate between :dateAt and :dateTo and cf_orders.socdiscount<>0 and "+
+                          "cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "+
+                    "group by cf_orders.idoforg";
+            }
+
+        try
+        {
+            Map<Long, Integer> res = new HashMap<Long, Integer>();
+            Query q = em.createNativeQuery (sql);
+            q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());
+            if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            } else {
+                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            }
+            List resultList = q.getResultList();
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            return res;
+        } catch (Exception e) {
+            logger.error("Failed to load data", e);
+        }
+        return Collections.EMPTY_MAP;
+        }
+
+
+    @SuppressWarnings("unchecked")
     public Map<Long, Integer> getOrgOrdersCount(Date at, Date to) {
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();

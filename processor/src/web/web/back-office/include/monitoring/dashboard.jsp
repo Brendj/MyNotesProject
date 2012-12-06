@@ -101,6 +101,18 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfDiscountOrders}"/>
                  </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%У" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfStudentsWithDiscountOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                     <f:facet name="header">
+                         <h:outputText value="%С" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfEmployeesWithDiscountOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
+                 </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
