@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Pu
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -102,6 +103,98 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Transaction transaction) throws Exception {}
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
                 Transaction transaction) throws Exception {}
+    }
+
+    @Override
+    public ProhibitionsListResult getProhibitionsList(@WebParam(name="contractId") Long contractId) {
+        authenticateRequest(null);
+
+        ProhibitionsListResult prohibitionsListResult = new ProhibitionsListResult();
+        prohibitionsListResult.resultCode = RC_OK;
+        prohibitionsListResult.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                prohibitionsListResult.resultCode = RC_CLIENT_NOT_FOUND;
+                prohibitionsListResult.description = RC_CLIENT_NOT_FOUND_DESC;
+                return prohibitionsListResult;
+            }
+
+            ProhibitionsList prohibitionsList = new ProhibitionsList();
+
+            ObjectFactory objectFactory = new ObjectFactory();
+
+            Criteria prohibitionCriteria = persistenceSession.createCriteria(Prohibition.class);
+            prohibitionCriteria.add(Restrictions.eq("client", client));
+            List objects = prohibitionCriteria.list();
+            if (!objects.isEmpty()) {
+                for (Object object : objects) {
+                    Prohibition prohibition = (Prohibition) object;
+                    ProhibitionsListExt prohibitionsListExt = objectFactory.createProhibitionsListExt();
+                    prohibitionsListExt.setGuid(prohibition.getGuid());
+                    prohibitionsListExt.setDeletedState(prohibition.getDeletedState());
+
+                    prohibitionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(prohibition.getCreatedDate()));
+                    prohibitionsListExt.setContactId(client.getContractId());
+                    prohibitionsListExt.setGuidOfProducts(prohibition.getProduct().getGuid());
+                    prohibitionsListExt.setGuidOfProductGroups(prohibition.getProductGroup().getGuid());
+                    prohibitionsListExt.setGuidOfGood(prohibition.getGood().getGuid());
+                    prohibitionsListExt.setGuidOfGoodsGroup(prohibition.getGoodGroup().getGuid());
+
+                    ProhibitionExclusionsList exclusionsList = new ProhibitionExclusionsList();
+                    prohibitionsListExt.getExclusions().add(exclusionsList);
+
+                    Criteria exclusionCriteria = persistenceSession.createCriteria(ProhibitionExclusion.class);
+                    exclusionCriteria.add(Restrictions.eq("prohibition", prohibition));
+                    List exclusionObjects = exclusionCriteria.list();
+                    if (!exclusionObjects.isEmpty()) {
+                        for (Object exclusionObject : objects) {
+                            ProhibitionExclusion exclusion = (ProhibitionExclusion) exclusionObject;
+                            ProhibitionExclusionsListExt prohibitionExclusionsListExt = objectFactory.createProhibitionExclusionsListExt();
+                            prohibitionExclusionsListExt.setGuid(exclusion.getGuid());
+                            prohibitionExclusionsListExt.setDeletedState(exclusion.getDeletedState());
+                            prohibitionExclusionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(exclusion.getCreatedDate()));
+                            prohibitionExclusionsListExt.setGuidOfGood(exclusion.getGood().getGuid());
+                            prohibitionExclusionsListExt.setGuidOfGoodsGroup(exclusion.getGoodsGroup().getGuid());
+
+                            exclusionsList.getE().add(prohibitionExclusionsListExt);
+                        }
+                    }
+
+                    prohibitionsList.getC().add(prohibitionsListExt);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            prohibitionsListResult.prohibitionsList = prohibitionsList;
+        }catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+            prohibitionsListResult.resultCode = RC_INTERNAL_ERROR;
+            prohibitionsListResult.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return prohibitionsListResult;
+    }
+
+    private XMLGregorianCalendar getXMLGregorianCalendarByDate(Date date) throws DatatypeConfigurationException {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        XMLGregorianCalendar xmlCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+        return xmlCalendar;
     }
 
     @Override

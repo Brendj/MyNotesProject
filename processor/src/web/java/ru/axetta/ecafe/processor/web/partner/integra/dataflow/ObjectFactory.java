@@ -86,6 +86,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ProhibitionsListExt }
+     *
+     */
+    public ProhibitionsListExt createProhibitionsListExt() {
+        return new ProhibitionsListExt();
+    }
+
+    /**
+     * Create an instance of {@link ProhibitionExclusionsListExt }
+     *
+     */
+    public ProhibitionExclusionsListExt createProhibitionExclusionsListExt() {
+        return new ProhibitionExclusionsListExt();
+    }
+
+    /**
      * Create an instance of {@link Data }
      * 
      */
