@@ -93,7 +93,7 @@ public class MSRStopListLoader {
             }
             return dateFormat.parse(d);
         } catch (Exception e) {
-            log("Failed to parse date from options");
+            logger.error ("Failed to parse date from options", e);
         }
         return new Date(0);
     }
@@ -140,7 +140,7 @@ public class MSRStopListLoader {
         WS_END_POINT = getURL();
         loggingEnabled = getLogging();
 
-        log("Start stoplist updating. Logging in using login: " + WS_LOGIN + " and pwsd: " + WS_PASSWORD + "...");
+        //log("Start stoplist updating. Logging in using login: " + WS_LOGIN + " and pwsd: " + WS_PASSWORD + "...");
         LongRunningStopListService_Service service = new LongRunningStopListService_Service();
         service.setHandlerResolver(new HandlerResolver() {
             public List<Handler> getHandlerChain(PortInfo portInfo) {
@@ -169,20 +169,18 @@ public class MSRStopListLoader {
             if (now.compareTo(last) <= 0) {
                 return;
             }
-            log("Get from [" + last + "] to [" + now + "]");
+            //log("Get from [" + last + "] to [" + now + "]");
             wsUID = port.submitCardsTask(createCardsTaskRequest(last, now)).getUid();
             updateDate = now;
-            log("Authorisation success, received UID: " + wsUID);
+            //log("Authorisation success, received UID: " + wsUID);
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error ("Failed to load cards from remote service", e);
         }
     }
 
 
     public void parseCards() {
-        setOn(false);
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            //logger.info ("MSR Stop List importer is turned off. You have to activate this tool using common Settings");
+        if (!RuntimeContext.getInstance().isMainNode() && !isOn()) {
             return;
         }
 
@@ -194,24 +192,24 @@ public class MSRStopListLoader {
         String uid = new String(wsUID);
         wsUID = null;
         try {
-            log("Receiving out previous [" + uid + "] task completion state...");
+            //log("Receiving out previous [" + uid + "] task completion state...");
             String state = port.getTaskState(createTaskStateRequest(uid)).getTaskState().value();
             while (!state.equalsIgnoreCase("done")) {
-                log("Our task is not finished yet [" + state + "]. Wait for 10 seconds and retry...");
+                //log("Our task is not finished yet [" + state + "]. Wait for 10 seconds and retry...");
                 wsUID = new String(uid);
                 return;
             }
-            log("Our task is finished");
+            //log("Our task is finished");
 
 
-            log("Receiving count of cards...");
+            //log("Receiving count of cards...");
             int count = port.getTaskCount(createTaskCountRequest(uid)).getCount();
-            log("There are " + count + " since last revise");
+            //log("There are " + count + " since last revise");
 
 
-            log("Receiving a list of cards...");
+            //log("Receiving a list of cards...");
             List<StopListCardReply> cards = port.getCards(createCardsRequest(uid, 0, count)).getCards();
-            log("There are blocked cards bellow: ");
+            //log("There are blocked cards bellow: ");
             for (StopListCardReply card : cards) {
                 if (card.getCurrentState().trim().equals("11") ||
                         card.getCurrentState().trim().equals("12") ||
@@ -219,20 +217,20 @@ public class MSRStopListLoader {
                         card.getCurrentState().trim().equals("14") ||
                         card.getCurrentState().trim().equals("21") ||
                         card.getCurrentState().trim().equals("22")) {
-                    log(card.getIdentifier() + " is blocked. Update it's status...");
+                    //log(card.getIdentifier() + " is blocked. Update it's status...");
                     daoService.setCardStatus(Long.parseLong(card.getIdentifier()), Card.LOCKED_STATE,
                             "Заблокировано МСР");
                 }
                 if (card.getCurrentState().trim().equals("5")) {
-                    log(card.getIdentifier() + " is unlocked. Update it's status...");
+                    //log(card.getIdentifier() + " is unlocked. Update it's status...");
                     daoService.setCardStatus(Long.parseLong(card.getIdentifier()), Card.ACTIVE_STATE, "");
                 }
             }
-            log("Operations are finished. Update uploading history in database...");
+            //log("Operations are finished. Update uploading history in database...");
             setLastUpdateDate(updateDate);
-            log("DB updating complete.");
+            //log("DB updating complete.");
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error ("Failed to update cards status", e);
         }
     }
 
@@ -288,12 +286,12 @@ public class MSRStopListLoader {
 
 
     private void log(String str) {
-        if (loggingEnabled) {
+        /*if (loggingEnabled) {
             logger.info(str);
             if (logger.isDebugEnabled()) {
                 logger.debug(str);
             }
-        }
+        }*/
     }
 
 
@@ -332,7 +330,6 @@ public class MSRStopListLoader {
                 try {
                     addSecurityHeader(context);
                 } catch (Exception e) {
-                    System.out.println("Exception in handler: " + e);
                     return false;
                 }
             }
