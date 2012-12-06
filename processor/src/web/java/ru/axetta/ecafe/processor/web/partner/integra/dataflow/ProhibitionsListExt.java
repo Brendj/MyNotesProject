@@ -12,21 +12,9 @@ public class ProhibitionsListExt {
     protected String guid;
     @XmlAttribute(name = "DeletedState")
     protected Boolean deletedState;
-    @XmlAttribute(name = "GlobalVersion")
-    protected Long globalVersion;
-    @XmlAttribute(name = "OrgOwner")
-    protected Long orgOwner;
     @XmlAttribute(name = "CreatedDate")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar createdDate;
-    @XmlAttribute(name = "LastUpdate")
-    @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar lastUpdate;
-    @XmlAttribute(name = "DeleteDate")
-    @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar deleteDate;
-    @XmlAttribute(name = "SendAll")
-    protected Integer sendAll;
     @XmlAttribute(name = "ContractId")
     protected Long contractId;
     @XmlAttribute(name = "GuidOfProducts")
@@ -48,14 +36,6 @@ public class ProhibitionsListExt {
         this.guid = guid;
     }
 
-    public Long getGlobalVersion() {
-        return globalVersion;
-    }
-
-    public void setGlobalVersion(Long globalVersion) {
-        this.globalVersion = globalVersion;
-    }
-
     public Boolean getDeletedState() {
         return deletedState;
     }
@@ -64,44 +44,12 @@ public class ProhibitionsListExt {
         this.deletedState = deletedState;
     }
 
-    public Long getOrgOwner() {
-        return orgOwner;
-    }
-
-    public void setOrgOwner(Long orgOwner) {
-        this.orgOwner = orgOwner;
-    }
-
     public XMLGregorianCalendar getCreatedDate() {
         return createdDate;
     }
 
     public void setCreatedDate(XMLGregorianCalendar createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public XMLGregorianCalendar getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(XMLGregorianCalendar lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public XMLGregorianCalendar getDeleteDate() {
-        return deleteDate;
-    }
-
-    public void setDeleteDate(XMLGregorianCalendar deleteDate) {
-        this.deleteDate = deleteDate;
-    }
-
-    public Integer getSendAll() {
-        return sendAll;
-    }
-
-    public void setSendAll(Integer sendAll) {
-        this.sendAll = sendAll;
     }
 
     public Long getContractId() {
