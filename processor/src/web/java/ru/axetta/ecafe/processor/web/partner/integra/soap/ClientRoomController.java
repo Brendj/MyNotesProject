@@ -48,7 +48,7 @@ public interface ClientRoomController {
      @WebMethod(operationName="getClientSmsList")
     ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate);
 
-    @WebMethod
+    @WebMethod(operationName="getProhibitionsList")
     ProhibitionsListResult getProhibitionsList(@WebParam(name="contractId") Long contractId);
 
     @WebMethod (operationName = "getMenuList")
