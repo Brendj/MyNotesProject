@@ -64,7 +64,8 @@ public class Option {
             OPTION_MSR_STOPLIST_PSWD=10017,
             OPTION_MSR_STOPLIST_LOGGING=10018,
             OPTION_PROJECT_STATE_REPORT_ON=10019,
-            OPTION_EXTERNAL_URL=10020
+            OPTION_EXTERNAL_URL=10020,
+            OPTION_BENEFITS_RECALC_ON=10020
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -92,7 +93,8 @@ public class Option {
             OPTION_MSR_STOPLIST_PSWD, "password",
             OPTION_MSR_STOPLIST_LOGGING, "0",
             OPTION_PROJECT_STATE_REPORT_ON, "0",
-            OPTION_EXTERNAL_URL, "http://localhost:8080"
+            OPTION_EXTERNAL_URL, "http://localhost:8080",
+            OPTION_BENEFITS_RECALC_ON, "0"
     };
 
     private Long idOfOption;

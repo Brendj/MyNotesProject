@@ -60,6 +60,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String importMSRPassword;
     private Boolean importMSRLogging;
     private String externalURL;
+    private Boolean recalculateBenefits;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -259,6 +260,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.importMSRLogging = importMSRLogging;
     }
 
+    public Boolean getRecalculateBenefits() {
+        return recalculateBenefits;
+    }
+
+    public void setRecalculateBenefits(Boolean recalculateBenefits) {
+        this.recalculateBenefits = recalculateBenefits;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -292,6 +301,7 @@ public class OptionPage extends BasicWorkspacePage {
         importMSRURL = runtimeContext.getOptionValueString(Option.OPTION_MSR_STOPLIST_URL);
         importMSRLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
         externalURL = runtimeContext.getOptionValueString(Option.OPTION_EXTERNAL_URL);
+        recalculateBenefits = runtimeContext.getOptionValueBool(Option.OPTION_BENEFITS_RECALC_ON);
 
         bankListPage.onShow();
 
@@ -359,14 +369,6 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.getPartnerRbkMoneyConfig().setRate(rbkRate);
 
 
-            /*runtimeContext.setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_ON, exportBIData);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_EXPORT_BI_DATA_DIR, exportBIDataDirectory);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_PROJECT_STATE_REPORT_ON, exportProjectStateData);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_ON, importMSRData);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_USER, importMSRLogin);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_PSWD, importMSRPassword);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
-            runtimeContext.setOptionValueWithSave (Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);*/
             runtimeContext.setOptionValue(Option.OPTION_EXPORT_BI_DATA_ON, exportBIData);
             runtimeContext.setOptionValue(Option.OPTION_EXPORT_BI_DATA_DIR, exportBIDataDirectory);
             runtimeContext.setOptionValue(Option.OPTION_PROJECT_STATE_REPORT_ON, exportProjectStateData);
@@ -375,6 +377,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_PSWD, importMSRPassword);
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);
+            runtimeContext.setOptionValue(Option.OPTION_BENEFITS_RECALC_ON, recalculateBenefits);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

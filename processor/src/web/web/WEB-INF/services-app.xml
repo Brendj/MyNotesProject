@@ -64,11 +64,30 @@
     <task:scheduler id="myScheduler" pool-size="5"/>
 
 
-    <!--<task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
-        <task:scheduled ref="MSRStopListLoader" method="parseCards" fixed-delay="15000" />
+    <!--
+    <task:scheduled-tasks scheduler="msrStoplistLoadScheduler">
+        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="15000" />
     </task:scheduled-tasks>
     <task:scheduler id="msrStoplistLoadScheduler" pool-size="5"/>
--->
+
+
+    <task:scheduled-tasks scheduler="msrStoplistParseScheduler">
+        <task:scheduled ref="MSRStopListLoader" method="parseCards" fixed-delay="30000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="msrStoplistParseScheduler" pool-size="5"/>
+
+
+    <task:scheduled-tasks scheduler="biDataExportSchedule">
+        <task:scheduled ref="BIDataExportService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="biDataExportSchedule" pool-size="5"/>
+
+
+
+    <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
+        <task:scheduled ref="benefitsRecalculationService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="benefitsRecalculationSchedule" pool-size="5"/>-->
 
 
 

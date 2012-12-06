@@ -174,6 +174,8 @@
            <h:panelGrid styleClass="borderless-grid" columns="2">
                <h:outputText escape="true" value="URL адрес для внешнего пользования" styleClass="output-text" />
                <h:inputText value="#{optionPage.externalURL}" styleClass="output-text" />
+               <h:outputText escape="true" value="Производить перерасчет льгот" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.recalculateBenefits}" styleClass="output-text" />
            </h:panelGrid>
        </rich:tab>
     </rich:tabPanel>
