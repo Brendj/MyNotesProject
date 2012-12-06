@@ -366,7 +366,6 @@ public class ProjectStateReportService {
 
 
     public void run() {
-        setOn(false);
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
             return;
