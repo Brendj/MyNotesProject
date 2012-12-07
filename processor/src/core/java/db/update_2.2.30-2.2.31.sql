@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
   (
+  idofclientcomplexdiscount bigint NOT NULL,
   createdate bigint NOT NULL,
   idofclient bigint NOT NULL,
   idofrule bigint NOT NULL,
@@ -8,7 +9,8 @@ CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
   operationar int NOT NULL,
   idofcomplex int NOT NULL,
 
-  CONSTRAINT cf_clientscomplexdiscounts_pk PRIMARY KEY (createdate, idofclient, idofrule, idofcategoryorg, priority, idofcomplex)
+  CONSTRAINT cf_clientscomplexdiscounts_pk PRIMARY KEY (idofclientcomplexdiscount),
+  CONSTRAINT cf_clientscomplexdiscounts_u_key UNIQUE (idofclient, idofrule, idofcategoryorg, priority, idofcomplex)
   );
 
 ALTER TABLE cf_complexinfo ADD COLUMN idofgood bigint;
