@@ -581,14 +581,16 @@ public class DAOService {
             sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
                     "from cf_clients " +
                     "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
-                    "where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
+                    "where cf_clients.idOfClientGroup<:studentsMaxValue " +
+                    //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
                     "group by idoforg " +
                     "having count(cf_clientscomplexdiscounts.idofclient)<>0";
         } else {
             sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
                     "from cf_clients " +
                     "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
-                    "where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    "where cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
                     "group by idoforg " +
                     "having count(cf_clientscomplexdiscounts.idofclient)<>0";
         }
@@ -596,8 +598,8 @@ public class DAOService {
         {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
             Query q = em.createNativeQuery (sql);
-            q.setParameter("dateAt", at.getTime());
-            q.setParameter("dateTo", to.getTime());
+            /*q.setParameter("dateAt", at.getTime());
+            q.setParameter("dateTo", to.getTime());*/
             if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             } else {

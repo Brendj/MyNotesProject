@@ -29,46 +29,32 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class BenefitsRecalculationService {
-    private static final String SELECT_SQL = "select idofclient, idofrule, idofcategoryorg, priority, operationor, "
-            + "       sum(complex0) as complex0, sum(complex1) as complex1, "
-            + "       sum(complex2) as complex2, sum(complex3) as complex3, "
-            + "       sum(complex4) as complex4, sum(complex5) as complex5, "
-            + "       sum(complex6) as complex6, sum(complex7) as complex7, "
-            + "       sum(complex8) as complex8, sum(complex9) as complex9 " + "from (SELECT "
-            + "  cf_clients.idofclient, " + "  cf_discountrules.idofrule, " + "  cf_categoryorg_orgs.idofcategoryorg, "
-            + "  cf_discountrules.priority, " + "  cf_discountrules.operationor, " +
-            "  cf_discountrules.complex0, "
-            + "  cf_discountrules.complex1, cf_discountrules.complex2, cf_discountrules.complex4, "
-            + "  cf_discountrules.complex3, cf_discountrules.complex5, cf_discountrules.complex6, "
-            + "  cf_discountrules.complex7, cf_discountrules.complex8, cf_discountrules.complex9 "
-            + "FROM public.cf_categorydiscounts, " +
-            "  public.cf_discountrules, " + "  public.cf_discountrules_categorydiscounts, " +
-            "  public.cf_clients, " + "  public.cf_clients_categorydiscounts, " + "public.cf_categoryorg_orgs " +
-            "WHERE " + "  cf_discountrules_categorydiscounts.idofrule = cf_discountrules.idofrule AND "
-            + "  cf_discountrules_categorydiscounts.idofcategorydiscount = cf_categorydiscounts.idofcategorydiscount AND "
-            + "  cf_clients_categorydiscounts.idofcategorydiscount = cf_categorydiscounts.idofcategorydiscount AND "
-            + "  cf_clients_categorydiscounts.idofclient = cf_clients.idofclient and "
-            + "  cf_categoryorg_orgs.idoforg=cf_clients.idoforg " +
-            "order by idofclient) as ooo " + "group by idofclient, idofrule, idofcategoryorg, priority, operationor " +
-
-            "union  all "
-
-            + "select idofclient, idofrule, idofcategoryorg, priority, operationor, "
-            + "       sum(complex0) as complex0, sum(complex1) as complex1, "
-            + "       sum(complex2) as complex2, sum(complex3) as complex3, "
-            + "       sum(complex4) as complex4, sum(complex5) as complex5, "
-            + "       sum(complex6) as complex6, sum(complex7) as complex7, "
-            + "       sum(complex8) as complex8, sum(complex9) as complex9 " +
-            "from public.cf_clients " + "left join public.cf_discountrules on 1=1 "
-            + "left join public.cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_clients.idoforg "
-            + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-            + "where cf_discountrules.idofrule=(case when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 then 47 "                                          // Если клиент в группе 1-4 класс, то ставим idofrule=47
-            + "                                      when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=8 then 48 "                                          // Если клиент в группе 1-4 класс, то ставим idofrule=48
-            + "                                      when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=9 then 49 else -999999 end) and idofcategoryorg<>0 " // Если клиент в группе 1-4 класс, то ставим idofrule=49
-            + "group by idofclient, idofrule, idofcategoryorg, priority, operationor "
-            + "order by idofclient, priority desc ";
-    private static final String UPDATE_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (:createdate, :idofclient, :idofrule, :idofcategoryorg, :priority, :operationor, :idofcomplex)";
-    private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts WHERE createdate=:createdate";
+    private static final String SELECT_ORGS_SQL =
+            "select cf_discountrules.idofrule, cf_discountrules_categorydiscounts.idofcategorydiscount, cf_discountrules_categoryorg.idofcategoryorg, "
+                    + "       cf_discountrules.priority, cf_discountrules.operationor, complex0, complex1, complex2, complex3, complex4, complex5, complex6, complex7, complex8, complex9 "
+                    + "from cf_discountrules "
+                    + "left join cf_discountrules_categorydiscounts on cf_discountrules.idofrule=cf_discountrules_categorydiscounts.idofrule "
+                    + "left join cf_discountrules_categoryorg on cf_discountrules.idofrule=cf_discountrules_categoryorg.idofrule "
+                    + "order by cf_discountrules.idofrule, cf_discountrules_categorydiscounts.idofcategorydiscount";
+    private static final String SELECT_CLIENTS_SQL =
+            "select cf_clients.idofclient, cf_categoryorg_orgs.idofcategoryorg, cf_clients_categorydiscounts.idofcategorydiscount "
+                    + "from cf_clients "
+                    + "left join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
+                    + "left join cf_categoryorg_orgs on cf_clients.idoforg=cf_categoryorg_orgs.idoforg "
+                    + "where cf_clients_categorydiscounts.idofcategorydiscount<>0 and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    //+ "and cf_clients.idofclient=1244 "  Для проверок, не удалять
+                    + "union all "
+                    + "select cf_clients.idofclient, cf_categoryorg_orgs.idofcategoryorg, case when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 then-90  "
+                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=8 then -91 "
+                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=9 then -92 else -999999 end "
+                    + "from cf_clients "
+                    + "left join cf_categoryorg_orgs on cf_clients.idoforg=cf_categoryorg_orgs.idoforg "
+                    + "left join cf_clientgroups on cf_clientgroups.idofclientgroup=cf_clients.idofclientgroup AND cf_clientgroups.idoforg=cf_clients.idoforg "
+                    + "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    //+ "and cf_clients.idofclient=1244 "  Для проверок, не удалять
+                    + "order by idofclient, 3";
+    private static final String INSERT_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (:createdate, :idofclient, :idofrule, :idofcategoryorg, :priority, :operationor, :idofcomplex)";
+    private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts ";//WHERE createdate=:createdate";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
 
 
@@ -109,53 +95,206 @@ public class BenefitsRecalculationService {
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.HOUR, 0);
-            org.hibernate.Query upd = session.createSQLQuery(UPDATE_SQL);
-            org.hibernate.Query sel = session.createSQLQuery(SELECT_SQL);
+            org.hibernate.Query ins = session.createSQLQuery(INSERT_SQL);
+            org.hibernate.Query org = session.createSQLQuery(SELECT_ORGS_SQL);
+            org.hibernate.Query sel = session.createSQLQuery(SELECT_CLIENTS_SQL);
             org.hibernate.Query del = session.createSQLQuery(DELETE_SQL);
+            sel.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
 
-            //  Удаляем данные за сегодняшний день, чтобы потом обновить их
-            List resultList = sel.list();
-            del.setLong("createdate", cal.getTimeInMillis());
             del.executeUpdate();
 
-            //  Считываем ответо от БД и записываем данные в БД
-            long prevIdOfClient = 0L;
+
+            //   priority       ruleObj
+            TreeMap<Integer, List<DiscountRule>> rules = new TreeMap<Integer, List<DiscountRule>>();
+            List resultList = org.list();
+            long prevID = 0L;
+            DiscountRule rule = null;
             for (Object entry : resultList) {
-                complexes.clear();
                 Object e[] = (Object[]) entry;
-                long idofclient = ((BigInteger) e[0]).longValue();
-                long idofrule = ((BigInteger) e[1]).longValue();
-                long idofcategoryorg = e[2] == null ? 0L : ((BigInteger) e[2]).longValue();
+                long ruleID = ((BigInteger) e[0]).longValue();
+                long categoryID = e[1] == null ? -1L : ((BigInteger) e[1]).longValue();
+                long orgCategoryID = e[2] == null ? -1L : ((BigInteger) e[2]).longValue();
                 int priority = ((Integer) e[3]).intValue();
                 int operationor = ((Integer) e[4]).intValue();
-                for (int i = 5; i < e.length; i++) {
-                    if (((BigInteger) e[i]).intValue() > 0) {
-                        complexes.add(i - 5);
+
+                if (ruleID != prevID) {
+                    List<DiscountRule> these = rules.get(priority);
+                    if (these == null) {
+                        these = new ArrayList<DiscountRule>();
+                        rules.put(priority, these);
                     }
+                    rule = new DiscountRule(ruleID, priority, operationor);
+                    for (int complexID = 5; complexID < e.length; complexID++) {
+                        int complex = ((Integer) e[complexID]).intValue();
+                        if (complex != 0) {
+                            rule.addComplex(complexID - 5);
+                        }
+                    }
+                    prevID = ruleID;
+                    these.add(rule);
+                }
+                rule.addCategory(orgCategoryID, categoryID);
+            }
+            //  Необходимо перевернуть правила (поставить приоритет по убыванию)
+            Map<Integer, List<DiscountRule>> descRules = rules.descendingMap();
+
+
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            resultList = sel.list();
+            prevID = 0L;
+            CheckoutClient cl = null;
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                long clientID = ((BigInteger) e[0]).longValue();
+                long orgCategoryID = e[1] == null ? -1L : ((BigInteger) e[1]).longValue();
+                long categoryID = e[2] == null ? -1L : ((BigInteger) e[2]).longValue();
+
+
+                if (clientID != prevID) {
+                    if (cl != null) {
+                        DiscountRule clientRules[] = getClientRule(cl, descRules);
+                        if (clientRules != null && clientRules.length > 0) {
+                            insertRuleIntoDb(ins, cl, clientRules, calendar);
+                        }
+                    }
+
+                    prevID = clientID;
+                    cl = new CheckoutClient(clientID, orgCategoryID);
                 }
 
+                cl.addCategory(categoryID);
+            }
 
-                //  С более низким приоритетом будут отсеяны и не записаны в БД, т.к. они отсортированны по приоритету,
-                //  а записывается только первый (т.е. с макс приоритетом)
-                if (idofclient == prevIdOfClient) {
-                    continue;
-                }
-                prevIdOfClient = idofclient;
-
-
-                upd.setLong("createdate", cal.getTimeInMillis());
-                upd.setLong("idofclient", idofclient);
-                upd.setLong("idofrule", idofrule);
-                upd.setLong("idofcategoryorg", idofcategoryorg);
-                upd.setInteger("priority", priority);
-                upd.setInteger("operationor", operationor);
-                for (Integer idofcomplex : complexes) {
-                    upd.setInteger("idofcomplex", idofcomplex);
-                    upd.executeUpdate();
+            if (cl != null) {
+                DiscountRule clientRules[] = getClientRule(cl, descRules);
+                if (clientRules != null && clientRules.length > 0) {
+                    insertRuleIntoDb(ins, cl, clientRules, calendar);
                 }
             }
         } catch (Exception e) {
             logger.error("Failed to recalculate benefits", e);
+        }
+    }
+
+
+    public DiscountRule[] getClientRule(CheckoutClient cl, Map<Integer, List<DiscountRule>> rules) {
+        //      priority      availableRules
+        TreeMap<Integer, List<DiscountRule>> validRules = new TreeMap<Integer, List<DiscountRule>>();
+        for (Integer priority : rules.keySet()) {
+            List<DiscountRule> list = rules.get(priority);
+            for (DiscountRule r : list) {
+                for (Long orgCategoryID : r.categories.keySet()) {
+                    //  Если типы оргов и проверяемого правила не совпадают, то выходим сразу
+                    if (orgCategoryID != -1L && orgCategoryID != cl.orgCategoryID) {
+                        continue;
+                    }
+                    //  Проверяем наличие всех требоуемых категорий у клиента
+                    List<Long> requiredCats = r.categories.get(orgCategoryID);
+                    if (cl.categories.containsAll(requiredCats)) {
+                        //  Если правило полность удовлетворяет требованиям, добавляем его в список доступных клиенту
+                        List<DiscountRule> usedRules = validRules.get(priority);
+                        if (usedRules == null) {
+                            usedRules = new ArrayList<DiscountRule>();
+                            validRules.put(priority, usedRules);
+                        }
+                        usedRules.add(r);
+                    }
+                }
+            }
+        }
+
+        //  Сортируем доступные клиенту правила по убыванию, чтобы взять с максимальным приоритетом
+        if (validRules.isEmpty()) {
+            return null;
+        }
+        List<DiscountRule> topRules = validRules.get(validRules.descendingMap().keySet().iterator().next());
+        return topRules.toArray(new DiscountRule[topRules.size()]);
+    }
+
+
+    public void insertRuleIntoDb(org.hibernate.Query ins, CheckoutClient cl, DiscountRule rules[], Calendar cal)
+            throws Exception {
+        try {
+            for (DiscountRule r : rules) {
+                if (r.complexes == null || r.complexes.size() < 1) {
+                    continue;
+                }
+                ins.setLong("createdate", cal.getTimeInMillis());
+                ins.setLong("idofclient", cl.id);
+                ins.setLong("idofrule", r.id);
+                ins.setInteger("priority", r.priority);
+                ins.setInteger("operationor", r.operationor);
+                ins.setLong("idofcategoryorg", cl.orgCategoryID == -1L ? 0 : cl.orgCategoryID);
+                for (Integer idofcomplex : r.complexes) {
+                    ins.setInteger("idofcomplex", idofcomplex);
+                    ins.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+
+    public class CheckoutClient {
+
+        private long id;
+        private long orgCategoryID;
+        private List<Long> categories;
+
+        public CheckoutClient(long id, long orgCategoryID) {
+            this.id = id;
+            this.orgCategoryID = orgCategoryID;
+        }
+
+
+        public void addCategory(long categoryID) {
+            if (categories == null) {
+                categories = new ArrayList<Long>();
+            }
+            if (!categories.contains(categoryID)) {
+                categories.add(categoryID);
+            }
+        }
+    }
+
+
+    public class DiscountRule {
+
+        private long id;
+        private int priority;
+        private int operationor;
+        //         orgType      catID
+        private Map<Long, List<Long>> categories;
+        private List<Integer> complexes;
+
+        public DiscountRule(long id, int priority, int operationor) {
+            this.id = id;
+            this.priority = priority;
+            this.operationor = operationor;
+        }
+
+
+        public void addComplex(int complexID) {
+            if (complexes == null) {
+                complexes = new ArrayList<Integer>();
+            }
+            complexes.add(complexID);
+        }
+
+
+        public void addCategory(long orgCategoryID, long categoryID) {
+            if (categories == null) {
+                categories = new HashMap<Long, List<Long>>();
+            }
+
+            List<Long> cats = categories.get(orgCategoryID);
+            if (cats == null) {
+                cats = new ArrayList<Long>();
+                categories.put(orgCategoryID, cats);
+            }
+            cats.add(categoryID);
         }
     }
 }
