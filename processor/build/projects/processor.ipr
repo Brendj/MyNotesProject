@@ -85,12 +85,9 @@
             <element id="module-output" name="util" />
           </element>
           <element id="directory" name="lib">
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/darkX-3.3.1.GA.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-impl-3.3.1.GA.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar" />
             <element id="library" level="project" name="javamelody-monitoring" />
             <element id="library" level="project" name="axetta_smpp" />
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -128,8 +125,8 @@
             <element id="jpa-descriptors" facet="client-room/jpa/JPA" />
           </element>
           <element id="directory" name="lib">
-            <element id="library" level="project" name="richfaces-api-3.3.2.SR1" />
             <element id="library" level="project" name="client-room" />
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
           </element>
         </element>
         <element id="javaee-facet-resources" facet="client-room/web/Web" />
@@ -1215,14 +1212,12 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="richfaces-api-3.3.2.SR1">
+    <library name="richfaces-api-3.3.1.GA">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/richfaces-api-3.3.2.SR1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/richfaces-impl-3.3.1.GA.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/richfaces-api-3.3.1.GA.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/richfaces-impl-3.3.2.SR1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/richfaces-ui-3.3.1.GA.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/darkX-3.3.2.SR1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-api-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-impl-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-ui-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/darkX-3.3.1.GA.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

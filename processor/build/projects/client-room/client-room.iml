@@ -52,10 +52,10 @@
     <orderEntry type="module" module-name="core" exported="" scope="PROVIDED" />
     <orderEntry type="module" module-name="web" exported="" scope="PROVIDED" />
     <orderEntry type="module" module-name="util" exported="" scope="PROVIDED" />
-    <orderEntry type="library" name="richfaces-api-3.3.2.SR1" level="project" />
     <orderEntry type="library" name="client-room" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="barcode4j" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="hibernate-commons-annotations-4.0.1.Final" level="project" />
+    <orderEntry type="library" name="richfaces-api-3.3.1.GA" level="project" />
   </component>
 </module>
 

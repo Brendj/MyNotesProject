@@ -346,6 +346,7 @@
     <orderEntry type="library" scope="PROVIDED" name="barcode4j" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="axetta_charset" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="guava-r07" level="project" />
+    <orderEntry type="library" name="richfaces-api-3.3.1.GA" level="project" />
   </component>
 </module>
 
