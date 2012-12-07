@@ -48,8 +48,20 @@ public interface ClientRoomController {
      @WebMethod(operationName="getClientSmsList")
     ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate);
 
-    @WebMethod(operationName="getProhibitionsList")
-    ProhibitionsListResult getProhibitionsList(@WebParam(name="contractId") Long contractId);
+    @WebMethod(operationName = "getDishProhibitionsList")
+    ProhibitionsListResult getDishProhibitionsList(@WebParam(name="contractId") Long contractId);
+    @WebMethod(operationName = "setProhibitionOnProduct")
+    IdResult setProhibitionOnProduct(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProduct") Long idOfProduct);
+    @WebMethod(operationName = "setProhibitionOnProductGroup")
+    IdResult setProhibitionOnProductGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProductGroup") Long idOfProductGroup);
+    @WebMethod(operationName = "setProhibitionOnGood")
+    IdResult setProhibitionOnGood(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood);
+    @WebMethod(operationName = "setProhibitionOnGoodGroup")
+    IdResult setProhibitionOnGoodGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup);
+    @WebMethod(operationName = "excludeGoodFromProhibition")
+    IdResult excludeGoodFromProhibition(@WebParam(name="orgId") Long orgId, @WebParam(name="idOfProhibition") Long idOfProhibition, @WebParam(name="idOfGood") Long idOfGood);
+    @WebMethod(operationName = "excludeGoodGroupFromProhibition")
+    IdResult excludeGoodGroupFromProhibition(@WebParam(name="orgId") Long orgId, @WebParam(name="idOfProhibition") Long idOfProhibition, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup);
 
     @WebMethod (operationName = "getMenuList")
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);

@@ -14,6 +14,9 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 
@@ -106,7 +109,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ProhibitionsListResult getProhibitionsList(@WebParam(name="contractId") Long contractId) {
+    public ProhibitionsListResult getDishProhibitionsList(@WebParam(name="contractId") Long contractId) {
         authenticateRequest(null);
 
         ProhibitionsListResult prohibitionsListResult = new ProhibitionsListResult();
@@ -212,6 +215,186 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public IdResult setProhibitionOnProduct(Long orgId, Long contractId, Long idOfProduct) {
+        return setProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
+    }
+
+    @Override
+    public IdResult setProhibitionOnProductGroup(Long orgId, Long contractId, Long idOfProductGroup) {
+        return setProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
+    }
+
+    @Override
+    public IdResult setProhibitionOnGood(Long orgId, Long contractId, Long idOfGood) {
+        return setProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
+    }
+
+    @Override
+    public IdResult setProhibitionOnGoodGroup(Long orgId, Long contractId, Long idOfGoodGroup) {
+        return setProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
+    }
+
+    private IdResult setProhibitionOnObject(Long orgId, Long contractId, Class objectClass, Long idOfObject) {
+        authenticateRequest(null);
+
+        IdResult idResult = new IdResult();
+        idResult.resultCode = RC_OK;
+        idResult.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria orgCritera = persistenceSession.createCriteria(Org.class);
+            orgCritera.add(Restrictions.eq("idOfOrg", orgId));
+            Org org = (Org) orgCritera.uniqueResult();
+            if (org == null) {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = "Организация не найдена";
+                return idResult;
+            }
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                idResult.resultCode = RC_CLIENT_NOT_FOUND;
+                idResult.description = RC_CLIENT_NOT_FOUND_DESC;
+                return idResult;
+            }
+
+            Prohibition prohibition = new Prohibition();
+            prohibition.setClient(client);
+            prohibition.setOrgOwner(org.getIdOfOrg());
+            prohibition.setGuid(UUID.randomUUID().toString());
+            prohibition.setCreatedDate(new Date());
+            prohibition.setDeletedState(false);
+            prohibition.setSendAll(SendToAssociatedOrgs.SendToSelf);
+            Criteria objectCriteria = persistenceSession.createCriteria(objectClass);
+            objectCriteria.add(Restrictions.eq("globalId", idOfObject));
+            if (objectClass.equals(Product.class)) {
+                Product product = (Product) objectCriteria.uniqueResult();
+                prohibition.setProduct(product);
+            } else if (objectClass.equals(ProductGroup.class)) {
+                ProductGroup productGroup = (ProductGroup) objectCriteria.uniqueResult();
+                prohibition.setProductGroup(productGroup);
+            } else if (objectClass.equals(Good.class)) {
+                Good good = (Good) objectCriteria.uniqueResult();
+                prohibition.setGood(good);
+            } else if (objectClass.equals(GoodGroup.class)) {
+                GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
+                prohibition.setGoodGroup(goodGroup);
+            } else {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = RC_INTERNAL_ERROR_DESC;
+                return idResult;
+            }
+            persistenceSession.save(prohibition);
+
+            DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName());
+
+            idResult.id = prohibition.getGlobalId();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            idResult.resultCode = RC_INTERNAL_ERROR;
+            idResult.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return idResult;
+    }
+
+    @Override
+    public IdResult excludeGoodFromProhibition(Long orgId, Long idOfProhibition, Long idOfGood) {
+        return excludeObjectFromProhibition(orgId, idOfProhibition, Good.class, idOfGood);
+    }
+
+    @Override
+    public IdResult excludeGoodGroupFromProhibition(Long orgId, Long idOfProhibition, Long idOfGoodGroup) {
+        return excludeObjectFromProhibition(orgId, idOfProhibition, GoodGroup.class, idOfGoodGroup);
+    }
+
+    private IdResult excludeObjectFromProhibition(Long orgId, Long idOfProhibition, Class objectClass, Long idOfObject) {
+        authenticateRequest(null);
+
+        IdResult idResult = new IdResult();
+        idResult.resultCode = RC_OK;
+        idResult.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria orgCritera = persistenceSession.createCriteria(Org.class);
+            orgCritera.add(Restrictions.eq("idOfOrg", orgId));
+            Org org = (Org) orgCritera.uniqueResult();
+            if (org == null) {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = "Организация не найдена";
+                return idResult;
+            }
+
+            Criteria prohibitionCriteria = persistenceSession.createCriteria(Prohibition.class);
+            prohibitionCriteria.add(Restrictions.eq("globalId", idOfProhibition));
+            Prohibition prohibition = (Prohibition) prohibitionCriteria.uniqueResult();
+            if (prohibition == null) {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = "Запрет с указанным id не найден";
+                return idResult;
+            }
+
+            ProhibitionExclusion exclusion = new ProhibitionExclusion();
+            exclusion.setProhibition(prohibition);
+            exclusion.setOrgOwner(org.getIdOfOrg());
+            exclusion.setGuid(UUID.randomUUID().toString());
+            exclusion.setCreatedDate(new Date());
+            exclusion.setDeletedState(false);
+            exclusion.setSendAll(SendToAssociatedOrgs.SendToSelf);
+            Criteria objectCriteria = persistenceSession.createCriteria(objectClass);
+            objectCriteria.add(Restrictions.eq("globalId", idOfObject));
+            if (objectClass.equals(Good.class)) {
+                Good good = (Good) objectCriteria.uniqueResult();
+                exclusion.setGood(good);
+            } else if (objectClass.equals(GoodGroup.class)) {
+                GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
+                exclusion.setGoodsGroup(goodGroup);
+            } else {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = RC_INTERNAL_ERROR_DESC;
+                return idResult;
+            }
+            persistenceSession.save(exclusion);
+
+            DAOService.getInstance().updateVersionByDistributedObjects(ProhibitionExclusion.class.getSimpleName());
+
+            idResult.id = exclusion.getGlobalId();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            idResult.resultCode = RC_INTERNAL_ERROR;
+            idResult.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return idResult;
+    }
+
+    @Override
     public ClassStudentListResult getStudentListByIdOfClientGroup(Long idOfClientGroup) {
         authenticateRequest(null);
 
@@ -309,10 +492,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                if (clientIdType==CLIENT_ID_INTERNALID) clientCriteria.add(Restrictions.eq("contractId", (Long)id));
-                else if (clientIdType==CLIENT_ID_SAN) clientCriteria.add(Restrictions.ilike("san", (String)id, MatchMode.EXACT));
-                else if (clientIdType==CLIENT_ID_EXTERNAL_ID) clientCriteria.add(Restrictions.eq("externalId", (Long)id));
-                else if (clientIdType==CLIENT_ID_GUID) clientCriteria.add(Restrictions.eq("clientGUID", (String)id));
+                if (clientIdType == CLIENT_ID_INTERNALID) {
+                    clientCriteria.add(Restrictions.eq("contractId", (Long) id));
+                } else if (clientIdType == CLIENT_ID_SAN) {
+                    clientCriteria.add(Restrictions.ilike("san", (String) id, MatchMode.EXACT));
+                } else if (clientIdType == CLIENT_ID_EXTERNAL_ID) {
+                    clientCriteria.add(Restrictions.eq("externalId", (Long) id));
+                } else if (clientIdType == CLIENT_ID_GUID) {
+                    clientCriteria.add(Restrictions.eq("clientGUID", (String) id));
+                }
 
                 List<Client> clients = clientCriteria.list();
 
@@ -428,11 +616,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null);
 
         Object idVal=null;
-        if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) idVal = Long.parseLong(id);
-        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_EXTERNAL_ID) idVal = Long.parseLong(id);
-        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN) idVal = id;
-        else if (idType==ClientRoomControllerWS.ClientRequest.CLIENT_ID_GUID) idVal = id;
-        else return new ClientSummaryResult(null, RC_INVALID_DATA, "idType invalid");
+        if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) {
+            idVal = Long.parseLong(id);
+        } else if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_EXTERNAL_ID) {
+            idVal = Long.parseLong(id);
+        } else if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN) {
+            idVal = id;
+        } else if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_GUID) {
+            idVal = id;
+        } else {
+            return new ClientSummaryResult(null, RC_INVALID_DATA, "idType invalid");
+        }
 
         Data data = new ClientRequest().process(idVal, idType, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -484,10 +678,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
         /* Группа к которой относится клиент (Наименование класса учиника) */
-        if (client.getClientGroup() == null)
+        if (client.getClientGroup() == null) {
             clientSummaryExt.setGrade(null);
-        else
+        } else {
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
+        }
         /* Официальное наименование Учебного учереждения */
         clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
        // Новые параметры:
@@ -577,7 +772,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List ordersList = ordersCriteria.list();
         PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
         for (Object o : ordersList) {
-            if (nRecs++>MAX_RECS) break;
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
             Order order = (Order)o;
             PurchaseExt purchaseExt = objectFactory.createPurchaseExt();
             purchaseExt.setByCard(order.getSumByCard());
@@ -586,10 +783,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseExt.setDonation(order.getGrantSum());
             purchaseExt.setSum(order.getRSum());
             purchaseExt.setByCash(order.getSumByCash());
-            if (order.getCard() == null)
+            if (order.getCard() == null) {
                 purchaseExt.setIdOfCard(null);
-            else
+            } else {
                 purchaseExt.setIdOfCard(order.getCard().getIdOfCard());
+            }
             //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
             purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
 
@@ -599,9 +797,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseElementExt.setAmount(od.getQty());
                 purchaseElementExt.setName(od.getMenuDetailName());
                 purchaseElementExt.setSum(od.getRPrice());
-                if (od.isComplex()) purchaseElementExt.setType(1);
-                else if (od.isComplexItem()) purchaseElementExt.setType(2);
-                else purchaseElementExt.setType(0);
+                if (od.isComplex()) {
+                    purchaseElementExt.setType(1);
+                } else if (od.isComplexItem()) {
+                    purchaseElementExt.setType(2);
+                } else {
+                    purchaseElementExt.setType(0);
+                }
                 purchaseExt.getE().add(purchaseElementExt);
             }
 
@@ -777,7 +979,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         MenuListExt menuListExt = objectFactory.createMenuListExt();
         int nRecs=0;
         for (Object currObject : menus) {
-            if (nRecs++>MAX_RECS) break;
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
 
             Menu menu = (Menu)currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
@@ -1123,10 +1327,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null)
+            if (entityTransaction != null) {
                 entityTransaction.rollback();
-            if (entityManager != null)
+            }
+            if (entityManager != null) {
                 entityManager.close();
+            }
         }
         return data;
     }
@@ -1153,10 +1359,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null)
+            if (entityTransaction != null) {
                 entityTransaction.rollback();
-            if (entityManager != null)
+            }
+            if (entityManager != null) {
                 entityManager.close();
+            }
         }
         return data;
     }
@@ -1184,10 +1392,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null)
+            if (entityTransaction != null) {
                 entityTransaction.rollback();
-            if (entityManager != null)
+            }
+            if (entityManager != null) {
                 entityManager.close();
+            }
         }
 
         return data;
@@ -1216,10 +1426,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null)
+            if (entityTransaction != null) {
                 entityTransaction.rollback();
-            if (entityManager != null)
+            }
+            if (entityManager != null) {
                 entityManager.close();
+            }
         }
 
         return data;
@@ -1256,10 +1468,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
                     } else {
                         String gs = "";
-                        if (clientGuardSan.endsWith(";"))
+                        if (clientGuardSan.endsWith(";")) {
                             gs = clientGuardSan + guardSan;
-                        else
+                        } else {
                             gs = clientGuardSan + ";" + guardSan;
+                        }
                         Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
                         query.setParameter("guardSan", gs);
                         query.setParameter("idOfClient", idOfClient);
@@ -1272,14 +1485,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
                         data.description =RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
                     } else {
-                        if (clientGuardSan.contains(";" + guardSan + ";"))
+                        if (clientGuardSan.contains(";" + guardSan + ";")) {
                             clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
-                        else if (clientGuardSan.startsWith(guardSan + ";"))
+                        } else if (clientGuardSan.startsWith(guardSan + ";")) {
                             clientGuardSan = clientGuardSan.substring((guardSan + ";").length());
-                        else if (clientGuardSan.endsWith(";" + guardSan))
-                            clientGuardSan = clientGuardSan.substring(0, clientGuardSan.length() - (";" + guardSan).length());
-                        else
+                        } else if (clientGuardSan.endsWith(";" + guardSan)) {
+                            clientGuardSan = clientGuardSan
+                                    .substring(0, clientGuardSan.length() - (";" + guardSan).length());
+                        } else {
                             clientGuardSan = clientGuardSan.replace(guardSan, "");
+                        }
                         Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
                         query.setParameter("guardSan", clientGuardSan);
                         query.setParameter("idOfClient", idOfClient);
@@ -1295,14 +1510,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private boolean isGuardSanExists(String guardSan, String clientGuardSans) {
         String[] guardSans = clientGuardSans.split(";");
-        for (String gs : guardSans)
-            if (gs.equals(guardSan))
+        for (String gs : guardSans) {
+            if (gs.equals(guardSan)) {
                 return true;
+            }
+        }
         return false;
     }
 
     XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {
-        if (date==null) return null;
+        if (date == null) {
+            return null;
+        }
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
         XMLGregorianCalendar xc = DatatypeFactory.newInstance()
@@ -1451,7 +1670,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (state==CIRCULATION_STATUS_FILTER_ALL_ON_HANDS) {
             circulationCriteria.add(Restrictions.or(Restrictions.eq("status", Circulation.EXTENDED), Restrictions.eq("status", Circulation.ISSUED)));
         }
-        else if (state!=CIRCULATION_STATUS_FILTER_ALL) circulationCriteria.add(Restrictions.eq("status", state));
+        else if (state != CIRCULATION_STATUS_FILTER_ALL) {
+            circulationCriteria.add(Restrictions.eq("status", state));
+        }
         circulationCriteria.addOrder(org.hibernate.criterion.Order.desc("issuanceDate"));
 
         List<Circulation> circulationList = circulationCriteria.list();
@@ -1614,9 +1835,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             LinkingToken linkingToken = daoService.generateLinkingToken(client);
             String info="";
-            if (client.hasEmail()) info+="e-mail";
+            if (client.hasEmail()) {
+                info += "e-mail";
+            }
             if (client.hasMobile()) {
-                if (info.length()>0) info+=", ";
+                if (info.length() > 0) {
+                    info += ", ";
+                }
                 info+="SMS";
             }
             if (info.length()==0) {
@@ -1657,7 +1882,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String codes="";
             for (Client cl : clientList) {
                 LinkingToken linkingToken = daoService.generateLinkingToken(cl);
-                if (codes.length()>0) codes+=", ";
+                if (codes.length() > 0) {
+                    codes += ", ";
+                }
                 codes+=linkingToken.getToken();
             }
             RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendMessageAsync(clientList.get(0), EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, new String[]{"linkingToken", codes});
@@ -1684,7 +1911,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (int n=0;n<certificates.length;++n) {
                 String dn = certificates[0].getSubjectDN().getName();
                 linkConfig =  runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
-                if (linkConfig!=null) break;
+                if (linkConfig != null) {
+                    break;
+                }
                 DNs+=dn+";";
             }
         }
@@ -1717,7 +1946,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 client = daoService.getClientByContractId(contractId);
             } catch (Throwable e) {
             }
-            if (client==null) throw new Error("Integra partner auth failed: client not found: contractId="+contractId+"; ip="+clientAddress+"; ssl DNs="+DNs);
+            if (client == null) {
+                throw new Error("Integra partner auth failed: client not found: contractId=" + contractId + "; ip="
+                        + clientAddress + "; ssl DNs=" + DNs);
+            }
             
             if (!client.hasIntegraPartnerAccessPermission(linkConfig.id)) {
                 throw new Error("Integra partner auth failed: access prohibited for client: contractId="+contractId+", authorize client first; ip="+clientAddress+"; ssl DNs="+DNs);
