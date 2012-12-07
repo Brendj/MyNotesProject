@@ -386,12 +386,15 @@ public class Manager {
                 whereOrgSource = " orgOwner = "+idOfOrg;
             }
             where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
+            String sendOnlyOrgWhere = " (sendAll = 3 and orgOwner = "+idOfOrg+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
+                sendOnlyOrgWhere = sendOnlyOrgWhere + " globalVersion>"+currentMaxVersion;
                 // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
             }
+            sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
             String sendAllWhere = " (sendAll is null or sendAll=0) ";
-            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where "+ sendAllWhere + " and " + where);
+            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where ("+ sendAllWhere + " and " + where)+") or "+sendOnlyOrgWhere;
             Query query = persistenceSession.createQuery(select);
             List list = query.list();
             if(!(list==null || list.isEmpty())){
