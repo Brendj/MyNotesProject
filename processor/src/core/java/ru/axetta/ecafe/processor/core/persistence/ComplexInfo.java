@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -21,7 +23,7 @@ public class ComplexInfo {
     private ComplexInfoDiscountDetail discountDetail;
     private MenuDetail menuDetail;
     private Long currentPrice;
-    private String goodsGuid;
+    private Good good;
 
     public Date getMenuDate() {
         return menuDate;
@@ -134,12 +136,12 @@ public class ComplexInfo {
         this.currentPrice = currentPrice;
     }
 
-    public String getGoodsGuid() {
-        return goodsGuid;
+    public Good getGood() {
+        return good;
     }
 
-    public void setGoodsGuid(String goodsGuid) {
-        this.goodsGuid = goodsGuid;
+    public void setGood(Good good) {
+        this.good = good;
     }
 
     @Override

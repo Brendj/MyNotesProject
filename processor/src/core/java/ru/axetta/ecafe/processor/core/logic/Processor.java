@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -1440,14 +1441,18 @@ public class Processor implements SyncProcessor,
             ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
                     reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
                     reqComplexInfo.getComplexMenuName());
-            if (reqComplexInfo.getUseTrDiscount() != null) {
-                complexInfo.setUseTrDiscount(reqComplexInfo.getUseTrDiscount());
+            Integer useTrDiscount = reqComplexInfo.getUseTrDiscount();
+            Long currentPrice = reqComplexInfo.getCurrentPrice();
+            String goodsGuid = reqComplexInfo.getGoodsGuid();
+            if (useTrDiscount != null) {
+                complexInfo.setUseTrDiscount(useTrDiscount);
             }
-            if (reqComplexInfo.getCurrentPrice() != null) {
-                complexInfo.setCurrentPrice(reqComplexInfo.getCurrentPrice());
+            if (currentPrice != null) {
+                complexInfo.setCurrentPrice(currentPrice);
             }
-            if (reqComplexInfo.getGoodsGuid() != null) {
-                complexInfo.setGoodsGuid(reqComplexInfo.getGoodsGuid());
+            if (goodsGuid != null) {
+                Good good = DAOUtils.findGoodByGuid(persistenceSession, goodsGuid);
+                complexInfo.setGood(good);
             }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {

@@ -31,6 +31,8 @@
         <many-to-one name="discountDetail" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDiscountDetail"
                      column="idOfDiscountDetail" not-null="false" lazy="proxy" update="false" />
         <property name="currentPrice" column="CurrentPrice" type="long" update="true"/>
-        <property name="goodsGuid" column="GoodsGuid" type="string" length="36" update="true"/>
+        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" column="IdOfGood"
+                    lazy="proxy"
+                    update="false"/>
     </class>
 </hibernate-mapping>

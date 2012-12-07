@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -794,6 +795,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Contragent.class);
         criteria.add(Restrictions.eq("classId", classId));
         return (Contragent) criteria.uniqueResult();
+    }
+
+    public static Good findGoodByGuid(Session session, String guidOfGood) {
+        Criteria criteria = session.createCriteria(Good.class);
+        criteria.add(Restrictions.eq("guid", guidOfGood));
+        return (Good) criteria.uniqueResult();
     }
 
     public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)

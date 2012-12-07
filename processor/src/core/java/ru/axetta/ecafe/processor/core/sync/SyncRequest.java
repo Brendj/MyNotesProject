@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
 import org.apache.commons.lang.StringUtils;
@@ -956,9 +958,10 @@ public class SyncRequest {
                         if (currentPriceNode != null) {
                             currentPrice = Long.parseLong(currentPriceNode.getTextContent());
                         }
-                        // guid товара
+                        // получение id товара по guid
                         Node goodsGuidNode = namedNodeMap.getNamedItem("GoodsGuid");
                         String goodsGuid = null;
+                        Integer idOfGood = null;
                         if (goodsGuidNode != null) {
                             goodsGuid = StringUtils.substring(goodsGuidNode.getTextContent(), 0, 36);
                         }
