@@ -144,10 +144,6 @@
         <c:import url="include/option/confirm_delete.jsp" />
     </f:subview>
 
-	<f:subview id="productGuideItemDeleteSubView">
-        <c:import url="include/report/product_guide/confirm_delete.jsp" />
-    </f:subview>
-
     <f:subview id="configurationProviderItemDeleteSubView">
         <c:import url="include/option/configuration_provider/confirm_delete.jsp" />
     </f:subview>
