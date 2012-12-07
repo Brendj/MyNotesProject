@@ -956,6 +956,12 @@ public class SyncRequest {
                         if (currentPriceNode != null) {
                             currentPrice = Long.parseLong(currentPriceNode.getTextContent());
                         }
+                        // guid товара
+                        Node goodsGuidNode = namedNodeMap.getNamedItem("GoodsGuid");
+                        String goodsGuid = null;
+                        if (goodsGuidNode != null) {
+                            goodsGuid = StringUtils.substring(goodsGuidNode.getTextContent(), 0, 36);
+                        }
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
@@ -987,7 +993,7 @@ public class SyncRequest {
                             childNode = childNode.getNextSibling();
                         }
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice);
+                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice, goodsGuid);
                     }
 
                 }
@@ -1002,10 +1008,11 @@ public class SyncRequest {
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
                 private final ReqComplexInfoDiscountDetail complexInfoDiscountDetail;
                 private final Long currentPrice;
+                private final String goodsGuid;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
-                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice) {
+                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -1016,6 +1023,7 @@ public class SyncRequest {
                     this.complexInfoDiscountDetail = complexInfoDiscountDetail;
                     this.reqMenuDetail = reqMenuDetail;
                     this.currentPrice = currentPrice;
+                    this.goodsGuid = goodsGuid;
                 }
 
                 public int getComplexId() {
@@ -1056,6 +1064,10 @@ public class SyncRequest {
 
                 public Long getCurrentPrice() {
                     return currentPrice;
+                }
+
+                public String getGoodsGuid() {
+                    return goodsGuid;
                 }
 
             }

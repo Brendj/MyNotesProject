@@ -21,6 +21,7 @@ public class ComplexInfo {
     private ComplexInfoDiscountDetail discountDetail;
     private MenuDetail menuDetail;
     private Long currentPrice;
+    private String goodsGuid;
 
     public Date getMenuDate() {
         return menuDate;
@@ -131,6 +132,14 @@ public class ComplexInfo {
 
     public void setCurrentPrice(Long currentPrice) {
         this.currentPrice = currentPrice;
+    }
+
+    public String getGoodsGuid() {
+        return goodsGuid;
+    }
+
+    public void setGoodsGuid(String goodsGuid) {
+        this.goodsGuid = goodsGuid;
     }
 
     @Override

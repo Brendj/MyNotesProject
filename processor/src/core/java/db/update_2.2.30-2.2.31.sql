@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
 
   CONSTRAINT cf_clientscomplexdiscounts_pk PRIMARY KEY (createdate, idofclient, idofrule, idofcategoryorg, priority, idofcomplex)
   );
+
+ALTER TABLE cf_complexinfo ADD COLUMN goodsguid character varying(36);

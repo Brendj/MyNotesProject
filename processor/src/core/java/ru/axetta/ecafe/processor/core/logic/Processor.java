@@ -1446,6 +1446,9 @@ public class Processor implements SyncProcessor,
             if (reqComplexInfo.getCurrentPrice() != null) {
                 complexInfo.setCurrentPrice(reqComplexInfo.getCurrentPrice());
             }
+            if (reqComplexInfo.getGoodsGuid() != null) {
+                complexInfo.setGoodsGuid(reqComplexInfo.getGoodsGuid());
+            }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
                 MenuDetail menuDetailOptional = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
