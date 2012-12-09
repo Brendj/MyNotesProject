@@ -4,7 +4,9 @@ import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProhibitionExclusionsListExt")
+@XmlType(name = "ProhibitionExclusionsListExt", propOrder = {
+        "guid", "deletedState", "createdDate", "guidOfGood", "guidOfGoodsGroup"
+})
 public class ProhibitionExclusionsListExt {
 
     @XmlAttribute(name = "Guid")

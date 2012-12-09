@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProhibitionsListExt")
+@XmlType(name = "ProhibitionsListExt", propOrder = {
+        "guid", "deletedState", "createdDate", "contractId", "guidOfProducts",
+        "guidOfProductGroups", "guidOfGood", "guidOfGoodsGroup", "exclusions"
+})
 public class ProhibitionsListExt {
 
     @XmlAttribute(name = "Guid")

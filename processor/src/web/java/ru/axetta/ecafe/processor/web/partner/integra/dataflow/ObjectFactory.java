@@ -85,6 +85,22 @@ public class ObjectFactory {
         return new ClientSummaryExt();
     }
 
+    public ListOfProductGroupsExt createListOfProductGroupsExt() {
+        return new ListOfProductGroupsExt();
+    }
+
+    public ListOfProductsExt createListOfProductsExt() {
+        return new ListOfProductsExt();
+    }
+
+    public ListOfGoodGroupsExt createListOfGoodGroupsExt() {
+        return new ListOfGoodGroupsExt();
+    }
+
+    public ListOfGoodsExt createListOfGoodsExt() {
+        return new ListOfGoodsExt();
+    }
+
     /**
      * Create an instance of {@link ProhibitionsListExt }
      *

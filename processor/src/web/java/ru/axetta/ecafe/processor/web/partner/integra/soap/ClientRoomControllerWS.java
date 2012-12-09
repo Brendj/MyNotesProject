@@ -14,12 +14,7 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
-
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 
@@ -112,6 +107,192 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ListOfProductsResult getListOfProducts(Long orgId) {
+        authenticateRequest(null);
+
+        ListOfProductsResult result = new ListOfProductsResult();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = null;
+            if (orgId != null) {
+                Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+                orgCriteria.add(Restrictions.eq("idOfOrg", orgId));
+                org = (Org) orgCriteria.uniqueResult();
+                if (org == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Организация не найдена";
+                    return result;
+                }
+            }
+
+            ListOfProductGroups listOfProductGroups = new ListOfProductGroups();
+
+            ObjectFactory objectFactory = new ObjectFactory();
+
+            Criteria productGroupCriteria = persistenceSession.createCriteria(ProductGroup.class);
+            List groupObjects = productGroupCriteria.list();
+            if (!groupObjects.isEmpty()) {
+                for (Object groupObject : groupObjects) {
+                    ProductGroup productGroup = (ProductGroup) groupObject;
+                    ListOfProductGroupsExt listOfProductGroupsExt = objectFactory.createListOfProductGroupsExt();
+                    listOfProductGroupsExt.setNameOfGroup(productGroup.getNameOfGroup());
+                    listOfProductGroupsExt.setClassificationCode(productGroup.getСlassificationCode());
+                    listOfProductGroupsExt.setDeletedState(productGroup.getDeletedState());
+                    listOfProductGroupsExt.setGuid(productGroup.getGuid());
+                    listOfProductGroupsExt.setOrgOwner(productGroup.getOrgOwner());
+                    listOfProductGroupsExt.setCreatedDate(getXMLGregorianCalendarByDate(productGroup.getCreatedDate()));
+
+                    ListOfProducts listOfProducts = new ListOfProducts();
+                    listOfProductGroupsExt.getProducts().add(listOfProducts);
+
+                    Criteria productCriteria = persistenceSession.createCriteria(Product.class);
+                    productCriteria.add(Restrictions.eq("productGroup", productGroup));
+                    if (org != null) {
+                        productCriteria.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                    }
+                    List objects = productCriteria.list();
+                    if (!objects.isEmpty()) {
+                        for (Object object : objects) {
+                            Product product = (Product) object;
+                            ListOfProductsExt listOfProductsExt = objectFactory.createListOfProductsExt();
+                            listOfProductsExt.setCode(product.getCode());
+                            listOfProductsExt.setOkpCode(product.getOkpCode());
+                            listOfProductsExt.setClassificationCode(product.getClassificationCode());
+                            listOfProductsExt.setDeletedState(product.getDeletedState());
+                            listOfProductsExt.setGuid(product.getGuid());
+                            listOfProductsExt.setProductName(product.getProductName());
+                            listOfProductsExt.setFullName(product.getFullName());
+                            listOfProductsExt.setDensity(product.getDensity());
+                            listOfProductsExt.setOrgOwner(product.getOrgOwner());
+                            listOfProductsExt.setCreatedDate(getXMLGregorianCalendarByDate(product.getCreatedDate()));
+
+                            listOfProducts.getP().add(listOfProductsExt);
+                        }
+                    }
+
+                    listOfProductGroups.getPG().add(listOfProductGroupsExt);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            result.listOfProductGroups = listOfProductGroups;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public ListOfGoodsResult getListOfGoods(Long orgId) {
+        authenticateRequest(null);
+
+        ListOfGoodsResult result = new ListOfGoodsResult();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = null;
+            if (orgId != null) {
+                Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+                orgCriteria.add(Restrictions.eq("idOfOrg", orgId));
+                org = (Org) orgCriteria.uniqueResult();
+                if (org == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Организация не найдена";
+                    return result;
+                }
+            }
+
+            ListOfGoodGroups listOfGoodGroups = new ListOfGoodGroups();
+
+            ObjectFactory objectFactory = new ObjectFactory();
+
+            Criteria goodGroupCriteria = persistenceSession.createCriteria(GoodGroup.class);
+            List groupObjects = goodGroupCriteria.list();
+            if (!groupObjects.isEmpty()) {
+                for (Object groupObject : groupObjects) {
+                    GoodGroup goodGroup = (GoodGroup) groupObject;
+                    ListOfGoodGroupsExt listOfGoodGroupsExt = objectFactory.createListOfGoodGroupsExt();
+                    listOfGoodGroupsExt.setNameOfGoodsGroup(goodGroup.getNameOfGoodsGroup());
+                    listOfGoodGroupsExt.setDeletedState(goodGroup.getDeletedState());
+                    listOfGoodGroupsExt.setGuid(goodGroup.getGuid());
+                    listOfGoodGroupsExt.setOrgOwner(goodGroup.getOrgOwner());
+                    listOfGoodGroupsExt.setCreatedDate(getXMLGregorianCalendarByDate(goodGroup.getCreatedDate()));
+
+                    ListOfGoods listOfGoods = new ListOfGoods();
+                    listOfGoodGroupsExt.getGoods().add(listOfGoods);
+
+                    Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
+                    goodCriteria.add(Restrictions.eq("goodGroup", goodGroup));
+                    if (org != null) {
+                        goodCriteria.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                    }
+                    List objects = goodCriteria.list();
+                    if (!objects.isEmpty()) {
+                        for (Object object : objects) {
+                            Good good = (Good) object;
+                            ListOfGoodsExt listOfGoodsExt = objectFactory.createListOfGoodsExt();
+                            listOfGoodsExt.setGoodsCode(good.getGoodsCode());
+                            listOfGoodsExt.setGuid(good.getGuid());
+                            listOfGoodsExt.setDeletedState(good.getDeletedState());
+                            listOfGoodsExt.setOrgOwner(good.getOrgOwner());
+                            listOfGoodsExt.setNameOfGood(good.getNameOfGood());
+                            listOfGoodsExt.setFullName(good.getFullName());
+                            listOfGoodsExt.setUnitsScale(good.getUnitsScale());
+                            listOfGoodsExt.setNetWeight(good.getNetWeight());
+                            listOfGoodsExt.setLifetime(good.getLifeTime());
+                            listOfGoodsExt.setMargin(good.getMargin());
+                            listOfGoodsExt.setCreatedDate(getXMLGregorianCalendarByDate(good.getCreatedDate()));
+
+                            listOfGoods.getG().add(listOfGoodsExt);
+                        }
+                    }
+
+                    listOfGoodGroups.getGG().add(listOfGoodGroupsExt);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            result.listOfGoodGroups = listOfGoodGroups;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+
+
+    }
+
+    @Override
     public ProhibitionsListResult getDishProhibitionsList(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(null);
 
@@ -148,7 +329,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ProhibitionsListExt prohibitionsListExt = objectFactory.createProhibitionsListExt();
                     prohibitionsListExt.setGuid(prohibition.getGuid());
                     prohibitionsListExt.setDeletedState(prohibition.getDeletedState());
-
                     prohibitionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(prohibition.getCreatedDate()));
                     prohibitionsListExt.setContactId(client.getContractId());
                     Product bannedProduct = prohibition.getProduct();
