@@ -51,13 +51,13 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getDishProhibitionsList")
     ProhibitionsListResult getDishProhibitionsList(@WebParam(name="contractId") Long contractId);
     @WebMethod(operationName = "setProhibitionOnProduct")
-    IdResult setProhibitionOnProduct(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProduct") Long idOfProduct);
+    IdResult setProhibitionOnProduct(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProduct") Long idOfProduct, @WebParam(name="isDeleted") Boolean isDeleted);
     @WebMethod(operationName = "setProhibitionOnProductGroup")
-    IdResult setProhibitionOnProductGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProductGroup") Long idOfProductGroup);
+    IdResult setProhibitionOnProductGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfProductGroup") Long idOfProductGroup, @WebParam(name="isDeleted") Boolean isDeleted);
     @WebMethod(operationName = "setProhibitionOnGood")
-    IdResult setProhibitionOnGood(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood);
+    IdResult setProhibitionOnGood(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood, @WebParam(name="isDeleted") Boolean isDeleted);
     @WebMethod(operationName = "setProhibitionOnGoodGroup")
-    IdResult setProhibitionOnGoodGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup);
+    IdResult setProhibitionOnGoodGroup(@WebParam(name="orgId") Long orgId, @WebParam(name="contractId") Long contractId, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup, @WebParam(name="isDeleted") Boolean isDeleted);
     @WebMethod(operationName = "excludeGoodFromProhibition")
     IdResult excludeGoodFromProhibition(@WebParam(name="orgId") Long orgId, @WebParam(name="idOfProhibition") Long idOfProhibition, @WebParam(name="idOfGood") Long idOfGood);
     @WebMethod(operationName = "excludeGoodGroupFromProhibition")

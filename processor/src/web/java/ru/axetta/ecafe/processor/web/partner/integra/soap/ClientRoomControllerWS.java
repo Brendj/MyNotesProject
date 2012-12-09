@@ -86,15 +86,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NO_CONTACT_DATA = 160L;
     private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
     private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
-    
-    private static final String RC_OK_DESC="OK";
-    private static final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
-    private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
-    private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
-    private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
-    private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
-    private static final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
-    private static final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";
+
+    private static final String RC_OK_DESC = "OK";
+    private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
+    private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC = "По условиям найден более одного клиента";
+    private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC = "У клиента нет СНИЛС опекуна";
+    private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC = "У клиента уже есть данный СНИЛС опекуна";
+    private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
+    private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
+    private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
 
     @Resource
     private WebServiceContext context;
@@ -103,13 +103,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     static class Processor {
 
         public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
-                Transaction transaction) throws Exception {}
+                Transaction transaction) throws Exception {
+        }
+
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
-                Transaction transaction) throws Exception {}
+                Transaction transaction) throws Exception {
+        }
     }
 
     @Override
-    public ProhibitionsListResult getDishProhibitionsList(@WebParam(name="contractId") Long contractId) {
+    public ProhibitionsListResult getDishProhibitionsList(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(null);
 
         ProhibitionsListResult prohibitionsListResult = new ProhibitionsListResult();
@@ -171,10 +174,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!exclusionObjects.isEmpty()) {
                         for (Object exclusionObject : exclusionObjects) {
                             ProhibitionExclusion exclusion = (ProhibitionExclusion) exclusionObject;
-                            ProhibitionExclusionsListExt prohibitionExclusionsListExt = objectFactory.createProhibitionExclusionsListExt();
+                            ProhibitionExclusionsListExt prohibitionExclusionsListExt = objectFactory
+                                    .createProhibitionExclusionsListExt();
                             prohibitionExclusionsListExt.setGuid(exclusion.getGuid());
                             prohibitionExclusionsListExt.setDeletedState(exclusion.getDeletedState());
-                            prohibitionExclusionsListExt.setCreatedDate(getXMLGregorianCalendarByDate(exclusion.getCreatedDate()));
+                            prohibitionExclusionsListExt
+                                    .setCreatedDate(getXMLGregorianCalendarByDate(exclusion.getCreatedDate()));
                             Good excludedGood = exclusion.getGood();
                             GoodGroup excludedGoodGroup = exclusion.getGoodsGroup();
                             if (excludedGood != null) {
@@ -196,7 +201,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction = null;
 
             prohibitionsListResult.prohibitionsList = prohibitionsList;
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -215,23 +220,103 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public IdResult setProhibitionOnProduct(Long orgId, Long contractId, Long idOfProduct) {
-        return setProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
+    public IdResult setProhibitionOnProduct(Long orgId, Long contractId, Long idOfProduct, Boolean isDeleted) {
+        if (isDeleted!=null && isDeleted) {
+            return deteteProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
+        } else{
+            return setProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
+        }
     }
 
     @Override
-    public IdResult setProhibitionOnProductGroup(Long orgId, Long contractId, Long idOfProductGroup) {
-        return setProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
+    public IdResult setProhibitionOnProductGroup(Long orgId, Long contractId, Long idOfProductGroup,
+            Boolean isDeleted) {
+        if (isDeleted!=null && isDeleted) {
+            return deteteProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
+        } else{
+            return setProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
+        }
     }
 
     @Override
-    public IdResult setProhibitionOnGood(Long orgId, Long contractId, Long idOfGood) {
-        return setProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
+    public IdResult setProhibitionOnGood(Long orgId, Long contractId, Long idOfGood, Boolean isDeleted) {
+        if (isDeleted!=null && isDeleted) {
+            return deteteProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
+        } else{
+            return setProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
+        }
     }
 
     @Override
-    public IdResult setProhibitionOnGoodGroup(Long orgId, Long contractId, Long idOfGoodGroup) {
-        return setProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
+    public IdResult setProhibitionOnGoodGroup(Long orgId, Long contractId, Long idOfGoodGroup, Boolean isDeleted) {
+        if (isDeleted!=null && isDeleted) {
+            return deteteProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
+        } else{
+            return setProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
+        }
+    }
+
+    private IdResult deteteProhibitionOnObject(Long orgId, Long contractId, Class objectClass, Long idOfObject) {
+        authenticateRequest(null);
+        IdResult idResult = new IdResult();
+        idResult.resultCode = RC_OK;
+        idResult.description = RC_OK_DESC;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+            orgCriteria.add(Restrictions.eq("idOfOrg", orgId));
+            Org org = (Org) orgCriteria.uniqueResult();
+            if (org == null) {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = "Организация не найдена";
+                return idResult;
+            }
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                idResult.resultCode = RC_CLIENT_NOT_FOUND;
+                idResult.description = RC_CLIENT_NOT_FOUND_DESC;
+                return idResult;
+            }
+
+            Criteria prohibitionCriteria = persistenceSession.createCriteria(Prohibition.class);
+            if (objectClass.equals(Product.class)) {
+                prohibitionCriteria.add(Restrictions.eq("product.globalId", idOfObject));
+            } else if (objectClass.equals(ProductGroup.class)) {
+                prohibitionCriteria.add(Restrictions.eq("productGroup.globalId", idOfObject));
+            } else if (objectClass.equals(Good.class)) {
+                prohibitionCriteria.add(Restrictions.eq("good.globalId", idOfObject));
+            } else if (objectClass.equals(GoodGroup.class)) {
+                prohibitionCriteria.add(Restrictions.eq("goodGroup.globalId", idOfObject));
+            } else {
+                idResult.resultCode = RC_INTERNAL_ERROR;
+                idResult.description = RC_INTERNAL_ERROR_DESC;
+                return idResult;
+            }
+            Prohibition prohibition = (Prohibition) prohibitionCriteria.uniqueResult();
+            prohibition.setDeletedState(true);
+            prohibition.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
+            persistenceSession.save(prohibition);
+            idResult.id = prohibition.getGlobalId();
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            idResult.resultCode = RC_INTERNAL_ERROR;
+            idResult.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return idResult;
     }
 
     private IdResult setProhibitionOnObject(Long orgId, Long contractId, Class objectClass, Long idOfObject) {
@@ -275,24 +360,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             prohibition.setSendAll(SendToAssociatedOrgs.SendToSelf);
             Criteria objectCriteria = persistenceSession.createCriteria(objectClass);
             objectCriteria.add(Restrictions.eq("globalId", idOfObject));
+            Criteria prohibitionCriteria = persistenceSession.createCriteria(Prohibition.class);
             if (objectClass.equals(Product.class)) {
-                Product product = (Product) objectCriteria.uniqueResult();
-                prohibition.setProduct(product);
+                prohibitionCriteria.add(Restrictions.eq("product.globalId", idOfObject));
+                Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
+                if(p==null){
+                    Product product = (Product) objectCriteria.uniqueResult();
+                    prohibition.setProduct(product);
+                } else {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Запрет с указанным id уже существует";
+                    return idResult;
+                }
             } else if (objectClass.equals(ProductGroup.class)) {
-                ProductGroup productGroup = (ProductGroup) objectCriteria.uniqueResult();
-                prohibition.setProductGroup(productGroup);
+                prohibitionCriteria.add(Restrictions.eq("productGroup.globalId", idOfObject));
+                Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
+                if(p==null){
+                    ProductGroup productGroup = (ProductGroup) objectCriteria.uniqueResult();
+                    prohibition.setProductGroup(productGroup);
+                } else {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Запрет с указанным id уже существует";
+                    return idResult;
+                }
             } else if (objectClass.equals(Good.class)) {
-                Good good = (Good) objectCriteria.uniqueResult();
-                prohibition.setGood(good);
+                prohibitionCriteria.add(Restrictions.eq("good.globalId", idOfObject));
+                Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
+                if(p==null){
+                    Good good = (Good) objectCriteria.uniqueResult();
+                    prohibition.setGood(good);
+                } else {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Запрет с указанным id уже существует";
+                    return idResult;
+                }
+
             } else if (objectClass.equals(GoodGroup.class)) {
-                GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
-                prohibition.setGoodGroup(goodGroup);
+                prohibitionCriteria.add(Restrictions.eq("goodGroup.globalId", idOfObject));
+                Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
+                if(p==null){
+                    GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
+                    prohibition.setGoodGroup(goodGroup);
+                } else {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Запрет с указанным id уже существует";
+                    return idResult;
+                }
             } else {
                 idResult.resultCode = RC_INTERNAL_ERROR;
                 idResult.description = RC_INTERNAL_ERROR_DESC;
                 return idResult;
             }
-            prohibition.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
+            prohibition.setGlobalVersion(
+                    DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
             persistenceSession.save(prohibition);
 
             idResult.id = prohibition.getGlobalId();
@@ -321,7 +441,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return excludeObjectFromProhibition(orgId, idOfProhibition, GoodGroup.class, idOfGoodGroup);
     }
 
-    private IdResult excludeObjectFromProhibition(Long orgId, Long idOfProhibition, Class objectClass, Long idOfObject) {
+    private IdResult excludeObjectFromProhibition(Long orgId, Long idOfProhibition, Class objectClass,
+            Long idOfObject) {
         authenticateRequest(null);
 
         IdResult idResult = new IdResult();
@@ -373,7 +494,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 idResult.description = RC_INTERNAL_ERROR_DESC;
                 return idResult;
             }
-            exclusion.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(ProhibitionExclusion.class.getSimpleName()));
+            exclusion.setGlobalVersion(DAOService.getInstance()
+                    .updateVersionByDistributedObjects(ProhibitionExclusion.class.getSimpleName()));
             persistenceSession.save(exclusion);
 
             idResult.id = exclusion.getGlobalId();
@@ -405,12 +527,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
             clientCriteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
-            List objects =clientCriteria.list();
+            List objects = clientCriteria.list();
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
             ClassStudentList classStudentList = new ClassStudentList();
-            if(!objects.isEmpty()){
-                for (Object object :objects){
+            if (!objects.isEmpty()) {
+                for (Object object : objects) {
                     Client client = (Client) object;
                     ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
                     clientSummaryExt.setContractId(client.getContractId());
@@ -434,7 +556,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ClientGroupListResult getGroupListByOrg(Long idOfOrg){
+    public ClientGroupListResult getGroupListByOrg(Long idOfOrg) {
         authenticateRequest(null);
 
         ClientGroupListResult clientGroupListResult = new ClientGroupListResult();
@@ -447,10 +569,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
             clientGroupCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
 
-            List objects =clientGroupCriteria.list();
+            List objects = clientGroupCriteria.list();
             ClientGroupList clientGroupList = new ClientGroupList();
-            if(!objects.isEmpty()){
-                for (Object object :objects){
+            if (!objects.isEmpty()) {
+                for (Object object : objects) {
                     ClientGroup clientGroup = (ClientGroup) object;
                     ClientGroupItem clientGroupItem = new ClientGroupItem();
                     clientGroupItem.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -477,7 +599,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return process(contractId, CLIENT_ID_INTERNALID, processor);
         }
 
-        final static int CLIENT_ID_INTERNALID=0, CLIENT_ID_SAN=1, CLIENT_ID_EXTERNAL_ID=2, CLIENT_ID_GUID=3;
+        final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3;
 
         public Data process(Object id, int clientIdType, Processor processor) {
             ObjectFactory objectFactory = new ObjectFactory();
@@ -530,9 +652,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
 
-}
+    }
 
     class OrgRequest {
+
         public Data process(long orgId, Processor processor) {
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
@@ -595,12 +718,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public ClientSummaryResult getSummary(String san) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processSummary(client, data, objectFactory, session);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processSummary(client, data, objectFactory, session);
+                    }
+                });
 
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
         clientSummaryResult.clientSummary = data.getClientSummaryExt();
@@ -613,7 +737,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public ClientSummaryResult getSummaryByTypedId(String id, int idType) {
         authenticateRequest(null);
 
-        Object idVal=null;
+        Object idVal = null;
         if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) {
             idVal = Long.parseLong(id);
         } else if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_EXTERNAL_ID) {
@@ -666,12 +790,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
         Contragent defaultMerchant = client.getOrg().getDefaultSupplier();
-        if (defaultMerchant!=null) {
+        if (defaultMerchant != null) {
             clientSummaryExt.setDefaultMerchantId(defaultMerchant.getIdOfContragent());
-            clientSummaryExt.setDefaultMerchantInfo(ParameterStringUtils.extractParameters("TSP.", defaultMerchant.getRemarks()));
+            clientSummaryExt.setDefaultMerchantInfo(
+                    ParameterStringUtils.extractParameters("TSP.", defaultMerchant.getRemarks()));
         }
         EnterEvent ee = DAOUtils.getLastEnterEvent(session, client);
-        if (ee!=null) {
+        if (ee != null) {
             clientSummaryExt.setLastEnterEventCode(ee.getPassDirection());
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
@@ -683,35 +808,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         /* Официальное наименование Учебного учереждения */
         clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
-       // Новые параметры:
-        String phone=client.getPhone();
-        if(phone!=null){
-        clientSummaryExt.setPhone(phone);   }
+        // Новые параметры:
+        String phone = client.getPhone();
+        if (phone != null) {
+            clientSummaryExt.setPhone(phone);
+        }
 
-        String address=client.getAddress();
-        if(address!=null){
-        clientSummaryExt.setAddress(address); }
-
+        String address = client.getAddress();
+        if (address != null) {
+            clientSummaryExt.setAddress(address);
+        }
 
 
         clientSummaryExt.setLimit(client.getLimit());
 
-        Integer freePayCount =client.getFreePayCount();
-        if(freePayCount!=null){
-        clientSummaryExt.setFreePayCount(client.getFreePayCount());  }
+        Integer freePayCount = client.getFreePayCount();
+        if (freePayCount != null) {
+            clientSummaryExt.setFreePayCount(client.getFreePayCount());
+        }
 
-         Integer freePayMaxCount=client.getFreePayMaxCount();
-        if(freePayMaxCount!=null){
-        clientSummaryExt.setFreePayMaxCount(client.getFreePayMaxCount());  }
+        Integer freePayMaxCount = client.getFreePayMaxCount();
+        if (freePayMaxCount != null) {
+            clientSummaryExt.setFreePayMaxCount(client.getFreePayMaxCount());
+        }
 
-         Date lastFreePayTime=client.getLastFreePayTime();
+        Date lastFreePayTime = client.getLastFreePayTime();
 
-        if(lastFreePayTime!=null){
-        GregorianCalendar greLastFreePayTime = new GregorianCalendar();
-        greLastFreePayTime.setTime(lastFreePayTime);
-        XMLGregorianCalendar xmlLastFreePayTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greLastFreePayTime);
+        if (lastFreePayTime != null) {
+            GregorianCalendar greLastFreePayTime = new GregorianCalendar();
+            greLastFreePayTime.setTime(lastFreePayTime);
+            XMLGregorianCalendar xmlLastFreePayTime = DatatypeFactory.newInstance()
+                    .newXMLGregorianCalendar(greLastFreePayTime);
 
-        clientSummaryExt.setLastFreePayTime(xmlLastFreePayTime); }
+            clientSummaryExt.setLastFreePayTime(xmlLastFreePayTime);
+        }
 
 
         clientSummaryExt.setDiscountMode(client.getDiscountMode());
@@ -744,12 +874,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processPurchaseList(client, data, objectFactory, session, endDate, startDate);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processPurchaseList(client, data, objectFactory, session, endDate, startDate);
+                    }
+                });
 
         PurchaseListResult purchaseListResult = new PurchaseListResult();
         purchaseListResult.purchaseList = data.getPurchaseListExt();
@@ -773,7 +904,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (nRecs++ > MAX_RECS) {
                 break;
             }
-            Order order = (Order)o;
+            Order order = (Order) o;
             PurchaseExt purchaseExt = objectFactory.createPurchaseExt();
             purchaseExt.setByCard(order.getSumByCard());
             purchaseExt.setSocDiscount(order.getSocDiscount());
@@ -789,7 +920,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
             purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
 
-            Set<OrderDetail> orderDetailSet=((Order) o).getOrderDetails();
+            Set<OrderDetail> orderDetailSet = ((Order) o).getOrderDetails();
             for (OrderDetail od : orderDetailSet) {
                 PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
                 purchaseElementExt.setAmount(od.getQty());
@@ -833,12 +964,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public PaymentListResult getPaymentList(String san, final Date startDate, final Date endDate) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processPaymentList(client, data, objectFactory, session, endDate, startDate);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processPaymentList(client, data, objectFactory, session, endDate, startDate);
+                    }
+                });
 
         PaymentListResult paymentListResult = new PaymentListResult();
         paymentListResult.paymentList = data.getPaymentList();
@@ -897,12 +1029,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                    }
+                });
 
         MenuListResult menuListResult = new MenuListResult();
         menuListResult.menuList = data.getMenuListExt();
@@ -912,8 +1045,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId,
-            final Date startDate, final Date endDate) {
+    public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId, final Date startDate,
+            final Date endDate) {
         authenticateRequest(null);
 
         Data data = new OrgRequest().process(orgId, new Processor() {
@@ -929,8 +1062,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuListResult.description = data.getDescription();
         return menuListResult;
     }
-
-
 
 
     @Override
@@ -952,8 +1083,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
 
-
-    public  void calendarResetTime(Calendar date) {
+    public void calendarResetTime(Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
@@ -964,8 +1094,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date endDate) throws DatatypeConfigurationException {
         Criteria menuCriteria = session.createCriteria(Menu.class);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate); toCal.setTime(endDate);
-        calendarResetTime(fromCal); calendarResetTime(toCal);
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        calendarResetTime(fromCal);
+        calendarResetTime(toCal);
         fromCal.add(Calendar.HOUR, -1);
         menuCriteria.add(Restrictions.eq("org", org));
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
@@ -975,13 +1107,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         List menus = menuCriteria.list();
         MenuListExt menuListExt = objectFactory.createMenuListExt();
-        int nRecs=0;
+        int nRecs = 0;
         for (Object currObject : menus) {
             if (nRecs++ > MAX_RECS) {
                 break;
             }
 
-            Menu menu = (Menu)currObject;
+            Menu menu = (Menu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
             menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
 
@@ -992,7 +1124,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List menuDetails = menuDetailCriteria.list();
 
             for (Object o : menuDetails) {
-                MenuDetail menuDetail = (MenuDetail)o;
+                MenuDetail menuDetail = (MenuDetail) o;
                 MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
                 menuItemExt.setGroup(menuDetail.getGroupName());
                 menuItemExt.setName(menuDetail.getMenuDetailName());
@@ -1020,8 +1152,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Criteria complexCriteria = session.createCriteria(ComplexInfo.class);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate); toCal.setTime(endDate);
-        calendarResetTime(fromCal); calendarResetTime(toCal);
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        calendarResetTime(fromCal);
+        calendarResetTime(toCal);
         fromCal.add(Calendar.HOUR, -1);
         complexCriteria.add(Restrictions.eq("org", org));
 
@@ -1030,37 +1164,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         //complexCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
 
-       List<ComplexInfo> complexes=complexCriteria.list();
+        List<ComplexInfo> complexes = complexCriteria.list();
 
 
-        ArrayList<ArrayList<ComplexInfo>> sortedComplexes=new ArrayList<ArrayList<ComplexInfo>>();
+        ArrayList<ArrayList<ComplexInfo>> sortedComplexes = new ArrayList<ArrayList<ComplexInfo>>();
 
-        Date currDate=null;
-        ArrayList<ComplexInfo>currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+        Date currDate = null;
+        ArrayList<ComplexInfo> currComplexListWithSameDate = new ArrayList<ComplexInfo>();
 
-        for(Object complexObject:complexes){
+        for (Object complexObject : complexes) {
 
-            ComplexInfo currComplex=(ComplexInfo)complexObject;
+            ComplexInfo currComplex = (ComplexInfo) complexObject;
 
-            if(currDate==null){
+            if (currDate == null) {
                 currComplexListWithSameDate.add(currComplex);
-                currDate=currComplex.getMenuDate();
+                currDate = currComplex.getMenuDate();
                 continue;
             }
 
-            if(currComplex.getMenuDate().equals(currDate)){
+            if (currComplex.getMenuDate().equals(currDate)) {
                 currComplexListWithSameDate.add(currComplex);
 
-            }else{
+            } else {
 
-                ArrayList<ComplexInfo>newComplexes=new ArrayList<ComplexInfo>();
+                ArrayList<ComplexInfo> newComplexes = new ArrayList<ComplexInfo>();
                 newComplexes.addAll(currComplexListWithSameDate);
 
                 sortedComplexes.add(newComplexes);
 
-                currComplexListWithSameDate=new ArrayList<ComplexInfo>();
+                currComplexListWithSameDate = new ArrayList<ComplexInfo>();
                 currComplexListWithSameDate.add(currComplex);
-                currDate=currComplex.getMenuDate();
+                currDate = currComplex.getMenuDate();
 
             }
 
@@ -1068,38 +1202,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
 
-        currDate=null;
-       ComplexDateList complexDateList=new ComplexDateList();
+        currDate = null;
+        ComplexDateList complexDateList = new ComplexDateList();
 
 
-        for(ArrayList<ComplexInfo> complexesWithSameDate:sortedComplexes){
+        for (ArrayList<ComplexInfo> complexesWithSameDate : sortedComplexes) {
 
-             ComplexDate complexDate=new ComplexDate();
+            ComplexDate complexDate = new ComplexDate();
 
-           // boolean emptyComplexDate=true;
+            // boolean emptyComplexDate=true;
 
-           // ComplexInfo currComplex=complexesWithSameDate.get(0);
+            // ComplexInfo currComplex=complexesWithSameDate.get(0);
 
             //currDate=currComplex.getMenuDate();
 
 
             // for(Object complexObject:complexes){
-           // ArrayList<ArrayList<ComplexInfoDetail>> complexDetailsWithSameDate =new ArrayList<ArrayList<ComplexInfoDetail>>();
+            // ArrayList<ArrayList<ComplexInfoDetail>> complexDetailsWithSameDate =new ArrayList<ArrayList<ComplexInfoDetail>>();
 
-            for(ComplexInfo complexInfo :complexesWithSameDate){
+            for (ComplexInfo complexInfo : complexesWithSameDate) {
 
-                Complex complex=new Complex();
+                Complex complex = new Complex();
 
-                Criteria complexDetailsCriteria=session.createCriteria(ComplexInfoDetail.class);
+                Criteria complexDetailsCriteria = session.createCriteria(ComplexInfoDetail.class);
                 complexDetailsCriteria.add(Restrictions.eq("complexInfo", complexInfo));
 
 
-                List<ComplexInfoDetail> complexDetails=complexDetailsCriteria.list();
+                List<ComplexInfoDetail> complexDetails = complexDetailsCriteria.list();
 
-                if(!complexDetails.isEmpty()) {
+                if (!complexDetails.isEmpty()) {
 
-                    for(ComplexInfoDetail complexInfoDetail:complexDetails){
-                        ComplexDetail complexDetail=new ComplexDetail();
+                    for (ComplexInfoDetail complexInfoDetail : complexDetails) {
+                        ComplexDetail complexDetail = new ComplexDetail();
                         complexDetail.setName(complexInfoDetail.getMenuDetail().getMenuDetailName());
                         complex.getE().add(complexDetail);
                         complex.setName(complexInfoDetail.getComplexInfo().getComplexName());
@@ -1109,21 +1243,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     complexDate.setDate(toXmlDateTime(complexInfo.getMenuDate()));
 
 
-                   // emptyComplexDate=false;
-                    logger.info("complexName: "+ complexInfo.getComplexName());
+                    // emptyComplexDate=false;
+                    logger.info("complexName: " + complexInfo.getComplexName());
 
-                  //  ArrayList<ComplexInfoDetail>complexDetailList=new ArrayList<ComplexInfoDetail>();
-                   // complexDetailList.addAll(complexDetails);
-                   // complexDetailsWithSameDate.add(complexDetailList);
+                    //  ArrayList<ComplexInfoDetail>complexDetailList=new ArrayList<ComplexInfoDetail>();
+                    // complexDetailList.addAll(complexDetails);
+                    // complexDetailsWithSameDate.add(complexDetailList);
 
                 }
 
 
-
-
             }
 
-            if(!complexDate.getE().isEmpty()) {
+            if (!complexDate.getE().isEmpty()) {
 
                 complexDateList.getE().add(complexDate);
             }
@@ -1146,7 +1278,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processCardList(client, data, objectFactory);
             }
         });
-        
+
         CardListResult cardListResult = new CardListResult();
         cardListResult.cardList = data.getCardList();
         cardListResult.resultCode = data.getResultCode();
@@ -1158,12 +1290,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public CardListResult getCardList(String san) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processCardList(client, data, objectFactory);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processCardList(client, data, objectFactory);
+                    }
+                });
 
         CardListResult cardListResult = new CardListResult();
         cardListResult.cardList = data.getCardList();
@@ -1213,12 +1346,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public EnterEventListResult getEnterEventList(String san, final Date startDate, final Date endDate) {
         authenticateRequest(null);
 
-        Data data = new ClientRequest().process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
-                processEnterEventList(client, data, objectFactory, session, endDate, startDate);
-            }
-        });
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processEnterEventList(client, data, objectFactory, session, endDate, startDate);
+                    }
+                });
 
         EnterEventListResult enterEventListResult = new EnterEventListResult();
         enterEventListResult.enterEventList = data.getEnterEventList();
@@ -1314,8 +1448,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             entityManager = EntityManagerUtils.createEntityManager();
             entityTransaction = entityManager.getTransaction();
             entityTransaction.begin();
-            Query query = entityManager.createNativeQuery(
-                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
+            Query query = entityManager
+                    .createNativeQuery("select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
             query.setParameter("san", san);
             List clientList = query.getResultList();
             workClientSan(entityManager, guardSan, data, clientList);
@@ -1379,8 +1513,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             entityManager = EntityManagerUtils.createEntityManager();
             entityTransaction = entityManager.getTransaction();
             entityTransaction.begin();
-            Query query = entityManager.createNativeQuery(
-                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
+            Query query = entityManager
+                    .createNativeQuery("select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
             query.setParameter("san", san);
             List clientList = query.getResultList();
             workClientSan(entityManager, guardSan, data, clientList);
@@ -1438,7 +1572,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
         if (clientList.size() == 0) {
             data.resultCode = RC_CLIENT_NOT_FOUND;
-            data.description =RC_CLIENT_NOT_FOUND_DESC;
+            data.description = RC_CLIENT_NOT_FOUND_DESC;
         } else if (clientList.size() > 1) {
             data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
             data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
@@ -1448,7 +1582,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String clientGuardSan = (String) clientObject[1];
             if (clientGuardSan == null) {
                 if (data instanceof AttachGuardSanResult) {
-                    Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                    Query query = entityManager.createNativeQuery(
+                            "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
                     query.setParameter("guardSan", guardSan);
                     query.setParameter("idOfClient", idOfClient);
                     query.executeUpdate();
@@ -1458,8 +1593,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
                     data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
                 }
-            }
-            else {
+            } else {
                 if (data instanceof AttachGuardSanResult) {
                     if (isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
@@ -1471,7 +1605,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         } else {
                             gs = clientGuardSan + ";" + guardSan;
                         }
-                        Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        Query query = entityManager.createNativeQuery(
+                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
                         query.setParameter("guardSan", gs);
                         query.setParameter("idOfClient", idOfClient);
                         query.executeUpdate();
@@ -1481,7 +1616,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else if (data instanceof DetachGuardSanResult) {
                     if (!isGuardSanExists(guardSan, clientGuardSan)) {
                         data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description =RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
+                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
                     } else {
                         if (clientGuardSan.contains(";" + guardSan + ";")) {
                             clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
@@ -1493,7 +1628,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         } else {
                             clientGuardSan = clientGuardSan.replace(guardSan, "");
                         }
-                        Query query = entityManager.createNativeQuery("update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        Query query = entityManager.createNativeQuery(
+                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
                         query.setParameter("guardSan", clientGuardSan);
                         query.setParameter("idOfClient", idOfClient);
                         query.executeUpdate();
@@ -1548,10 +1684,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientsData cd = getClientsByGuardSan(guardSan);
         LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
-        if (cd!=null && cd.clientList!=null) {
+        if (cd != null && cd.clientList != null) {
             for (ClientItem ci : cd.clientList.getClients()) {
                 ClientSummaryResult cs = getSummary(ci.getContractId());
-                if (cs.clientSummary!=null) {
+                if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
                 }
             }
@@ -1565,11 +1701,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         if (!DAOService.getInstance().enableClientNotificationBySMS(contractId, state)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
         return r;
     }
@@ -1580,11 +1716,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         if (!DAOService.getInstance().enableClientNotificationByEmail(contractId, state)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
         return r;
     }
@@ -1595,17 +1731,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-        if (mobilePhone==null) {
-            r.resultCode=RC_INVALID_DATA;
-            r.description="Неверный формат телефона";
+        if (mobilePhone == null) {
+            r.resultCode = RC_INVALID_DATA;
+            r.description = "Неверный формат телефона";
             return r;
         }
         if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
         return r;
     }
@@ -1615,21 +1751,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         if (!DAOService.getInstance().setClientEmail(contractId, email)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
         return r;
     }
 
     @Override
-    public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit) {
+    public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "limit") long limit) {
         authenticateRequest(contractId);
 
         Result r = new Result(RC_OK, RC_OK_DESC);
-        if (limit<0) {
+        if (limit < 0) {
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
             return r;
         }
@@ -1638,7 +1775,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return r;
     }
-
 
 
     @Override
@@ -1660,15 +1796,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return circListResult;
     }
 
-    public final static int CIRCULATION_STATUS_FILTER_ALL=-1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS=-2;
-    private void processCirculationList(Client client, Data data, ObjectFactory objectFactory, Session session, int state)
-            throws DatatypeConfigurationException {
+    public final static int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
+
+    private void processCirculationList(Client client, Data data, ObjectFactory objectFactory, Session session,
+            int state) throws DatatypeConfigurationException {
         Criteria circulationCriteria = session.createCriteria(Circulation.class);
         circulationCriteria.add(Restrictions.eq("client", client));
-        if (state==CIRCULATION_STATUS_FILTER_ALL_ON_HANDS) {
-            circulationCriteria.add(Restrictions.or(Restrictions.eq("status", Circulation.EXTENDED), Restrictions.eq("status", Circulation.ISSUED)));
-        }
-        else if (state != CIRCULATION_STATUS_FILTER_ALL) {
+        if (state == CIRCULATION_STATUS_FILTER_ALL_ON_HANDS) {
+            circulationCriteria.add(Restrictions.or(Restrictions.eq("status", Circulation.EXTENDED),
+                    Restrictions.eq("status", Circulation.ISSUED)));
+        } else if (state != CIRCULATION_STATUS_FILTER_ALL) {
             circulationCriteria.add(Restrictions.eq("status", state));
         }
         circulationCriteria.addOrder(org.hibernate.criterion.Order.desc("issuanceDate"));
@@ -1683,7 +1820,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ci.setRealRefundDate(toXmlDateTime(c.getRealRefundDate()));
             ci.setRefundDate(toXmlDateTime(c.getRefundDate()));
             Publication p = c.getIssuable().getInstance().getPublication();
-            if (p!=null) {
+            if (p != null) {
                 PublicationItem pi = new PublicationItem();
                 pi.setAuthor(p.getAuthor());
                 pi.setPublisher(p.getPublisher());
@@ -1712,7 +1849,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             //logger.info("begin get Client");
             Client client = daoService.getClientByContractId(contractId);
             //logger.info("find client");
-            if (client==null){
+            if (client == null) {
                 //logger.info("find client == null");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Client not found");
@@ -1720,11 +1857,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
             //logger.info("find client != null");
-            boolean authorized=false;
-            if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
+            boolean authorized = false;
+            if (partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
                 //logger.info("MD5");
                 String fullNameUpCase = client.getPerson().getFullName().replaceAll("\\s", "").toUpperCase();
-                fullNameUpCase= fullNameUpCase+"Nb37wwZWufB";
+                fullNameUpCase = fullNameUpCase + "Nb37wwZWufB";
                 byte[] bytesOfMessage = fullNameUpCase.getBytes("UTF-8");
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 byte[] hash = md.digest(bytesOfMessage);
@@ -1732,13 +1869,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 //String md5HashString = bigInt.toString(16);
                 String md5HashString = String.format("%0" + (hash.length << 1) + "X", bigInt);
                 if (logger.isDebugEnabled()) {
-                    logger.info("token    md5: "+token.toUpperCase());
-                    logger.info("generate md5: "+md5HashString.toUpperCase());
+                    logger.info("token    md5: " + token.toUpperCase());
+                    logger.info("generate md5: " + md5HashString.toUpperCase());
                 }
-                if (md5HashString.toUpperCase().compareTo(token.toUpperCase())==0) {
+                if (md5HashString.toUpperCase().compareTo(token.toUpperCase()) == 0) {
                     authorized = true;
-                    if (partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
-                        daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
+                    if (partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+                        daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(),
+                                partnerLinkConfig.id);
                     }
                 }
             }
@@ -1747,12 +1885,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     logger.debug("hasEncryptedPassword");
                 }
                 authorized = true;
-                if (!authorized && partnerLinkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+                if (!authorized
+                        && partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
                     daoService.addIntegraPartnerAccessPermissionToClient(client.getIdOfClient(), partnerLinkConfig.id);
                 }
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("authorized"+String.valueOf(authorized));
+                logger.debug("authorized" + String.valueOf(authorized));
             }
             if (authorized) {
                 return new Result(RC_OK, RC_OK_DESC);
@@ -1766,17 +1905,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ActivateLinkingTokenResult activateLinkingToken(
-            String linkingToken) {
+    public ActivateLinkingTokenResult activateLinkingToken(String linkingToken) {
         authenticateRequest(null);
 
         ActivateLinkingTokenResult result = new ActivateLinkingTokenResult();
         try {
-                
+
             DAOService daoService = DAOService.getInstance();
-            
+
             Client client = daoService.findAndDeleteLinkingToken(linkingToken);
-            if (client==null) {
+            if (client == null) {
                 result.resultCode = RC_INVALID_DATA;
                 result.description = "Код активации не найден";
             } else {
@@ -1785,7 +1923,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_OK_DESC;
             }
         } catch (Exception e) {
-            logger.error("Failed to activate linking token: "+linkingToken, e);
+            logger.error("Failed to activate linking token: " + linkingToken, e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         }
@@ -1800,7 +1938,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             DAOService daoService = DAOService.getInstance();
             Client client = daoService.getClientByContractId(contractId);
-            if (client==null) {
+            if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
@@ -1826,13 +1964,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Result result = new Result();
             DAOService daoService = DAOService.getInstance();
             Client client = daoService.getClientByContractId(contractId);
-            if (client==null) {
+            if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
             LinkingToken linkingToken = daoService.generateLinkingToken(client);
-            String info="";
+            String info = "";
             if (client.hasEmail()) {
                 info += "e-mail";
             }
@@ -1840,15 +1978,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (info.length() > 0) {
                     info += ", ";
                 }
-                info+="SMS";
+                info += "SMS";
             }
-            if (info.length()==0) {
+            if (info.length() == 0) {
                 result.resultCode = RC_NO_CONTACT_DATA;
                 result.description = RC_NO_CONTACT_DATA_DESC;
             } else {
-                RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, new String[]{"linkingToken", linkingToken.getToken()});
+                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                        .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
+                                new String[]{"linkingToken", linkingToken.getToken()});
                 result.resultCode = RC_OK;
-                result.description = "Код активации отправлен по "+info;
+                result.description = "Код активации отправлен по " + info;
             }
             return result;
         } catch (Exception e) {
@@ -1864,80 +2004,89 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         try {
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-            if (mobilePhone==null) {
-                result.resultCode=RC_INVALID_DATA;
-                result.description="Неверный формат телефона";
+            if (mobilePhone == null) {
+                result.resultCode = RC_INVALID_DATA;
+                result.description = "Неверный формат телефона";
                 return result;
             }
 
             DAOService daoService = DAOService.getInstance();
             List<Client> clientList = daoService.findClientsByMobilePhone(mobilePhone);
-            if (clientList.size()==0) {
+            if (clientList.size() == 0) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
-            String codes="";
+            String codes = "";
             for (Client cl : clientList) {
                 LinkingToken linkingToken = daoService.generateLinkingToken(cl);
                 if (codes.length() > 0) {
                     codes += ", ";
                 }
-                codes+=linkingToken.getToken();
+                codes += linkingToken.getToken();
             }
-            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendMessageAsync(clientList.get(0), EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, new String[]{"linkingToken", codes});
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                    .sendMessageAsync(clientList.get(0), EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
+                            new String[]{"linkingToken", codes});
             result.resultCode = RC_OK;
-            result.description = "Код активации отправлен по SMS для "+clientList.size()+" л/с";
+            result.description = "Код активации отправлен по SMS для " + clientList.size() + " л/с";
             return result;
         } catch (Exception e) {
             logger.error("Failed to send linking token", e);
             return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
     }
-    
+
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
         MessageContext jaxwsContext = context.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest)jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
+        HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
         String clientAddress = request.getRemoteAddr();
         ////
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        X509Certificate[] certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+        X509Certificate[] certificates = (X509Certificate[]) request
+                .getAttribute("javax.servlet.request.X509Certificate");
         ////
         IntegraPartnerConfig.LinkConfig linkConfig = null;
-        String DNs="";
-        if (certificates!=null && certificates.length>0) {
-            for (int n=0;n<certificates.length;++n) {
+        String DNs = "";
+        if (certificates != null && certificates.length > 0) {
+            for (int n = 0; n < certificates.length; ++n) {
                 String dn = certificates[0].getSubjectDN().getName();
-                linkConfig =  runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
+                linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
                 if (linkConfig != null) {
                     break;
                 }
-                DNs+=dn+";";
+                DNs += dn + ";";
             }
         }
         /////
         // пробуем по имени и паролю
-        if (linkConfig==null) {
-            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy)jaxwsContext.get("org.apache.cxf.configuration.security.AuthorizationPolicy");
-            if (authorizationPolicy!=null && authorizationPolicy.getUserName()!=null) {
-                linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),  authorizationPolicy.getPassword());
+        if (linkConfig == null) {
+            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) jaxwsContext
+                    .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
+            if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
+                linkConfig = runtimeContext.getIntegraPartnerConfig()
+                        .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
+                                authorizationPolicy.getPassword());
             }
         }
         /////
-        if (linkConfig==null) {
-            linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigWithAuthTypeNoneAndMatchingAddress(clientAddress);
+        if (linkConfig == null) {
+            linkConfig = runtimeContext.getIntegraPartnerConfig()
+                    .getLinkConfigWithAuthTypeNoneAndMatchingAddress(clientAddress);
         } else {
             // check remote addr
             if (!linkConfig.matchAddress(clientAddress)) {
-                throw new Error("Integra partner auth failed: remote address does not match: "+clientAddress+" for link config: "+linkConfig.id+"; request: ip="+clientAddress+"; ssl DNs="+DNs);
+                throw new Error("Integra partner auth failed: remote address does not match: " + clientAddress
+                        + " for link config: " + linkConfig.id + "; request: ip=" + clientAddress + "; ssl DNs=" + DNs);
             }
         }
         /////
-        if (linkConfig==null) {
-            throw new Error("Integra partner auth failed: link config not found: ip="+clientAddress+"; ssl DNs="+DNs);
+        if (linkConfig == null) {
+            throw new Error(
+                    "Integra partner auth failed: link config not found: ip=" + clientAddress + "; ssl DNs=" + DNs);
         }
         /////
-        if (contractId!=null && linkConfig.permissionType==IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+        if (contractId != null && linkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
             DAOService daoService = DAOService.getInstance();
             Client client = null;
             try {
@@ -1948,109 +2097,114 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new Error("Integra partner auth failed: client not found: contractId=" + contractId + "; ip="
                         + clientAddress + "; ssl DNs=" + DNs);
             }
-            
+
             if (!client.hasIntegraPartnerAccessPermission(linkConfig.id)) {
-                throw new Error("Integra partner auth failed: access prohibited for client: contractId="+contractId+", authorize client first; ip="+clientAddress+"; ssl DNs="+DNs);
+                throw new Error("Integra partner auth failed: access prohibited for client: contractId=" + contractId
+                        + ", authorize client first; ip=" + clientAddress + "; ssl DNs=" + DNs);
             }
         }
         return linkConfig;
     }
 
     @Override
-    public Result changePassword(@WebParam(name = "contractId") Long contractId, @WebParam(name="base64passwordHash")  String base64passwordHash) {
+    public Result changePassword(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "base64passwordHash") String base64passwordHash) {
 
         authenticateRequest(contractId);
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         if (!DAOService.getInstance().setClientPassword(contractId, base64passwordHash)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
         return r;
     }
-      @Override
-    public SendResult sendPasswordRecoverURLFromEmail(@WebParam(name="contractId") Long contractId,@WebParam(name="request")RequestWebParam request){
-          ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-           SendResult sr=new SendResult();
-          sr.resultCode=RC_OK;
-          sr.description=RC_OK_DESC;
-          try{
-          int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,request);
-                 sr.recoverStatus=succeeded;
-
-          }catch(Exception e){
-              logger.error(e.getMessage(),e);
-              sr.resultCode=RC_INTERNAL_ERROR;
-              sr.description=RC_INTERNAL_ERROR_DESC;
-
-
-          }
-           return sr;
-      }
 
     @Override
-    public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name="request")RequestWebParam request){
+    public SendResult sendPasswordRecoverURLFromEmail(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "request") RequestWebParam request) {
         ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-        CheckPasswordResult cpr=new CheckPasswordResult();
-        cpr.resultCode=RC_OK;
-        cpr.description=RC_OK_DESC;
-           try{
-          boolean succeeded=clientPasswordRecover.checkPasswordRestoreRequest(request);
-               cpr.succeeded=succeeded;
-           }catch (Exception e){
-               logger.error(e.getMessage(),e);
-               cpr.resultCode=RC_INTERNAL_ERROR;
-               cpr.description=RC_INTERNAL_ERROR_DESC;
+        SendResult sr = new SendResult();
+        sr.resultCode = RC_OK;
+        sr.description = RC_OK_DESC;
+        try {
+            int succeeded = clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId, request);
+            sr.recoverStatus = succeeded;
 
-           }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            sr.resultCode = RC_INTERNAL_ERROR;
+            sr.description = RC_INTERNAL_ERROR_DESC;
+
+
+        }
+        return sr;
+    }
+
+    @Override
+    public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name = "request") RequestWebParam request) {
+        ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
+        CheckPasswordResult cpr = new CheckPasswordResult();
+        cpr.resultCode = RC_OK;
+        cpr.description = RC_OK_DESC;
+        try {
+            boolean succeeded = clientPasswordRecover.checkPasswordRestoreRequest(request);
+            cpr.succeeded = succeeded;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            cpr.resultCode = RC_INTERNAL_ERROR;
+            cpr.description = RC_INTERNAL_ERROR_DESC;
+
+        }
         return cpr;
     }
-     @Override
-    public IdResult getIdOfClient(@WebParam(name="contractId")Long contractId){
-         Long idOfClient = null;
+
+    @Override
+    public IdResult getIdOfClient(@WebParam(name = "contractId") Long contractId) {
+        Long idOfClient = null;
 
 
-         Session persistenceSession = null;
-         org.hibernate.Transaction persistenceTransaction = null;
+        Session persistenceSession = null;
+        org.hibernate.Transaction persistenceTransaction = null;
 
-         IdResult r=new IdResult();
-         r.resultCode=RC_OK;
-         r.description=RC_OK_DESC;
-
-
-         try {
-             RuntimeContext runtimeContext = null;
-
-             runtimeContext = RuntimeContext.getInstance();
-
-             persistenceSession = runtimeContext.createPersistenceSession();
-             persistenceTransaction = persistenceSession.beginTransaction();
-
-             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-             clientCriteria.add(Restrictions.eq("contractId", contractId));
-             Client client = (Client) clientCriteria.uniqueResult();
-             idOfClient = client.getIdOfClient();
+        IdResult r = new IdResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
 
 
-              r.id=idOfClient;
-             persistenceSession.flush();
-             persistenceTransaction.commit();
-             persistenceTransaction = null;
-         } catch (Exception e) {
-             logger.error(e.getMessage(),e);
-             r.resultCode=RC_INTERNAL_ERROR;
-             r.description=RC_INTERNAL_ERROR_DESC;
-         } finally {
-             HibernateUtils.rollback(persistenceTransaction, logger);
-             HibernateUtils.close(persistenceSession, logger);
-         }
+        try {
+            RuntimeContext runtimeContext = null;
+
+            runtimeContext = RuntimeContext.getInstance();
+
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            idOfClient = client.getIdOfClient();
+
+
+            r.id = idOfClient;
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
         return r;
 
-     }
+    }
 
-    public IdResult getIdOfContragent(@WebParam(name="contragentName")String contragentName){
+    public IdResult getIdOfContragent(@WebParam(name = "contragentName") String contragentName) {
 
 
         Long idOfContragent = null;
@@ -2058,9 +2212,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session persistenceSession = null;
         org.hibernate.Transaction persistenceTransaction = null;
 
-        IdResult r=new IdResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        IdResult r = new IdResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
 
         try {
             RuntimeContext runtimeContext = null;
@@ -2071,21 +2225,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction = persistenceSession.beginTransaction();
 
 
-
             Criteria contragentCriteria = persistenceSession.createCriteria(Contragent.class);
             contragentCriteria.add(Restrictions.eq("contragentName", contragentName));
             Contragent contragent = (Contragent) contragentCriteria.uniqueResult();
             idOfContragent = contragent.getIdOfContragent();
 
-            r.id=idOfContragent;
+            r.id = idOfContragent;
 
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            r.resultCode=RC_INTERNAL_ERROR;
-            r.description=RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2093,43 +2246,43 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         return r;
     }
+
     @Override
-    public IdResult createPaymentOrder(@WebParam(name="idOfClient")Long idOfClient,
-            @WebParam(name="idOfContragent")Long idOfContragent,
-            @WebParam(name="paymentMethod")int paymentMethod,
-            @WebParam(name="copecksAmount")Long copecksAmount,
-            @WebParam(name="contragentSum")Long contragentSum){
-        IdResult r=new IdResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+    public IdResult createPaymentOrder(@WebParam(name = "idOfClient") Long idOfClient,
+            @WebParam(name = "idOfContragent") Long idOfContragent, @WebParam(name = "paymentMethod") int paymentMethod,
+            @WebParam(name = "copecksAmount") Long copecksAmount,
+            @WebParam(name = "contragentSum") Long contragentSum) {
+        IdResult r = new IdResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
 
 
-        try{
-        RuntimeContext runtimeContext = null;
+        try {
+            RuntimeContext runtimeContext = null;
 
-        runtimeContext = RuntimeContext.getInstance();
-        Long idOfClientPaymentOrder = runtimeContext.getClientPaymentOrderProcessor()
-                .createPaymentOrder(idOfClient, idOfContragent, paymentMethod, copecksAmount, contragentSum);
-         r.id=idOfClientPaymentOrder;
+            runtimeContext = RuntimeContext.getInstance();
+            Long idOfClientPaymentOrder = runtimeContext.getClientPaymentOrderProcessor()
+                    .createPaymentOrder(idOfClient, idOfContragent, paymentMethod, copecksAmount, contragentSum);
+            r.id = idOfClientPaymentOrder;
 
-        }catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            r.resultCode=RC_INTERNAL_ERROR;
-            r.description=RC_INTERNAL_ERROR_DESC;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
 
         }
-       return r;
+        return r;
     }
 
 
     @Override
-    public Result changePaymentOrderStatus(@WebParam(name="idOfClient")Long idOfClient,
-            @WebParam(name="idOfClientPaymentOrder")Long idOfClientPaymentOrder,
-            @WebParam(name="orderStatus") int orderStatus){
+    public Result changePaymentOrderStatus(@WebParam(name = "idOfClient") Long idOfClient,
+            @WebParam(name = "idOfClientPaymentOrder") Long idOfClientPaymentOrder,
+            @WebParam(name = "orderStatus") int orderStatus) {
 
         Result r = new Result();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         RuntimeContext runtimeContext = null;
 
         runtimeContext = RuntimeContext.getInstance();
@@ -2139,22 +2292,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientPaymentOrder.ORDER_STATUS_CANCELLED);
 
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            r.resultCode=RC_INTERNAL_ERROR;
-            r.description=RC_INTERNAL_ERROR_DESC;
-    }
-    return r;
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return r;
 
-}
+    }
+
     @Override
-    public RBKMoneyConfigResult getRBKMoneyConfig(){
+    public RBKMoneyConfigResult getRBKMoneyConfig() {
         RuntimeContext runtimeContext = null;
-        RBKMoneyConfigResult r=new RBKMoneyConfigResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        RBKMoneyConfigResult r = new RBKMoneyConfigResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         runtimeContext = RuntimeContext.getInstance();
         RBKMoneyConfig rbkMoneyConfig = runtimeContext.getPartnerRbkMoneyConfig();
-        RBKMoneyConfigExt rbkMoneyConfigExt=new RBKMoneyConfigExt();
+        RBKMoneyConfigExt rbkMoneyConfigExt = new RBKMoneyConfigExt();
         rbkMoneyConfigExt.setContragentName(rbkMoneyConfig.getContragentName());
         rbkMoneyConfigExt.setEshopId(rbkMoneyConfig.getEshopId());
         rbkMoneyConfigExt.setPurchaseUri(rbkMoneyConfig.getPurchaseUri().toString());
@@ -2162,20 +2316,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         rbkMoneyConfigExt.setSecretKey(rbkMoneyConfig.getSecretKey());
         rbkMoneyConfigExt.setServiceName(rbkMoneyConfig.getServiceName());
         rbkMoneyConfigExt.setShow(rbkMoneyConfig.getShow());
-        r.rbkConfig=rbkMoneyConfigExt;
+        r.rbkConfig = rbkMoneyConfigExt;
         return r;
 
     }
 
     @Override
-    public ChronopayConfigResult getChronopayConfig(){
+    public ChronopayConfigResult getChronopayConfig() {
         RuntimeContext runtimeContext = null;
-        ChronopayConfigResult r=new ChronopayConfigResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        ChronopayConfigResult r = new ChronopayConfigResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         runtimeContext = RuntimeContext.getInstance();
         ChronopayConfig chronopayConfig = runtimeContext.getPartnerChronopayConfig();
-        ChronopayConfigExt chronopayConfigExt=new ChronopayConfigExt();
+        ChronopayConfigExt chronopayConfigExt = new ChronopayConfigExt();
         chronopayConfigExt.setCallbackUrl(chronopayConfig.getCallbackUrl());
         chronopayConfigExt.setContragentName(chronopayConfig.getContragentName());
         chronopayConfigExt.setIp(chronopayConfig.getIp());
@@ -2184,19 +2338,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         chronopayConfigExt.setSharedSec(chronopayConfig.getSharedSec());
         chronopayConfigExt.setShow(chronopayConfig.getShow());
 
-        r.chronopayConfig=chronopayConfigExt;
+        r.chronopayConfig = chronopayConfigExt;
         return r;
 
     }
+
     @Override
-   public  ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate){
+    public ClientSmsListResult getClientSmsList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         org.hibernate.Transaction persistenceTransaction = null;
 
-         ClientSmsListResult r=new ClientSmsListResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
+        ClientSmsListResult r = new ClientSmsListResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -2214,183 +2370,187 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSmsCriteria.add(Restrictions.lt("serviceSendTime", nextToEndDate));
             clientSmsCriteria.add(Restrictions.eq("client", client));
             List clientSmsList = clientSmsCriteria.list();
-               ClientSmsList clientSmsListR=new ClientSmsList();
+            ClientSmsList clientSmsListR = new ClientSmsList();
 
-               for(Object clientSmsObject:clientSmsList){
-                   ClientSms clientSms=(ClientSms)clientSmsObject;
-                   AccountTransaction accountTransaction = clientSms.getTransaction();
+            for (Object clientSmsObject : clientSmsList) {
+                ClientSms clientSms = (ClientSms) clientSmsObject;
+                AccountTransaction accountTransaction = clientSms.getTransaction();
 
-                   Sms sms=new Sms();
+                Sms sms = new Sms();
 
-                   sms.setDeliveryStatus(clientSms.getDeliveryStatus());
-                   sms.setPrice(clientSms.getPrice());
+                sms.setDeliveryStatus(clientSms.getDeliveryStatus());
+                sms.setPrice(clientSms.getPrice());
 
-                   sms.setContentsType(clientSms.getContentsType());
+                sms.setContentsType(clientSms.getContentsType());
 
-                   GregorianCalendar greSendTime = new GregorianCalendar();
-                   greSendTime.setTime(clientSms.getServiceSendTime());
-                   XMLGregorianCalendar xmlSendTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greSendTime);
+                GregorianCalendar greSendTime = new GregorianCalendar();
+                greSendTime.setTime(clientSms.getServiceSendTime());
+                XMLGregorianCalendar xmlSendTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(greSendTime);
 
-                   sms.setServiceSendTime(xmlSendTime);
+                sms.setServiceSendTime(xmlSendTime);
 
-                   Long transactionSum = 0L;
-                   if (null != accountTransaction) {
-                       transactionSum = accountTransaction.getTransactionSum();
-                   }
+                Long transactionSum = 0L;
+                if (null != accountTransaction) {
+                    transactionSum = accountTransaction.getTransactionSum();
+                }
 
-                   sms.setTransactionSum(transactionSum);
+                sms.setTransactionSum(transactionSum);
 
-                   if (null != accountTransaction) {
-                       Card card = accountTransaction.getCard();
-                       if (null != card) {
+                if (null != accountTransaction) {
+                    Card card = accountTransaction.getCard();
+                    if (null != card) {
 
-                      sms.setCardNo(card.getCardNo());
-                       }
-                   }
-                  clientSmsListR.getS().add(sms);
+                        sms.setCardNo(card.getCardNo());
+                    }
+                }
+                clientSmsListR.getS().add(sms);
 
 
-               }   r.clientSmsList=clientSmsListR;
+            }
+            r.clientSmsList = clientSmsListR;
 
-        }catch(Exception e){
-            logger.error(e.getMessage(),e);
-            r.resultCode=RC_INTERNAL_ERROR;
-            r.description=RC_INTERNAL_ERROR_DESC;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
 
         }
 
 
-         return r;
+        return r;
+    }
+
+
+    @Override
+    public BanksData getBanks() {
+
+        BanksData bd = new BanksData();
+        bd.resultCode = RC_OK;
+        bd.description = RC_OK_DESC;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        BanksList bankItemList = new BanksList();
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria banksCriteria = persistenceSession.createCriteria(Bank.class);
+
+            List<Bank> banksList = (List<Bank>) banksCriteria.list();
+            //List<BankItem>banks=new ArrayList<BankItem>();
+            for (Bank bank : banksList) {
+                BankItem bankItem = new BankItem();
+                bankItem.setEnrollmentType(bank.getEnrollmentType());
+                bankItem.setLogoUrl(bank.getLogoUrl());
+                bankItem.setMinRate(bank.getMinRate());
+                bankItem.setName(bank.getName());
+                bankItem.setTerminalsUrl(bank.getTerminalsUrl());
+                bankItem.setRate(bank.getRate());
+                bankItem.setIdOfBank(bank.getIdOfBank());
+
+                bankItemList.getBanks().add(bankItem);
+            }
+
+            bd.banksList = bankItemList;
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+
+        } catch (Exception e) {
+            bd.resultCode = RC_INTERNAL_ERROR;
+            bd.description = RC_INTERNAL_ERROR_DESC;
+
+
+            logger.error(e.getMessage(), e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
-
-
-      @Override
-    public BanksData getBanks(){
-
-          BanksData bd=new BanksData();
-         bd.resultCode=RC_OK;
-         bd.description=RC_OK_DESC;
-          RuntimeContext runtimeContext = RuntimeContext.getInstance();
-          Session persistenceSession = null;
-          Transaction persistenceTransaction = null;
-
-            BanksList bankItemList =new BanksList();
-          try {
-              persistenceSession = runtimeContext.createPersistenceSession();
-              persistenceTransaction = persistenceSession.beginTransaction();
-              Criteria banksCriteria = persistenceSession.createCriteria(Bank.class);
-
-              List<Bank> banksList=(List<Bank>)banksCriteria.list();
-              //List<BankItem>banks=new ArrayList<BankItem>();
-              for(Bank bank:banksList){
-                  BankItem bankItem =new BankItem();
-                  bankItem.setEnrollmentType(bank.getEnrollmentType());
-                  bankItem.setLogoUrl(bank.getLogoUrl());
-                  bankItem.setMinRate(bank.getMinRate());
-                  bankItem.setName(bank.getName());
-                  bankItem.setTerminalsUrl(bank.getTerminalsUrl());
-                  bankItem.setRate(bank.getRate());
-                  bankItem.setIdOfBank(bank.getIdOfBank());
-
-                  bankItemList.getBanks().add(bankItem);
-              }
-
-               bd.banksList=bankItemList;
-
-              persistenceSession.flush();
-              persistenceTransaction.commit();
-              persistenceTransaction = null;
-
-
-
-
-          }catch(Exception e){
-           bd.resultCode=RC_INTERNAL_ERROR;
-           bd.description=RC_INTERNAL_ERROR_DESC;
-
-
-              logger.error(e.getMessage(),e);
-          }  finally {
-              HibernateUtils.rollback(persistenceTransaction, logger);
-              HibernateUtils.close(persistenceSession, logger);
-          }
 
         return bd;
 
-      }
+    }
 
     @Override
-    public Result changePersonalInfo(@WebParam(name="contractId") Long contractId,@WebParam(name="limit") Long limit,
-            @WebParam(name="address") String address,@WebParam(name="phone") String phone,@WebParam(name="mobilePhone") String mobilePhone,
-            @WebParam(name="email") String email,@WebParam(name="smsNotificationState") boolean smsNotificationState){
+    public Result changePersonalInfo(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "limit") Long limit, @WebParam(name = "address") String address,
+            @WebParam(name = "phone") String phone, @WebParam(name = "mobilePhone") String mobilePhone,
+            @WebParam(name = "email") String email,
+            @WebParam(name = "smsNotificationState") boolean smsNotificationState) {
 
         authenticateRequest(contractId);
 
         Result r = new Result(RC_OK, RC_OK_DESC);
 
-        try{
-        DAOService daoService=DAOService.getInstance();
+        try {
+            DAOService daoService = DAOService.getInstance();
 
 
-         //change limit
-        if (limit<0) {
-            r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
-            return r;
-        }
-        if (!daoService.setClientExpenditureLimit(contractId, limit)) {
-            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-        }
+            //change limit
+            if (limit < 0) {
+                r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
+                return r;
+            }
+            if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+                r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
 
-        //change email
-        if (!daoService.setClientEmail(contractId, email)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
-        }
+            //change email
+            if (!daoService.setClientEmail(contractId, email)) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+            }
 
-        //change mobile phone
-        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-        if (mobilePhone==null) {
-            r.resultCode=RC_INVALID_DATA;
-            r.description="Неверный формат телефона";
-            return r;
-        }
-        if (!daoService.setClientMobilePhone(contractId, mobilePhone)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
-        }
+            //change mobile phone
+            mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+            if (mobilePhone == null) {
+                r.resultCode = RC_INVALID_DATA;
+                r.description = "Неверный формат телефона";
+                return r;
+            }
+            if (!daoService.setClientMobilePhone(contractId, mobilePhone)) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+            }
 
-        //enableNotificationBySms
-        if (!daoService.enableClientNotificationBySMS(contractId, smsNotificationState)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
-        }
-       //change phone
-        if (!daoService.setClientPhone(contractId, phone)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
-        }
+            //enableNotificationBySms
+            if (!daoService.enableClientNotificationBySMS(contractId, smsNotificationState)) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+            }
+            //change phone
+            if (!daoService.setClientPhone(contractId, phone)) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+            }
 
-       //change address
-        if (!daoService.setClientAddress(contractId, address)) {
-            r.resultCode=RC_CLIENT_NOT_FOUND;
-            r.description=RC_CLIENT_NOT_FOUND_DESC;
-        }
+            //change address
+            if (!daoService.setClientAddress(contractId, address)) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+            }
 
-        }catch(Exception e){logger.error("error in changePersonalInfo: ",e);}
+        } catch (Exception e) {
+            logger.error("error in changePersonalInfo: ", e);
+        }
         return r;
     }
 
 
-    @WebMethod(operationName="getHiddenPages")
+    @WebMethod(operationName = "getHiddenPages")
 
-    public HiddenPagesResult getHiddenPages(){
-        RuntimeContext runtimeContext=null;
-        HiddenPagesResult r=new HiddenPagesResult();
-        r.resultCode=RC_OK;
-        r.description=RC_OK_DESC;
-        runtimeContext=RuntimeContext.getInstance();
-        String hiddenPages=runtimeContext.getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
-        r.hiddenPages=hiddenPages;
+    public HiddenPagesResult getHiddenPages() {
+        RuntimeContext runtimeContext = null;
+        HiddenPagesResult r = new HiddenPagesResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        runtimeContext = RuntimeContext.getInstance();
+        String hiddenPages = runtimeContext
+                .getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
+        r.hiddenPages = hiddenPages;
         return r;
     }
 

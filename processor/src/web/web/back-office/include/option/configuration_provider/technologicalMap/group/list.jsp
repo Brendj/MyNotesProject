@@ -59,9 +59,15 @@
             rendered="#{!technologicalMapGroupListPage.emptyTechnologicalMapGroup}">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="№" styleClass="output-text" escape="true"/>
+                <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{row+1}" />
+            <h:outputText styleClass="output-text" value="#{technologicalMapGroup.globalId}" />
+        </rich:column>
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="GUID" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{technologicalMapGroup.guid}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

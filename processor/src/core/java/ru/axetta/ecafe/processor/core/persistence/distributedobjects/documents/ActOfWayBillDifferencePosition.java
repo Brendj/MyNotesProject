@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -69,7 +68,7 @@ public class ActOfWayBillDifferencePosition extends DistributedObject {
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if(longTotalCount != null) setTotalCount(longNetWeight);
+        if(longTotalCount != null) setNetWeight(longNetWeight);
         Long longGrossWeight = getLongAttributeValue(node,"GrossWeight");
         if(longGrossWeight != null) setGrossWeight(longGrossWeight);
         Date dateNameOfGood = getDateTimeAttributeValue(node, "GoodsCreationDate");
