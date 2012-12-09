@@ -38,7 +38,9 @@
             <f:facet name="header">
                 <h:outputText value="Количество" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount}" />
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}">
+                <f:convertNumber pattern="#0.000"/>
+            </h:outputText>
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">

@@ -78,7 +78,10 @@
             <f:facet name="header">
                 <h:outputText value="Дата создания" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.createdDateFormatted}" />
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.createdDateFormatted}"
+                             action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
