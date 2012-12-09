@@ -292,9 +292,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 idResult.description = RC_INTERNAL_ERROR_DESC;
                 return idResult;
             }
+            prohibition.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
             persistenceSession.save(prohibition);
-
-            DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName());
 
             idResult.id = prohibition.getGlobalId();
 
@@ -374,9 +373,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 idResult.description = RC_INTERNAL_ERROR_DESC;
                 return idResult;
             }
+            exclusion.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(ProhibitionExclusion.class.getSimpleName()));
             persistenceSession.save(exclusion);
-
-            DAOService.getInstance().updateVersionByDistributedObjects(ProhibitionExclusion.class.getSimpleName());
 
             idResult.id = exclusion.getGlobalId();
 
