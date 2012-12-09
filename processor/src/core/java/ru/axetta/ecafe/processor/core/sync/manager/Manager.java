@@ -389,7 +389,7 @@ public class Manager {
             String sendOnlyOrgWhere = " (sendAll = 3 and orgOwner = "+idOfOrg+" ";
             if(currentMaxVersion != null){
                 where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
-                sendOnlyOrgWhere = sendOnlyOrgWhere + " globalVersion>"+currentMaxVersion;
+                sendOnlyOrgWhere = sendOnlyOrgWhere + " and globalVersion>"+currentMaxVersion;
                 // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
             }
             sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
