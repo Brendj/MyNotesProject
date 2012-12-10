@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
   (
-  idofclientcomplexdiscount bigint NOT NULL,
+  idofclientcomplexdiscount bigserial NOT NULL,
   createdate bigint NOT NULL,
   idofclient bigint NOT NULL,
   idofrule bigint NOT NULL,
@@ -15,3 +15,5 @@ CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
 
 ALTER TABLE cf_complexinfo ADD COLUMN idofgood bigint;
 ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods (idofgood);
+
+--! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
