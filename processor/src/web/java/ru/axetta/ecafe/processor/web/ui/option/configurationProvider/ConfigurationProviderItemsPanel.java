@@ -60,7 +60,8 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
 
     @PostConstruct
     public void reload() throws Exception {
-        configurationProviderList = new ArrayList<ConfigurationProvider>();
+        //configurationProviderList = new ArrayList<ConfigurationProvider>();
+        configurationProviderList = retrieveProduct();
         selectConfigurationProvider = new ConfigurationProvider();
         filter="";
     }
