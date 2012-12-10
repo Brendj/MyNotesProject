@@ -121,23 +121,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org org = null;
+            Set<Long> setIdOfOrgs = new HashSet<Long>();
             if (orgId != null) {
-                Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
-                orgCriteria.add(Restrictions.eq("idOfOrg", orgId));
-                org = (Org) orgCriteria.uniqueResult();
+                Org org = (Org) persistenceSession.load(Org.class, orgId);
                 if (org == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "Организация не найдена";
                     return result;
                 }
+                setIdOfOrgs.add(orgId);
+                List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                setIdOfOrgs.addAll(longList);
             }
-
             ListOfProductGroups listOfProductGroups = new ListOfProductGroups();
 
             ObjectFactory objectFactory = new ObjectFactory();
 
             Criteria productGroupCriteria = persistenceSession.createCriteria(ProductGroup.class);
+            productGroupCriteria.add(Restrictions.in("orgOwner",setIdOfOrgs));
             List groupObjects = productGroupCriteria.list();
             if (!groupObjects.isEmpty()) {
                 for (Object groupObject : groupObjects) {
@@ -149,24 +150,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     listOfProductGroupsExt.setGuid(productGroup.getGuid());
                     listOfProductGroupsExt.setOrgOwner(productGroup.getOrgOwner());
                     listOfProductGroupsExt.setCreatedDate(getXMLGregorianCalendarByDate(productGroup.getCreatedDate()));
-
                     ListOfProducts listOfProducts = new ListOfProducts();
                     listOfProductGroupsExt.getProducts().add(listOfProducts);
-
                     Criteria productCriteria = persistenceSession.createCriteria(Product.class);
                     productCriteria.add(Restrictions.eq("productGroup", productGroup));
-                    if (org != null) {
-                        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
-                        StringBuffer sqlRestriction = new StringBuffer();
-                        for (Long idOfProvider : menuExchangeRuleList) {
-                            sqlRestriction.append("orgOwner=");
-                            sqlRestriction.append(idOfProvider);
-                            sqlRestriction.append(" or ");
-                        }
-                        sqlRestriction.append("orgOwner=");
-                        sqlRestriction.append(org.getIdOfOrg());
-                        productCriteria.add(Restrictions.sqlRestriction(sqlRestriction.toString()));
-                    }
+                    productCriteria.add(Restrictions.in("orgOwner",setIdOfOrgs));
                     List objects = productCriteria.list();
                     if (!objects.isEmpty()) {
                         for (Object object : objects) {
