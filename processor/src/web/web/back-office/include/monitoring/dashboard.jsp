@@ -34,7 +34,7 @@
              <rich:extendedDataTable id="orgBasicStatsTable" value="#{dashboardPage.orgBasicStats.orgBasicStatItems}" var="item"
                                      rows="500"
                                      sortMode="multi" selectionMode="single" width="1500" height="900"
-                                     footerClass="data-table-footer">
+                                     footerClass="data-table-footer" noDataLabel="Данных нет">
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfOrg}"  width="35px" filterBy="#{item.idOfOrg}" filterEvent="onkeyup">
                      <f:facet name="header">
                          <h:outputText value="Ид." styleClass="output-text" escape="true"/>
