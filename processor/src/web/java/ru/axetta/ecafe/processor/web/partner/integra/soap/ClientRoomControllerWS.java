@@ -156,7 +156,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     Criteria productCriteria = persistenceSession.createCriteria(Product.class);
                     productCriteria.add(Restrictions.eq("productGroup", productGroup));
                     if (org != null) {
-                        productCriteria.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                        StringBuffer sqlRestriction = new StringBuffer();
+                        for (Long idOfProvider : menuExchangeRuleList) {
+                            sqlRestriction.append("orgOwner=");
+                            sqlRestriction.append(idOfProvider);
+                            sqlRestriction.append(" or ");
+                        }
+                        sqlRestriction.append("orgOwner=");
+                        sqlRestriction.append(org.getIdOfOrg());
+                        productCriteria.add(Restrictions.sqlRestriction(sqlRestriction.toString()));
                     }
                     List objects = productCriteria.list();
                     if (!objects.isEmpty()) {
@@ -247,7 +256,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
                     goodCriteria.add(Restrictions.eq("goodGroup", goodGroup));
                     if (org != null) {
-                        goodCriteria.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                        StringBuffer sqlRestriction = new StringBuffer();
+                        for (Long idOfProvider : menuExchangeRuleList) {
+                            sqlRestriction.append("orgOwner=");
+                            sqlRestriction.append(idOfProvider);
+                            sqlRestriction.append(" or ");
+                        }
+                        sqlRestriction.append("orgOwner=");
+                        sqlRestriction.append(org.getIdOfOrg());
+                        goodCriteria.add(Restrictions.sqlRestriction(sqlRestriction.toString()));
                     }
                     List objects = goodCriteria.list();
                     if (!objects.isEmpty()) {
