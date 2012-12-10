@@ -687,6 +687,74 @@
                      label="Производственная конфигурация">
     <a4j:support event="onclick" action="#{mainPage.showConfigurationProviderGroupPage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="goodCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.GoodCreatePage"--%>
+    <%--@elvariable id="goodEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.GoodEditPage"--%>
+    <%--@elvariable id="goodViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.GoodViewPage"--%>
+    <%--@elvariable id="goodListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.GoodListPage"--%>
+    <%--@elvariable id="selectedGoodGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.SelectedGoodGroupPage"--%>
+
+    <rich:panelMenuGroup id="goodGroupMenu" binding="#{mainPage.goodGroupPage.mainMenuComponent}"
+                         label="Справочник товаров" rendered="#{mainPage.eligibleToViewRule}">
+        <a4j:support event="onclick" action="#{mainPage.showGoodGroupPage}" reRender="workspaceForm" />
+        <%--@elvariable id="goodGroupCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupCreatePage"--%>
+        <%--@elvariable id="goodGroupListPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupListPage"--%>
+        <%--@elvariable id="goodGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupEditPage"--%>
+        <%--@elvariable id="goodGroupViewPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupViewPage"--%>
+        <%--@elvariable id="selectedGoodGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.SelectedGoodGroupGroupPage"--%>
+
+        <rich:panelMenuGroup id="goodGroupsGroupMenu" binding="#{mainPage.goodGroupsGroupPage.mainMenuComponent}"
+                             label="Группы товаров">
+
+            <rich:panelMenuItem id="listGoodGroupsMenuItem" label="Список"
+                                binding="#{goodGroupListPage.mainMenuComponent}"
+                                action="#{goodGroupListPage.show}" reRender="workspaceForm" />
+
+
+            <rich:panelMenuGroup id="selectedGoodGroupGroupMenu"
+                                 binding="#{selectedGoodGroupGroupPage.mainMenuComponent}"
+                                 label="#{selectedGoodGroupGroupPage.title}" rendered="false">
+                <a4j:support event="onclick" action="#{selectedGoodGroupGroupPage.show}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="viewGoodGroupsMenuItem" label="Просмотр"
+                                    binding="#{goodGroupViewPage.mainMenuComponent}"
+                                    action="#{goodGroupViewPage.show}" reRender="workspaceForm" />
+
+                <rich:panelMenuItem id="editGoodGroupsMenuItem" label="Редактирование"
+                                    binding="#{goodGroupEditPage.mainMenuComponent}"
+                                    action="#{goodGroupEditPage.show}" reRender="workspaceForm" />
+
+            </rich:panelMenuGroup>
+
+            <rich:panelMenuItem id="createGoodGroupsMenuItem" label="Регистрация"
+                                binding="#{goodGroupCreatePage.mainMenuComponent}"
+                                action="#{goodGroupCreatePage.show}" reRender="workspaceForm" />
+
+
+        </rich:panelMenuGroup>
+
+
+        <rich:panelMenuItem id="goodListMenuItem" label="Список" binding="#{goodListPage.mainMenuComponent}"
+                            action="#{goodListPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedGoodMenu" binding="#{selectedGoodGroupPage.mainMenuComponent}"
+                             label="#{selectedGoodGroupPage.title}" rendered="false">
+            <a4j:support event="onclick" action="#{selectedGoodGroupPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewGoodMenuItem" label="Просмотр" binding="#{goodViewPage.mainMenuComponent}"
+                                action="#{productViewPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editGoodMenuItem" label="Редактирование"
+                                binding="#{goodEditPage.mainMenuComponent}" action="#{goodEditPage.show}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="goodCreateMenuItem" label="Регистрация"
+                            binding="#{goodCreatePage.mainMenuComponent}" action="#{goodCreatePage.show}"
+                            reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
                          label="Справочник продуктов" rendered="#{mainPage.eligibleToViewRule}">
         <a4j:support event="onclick" action="#{mainPage.showProductGuideGroupPage}" reRender="workspaceForm" />

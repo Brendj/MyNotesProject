@@ -17,3 +17,7 @@ ALTER TABLE cf_complexinfo ADD COLUMN idofgood bigint;
 ALTER TABLE cf_complexinfo ADD CONSTRAINT cf_complexinfo_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods (idofgood);
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
+
+ALTER TABLE cf_goods ADD COLUMN idofusercreate bigint;
+ALTER TABLE cf_goods ADD COLUMN idofuseredit bigint;
+ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;

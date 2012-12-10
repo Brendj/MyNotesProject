@@ -114,8 +114,8 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             return;
         }
         try{
-            ProductGroup pg = entityManager.getReference(ProductGroup.class, currentProduct.getGlobalId());
-            entityManager.remove(pg);
+            Product p = entityManager.getReference(Product.class, currentProduct.getGlobalId());
+            entityManager.remove(p);
             printMessage("Продукт успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении продукта.");

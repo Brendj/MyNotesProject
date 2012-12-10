@@ -324,7 +324,16 @@ public class MainPage {
     private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage productGroupsGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage goodGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage goodGroupsGroupPage = new BasicWorkspacePage();
 
+    public BasicWorkspacePage getGoodGroupPage() {
+        return goodGroupPage;
+    }
+
+    public BasicWorkspacePage getGoodGroupsGroupPage() {
+        return goodGroupsGroupPage;
+    }
 
     public BasicWorkspacePage getProductGroupsGroupPage() {
         return productGroupsGroupPage;
@@ -6685,6 +6694,13 @@ public Long getSelectedIdOfReportRule() {
         updateSelectedMainMenu();
         return null;
     }
+
+    public Object showGoodGroupPage() {
+        currentWorkspacePage = goodGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     //private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
     ///* For ru.axetta.ecafe.processor.core.test only */

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -100,6 +101,10 @@ public class Good extends DistributedObject {
     private String guidOfP;
     private TechnologicalMap technologicalMap;
     private String guidOfTM;
+
+    private User userCreate;
+    private User userEdit;
+    private User userDelete;
 
     public String getGuidOfP() {
         return guidOfP;
@@ -203,5 +208,29 @@ public class Good extends DistributedObject {
 
     public void setNameOfGood(String nameOfGood) {
         this.nameOfGood = nameOfGood;
+    }
+
+    public User getUserCreate() {
+        return userCreate;
+    }
+
+    public void setUserCreate(User userCreate) {
+        this.userCreate = userCreate;
+    }
+
+    public User getUserEdit() {
+        return userEdit;
+    }
+
+    public void setUserEdit(User userEdit) {
+        this.userEdit = userEdit;
+    }
+
+    public User getUserDelete() {
+        return userDelete;
+    }
+
+    public void setUserDelete(User userDelete) {
+        this.userDelete = userDelete;
     }
 }
