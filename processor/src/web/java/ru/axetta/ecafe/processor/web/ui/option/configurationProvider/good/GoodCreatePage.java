@@ -5,15 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good;
 
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.good.group.GoodGroupSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.TechnologicalMapSelect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.UUID;
+import javax.faces.model.SelectItem;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,12 +34,20 @@ import java.util.UUID;
  */
 @Component
 @Scope("session")
-public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelect {
+public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelect, ProductSelect,
+        TechnologicalMapSelect {
     private static final Logger logger = LoggerFactory.getLogger(GoodCreatePage.class);
     private Good good;
     private GoodGroup currentGoodGroup;
+    private Product currentProduct;
+    private TechnologicalMap currentTechnologicalMap;
+    private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
     @Autowired
     private GoodGroupItemsPanel goodGroupItemsPanel;
+    @Autowired
+    private ProductPanel productPanel;
+    @Autowired
+    private TechnologicalMapPanel technologicalMapPanel;
     @Autowired
     private DAOService daoService;
 
@@ -49,13 +58,23 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
 
     private void reload() {
         good = new Good();
+        currentProduct = null;
+        currentTechnologicalMap =null;
         currentGoodGroup = null;
+        this.selectItemList = new LinkedList<SelectItem>();
+        for (Integer i=0;i<Good.UNIT_SCALES.length; i++){
+            this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
+        }
     }
 
     public Object onSave(){
         try {
             if(currentGoodGroup==null){
                 printError("Поле 'Группа товаров' обязательное.");
+                return null;
+            }
+            if(currentProduct == null && currentTechnologicalMap == null){
+                printError("Не выбран 'Продукт' или 'Технологическая карта' обязательное.");
                 return null;
             }
             if(good.getNameOfGood()==null || good.getNameOfGood().equals("")){
@@ -71,7 +90,8 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             MainPage mainPage = MainPage.getSessionInstance();
             good.setUserCreate(mainPage.getCurrentUser());
             good.setGoodGroup(currentGoodGroup);
-
+            good.setProduct(currentProduct);
+            good.setTechnologicalMap(currentTechnologicalMap);
             daoService.persistEntity(good);
             reload();
             printMessage("Товар сохранена успешно.");
@@ -80,6 +100,34 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             logger.error("Error create good",e);
         }
         return null;
+    }
+
+    @Override
+    public void select(Product product) {
+        currentProduct = product;
+    }
+
+    public Object selectProduct() throws Exception{
+        productPanel.reload();
+        if(currentProduct!=null){
+            productPanel.setSelectProduct(currentProduct);
+        }
+        productPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    public Object selectTechnologicalMap() throws Exception{
+        technologicalMapPanel.reload();
+        if(currentTechnologicalMap!=null){
+            technologicalMapPanel.setSelectTechnologicalMap(currentTechnologicalMap);
+        }
+        technologicalMapPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(TechnologicalMap technologicalMap) {
+        currentTechnologicalMap = technologicalMap;
     }
 
     public Object selectGoodGroup() throws Exception{
@@ -110,5 +158,29 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
 
     public void setGood(Good good) {
         this.good = good;
+    }
+
+    public Product getCurrentProduct() {
+        return currentProduct;
+    }
+
+    public void setCurrentProduct(Product currentProduct) {
+        this.currentProduct = currentProduct;
+    }
+
+    public TechnologicalMap getCurrentTechnologicalMap() {
+        return currentTechnologicalMap;
+    }
+
+    public void setCurrentTechnologicalMap(TechnologicalMap currentTechnologicalMap) {
+        this.currentTechnologicalMap = currentTechnologicalMap;
+    }
+
+    public List<SelectItem> getSelectItemList() {
+        return selectItemList;
+    }
+
+    public void setSelectItemList(List<SelectItem> selectItemList) {
+        this.selectItemList = selectItemList;
     }
 }

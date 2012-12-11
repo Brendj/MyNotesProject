@@ -76,17 +76,23 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
         return null;
     }
 
+    public Object remove(){
+        removeGroup();
+        return null;
+    }
+
+
     @Transactional
-    public void remove(){
+    protected void removeGroup(){
         if(!currentGoodGroup.getDeletedState()) {
-            printMessage("Группа не может быть удалена.");
+            printError("Группа не может быть удалена.");
             return;
         }
         TypedQuery<Good> query = entityManager.createQuery("from Good where goodGroup=:goodGroup",Good.class);
         query.setParameter("goodGroup",currentGoodGroup);
         List<Good> goodList = query.getResultList();
         if(!(goodList==null || goodList.isEmpty())){
-            printError("Группа не может быть удален.");
+            printError("В группе имеются зарегистрированные товары.");
             return;
         }
         try{
