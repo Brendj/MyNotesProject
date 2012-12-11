@@ -21,6 +21,22 @@
                                styleClass="command-link" style="width: 25px; float: right;" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Продукт" styleClass="output-text required-field" rendered="#{goodEditPage.currentTechnologicalMap==null}"/>
+        <h:panelGroup styleClass="borderless-div" rendered="#{goodEditPage.currentTechnologicalMap==null}">
+            <h:outputText value="#{goodEditPage.currentProduct.productName}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{goodEditPage.selectProduct}" reRender="productSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Технологическая карта" styleClass="output-text required-field" rendered="#{goodEditPage.currentProduct==null}"/>
+        <h:panelGroup styleClass="borderless-div" rendered="#{goodEditPage.currentProduct==null}">
+            <h:outputText value="#{goodEditPage.currentTechnologicalMap.nameOfTechnologicalMap}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{goodEditPage.selectTechnologicalMap}" reRender="technologicalMapSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
+
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectOneListbox value="#{goodEditPage.currentGood.deletedState}" size="1">
             <f:selectItem itemLabel="Не удален" itemValue="false"/>
@@ -34,10 +50,12 @@
         <h:outputText escape="true" value="Код" styleClass="output-text" />
         <h:inputText value="#{goodEditPage.currentGood.goodsCode}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Единица измерения" styleClass="output-text" />
-        <h:inputText value="#{goodEditPage.currentGood.unitsScale}" maxlength="128" styleClass="input-text long-field" />
+        <h:selectOneMenu value="#{goodEditPage.currentGood.unitsScale}">
+            <f:selectItems value="#{goodEditPage.selectItemList}"/>
+        </h:selectOneMenu>
         <h:outputText escape="true" value="Масса нетто" styleClass="output-text" />
         <h:inputText value="#{goodEditPage.currentGood.netWeight}" maxlength="32" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Срок годности" styleClass="output-text" />
+        <h:outputText escape="true" value="Срок годности (в минутах)" styleClass="output-text" />
         <h:inputText value="#{goodEditPage.currentGood.lifeTime}" maxlength="32" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Наценка" styleClass="output-text" />
         <h:inputText value="#{goodEditPage.currentGood.margin}" maxlength="32" styleClass="input-text long-field" />

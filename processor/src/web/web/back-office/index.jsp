@@ -43,6 +43,15 @@
         <c:import url="include/confirm_delete.jsp" />
     </f:subview>
 
+    <f:subview id="technologicalMapSelectSubView">
+        <c:import url="include/option/configuration_provider/technologicalMap/select.jsp" />
+    </f:subview>
+
+    <f:subview id="productSelectSubView">
+        <c:import url="include/option/configuration_provider/product/select.jsp" />
+    </f:subview>
+
+
     <f:subview id="technologicalMapGroupSelectSubView">
         <c:import url="include/option/configuration_provider/technologicalMap/group/select.jsp" />
     </f:subview>
@@ -60,8 +69,15 @@
         <c:import url="include/option/configuration_provider/select.jsp" />
     </f:subview>
 
+    <f:subview id="goodSelectSubView">
+        <c:import url="include/option/configuration_provider/good/confirm_delete.jsp" />
+    </f:subview>
 
-<f:subview id="productSelectSubView">
+    <f:subview id="goodGroupsSelectSubView">
+        <c:import url="include/option/configuration_provider/good/group/confirm_delete.jsp" />
+    </f:subview>
+
+    <f:subview id="productDeleteSelectSubView">
         <c:import url="include/option/configuration_provider/product/confirm_delete.jsp" />
     </f:subview>
 

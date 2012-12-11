@@ -25,6 +25,12 @@
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{goodViewPage.currentGood.deletedState}" readonly="true" disabled="true"/>
 
+        <h:outputText escape="true" value="Продукт" styleClass="output-text required-field" rendered="#{goodViewPage.currentProduct!=null}"/>
+        <h:inputText value="#{goodViewPage.currentProduct.productName}" maxlength="128" readonly="true" styleClass="input-text long-field" rendered="#{goodViewPage.currentProduct!=null}"/>
+
+        <h:outputText escape="true" value="Технологическая карта" styleClass="output-text required-field" rendered="#{goodViewPage.currentTechnologicalMap!=null}"/>
+        <h:inputText value="#{goodViewPage.currentTechnologicalMap.nameOfTechnologicalMap}" maxlength="128" readonly="true" styleClass="input-text long-field" rendered="#{goodViewPage.currentTechnologicalMap!=null}"/>
+
         <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
         <h:inputText value="#{goodViewPage.currentGood.nameOfGood}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text" />
@@ -32,11 +38,11 @@
         <h:outputText escape="true" value="Код" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.goodsCode}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Единица измерения" styleClass="output-text" />
-        <h:inputText value="#{goodViewPage.currentGood.unitsScale}" maxlength="128" readonly="true" styleClass="input-text long-field" />
+        <h:inputText value="#{goodViewPage.currentGood.unitScaleString}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Масса нетто" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.netWeight}" maxlength="32" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Срок годности" styleClass="output-text" />
-        <h:inputText value="#{goodViewPage.currentGood.lifeTime}" maxlength="32" readonly="true" styleClass="input-text long-field" />
+        <h:inputText value="#{goodViewPage.currentGood.lifeTime} минут" maxlength="32" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Наценка" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.margin}" maxlength="32" readonly="true" styleClass="input-text long-field" />
     </h:panelGrid>
@@ -47,10 +53,15 @@
                            reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
     </h:panelGrid>
 
+    <a4j:status id="sGoodViewPageStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-
 </h:panelGrid>

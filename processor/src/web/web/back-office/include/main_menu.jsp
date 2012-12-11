@@ -745,7 +745,7 @@
             <a4j:support event="onclick" action="#{selectedGoodGroupPage.show}" reRender="workspaceForm" />
 
             <rich:panelMenuItem id="viewGoodMenuItem" label="Просмотр" binding="#{goodViewPage.mainMenuComponent}"
-                                action="#{productViewPage.show}" reRender="workspaceForm" />
+                                action="#{goodViewPage.show}" reRender="workspaceForm" />
 
             <rich:panelMenuItem id="editGoodMenuItem" label="Редактирование"
                                 binding="#{goodEditPage.mainMenuComponent}" action="#{goodEditPage.show}"

@@ -24,7 +24,7 @@
             <tr>
                 <td style="text-align: center;">
                     <h:panelGroup styleClass="borderless-div">
-                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{productEditPage.remove}"
+                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{productEditPage.removeProduct}"
                                            oncomplete="#{rich:component('removedProductItemDeletePanel')}.hide();"
                                            reRender="mainMenu, workspaceTogglePanel, #{productListPage.pageComponent.id}"
                                            styleClass="command-button" />

@@ -99,7 +99,7 @@
             <f:facet name="header">
                 <h:outputText value="Единица измерения" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{good.unitsScale}" />
+            <h:outputText styleClass="output-text" value="#{good.unitScaleString}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -111,13 +111,19 @@
             <f:facet name="header">
                 <h:outputText value="Срок годности" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{good.lifeTime}" />
+            <h:outputText styleClass="output-text" value="#{good.lifeTime} минут" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Наценка" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{good.margin}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Статус товара" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{good.deletedState}" readonly="true" disabled="true"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">
@@ -150,10 +156,10 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
-    </h:panelGrid>
-
 </h:panelGrid>
+
+<h:panelGrid styleClass="borderless-grid">
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+</h:panelGrid>
+
