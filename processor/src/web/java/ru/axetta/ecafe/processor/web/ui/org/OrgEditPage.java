@@ -67,7 +67,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private ConfigurationProvider configurationProvider;
     private String configurationProviderName;
     private Set<Org> orgSet = new HashSet<Org>();
-    private List<Long> idOfOrgList;
+    private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
     private String district;
     private String location;
@@ -280,12 +280,14 @@ public class OrgEditPage extends BasicWorkspacePage
             this.filterCategoryOrg = stringBuilder.substring(0,stringBuilder.length()-2);
         }
 
-        if(org.getConfigurationProvider()!=null){
-            this.configurationProviderName = org.getConfigurationProvider().getName();
-        } else {
-            this.configurationProviderName = "";
-        }
+        select(org.getConfigurationProvider());
+        //if(org.getConfigurationProvider()!=null){
+        //    this.configurationProviderName = org.getConfigurationProvider().getName();
+        //} else {
+        //    this.configurationProviderName = "";
+        //}
         friendlyIdOfOrgList.clear();
+        idOfOrgList.clear();
         filterFriendlyOrgs = "Не выбрано";
         if(!(org.getFriendlyOrg()==null || org.getFriendlyOrg().isEmpty())){
             StringBuilder stringBuilder = new StringBuilder();
@@ -293,6 +295,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 stringBuilder.append(friendlyOrg.getShortName());
                 stringBuilder.append("; ");
                 friendlyIdOfOrgList.add(friendlyOrg.getIdOfOrg());
+                idOfOrgList.add(friendlyOrg.getIdOfOrg());
             }
             filterFriendlyOrgs = stringBuilder.toString();
         }
