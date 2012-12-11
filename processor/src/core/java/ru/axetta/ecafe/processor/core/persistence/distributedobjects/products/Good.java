@@ -23,6 +23,8 @@ import org.w3c.dom.Node;
  */
 public class Good extends DistributedObject {
 
+    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //GoodGroup gg = DAOService.getInstance().findDistributedObjectByRefGUID(GoodGroup.class, guidOfGG);
@@ -232,5 +234,9 @@ public class Good extends DistributedObject {
 
     public void setUserDelete(User userDelete) {
         this.userDelete = userDelete;
+    }
+
+    public String getUnitScaleString(){
+        return UNIT_SCALES[unitsScale];
     }
 }
