@@ -75,7 +75,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String longitude;
 
     private Integer refectoryType;
-    private SelectItem[] refectoryTypeComboMenuItems;
+    private List<SelectItem> refectoryTypeComboMenuItems;
 
     private String filterCategoryOrg;
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
@@ -252,20 +252,21 @@ public class OrgEditPage extends BasicWorkspacePage
         this.guid = org.getGuid();
 
         this.refectoryType = org.getRefectoryType();
-        // Добавление элементов в выпадающий список для типа пищеблока
-        SelectItem[] items;
-        int i_first = 0;
         if (this.refectoryType == null) {
-            items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length + 1];
-            items[i_first] = new SelectItem(-1, "-- не выставлено --");
-            i_first++;
-        } else {
-            items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
+            this.refectoryType = -1;
         }
-        for (int i = i_first; i < Org.REFECTORY_TYPE_NAMES.length + i_first; i++) {
-            items[i] = new SelectItem((i - i_first), Org.REFECTORY_TYPE_NAMES[i - i_first]);
+        // Добавление элементов в выпадающий список для типа пищеблока
+        refectoryTypeComboMenuItems = new ArrayList<SelectItem>();
+        if (this.refectoryType != -1) {
+            refectoryTypeComboMenuItems.add(new SelectItem(refectoryType, Org.REFECTORY_TYPE_NAMES[refectoryType]));
         }
-        this.refectoryTypeComboMenuItems = items;
+        refectoryTypeComboMenuItems.add(new SelectItem(-1, ""));
+        for (int i = 0; i < Org.REFECTORY_TYPE_NAMES.length; i++) {
+            if (i != this.refectoryType) {
+                SelectItem item = new SelectItem(i, Org.REFECTORY_TYPE_NAMES[i]);
+                refectoryTypeComboMenuItems.add(item);
+            }
+        }
 
         idOfCategoryOrgList.clear();
         this.filterCategoryOrg ="Не выбрано";
@@ -709,19 +710,10 @@ public class OrgEditPage extends BasicWorkspacePage
     }
 
     public void setRefectoryType(Integer refectoryType) {
-        if (refectoryType != -1) {
-            SelectItem[] items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
-            for (int i = 1; i < refectoryTypeComboMenuItems.length; i++) {
-                items[i - 1] = refectoryTypeComboMenuItems[i];
-            }
-            refectoryTypeComboMenuItems = items;
-            this.refectoryType = refectoryType;
-        } else {
-            this.refectoryType = null;
-        }
+        this.refectoryType = refectoryType;
     }
 
-    public SelectItem[] getRefectoryTypeComboMenuItems() {
+    public List<SelectItem> getRefectoryTypeComboMenuItems() {
         return refectoryTypeComboMenuItems;
     }
 

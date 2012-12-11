@@ -67,7 +67,6 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String latitude;
     private String longitude;
     private Integer refectoryType;
-    private SelectItem[] refectoryTypeComboMenuItems;
     private String refectoryTypeStringRepresentation;
 
     public String getFriendlyFilterOrgs() {
@@ -227,25 +226,16 @@ public class OrgViewPage extends BasicWorkspacePage {
         return refectoryType;
     }
 
-    public void setRefectoryType(Integer refectoryType) {
-        this.refectoryType = refectoryType;
-    }
-
-    public SelectItem[] getRefectoryTypeComboMenuItems() {
-        return refectoryTypeComboMenuItems;
-    }
-
     public String getRefectoryTypeStringRepresentation() {
-        discoverCurrentRefectoryType();
-        return refectoryTypeStringRepresentation;
-    }
-
-    private void discoverCurrentRefectoryType() {
-        if (refectoryType == null) {
+        if ((refectoryType == null) || (refectoryType >= Org.REFECTORY_TYPE_NAMES.length)) {
+            refectoryType = -1;
             refectoryTypeStringRepresentation = "";
-            return;
+        } else if (refectoryType == -1) {
+            refectoryTypeStringRepresentation = "";
+        } else {
+            refectoryTypeStringRepresentation = Org.REFECTORY_TYPE_NAMES[refectoryType];
         }
-        refectoryTypeStringRepresentation = refectoryTypeComboMenuItems[refectoryType].getLabel();
+        return refectoryTypeStringRepresentation;
     }
 
     public void fill(Session session, Long idOfOrg) throws Exception {
@@ -287,14 +277,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         }
 
         this.refectoryType = org.getRefectoryType();
-        // Добавление элементов в выпадающий список для типа пищеблока
-        SelectItem[] items = new SelectItem[Org.REFECTORY_TYPE_NAMES.length];
-        for (int i = 0; i < Org.REFECTORY_TYPE_NAMES.length; i++) {
-            items[i] = new SelectItem(i, Org.REFECTORY_TYPE_NAMES[i]);
-        }
-        this.refectoryTypeComboMenuItems = items;
-        discoverCurrentRefectoryType();
-
+        getRefectoryTypeStringRepresentation();
 
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
