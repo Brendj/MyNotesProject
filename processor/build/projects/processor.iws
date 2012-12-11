@@ -6,7 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/SupportSMSPage.java" line="38" />
+    <bookmark url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/SupportSMSPage.java" line="40" />
   </component>
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
@@ -23,20 +23,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/core/database/derby/clearDOTable.sql" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductPanel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductSelect.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapPanel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapSelect.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/select.jsp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/select.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web.iml" afterPath="$PROJECT_DIR$/web.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/BasicWorkspacePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/BasicWorkspacePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodCreatePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodCreatePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodEditPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodViewPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodViewPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupEditPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupItemsPanel.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupItemsPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductEditPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/group/ProductGroupEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/group/ProductGroupEditPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapCreatePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapCreatePage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapEditPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapEditPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapViewPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapViewPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/create.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/create.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/edit.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/edit.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/confirm_delete.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/confirm_delete.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/create.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/create.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/edit.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/edit.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/view.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/view.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/view.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/view.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/confirm_delete.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/confirm_delete.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/group/edit.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/group/edit.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/group/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/group/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/group/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/group/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/list.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/product/select.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/product/select.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/index.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/index.jsp" />
+      <change type="MOVED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\java\ru\axetta\ecafe\processor\web\ui\option\configurationProvider\technologicalMap\technologicalMapProduct\ProductItem.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/technologicalMapProduct/ProductListItem.java" />
+      <change type="MOVED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\java\ru\axetta\ecafe\processor\web\ui\option\configurationProvider\technologicalMap\technologicalMapProduct\ProductItemsPanel.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/technologicalMapProduct/ProductListItemsPanel.java" />
+      <change type="MOVED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\java\ru\axetta\ecafe\processor\web\ui\option\configurationProvider\technologicalMap\technologicalMapProduct\ProductSelect.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/technologicalMapProduct/ProductListSelect.java" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
     <list id="7e8effdf-c23d-41fa-a191-cdc309bd5038" name="Failed commit: Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
     <list id="1c87b227-3fd2-4ea3-b77a-585c0cc1f32d" name="Failed commit: Failed commit: Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
-    <list id="9fc048e1-fe22-4245-90cb-d5cb7cfe7225" name="Failed commit: Default (2)" comment="страницы не используются">
-      <change type="DELETED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\report\product_guide\confirm_delete.jsp" afterPath="" />
-      <change type="DELETED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\report\product_guide\list.jsp" afterPath="" />
-      <change type="DELETED" beforePath="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\report\product_guide\load_file.jsp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/productGuide" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/report/product_guide" afterPath="" />
-    </list>
+    <list id="9fc048e1-fe22-4245-90cb-d5cb7cfe7225" name="Failed commit: Default (2)" comment="страницы не используются" />
     <ignored path="processor.iws" />
     <ignored path="$USER_HOME$/.griffon/" />
     <ignored path=".idea/workspace.xml" />
@@ -81,7 +115,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncRequest.java" line="1111" class="ru.axetta.ecafe.processor.core.sync.SyncRequest.ReqMenu.Item.ReqMenuDetail.Builder" package="ru.axetta.ecafe.processor.core.sync">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncRequest.java" line="1126" class="ru.axetta.ecafe.processor.core.sync.SyncRequest.ReqMenu.Item.ReqMenuDetail.Builder" package="ru.axetta.ecafe.processor.core.sync">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -146,6 +180,32 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductEditPage.java" line="112" class="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product.ProductEditPage" package="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgEditPage.java" line="724" class="ru.axetta.ecafe.processor.web.ui.org.OrgEditPage" package="ru.axetta.ecafe.processor.web.ui.org">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
@@ -194,8 +254,8 @@
       <property name="field_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByClasses" value="true" />
       <property name="exception_breakpoints_viewId" value="TABLE" />
-      <property name="exception_breakpoints_groupByClasses" value="true" />
       <property name="field_breakpoints_viewId" value="TABLE" />
+      <property name="exception_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByMethods" value="false" />
     </ui_properties>
   </component>
@@ -213,536 +273,59 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="MainPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java">
+      <file leaf-file-name="create.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/create.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6614" column="46" selection-start="280738" selection-end="280738" vertical-scroll-proportion="0.0">
+            <state line="52" column="57" selection-start="4523" selection-end="4534" vertical-scroll-proportion="-11.785714">
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="docComment;class#MainPage#0" expanded="false" />
-                <element signature="method#setModalPages#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportTemplateManagerPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAllOrgsDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAllOrgsDiscountReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildAllOrgsDiscountsReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildOrgDiscountsReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEndOfLine#0;class#MainPage#0" expanded="false" />
-                <element signature="method#logout#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateSelectedMainMenu#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getMainMenu#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setMainMenu#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCurrentWorkspacePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUserGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOptionsGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCategoryOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUserListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRemovedIdOfUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setRemovedIdOfUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedUserGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedUserGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUserViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUserEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUserCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateOrgListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearOrgListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfOrg#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfOrg#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedOrgGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedMenuDataXML#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedMenuDataXML#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showMenuDataXML#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getMenuExchangePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showMenuExchangePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfMenu#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfMenu#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getMenuDetailsPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showMenuDetailsPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getMenuViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showMenuViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getGoodRequestListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showGoodRequestListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateOrg#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createOrg#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgBalanceReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgBalanceReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildOrgBalanceReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgOrderReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgOrderReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildOrgOrderReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getTopMostPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeClientGroupSelection#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrgFilterOfSelectOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setOrgFilterOfSelectOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateOrgSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeOrgSelection#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeOrgListSelectionOk#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeOrgListSelectionCancel#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfContragent#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfContragent#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedContragentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedContragentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateContragent#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createContragent#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentClientPaymentReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentClientPaymentReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildContragentClientPaymentReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContragentSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setMultiContrFlag#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setClassTypes#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeContragentSelection#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isModalPageVisible#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isOrgSelectPageVisible#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isContragentSelectPageVisible#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateClientListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearClientListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfClient#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfClient#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedClientGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedClientGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateClient#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientOperationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientOperationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createClient#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientUpdateFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientUpdateFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clientLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clientUpdateLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#close#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientUpdateLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfCard#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfCard#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateClientSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeClientSelection#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearClientSelectPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getContractBuildPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContractBuildPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#generateClientContractNumber#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientLimitBatchEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardExpireBatchEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientLimitBatchEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardExpireBatchEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#batchUpdateClientLimit#0;class#MainPage#0" expanded="false" />
-                <element signature="method#batchUpdateCardExpire#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientSmsListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientSmsListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#sendClientNegativeBalanceSms#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateClientSmsListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearClientSmsListPageClientFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearClientSmsListPageClientSmsFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateCardListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearCardListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedCardGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedCardGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateCard#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createCard#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardOperationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardOperationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCardFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCardFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#cardLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCcAccountGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCCAccountGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showContragentOpsGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientOpsGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCaOpsGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientOpsGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCcAccountListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCCAccountListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateCCAccountListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearCCAccountListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRemovedIdOfCCAccount#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setRemovedIdOfCCAccount#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCcAccountDeletePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeCCAccount#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCCAccountCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCCAccountCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCCAccountCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createCCAccount#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCCAccountFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCCAccountFileLoadPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#ccAccountLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#mailLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#reportTemplateLoadFileListener#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getServiceGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showServiceGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSupportEmailPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSupportEmailPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#sendSupportEmail#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportRuleListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportRuleListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRemovedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setRemovedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportRuleViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportRuleViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportRuleEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportRuleEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportRuleCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportRuleCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createReportRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEventNotificationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEventNotificationListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRemovedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setRemovedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEventNotificationViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEventNotificationViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEventNotificationEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEventNotificationEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEventNotificationCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEventNotificationCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createEventNotification#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getTestLogPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showTestLogPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#doLogTest#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getBuildSignKeysPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showBuildSignKeysPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildSignKeys#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOrderRemovePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOrderRemovePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeOrder#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportJobListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportJobListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRemovedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setRemovedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportJobViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportJobViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportJobEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportJobEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportJobCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportJobCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createReportJob#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getReportOnlineGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getMonitoringGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportOnlineGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showMonitoringGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getComplexGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getNsiGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUosGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showComplexGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showNSIGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showUOSGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getDiscountGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showDiscountGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getFreeComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showFreeComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildFreeComplexReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPayComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPayComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildPayComplexReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSalesReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSalesReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildSalesReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showFreeComplexCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPayComplexCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSalesCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSyncReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSyncReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildSyncReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getStatusSyncReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showStatusSyncReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildStatusSyncReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getEnterEventReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEnterEventReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildEnterEventReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showEnterEventCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getClientReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildClientReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showClientOrgCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getConfigurationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showConfigurationGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getConfigurationPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showConfigurationPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportTemplateManagerPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#saveConfiguration#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getJournalViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showJournalViewPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getOptionGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showOptionGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setCurrentWorkspacePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCurrentPositionsReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCurrentPositionsReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildCurrentPositionsReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#countCurrentPositions#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPosGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPosGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPosListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPosListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPosCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPosCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createPos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearPosListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPosDeletePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfPos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfPos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removePos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPosCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showPosEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getPosEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updatePos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedPosGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedPosGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSettlementListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSettlementListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSettlementCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSettlementCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createSettlement#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearSettlementListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSettlementDeletePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfSettlement#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfSettlement#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeSettlement#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSettlementCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSettlementEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSettlementEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateSettlement#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAddPaymentListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAddPaymentListPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAddPaymentCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAddPaymentCreatePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#createAddPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#clearAddPaymentListPageFilter#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAddPaymentDeletePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfAddPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfAddPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeAddPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAddPaymentCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAddPaymentEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAddPaymentEditPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateAddPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showSelectedAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCategoryGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getConfirmDeletePage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeRuleListSelectionOk#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeRuleListSelectionCancel#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryOrgFilterOfSelectCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setCategoryOrgFilterOfSelectCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeCategoryOrgListSelectionOk#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeCategoryOrgListSelectionCancel#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategoryFilterOfSelectCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setCategoryFilterOfSelectCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#updateCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeCategoryListSelectionOk#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeCategoryListSelectionCancel#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getCategorySelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCategorySelectPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#completeCategorySelection#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showRuleGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showReportGroupPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSelectedIdOfRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setSelectedIdOfRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showCurrentPositionCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="e#282977#283046#0" expanded="false" />
-                <element signature="method#getCurrentUser#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getSessionInstance#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getUserRole#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewOrgs#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewUsers#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewContragents#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewCards#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditCards#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewClients#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToRemoveClients#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewReports#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToServiceClients#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToServiceSupport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToServiceAdmin#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditClients#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditContragents#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditReports#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditOrgs#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditUsers#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToDeleteUsers#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditOptions#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToWorkOnlineReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToMonitor#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToCountCurrentPositions#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewPos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditPos#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToProcessPayment#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewCategory#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditCategory#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToViewRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#isEligibleToEditRule#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeClient#0;class#MainPage#0" expanded="false" />
-                <element signature="method#getAllComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAllComplexReportPage#0;class#MainPage#0" expanded="false" />
-                <element signature="method#buildAllComplexReport#0;class#MainPage#0" expanded="false" />
-                <element signature="method#showAllComplexCSVList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#removeClientFromList#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setLimit#0;class#MainPage#0" expanded="false" />
-                <element signature="method#setOrg#0;class#MainPage#0" expanded="false" />
+                <marker date="1355237366266" expanded="true" signature="983:1129" placeholder="{...}" />
+                <marker date="1355237366266" expanded="true" signature="1465:1491" placeholder="{...}" />
+                <marker date="1355237366266" expanded="true" signature="1896:2042" placeholder="{...}" />
+                <marker date="1355237366266" expanded="true" signature="2372:2398" placeholder="{...}" />
+                <marker date="1355237366266" expanded="true" signature="2818:2964" placeholder="{...}" />
+                <marker date="1355237366266" expanded="true" signature="3321:3347" placeholder="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SyncServlet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java">
+      <file leaf-file-name="edit.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/edit.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="123" column="23" selection-start="5100" selection-end="5100" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClientRoomControllerWS.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="113" column="24" selection-start="5263" selection-end="5263" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClientRoomController.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="17" selection-start="788" selection-end="788" vertical-scroll-proportion="-4.5751634">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Manager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="404" column="21" selection-start="22103" selection-end="22103" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SendToAssociatedOrgs.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/SendToAssociatedOrgs.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="27" selection-start="579" selection-end="579" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main_menu.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="801" column="46" selection-start="52141" selection-end="52141" vertical-scroll-proportion="-29.37736">
+            <state line="57" column="68" selection-start="4857" selection-end="4857" vertical-scroll-proportion="-15.714286">
               <folding>
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+                <marker date="1355237366298" expanded="true" signature="974:1120" placeholder="{...}" />
+                <marker date="1355237366298" expanded="true" signature="1454:1480" placeholder="{...}" />
+                <marker date="1355237366298" expanded="true" signature="1878:2024" placeholder="{...}" />
+                <marker date="1355237366298" expanded="true" signature="2352:2378" placeholder="{...}" />
+                <marker date="1355237366298" expanded="true" signature="2792:2938" placeholder="{...}" />
+                <marker date="1355237366298" expanded="true" signature="3293:3319" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="list.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/list.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="113" column="80" selection-start="6364" selection-end="6364" vertical-scroll-proportion="-7.642857">
+              <folding>
+                <marker date="1355237366232" expanded="true" signature="1749:1895" placeholder="{...}" />
+                <marker date="1355237366232" expanded="true" signature="2253:2279" placeholder="{...}" />
+                <marker date="1355237366232" expanded="true" signature="7378:7388" placeholder="{...}" />
+                <marker date="1355237366232" expanded="true" signature="7585:7602" placeholder="{...}" />
+                <marker date="1355237366232" expanded="true" signature="7994:8004" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="view.jsp" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/view.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="44" column="70" selection-start="3920" selection-end="3920" vertical-scroll-proportion="0.7773852">
+              <folding>
+                <marker date="1355237366316" expanded="true" signature="1431:1525" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -806,22 +389,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/web/servlets/BarcodeServlet.java" />
-        <option value="$PROJECT_DIR$/../../src/client-room/web/WEB-INF/jboss-deployment-structure.xml" />
-        <option value="$PROJECT_DIR$/../../src/client-room/web/WEB-INF/web.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ClientOrderDetailsByAllOrgReport.java" />
-        <option value="$PROJECT_DIR$/../../src/client-room/web/client-room/payform_receipt.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/ProhibitionExclusion.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Prohibition.hbm.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.hbm.xml" />
-        <option value="$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/core/card/CardNoFormat.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomController.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/index.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/product/select.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/select.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/select.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodEditPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodCreatePage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapPanel.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductPanel.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupItemsPanel.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodViewPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/create.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/edit.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/list.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/view.jsp" />
       </list>
     </option>
   </component>
@@ -913,10 +496,10 @@
     <subPane />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="62" />
-    <option name="y" value="86" />
-    <option name="width" value="1502" />
-    <option name="height" value="892" />
+    <option name="x" value="-8" />
+    <option name="y" value="32" />
+    <option name="width" value="1696" />
+    <option name="height" value="1026" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -1070,6 +653,16 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -1077,16 +670,6 @@
               <option name="myItemId" value="processor" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -1164,7 +747,71 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
+              <option name="myItemId" value="option" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="option" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="configuration_provider" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="option" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="configuration_provider" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="good" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1215,266 +862,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="partner" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="partner" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="integra" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="partner" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="integra" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="soap" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="synctest" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="synctest" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="synctest" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sync" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sync" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="manager" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="persistence" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="persistence" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="distributedobjects" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1490,16 +877,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
       <pane id="Favorites" />
     </panes>
   </component>
@@ -1507,15 +884,15 @@
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
-    <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.11694747" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="RunManagerConfig.showSettingsBeforeRunnig" value="false" />
-    <property name="recentsLimit" value="5" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
+    <property name="recentsLimit" value="5" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../.." />
+    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
     <property name="JdbcConsole.OpenEditorOnStart" value="false" />
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="processor" />
     <property name="GoToClass.includeJavaFiles" value="false" />
@@ -1529,32 +906,32 @@
     <property name="last_directory_selection" value="$PROJECT_DIR$/../../src/core/test" />
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="options.lastSelected" value="project.propCompiler" />
-    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="project.structure.side.proportion" value="0.21096176" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="TEMP_MODULE_EXPLODED_DIR_FOR_web/web/web" value="C:\Users\Marat\AppData\Local\Temp\webExplodedDir3886714855693816300tmp" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
       <recent name="ru.axetta.ecafe.processor.core.sync.manager" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap" />
+      <recent name="ru.axetta.ecafe.processor.web.ui.option.configurationProvider.product" />
       <recent name="ru.axetta.ecafe.processor.web.servlets" />
       <recent name="ru.axetta.ecafe.processor.core.report" />
       <recent name="ru.axetta.ecafe.processor.dashboard.data" />
-      <recent name="ru.axetta.ecafe.processor.web.ui.client.rule" />
-      <recent name="ru.axetta.ecafe.processor.web.ui.option" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\option\configuration_provider\technologicalMap" />
+      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\option\configuration_provider\product" />
+      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\java\ru\axetta\ecafe\processor\web\ui\option\configurationProvider\good" />
+      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\option\configuration_provider\good" />
       <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office" />
-      <recent name="D:\workspace\ecafe\11\ecafe_1211\src\core\java\ru\axetta\ecafe\processor\core\persistence\distributedobjects" />
-      <recent name="D:\workspace\ecafe\10\khb_CR1b\build\projects\smpp\java\ru" />
-      <recent name="D:\workspace\ecafe\10\khb_CR1b\build\projects\smpp\java" />
-      <recent name="F:\homeWork\java\workspace\ecafe\ecafe08_10\src\core\java\ru\axetta\ecafe\processor\core\persistence" />
     </key>
     <key name="OPEN_URL_DIALOG">
       <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
@@ -1828,6 +1205,25 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <module name="" />
@@ -1862,25 +1258,6 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
-      </method>
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <option name="MAIN_CLASS_NAME" />
@@ -1894,6 +1271,29 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
       <envs />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
+      <JSDebuggerConfigurationSettings>
+        <option name="engineId" value="embedded" />
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GWT.ConfigurationType" factoryName="GWT Configuration">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
@@ -1929,25 +1329,14 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="GWT.ConfigurationType" factoryName="GWT Configuration">
-      <module name="" />
+    <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
       <option name="VM_PARAMETERS" value="" />
+      <option name="USER_CFG_CLASS" />
+      <option name="CONTEXT_PROVIDER" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
         <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
-      <JSDebuggerConfigurationSettings>
-        <option name="engineId" value="embedded" />
-        <option name="fileUrl" />
-      </JSDebuggerConfigurationSettings>
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
         <option name="Maven.BeforeRunTask" enabled="false" />
         <option name="PhingTarget" enabled="false" />
       </method>
@@ -1957,18 +1346,6 @@
       <server-settings />
       <predefined_log_file id="TOMCAT_LOCALHOST_LOG_ID" enabled="true" />
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-        <option name="PhingTarget" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
-      <option name="VM_PARAMETERS" value="" />
-      <option name="USER_CFG_CLASS" />
-      <option name="CONTEXT_PROVIDER" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
@@ -2455,7 +1832,11 @@
       <created>1353601439266</created>
       <updated>1353601439266</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="удалил ссылки на не используемые страницы">
+      <created>1354879743182</created>
+      <updated>1354879743182</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -2479,58 +1860,58 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="62" y="86" width="1502" height="892" extended-state="0" />
-    <editor active="false" />
+    <frame x="-8" y="32" width="1696" height="1026" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3251366" sideWeight="0.0" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3251366" sideWeight="0.0" order="23" side_tool="false" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.3763797" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.27704194" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.27704194" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289183" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289183" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20971303" sideWeight="0.42325228" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902735" sideWeight="0.6996587" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32854208" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3225256" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Log4jMonitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26147428" sideWeight="0.67896175" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.48556232" order="23" side_tool="false" content_ui="tabs" />
+      <window_info id="Log4jMonitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.29534313" sideWeight="0.7297921" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.48556232" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3897059" sideWeight="0.75635105" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37066975" sideWeight="0.71276593" order="22" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24223107" sideWeight="0.92788464" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32103825" sideWeight="0.5714286" order="19" side_tool="false" content_ui="tabs" />
-      <window_info id="RESTClient" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.86378205" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26327944" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.7090069" sideWeight="0.71276593" order="27" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24223107" sideWeight="0.92788464" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27020785" sideWeight="0.5714286" order="24" side_tool="false" content_ui="tabs" />
+      <window_info id="RESTClient" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.86378205" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23345588" sideWeight="0.6212471" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.22737306" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.22737306" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939914" sideWeight="0.80806977" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39786097" sideWeight="0.8196371" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
+      <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="26" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24837027" sideWeight="0.7407407" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="soapUI Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="soapUI Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.53588516" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5883134" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Atlassian " active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2636612" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="APIdoc" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32536522" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.963141" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5883134" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
+      <window_info id="Atlassian " active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="APIdoc" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32536522" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
+      <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.963141" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="IView" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32934928" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Cycles" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Cycles" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290735" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290735" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
-      <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="25" side_tool="false" content_ui="tabs" />
+      <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17465389" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="soapUI Navigator" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="soapUI Navigator" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="ValidationConfiguration">
@@ -2590,7 +1971,7 @@
     <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="страницы не используются" />
+    <option name="LAST_COMMIT_MESSAGE" value="удалил ссылки на не используемые страницы" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -2625,6 +2006,7 @@
     <MESSAGE value="Добавлеы онлайн-отчеты" />
     <MESSAGE value="добавлено экранирование для поля limit, таймаут для транзакций в отчетах установлен на 10 минут" />
     <MESSAGE value="страницы не используются" />
+    <MESSAGE value="удалил ссылки на не используемые страницы" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -2727,576 +2109,174 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderEditPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/product/ProductPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="13" selection-start="1355" selection-end="1355" vertical-scroll-proportion="0.0" />
+        <state line="67" column="48" selection-start="2044" selection-end="2044" vertical-scroll-proportion="1.4563427">
+          <folding>
+            <element signature="e#1223#1238#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderItemsPanel.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/TechnologicalMapPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="13" selection-start="812" selection-end="812" vertical-scroll-proportion="0.0" />
+        <state line="67" column="66" selection-start="2154" selection-end="2154" vertical-scroll-proportion="0.15650742">
+          <folding>
+            <element signature="e#1243#1267#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderListPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodCreatePage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="13" selection-start="1041" selection-end="1041" vertical-scroll-proportion="0.0" />
+        <state line="71" column="0" selection-start="2650" selection-end="2650" vertical-scroll-proportion="0.21911038">
+          <folding>
+            <element signature="e#1895#1907#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderMenu.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/group/GoodGroupItemsPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="13" selection-start="587" selection-end="587" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderSelect.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="17" selection-start="403" selection-end="403" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/ConfigurationProviderViewPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="13" selection-start="978" selection-end="978" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/Item.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="323" selection-end="323" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/SelectedConfigurationProviderGroupPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="13" selection-start="821" selection-end="821" vertical-scroll-proportion="0.21782178">
+        <state line="66" column="52" selection-start="1975" selection-end="1975" vertical-scroll-proportion="-0.7759473">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="801" column="46" selection-start="52141" selection-end="52141" vertical-scroll-proportion="-29.37736">
+        <state line="747" column="54" selection-start="49477" selection-end="49477" vertical-scroll-proportion="0.91519433">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/create.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="77" selection-start="1462" selection-end="1462" vertical-scroll-proportion="-14.142858">
           <folding>
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462225" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/technologicalMap/group/select.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6614" column="46" selection-start="280738" selection-end="280738" vertical-scroll-proportion="0.0">
+        <state line="21" column="92" selection-start="1232" selection-end="1232" vertical-scroll-proportion="-11.785714">
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="docComment;class#MainPage#0" expanded="false" />
-            <element signature="method#setModalPages#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportTemplateManagerPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAllOrgsDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAllOrgsDiscountReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgDiscountsReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildAllOrgsDiscountsReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildOrgDiscountsReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEndOfLine#0;class#MainPage#0" expanded="false" />
-            <element signature="method#logout#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateSelectedMainMenu#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getMainMenu#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setMainMenu#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCurrentWorkspacePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUserGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOptionsGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCategoryOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUserListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRemovedIdOfUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setRemovedIdOfUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedUserGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedUserGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUserViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUserEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUserCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateOrgListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearOrgListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfOrg#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfOrg#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedOrgGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedMenuDataXML#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedMenuDataXML#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showMenuDataXML#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getMenuExchangePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showMenuExchangePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfMenu#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfMenu#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getMenuDetailsPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showMenuDetailsPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getMenuViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showMenuViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getGoodRequestListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showGoodRequestListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateOrg#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createOrg#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgBalanceReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgBalanceReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildOrgBalanceReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgOrderReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgOrderReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildOrgOrderReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getTopMostPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateClientGroupSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeClientGroupSelection#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrgFilterOfSelectOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setOrgFilterOfSelectOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateOrgSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeOrgSelection#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeOrgListSelectionOk#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeOrgListSelectionCancel#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfContragent#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfContragent#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedContragentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedContragentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateContragent#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createContragent#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentClientPaymentReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentClientPaymentReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildContragentClientPaymentReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContragentSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setMultiContrFlag#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setClassTypes#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeContragentSelection#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isModalPageVisible#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isOrgSelectPageVisible#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isContragentSelectPageVisible#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateClientListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearClientListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfClient#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfClient#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedClientGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedClientGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateClient#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientOperationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientOperationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createClient#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientUpdateFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientUpdateFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clientLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clientUpdateLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#close#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientUpdateLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardLoadResultCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfCard#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfCard#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateClientSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeClientSelection#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearClientSelectPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getContractBuildPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContractBuildPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#generateClientContractNumber#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientLimitBatchEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardExpireBatchEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientLimitBatchEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardExpireBatchEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#batchUpdateClientLimit#0;class#MainPage#0" expanded="false" />
-            <element signature="method#batchUpdateCardExpire#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientSmsListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientSmsListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#sendClientNegativeBalanceSms#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateClientSmsListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearClientSmsListPageClientFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearClientSmsListPageClientSmsFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateCardListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearCardListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedCardGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedCardGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateCard#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createCard#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardOperationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardOperationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCardFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCardFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#cardLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCcAccountGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCCAccountGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showContragentOpsGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientOpsGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCaOpsGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientOpsGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCcAccountListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCCAccountListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateCCAccountListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearCCAccountListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRemovedIdOfCCAccount#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setRemovedIdOfCCAccount#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCcAccountDeletePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeCCAccount#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCCAccountCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCCAccountCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCCAccountCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createCCAccount#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCCAccountFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCCAccountFileLoadPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#ccAccountLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#mailLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#reportTemplateLoadFileListener#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getServiceGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showServiceGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSupportEmailPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSupportEmailPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#sendSupportEmail#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportRuleListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportRuleListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRemovedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setRemovedIdOfReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedReportRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportRuleViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportRuleViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportRuleEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportRuleEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportRuleCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportRuleCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createReportRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEventNotificationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEventNotificationListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRemovedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setRemovedIdOfEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedEventNotificationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEventNotificationViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEventNotificationViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEventNotificationEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEventNotificationEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEventNotificationCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEventNotificationCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createEventNotification#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getTestLogPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showTestLogPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#doLogTest#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getBuildSignKeysPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showBuildSignKeysPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildSignKeys#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOrderRemovePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOrderRemovePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeOrder#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportJobListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportJobListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRemovedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setRemovedIdOfReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedReportJobGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportJobViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportJobViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportJobEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportJobEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportJobCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportJobCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createReportJob#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getReportOnlineGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getMonitoringGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportOnlineGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showMonitoringGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getComplexGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getNsiGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUosGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showComplexGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showNSIGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showUOSGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getDiscountGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showDiscountGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getFreeComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showFreeComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildFreeComplexReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPayComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPayComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildPayComplexReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSalesReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSalesReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildSalesReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showFreeComplexCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPayComplexCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSalesCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSyncReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSyncReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildSyncReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getStatusSyncReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showStatusSyncReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildStatusSyncReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getEnterEventReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEnterEventReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildEnterEventReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showEnterEventCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getClientReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildClientReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showClientOrgCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getConfigurationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showConfigurationGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getConfigurationPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showConfigurationPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportTemplateManagerPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#saveConfiguration#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getJournalViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showJournalViewPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getOptionGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showOptionGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setCurrentWorkspacePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCurrentPositionsReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCurrentPositionsReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildCurrentPositionsReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#countCurrentPositions#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPosGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPosGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPosListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPosListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPosCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPosCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createPos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearPosListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPosDeletePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfPos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfPos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removePos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPosCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showPosEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getPosEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updatePos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedPosGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedPosGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSettlementListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSettlementListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSettlementCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSettlementCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createSettlement#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearSettlementListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSettlementDeletePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfSettlement#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfSettlement#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeSettlement#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSettlementCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSettlementEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSettlementEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateSettlement#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedSettlementGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAddPaymentListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAddPaymentListPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAddPaymentCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAddPaymentCreatePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#createAddPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#clearAddPaymentListPageFilter#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAddPaymentDeletePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfAddPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfAddPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeAddPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAddPaymentCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAddPaymentEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAddPaymentEditPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateAddPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showSelectedAddPaymentGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCategoryGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getConfirmDeletePage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateRuleListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeRuleListSelectionOk#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeRuleListSelectionCancel#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryOrgFilterOfSelectCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setCategoryOrgFilterOfSelectCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateCategoryOrgListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeCategoryOrgListSelectionOk#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeCategoryOrgListSelectionCancel#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategoryFilterOfSelectCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setCategoryFilterOfSelectCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#updateCategoryListSelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeCategoryListSelectionOk#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeCategoryListSelectionCancel#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getCategorySelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCategorySelectPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#completeCategorySelection#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showRuleGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showReportGroupPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSelectedIdOfRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setSelectedIdOfRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showCurrentPositionCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="e#282977#283046#0" expanded="false" />
-            <element signature="method#getCurrentUser#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getSessionInstance#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getUserRole#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewOrgs#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewUsers#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewContragents#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewCards#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditCards#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewClients#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToRemoveClients#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewReports#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToServiceClients#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToServiceSupport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToServiceAdmin#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditClients#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditContragents#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditReports#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditOrgs#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditUsers#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToDeleteUsers#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditOptions#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToWorkOnlineReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToMonitor#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToCountCurrentPositions#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewPos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditPos#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToProcessPayment#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewCategory#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditCategory#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToViewRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#isEligibleToEditRule#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeClient#0;class#MainPage#0" expanded="false" />
-            <element signature="method#getAllComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAllComplexReportPage#0;class#MainPage#0" expanded="false" />
-            <element signature="method#buildAllComplexReport#0;class#MainPage#0" expanded="false" />
-            <element signature="method#showAllComplexCSVList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#removeClientFromList#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setLimit#0;class#MainPage#0" expanded="false" />
-            <element signature="method#setOrg#0;class#MainPage#0" expanded="false" />
+            <marker date="1354521462136" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462136" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462136" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462136" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1354521462136" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/synctest/java/ru/axetta/ecafe/synctest/Main.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/technologicalMap/group/TechnologicalMapGroupItemsPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="41" selection-start="5074" selection-end="5074" vertical-scroll-proportion="-3.1220043">
+        <state line="74" column="22" selection-start="2323" selection-end="2323" vertical-scroll-proportion="1.5897858">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodEditPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="13" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#5074#5224#0" expanded="true" />
-            <element signature="e#5213#5214#0" expanded="true" />
+            <element signature="e#2353#2365#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/SendToAssociatedOrgs.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/product/list.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="27" selection-start="579" selection-end="579" vertical-scroll-proportion="0.0">
+        <state line="115" column="23" selection-start="6798" selection-end="7120" vertical-scroll-proportion="0.5318021">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/configurationProvider/good/GoodViewPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="404" column="21" selection-start="22103" selection-end="22103" vertical-scroll-proportion="0.0">
+        <state line="57" column="24" selection-start="2024" selection-end="2024" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/group/list.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="123" column="23" selection-start="5100" selection-end="5100" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="24" column="39" selection-start="1417" selection-end="1417" vertical-scroll-proportion="0.69964665">
+          <folding>
+            <marker date="1355222098794" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1355222098794" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1355222098794" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/create.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="113" column="24" selection-start="5263" selection-end="5263" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="52" column="57" selection-start="4523" selection-end="4534" vertical-scroll-proportion="-11.785714">
+          <folding>
+            <marker date="1355237366266" expanded="true" signature="983:1129" placeholder="{...}" />
+            <marker date="1355237366266" expanded="true" signature="1465:1491" placeholder="{...}" />
+            <marker date="1355237366266" expanded="true" signature="1896:2042" placeholder="{...}" />
+            <marker date="1355237366266" expanded="true" signature="2372:2398" placeholder="{...}" />
+            <marker date="1355237366266" expanded="true" signature="2818:2964" placeholder="{...}" />
+            <marker date="1355237366266" expanded="true" signature="3321:3347" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomController.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/edit.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="17" selection-start="788" selection-end="788" vertical-scroll-proportion="-4.5751634">
-          <folding />
+        <state line="57" column="68" selection-start="4857" selection-end="4857" vertical-scroll-proportion="-15.714286">
+          <folding>
+            <marker date="1355237366298" expanded="true" signature="974:1120" placeholder="{...}" />
+            <marker date="1355237366298" expanded="true" signature="1454:1480" placeholder="{...}" />
+            <marker date="1355237366298" expanded="true" signature="1878:2024" placeholder="{...}" />
+            <marker date="1355237366298" expanded="true" signature="2352:2378" placeholder="{...}" />
+            <marker date="1355237366298" expanded="true" signature="2792:2938" placeholder="{...}" />
+            <marker date="1355237366298" expanded="true" signature="3293:3319" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/list.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="80" selection-start="6364" selection-end="6364" vertical-scroll-proportion="-7.642857">
+          <folding>
+            <marker date="1355237366232" expanded="true" signature="1749:1895" placeholder="{...}" />
+            <marker date="1355237366232" expanded="true" signature="2253:2279" placeholder="{...}" />
+            <marker date="1355237366232" expanded="true" signature="7378:7388" placeholder="{...}" />
+            <marker date="1355237366232" expanded="true" signature="7585:7602" placeholder="{...}" />
+            <marker date="1355237366232" expanded="true" signature="7994:8004" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration_provider/good/view.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="70" selection-start="3920" selection-end="3920" vertical-scroll-proportion="0.7773852">
+          <folding>
+            <marker date="1355237366316" expanded="true" signature="1431:1525" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
