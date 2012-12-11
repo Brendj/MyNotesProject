@@ -146,6 +146,12 @@ public class BasicWorkspacePage extends BasicPage {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 
+    public void printWarn(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, msg, null));
+    }
+
     public Logger getLogger() {
         return logger;
     }
