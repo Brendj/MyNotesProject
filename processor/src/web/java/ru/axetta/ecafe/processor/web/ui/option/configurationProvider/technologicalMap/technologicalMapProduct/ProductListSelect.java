@@ -13,8 +13,8 @@ import java.util.List;
  * Time: 16:14
  * To change this template use File | Settings | File Templates.
  */
-public interface ProductSelect {
+public interface ProductListSelect {
 
-    public void select(List<ProductItem> productItemList);
+    public void select(List<ProductListItem> productItemList);
 
 }

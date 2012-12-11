@@ -13,12 +13,12 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
  * Time: 13:23
  * To change this template use File | Settings | File Templates.
  */
-public class ProductItem {
+public class ProductListItem {
 
     private Boolean checked=false;
     private Product product;
 
-    public ProductItem(Boolean checked, Product product) {
+    public ProductListItem(Boolean checked, Product product) {
         this.checked = checked;
         this.product = product;
     }

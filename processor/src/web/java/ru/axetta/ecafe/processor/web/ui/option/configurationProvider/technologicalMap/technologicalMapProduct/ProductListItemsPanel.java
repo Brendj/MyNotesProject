@@ -23,20 +23,20 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class ProductItemsPanel extends BasicPage {
+public class ProductListItemsPanel extends BasicPage {
 
-    private final Queue<ProductSelect> completeHandlerLists = new LinkedList<ProductSelect>();
+    private final Queue<ProductListSelect> completeHandlerLists = new LinkedList<ProductListSelect>();
 
     private TechnologicalMap technologicalMap;
 
-    private List<ProductItem> productItems = new ArrayList<ProductItem>();
+    private List<ProductListItem> productItems = new ArrayList<ProductListItem>();
     private List<Product> pr = new ArrayList<Product>();
     private String filter="";
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void pushCompleteHandlerList(ProductSelect handlerList) {
+    public void pushCompleteHandlerList(ProductListSelect handlerList) {
         completeHandlerLists.add(handlerList);
     }
 
@@ -46,9 +46,9 @@ public class ProductItemsPanel extends BasicPage {
     }
 
     private void completeSelection(boolean flag){
-        List<ProductItem> productItemList = new ArrayList<ProductItem>();
+        List<ProductListItem> productItemList = new ArrayList<ProductListItem>();
         if(flag){
-            for (ProductItem productItem: productItems){
+            for (ProductListItem productItem: productItems){
                 if(productItem.getChecked()) productItemList.add(productItem);
             }
         }
@@ -72,7 +72,7 @@ public class ProductItemsPanel extends BasicPage {
         productItems.clear();
         for (Product product: productList){
             if (!pr.contains(product)) {
-                productItems.add(new ProductItem(pr.contains(product), product));
+                productItems.add(new ProductListItem(pr.contains(product), product));
             }
         }
     }
@@ -82,7 +82,7 @@ public class ProductItemsPanel extends BasicPage {
         productItems.clear();
         for (Product product: productList){
             if (!pr.contains(product)) {
-                productItems.add(new ProductItem(pr.contains(product), product));
+                productItems.add(new ProductListItem(pr.contains(product), product));
             }
         }
         return null;
@@ -114,11 +114,11 @@ public class ProductItemsPanel extends BasicPage {
         this.filter = filter;
     }
 
-    public List<ProductItem> getProductItems() {
+    public List<ProductListItem> getProductItems() {
         return productItems;
     }
 
-    public void setProductItems(List<ProductItem> productItems) {
+    public void setProductItems(List<ProductListItem> productItems) {
         this.productItems = productItems;
     }
 }
