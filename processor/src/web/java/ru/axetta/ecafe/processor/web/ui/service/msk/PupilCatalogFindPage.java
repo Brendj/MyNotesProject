@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Component
+@Scope("session")
 public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
     @Resource
     MskNSIService nsiService;

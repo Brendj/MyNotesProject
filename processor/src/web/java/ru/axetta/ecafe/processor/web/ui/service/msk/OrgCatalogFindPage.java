@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Component
+@Scope("session")
 public class OrgCatalogFindPage extends BasicWorkspacePage {
     @Resource
     MskNSIService nsiService;

@@ -122,6 +122,7 @@ public class MskNSIService {
         logger.info("Trying NSI service: "+url);
         nsiServicePort = new NSIServiceService(new URL(url+"?wsdl"), new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
+
     }
     
     public List<QueryResult> executeQuery(String queryText) throws Exception {
@@ -132,6 +133,9 @@ public class MskNSIService {
         NSIRequestType request = new NSIRequestType();
         BindingProvider provider = (BindingProvider)nsiService;
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+        provider.getRequestContext().put("set-jaxb-validation-event-handler", false);
+        //provider.getRequestContext().put("jaxb-validation-event-handle", null);
+
 
         OrgExternalType recipient = new OrgExternalType();
         recipient.setName("NSI");
@@ -172,12 +176,12 @@ public class MskNSIService {
     
     public List<OrgInfo> getOrgByName(String orgName) throws Exception {
         List<QueryResult> queryResults = executeQuery("select \n"
-                + "item['Реестр образовательных учреждений спец/GUID Образовательного учреждения'],\n"
-                + "item['Реестр образовательных учреждений спец/Номер  учреждения'], \n"
-                + "item['Реестр образовательных учреждений спец/Краткое наименование учреждения'],\n"
-                + "item['Реестр образовательных учреждений спец/Дата изменения (число)']\n"
+                + "item['РОУ XML/GUID Образовательного учреждения'],\n"
+                + "item['РОУ XML/Номер  учреждения'], \n"
+                + "item['РОУ XML/Краткое наименование учреждения'],\n"
+                + "item['РОУ XML/Дата изменения (число)']\n"
                 + "from catalog('Реестр образовательных учреждений') where \n"
-                + "item['Реестр образовательных учреждений спец/Краткое наименование учреждения'] like '%"+orgName+"%'");
+                + "item['РОУ XML/Краткое наименование учреждения'] like '%"+orgName+"%'");
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
@@ -195,14 +199,14 @@ public class MskNSIService {
                         + "item['Реестр обучаемых линейный/Дата рождения'], \n"
                         + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" + "from catalog('Реестр обучаемых')\n"
                         + "where\n"
-                        + "item['Реестр обучаемых линейный/GIUD образовательного учреждения']='"+orgGuid+"'";
+                        + "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";
         if (familyName!=null && familyName.length()>0) {
             select += " and item['Реестр обучаемых линейный/Фамилия'] like '%"+familyName+"%'";
         }
         if (updateTime!=null) {
             select += " and  item['Реестр обучаемых линейный/Дата изменения (число)']  &gt; "+(updateTime/1000);
         }
-        select += " order by item['Реестр обучаемых линейный/Фамилия'], item['Реестр обучаемых линейный/Имя'], item['Реестр обучаемых линейный/Отчество']";
+        //select += " order by item['Реестр обучаемых линейный/Фамилия'], item['Реестр обучаемых линейный/Имя'], item['Реестр обучаемых линейный/Отчество']";
         List<QueryResult> queryResults = executeQuery(select);
         LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
         for (QueryResult qr : queryResults) {

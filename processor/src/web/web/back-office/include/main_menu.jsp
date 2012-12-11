@@ -358,6 +358,10 @@
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         rendered="#{mainPage.eligibleToServiceAdmin}"
                         reRender="workspaceForm" />
+    <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
+    <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
+                        action="#{otherActionsPage.show}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToServiceAdmin}" />
 
     <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Реестры"
                          rendered="#{mainPage.eligibleToServiceAdmin}" >

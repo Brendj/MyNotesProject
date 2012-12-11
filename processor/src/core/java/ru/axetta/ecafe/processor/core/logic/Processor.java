@@ -1714,11 +1714,13 @@ public class Processor implements SyncProcessor,
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
 
-            for (SyncRequest.EnterEvents.EnterEvent e : enterEvents.getEvents()) {
+        for (SyncRequest.EnterEvents.EnterEvent e : enterEvents.getEvents()) {
+
+            try {
+                persistenceSession = persistenceSessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
                 // Check enter event existence
                 if (DAOUtils.existEnterEvent(persistenceSession, e.getIdOfOrg(), e.getIdOfEnterEvent())) {
                     EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
@@ -1835,22 +1837,22 @@ public class Processor implements SyncProcessor,
                     }
 
                 }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception ex) {
+                logger.error("Save enter event to database error: ", e);
+                resEnterEvents = new SyncResponse.ResEnterEvents();
+                for (SyncRequest.EnterEvents.EnterEvent ee : enterEvents.getEvents()) {
+                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(), 1,
+                            "Save to data base error");
+                    resEnterEvents.addItem(item);
+                }
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Save enter event to database error: ", e);
-            resEnterEvents = new SyncResponse.ResEnterEvents();
-            for (SyncRequest.EnterEvents.EnterEvent ee : enterEvents.getEvents()) {
-                SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(), 1,
-                        "Save to data base error");
-                resEnterEvents.addItem(item);
-            }
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
+
         return resEnterEvents;
     }
 

@@ -100,12 +100,11 @@ public class DashboardServiceBean {
             String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE org.state=1";
             HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
             if (idOfOrg != null) {
-                //queryText += " WHERE org.idOfOrg=:idOfOrg";
-                queryText += " and org.idOfOrg=:idOfOrg";
+                queryText += " AND org.idOfOrg=:idOfOrg";
             }
             Query query = entityManager.createQuery(queryText);
-            if (idOfOrg != null) {
-                query.setParameter("idOfOrg",idOfOrg);
+            if (idOfOrg!=null) {
+                query.setParameter("idOfOrg", idOfOrg);
             }
             List queryResult = query.getResultList();
             for (Object object : queryResult) {

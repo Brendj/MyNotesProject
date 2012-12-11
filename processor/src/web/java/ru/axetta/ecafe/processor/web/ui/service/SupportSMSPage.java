@@ -7,9 +7,11 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("session")
 public class SupportSMSPage extends BasicWorkspacePage {
     String address, text;
 

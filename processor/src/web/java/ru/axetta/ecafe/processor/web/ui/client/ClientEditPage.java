@@ -644,6 +644,8 @@ public class ClientEditPage extends BasicWorkspacePage
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();
+        this.san = client.getSan();
+        this.guardsan = client.getGuardSan();
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
         this.discountMode = client.getDiscountMode();
