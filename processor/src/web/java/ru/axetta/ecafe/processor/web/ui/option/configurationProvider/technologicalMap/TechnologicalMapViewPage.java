@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItemsPanel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
     @Autowired
     private DAOService daoService;
     @Autowired
-    private ProductItemsPanel productItemsPanel;
+    private ProductListItemsPanel productItemsPanel;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired

@@ -12,9 +12,9 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupSelect;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItem;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListSelect;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class TechnologicalMapCreatePage extends BasicWorkspacePage implements ProductSelect,
+public class TechnologicalMapCreatePage extends BasicWorkspacePage implements ProductListSelect,
         TechnologicalMapGroupSelect {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TechnologicalMapCreatePage.class);
@@ -48,7 +48,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     @Autowired
     private DAOService daoService;
     @Autowired
-    private ProductItemsPanel productItemsPanel;
+    private ProductListItemsPanel productItemsPanel;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -65,9 +65,9 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
 
 
     @Override
-    public void select(List<ProductItem> productItemList) {
+    public void select(List<ProductListItem> productItemList) {
         if (!(productItemList == null || productItemList.isEmpty())) {
-            for (ProductItem productItem: productItemList){
+            for (ProductListItem productItem: productItemList){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
                 technologicalMapProduct.setProduct(productItem.getProduct());
                 technologicalMapProduct.setDeletedState(false);

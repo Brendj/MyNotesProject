@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -107,10 +109,18 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
         return null;
     }
 
+    public Object removeProduct(){
+        remove();
+        return null;
+    }
+
     @Transactional
-    public void remove(){
+    protected void remove(){
         if(!currentProduct.getDeletedState()) {
-            printError("Продукт не может быть удален.");
+            //printError();
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            facesContext.addMessage("productListMessages",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Продукт не может быть удален со статусом неудален.", null));
             return;
         }
         try{

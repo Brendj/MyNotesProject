@@ -63,15 +63,15 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     public Object onSave(){
         try {
             if(org==null){
-                printError("Поле 'Организация поставщик' обязательное.");
+                printWarn("Поле 'Организация поставщик' обязательное.");
                 return null;
             }
             if(currentConfigurationProvider==null){
-                printError("Поле 'Производственная конфигурация' обязательное.");
+                printWarn("Поле 'Производственная конфигурация' обязательное.");
                 return null;
             }
             if(currentProductGroup.getNameOfGroup() == null || currentProductGroup.getNameOfGroup().equals("")){
-                printError("Поле 'Наименование группы' обязательное.");
+                printWarn("Поле 'Наименование группы' обязательное.");
                 return null;
             }
             currentProductGroup.setOrgOwner(org.getIdOfOrg());
@@ -90,7 +90,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     @Transactional
     public void remove(){
         if(!currentProductGroup.getDeletedState()) {
-            printMessage("Группа не может быть удалена.");
+            printError("Группа не может быть удалена.");
             return;
         }
         TypedQuery<Product> query = entityManager.createQuery("from Product where productGroup=:productGroup",Product.class);

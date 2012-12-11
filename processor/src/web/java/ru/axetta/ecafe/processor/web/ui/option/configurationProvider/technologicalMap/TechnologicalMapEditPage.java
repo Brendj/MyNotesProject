@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.group.TechnologicalMapGroupSelect;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItem;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductSelect;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItem;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.technologicalMap.technologicalMapProduct.ProductListSelect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class TechnologicalMapEditPage extends BasicWorkspacePage implements ProductSelect, TechnologicalMapGroupSelect {
+public class TechnologicalMapEditPage extends BasicWorkspacePage implements ProductListSelect, TechnologicalMapGroupSelect {
 
     private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapEditPage.class);
 
@@ -53,7 +53,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     @Autowired
     private DAOService daoService;
     @Autowired
-    private ProductItemsPanel productItemsPanel;
+    private ProductListItemsPanel productItemsPanel;
     @Autowired
     private TechnologicalMapGroupItemsPanel technologicalMapGroupItemsPanel;
     @Autowired
@@ -82,9 +82,9 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     }
 
     @Override
-    public void select(List<ProductItem> productItemList) {
+    public void select(List<ProductListItem> productItemList) {
         if (!(productItemList == null || productItemList.isEmpty())) {
-            for (ProductItem productItem: productItemList){
+            for (ProductListItem productItem: productItemList){
                 TechnologicalMapProduct technologicalMapProduct = new TechnologicalMapProduct();
                 technologicalMapProduct.setProduct(productItem.getProduct());
                 technologicalMapProduct.setDeletedState(false);
