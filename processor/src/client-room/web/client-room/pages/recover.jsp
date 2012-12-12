@@ -10,16 +10,10 @@
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.client.ClientPasswordRecover" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="org.hibernate.annotations.Check" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.Result" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
@@ -28,7 +22,6 @@
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.recover_jsp");
     try{
-    //ClientRoomController port=clientAuthToken.getPort();
 
    Long  cityId=Long.parseLong(request.getParameter("cityId"));
     logger.info("from recover: cityId="+cityId);

@@ -6,9 +6,7 @@
 <%--<%@ page import="RuntimeContext" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
@@ -21,7 +19,6 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
 <%@ page import="org.apache.commons.lang.CharEncoding" %>
@@ -30,8 +27,7 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
 
 <%
-    final Logger logger = LoggerFactory
-            .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.change-password_jsp");
+    final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.change-password_jsp");
 
 
     final Long RC_CLIENT_NOT_FOUND = 110L;

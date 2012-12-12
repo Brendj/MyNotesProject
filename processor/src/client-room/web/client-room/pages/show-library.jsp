@@ -1,31 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.persistence.Circulation" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CirculationItemList" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CirculationItem" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CirculationListResult" %>
 
 <%--
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.

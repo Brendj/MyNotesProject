@@ -7,41 +7,21 @@
 <%@ page import="ru.axetta.ecafe.processor.core.partner.rbkmoney.CurrencyStringConverter" %>
 <%@ page import="ru.axetta.ecafe.processor.core.partner.rbkmoney.PaymentMethodConverter" %>
 <%@ page import="ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKConstants" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.ClientPayment" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Contragent" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
-<%@ page import="java.text.DateFormat" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.TimeZone" %>
 <%@ page import="java.security.MessageDigest" %>
 <%@ page import="java.security.NoSuchAlgorithmException" %>
 <%@ page import="java.io.UnsupportedEncodingException" %>
 <%@ page import="java.math.BigInteger" %>
-<%@ page import="java.net.URL" %>
-<%@ page import="java.net.Inet4Address" %>
-<%@ page import="java.net.InetAddress" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
-
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%!
 
     public static String getHash(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {

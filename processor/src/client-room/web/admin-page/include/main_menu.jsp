@@ -3,7 +3,6 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
@@ -18,13 +17,9 @@
                 topItemClass="main-menu-top-item" iconCollapsedGroup="triangle" iconExpandedGroup="triangleDown"
                 iconItem="none" mode="ajax">
 
-
 <rich:panelMenuGroup id="optionGroupMenu" label="Настройки" binding="#{mainPage.optionGroupPage.mainMenuComponent}"
                      rendered="#{mainPage.eligibleToEditOptions}">
     <a4j:support event="onclick" action="#{mainPage.showOptionGroupPage}" reRender="workspaceForm" />
-
-
-
 
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
@@ -49,9 +44,6 @@
 
     </rich:panelMenuGroup>
 
-
-
-
     <rich:panelMenuGroup id="cityGroupMenu" label="Города" binding="#{mainPage.cityGroupPage.mainMenuComponent}"
                          rendered="true">
         <a4j:support event="onclick" action="#{mainPage.showCityGroupPage}" reRender="workspaceForm" />
@@ -74,29 +66,6 @@
                             action="#{mainPage.showCityCreatePage}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </rich:panelMenuGroup>
 </rich:panelMenu>
 </a4j:form> <%-- Главное меню --%>

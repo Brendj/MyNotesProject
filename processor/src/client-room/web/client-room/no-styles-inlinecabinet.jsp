@@ -13,7 +13,6 @@
 <%@ page import="java.net.URI" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%--<%@ page import="RuntimeContext" %>--%>
 
 
 <%

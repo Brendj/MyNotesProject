@@ -7,16 +7,6 @@
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="org.hibernate.Session" %>
-<%@ page import="org.hibernate.Transaction" %>
-<%@ page import="org.hibernate.Criteria" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
-<%@ page import="java.util.List" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
-<%@ page import="org.slf4j.Logger" %>
-<%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 
 <%ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
@@ -24,11 +14,12 @@
 
     Cookie[] cks=request.getCookies();
     Long cityIdFromCookie =null;
-    if(cks!=null)for(int i=0;i<cks.length;i++){
-        if(cks[i].getName().equals("cityId")){
+    if(cks!=null)
+        for(int i=0;i<cks.length;i++){
+            if(cks[i].getName().equals("cityId")){
             cityIdFromCookie =Long.parseLong(cks[i].getValue());
-
-        } }
+            }
+        }
 
        if(cityIdFromCookie==null){
 

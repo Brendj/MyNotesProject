@@ -1,20 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--<%@ page import="RuntimeContext" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.EnterEvent" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Order" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
@@ -22,17 +14,10 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
 
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-
 <%@ page import="javax.xml.datatype.DatatypeFactory" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.EnterEventItem" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.EnterEventListResult" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.EnterEventList" %>
 
 <%--
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.

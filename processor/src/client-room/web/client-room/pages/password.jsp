@@ -3,9 +3,6 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.client.ClientAuthenticator" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
@@ -13,13 +10,7 @@
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
-<%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
-<%--<%@ page import="File" %>--%>
-<%--<%@ page import="java.util.LinkedList" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" %>--%>
-<%@ page import="java.util.Date" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ClientPasswordRecover" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
@@ -74,28 +65,13 @@
                          = service.getClientRoomControllerWSPort();
                  ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, city.getServiceUrl());
 
-                 //ClientAuthToken clientAuthToken=new ClientAuthToken(port,null,false);
-                 //clientAuthToken.storeTo(session);
-                 //ClientRoomController port=clientAuthToken.getPort();
-
                    RequestWebParam requestWebParam  =new RequestWebParam();
                    URI passwordRecoverURI=UriUtils.getURIWithNoParams(new URI(request.getRequestURL().toString()));
-
-                  logger.info("from password recoverURI: "+passwordRecoverURI.toString());
-
-                 // UriUtils.putParam(passwordRecoverURI,CITY_PARAM,cityName);
-
-                // logger.info("from password recoverURI after putting: "+passwordRecoverURI.toString());
-
-
-
                  requestWebParam.setUrl(passwordRecoverURI.toString()+"?"+"cityId"+"="+city.getIdOfCity().toString());
 
                   SendResult sr=  port.sendPasswordRecoverURLFromEmail(contractId,requestWebParam);
 
-                 //ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
-                 int succeeded = //clientPasswordRecover.sendPasswordRecoverURLFromEmail(contractId,request);
-                   sr.getRecoverStatus();
+                 int succeeded = sr.getRecoverStatus();
                  if (succeeded == ClientPasswordRecover.CONTRACT_SEND_RECOVER_PASSWORD){
                      sendEmailSucceed = true;
                      infoMessage = "Для восстановления пароля перейдите по ссылке, отправленной на Ваш адрес электронной почты.";

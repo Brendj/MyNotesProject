@@ -4,15 +4,9 @@
   --%>
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor" %>--%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
@@ -24,7 +18,6 @@
     final Logger logger = LoggerFactory
             .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.pay.cancel-order_jsp");
     final String ID_OF_CLIENT_PAYMENT_ORDER_PARAM = "order-id";
-    //RuntimeContext runtimeContext = null;
 
     ClientRoomControllerWSService service = new ClientRoomControllerWSService();
     ClientRoomController port
@@ -32,8 +25,6 @@
     ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost:8080/processor/soap/client");
 
     try {
-        //runtimeContext = RuntimeContext.getInstance();
-
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
         boolean haveDataToProcess = StringUtils.isNotEmpty(request.getParameter(ID_OF_CLIENT_PAYMENT_ORDER_PARAM));
@@ -53,14 +44,9 @@
 
         if (haveDataToProcess && dataToProcessVerified) {
             Long idOfClient = null;
-
-
             IdResult idOfClientResult=port.getIdOfClient(clientAuthToken.getContractId());
             idOfClient=idOfClientResult.getId();
-
-
             try {
-
                 port.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder,
                         ClientPaymentOrder.ORDER_STATUS_CANCELLED);
             } catch (Exception e) {

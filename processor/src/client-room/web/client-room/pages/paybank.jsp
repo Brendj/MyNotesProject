@@ -5,11 +5,7 @@
 
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.BankItem" %>
 <%@ page import="java.util.List" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.BanksData" %>

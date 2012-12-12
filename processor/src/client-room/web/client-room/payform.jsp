@@ -1,15 +1,8 @@
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Card" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.utils.AbbreviationUtils" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryExt" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientSummaryResult" %>
@@ -55,10 +48,8 @@
     }
 
     if (null != contractId) {
-        RuntimeContext runtimeContext = null;
 
         try {
-            runtimeContext =new  RuntimeContext();
 
              ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 

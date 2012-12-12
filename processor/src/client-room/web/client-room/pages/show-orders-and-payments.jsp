@@ -5,36 +5,22 @@
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.card.CardNoFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.*" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ui.PaymentTextUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
 <%@ page import="javax.xml.datatype.DatatypeFactory" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.OrderDetail" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.ClientSms" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.Payment" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.PurchaseExt" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CardItem" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.PurchaseElementExt" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 

@@ -4,36 +4,22 @@
   --%>
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%--<%@ page import="HibernateUtils" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
-<%--<%@ page import="org.hibernate.Criteria" %>--%>
-<%--<%@ page import="org.hibernate.Transaction" %>--%>
-<%--<%@ page import="org.hibernate.Session" %>--%>
-<%--<%@ page import="org.hibernate.criterion.Restrictions" %>--%>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="javax.xml.datatype.XMLGregorianCalendar" %>
 <%@ page import="javax.xml.datatype.DatatypeFactory" %>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuItemExt" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuListResult" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.MenuDateItemExt" %>
 <%@ page import="javax.xml.datatype.DatatypeConfigurationException" %>
 <%@ page import="javax.xml.datatype.DatatypeConstants" %>
 

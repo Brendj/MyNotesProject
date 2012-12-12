@@ -3,8 +3,6 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
-<%--<%@ page import="RuntimeContext" %>--%>
-<%--<%@ page import="ru.axetta.ecafe.processor.core.client.ClientAuthenticator" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
@@ -18,7 +16,6 @@
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="java.util.Map" %>
-<%--<%@ page import="Client" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.web.bo.client.Result" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
