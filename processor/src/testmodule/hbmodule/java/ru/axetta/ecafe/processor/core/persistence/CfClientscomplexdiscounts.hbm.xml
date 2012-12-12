@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClientscomplexdiscounts"
+           table="cf_clientscomplexdiscounts" schema="public">
+        <id name="idofclientcomplexdiscount">
+            <column name="idofclientcomplexdiscount" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="createdate">
+            <column name="createdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofrule">
+            <column name="idofrule" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcategoryorg">
+            <column name="idofcategoryorg" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="priority">
+            <column name="priority" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="operationar">
+            <column name="operationar" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="idofcomplex">
+            <column name="idofcomplex" sql-type="int4" length="10" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

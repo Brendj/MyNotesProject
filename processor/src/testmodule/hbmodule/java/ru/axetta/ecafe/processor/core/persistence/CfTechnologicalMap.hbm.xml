@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfTechnologicalMap" table="cf_technological_map"
+           schema="public">
+        <id name="idoftechnologicalmaps">
+            <column name="idoftechnologicalmaps" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idoftechmapgroups">
+            <column name="idoftechmapgroups" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="nameoftechnologicalmap">
+            <column name="nameoftechnologicalmap" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="numberoftechnologicalmap">
+            <column name="numberoftechnologicalmap" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="technologyofpreparation">
+            <column name="technologyofpreparation" sql-type="varchar" length="4096" not-null="true"/>
+        </property>
+        <property name="tempofpreparation">
+            <column name="tempofpreparation" sql-type="varchar" length="32"/>
+        </property>
+        <property name="energyvalue">
+            <column name="energyvalue" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="proteins">
+            <column name="proteins" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="carbohydrates">
+            <column name="carbohydrates" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="fats">
+            <column name="fats" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="microelca">
+            <column name="microelca" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="microelmg">
+            <column name="microelmg" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="microelp">
+            <column name="microelp" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="microelfe">
+            <column name="microelfe" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitamina">
+            <column name="vitamina" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitaminb1">
+            <column name="vitaminb1" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitaminb2">
+            <column name="vitaminb2" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitaminpp">
+            <column name="vitaminpp" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitaminc">
+            <column name="vitaminc" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="vitamine">
+            <column name="vitamine" sql-type="float8" length="17" precision="17"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofusercreate">
+            <column name="idofusercreate" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuseredit">
+            <column name="idofuseredit" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuserdelete">
+            <column name="idofuserdelete" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofconfigurationprovider">
+            <column name="idofconfigurationprovider" sql-type="int8" length="19"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <property name="lifetime">
+            <column name="lifetime" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <many-to-one name="cfTechnologicalMapGroupsByIdoftechmapgroups"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfTechnologicalMapGroups">
+            <column name="idoftechmapgroups" not-null="true"/>
+        </many-to-one>
+        <set name="cfTechnologicalMapProductsesByIdoftechnologicalmaps" inverse="true">
+            <key>
+                <column name="idoftechnologicalmaps" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfTechnologicalMapProducts"/>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClientpayments" table="cf_clientpayments"
+           schema="public">
+        <id name="idofclientpayment">
+            <column name="idofclientpayment" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idoftransaction">
+            <column name="idoftransaction" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="paymentmethod">
+            <column name="paymentmethod" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="paysum">
+            <column name="paysum" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="paytype">
+            <column name="paytype" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontragent">
+            <column name="idofcontragent" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofpayment">
+            <column name="idofpayment" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="idofclientpaymentorder">
+            <column name="idofclientpaymentorder" sql-type="int8" length="19"/>
+        </property>
+        <property name="addpaymentmethod">
+            <column name="addpaymentmethod" sql-type="varchar" length="1024"/>
+        </property>
+        <property name="addidofpayment">
+            <column name="addidofpayment" sql-type="varchar" length="1024"/>
+        </property>
+        <property name="idofcontragentreceiver">
+            <column name="idofcontragentreceiver" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfClientpaymentordersByIdofclientpaymentorder"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfClientpaymentorders">
+            <column name="idofclientpaymentorder"/>
+        </many-to-one>
+        <many-to-one name="cfContragentsByIdofcontragent"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragent"/>
+        </many-to-one>
+        <many-to-one name="cfContragentsByIdofcontragentreceiver"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragentreceiver"/>
+        </many-to-one>
+        <many-to-one name="cfTransactionsByIdoftransaction"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfTransactions">
+            <column name="idoftransaction" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

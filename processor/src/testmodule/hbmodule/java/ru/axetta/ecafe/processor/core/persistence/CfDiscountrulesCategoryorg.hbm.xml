@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfDiscountrulesCategoryorg"
+           table="cf_discountrules_categoryorg" schema="public">
+        <id name="idofcatorgdiscrule">
+            <column name="idofcatorgdiscrule" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofcategoryorg">
+            <column name="idofcategoryorg" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofrule">
+            <column name="idofrule" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfCategoryorgByIdofcategoryorg"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfCategoryorg">
+            <column name="idofcategoryorg"/>
+        </many-to-one>
+        <many-to-one name="cfDiscountrulesByIdofrule"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfDiscountrules">
+            <column name="idofrule"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

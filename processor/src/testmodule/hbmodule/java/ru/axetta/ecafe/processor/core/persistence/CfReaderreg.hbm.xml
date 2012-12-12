@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfReaderreg" table="cf_readerreg" schema="public">
+        <id name="idofreg">
+            <column name="idofreg" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofreader">
+            <column name="idofreader" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclientgrouphist">
+            <column name="idofclientgrouphist" sql-type="int8" length="19"/>
+        </property>
+        <property name="date">
+            <column name="date" sql-type="date" length="13" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <many-to-one name="cfReadersByIdofreader" class="ru.axetta.ecafe.processor.core.persistence.CfReaders">
+            <column name="idofreader" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

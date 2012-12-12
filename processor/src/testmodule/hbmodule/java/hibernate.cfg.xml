@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:postgresql://localhost:5432/ecafe_test_101212</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">postgres</property>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccompanyingdocuments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccountRefund.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccountTransfers.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfActsOfInventarization.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfActsOfWaybillDifference.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfActsOfWaybillDifferencePositions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAddpayments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAssortment.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfBanks.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCalls.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCards.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCategorydiscounts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCategoryorg.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCategoryorgOrgs.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCirculations.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientgroups.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientpaymentorders.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientpayments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClients.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientsCategorydiscounts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientscomplexdiscounts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfClientsms.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfComplexinfo.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfComplexinfoDiscountdetail.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfComplexinfodetail.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContracts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContragentclientaccounts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContragentpayments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContragents.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCurrentpositions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiaryclasses.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiarytimesheet.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiaryvalues.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrules.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrulesCategorydiscounts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrulesCategoryorg.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDishProhibitionExclusions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDishProhibitions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDoConfirms.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDoConflicts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDoVersions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfEcafesettings.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfEnterevents.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFriendlyOrganization.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFunctions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFunds.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGenerators.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoods.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoodsGroups.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoodsRequests.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoodsRequestsPositions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInstances.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInternalDisposingDocumentPositions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInternalDisposingDocuments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInternalIncomingDocumentPositions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInternalIncomingDocuments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfInventorybooks.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfIssuable.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfJournalitems.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfJournals.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfKsu1Records.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfKsu2Records.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfLibvisits.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfLinkingTokens.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfMenu.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfMenudetails.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfMenuexchange.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfMenuexchangerules.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfNotifications.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfOptions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfOrderdetails.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfOrders.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfOrgs.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfPermissions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfPersons.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfPos.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfProductGroups.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfProducts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfProjectstateData.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfProviderConfigurations.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfPublications.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfReaderreg.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfReaders.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfRegistry.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfReporthandlerules.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfReportinfo.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfRetirementreasons.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfRuleconditions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSchedulerjobs.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSchemaVersionInfo.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSettlements.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSources.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfStaffs.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfStateChanges.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSubscriptionfee.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfSynchistory.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTechnologicalMap.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTechnologicalMapGroups.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTechnologicalMapProducts.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTradeMaterialGoods.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTransactionjournal.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTransactions.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfTypesofaccompanyingdocuments.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfUsers.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfWaybills.hbm.xml"/>
+        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfWaybillsPositions.hbm.xml"/>
+        <!-- DB schema will be updated if needed -->
+        <!-- <property name="hbm2ddl.auto">update</property> -->
+    </session-factory>
+</hibernate-configuration>

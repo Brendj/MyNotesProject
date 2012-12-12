@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfSchedulerjobs" table="cf_schedulerjobs" schema="public">
+        <id name="idofschedulerjob">
+            <column name="idofschedulerjob" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="jobclass">
+            <column name="jobclass" sql-type="varchar" length="512" not-null="true"/>
+        </property>
+        <property name="cronexpression">
+            <column name="cronexpression" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="jobname">
+            <column name="jobname" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="enabled">
+            <column name="enabled" sql-type="int4" length="10" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

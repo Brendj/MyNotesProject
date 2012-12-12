@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfStaffs" table="cf_staffs" schema="public">
+        <id name="idofstaff">
+            <column name="idofstaff" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofrole">
+            <column name="idofrole" sql-type="int8" length="19"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="parentid">
+            <column name="parentid" sql-type="int8" length="19"/>
+        </property>
+        <property name="flags">
+            <column name="flags" sql-type="int4" length="10"/>
+        </property>
+        <property name="surname">
+            <column name="surname" sql-type="varchar" length="30"/>
+        </property>
+        <property name="firstname">
+            <column name="firstname" sql-type="varchar" length="30"/>
+        </property>
+        <property name="secondname">
+            <column name="secondname" sql-type="varchar" length="30"/>
+        </property>
+        <property name="staffposition">
+            <column name="staffposition" sql-type="varchar" length="30"/>
+        </property>
+        <property name="personalcode">
+            <column name="personalcode" sql-type="varchar" length="128"/>
+        </property>
+        <property name="rights">
+            <column name="rights" sql-type="varchar" length="256" not-null="true"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <property name="hashcode">
+            <column name="hashcode" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <set name="cfActsOfWaybillDifferencesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfActsOfWaybillDifference"/>
+        </set>
+        <set name="cfGoodsRequestsesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfGoodsRequests"/>
+        </set>
+        <set name="cfInternalDisposingDocumentsesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfInternalDisposingDocuments"/>
+        </set>
+        <set name="cfInternalIncomingDocumentsesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfInternalIncomingDocuments"/>
+        </set>
+        <set name="cfStateChangesesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfStateChanges"/>
+        </set>
+        <set name="cfWaybillsesByIdofstaff" inverse="true">
+            <key>
+                <column name="idofstaff" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfWaybills"/>
+        </set>
+    </class>
+</hibernate-mapping>

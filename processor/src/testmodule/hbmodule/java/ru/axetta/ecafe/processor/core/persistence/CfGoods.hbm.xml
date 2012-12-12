@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfGoods" table="cf_goods" schema="public">
+        <id name="idofgood">
+            <column name="idofgood" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofgoodsgroup">
+            <column name="idofgoodsgroup" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoftechnologicalmaps">
+            <column name="idoftechnologicalmaps" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofproducts">
+            <column name="idofproducts" sql-type="int8" length="19"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="nameofgood">
+            <column name="nameofgood" sql-type="varchar" length="512" not-null="true"/>
+        </property>
+        <property name="fullname">
+            <column name="fullname" sql-type="varchar" length="1024"/>
+        </property>
+        <property name="goodscode">
+            <column name="goodscode" sql-type="varchar" length="32" not-null="true"/>
+        </property>
+        <property name="unitsscale">
+            <column name="unitsscale" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="netweight">
+            <column name="netweight" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lifetime">
+            <column name="lifetime" sql-type="int8" length="19"/>
+        </property>
+        <property name="margin">
+            <column name="margin" sql-type="int8" length="19"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <property name="idofusercreate">
+            <column name="idofusercreate" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuseredit">
+            <column name="idofuseredit" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuserdelete">
+            <column name="idofuserdelete" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfGoodsGroupsByIdofgoodsgroup"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfGoodsGroups">
+            <column name="idofgoodsgroup" not-null="true"/>
+        </many-to-one>
+        <set name="cfActsOfWaybillDifferencePositionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfActsOfWaybillDifferencePositions"/>
+        </set>
+        <set name="cfComplexinfosByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfComplexinfo"/>
+        </set>
+        <set name="cfDishProhibitionExclusionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfDishProhibitionExclusions"/>
+        </set>
+        <set name="cfDishProhibitionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDishProhibitions"/>
+        </set>
+        <set name="cfInternalDisposingDocumentPositionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfInternalDisposingDocumentPositions"/>
+        </set>
+        <set name="cfInternalIncomingDocumentPositionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfInternalIncomingDocumentPositions"/>
+        </set>
+        <set name="cfMenudetailsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfMenudetails"/>
+        </set>
+        <set name="cfTradeMaterialGoodsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfTradeMaterialGoods"/>
+        </set>
+        <set name="cfWaybillsPositionsesByIdofgood" inverse="true">
+            <key>
+                <column name="idofgood" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfWaybillsPositions"/>
+        </set>
+    </class>
+</hibernate-mapping>

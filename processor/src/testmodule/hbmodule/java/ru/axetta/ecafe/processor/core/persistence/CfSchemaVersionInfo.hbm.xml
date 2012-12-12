@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfSchemaVersionInfo" table="cf_schema_version_info"
+           schema="public">
+        <id name="schemaversioninfoid">
+            <column name="schemaversioninfoid" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="majorversionnum">
+            <column name="majorversionnum" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="middleversionnum">
+            <column name="middleversionnum" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="minorversionnum">
+            <column name="minorversionnum" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="buildversionnum">
+            <column name="buildversionnum" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="updatetime">
+            <column name="updatetime" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="committext">
+            <column name="committext" sql-type="text" length="2147483647"/>
+        </property>
+    </class>
+</hibernate-mapping>

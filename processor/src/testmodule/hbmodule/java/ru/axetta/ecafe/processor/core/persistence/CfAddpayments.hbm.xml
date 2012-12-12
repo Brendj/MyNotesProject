@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfAddpayments" table="cf_addpayments" schema="public">
+        <id name="idofaddpayment">
+            <column name="idofaddpayment" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idofcontragentpayer">
+            <column name="idofcontragentpayer" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontragentreceiver">
+            <column name="idofcontragentreceiver" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="summa">
+            <column name="summa" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="comment">
+            <column name="comment" sql-type="varchar" length="128"/>
+        </property>
+        <property name="fromdate">
+            <column name="fromdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="todate">
+            <column name="todate" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfContragentsByIdofcontragentpayer"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragentpayer" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfContragentsByIdofcontragentreceiver"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragentreceiver" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

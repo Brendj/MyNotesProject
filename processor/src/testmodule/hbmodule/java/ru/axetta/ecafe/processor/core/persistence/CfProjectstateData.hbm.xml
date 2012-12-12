@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfProjectstateData" table="cf_projectstate_data"
+           schema="public">
+        <composite-id mapped="true" class="ru.axetta.ecafe.processor.core.persistence.CfProjectstateDataPK">
+            <key-property name="period">
+                <column name="period" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+            <key-property name="type">
+                <column name="type" sql-type="int4" length="10" not-null="true"/>
+            </key-property>
+            <key-property name="stringkey">
+                <column name="stringkey" sql-type="varchar" length="128" not-null="true"/>
+            </key-property>
+        </composite-id>
+        <property name="stringvalue">
+            <column name="stringvalue" sql-type="varchar" length="128"/>
+        </property>
+        <property name="generationdate">
+            <column name="generationdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

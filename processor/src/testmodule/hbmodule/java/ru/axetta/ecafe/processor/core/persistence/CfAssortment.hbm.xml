@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfAssortment" table="cf_assortment" schema="public">
+        <id name="idofast">
+            <column name="idofast" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idoforg">
+            <column name="idoforg" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="begindate">
+            <column name="begindate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="shortname">
+            <column name="shortname" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="fullname">
+            <column name="fullname" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="groupname">
+            <column name="groupname" sql-type="varchar" length="60" not-null="true"/>
+        </property>
+        <property name="menuorigin">
+            <column name="menuorigin" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="menuoutput">
+            <column name="menuoutput" sql-type="varchar" length="32" not-null="true"/>
+        </property>
+        <property name="price">
+            <column name="price" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="protein">
+            <column name="protein" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="fat">
+            <column name="fat" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="carbohydrates">
+            <column name="carbohydrates" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="calories">
+            <column name="calories" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="vitb1">
+            <column name="vitb1" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="vitc">
+            <column name="vitc" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="vita">
+            <column name="vita" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="vite">
+            <column name="vite" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="minca">
+            <column name="minca" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="minp">
+            <column name="minp" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="minmg">
+            <column name="minmg" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <property name="minfe">
+            <column name="minfe" sql-type="numeric" length="5" precision="2"/>
+        </property>
+        <many-to-one name="cfOrgsByIdoforg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idoforg" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

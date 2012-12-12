@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfOrderdetails" table="cf_orderdetails" schema="public">
+        <composite-id mapped="true" class="ru.axetta.ecafe.processor.core.persistence.CfOrderdetailsPK">
+            <key-property name="idoforg">
+                <column name="idoforg" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+            <key-property name="idoforderdetail">
+                <column name="idoforderdetail" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+        </composite-id>
+        <property name="idoforder">
+            <column name="idoforder" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="qty">
+            <column name="qty" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="discount">
+            <column name="discount" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="rprice">
+            <column name="rprice" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="menudetailname">
+            <column name="menudetailname" sql-type="varchar" length="256" not-null="true"/>
+        </property>
+        <property name="rootmenu">
+            <column name="rootmenu" sql-type="varchar" length="32" not-null="true"/>
+        </property>
+        <property name="menugroup">
+            <column name="menugroup" sql-type="varchar" length="60" not-null="true"/>
+        </property>
+        <property name="menutype">
+            <column name="menutype" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="menuoutput">
+            <column name="menuoutput" sql-type="varchar" length="32" not-null="true"/>
+        </property>
+        <property name="menuorigin">
+            <column name="menuorigin" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="socdiscount">
+            <column name="socdiscount" sql-type="int8" length="19"/>
+        </property>
+        <property name="state">
+            <column name="state" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="itemcode">
+            <column name="itemcode" sql-type="varchar" length="32"/>
+        </property>
+        <many-to-one name="cfOrders" class="ru.axetta.ecafe.processor.core.persistence.CfOrders">
+            <column name="idoforg" not-null="true"/>
+            <column name="idoforder" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfOrgsByIdoforg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idoforg" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

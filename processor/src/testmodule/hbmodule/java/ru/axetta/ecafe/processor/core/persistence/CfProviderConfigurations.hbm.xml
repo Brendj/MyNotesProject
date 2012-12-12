@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfProviderConfigurations" table="cf_provider_configurations"
+           schema="public">
+        <id name="idofconfigurationprovider">
+            <column name="idofconfigurationprovider" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="nameofconfigurationprovider">
+            <column name="nameofconfigurationprovider" sql-type="varchar" length="64" not-null="true"/>
+        </property>
+        <property name="idofusercreate">
+            <column name="idofusercreate" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuseredit">
+            <column name="idofuseredit" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofuserdelete">
+            <column name="idofuserdelete" sql-type="int8" length="19"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+    </class>
+</hibernate-mapping>

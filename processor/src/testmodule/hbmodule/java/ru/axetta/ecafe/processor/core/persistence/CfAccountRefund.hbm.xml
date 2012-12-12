@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfAccountRefund" table="cf_account_refund" schema="public">
+        <id name="idofaccountrefund">
+            <column name="idofaccountrefund" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="reason">
+            <column name="reason" sql-type="varchar" length="256"/>
+        </property>
+        <property name="createdby">
+            <column name="createdby" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoftransaction">
+            <column name="idoftransaction" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="refundsum">
+            <column name="refundsum" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <many-to-one name="cfClientsByIdofclient" class="ru.axetta.ecafe.processor.core.persistence.CfClients">
+            <column name="idofclient" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfTransactionsByIdoftransaction"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfTransactions">
+            <column name="idoftransaction" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

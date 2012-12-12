@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfGenerators" table="cf_generators" schema="public">
+        <property name="idofperson">
+            <column name="idofperson" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoforg">
+            <column name="idoforg" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontragent">
+            <column name="idofcontragent" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcard">
+            <column name="idofcard" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoftransaction">
+            <column name="idoftransaction" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofuser">
+            <column name="idofuser" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoffunction">
+            <column name="idoffunction" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofmenu">
+            <column name="idofmenu" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofmenudetail">
+            <column name="idofmenudetail" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontragentpayment">
+            <column name="idofcontragentpayment" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclientpaymentorder">
+            <column name="idofclientpaymentorder" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclientpayment">
+            <column name="idofclientpayment" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcall">
+            <column name="idofcall" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofnotification">
+            <column name="idofnotification" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofsync">
+            <column name="idofsync" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofreporthandlerule">
+            <column name="idofreporthandlerule" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofrulecondition">
+            <column name="idofrulecondition" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofschedulerjob">
+            <column name="idofschedulerjob" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofast">
+            <column name="idofast" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcomplexinfo">
+            <column name="idofcomplexinfo" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcomplexinfodetail">
+            <column name="idofcomplexinfodetail" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofpos">
+            <column name="idofpos" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofsettlement">
+            <column name="idofsettlement" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofposition">
+            <column name="idofposition" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofaddpayment">
+            <column name="idofaddpayment" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcategorydiscount">
+            <column name="idofcategorydiscount" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofrule">
+            <column name="idofrule" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofproductguide">
+            <column name="idofproductguide" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofconfigurationprovider">
+            <column name="idofconfigurationprovider" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofproduct">
+            <column name="idofproduct" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofproducts">
+            <column name="idofproducts" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoftechnologicalmap">
+            <column name="idoftechnologicalmap" sql-type="int8" length="19" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

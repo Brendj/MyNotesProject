@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClientsCategorydiscounts"
+           table="cf_clients_categorydiscounts" schema="public">
+        <id name="idofclienscategorydiscount">
+            <column name="idofclienscategorydiscount" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofcategorydiscount">
+            <column name="idofcategorydiscount" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfCategorydiscountsByIdofcategorydiscount"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfCategorydiscounts">
+            <column name="idofcategorydiscount"/>
+        </many-to-one>
+        <many-to-one name="cfClientsByIdofclient" class="ru.axetta.ecafe.processor.core.persistence.CfClients">
+            <column name="idofclient"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

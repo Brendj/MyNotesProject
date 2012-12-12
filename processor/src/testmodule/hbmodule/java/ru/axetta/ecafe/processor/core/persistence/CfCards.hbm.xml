@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfCards" table="cf_cards" schema="public">
+        <id name="idofcard">
+            <column name="idofcard" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="version">
+            <column name="version" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="cardno">
+            <column name="cardno" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="cardtype">
+            <column name="cardtype" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="state">
+            <column name="state" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="lockreason">
+            <column name="lockreason" sql-type="varchar" length="64"/>
+        </property>
+        <property name="validdate">
+            <column name="validdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="issuedate">
+            <column name="issuedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="lifestate">
+            <column name="lifestate" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="cardprintedno">
+            <column name="cardprintedno" sql-type="int8" length="19"/>
+        </property>
+        <property name="externalid">
+            <column name="externalid" sql-type="varchar" length="32"/>
+        </property>
+        <many-to-one name="cfClientsByIdofclient" class="ru.axetta.ecafe.processor.core.persistence.CfClients">
+            <column name="idofclient" not-null="true"/>
+        </many-to-one>
+        <set name="cfOrdersesByIdofcard" inverse="true">
+            <key>
+                <column name="idofcard"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfOrders"/>
+        </set>
+        <set name="cfTransactionsesByIdofcard" inverse="true">
+            <key>
+                <column name="idofcard"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfTransactions"/>
+        </set>
+    </class>
+</hibernate-mapping>

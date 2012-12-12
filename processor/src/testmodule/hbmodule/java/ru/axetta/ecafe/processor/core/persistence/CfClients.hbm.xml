@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClients" table="cf_clients" schema="public">
+        <id name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="version">
+            <column name="version" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoforg">
+            <column name="idoforg" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofperson">
+            <column name="idofperson" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontractperson">
+            <column name="idofcontractperson" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclientgroup">
+            <column name="idofclientgroup" sql-type="int8" length="19"/>
+        </property>
+        <property name="clientregistryversion">
+            <column name="clientregistryversion" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="flags">
+            <column name="flags" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="address">
+            <column name="address" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="phone">
+            <column name="phone" sql-type="varchar" length="32"/>
+        </property>
+        <property name="mobile">
+            <column name="mobile" sql-type="varchar" length="32"/>
+        </property>
+        <property name="email">
+            <column name="email" sql-type="varchar" length="128"/>
+        </property>
+        <property name="notifyviaemail">
+            <column name="notifyviaemail" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="notifyviasms">
+            <column name="notifyviasms" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="image">
+            <column name="image" sql-type="oid" length="10"/>
+        </property>
+        <property name="remarks">
+            <column name="remarks" sql-type="varchar" length="1024"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="contractid">
+            <column name="contractid" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="contractdate">
+            <column name="contractdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="contractstate">
+            <column name="contractstate" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="password">
+            <column name="password" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="payforsms">
+            <column name="payforsms" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="freepaymaxcount">
+            <column name="freepaymaxcount" sql-type="int4" length="10"/>
+        </property>
+        <property name="freepaycount">
+            <column name="freepaycount" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="lastfreepaytime">
+            <column name="lastfreepaytime" sql-type="int8" length="19"/>
+        </property>
+        <property name="discountmode">
+            <column name="discountmode" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="balance">
+            <column name="balance" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="limit">
+            <column name="Limit" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="expenditurelimit">
+            <column name="expenditurelimit" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="categoriesdiscounts">
+            <column name="categoriesdiscounts" sql-type="varchar" length="60" not-null="true"/>
+        </property>
+        <property name="san">
+            <column name="san" sql-type="varchar" length="11"/>
+        </property>
+        <property name="guardsan">
+            <column name="guardsan" sql-type="varchar" length="64"/>
+        </property>
+        <property name="externalid">
+            <column name="externalid" sql-type="int8" length="19"/>
+        </property>
+        <property name="clientguid">
+            <column name="clientguid" sql-type="varchar" length="40"/>
+        </property>
+        <property name="fax">
+            <column name="fax" sql-type="varchar" length="32"/>
+        </property>
+        <many-to-one name="cfOrgsByIdoforg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idoforg" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfPersonsByIdofcontractperson" class="ru.axetta.ecafe.processor.core.persistence.CfPersons">
+            <column name="idofcontractperson" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfPersonsByIdofperson" class="ru.axetta.ecafe.processor.core.persistence.CfPersons">
+            <column name="idofperson" not-null="true"/>
+        </many-to-one>
+        <set name="cfAccountRefundsByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountRefund"/>
+        </set>
+        <set name="cfAccountTransfersesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclientbeneficiary" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountTransfers"/>
+        </set>
+        <set name="cfAccountTransfersesByIdofclient_0" inverse="true">
+            <key>
+                <column name="idofclientbenefactor" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountTransfers"/>
+        </set>
+        <set name="cfCallsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfCalls"/>
+        </set>
+        <set name="cfCardsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfCards"/>
+        </set>
+        <set name="cfCirculationsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfCirculations"/>
+        </set>
+        <set name="cfClientpaymentordersesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClientpaymentorders"/>
+        </set>
+        <set name="cfClientsCategorydiscountsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfClientsCategorydiscounts"/>
+        </set>
+        <set name="cfClientsmsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClientsms"/>
+        </set>
+        <set name="cfContragentclientaccountsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfContragentclientaccounts"/>
+        </set>
+        <set name="cfDiaryvaluesesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDiaryvalues"/>
+        </set>
+        <set name="cfDishProhibitionsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDishProhibitions"/>
+        </set>
+        <set name="cfLibvisitsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfLibvisits"/>
+        </set>
+        <set name="cfLinkingTokensesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfLinkingTokens"/>
+        </set>
+        <set name="cfNotificationsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfNotifications"/>
+        </set>
+        <set name="cfOrdersesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfOrders"/>
+        </set>
+        <set name="cfReadersesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfReaders"/>
+        </set>
+        <set name="cfTransactionsesByIdofclient" inverse="true">
+            <key>
+                <column name="idofclient" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfTransactions"/>
+        </set>
+    </class>
+</hibernate-mapping>

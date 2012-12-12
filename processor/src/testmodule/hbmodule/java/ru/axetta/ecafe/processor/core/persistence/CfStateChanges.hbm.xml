@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfStateChanges" table="cf_state_changes" schema="public">
+        <id name="idofstatechange">
+            <column name="idofstatechange" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofwaybill">
+            <column name="idofwaybill" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofinternaldisposingdocument">
+            <column name="idofinternaldisposingdocument" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofgoodsrequest">
+            <column name="idofgoodsrequest" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofstaff">
+            <column name="idofstaff" sql-type="int8" length="19"/>
+        </property>
+        <property name="idofinternalincomingdocument">
+            <column name="idofinternalincomingdocument" sql-type="int8" length="19"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="dateofstatechange">
+            <column name="dateofstatechange" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="statefrom">
+            <column name="statefrom" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="stateto">
+            <column name="stateto" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <many-to-one name="cfStaffsByIdofstaff" class="ru.axetta.ecafe.processor.core.persistence.CfStaffs">
+            <column name="idofstaff"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

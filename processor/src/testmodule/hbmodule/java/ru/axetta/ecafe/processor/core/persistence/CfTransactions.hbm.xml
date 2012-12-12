@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfTransactions" table="cf_transactions" schema="public">
+        <id name="idoftransaction">
+            <column name="idoftransaction" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcard">
+            <column name="idofcard" sql-type="int8" length="19"/>
+        </property>
+        <property name="transactionsum">
+            <column name="transactionsum" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="source">
+            <column name="source" sql-type="varchar" length="30" not-null="true"/>
+        </property>
+        <property name="sourcetype">
+            <column name="sourcetype" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="transactiondate">
+            <column name="transactiondate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="balancebefore">
+            <column name="balancebefore" sql-type="int8" length="19"/>
+        </property>
+        <many-to-one name="cfCardsByIdofcard" class="ru.axetta.ecafe.processor.core.persistence.CfCards">
+            <column name="idofcard"/>
+        </many-to-one>
+        <many-to-one name="cfClientsByIdofclient" class="ru.axetta.ecafe.processor.core.persistence.CfClients">
+            <column name="idofclient" not-null="true"/>
+        </many-to-one>
+        <set name="cfAccountRefundsByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountRefund"/>
+        </set>
+        <set name="cfAccountTransfersesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransactiononbeneficiary" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountTransfers"/>
+        </set>
+        <set name="cfAccountTransfersesByIdoftransaction_0" inverse="true">
+            <key>
+                <column name="idoftransactiononbenefactor" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfAccountTransfers"/>
+        </set>
+        <set name="cfClientpaymentsesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClientpayments"/>
+        </set>
+        <set name="cfClientsmsesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClientsms"/>
+        </set>
+        <set name="cfContragentpaymentsesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfContragentpayments"/>
+        </set>
+        <set name="cfOrdersesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfOrders"/>
+        </set>
+        <set name="cfSubscriptionfeesByIdoftransaction" inverse="true">
+            <key>
+                <column name="idoftransaction" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfSubscriptionfee"/>
+        </set>
+    </class>
+</hibernate-mapping>

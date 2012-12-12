@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfRuleconditions" table="cf_ruleconditions"
+           schema="public">
+        <id name="idofrulecondition">
+            <column name="idofrulecondition" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idofreporthandlerule">
+            <column name="idofreporthandlerule" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="conditionoperation">
+            <column name="conditionoperation" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="conditionargument">
+            <column name="conditionargument" sql-type="varchar" length="128"/>
+        </property>
+        <property name="conditionconstant">
+            <column name="conditionconstant" sql-type="varchar" length="128"/>
+        </property>
+        <many-to-one name="cfReporthandlerulesByIdofreporthandlerule"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfReporthandlerules">
+            <column name="idofreporthandlerule" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

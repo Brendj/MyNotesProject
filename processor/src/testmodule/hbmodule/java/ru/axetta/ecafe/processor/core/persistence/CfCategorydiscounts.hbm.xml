@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfCategorydiscounts" table="cf_categorydiscounts"
+           schema="public">
+        <id name="idofcategorydiscount">
+            <column name="idofcategorydiscount" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="categoryname">
+            <column name="categoryname" sql-type="varchar" length="100" not-null="true"/>
+        </property>
+        <property name="discountrules">
+            <column name="discountrules" sql-type="varchar" length="60"/>
+        </property>
+        <property name="description">
+            <column name="description" sql-type="varchar" length="100" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <set name="cfClientsCategorydiscountsesByIdofcategorydiscount" inverse="true">
+            <key>
+                <column name="idofcategorydiscount"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfClientsCategorydiscounts"/>
+        </set>
+        <set name="cfDiscountrulesCategorydiscountsesByIdofcategorydiscount" inverse="true">
+            <key>
+                <column name="idofcategorydiscount" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfDiscountrulesCategorydiscounts"/>
+        </set>
+    </class>
+</hibernate-mapping>

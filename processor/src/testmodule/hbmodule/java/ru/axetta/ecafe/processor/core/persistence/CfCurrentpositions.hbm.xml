@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfCurrentpositions" table="cf_currentpositions"
+           schema="public">
+        <id name="idofposition">
+            <column name="idofposition" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="idofcontragentdebtor">
+            <column name="idofcontragentdebtor" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofcontragentcreditor">
+            <column name="idofcontragentcreditor" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="summa">
+            <column name="summa" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <many-to-one name="cfContragentsByIdofcontragentcreditor"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragentcreditor" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfContragentsByIdofcontragentdebtor"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfContragents">
+            <column name="idofcontragentdebtor" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

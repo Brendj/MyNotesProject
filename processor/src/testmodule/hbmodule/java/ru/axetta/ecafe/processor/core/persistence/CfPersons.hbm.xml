@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfPersons" table="cf_persons" schema="public">
+        <id name="idofperson">
+            <column name="idofperson" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="firstname">
+            <column name="firstname" sql-type="varchar" length="64" not-null="true"/>
+        </property>
+        <property name="surname">
+            <column name="surname" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="secondname">
+            <column name="secondname" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="iddocument">
+            <column name="iddocument" sql-type="varchar" length="128"/>
+        </property>
+        <set name="cfClientsesByIdofperson" inverse="true">
+            <key>
+                <column name="idofcontractperson" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClients"/>
+        </set>
+        <set name="cfClientsesByIdofperson_0" inverse="true">
+            <key>
+                <column name="idofperson" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfClients"/>
+        </set>
+        <set name="cfContragentsesByIdofperson" inverse="true">
+            <key>
+                <column name="idofcontactperson" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfContragents"/>
+        </set>
+        <set name="cfOrgsesByIdofperson" inverse="true">
+            <key>
+                <column name="idofofficialperson" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs"/>
+        </set>
+    </class>
+</hibernate-mapping>

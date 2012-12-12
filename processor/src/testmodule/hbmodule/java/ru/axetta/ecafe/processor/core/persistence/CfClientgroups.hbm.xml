@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClientgroups" table="cf_clientgroups" schema="public">
+        <composite-id mapped="true" class="ru.axetta.ecafe.processor.core.persistence.CfClientgroupsPK">
+            <key-property name="idoforg">
+                <column name="idoforg" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+            <key-property name="idofclientgroup">
+                <column name="idofclientgroup" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+        </composite-id>
+        <property name="groupname">
+            <column name="groupname" sql-type="varchar" length="64" not-null="true"/>
+        </property>
+        <many-to-one name="cfOrgsByIdoforg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idoforg" not-null="true"/>
+        </many-to-one>
+        <set name="cfComplexinfoDiscountdetails" inverse="true">
+            <key>
+                <column name="idoforg"/>
+                <column name="idofclientgroup"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfComplexinfoDiscountdetail"/>
+        </set>
+        <set name="cfDiarytimesheets" inverse="true">
+            <key>
+                <column name="idoforg" not-null="true"/>
+                <column name="idofclientgroup" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDiarytimesheet"/>
+        </set>
+    </class>
+</hibernate-mapping>

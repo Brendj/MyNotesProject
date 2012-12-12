@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfDiscountrules" table="cf_discountrules" schema="public">
+        <id name="idofrule">
+            <column name="idofrule" sql-type="int8" length="19" not-null="true"/>
+        </id>
+        <property name="description">
+            <column name="description" sql-type="varchar" length="100" not-null="true"/>
+        </property>
+        <property name="complex0">
+            <column name="complex0" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex1">
+            <column name="complex1" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex2">
+            <column name="complex2" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex3">
+            <column name="complex3" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex4">
+            <column name="complex4" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex5">
+            <column name="complex5" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex6">
+            <column name="complex6" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex7">
+            <column name="complex7" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex8">
+            <column name="complex8" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="complex9">
+            <column name="complex9" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="priority">
+            <column name="priority" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="categoriesdiscounts">
+            <column name="categoriesdiscounts" sql-type="varchar" length="64"/>
+        </property>
+        <property name="operationor">
+            <column name="operationor" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <set name="cfDiscountrulesCategorydiscountsesByIdofrule" inverse="true">
+            <key>
+                <column name="idofrule" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfDiscountrulesCategorydiscounts"/>
+        </set>
+        <set name="cfDiscountrulesCategoryorgsByIdofrule" inverse="true">
+            <key>
+                <column name="idofrule"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfDiscountrulesCategoryorg"/>
+        </set>
+    </class>
+</hibernate-mapping>

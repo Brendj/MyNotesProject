@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfFunds" table="cf_funds" schema="public">
+        <id name="idoffund">
+            <column name="idoffund" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="fundname">
+            <column name="fundname" sql-type="varchar" length="127"/>
+        </property>
+        <property name="stud">
+            <column name="stud" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <set name="cfInstancesesByIdoffund" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfInstances"/>
+        </set>
+        <set name="cfJournalitemsesByIdoffund" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfJournalitems"/>
+        </set>
+        <set name="cfJournalsesByIdoffund" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfJournals"/>
+        </set>
+        <set name="cfKsu1RecordsesByIdoffund" inverse="true">
+            <key>
+                <column name="idoffund" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfKsu1Records"/>
+        </set>
+        <set name="cfKsu2RecordsesByIdoffund" inverse="true">
+            <key>
+                <column name="idoffund" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfKsu2Records"/>
+        </set>
+    </class>
+</hibernate-mapping>

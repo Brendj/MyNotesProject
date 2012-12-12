@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfDoConflicts" table="cf_do_conflicts" schema="public">
+        <id name="idofdoconflict">
+            <column name="idofdoconflict" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idoforg">
+            <column name="idoforg" sql-type="int8" length="19"/>
+        </property>
+        <property name="distributedobjectclassname">
+            <column name="distributedobjectclassname" sql-type="varchar" length="64"/>
+        </property>
+        <property name="createconflictdate">
+            <column name="createconflictdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="gversionInc">
+            <column name="gversion_inc" sql-type="int8" length="19"/>
+        </property>
+        <property name="gversionCur">
+            <column name="gversion_cur" sql-type="int8" length="19"/>
+        </property>
+        <property name="valInc">
+            <column name="val_inc" sql-type="varchar" length="16548"/>
+        </property>
+        <property name="valCur">
+            <column name="val_cur" sql-type="varchar" length="16548"/>
+        </property>
+        <property name="gversionResult">
+            <column name="gversion_result" sql-type="int8" length="19"/>
+        </property>
+    </class>
+</hibernate-mapping>

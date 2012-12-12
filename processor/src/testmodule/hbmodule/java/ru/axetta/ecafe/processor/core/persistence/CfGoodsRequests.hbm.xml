@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfGoodsRequests" table="cf_goods_requests" schema="public">
+        <id name="idofgoodsrequest">
+            <column name="idofgoodsrequest" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofstaff">
+            <column name="idofstaff" sql-type="int8" length="19"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="numberofgoodsrequest">
+            <column name="numberofgoodsrequest" sql-type="varchar" length="128" not-null="true"/>
+        </property>
+        <property name="dateofgoodsrequest">
+            <column name="dateofgoodsrequest" sql-type="int8" length="19"/>
+        </property>
+        <property name="state">
+            <column name="state" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="donedate">
+            <column name="donedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="comment">
+            <column name="comment" sql-type="varchar" length="512"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <many-to-one name="cfStaffsByIdofstaff" class="ru.axetta.ecafe.processor.core.persistence.CfStaffs">
+            <column name="idofstaff"/>
+        </many-to-one>
+        <set name="cfGoodsRequestsPositionsesByIdofgoodsrequest" inverse="true">
+            <key>
+                <column name="idofgoodsrequest" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfGoodsRequestsPositions"/>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfContracts" table="cf_contracts" schema="public">
+        <id name="idofcontract">
+            <column name="idofcontract" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="contractnumber">
+            <column name="contractnumber" sql-type="varchar" length="50"/>
+        </property>
+        <property name="performer">
+            <column name="performer" sql-type="varchar" length="128"/>
+        </property>
+        <property name="customer">
+            <column name="customer" sql-type="varchar" length="128"/>
+        </property>
+        <property name="dateofconclusion">
+            <column name="dateofconclusion" sql-type="timestamptz" length="35" precision="6"/>
+        </property>
+        <property name="dateofclosing">
+            <column name="dateofclosing" sql-type="timestamptz" length="35" precision="6"/>
+        </property>
+        <property name="contractstate">
+            <column name="contractstate" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <set name="cfOrgsesByIdofcontract" inverse="true">
+            <key>
+                <column name="idofcontract"/>
+            </key>
+            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs"/>
+        </set>
+    </class>
+</hibernate-mapping>

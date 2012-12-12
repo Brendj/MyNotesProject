@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfClientsms" table="cf_clientsms" schema="public">
+        <id name="idofsms">
+            <column name="idofsms" sql-type="bpchar" length="32" not-null="true"/>
+        </id>
+        <property name="version">
+            <column name="version" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofclient">
+            <column name="idofclient" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idoftransaction">
+            <column name="idoftransaction" sql-type="int8" length="19"/>
+        </property>
+        <property name="phone">
+            <column name="phone" sql-type="varchar" length="32" not-null="true"/>
+        </property>
+        <property name="contentstype">
+            <column name="contentstype" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="textcontents">
+            <column name="textcontents" sql-type="varchar" length="70" not-null="true"/>
+        </property>
+        <property name="deliverystatus">
+            <column name="deliverystatus" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="servicesenddate">
+            <column name="servicesenddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="senddate">
+            <column name="senddate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deliverydate">
+            <column name="deliverydate" sql-type="int8" length="19"/>
+        </property>
+        <property name="price">
+            <column name="price" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <many-to-one name="cfClientsByIdofclient" class="ru.axetta.ecafe.processor.core.persistence.CfClients">
+            <column name="idofclient" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfTransactionsByIdoftransaction"
+                     class="ru.axetta.ecafe.processor.core.persistence.CfTransactions">
+            <column name="idoftransaction"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

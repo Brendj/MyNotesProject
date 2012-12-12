@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfInternalDisposingDocuments"
+           table="cf_internal_disposing_documents" schema="public">
+        <id name="idofinternaldisposingdocument">
+            <column name="idofinternaldisposingdocument" sql-type="bigserial" length="19" not-null="true"/>
+        </id>
+        <property name="idofstaff">
+            <column name="idofstaff" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="idofactofinventarization">
+            <column name="idofactofinventarization" sql-type="int8" length="19"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="varchar" length="36" not-null="true"/>
+        </property>
+        <property name="globalversion">
+            <column name="globalversion" sql-type="int8" length="19"/>
+        </property>
+        <property name="orgowner">
+            <column name="orgowner" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedstate">
+            <column name="deletedstate" sql-type="bool" length="1" not-null="true"/>
+        </property>
+        <property name="createddate">
+            <column name="createddate" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="int8" length="19"/>
+        </property>
+        <property name="deletedate">
+            <column name="deletedate" sql-type="int8" length="19"/>
+        </property>
+        <property name="typeofinternaldisposingdocument">
+            <column name="typeofinternaldisposingdocument" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="dateofinternaldisposingdocument">
+            <column name="dateofinternaldisposingdocument" sql-type="int8" length="19" not-null="true"/>
+        </property>
+        <property name="state">
+            <column name="state" sql-type="int4" length="10" not-null="true"/>
+        </property>
+        <property name="comments">
+            <column name="comments" sql-type="varchar" length="1024"/>
+        </property>
+        <property name="sendall">
+            <column name="sendall" sql-type="int4" length="10"/>
+        </property>
+        <many-to-one name="cfStaffsByIdofstaff" class="ru.axetta.ecafe.processor.core.persistence.CfStaffs">
+            <column name="idofstaff" not-null="true"/>
+        </many-to-one>
+        <set name="cfInternalDisposingDocumentPositionsesByIdofinternaldisposingdocument" inverse="true">
+            <key>
+                <column name="idofinternaldisposingdocument" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore"
+                         class="ru.axetta.ecafe.processor.core.persistence.CfInternalDisposingDocumentPositions"/>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
+        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.CfMenuexchangerules" table="cf_menuexchangerules"
+           schema="public">
+        <composite-id mapped="true" class="ru.axetta.ecafe.processor.core.persistence.CfMenuexchangerulesPK">
+            <key-property name="idofsourceorg">
+                <column name="idofsourceorg" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+            <key-property name="idofdestorg">
+                <column name="idofdestorg" sql-type="int8" length="19" not-null="true"/>
+            </key-property>
+        </composite-id>
+        <many-to-one name="cfOrgsByIdofdestorg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idofdestorg" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cfOrgsByIdofsourceorg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
+            <column name="idofsourceorg" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>
