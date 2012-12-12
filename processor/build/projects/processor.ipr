@@ -904,9 +904,6 @@
     </modules>
   </component>
   <component name="ProjectResources">
-    <resource url="http://www.jboss.org/j2ee/dtd/jboss-service_5_0.dtd" location="$USER_HOME$/jboss-5.0.1.GA/docs/dtd/jboss-service_5_0.dtd" />
-    <resource url="resource:security-config_5_0.xsd" location="$USER_HOME$/jboss-5.0.1.GA/common/lib/jbosssx.jar!/schema/security-config_5_0.xsd" />
-    <resource url="http://www.jboss.org/j2ee/dtd/jboss-ds_5_0.dtd" location="$USER_HOME$/jboss-5.0.1.GA/docs/dtd/jboss-ds_5_0.dtd" />
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
@@ -1206,6 +1203,8 @@
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-entitymanager-4.0.1.Final.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/jboss-logging-3.1.0.GA.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/dom4j-1.6.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/javassist-3.15.0-GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/antlr-2.7.7.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
