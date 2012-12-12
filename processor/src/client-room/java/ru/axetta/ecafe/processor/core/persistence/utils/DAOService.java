@@ -32,38 +32,21 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class DAOService {
-    final Logger logger = LoggerFactory
-            .getLogger(DAOService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DAOService.class);
+
     @PersistenceContext
     private EntityManager entityManager;
-
-   /* private static final Logger logger = LoggerFactory.getLogger(DAOService.class);
-
-    @Autowired
-    private SessionFactory sessionFactory;
-
-    @Autowired
-    public Session getSession() throws Exception{
-         return sessionFactory.openSession();
-    }*/
 
     @Transactional
     public  List<City> getTowns(Boolean activity){
         TypedQuery<City> query ;
         if(activity==null){
-        query = entityManager.createQuery("from City", City.class);
-        return query.getResultList();
+            query = entityManager.createQuery("from City", City.class);
+            return query.getResultList();
         }
-
-
         query = entityManager.createQuery("from City where activity=:activity", City.class);
-
         query.setParameter("activity",activity);
-
-
         return query.getResultList();
-
-
      }
     public List<City> getCity(Long idOfCity){
         TypedQuery<City> query;
@@ -72,7 +55,6 @@ public class DAOService {
             query.setParameter("idOfCity",idOfCity);
             return query.getResultList();
         }
-
         query=entityManager.createQuery("from City",City.class);
         return query.getResultList();
     }
@@ -89,7 +71,6 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return(DAOService) SpringApplicationContext.getBean("DAOService");
-       // return ru.axetta.ecafe.processor.core.RuntimeContext.getAppContext().getBean(DAOService.class);
     }
     @Transactional
     public List<User> getUser(Long idOfUser){
@@ -98,7 +79,6 @@ public class DAOService {
       query=entityManager.createQuery("from User ",User.class);
          return query.getResultList();
         }
-
         query=entityManager.createQuery("from User where idOfUser=:idOfUser",User.class);
        query.setParameter("idOfUser",idOfUser);
        return query.getResultList();
