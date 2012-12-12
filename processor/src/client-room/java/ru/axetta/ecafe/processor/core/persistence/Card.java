@@ -54,8 +54,8 @@ public class Card {
     private Integer lifeState;
     private Long cardPrintedNo;
     private String externalId;
-    private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
-    private Set<Order> orders = new HashSet<Order>();
+    //private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
+    //private Set<Order> orders = new HashSet<Order>();
 
     Card() {
         // For Hibernate only
@@ -193,33 +193,33 @@ public class Card {
         this.externalId = externalId;
     }
 
-    private Set<AccountTransaction> getTransactionsInternal() {
-        // For Hibernate only
-        return transactions;
-    }
+    //private Set<AccountTransaction> getTransactionsInternal() {
+    //    // For Hibernate only
+    //    return transactions;
+    //}
+    //
+    //private void setTransactionsInternal(Set<AccountTransaction> accountTransactions) {
+    //    // For Hibernate only
+    //    this.transactions = accountTransactions;
+    //}
+    //
+    //public Set<AccountTransaction> getTransactions() {
+    //    return Collections.unmodifiableSet(getTransactionsInternal());
+    //}
+    //
+    //private Set<Order> getOrdersIntenal() {
+    //    // For Hibernate only
+    //    return orders;
+    //}
 
-    private void setTransactionsInternal(Set<AccountTransaction> accountTransactions) {
-        // For Hibernate only
-        this.transactions = accountTransactions;
-    }
-
-    public Set<AccountTransaction> getTransactions() {
-        return Collections.unmodifiableSet(getTransactionsInternal());
-    }
-
-    private Set<Order> getOrdersIntenal() {
-        // For Hibernate only
-        return orders;
-    }
-
-    private void setOrdersIntenal(Set<Order> orders) {
-        // For Hibernate only
-        this.orders = orders;
-    }
-
-    public Set<Order> getOrders() {
-        return Collections.unmodifiableSet(getOrdersIntenal());
-    }
+    //private void setOrdersIntenal(Set<Order> orders) {
+    //    // For Hibernate only
+    //    this.orders = orders;
+    //}
+    //
+    //public Set<Order> getOrders() {
+    //    return Collections.unmodifiableSet(getOrdersIntenal());
+    //}
 
     @Override
     public boolean equals(Object o) {

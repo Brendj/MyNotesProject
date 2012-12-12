@@ -23,7 +23,7 @@ public class Person {
     private String secondName;
     private String idDocument;
     private Set<Contragent> contragents = new HashSet<Contragent>();
-    private Set<Org> orgs = new HashSet<Org>();
+    //private Set<Org> orgs = new HashSet<Org>();
     private Set<Client> clients = new HashSet<Client>();
     private Set<Client> contractClients = new HashSet<Client>();
 
@@ -92,19 +92,19 @@ public class Person {
         return Collections.unmodifiableSet(getContragentsInternal());
     }
 
-    private Set<Org> getOrgsInternal() {
-        // For Hibernate only
-        return orgs;
-    }
-
-    private void setOrgsInternal(Set<Org> orgs) {
-        // For Hibernate only
-        this.orgs = orgs;
-    }
-
-    public Set<Org> getOrgs() {
-        return Collections.unmodifiableSet(getOrgsInternal());
-    }
+    //private Set<Org> getOrgsInternal() {
+    //    // For Hibernate only
+    //    return orgs;
+    //}
+    //
+    //private void setOrgsInternal(Set<Org> orgs) {
+    //    // For Hibernate only
+    //    this.orgs = orgs;
+    //}
+    //
+    //public Set<Org> getOrgs() {
+    //    return Collections.unmodifiableSet(getOrgsInternal());
+    //}
 
     private Set<Client> getClientsInternal() {
         // For Hibernate only
@@ -134,29 +134,29 @@ public class Person {
         return Collections.unmodifiableSet(getContractClientsInternal());
     }
 
-    public boolean isRelatedOnlyWith(Org org) {
-        if (orgs.isEmpty()) {
-            return false;
-        }
-        if (!contragents.isEmpty()) {
-            return false;
-        }
-        if (!clients.isEmpty()) {
-            return false;
-        }
-        if (!contractClients.isEmpty()) {
-            return false;
-        }
-        return 1 == orgs.size() && orgs.contains(org);
-    }
+    //public boolean isRelatedOnlyWith(Org org) {
+    //    if (orgs.isEmpty()) {
+    //        return false;
+    //    }
+    //    if (!contragents.isEmpty()) {
+    //        return false;
+    //    }
+    //    if (!clients.isEmpty()) {
+    //        return false;
+    //    }
+    //    if (!contractClients.isEmpty()) {
+    //        return false;
+    //    }
+    //    return 1 == orgs.size() && orgs.contains(org);
+    //}
 
     public boolean isRelatedOnlyWith(Client client) {
         if (!contragents.isEmpty()) {
             return false;
         }
-        if (!orgs.isEmpty()) {
-            return false;
-        }
+        //if (!orgs.isEmpty()) {
+        //    return false;
+        //}
         boolean hasClients = null != clients && !clients.isEmpty();
         boolean clientsContains = false;
         if (hasClients) {
@@ -175,9 +175,9 @@ public class Person {
         if (null == contragents) {
             return false;
         }
-        if (null != orgs && !orgs.isEmpty()) {
-            return false;
-        }
+        //if (null != orgs && !orgs.isEmpty()) {
+        //    return false;
+        //}
         if (null != clients && !clients.isEmpty()) {
             return false;
         }

@@ -36,10 +36,11 @@ public class OrderDetail {
     public static final int TYPE_COMPLEX_ITEM_8 = 158;
     public static final int TYPE_COMPLEX_ITEM_9 = 159;
 
-    private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
+    //private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
+    private Long idOfOrderDetail;
     private Long idOfOrder;
-    private Org org;
-    private Order order;
+    //private Org org;
+    //private Order order;
     private Long qty;
     private Long discount;
     private Long socDiscount;
@@ -97,10 +98,12 @@ public class OrderDetail {
         // For Hibernate only
     }
 
-    public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
+
+
+    public OrderDetail(Long idOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
             String menuOutput, int menuType) {
-        this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
+        this.idOfOrderDetail = idOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
         this.discount = discount;
@@ -114,14 +117,39 @@ public class OrderDetail {
         this.menuType = menuType;
     }
 
-    public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {
-        return compositeIdOfOrderDetail;
+     //public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
+    //        long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
+    //        String menuOutput, int menuType) {
+    //    this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
+    //    this.idOfOrder = idOfOrder;
+    //    this.qty = qty;
+    //    this.discount = discount;
+    //    this.socDiscount = socDiscount;
+    //    this.rPrice = rPrice;
+    //    this.menuDetailName = menuDetailName;
+    //    this.rootMenu = rootMenu;
+    //    this.menuGroup = menuGroup;
+    //    this.menuOrigin = menuOrigin;
+    //    this.menuOutput = menuOutput;
+    //    this.menuType = menuType;
+    //}
+
+    public Long getIdOfOrderDetail() {
+        return idOfOrderDetail;
     }
 
-    private void setCompositeIdOfOrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail) {
-        // For Hibernate only
-        this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
+    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+        this.idOfOrderDetail = idOfOrderDetail;
     }
+
+    //public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {
+    //    return compositeIdOfOrderDetail;
+    //}
+    //
+    //private void setCompositeIdOfOrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail) {
+    //    // For Hibernate only
+    //    this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
+    //}
 
     public Long getIdOfOrder() {
         return idOfOrder;
@@ -132,23 +160,23 @@ public class OrderDetail {
         this.idOfOrder = idOfOrder;
     }
 
-    public Org getOrg() {
-        return org;
-    }
-
-    private void setOrg(Org org) {
-        // For Hibernate only
-        this.org = org;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    private void setOrder(Order order) {
-        // For Hibernate only
-        this.order = order;
-    }
+    //public Org getOrg() {
+    //    return org;
+    //}
+    //
+    //private void setOrg(Org org) {
+    //    // For Hibernate only
+    //    this.org = org;
+    //}
+    //
+    //public Order getOrder() {
+    //    return order;
+    //}
+    //
+    //private void setOrder(Order order) {
+    //    // For Hibernate only
+    //    this.order = order;
+    //}
 
     public Long getQty() {
         return qty;
@@ -219,18 +247,20 @@ public class OrderDetail {
             return false;
         }
         final OrderDetail that = (OrderDetail) o;
-        return compositeIdOfOrderDetail.equals(that.getCompositeIdOfOrderDetail());
+        //return compositeIdOfOrderDetail.equals(that.getCompositeIdOfOrderDetail());
+        return idOfOrderDetail.equals(idOfOrderDetail);
     }
+
 
     @Override
     public int hashCode() {
-        return compositeIdOfOrderDetail.hashCode();
+        return idOfOrderDetail.hashCode();
     }
 
     @Override
     public String toString() {
-        return "OrderDetail{" + "compositeIdOfOrderDetail=" + compositeIdOfOrderDetail + ", idOfOrder=" + idOfOrder
-                + ", org=" + org + ", order=" + order + ", qty=" + qty + ", discount=" + discount
+        return "OrderDetail{" + "idOfOrderDetail=" + idOfOrderDetail + ", idOfOrder=" + idOfOrder +
+                ", qty=" + qty + ", discount=" + discount
                 + ", rPrice=" + rPrice + ", socDiscount=" + socDiscount + ", menuDetailName='" + menuDetailName
                 + '\'' + ", rootMenu='" + rootMenu + '\'' + ", menuType=" + menuType + ", menuOutput='"
                 + menuOutput + '\'' + ", menuOrigin=" + menuOrigin + '}';

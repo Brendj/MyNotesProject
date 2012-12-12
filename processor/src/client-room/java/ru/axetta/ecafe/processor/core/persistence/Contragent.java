@@ -58,19 +58,19 @@ public class Contragent {
     private String publicKey;
     private Boolean needAccountTranslate;
     private Set<User> users = new HashSet<User>();
-    private Set<ContragentPayment> contragentPayments = new HashSet<ContragentPayment>();
+    //private Set<ContragentPayment> contragentPayments = new HashSet<ContragentPayment>();
     private Set<ClientPayment> clientPayments = new HashSet<ClientPayment>();
     private Set<ClientPaymentOrder> clientPaymentOrders = new HashSet<ClientPaymentOrder>();
-    private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
-    private Set<Settlement> payerSettlements = new HashSet<Settlement>();
-    private Set<Settlement> receiverSettlements = new HashSet<Settlement>();
-    private Set<CurrentPosition> debtorPositions = new HashSet<CurrentPosition>();
-    private Set<CurrentPosition> creditorPositions = new HashSet<CurrentPosition>();
-    private Set<POS> POSSet = new HashSet<POS>();
-    private Set<Order> orders = new HashSet<Order>();
-    private Set<Org> orgs = new HashSet<Org>();
-    private Set<AddPayment> payerAddPayments = new HashSet<AddPayment>();
-    private Set<AddPayment> receiverAddPayments = new HashSet<AddPayment>();
+    //private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
+    //private Set<Settlement> payerSettlements = new HashSet<Settlement>();
+    //private Set<Settlement> receiverSettlements = new HashSet<Settlement>();
+    //private Set<CurrentPosition> debtorPositions = new HashSet<CurrentPosition>();
+    //private Set<CurrentPosition> creditorPositions = new HashSet<CurrentPosition>();
+    //private Set<POS> POSSet = new HashSet<POS>();
+    //private Set<Order> orders = new HashSet<Order>();
+    //private Set<Org> orgs = new HashSet<Org>();
+    //private Set<AddPayment> payerAddPayments = new HashSet<AddPayment>();
+    //private Set<AddPayment> receiverAddPayments = new HashSet<AddPayment>();
 
     Contragent() {
         // For Hibernate only
@@ -284,19 +284,19 @@ public class Contragent {
         return Collections.unmodifiableSet(getUsersInternal());
     }
 
-    private Set<ContragentPayment> getContragentPaymentsInternal() {
-        // For Hibernate only
-        return contragentPayments;
-    }
-
-    private void setContragentPaymentsInternal(Set<ContragentPayment> contragentPayments) {
-        // For Hibernate only
-        this.contragentPayments = contragentPayments;
-    }
-
-    public Set<ContragentPayment> getContragentPayments() {
-        return Collections.unmodifiableSet(getContragentPaymentsInternal());
-    }
+    //private Set<ContragentPayment> getContragentPaymentsInternal() {
+    //    // For Hibernate only
+    //    return contragentPayments;
+    //}
+    //
+    //private void setContragentPaymentsInternal(Set<ContragentPayment> contragentPayments) {
+    //    // For Hibernate only
+    //    this.contragentPayments = contragentPayments;
+    //}
+    //
+    //public Set<ContragentPayment> getContragentPayments() {
+    //    return Collections.unmodifiableSet(getContragentPaymentsInternal());
+    //}
 
     private Set<ClientPayment> getClientPaymentsInternal() {
         // For Hibernate only
@@ -334,143 +334,143 @@ public class Contragent {
         this.needAccountTranslate = needAccountTranslate;
     }
 
-    public Set<ContragentClientAccount> getContragentClientAccounts() {
-        return Collections.unmodifiableSet(getContragentClientAccountsInternal());
-    }
-
-    private Set<ContragentClientAccount> getContragentClientAccountsInternal() {
-        return contragentClientAccounts;
-    }
-
-    private void setContragentClientAccountsInternal(Set<ContragentClientAccount> contragentClientAccounts) {
-        this.contragentClientAccounts = contragentClientAccounts;
-    }
-
-    private Set<Settlement> getPayerSettlementsInternal() {
-        // For Hibernate only
-        return payerSettlements;
-    }
-
-    private void setPayerSettlementsInternal(Set<Settlement> payerSettlements) {
-        // For Hibernate only
-        this.payerSettlements = payerSettlements;
-    }
-
-    public Set<Settlement> getPayerSettlements() {
-        return Collections.unmodifiableSet(getPayerSettlementsInternal());
-    }
-
-    private Set<Settlement> getReceiverSettlementsInternal() {
-        // For Hibernate only
-        return receiverSettlements;
-    }
-
-    private void setReceiverSettlementsInternal(Set<Settlement> receiverSettlements) {
-        // For Hibernate only
-        this.receiverSettlements = receiverSettlements;
-    }
-
-    public Set<Settlement> getReceiverSettlements() {
-        return Collections.unmodifiableSet(getReceiverSettlementsInternal());
-    }
-
-    private Set<CurrentPosition> getDebtorPositionsInternal() {
-        // For Hibernate only
-        return debtorPositions;
-    }
-
-    private void setDebtorPositionsInternal(Set<CurrentPosition> debtorPositions) {
-        // For Hibernate only
-        this.debtorPositions = debtorPositions;
-    }
-
-    public Set<CurrentPosition> getDebtorPositions() {
-        return Collections.unmodifiableSet(getDebtorPositionsInternal());
-    }
-
-    private Set<CurrentPosition> getCreditorPositionsInternal() {
-        // For Hibernate only
-        return creditorPositions;
-    }
-
-    private void setCreditorPositionsInternal(Set<CurrentPosition> creditorPositions) {
-        // For Hibernate only
-        this.creditorPositions = creditorPositions;
-    }
-
-    public Set<CurrentPosition> getCreditorPositions() {
-        return Collections.unmodifiableSet(getCreditorPositionsInternal());
-    }
-
-    private Set<POS> getPOSSetInternal() {
-        // For Hibernate only
-        return POSSet;
-    }
-
-    private void setPOSSetInternal(Set<POS> POSSet) {
-        // For Hibernate only
-        this.POSSet = POSSet;
-    }
-
-    public Set<POS> getPOSSet() {
-        return Collections.unmodifiableSet(getPOSSetInternal());
-    }
-
-    private Set<Order> getOrdersInternal() {
-        // For Hibernate only
-        return orders;
-    }
-
-    private void setOrdersInternal(Set<Order> orders) {
-        // For Hibernate only
-        this.orders = orders;
-    }
-
-    public Set<Order> getOrders() {
-        return Collections.unmodifiableSet(getOrdersInternal());
-    }
-
-    private Set<Org> getOrgsInternal() {
-        // For Hibernate only
-        return orgs;
-    }
-
-    private void setOrgsInternal(Set<Org> orgs) {
-        // For Hibernate only
-        this.orgs = orgs;
-    }
-
-    public Set<Org> getOrgs() {
-        return Collections.unmodifiableSet(getOrgsInternal());
-    }
-
-    private Set<AddPayment> getPayerAddPaymentsInternal() {
-        // For Hibernate only
-        return payerAddPayments;
-    }
-
-    private void setPayerAddPaymentsInternal(Set<AddPayment> payerAddPayments) {
-        // For Hibernate only
-        this.payerAddPayments = payerAddPayments;
-    }
-
-    public Set<AddPayment> getPayerAddPayments() {
-        return Collections.unmodifiableSet(getPayerAddPaymentsInternal());
-    }
-
-    private Set<AddPayment> getReceiverAddPaymentsInternal() {
-        // For Hibernate only
-        return receiverAddPayments;
-    }
-
-    private void setReceiverAddPaymentsInternal(Set<AddPayment> receiverAddPayments) {
-        // For Hibernate only
-        this.receiverAddPayments = receiverAddPayments;
-    }
-
-    public Set<AddPayment> getReceiverAddPayments() {
-        return Collections.unmodifiableSet(getReceiverAddPaymentsInternal());
-    }
+    //public Set<ContragentClientAccount> getContragentClientAccounts() {
+    //    return Collections.unmodifiableSet(getContragentClientAccountsInternal());
+    //}
+    //
+    //private Set<ContragentClientAccount> getContragentClientAccountsInternal() {
+    //    return contragentClientAccounts;
+    //}
+    //
+    //private void setContragentClientAccountsInternal(Set<ContragentClientAccount> contragentClientAccounts) {
+    //    this.contragentClientAccounts = contragentClientAccounts;
+    //}
+    //
+    //private Set<Settlement> getPayerSettlementsInternal() {
+    //    // For Hibernate only
+    //    return payerSettlements;
+    //}
+    //
+    //private void setPayerSettlementsInternal(Set<Settlement> payerSettlements) {
+    //    // For Hibernate only
+    //    this.payerSettlements = payerSettlements;
+    //}
+    //
+    //public Set<Settlement> getPayerSettlements() {
+    //    return Collections.unmodifiableSet(getPayerSettlementsInternal());
+    //}
+    //
+    //private Set<Settlement> getReceiverSettlementsInternal() {
+    //    // For Hibernate only
+    //    return receiverSettlements;
+    //}
+    //
+    //private void setReceiverSettlementsInternal(Set<Settlement> receiverSettlements) {
+    //    // For Hibernate only
+    //    this.receiverSettlements = receiverSettlements;
+    //}
+    //
+    //public Set<Settlement> getReceiverSettlements() {
+    //    return Collections.unmodifiableSet(getReceiverSettlementsInternal());
+    //}
+    //
+    //private Set<CurrentPosition> getDebtorPositionsInternal() {
+    //    // For Hibernate only
+    //    return debtorPositions;
+    //}
+    //
+    //private void setDebtorPositionsInternal(Set<CurrentPosition> debtorPositions) {
+    //    // For Hibernate only
+    //    this.debtorPositions = debtorPositions;
+    //}
+    //
+    //public Set<CurrentPosition> getDebtorPositions() {
+    //    return Collections.unmodifiableSet(getDebtorPositionsInternal());
+    //}
+    //
+    //private Set<CurrentPosition> getCreditorPositionsInternal() {
+    //    // For Hibernate only
+    //    return creditorPositions;
+    //}
+    //
+    //private void setCreditorPositionsInternal(Set<CurrentPosition> creditorPositions) {
+    //    // For Hibernate only
+    //    this.creditorPositions = creditorPositions;
+    //}
+    //
+    //public Set<CurrentPosition> getCreditorPositions() {
+    //    return Collections.unmodifiableSet(getCreditorPositionsInternal());
+    //}
+    //
+    //private Set<POS> getPOSSetInternal() {
+    //    // For Hibernate only
+    //    return POSSet;
+    //}
+    //
+    //private void setPOSSetInternal(Set<POS> POSSet) {
+    //    // For Hibernate only
+    //    this.POSSet = POSSet;
+    //}
+    //
+    //public Set<POS> getPOSSet() {
+    //    return Collections.unmodifiableSet(getPOSSetInternal());
+    //}
+    //
+    //private Set<Order> getOrdersInternal() {
+    //    // For Hibernate only
+    //    return orders;
+    //}
+    //
+    //private void setOrdersInternal(Set<Order> orders) {
+    //    // For Hibernate only
+    //    this.orders = orders;
+    //}
+    //
+    //public Set<Order> getOrders() {
+    //    return Collections.unmodifiableSet(getOrdersInternal());
+    //}
+    //
+    //private Set<Org> getOrgsInternal() {
+    //    // For Hibernate only
+    //    return orgs;
+    //}
+    //
+    //private void setOrgsInternal(Set<Org> orgs) {
+    //    // For Hibernate only
+    //    this.orgs = orgs;
+    //}
+    //
+    //public Set<Org> getOrgs() {
+    //    return Collections.unmodifiableSet(getOrgsInternal());
+    //}
+    //
+    //private Set<AddPayment> getPayerAddPaymentsInternal() {
+    //    // For Hibernate only
+    //    return payerAddPayments;
+    //}
+    //
+    //private void setPayerAddPaymentsInternal(Set<AddPayment> payerAddPayments) {
+    //    // For Hibernate only
+    //    this.payerAddPayments = payerAddPayments;
+    //}
+    //
+    //public Set<AddPayment> getPayerAddPayments() {
+    //    return Collections.unmodifiableSet(getPayerAddPaymentsInternal());
+    //}
+    //
+    //private Set<AddPayment> getReceiverAddPaymentsInternal() {
+    //    // For Hibernate only
+    //    return receiverAddPayments;
+    //}
+    //
+    //private void setReceiverAddPaymentsInternal(Set<AddPayment> receiverAddPayments) {
+    //    // For Hibernate only
+    //    this.receiverAddPayments = receiverAddPayments;
+    //}
+    //
+    //public Set<AddPayment> getReceiverAddPayments() {
+    //    return Collections.unmodifiableSet(getReceiverAddPaymentsInternal());
+    //}
 
     @Override
     public boolean equals(Object o) {

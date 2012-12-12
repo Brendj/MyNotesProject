@@ -43,10 +43,10 @@ public class Client {
 
     private Long idOfClient;
     private long version;
-    private Org org;
+    //private Org org;
     private Long idOfClientGroup;
     private Long clientRegistryVersion;
-    private ClientGroup clientGroup;
+    //private ClientGroup clientGroup;
     private ru.axetta.ecafe.processor.core.persistence.Person person;
     private ru.axetta.ecafe.processor.core.persistence.Person contractPerson;
     private Integer flags;
@@ -77,14 +77,14 @@ public class Client {
     private Long externalId;
     private String clientGUID;
     private Set<Card> cards = new HashSet<Card>();
-    private Set<Call> calls = new HashSet<Call>();
-    private Set<Notification> notifications = new HashSet<Notification>();
+    //private Set<Call> calls = new HashSet<Call>();
+    //private Set<Notification> notifications = new HashSet<Notification>();
     private Set<ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder> clientPaymentOrders = new HashSet<ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder>();
-    private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
-    private Set<Order> orders = new HashSet<Order>();
+    //private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
+    //private Set<Order> orders = new HashSet<Order>();
     private Set<ru.axetta.ecafe.processor.core.persistence.ClientSms> clientSms = new HashSet<ru.axetta.ecafe.processor.core.persistence.ClientSms>();
-    private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
-    private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
+    //private Set<ContragentClientAccount> contragentClientAccounts = new HashSet<ContragentClientAccount>();
+    //private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     //private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<ru.axetta.ecafe.processor.core.persistence.EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<ru.axetta.ecafe.processor.core.persistence.CategoryDiscount>();
@@ -109,11 +109,10 @@ public class Client {
         // For Hibernate only
     }
 
-    public Client(Org org, ru.axetta.ecafe.processor.core.persistence.Person person, ru.axetta.ecafe.processor.core.persistence.Person contractPerson, int flags, boolean notifyViaEmail,
+    public Client(Person person, Person contractPerson, int flags, boolean notifyViaEmail,
             boolean notifyViaSMS, long contractId, Date contractTime, int contractState, String plainPassword,
             int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit, String categoriesDiscounts)
             throws Exception {
-        this.org = org;
         this.person = person;
         this.contractPerson = contractPerson;
         this.flags = flags;
@@ -134,6 +133,32 @@ public class Client {
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
     }
+
+    //public Client(Org org, ru.axetta.ecafe.processor.core.persistence.Person person, ru.axetta.ecafe.processor.core.persistence.Person contractPerson, int flags, boolean notifyViaEmail,
+    //        boolean notifyViaSMS, long contractId, Date contractTime, int contractState, String plainPassword,
+    //        int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit, String categoriesDiscounts)
+    //        throws Exception {
+    //    this.org = org;
+    //    this.person = person;
+    //    this.contractPerson = contractPerson;
+    //    this.flags = flags;
+    //    this.notifyViaEmail = notifyViaEmail;
+    //    this.notifyViaSMS = notifyViaSMS;
+    //    this.updateTime = new Date();
+    //    this.contractId = contractId;
+    //    this.contractTime = contractTime;
+    //    this.contractState = contractState;
+    //    this.cypheredPassword = encryptPassword(plainPassword);
+    //    this.payForSMS = payForSMS;
+    //    this.freePayCount = 0;
+    //    this.discountMode = INITIAL_DISCOUNT_MODE;
+    //    this.clientRegistryVersion = clientRegistryVersion;
+    //    //this.image = Hibernate.createBlob(ArrayUtils.EMPTY_BYTE_ARRAY);
+    //    this.balance = 0L;
+    //    this.limit = limit;
+    //    this.expenditureLimit = expenditureLimit;
+    //    this.categoriesDiscounts = categoriesDiscounts;
+    //}
 
     public String getGuardSan() {
         return guardSan;
@@ -213,13 +238,13 @@ public class Client {
         this.version = version;
     }
 
-    public Org getOrg() {
-        return org;
-    }
-
-    public void setOrg(Org org) {
-        this.org = org;
-    }
+    //public Org getOrg() {
+    //    return org;
+    //}
+    //
+    //public void setOrg(Org org) {
+    //    this.org = org;
+    //}
 
     public Long getIdOfClientGroup() {
         return idOfClientGroup;
@@ -237,14 +262,14 @@ public class Client {
         this.clientRegistryVersion = clientRegistryVersion;
     }
 
-    public ClientGroup getClientGroup() {
-        return clientGroup;
-    }
-
-    private void setClientGroup(ClientGroup clientGroup) {
-        // For Hibernate only
-        this.clientGroup = clientGroup;
-    }
+    //public ClientGroup getClientGroup() {
+    //    return clientGroup;
+    //}
+    //
+    //private void setClientGroup(ClientGroup clientGroup) {
+    //    // For Hibernate only
+    //    this.clientGroup = clientGroup;
+    //}
 
     public ru.axetta.ecafe.processor.core.persistence.Person getPerson() {
         return person;
@@ -446,40 +471,40 @@ public class Client {
         return Collections.unmodifiableSet(getCardsInternal());
     }
 
-    private Set<Notification> getNotificationsInternal() {
-        // For Hibernate only
-        return notifications;
-    }
+    //private Set<Notification> getNotificationsInternal() {
+    //    // For Hibernate only
+    //    return notifications;
+    //}
+    //
+    //private void setNotificationsInternal(Set<Notification> notifications) {
+    //    // For Hibernate only
+    //    this.notifications = notifications;
+    //}
+    //
+    //public Set<Notification> getNotifications() {
+    //    return Collections.unmodifiableSet(getNotificationsInternal());
+    //}
+    //
+    //private Set<Call> getCallsInternal() {
+    //    // For Hibernate only
+    //    return calls;
+    //}
+    //
+    //private void setCallsInternal(Set<Call> calls) {
+    //    // For Hibernate only
+    //    this.calls = calls;
+    //}
+    //
+    //public Set<Call> getCalls() {
+    //    return Collections.unmodifiableSet(getCallsInternal());
+    //}
 
-    private void setNotificationsInternal(Set<Notification> notifications) {
-        // For Hibernate only
-        this.notifications = notifications;
-    }
-
-    public Set<Notification> getNotifications() {
-        return Collections.unmodifiableSet(getNotificationsInternal());
-    }
-
-    private Set<Call> getCallsInternal() {
-        // For Hibernate only
-        return calls;
-    }
-
-    private void setCallsInternal(Set<Call> calls) {
-        // For Hibernate only
-        this.calls = calls;
-    }
-
-    public Set<Call> getCalls() {
-        return Collections.unmodifiableSet(getCallsInternal());
-    }
-
-    private Set<ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder> getClientPaymentOrdersInternal() {
+    private Set<ClientPaymentOrder> getClientPaymentOrdersInternal() {
         // For Hibernate only
         return clientPaymentOrders;
     }
 
-    private void setClientPaymentOrdersInternal(Set<ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder> clientPaymentOrders) {
+    private void setClientPaymentOrdersInternal(Set<ClientPaymentOrder> clientPaymentOrders) {
         // For Hibernate only
         this.clientPaymentOrders = clientPaymentOrders;
     }
@@ -499,45 +524,45 @@ public class Client {
         return StringUtils.equals(this.cypheredPassword, encryptedPassword);
     }
 
-    private Set<DiaryValue> getDiaryValuesInternal() {
-        // For Hibernate only
-        return diaryValues;
-    }
+    //private Set<DiaryValue> getDiaryValuesInternal() {
+    //    // For Hibernate only
+    //    return diaryValues;
+    //}
+    //
+    //private void setDiaryValuesInternal(Set<DiaryValue> diaryValues) {
+    //    // For Hibernate only
+    //    this.diaryValues = diaryValues;
+    //}
+    //
+    //public Set<DiaryValue> getDiaryValues() {
+    //    return Collections.unmodifiableSet(getDiaryValuesInternal());
+    //}
+    //
+    //public Set<ContragentClientAccount> getContragentClientAccounts() {
+    //    return Collections.unmodifiableSet(getContragentClientAccountsInternal());
+    //}
+    //
+    //private Set<ContragentClientAccount> getContragentClientAccountsInternal() {
+    //    return contragentClientAccounts;
+    //}
+    //
+    //private void setContragentClientAccountsInternal(Set<ContragentClientAccount> contragentClientAccounts) {
+    //    this.contragentClientAccounts = contragentClientAccounts;
+    //}
+    //
+    //public Set<Order> getOrders() {
+    //    return Collections.unmodifiableSet(getOrdersInternal());
+    //}
 
-    private void setDiaryValuesInternal(Set<DiaryValue> diaryValues) {
-        // For Hibernate only
-        this.diaryValues = diaryValues;
-    }
-
-    public Set<DiaryValue> getDiaryValues() {
-        return Collections.unmodifiableSet(getDiaryValuesInternal());
-    }
-
-    public Set<ContragentClientAccount> getContragentClientAccounts() {
-        return Collections.unmodifiableSet(getContragentClientAccountsInternal());
-    }
-
-    private Set<ContragentClientAccount> getContragentClientAccountsInternal() {
-        return contragentClientAccounts;
-    }
-
-    private void setContragentClientAccountsInternal(Set<ContragentClientAccount> contragentClientAccounts) {
-        this.contragentClientAccounts = contragentClientAccounts;
-    }
-
-    public Set<Order> getOrders() {
-        return Collections.unmodifiableSet(getOrdersInternal());
-    }
-
-    private Set<Order> getOrdersInternal() {
-        // For Hibernate only
-        return orders;
-    }
-
-    private void setOrdersInternal(Set<Order> orders) {
-        // For Hibernate only
-        this.orders = orders;
-    }
+    //private Set<Order> getOrdersInternal() {
+    //    // For Hibernate only
+    //    return orders;
+    //}
+    //
+    //private void setOrdersInternal(Set<Order> orders) {
+    //    // For Hibernate only
+    //    this.orders = orders;
+    //}
 
     public Set<ru.axetta.ecafe.processor.core.persistence.ClientSms> getClientSms() {
         return Collections.unmodifiableSet(getClientSmsInternal());
@@ -553,19 +578,19 @@ public class Client {
         this.clientSms = clientSms;
     }
 
-    private Set<AccountTransaction> getTransactionsInternal() {
-        // For Hibernate only
-        return transactions;
-    }
-
-    private void setTransactionsInternal(Set<AccountTransaction> accountTransactions) {
-        // For Hibernate only
-        this.transactions = accountTransactions;
-    }
-
-    public Set<AccountTransaction> getTransactions() {
-        return Collections.unmodifiableSet(getTransactionsInternal());
-    }
+    //private Set<AccountTransaction> getTransactionsInternal() {
+    //    // For Hibernate only
+    //    return transactions;
+    //}
+    //
+    //private void setTransactionsInternal(Set<AccountTransaction> accountTransactions) {
+    //    // For Hibernate only
+    //    this.transactions = accountTransactions;
+    //}
+    //
+    //public Set<AccountTransaction> getTransactions() {
+    //    return Collections.unmodifiableSet(getTransactionsInternal());
+    //}
 
     private Set<ru.axetta.ecafe.processor.core.persistence.EnterEvent> getEnterEventsInternal() {
         // For Hibernate only
@@ -638,8 +663,8 @@ public class Client {
 
     @Override
     public String toString() {
-        return "Client{" + "idOfClient=" + idOfClient + ", version=" + version + ", org=" + org + ", idOfClientGroup="
-                + idOfClientGroup + ", clientRegistryVersion=" + clientRegistryVersion + ", clientGroup=" + clientGroup
+        return "Client{" + "idOfClient=" + idOfClient + ", version=" + version + ", idOfClientGroup="
+                + idOfClientGroup + ", clientRegistryVersion=" + clientRegistryVersion
                 + ", person=" + person + ", contractPerson=" + contractPerson + ", flags=" + flags + ", address='"
                 + address + '\'' + ", phone='" + phone + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email
                 + '\'' + ", notifyViaEmail=" + notifyViaEmail + ", notifyViaSMS=" + notifyViaSMS
@@ -660,16 +685,16 @@ public class Client {
         return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
     }
 
-    public String getClientGroupTypeAsString() {
-        long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-        if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER){
-            return "Другое";
-        } else if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
-            return "Сотрудники";
-        } else {
-            return "Ученик";
-        }
-    }
+    //public String getClientGroupTypeAsString() {
+    //    long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+    //    if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER){
+    //        return "Другое";
+    //    } else if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+    //        return "Сотрудники";
+    //    } else {
+    //        return "Ученик";
+    //    }
+    //}
 
     public static String checkAndConvertMobile(String mobilePhone) {
         if (mobilePhone==null || mobilePhone.length()==0) return mobilePhone;

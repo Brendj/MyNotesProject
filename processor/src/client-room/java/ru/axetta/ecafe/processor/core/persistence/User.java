@@ -5,17 +5,13 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -199,16 +195,6 @@ public class User {
                 + cypheredPassword + '\'' + ", phone='" + phone + '\'' + ", updateTime=" + updateTime + ", contragent="
                 +'}';
     }
-
-    /*TODO: replase has method*/
-    //private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
-    //    MessageDigest hash = MessageDigest.getInstance("SHA1");
-    //    ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
-    //    DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
-    //    ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-    //    IOUtils.copy(digestInputStream, arrayOutputStream);
-    //    return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
-    //}
 
     public String getEmail() {
         return email;

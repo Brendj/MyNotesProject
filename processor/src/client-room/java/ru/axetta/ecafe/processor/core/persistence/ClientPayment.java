@@ -27,7 +27,7 @@ public class ClientPayment {
     public static final int ATM_PAYMENT_METHOD = 8;
 
     private Long idOfClientPayment;
-    private AccountTransaction transaction;
+    //private AccountTransaction transaction;
     private Integer paymentMethod;
     private Long paySum;
     private Integer payType;
@@ -42,66 +42,66 @@ public class ClientPayment {
         // For Hibernate only
     }
 
-    ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType, Date createTime,
-            String idOfPayment, Contragent contragent) {
-        this.transaction = transaction;
-        this.paymentMethod = paymentMethod;
-        this.paySum = paySum;
-        this.payType = payType;
-        this.createTime = createTime;
-        this.idOfPayment = idOfPayment;
-        this.contragent = contragent;
-    }
-
-    public ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType,
-            Date createTime, String idOfPayment, Contragent contragent, String addPaymentMethod, String addIdOfPayment) {
-        this.transaction = transaction;
-        this.paymentMethod = paymentMethod;
-        this.paySum = paySum;
-        this.payType = payType;
-        this.createTime = createTime;
-        this.idOfPayment = idOfPayment;
-        this.contragent = contragent;
-        this.addPaymentMethod = addPaymentMethod;
-        this.addIdOfPayment = addIdOfPayment;
-    }
-
-    public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime) {
-        this.transaction = transaction;
-        this.paymentMethod = clientPaymentOrder.getPaymentMethod();
-        this.paySum = clientPaymentOrder.getPaySum();
-        this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
-        this.createTime = createTime;
-        this.idOfPayment = clientPaymentOrder.getIdOfPayment();
-        this.contragent = clientPaymentOrder.getContragent();
-        this.clientPaymentOrder = clientPaymentOrder;
-    }
-
-    public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime,
-            String addIdOfPayment) {
-        this.transaction = transaction;
-        this.paymentMethod = clientPaymentOrder.getPaymentMethod();
-        this.paySum = clientPaymentOrder.getPaySum();
-        this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
-        this.createTime = createTime;
-        this.idOfPayment = clientPaymentOrder.getIdOfPayment();
-        this.contragent = clientPaymentOrder.getContragent();
-        this.clientPaymentOrder = clientPaymentOrder;
-        this.addIdOfPayment = addIdOfPayment;
-    }
-
-    public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder,
-            Date createTime) {
-        this.transaction = transaction;
-        this.paymentMethod = clientPaymentOrder.getPaymentMethod();
-        this.paySum = contragentSum;
-        this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
-        this.createTime = createTime;
-        this.idOfPayment = clientPaymentOrder.getIdOfPayment();
-        this.contragent = clientPaymentOrder.getContragent();
-        this.clientPaymentOrder = clientPaymentOrder;
-
-    }
+    //ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType, Date createTime,
+    //        String idOfPayment, Contragent contragent) {
+    //    this.transaction = transaction;
+    //    this.paymentMethod = paymentMethod;
+    //    this.paySum = paySum;
+    //    this.payType = payType;
+    //    this.createTime = createTime;
+    //    this.idOfPayment = idOfPayment;
+    //    this.contragent = contragent;
+    //}
+    //
+    //public ClientPayment(AccountTransaction transaction, Integer paymentMethod, Long paySum, Integer payType,
+    //        Date createTime, String idOfPayment, Contragent contragent, String addPaymentMethod, String addIdOfPayment) {
+    //    this.transaction = transaction;
+    //    this.paymentMethod = paymentMethod;
+    //    this.paySum = paySum;
+    //    this.payType = payType;
+    //    this.createTime = createTime;
+    //    this.idOfPayment = idOfPayment;
+    //    this.contragent = contragent;
+    //    this.addPaymentMethod = addPaymentMethod;
+    //    this.addIdOfPayment = addIdOfPayment;
+    //}
+    //
+    //public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime) {
+    //    this.transaction = transaction;
+    //    this.paymentMethod = clientPaymentOrder.getPaymentMethod();
+    //    this.paySum = clientPaymentOrder.getPaySum();
+    //    this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
+    //    this.createTime = createTime;
+    //    this.idOfPayment = clientPaymentOrder.getIdOfPayment();
+    //    this.contragent = clientPaymentOrder.getContragent();
+    //    this.clientPaymentOrder = clientPaymentOrder;
+    //}
+    //
+    //public ClientPayment(AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder, Date createTime,
+    //        String addIdOfPayment) {
+    //    this.transaction = transaction;
+    //    this.paymentMethod = clientPaymentOrder.getPaymentMethod();
+    //    this.paySum = clientPaymentOrder.getPaySum();
+    //    this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
+    //    this.createTime = createTime;
+    //    this.idOfPayment = clientPaymentOrder.getIdOfPayment();
+    //    this.contragent = clientPaymentOrder.getContragent();
+    //    this.clientPaymentOrder = clientPaymentOrder;
+    //    this.addIdOfPayment = addIdOfPayment;
+    //}
+    //
+    //public ClientPayment(Long contragentSum, AccountTransaction transaction, ClientPaymentOrder clientPaymentOrder,
+    //        Date createTime) {
+    //    this.transaction = transaction;
+    //    this.paymentMethod = clientPaymentOrder.getPaymentMethod();
+    //    this.paySum = contragentSum;
+    //    this.payType = CLIENT_TO_ACCOUNT_PAYMENT;
+    //    this.createTime = createTime;
+    //    this.idOfPayment = clientPaymentOrder.getIdOfPayment();
+    //    this.contragent = clientPaymentOrder.getContragent();
+    //    this.clientPaymentOrder = clientPaymentOrder;
+    //
+    //}
 
     public Long getIdOfClientPayment() {
         return idOfClientPayment;
@@ -112,14 +112,14 @@ public class ClientPayment {
         this.idOfClientPayment = idOfClientPayment;
     }
 
-    public AccountTransaction getTransaction() {
-        return transaction;
-    }
-
-    private void setTransaction(AccountTransaction accountTransaction) {
-        // For Hibernate only
-        this.transaction = accountTransaction;
-    }
+    //public AccountTransaction getTransaction() {
+    //    return transaction;
+    //}
+    //
+    //private void setTransaction(AccountTransaction accountTransaction) {
+    //    // For Hibernate only
+    //    this.transaction = accountTransaction;
+    //}
 
     public Long getPaySum() {
         return paySum;
@@ -224,7 +224,7 @@ public class ClientPayment {
 
     @Override
     public String toString() {
-        return "ClientPayment{" + "idOfClientPayment=" + idOfClientPayment + ", accountTransaction=" + transaction
+        return "ClientPayment{" + "idOfClientPayment=" + idOfClientPayment
                 + ", paymentMethod=" + paymentMethod + ", paySum=" + paySum + ", payType=" + payType + ", createTime="
                 + createTime + ", idOfPayment='" + idOfPayment + '\'' + ", contragent=" + contragent
                 + ", clientPaymentOrder=" + clientPaymentOrder + ", addPaymentMethod='" + addPaymentMethod + '\''

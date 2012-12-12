@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class EnterEvent {
 
-    private CompositeIdOfEnterEvent compositeIdOfEnterEvent;
+    private Long idOfEnterEvent;
     private String enterName;
     private String turnstileAddr;
     private int passDirection;
@@ -31,7 +31,7 @@ public class EnterEvent {
     private Date visitDateTime;
     //Kadyrov (21.12.2011)
     private Client client;
-    private Org org;
+    //private Org org;
 
     public static final int ENTRY = 0; // вход
     public static final int EXIT = 1; // выход
@@ -52,23 +52,23 @@ public class EnterEvent {
         // For Hibernate
     }
 
-    public EnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent, String enterName, String turnstileAddr,
-            int passDirection, int eventCode, Date evtDateTime) {
-        this.compositeIdOfEnterEvent = compositeIdOfEnterEvent;
-        this.enterName = enterName;
-        this.turnstileAddr = turnstileAddr;
-        this.passDirection = passDirection;
-        this.eventCode = eventCode;
-        this.evtDateTime = evtDateTime;
-    }
-
-    public CompositeIdOfEnterEvent getCompositeIdOfEnterEvent() {
-        return compositeIdOfEnterEvent;
-    }
-
-    public void setCompositeIdOfEnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent) {
-        this.compositeIdOfEnterEvent = compositeIdOfEnterEvent;
-    }
+    //public EnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent, String enterName, String turnstileAddr,
+    //        int passDirection, int eventCode, Date evtDateTime) {
+    //    this.compositeIdOfEnterEvent = compositeIdOfEnterEvent;
+    //    this.enterName = enterName;
+    //    this.turnstileAddr = turnstileAddr;
+    //    this.passDirection = passDirection;
+    //    this.eventCode = eventCode;
+    //    this.evtDateTime = evtDateTime;
+    //}
+    //
+    //public CompositeIdOfEnterEvent getCompositeIdOfEnterEvent() {
+    //    return compositeIdOfEnterEvent;
+    //}
+    //
+    //public void setCompositeIdOfEnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent) {
+    //    this.compositeIdOfEnterEvent = compositeIdOfEnterEvent;
+    //}
 
     public String getEnterName() {
         return enterName;
@@ -174,13 +174,13 @@ public class EnterEvent {
         this.visitDateTime = visitDateTime;
     }
 
-    public Org getOrg() {
-        return org;
-    }
-
-    public void setOrg(Org org) {
-        this.org = org;
-    }
+    //public Org getOrg() {
+    //    return org;
+    //}
+    //
+    //public void setOrg(Org org) {
+    //    this.org = org;
+    //}
 
     public Client getClient() {
         return client;
@@ -201,21 +201,21 @@ public class EnterEvent {
 
         EnterEvent that = (EnterEvent) o;
 
-        if (!compositeIdOfEnterEvent.equals(that.compositeIdOfEnterEvent)) {
-            return false;
-        }
+        //if (!compositeIdOfEnterEvent.equals(that.compositeIdOfEnterEvent)) {
+        //    return false;
+        //}
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return compositeIdOfEnterEvent.hashCode();
+        return idOfEnterEvent.hashCode();
     }
 
     @Override
     public String toString() {
-        return "EnterEvent{" + "compositeIdOfEnterEvent=" + compositeIdOfEnterEvent + ", enterName='" + enterName + '\''
+        return "EnterEvent{" + "compositeIdOfEnterEvent=" + enterName + '\''
                 + ", turnstileAddr='" + turnstileAddr + '\'' + ", passDirection=" + passDirection + ", eventCode="
                 + eventCode + ", idOfCard=" + idOfCard  + ", client=" + client + ", idOfTempCard=" + idOfTempCard
                 + ", evtDateTime=" + evtDateTime + ", idOfVisitor=" + idOfVisitor + ", visitorFullName='"

@@ -35,7 +35,7 @@ public class ClientSms {
     private String idOfSms;
     private long version;
     private Client client;
-    private AccountTransaction transaction;
+    //private AccountTransaction transaction;
     private String phone;
     private Integer contentsType;
     private String textContents;
@@ -61,18 +61,18 @@ public class ClientSms {
         this.price = price;
     }
 
-    public ClientSms(String idOfSms, Client client, AccountTransaction transaction, String phone, Integer contentsType,
-            String textContents, Date serviceSendTime, Long price) {
-        this.idOfSms = idOfSms;
-        this.transaction = transaction;
-        this.client = client;
-        this.phone = phone;
-        this.contentsType = contentsType;
-        this.textContents = textContents;
-        this.deliveryStatus = SENT_TO_SERVICE;
-        this.serviceSendTime = serviceSendTime;
-        this.price = price;
-    }
+    //public ClientSms(String idOfSms, Client client, AccountTransaction transaction, String phone, Integer contentsType,
+    //        String textContents, Date serviceSendTime, Long price) {
+    //    this.idOfSms = idOfSms;
+    //    this.transaction = transaction;
+    //    this.client = client;
+    //    this.phone = phone;
+    //    this.contentsType = contentsType;
+    //    this.textContents = textContents;
+    //    this.deliveryStatus = SENT_TO_SERVICE;
+    //    this.serviceSendTime = serviceSendTime;
+    //    this.price = price;
+    //}
 
     public String getIdOfSms() {
         return idOfSms;
@@ -161,14 +161,14 @@ public class ClientSms {
         this.client = client;
     }
 
-    public AccountTransaction getTransaction() {
-        return transaction;
-    }
-
-    private void setTransaction(AccountTransaction accountTransaction) {
-        // For Hibernate only
-        this.transaction = accountTransaction;
-    }
+    //public AccountTransaction getTransaction() {
+    //    return transaction;
+    //}
+    //
+    //private void setTransaction(AccountTransaction accountTransaction) {
+    //    // For Hibernate only
+    //    this.transaction = accountTransaction;
+    //}
 
     public Long getPrice() {
         return price;

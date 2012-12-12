@@ -15,8 +15,8 @@ import java.util.Set;
  * Time: 16:26
  * To change this template use File | Settings | File Templates.
  */
-  @Table(name="cf_authorization_types")
- @Entity
+@Table(name="cf_authorization_types")
+@Entity
 public class AuthorizationType {
 
     @Id

@@ -23,7 +23,7 @@ public class Menu {
     public static final int ORG_MENU_SOURCE = 1;
 
     private Long idOfMenu;
-    private Org org;
+    //private Org org;
     private Date menuDate;
     private Date createTime;
     private Integer menuSource;
@@ -42,13 +42,20 @@ public class Menu {
         // For Hibernate only
     }
 
-    public Menu(Org org, Date menuDate, Date createTime, int menuSource, int flags) throws Exception {
-        this.org = org;
+    public Menu(Date menuDate, Date createTime, int menuSource, int flags) throws Exception {
         this.menuDate = menuDate;
         this.createTime = createTime;
         this.menuSource = menuSource;
         this.flags = flags;
     }
+
+    //public Menu(Org org, Date menuDate, Date createTime, int menuSource, int flags) throws Exception {
+    //    this.org = org;
+    //    this.menuDate = menuDate;
+    //    this.createTime = createTime;
+    //    this.menuSource = menuSource;
+    //    this.flags = flags;
+    //}
 
     public Long getIdOfMenu() {
         return idOfMenu;
@@ -59,14 +66,14 @@ public class Menu {
         this.idOfMenu = idOfMenu;
     }
 
-    public Org getOrg() {
-        return org;
-    }
-
-    private void setOrg(Org org) {
-        // For Hibernate only
-        this.org = org;
-    }
+    //public Org getOrg() {
+    //    return org;
+    //}
+    //
+    //private void setOrg(Org org) {
+    //    // For Hibernate only
+    //    this.org = org;
+    //}
 
     public Date getMenuDate() {
         return menuDate;
@@ -136,7 +143,6 @@ public class Menu {
 
     @Override
     public String toString() {
-        return "Menu{" + "menuSource=" + menuSource + ", createTime=" + createTime + ", menuDate=" + menuDate + ", org="
-                + org + ", idOfMenu=" + idOfMenu + '}';
+        return "Menu{" + "menuSource=" + menuSource + ", createTime=" + createTime + ", menuDate=" + menuDate +", idOfMenu=" + idOfMenu + '}';
     }
 }

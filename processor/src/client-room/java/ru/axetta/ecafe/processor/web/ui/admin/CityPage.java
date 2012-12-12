@@ -34,8 +34,7 @@ import java.util.List;
 public class CityPage {
 
 
-    final Logger logger = LoggerFactory
-            .getLogger(CityPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(CityPage.class);
 
     @PersistenceContext
     private  EntityManager entityManager;
@@ -60,25 +59,21 @@ public class CityPage {
 
 
 
-    private  void getAllTypeItems(){
-        TypedQuery<AuthorizationType> query = entityManager.createQuery("from AuthorizationType",AuthorizationType.class);
-
+    @Transactional
+    protected void getAllTypeItems(){
+        TypedQuery<AuthorizationType> query = entityManager.createQuery("select a from AuthorizationType a", AuthorizationType.class);
         List<AuthorizationType> authTypes=query.getResultList();
-         this.authTypeItems=new SelectItem[authTypes.size()] ;
-
+        this.authTypeItems=new SelectItem[authTypes.size()];
         int index=0;
         for(AuthorizationType authType:authTypes){
            this.authTypeItems[index]=new SelectItem(authType.getIdOfAuthorizationType(),authType.getName());
             index++;
         }
-
-
     }
 
 
     @PostConstruct
     public void init(){
-        logger.info("PostConstruct");
         cityItems=new ArrayList<CityItem>();
         loadCitiesList();
         getAllTypeItems();
@@ -87,20 +82,13 @@ public class CityPage {
 
     public  void loadCitiesList() {
         TypedQuery<City> query = entityManager.createQuery("from City order by idOfCity", City.class);
-
         cities = query.getResultList();
         cityItems=new ArrayList<CityItem>();
-
-
-
          for(City city:cities){
              CityItem cityItem=new CityItem();
              cityItem.fill(city);
              cityItems.add(cityItem);
-
-
          }
-
     }
 
     public List<City> getCities() {
@@ -122,39 +110,31 @@ public class CityPage {
 
     @Transactional
      public Object addCity(){
-          logger.info("begin addCity");
-
          City newCity =new City();
          TypedQuery<AuthorizationType> query = entityManager.createQuery("from AuthorizationType where idOfAuthorizationType=1", AuthorizationType.class);
          newCity.setAuthorizationType(query.getResultList().get(0));
           newCity.setActivity(true);
          entityManager.persist(newCity);
-         logger.info("after persist");
          loadCitiesList();
-          logger.info("end addCity");
          return null;
      }
 
       @Transactional
     public Object deleteCity(Long idOfCity){
-
         Query q=entityManager.createQuery("delete from City where idOfCity=:idOfCity");
         q.setParameter("idOfCity",idOfCity);
         q.executeUpdate();
-          loadCitiesList();
+        loadCitiesList();
         return null;
 
     }
     @Transactional
     public Object save(){
-       logger.info("begin save");
         for (int i=0;i<cityItems.size();i++){
              CityItem cityItem=cityItems.get(i);
-            //logger.info("idOfCity: "+cityItem.getIdOfCity());
             TypedQuery<City> cityQuery = entityManager.createQuery("from City where idOfCity=:idOfCity", City.class);
             cityQuery.setParameter("idOfCity",cityItem.getIdOfCity()) ;
             List<City> cityList= cityQuery.getResultList();
-           // logger.info("size: "+cityList.size());
             City city=cityList.get(0);
              logger.info("cityItem: "+cityItem.getName());
 
@@ -166,24 +146,14 @@ public class CityPage {
             city.setPassword(cityItem.getPassword());
             city.setServiceUrl(cityItem.getServiceUrl());
             city.setUserName(cityItem.getUserName());
-
-            /*logger.info("cityItem.getIndexOfAuthType(): "+cityItem.getIndexOfAuthType());*/
             Integer authTypeId=(Integer)authTypeItems[cityItem.getIndexOfAuthType()-1].getValue();
             TypedQuery<AuthorizationType> typeQuery = entityManager.createQuery("from AuthorizationType where idOfAuthorizationType=:idOfAuthType", AuthorizationType.class);
-            typeQuery.setParameter("idOfAuthType",authTypeId) ;
-           logger.info("types.size(): "+typeQuery.getResultList().size());
-
+            typeQuery.setParameter("idOfAuthType",authTypeId);
             AuthorizationType type=typeQuery.getResultList().get(0);
-            logger.info("authType: "+type);
-
             city.setAuthorizationType(type);
             City newCity =entityManager.merge(city);
-            logger.info("after merge");
-
-
         }
         loadCitiesList();
-        logger.info("end save");
        return null;
 
     }

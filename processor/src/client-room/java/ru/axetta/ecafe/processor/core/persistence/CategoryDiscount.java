@@ -22,7 +22,7 @@ public class CategoryDiscount {
     private Date createdDate;
     private Date lastUpdate;
     private String discountRules;
-    private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
+    //private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
 
     public Set<Client> getClients(){
@@ -37,21 +37,21 @@ public class CategoryDiscount {
         this.clientsInternal = clientsInternal;
     }
 
-    public Set<DiscountRule> getDiscountsRules() {
-        return getDiscountRulesInternal();
-    }
-
-    public void setDiscountsRules(Set<DiscountRule> discountRulesInternal) {
-        this.discountRulesInternal = discountRulesInternal;
-    }
-
-    private Set<DiscountRule> getDiscountRulesInternal() {
-        return discountRulesInternal;
-    }
-
-    private void setDiscountRulesInternal(Set<DiscountRule> discountRulesInternal) {
-        this.discountRulesInternal = discountRulesInternal;
-    }
+    //public Set<DiscountRule> getDiscountsRules() {
+    //    return getDiscountRulesInternal();
+    //}
+    //
+    //public void setDiscountsRules(Set<DiscountRule> discountRulesInternal) {
+    //    this.discountRulesInternal = discountRulesInternal;
+    //}
+    //
+    //private Set<DiscountRule> getDiscountRulesInternal() {
+    //    return discountRulesInternal;
+    //}
+    //
+    //private void setDiscountRulesInternal(Set<DiscountRule> discountRulesInternal) {
+    //    this.discountRulesInternal = discountRulesInternal;
+    //}
 
     public String getDiscountRules() {
         return discountRules;
