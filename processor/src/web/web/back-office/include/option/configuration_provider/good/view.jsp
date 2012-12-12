@@ -41,8 +41,8 @@
         <h:inputText value="#{goodViewPage.currentGood.unitScaleString}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Масса нетто" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.netWeight}" maxlength="32" readonly="true" styleClass="input-text long-field" />
-        <h:outputText escape="true" value="Срок годности" styleClass="output-text" />
-        <h:inputText value="#{goodViewPage.currentGood.lifeTime} минут" maxlength="32" readonly="true" styleClass="input-text long-field" />
+        <h:outputText escape="true" value="Срок годности (в минутах)" styleClass="output-text" />
+        <h:inputText value="#{goodViewPage.currentGood.lifeTime}" maxlength="32" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Наценка" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.margin}" maxlength="32" readonly="true" styleClass="input-text long-field" />
     </h:panelGrid>

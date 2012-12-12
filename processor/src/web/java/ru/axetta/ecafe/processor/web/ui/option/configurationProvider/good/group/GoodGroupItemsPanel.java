@@ -58,7 +58,7 @@ public class GoodGroupItemsPanel extends BasicPage {
     }
 
     public Object cancel(){
-        completeSelection(false);
+        //completeSelection(false);
         return null;
     }
 

@@ -109,9 +109,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Срок годности" styleClass="output-text" escape="true"/>
+                <h:outputText value="Срок годности (в минутах)" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{good.lifeTime} минут" />
+            <h:outputText styleClass="output-text" value="#{good.lifeTime}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

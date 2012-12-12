@@ -58,6 +58,7 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
 
     public Object onClear() throws Exception{
         selectedGoodGroup = null;
+        goodList.clear();
         return null;
     }
 
