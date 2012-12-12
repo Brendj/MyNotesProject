@@ -25,9 +25,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private Long idOfOrg;
     private Date baseDate = DateUtils.addMonths(new Date(), -1);
     private Date endDate = new Date();
-    private Boolean useDeletedFilter = false;
-    private Boolean deletedState;
-    private Boolean useStateFilter = false;
+    private Integer deletedState = 2;
     private List<Integer> stateList = new ArrayList<Integer>();
 
     SelectItem[] stateSelectItemList;
@@ -44,7 +42,15 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     }
 
     @Override
-    public void onShow() {}
+    public void onShow() {
+        baseDate = DateUtils.addMonths(new Date(), -1);
+        endDate = new Date();
+        deletedState = 2;
+        stateList.clear();
+        for (int i = 0; i < GoodRequest.GOOD_REQUEST_STATES.length; i++) {
+            stateList.add(i);
+        }
+    }
 
     public Object onSearch() throws Exception{
         reload();
@@ -52,12 +58,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     }
 
     public Object onClear() throws Exception {
-        baseDate = DateUtils.addMonths(new Date(), -1);
-        endDate = new Date();
-        useDeletedFilter = false;
-        deletedState = null;
-        useStateFilter = false;
-        stateList.clear();
+        onShow();
         return null;
     }
 
@@ -67,17 +68,22 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         if (idOfOrg != null) {
             where = (where.equals("")?"":where + " and ") + "orgowner=" + idOfOrg;
         }
-        if ((useDeletedFilter != null) && useDeletedFilter) {
-            where = (where.equals("")?"":where + " and ") + "deletedstate=" + deletedState;
-        }
-        if ((useStateFilter != null) && useStateFilter && (stateList != null) && !stateList.isEmpty()) {
-            where = (where.equals("")?"":where + " and ");
+        if ((stateList != null) && !stateList.isEmpty()) {
+            where = (where.equals("")?"":where + " and (");
             for (Integer state : stateList) {
                 if (state != null) {
                     where += "state=" + state + " or ";
                 }
             }
             where = where.substring(0,where.length() - 4);
+            where += ")";
+        }
+        if (deletedState != 2) {
+            boolean deletedFlag = false;
+            if (deletedState == 1) {
+                deletedFlag = true;
+            }
+            where = (where.equals("")?"":where + " and ") + "deletedstate=" + deletedFlag;
         }
         where = (where.equals("")?"":" where ") + where;
         TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequest" + where, GoodRequest.class);
@@ -106,11 +112,11 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         filter.append(sdf.format(baseDate));
         filter.append(" - ");
         filter.append(sdf.format(endDate));
-        if ((useDeletedFilter != null) && useDeletedFilter && deletedState != null) {
-            if (deletedState) {
-                filter.append(", включая удаленные");
+        if (deletedState != 2) {
+            if (deletedState == 1) {
+                filter.append(", только удаленные");
             } else {
-                filter.append(", не включая удаленные");
+                filter.append(", только неудаленные");
             }
         }
         if ((stateList != null) && !stateList.isEmpty()) {
@@ -159,27 +165,11 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         this.endDate = endDate;
     }
 
-    public Boolean getUseDeletedFilter() {
-        return useDeletedFilter;
-    }
-
-    public void setUseDeletedFilter(Boolean useDeletedFilter) {
-        this.useDeletedFilter = useDeletedFilter;
-    }
-
-    public Boolean getUseStateFilter() {
-        return useStateFilter;
-    }
-
-    public void setUseStateFilter(Boolean useStateFilter) {
-        this.useStateFilter = useStateFilter;
-    }
-
-    public Boolean getDeletedState() {
+    public Integer getDeletedState() {
         return deletedState;
     }
 
-    public void setDeletedState(Boolean deletedState) {
+    public void setDeletedState(Integer deletedState) {
         this.deletedState = deletedState;
     }
 
@@ -193,14 +183,6 @@ public class GoodRequestListPage extends BasicWorkspacePage {
 
     public int getStatesListSize() {
         return GoodRequest.GOOD_REQUEST_STATES.length;
-    }
-
-    public void switchDeletedFilter() {
-        useDeletedFilter = !useDeletedFilter;
-    }
-
-    public void switchStateFilter() {
-        useStateFilter = !useStateFilter;
     }
 
 }

@@ -25,22 +25,18 @@
                 <rich:calendar value="#{goodRequestListPage.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-                <h:panelGroup styleClass="borderless-div">
-                    <h:outputText value="Выводить удаленные заявки" styleClass="output-text" escape="true"/>
-                    <h:selectBooleanCheckbox value="#{goodRequestListPage.useDeletedFilter}"/>
-                </h:panelGroup>
+                <h:outputText value="Фильтр вывода удаленных заявок" styleClass="output-text" escape="true"/>
                 <h:selectOneMenu id="selectDeletedMenu" value="#{goodRequestListPage.deletedState}"
-                                 converter="javax.faces.Boolean" styleClass="input-text" style="width: 250px;">
-                    <f:selectItem itemValue="false" itemLabel="Не показывать"/>
-                    <f:selectItem itemValue="true" itemLabel="Показывать"/>
+                                 converter="javax.faces.Integer" styleClass="input-text" style="width: 250px;">
+                    <f:selectItem itemValue="2" itemLabel="Показывать все"/>
+                    <f:selectItem itemValue="0" itemLabel="Не показывать удаленные"/>
+                    <f:selectItem itemValue="1" itemLabel="Показывать только удаленные"/>
                 </h:selectOneMenu>
 
-                <h:panelGroup styleClass="borderless-div">
-                    <h:outputText value="Выводить только со статусами" styleClass="output-text" escape="true"/>
-                    <h:selectBooleanCheckbox value="#{goodRequestListPage.useStateFilter}"/>
-                </h:panelGroup>
+                <h:outputText value="Выводить только со статусами" styleClass="output-text" escape="true"/>
                 <h:selectManyListbox id="selectStateMenu" size="#{goodRequestListPage.statesListSize}"
-                                     converter="javax.faces.Integer" value="#{goodRequestListPage.stateList}">
+                                     converter="javax.faces.Integer" value="#{goodRequestListPage.stateList}"
+                                     style="width: 250px;">
                     <f:selectItems value="#{goodRequestListPage.stateSelectItemList}"/>
                 </h:selectManyListbox>
 
