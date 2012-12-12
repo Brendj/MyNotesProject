@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfKsu2Records" table="cf_ksu2records" schema="public">
         <id name="idofksu2Record">
@@ -10,13 +10,13 @@
         <property name="recordnumber">
             <column name="recordnumber" sql-type="int4" length="10" not-null="true"/>
         </property>
-        <property name="idoffund">
+        <property insert="false" update="false" name="idoffund">
             <column name="idoffund" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="retirementdate">
             <column name="retirementdate" sql-type="date" length="13" not-null="true"/>
         </property>
-        <property name="idofretirementreason">
+        <property insert="false" update="false" name="idofretirementreason">
             <column name="idofretirementreason" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="globalversion">

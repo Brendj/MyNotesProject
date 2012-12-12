@@ -93,13 +93,4 @@ public class CfClientgroups {
         this.cfComplexinfoDiscountdetails = cfComplexinfoDiscountdetails;
     }
 
-    private Collection<CfDiarytimesheet> cfDiarytimesheets;
-
-    public Collection<CfDiarytimesheet> getCfDiarytimesheets() {
-        return cfDiarytimesheets;
-    }
-
-    public void setCfDiarytimesheets(Collection<CfDiarytimesheet> cfDiarytimesheets) {
-        this.cfDiarytimesheets = cfDiarytimesheets;
-    }
 }

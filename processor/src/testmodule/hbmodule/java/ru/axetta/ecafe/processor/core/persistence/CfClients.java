@@ -656,16 +656,6 @@ public class CfClients {
         this.cfContragentclientaccountsesByIdofclient = cfContragentclientaccountsesByIdofclient;
     }
 
-    private Collection<CfDiaryvalues> cfDiaryvaluesesByIdofclient;
-
-    public Collection<CfDiaryvalues> getCfDiaryvaluesesByIdofclient() {
-        return cfDiaryvaluesesByIdofclient;
-    }
-
-    public void setCfDiaryvaluesesByIdofclient(Collection<CfDiaryvalues> cfDiaryvaluesesByIdofclient) {
-        this.cfDiaryvaluesesByIdofclient = cfDiaryvaluesesByIdofclient;
-    }
-
     private Collection<CfDishProhibitions> cfDishProhibitionsesByIdofclient;
 
     public Collection<CfDishProhibitions> getCfDishProhibitionsesByIdofclient() {

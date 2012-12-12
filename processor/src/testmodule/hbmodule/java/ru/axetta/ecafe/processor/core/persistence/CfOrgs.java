@@ -629,36 +629,6 @@ public class CfOrgs {
         this.cfComplexinfoDiscountdetailsByIdoforg = cfComplexinfoDiscountdetailsByIdoforg;
     }
 
-    private Collection<CfDiaryclasses> cfDiaryclassesesByIdoforg;
-
-    public Collection<CfDiaryclasses> getCfDiaryclassesesByIdoforg() {
-        return cfDiaryclassesesByIdoforg;
-    }
-
-    public void setCfDiaryclassesesByIdoforg(Collection<CfDiaryclasses> cfDiaryclassesesByIdoforg) {
-        this.cfDiaryclassesesByIdoforg = cfDiaryclassesesByIdoforg;
-    }
-
-    private Collection<CfDiarytimesheet> cfDiarytimesheetsByIdoforg;
-
-    public Collection<CfDiarytimesheet> getCfDiarytimesheetsByIdoforg() {
-        return cfDiarytimesheetsByIdoforg;
-    }
-
-    public void setCfDiarytimesheetsByIdoforg(Collection<CfDiarytimesheet> cfDiarytimesheetsByIdoforg) {
-        this.cfDiarytimesheetsByIdoforg = cfDiarytimesheetsByIdoforg;
-    }
-
-    private Collection<CfDiaryvalues> cfDiaryvaluesesByIdoforg;
-
-    public Collection<CfDiaryvalues> getCfDiaryvaluesesByIdoforg() {
-        return cfDiaryvaluesesByIdoforg;
-    }
-
-    public void setCfDiaryvaluesesByIdoforg(Collection<CfDiaryvalues> cfDiaryvaluesesByIdoforg) {
-        this.cfDiaryvaluesesByIdoforg = cfDiaryvaluesesByIdoforg;
-    }
-
     private Collection<CfFriendlyOrganization> cfFriendlyOrganizationsByIdoforg;
 
     public Collection<CfFriendlyOrganization> getCfFriendlyOrganizationsByIdoforg() {

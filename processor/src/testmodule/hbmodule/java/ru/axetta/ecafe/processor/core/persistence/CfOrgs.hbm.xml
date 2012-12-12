@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfOrgs" table="cf_orgs" schema="public">
         <id name="idoforg">
@@ -22,7 +22,7 @@
         <property name="phone">
             <column name="phone" sql-type="varchar" length="32"/>
         </property>
-        <property name="idofofficialperson">
+        <property insert="false" update="false" name="idofofficialperson">
             <column name="idofofficialperson" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="officialposition">
@@ -43,7 +43,7 @@
         <property name="publickey">
             <column name="publickey" sql-type="varchar" length="1024" not-null="true"/>
         </property>
-        <property name="idofpacket">
+        <property insert="false" update="false" name="idofpacket">
             <column name="idofpacket" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="lastclientcontractid">
@@ -61,7 +61,7 @@
         <property name="subscriptionprice">
             <column name="subscriptionprice" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="defaultsupplier">
+        <property name="defaultsupplier" insert="false" update="false">
             <column name="defaultsupplier" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="ogrn">
@@ -82,13 +82,13 @@
         <property name="mailinglistreports2">
             <column name="mailinglistreports2" sql-type="varchar" length="1024"/>
         </property>
-        <property name="idofconfigurationprovider">
+        <property insert="false" update="false" name="idofconfigurationprovider">
             <column name="idofconfigurationprovider" sql-type="int8" length="19"/>
         </property>
         <property name="guid">
             <column name="guid" sql-type="varchar" length="40"/>
         </property>
-        <property name="idofcontract">
+        <property insert="false" update="false" name="idofcontract">
             <column name="idofcontract" sql-type="int8" length="19"/>
         </property>
         <property name="lastsucbalancesync">
@@ -164,24 +164,6 @@
             </key>
             <one-to-many not-found="ignore"
                          class="ru.axetta.ecafe.processor.core.persistence.CfComplexinfoDiscountdetail"/>
-        </set>
-        <set name="cfDiaryclassesesByIdoforg" inverse="true">
-            <key>
-                <column name="idoforg" not-null="true"/>
-            </key>
-            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDiaryclasses"/>
-        </set>
-        <set name="cfDiarytimesheetsByIdoforg" inverse="true">
-            <key>
-                <column name="idoforg" not-null="true"/>
-            </key>
-            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDiarytimesheet"/>
-        </set>
-        <set name="cfDiaryvaluesesByIdoforg" inverse="true">
-            <key>
-                <column name="idoforg" not-null="true"/>
-            </key>
-            <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfDiaryvalues"/>
         </set>
         <set name="cfFriendlyOrganizationsByIdoforg" inverse="true">
             <key>

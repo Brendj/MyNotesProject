@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfInternalIncomingDocuments"
            table="cf_internal_incoming_documents" schema="public">
         <id name="idofinternalincomingdocument">
             <column name="idofinternalincomingdocument" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idofwaybill">
+        <property insert="false" update="false" name="idofwaybill">
             <column name="idofwaybill" sql-type="int8" length="19"/>
         </property>
-        <property name="idofinternaldisposingdocument">
+        <property insert="false" update="false" name="idofinternaldisposingdocument">
             <column name="idofinternaldisposingdocument" sql-type="int8" length="19"/>
         </property>
-        <property name="idofactofinventarization">
+        <property insert="false" update="false" name="idofactofinventarization">
             <column name="idofactofinventarization" sql-type="int8" length="19"/>
         </property>
-        <property name="idofstaff">
+        <property insert="false" update="false" name="idofstaff">
             <column name="idofstaff" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="guid">

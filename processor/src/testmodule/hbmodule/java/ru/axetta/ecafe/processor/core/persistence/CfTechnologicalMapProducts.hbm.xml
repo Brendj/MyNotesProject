@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfTechnologicalMapProducts"
            table="cf_technological_map_products" schema="public">
         <id name="idoftechnomapproducts">
             <column name="idoftechnomapproducts" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idoftechnologicalmaps">
+        <property insert="false" update="false" name="idoftechnologicalmaps">
             <column name="idoftechnologicalmaps" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="idofproducts">
+        <property insert="false" update="false" name="idofproducts">
             <column name="idofproducts" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="netweight">
@@ -41,7 +41,7 @@
         <property name="deletedate">
             <column name="deletedate" sql-type="int8" length="19"/>
         </property>
-        <property name="idofconfigurationprovider">
+        <property insert="false" update="false" name="idofconfigurationprovider">
             <column name="idofconfigurationprovider" sql-type="int8" length="19"/>
         </property>
         <property name="sendall">

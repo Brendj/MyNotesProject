@@ -5,13 +5,14 @@
 
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <property name="connection.url">jdbc:postgresql://localhost:5432/ecafe_test_101212</property>
         <property name="connection.driver_class">org.postgresql.Driver</property>
         <property name="connection.username">postgres</property>
         <property name="connection.password">postgres</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccompanyingdocuments.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccountRefund.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfAccountTransfers.hbm.xml"/>
@@ -42,9 +43,6 @@
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContragentpayments.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfContragents.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfCurrentpositions.hbm.xml"/>
-        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiaryclasses.hbm.xml"/>
-        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiarytimesheet.hbm.xml"/>
-        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiaryvalues.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrules.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrulesCategorydiscounts.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfDiscountrulesCategoryorg.hbm.xml"/>
@@ -58,7 +56,6 @@
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFriendlyOrganization.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFunctions.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfFunds.hbm.xml"/>
-        <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGenerators.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoods.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoodsGroups.hbm.xml"/>
         <mapping resource="ru/axetta/ecafe/processor/core/persistence/CfGoodsRequests.hbm.xml"/>

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfComplexinfoDiscountdetail"
            table="cf_complexinfo_discountdetail" schema="public">
@@ -14,13 +14,13 @@
         <property name="isallgroups">
             <column name="isallgroups" sql-type="int4" length="10" not-null="true"/>
         </property>
-        <property name="idofclientgroup">
+        <property insert="false" update="false" name="idofclientgroup">
             <column name="idofclientgroup" sql-type="int8" length="19"/>
         </property>
         <property name="maxcount">
             <column name="maxcount" sql-type="int4" length="10"/>
         </property>
-        <property name="idoforg">
+       <!-- <property name="idoforg" insert="false" update="false" >
             <column name="idoforg" sql-type="int8" length="19"/>
         </property>
         <many-to-one name="cfClientgroups" class="ru.axetta.ecafe.processor.core.persistence.CfClientgroups">
@@ -29,6 +29,6 @@
         </many-to-one>
         <many-to-one name="cfOrgsByIdoforg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">
             <column name="idoforg"/>
-        </many-to-one>
+        </many-to-one>-->
     </class>
 </hibernate-mapping>

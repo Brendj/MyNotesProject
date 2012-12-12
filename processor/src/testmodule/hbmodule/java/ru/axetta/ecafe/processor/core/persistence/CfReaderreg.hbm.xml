@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfReaderreg" table="cf_readerreg" schema="public">
         <id name="idofreg">
             <column name="idofreg" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idofreader">
+        <property insert="false" update="false" name="idofreader">
             <column name="idofreader" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="idofclientgrouphist">
+        <property insert="false" update="false" name="idofclientgrouphist">
             <column name="idofclientgrouphist" sql-type="int8" length="19"/>
         </property>
         <property name="date">

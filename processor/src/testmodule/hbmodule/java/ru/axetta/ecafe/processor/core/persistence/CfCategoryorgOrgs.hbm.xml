@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfCategoryorgOrgs" table="cf_categoryorg_orgs"
            schema="public">
         <id name="idoforgscategories">
             <column name="idoforgscategories" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idoforg">
+        <property insert="false" update="false" name="idoforg">
             <column name="idoforg" sql-type="int8" length="19"/>
         </property>
-        <property name="idofcategoryorg">
+        <property insert="false" update="false" name="idofcategoryorg">
             <column name="idofcategoryorg" sql-type="int8" length="19"/>
         </property>
         <many-to-one name="cfCategoryorgByIdofcategoryorg"

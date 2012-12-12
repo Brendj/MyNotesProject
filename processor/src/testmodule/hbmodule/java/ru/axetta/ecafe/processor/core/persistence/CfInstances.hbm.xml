@@ -1,31 +1,31 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfInstances" table="cf_instances" schema="public">
         <id name="idofinstance">
             <column name="idofinstance" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idofpublication">
+        <property insert="false" update="false" name="idofpublication">
             <column name="idofpublication" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="ingroup">
             <column name="ingroup" sql-type="bool" length="1" not-null="true"/>
         </property>
-        <property name="idoffund">
+        <property insert="false" update="false" name="idoffund">
             <column name="idoffund" sql-type="int8" length="19"/>
         </property>
         <property name="invnumber">
             <column name="invnumber" sql-type="varchar" length="10"/>
         </property>
-        <property name="invbook">
+        <property name="invbook" insert="false" update="false">
             <column name="invbook" sql-type="int8" length="19"/>
         </property>
-        <property name="idofksu1Record">
+        <property insert="false" update="false" name="idofksu1Record">
             <column name="idofksu1record" sql-type="int8" length="19"/>
         </property>
-        <property name="idofksu2Record">
+        <property insert="false" update="false" name="idofksu2Record">
             <column name="idofksu2record" sql-type="int8" length="19"/>
         </property>
         <property name="cost">

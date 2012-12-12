@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfFriendlyOrganization" table="cf_friendly_organization"
            schema="public">
         <id name="idoffriendlyorg">
             <column name="idoffriendlyorg" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="currentorg">
+        <property name="currentorg" insert="false" update="false">
             <column name="currentorg" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="friendlyorg">
+        <property name="friendlyorg" insert="false" update="false">
             <column name="friendlyorg" sql-type="int8" length="19" not-null="true"/>
         </property>
         <many-to-one name="cfOrgsByCurrentorg" class="ru.axetta.ecafe.processor.core.persistence.CfOrgs">

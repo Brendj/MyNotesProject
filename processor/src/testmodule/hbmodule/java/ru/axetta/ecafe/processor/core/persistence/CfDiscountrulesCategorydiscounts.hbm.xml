@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfDiscountrulesCategorydiscounts"
            table="cf_discountrules_categorydiscounts" schema="public">
@@ -14,7 +14,7 @@
                 <column name="idofcategorydiscount" sql-type="int8" length="19" not-null="true"/>
             </key-property>
         </composite-id>
-        <property name="idofdrcd">
+        <property insert="false" update="false" name="idofdrcd">
             <column name="idofdrcd" sql-type="bigserial" length="19" not-null="true"/>
         </property>
         <many-to-one name="cfCategorydiscountsByIdofcategorydiscount"

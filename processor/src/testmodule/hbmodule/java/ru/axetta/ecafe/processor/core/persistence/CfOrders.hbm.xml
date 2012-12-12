@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfOrders" table="cf_orders" schema="public">
         <composite-id mapped="true" class="ru.axetta.ecafe.processor.core.persistence.CfOrdersPK">
@@ -12,16 +12,16 @@
                 <column name="idoforder" sql-type="int8" length="19" not-null="true"/>
             </key-property>
         </composite-id>
-        <property name="idofcard">
+        <property insert="false" update="false" name="idofcard">
             <column name="idofcard" sql-type="int8" length="19"/>
         </property>
-        <property name="idofclient">
+        <property insert="false" update="false" name="idofclient">
             <column name="idofclient" sql-type="int8" length="19"/>
         </property>
-        <property name="idoftransaction">
+        <property insert="false" update="false" name="idoftransaction">
             <column name="idoftransaction" sql-type="int8" length="19"/>
         </property>
-        <property name="idofcashier">
+        <property insert="false" update="false" name="idofcashier">
             <column name="idofcashier" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="socdiscount">
@@ -42,10 +42,10 @@
         <property name="sumbycash">
             <column name="sumbycash" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="idofpos">
+        <property insert="false" update="false" name="idofpos">
             <column name="idofpos" sql-type="int8" length="19"/>
         </property>
-        <property name="idofcontragent">
+        <property insert="false" update="false" name="idofcontragent">
             <column name="idofcontragent" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="trddiscount">

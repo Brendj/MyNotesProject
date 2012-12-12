@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hibernate-mapping xmlns="http://www.hibernate.org/xsd/hibernate-mapping"
-        xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-mapping http://www.hibernate.org/xsd/hibernate-mapping/hibernate-mapping-4.0.xsd" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.CfJournalitems" table="cf_journalitems" schema="public">
         <id name="idofjournalitem">
             <column name="idofjournalitem" sql-type="bigserial" length="19" not-null="true"/>
         </id>
-        <property name="idofjournal">
+        <property insert="false" update="false" name="idofjournal">
             <column name="idofjournal" sql-type="int8" length="19" not-null="true"/>
         </property>
-        <property name="idoffund">
+        <property insert="false" update="false" name="idoffund">
             <column name="idoffund" sql-type="int8" length="19"/>
         </property>
         <property name="date">
@@ -22,10 +22,10 @@
         <property name="cost">
             <column name="cost" sql-type="int4" length="10" not-null="true"/>
         </property>
-        <property name="idofksu1Record">
+        <property insert="false" update="false" name="idofksu1Record">
             <column name="idofksu1record" sql-type="int8" length="19"/>
         </property>
-        <property name="idofksu2Record">
+        <property insert="false" update="false" name="idofksu2Record">
             <column name="idofksu2record" sql-type="int8" length="19"/>
         </property>
         <property name="globalversion">
