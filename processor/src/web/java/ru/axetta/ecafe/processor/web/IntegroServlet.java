@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -117,7 +116,7 @@ public class IntegroServlet extends HttpServlet {
                 return;
             }
             /* Must be commented for testing!!!  */
-            try {
+           /* try {
                 if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,7 +126,7 @@ public class IntegroServlet extends HttpServlet {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
-            }
+            }*/
             Manager manager = new Manager(dateFormat, timeFormat);
             try {
                 // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
@@ -176,7 +175,7 @@ public class IntegroServlet extends HttpServlet {
             }
             // Send XML response
             try {
-                integroLogger.registerIntegroResponse(responseDocument, org.getIdOfOrg(), idOfSync);
+                integroLogger.registerIntegroResponse(responseDocument, idOfOrg, idOfSync);
                 writeResponse(response, true, responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);

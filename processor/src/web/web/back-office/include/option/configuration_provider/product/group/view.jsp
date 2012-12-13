@@ -28,7 +28,7 @@
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{productGroupViewPage.currentProductGroup.deletedState}" readonly="true" disabled="true"/>
         <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
-        <h:inputText value="#{productGroupViewPage.currentProductGroup.сlassificationCode}" readonly="true" maxlength="32" styleClass="input-text long-field" />
+        <h:inputText value="#{productGroupViewPage.currentProductGroup.classificationCode}" readonly="true" maxlength="32" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Продукты (количество)" styleClass="output-text" />
         <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{productGroupViewPage.countProducts}" action="#{productGroupViewPage.showProducts}" styleClass="command-link"/>
     </h:panelGrid>

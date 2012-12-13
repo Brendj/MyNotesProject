@@ -32,7 +32,7 @@
             styleClass="command-link" style="width: 25px; float: right;" />
         </h:panelGroup>
         <h:outputText escape="true" value="Код классификации" styleClass="output-text" />
-        <h:inputText value="#{productGroupCreatePage.productGroup.сlassificationCode}" maxlength="32" styleClass="input-text long-field" />
+        <h:inputText value="#{productGroupCreatePage.productGroup.classificationCode}" maxlength="32" styleClass="input-text long-field" />
     </h:panelGrid>
 
 </h:panelGrid>

@@ -27,22 +27,14 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
 
     private String nameOfGroup;
     private Set<Product> productInternal;
-    private String сlassificationCode;
     private Long idOfConfigurationProvider;
-
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
+    private String classificationCode;
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Name", nameOfGroup);
-        setAttribute(element,"ClassificationCode", сlassificationCode);
+        setAttribute(element,"ClassificationCode", classificationCode);
     }
 
     @Override
@@ -54,7 +46,7 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
         if(stringNameOfGroup!=null) setNameOfGroup(stringNameOfGroup);
 
         String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
-        if(stringClassificationCode!=null) setСlassificationCode(stringClassificationCode);
+        if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
 
         return this;
     }
@@ -63,7 +55,7 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((ProductGroup) distributedObject).getOrgOwner());
         setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
-        setСlassificationCode(((ProductGroup) distributedObject).getСlassificationCode());
+        setClassificationCode(((ProductGroup) distributedObject).getClassificationCode());
     }
 
     public String getNameOfGroup() {
@@ -101,12 +93,29 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
         this.productInternal = productInternal;
     }
 
-    public String getСlassificationCode() {
-        return сlassificationCode;
+    public String getCodeClassificationSystem(){
+        StringBuilder stringBuilder = new StringBuilder(classificationCode.substring(0,4));
+        stringBuilder.append(classificationCode.substring(4,5));
+        stringBuilder.append(classificationCode.substring(5,6));
+        stringBuilder.append(classificationCode.substring(6,7));
+        stringBuilder.append(classificationCode.substring(8));
+        return stringBuilder.toString();
     }
 
-    public void setСlassificationCode(String сlassificationCode) {
-        this.сlassificationCode = сlassificationCode;
+    public String getClassificationCode() {
+        return classificationCode;
+    }
+
+    public void setClassificationCode(String classificationCode) {
+        this.classificationCode = classificationCode;
+    }
+
+    public Long getIdOfConfigurationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
 }

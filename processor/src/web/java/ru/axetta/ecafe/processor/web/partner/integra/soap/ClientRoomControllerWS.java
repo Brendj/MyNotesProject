@@ -145,7 +145,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ProductGroup productGroup = (ProductGroup) groupObject;
                     ListOfProductGroupsExt listOfProductGroupsExt = objectFactory.createListOfProductGroupsExt();
                     listOfProductGroupsExt.setNameOfGroup(productGroup.getNameOfGroup());
-                    listOfProductGroupsExt.setClassificationCode(productGroup.getСlassificationCode());
+                    listOfProductGroupsExt.setClassificationCode(productGroup.getClassificationCode());
                     listOfProductGroupsExt.setDeletedState(productGroup.getDeletedState());
                     listOfProductGroupsExt.setGuid(productGroup.getGuid());
                     listOfProductGroupsExt.setOrgOwner(productGroup.getOrgOwner());

@@ -30,42 +30,42 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column styleClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Дата платежа" styleClass="output-text" />
+                        <h:outputText escape="true" value="Дата платежа" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" styleClass="output-text" value="Идентификатор платежа" />
+                        <h:outputText escape="true" styleClass="output-text" value="Идентификатор платежа" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Дата транзакции" styleClass="output-text" />
+                        <h:outputText escape="true" value="Дата транзакции" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column" colspan="4">
-                        <h:outputText escape="true" value="Клиент" styleClass="output-text" />
+                        <h:outputText escape="true" value="Клиент" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
+                        <h:outputText escape="true" value="Номер карты" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Сумма платежа" styleClass="output-text" />
+                        <h:outputText escape="true" value="Сумма платежа" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column breakBefore="true" styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
+                        <h:outputText escape="true" value="Номер договора" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+                        <h:outputText escape="true" value="Фамилия" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Имя" styleClass="output-text" />
+                        <h:outputText escape="true" value="Имя" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+                        <h:outputText escape="true" value="Отчество" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                     <rich:column breakBefore="true" styleClass="left-aligned-column" colspan="8">
-                        <h:outputText escape="true" value="Итого" styleClass="output-text" />
+                        <h:outputText escape="true" value="Итого" styleClass="output-text" style="color: #ffffff;" />
                     </rich:column>
-                    <rich:column styleClass="right-aligned-column">
+                    <rich:column styleClass="right-aligned-column" >
                         <h:outputText escape="true"
                                       value="#{mainPage.contragentClientPaymentReportPage.contragentClientPaymentReport.totalSum}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="output-text" style="color: #ffffff;"/>
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

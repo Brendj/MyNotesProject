@@ -81,7 +81,7 @@
             <f:facet name="header">
                 <h:outputText value="Код классификации" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{productGroup.сlassificationCode}" />
+            <h:outputText styleClass="output-text" value="#{productGroup.classificationCode}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

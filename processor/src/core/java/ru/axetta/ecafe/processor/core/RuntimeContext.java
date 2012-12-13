@@ -699,8 +699,8 @@ public class RuntimeContext implements ApplicationContextAware {
             logger.error("IntegRO input files not saved.");
         }
         try {
-            intgeroRequestLogPath = restoreFilename(basePath,
-                    properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.in.log.path"));
+            intgeroResponseLogPath = restoreFilename(basePath,
+                    properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.out.log.path"));
         }   catch (Exception e){
             logger.error("IntegRO output files not saved.");
         }
