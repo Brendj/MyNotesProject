@@ -45,6 +45,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Полное наименование" />
+            </f:facet>
+            <h:outputText value="#{item.longName}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="GUID" />
             </f:facet>
             <h:outputText value="#{item.guid}" />

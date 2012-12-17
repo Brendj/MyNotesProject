@@ -55,7 +55,7 @@ public class MskNSIService {
     }
     
     public static class OrgInfo {
-        public String guid, number, shortName;
+        public String guid, number, shortName, longName;
 
         public String getGuid() {
             return guid;
@@ -67,6 +67,10 @@ public class MskNSIService {
 
         public String getShortName() {
             return shortName;
+        }
+
+        public String getLongName() {
+            return longName;
         }
     }
     
@@ -117,7 +121,7 @@ public class MskNSIService {
     NSIService nsiService;
     public void init() throws Exception {
         if (nsiService!=null) return;
-        Config config = RuntimeContext.getInstance().getNsiServiceConfig();
+        Config config = RuntimeContext.getInstance().getNsiServiceConfig(); //http://10.126.216.2:2000/nsiws/services/NSIService
         String url = config.url;
         logger.info("Trying NSI service: "+url);
         nsiServicePort = new NSIServiceService(new URL(url+"?wsdl"), new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
@@ -179,6 +183,7 @@ public class MskNSIService {
                 + "item['РОУ XML/GUID Образовательного учреждения'],\n"
                 + "item['РОУ XML/Номер  учреждения'], \n"
                 + "item['РОУ XML/Краткое наименование учреждения'],\n"
+                + "item['РОУ XML/Краткое наименование учреждения'],\n"
                 + "item['РОУ XML/Дата изменения (число)']\n"
                 + "from catalog('Реестр образовательных учреждений') where \n"
                 + "item['РОУ XML/Краткое наименование учреждения'] like '%"+orgName+"%'");
@@ -188,18 +193,23 @@ public class MskNSIService {
             orgInfo.guid = qr.getQrValue().get(0);
             orgInfo.number = qr.getQrValue().get(1);
             orgInfo.shortName = qr.getQrValue().get(2);
+            orgInfo.longName = qr.getQrValue().get(3);
             list.add(orgInfo);
         }
         return list;
     }
-    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
+    public List<PupilInfo> getPupilsByOrgGUID(String orgName, String familyName, Long updateTime) throws Exception {
         String select = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                         + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                         + "item['Реестр обучаемых линейный/GUID'],\n"
                         + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                        + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" + "from catalog('Реестр обучаемых')\n"
+                        + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" +
+                        "from catalog('Реестр обучаемых')\n"
                         + "where\n"
-                        + "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";
+                        //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
+                        + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
+                        + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
+                        + "where  item['РОУ XML/Краткое наименование учреждения']='" + orgName + "')\n";
         if (familyName!=null && familyName.length()>0) {
             select += " and item['Реестр обучаемых линейный/Фамилия'] like '%"+familyName+"%'";
         }
@@ -217,8 +227,8 @@ public class MskNSIService {
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
             pupilInfo.group = qr.getQrValue().get(5);
-            list.add(pupilInfo);
-        }
-        return list;
-    }
+list.add(pupilInfo);
 }
+        return list;
+}
+        }

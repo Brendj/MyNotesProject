@@ -133,7 +133,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound=0;
-            List<MskNSIService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getGuid(), familyName, null);
+            List<MskNSIService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getOfficialName()/*.getGuid()*/, familyName, null);
             for (MskNSIService.PupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
@@ -182,7 +182,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 fieldConfig.setValue(ClientManager.FieldId.NAME, emptyIfNull(i.getFirstName()));
                 fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(i.getSecondName()));
                 if (i.getGroup()!=null) fieldConfig.setValue(ClientManager.FieldId.GROUP, i.getGroup());
-                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, false);
+                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true);
                 ++nItems;
             }
             printMessage("Успешно зарегистрировано клиентов: "+nItems);
