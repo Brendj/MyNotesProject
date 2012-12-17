@@ -22,6 +22,9 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
 
+-- Связь таблицы пунктов заказа и товаров
+ALTER TABLE cf_orderdetails ADD COLUMN guidofgoods character varying(36);
+
 -- Жалобная книга на товары
 CREATE TABLE cf_goods_complaintbook
 (
@@ -32,7 +35,7 @@ CREATE TABLE cf_goods_complaintbook
   lastupdate bigint,
   deletedate bigint,
   createddate bigint NOT NULL,
-  sendall integer,
+  sendall integer DEFAULT 4,
   orgowner bigint,
   idofclient bigint NOT NULL,
   idofgood bigint NOT NULL,
@@ -61,7 +64,7 @@ CREATE TABLE cf_goods_complaintcauses
   lastupdate bigint,
   deletedate bigint,
   createddate bigint NOT NULL,
-  sendall integer,
+  sendall integer DEFAULT 4,
   orgowner bigint,
   idofcomplaint bigint NOT NULL,
   CONSTRAINT cf_goods_complaintcauses_pk PRIMARY KEY (idofcause),
