@@ -68,6 +68,9 @@ public interface ClientRoomController {
     @WebMethod(operationName = "excludeGoodGroupFromProhibition")
     IdResult excludeGoodGroupFromProhibition(@WebParam(name="orgId") Long orgId, @WebParam(name="idOfProhibition") Long idOfProhibition, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup);
 
+    @WebMethod(operationName = "addComplaintBookEntry")
+    IdResult addComplaintBookEntry(@WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood, @WebParam(name="cause") Integer[] causes, @WebParam(name="comment") String comment);
+
     @WebMethod (operationName = "getMenuList")
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getMenuListBySan")

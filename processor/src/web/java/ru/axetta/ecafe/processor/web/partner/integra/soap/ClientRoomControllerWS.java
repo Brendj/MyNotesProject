@@ -107,6 +107,90 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String comment) {
+        authenticateRequest(null);
+        IdChildResult idChildResult = new IdChildResult();
+        idChildResult.resultCode = RC_OK;
+        idChildResult.description = RC_OK_DESC;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                idChildResult.resultCode = RC_CLIENT_NOT_FOUND;
+                idChildResult.description = RC_CLIENT_NOT_FOUND_DESC;
+                return idChildResult;
+            }
+
+            Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
+            goodCriteria.add(Restrictions.eq("idOfGood", idOfGood));
+            Good good = (Good) goodCriteria.uniqueResult();
+            if (good == null) {
+                idChildResult.resultCode = RC_INTERNAL_ERROR;
+                idChildResult.description = "Товара с указанным id не существует";
+                return idChildResult;
+            }
+
+            GoodComplaintBook goodComplaintBook = new GoodComplaintBook();
+            goodComplaintBook.setClient(client);
+            goodComplaintBook.setGood(good);
+            goodComplaintBook.setOrgOwner(client.getOrg().getIdOfOrg());
+            goodComplaintBook.setGuid(UUID.randomUUID().toString());
+            goodComplaintBook.setCreatedDate(new Date());
+            goodComplaintBook.setDeletedState(false);
+            goodComplaintBook.setSendAll(SendToAssociatedOrgs.SendToMain);
+
+            List<Long> childIdList = new ArrayList<Long>(causes.length);
+            for (Integer causeNumber : causes) {
+                GoodComplaintBookCauses.ComplaintCauses cause = GoodComplaintBookCauses.ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
+                if (cause == null) {
+                    idChildResult.resultCode = RC_INTERNAL_ERROR;
+                    idChildResult.description = "Причины жалобы с указанным номером " + causeNumber + " не существует";
+                    return idChildResult;
+                }
+                GoodComplaintBookCauses goodComplaintBookCauses = new GoodComplaintBookCauses();
+                goodComplaintBookCauses.setComplaint(goodComplaintBook);
+                goodComplaintBookCauses.setCause(cause);
+                goodComplaintBookCauses.setOrgOwner(client.getOrg().getIdOfOrg());
+                goodComplaintBookCauses.setGuid(UUID.randomUUID().toString());
+                goodComplaintBookCauses.setCreatedDate(new Date());
+                goodComplaintBookCauses.setDeletedState(false);
+                goodComplaintBookCauses.setSendAll(SendToAssociatedOrgs.SendToMain);
+                goodComplaintBookCauses.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintBookCauses.class.getSimpleName()));
+
+                persistenceSession.save(goodComplaintBookCauses);
+
+                childIdList.add(goodComplaintBookCauses.getGlobalId());
+            }
+            idChildResult.childIdList = childIdList;
+
+            goodComplaintBook.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintBook.class.getSimpleName()));
+
+            persistenceSession.save(goodComplaintBook);
+
+            idChildResult.id = goodComplaintBook.getGlobalId();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            idChildResult.resultCode = RC_INTERNAL_ERROR;
+            idChildResult.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return idChildResult;
+    }
+
+    @Override
     public ListOfProductsResult getListOfProducts(Long orgId) {
         authenticateRequest(null);
 
@@ -550,8 +634,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (objectClass.equals(Product.class)) {
                 prohibitionCriteria.add(Restrictions.eq("product.globalId", idOfObject));
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
-                if(p==null){
+                if(p == null){
                     Product product = (Product) objectCriteria.uniqueResult();
+                    if (product == null) {
+                        idResult.resultCode = RC_INTERNAL_ERROR;
+                        idResult.description = "Продукта с указанным id не существует";
+                        return idResult;
+                    }
                     prohibition.setProduct(product);
                 } else {
                     idResult.resultCode = RC_INTERNAL_ERROR;
@@ -563,6 +652,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
                 if(p==null){
                     ProductGroup productGroup = (ProductGroup) objectCriteria.uniqueResult();
+                    if (productGroup == null) {
+                        idResult.resultCode = RC_INTERNAL_ERROR;
+                        idResult.description = "Группы продуктов с указанным id не существует";
+                        return idResult;
+                    }
                     prohibition.setProductGroup(productGroup);
                 } else {
                     idResult.resultCode = RC_INTERNAL_ERROR;
@@ -574,6 +668,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
                 if(p==null){
                     Good good = (Good) objectCriteria.uniqueResult();
+                    if (good == null) {
+                        idResult.resultCode = RC_INTERNAL_ERROR;
+                        idResult.description = "Товара с указанным id не существует";
+                        return idResult;
+                    }
                     prohibition.setGood(good);
                 } else {
                     idResult.resultCode = RC_INTERNAL_ERROR;
@@ -586,6 +685,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
                 if(p==null){
                     GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
+                    if (goodGroup == null) {
+                        idResult.resultCode = RC_INTERNAL_ERROR;
+                        idResult.description = "Группы товаров с указанным id не существует";
+                        return idResult;
+                    }
                     prohibition.setGoodGroup(goodGroup);
                 } else {
                     idResult.resultCode = RC_INTERNAL_ERROR;
@@ -671,9 +775,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             objectCriteria.add(Restrictions.eq("globalId", idOfObject));
             if (objectClass.equals(Good.class)) {
                 Good good = (Good) objectCriteria.uniqueResult();
+                if (good == null) {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Товар с указанным id не найден";
+                    return idResult;
+                }
                 exclusion.setGood(good);
             } else if (objectClass.equals(GoodGroup.class)) {
                 GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
+                if (goodGroup == null) {
+                    idResult.resultCode = RC_INTERNAL_ERROR;
+                    idResult.description = "Группа товаров с указанным id не найдена";
+                    return idResult;
+                }
                 exclusion.setGoodsGroup(goodGroup);
             } else {
                 idResult.resultCode = RC_INTERNAL_ERROR;
