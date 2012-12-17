@@ -55,6 +55,7 @@ public class OrderDetail {
     private String menuGroup;
     private int state;
     private String itemCode;
+    private String guidOfGoods;
 
     public String getItemCode() {
         return itemCode;
@@ -211,6 +212,14 @@ public class OrderDetail {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getGuidOfGoods() {
+        return guidOfGoods;
+    }
+
+    public void setGuidOfGoods(String guidOfGoods) {
+        this.guidOfGoods = guidOfGoods;
     }
 
     @Override

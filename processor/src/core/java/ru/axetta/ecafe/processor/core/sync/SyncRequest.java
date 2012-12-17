@@ -111,9 +111,10 @@ public class SyncRequest {
                         if (menuGroup == null) {
                             menuGroup = MenuDetail.DEFAULT_GROUP_NAME;
                         }
+                        String guidOfGoods = getStringValueNullSafe(namedNodeMap, "GuidOfGoods");
 
                         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                                menuOutput, type, menuGroup, menuOrigin, itemCode);
+                                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods);
                     }
 
                 }
@@ -130,9 +131,10 @@ public class SyncRequest {
                 private final String menuGroup;
                 private final int menuOrigin;
                 private final String itemCode;
+                private final String guidOfGoods;
 
                 public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
-                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin, String itemCode) {
+                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin, String itemCode, String guidOfGoods) {
                     this.discount = discount;
                     this.socDiscount = socDiscount;
                     this.idOfOrderDetail = idOfOrderDetail;
@@ -145,6 +147,7 @@ public class SyncRequest {
                     this.menuGroup = menuGroup;
                     this.menuOrigin = menuOrigin;
                     this.itemCode = itemCode;
+                    this.guidOfGoods = guidOfGoods;
                 }
 
                 public String getItemCode() {
@@ -193,6 +196,10 @@ public class SyncRequest {
 
                 public int getMenuOrigin() {
                     return menuOrigin;
+                }
+
+                public String getGuidOfGoods() {
+                    return guidOfGoods;
                 }
 
                 @Override

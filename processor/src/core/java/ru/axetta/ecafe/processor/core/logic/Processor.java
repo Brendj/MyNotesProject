@@ -734,6 +734,9 @@ public class Processor implements SyncProcessor,
                 if(purchase.getItemCode() != null){
                     orderDetail.setItemCode(purchase.getItemCode());
                 }
+                if (purchase.getGuidOfGoods() != null) {
+                    orderDetail.setGuidOfGoods(purchase.getGuidOfGoods());
+                }
                 persistenceSession.save(orderDetail);
                 totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
                 totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();

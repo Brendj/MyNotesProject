@@ -38,5 +38,7 @@
         <property name="itemCode" column="ItemCode" type="string" length="32" not-null="true"
                   update="false"/>
 
+        <property name="guidOfGoods" column="GuidOfGoods" type="string" length="36" update="false"/>
+
     </class>
 </hibernate-mapping>
