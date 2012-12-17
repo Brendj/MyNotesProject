@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+
 import java.awt.*;
 
 /**
@@ -55,7 +57,7 @@ public class OrderDetail {
     private String menuGroup;
     private int state;
     private String itemCode;
-    private String guidOfGoods;
+    private Good good;
 
     public String getItemCode() {
         return itemCode;
@@ -214,12 +216,12 @@ public class OrderDetail {
         this.state = state;
     }
 
-    public String getGuidOfGoods() {
-        return guidOfGoods;
+    public Good getGood() {
+        return good;
     }
 
-    public void setGuidOfGoods(String guidOfGoods) {
-        this.guidOfGoods = guidOfGoods;
+    public void setGood(Good good) {
+        this.good = good;
     }
 
     @Override

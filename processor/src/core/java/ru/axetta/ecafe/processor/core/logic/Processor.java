@@ -735,7 +735,10 @@ public class Processor implements SyncProcessor,
                     orderDetail.setItemCode(purchase.getItemCode());
                 }
                 if (purchase.getGuidOfGoods() != null) {
-                    orderDetail.setGuidOfGoods(purchase.getGuidOfGoods());
+                    Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
+                    if (good != null) {
+                        orderDetail.setGood(good);
+                    }
                 }
                 persistenceSession.save(orderDetail);
                 totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
