@@ -47,6 +47,18 @@ public class GoodComplaintBookCauses extends DistributedObject {
             return CAUSE_TITLES_MAP.get(this);
         }
 
+        public static ComplaintCauses getCauseByNumberNullSafe(Integer causeNumber) {
+            if (causeNumber == null) {
+                return null;
+            }
+            for (ComplaintCauses cause : ComplaintCauses.values()) {
+                if (causeNumber.equals(cause.getCauseNumber())) {
+                    return cause;
+                }
+            }
+            return null;
+        }
+
     }
 
     @Override
@@ -55,16 +67,9 @@ public class GoodComplaintBookCauses extends DistributedObject {
         if (gcb == null) throw new DistributedObjectException("Complaint NOT_FOUND_VALUE");
         setComplaint(gcb);
 
-        boolean causeFound = false;
-        for (ComplaintCauses cause : ComplaintCauses.values()) {
-            if (causeNumber.equals(cause.getCauseNumber())) {
-                setCause(cause);
-                causeFound = true;
-            }
-        }
-        if (!causeFound) {
-            throw new DistributedObjectException("ComplaintCause NOT_FOUND_VALUE");
-        }
+        ComplaintCauses cause = ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
+        if (cause == null) throw new DistributedObjectException("Complaint cause NOT_FOUND_VALUE");
+        setCause(cause);
     }
 
     @Override
