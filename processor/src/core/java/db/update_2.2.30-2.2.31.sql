@@ -22,4 +22,55 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
 
+-- Жалобная книга на товары
+CREATE TABLE cf_goods_complaintbook
+(
+  idofcomplaint bigserial NOT NULL,
+  globalversion bigint,
+  deletedstate boolean,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  sendall integer,
+  orgowner bigint,
+  idofclient bigint NOT NULL,
+  idofgood bigint NOT NULL,
+  comment character varying(512),
+  CONSTRAINT cf_good_complaintbook_pk PRIMARY KEY (idofcomplaint),
+  CONSTRAINT cf_goods_complaintbook_idofclient_fk FOREIGN KEY (idofclient)
+      REFERENCES cf_clients (idofclient) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_goods_complaintbook_idofgood_fk FOREIGN KEY (idofgood)
+      REFERENCES cf_goods (idofgood) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE cf_goods_complaintbook
+  OWNER TO postgres;
 
+-- Причины жалобы на товар
+CREATE TABLE cf_goods_complaintcauses
+(
+  idofcause bigserial NOT NULL,
+  globalversion bigint,
+  deletedstate boolean,
+  guid character varying(36) NOT NULL,
+  lastupdate bigint,
+  deletedate bigint,
+  createddate bigint NOT NULL,
+  sendall integer,
+  orgowner bigint,
+  idofcomplaint bigint NOT NULL,
+  CONSTRAINT cf_goods_complaintcauses_pk PRIMARY KEY (idofcause),
+  CONSTRAINT cf_goods_complaintcauses_idofcomplaint_fk FOREIGN KEY (idofcomplaint)
+      REFERENCES cf_goods_complaintbook (idofcomplaint) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE cf_goods_complaintcauses
+  OWNER TO postgres;
