@@ -26,6 +26,7 @@ public class Prohibition extends DistributedObject {
             throw distributedObjectException;
         }
         if (c == null) throw distributedObjectException;
+        setClient(c);
 
         Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProduct);
         ProductGroup pg = (ProductGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProductGroup);

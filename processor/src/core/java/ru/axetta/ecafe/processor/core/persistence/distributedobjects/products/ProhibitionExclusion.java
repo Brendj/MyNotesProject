@@ -18,6 +18,7 @@ public class ProhibitionExclusion extends DistributedObject {
     public void preProcess(Session session) throws DistributedObjectException {
         Prohibition p = (Prohibition) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProhibition);
         if (p == null) throw new DistributedObjectException("Prohibition NOT_FOUND_VALUE");
+        setProhibition(p);
 
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
