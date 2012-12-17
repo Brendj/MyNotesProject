@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
-import org.apache.commons.net.ftp.*;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -42,7 +41,6 @@ public class BIDataExportService {
     private static final String FTP_PASSWORD = "";
     private static final String FTP_WORKDIR = "";
     private String LOCAL_DIRECTORY = null;
-    private FTPClient client;
     private static final List<BIDataExportType> TYPES;
 
     static {
@@ -180,7 +178,7 @@ public class BIDataExportService {
 
                 getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, end);
                 for (String t : typesToUpdate) {
-                    if (!updateFiles(client, session, t, end, start)) // Если файл не удалось создать, то пропускаем
+                    if (!updateFiles(session, t, end, start)) // Если файл не удалось создать, то пропускаем
                     // создание всех остальных файлов
                     {
                         break;
@@ -208,7 +206,7 @@ public class BIDataExportService {
     }
 
 
-    private boolean updateFiles(FTPClient client, Session session, String t, Calendar now, Calendar last) {
+    private boolean updateFiles(Session session, String t, Calendar now, Calendar last) {
         try {
             // Запись во временный файл
             BIDataExportType type = getTypeByName(t);
@@ -280,14 +278,6 @@ public class BIDataExportService {
             if (output != null) {
                 output.close();
             }
-
-
-            //  Записываем файл на FTP сервер
-            if (USE_FTP_AS_STORAGE) {
-                client.deleteFile(parseFileName(now, t) + ".csv");
-                FileInputStream fis = new FileInputStream(tempFile);
-                boolean fileStatus = client.storeFile(parseFileName(now, t), fis);
-            }
             return dataExists;
         } catch (Exception e) {
             logger.error("Failed to build query for " + t, e);
@@ -320,83 +310,6 @@ public class BIDataExportService {
             last = getStartDate();
         }
         return last;
-    }
-
-
-    private Calendar getLastBuildedPeriod(FTPClient client) throws IOException {
-        FTPFile content[] = getDirectories(client);
-        Calendar last = null;
-        for (FTPFile f : content) {
-            if (!f.isFile()) {
-                continue;
-            }
-
-            try {
-                String date = f.getName().substring(0, f.getName().indexOf("_"));
-                Calendar that = new GregorianCalendar();
-                that.setTimeInMillis(FILES_FORMAT.parse(date).getTime());
-
-                if (last == null || last.getTimeInMillis() < that.getTimeInMillis()) {
-                    last = that;
-                }
-            } catch (Exception e) {
-                logger.error("Wrong file found: " + f.getName(), e);
-            }
-        }
-        if (last == null) {
-            last = getStartDate();
-        }
-        return last;
-    }
-
-
-    private FTPClient openConnection() throws IOException {
-        FTPClient client = new FTPClient();
-        try {
-            client.connect(FTP_ADDRESS);
-            client.login(FTP_LOGIN, FTP_PASSWORD);
-            client.changeWorkingDirectory(FTP_WORKDIR);
-            return client;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-
-    public FTPFile[] getDirectories(FTPClient client) throws IOException {
-        return getDirectories(client, "");
-    }
-
-
-    public FTPFile[] getDirectories(FTPClient client, String dir) throws IOException {
-        try {
-            if (dir.length() > 1) {
-                client.changeWorkingDirectory(dir);
-            }
-            return client.listDirectories();
-        } catch (IOException e) {
-            logger.error("Failed to get directories list from " + dir, e);
-            throw e;
-        }
-    }
-
-
-    public FTPFile[] getFiles(FTPClient client) throws IOException {
-        return getFiles(client, "");
-    }
-
-
-    public FTPFile[] getFiles(FTPClient client, String dir) throws IOException {
-        try {
-            if (dir.length() > 1) {
-                client.changeWorkingDirectory(dir);
-            }
-            return client.listFiles();
-        } catch (IOException e) {
-            logger.error("Failed to get files list from " + dir, e);
-            throw e;
-        }
     }
 
 
@@ -484,46 +397,6 @@ public class BIDataExportService {
             }
         } else {
             dir.mkdirs();
-            for (BIDataExportType type : TYPES) {
-                typesToUpdate.add(type.getReportName());
-            }
-        }
-
-        return new Calendar[]{last, now};
-    }
-
-
-    public Calendar[] getUpdatePeriodsViaFTP(List<String> typesToUpdate) throws IOException {
-        client = openConnection();
-
-        Calendar last = getLastBuildedPeriod(client);
-        Calendar now = new GregorianCalendar();
-        now.setTimeInMillis(System.currentTimeMillis());
-        clearCalendar(last);
-        clearCalendar(now);
-        // Проверяем наличие директории
-        if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
-            //  Если директория существует, проверяем все ли в ней файлы
-            FTPFile files[] = getFiles(client, FILES_FORMAT.format(now.getTime()));
-            for (BIDataExportType type : TYPES) {
-                String t = type.getReportName();
-                String fileName = parseFileName(now, t);
-                boolean doAdd = true;
-                for (FTPFile f : files) {
-                    if (f.getName().toLowerCase().equals(fileName) && f.getSize() > 0) {
-                        doAdd = false;
-                        break;
-                    }
-                }
-                if (doAdd) {
-                    last.setTimeInMillis(
-                            last.getTimeInMillis() - 86400000);  //  Если необходимо добавлять хотябы одну запись,
-                    //  данные выбираем с предыдущего дня по сегодняшний
-                    typesToUpdate.add(t);
-                }
-            }
-        } else {
-            //  Указываем, что загружать необходимо все данные
             for (BIDataExportType type : TYPES) {
                 typesToUpdate.add(type.getReportName());
             }
