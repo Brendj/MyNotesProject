@@ -67,6 +67,7 @@ CREATE TABLE cf_goods_complaintcauses
   sendall integer DEFAULT 4,
   orgowner bigint,
   idofcomplaint bigint NOT NULL,
+  cause integer NOT NULL,
   CONSTRAINT cf_goods_complaintcauses_pk PRIMARY KEY (idofcause),
   CONSTRAINT cf_goods_complaintcauses_idofcomplaint_fk FOREIGN KEY (idofcomplaint)
       REFERENCES cf_goods_complaintbook (idofcomplaint) MATCH SIMPLE

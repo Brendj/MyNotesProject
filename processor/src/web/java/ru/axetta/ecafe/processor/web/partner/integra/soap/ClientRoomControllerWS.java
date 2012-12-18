@@ -107,6 +107,123 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByOrg(Long orgId) {
+        return getListOfComplaintBookEntriesByCriteria(orgId, null);
+    }
+
+    @Override
+    public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByClient(Long contractId) {
+        return getListOfComplaintBookEntriesByCriteria(null, contractId);
+    }
+
+    private ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByCriteria(Long orgId, Long contractId) {
+        authenticateRequest(null);
+
+        ListOfComplaintBookEntriesResult result = new ListOfComplaintBookEntriesResult();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Set<Long> setIdOfOrgs = null;
+            Client client = null;
+            if ((orgId != null) && (contractId == null)) {
+                setIdOfOrgs = new HashSet<Long>();
+                Org org = (Org) persistenceSession.load(Org.class, orgId);
+                if (org == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Организация не найдена";
+                    return result;
+                }
+                setIdOfOrgs.add(orgId);
+                List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                setIdOfOrgs.addAll(longList);
+            } else if ((orgId == null) && (contractId != null)) {
+                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+                clientCriteria.add(Restrictions.eq("contractId", contractId));
+                client = (Client) clientCriteria.uniqueResult();
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+            } else {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = RC_INTERNAL_ERROR_DESC;
+                return result;
+            }
+
+            ListOfComplaintBookEntries listOfComplaintBookEntries = new ListOfComplaintBookEntries();
+
+            ObjectFactory objectFactory = new ObjectFactory();
+
+            Criteria bookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            if (setIdOfOrgs != null) {
+                bookCriteria.add(Restrictions.in("orgOwner", setIdOfOrgs));
+            } else {
+                bookCriteria.add(Restrictions.eq("client", client));
+            }
+            List bookEntries = bookCriteria.list();
+            if (!bookEntries.isEmpty()) {
+                for (Object entry : bookEntries) {
+                    GoodComplaintBook goodComplaintBook = (GoodComplaintBook) entry;
+                    ListOfComplaintBookEntriesExt listOfComplaintBookEntriesExt = objectFactory.createListOfComplaintBookEntriesExt();
+                    listOfComplaintBookEntriesExt.setGuid(goodComplaintBook.getGuid());
+                    listOfComplaintBookEntriesExt.setDeletedState(goodComplaintBook.getDeletedState());
+                    listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
+                    listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
+                    listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getClient().getContractId());
+                    listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getGood().getGlobalId());
+                    listOfComplaintBookEntriesExt.setComment(goodComplaintBook.getComment());
+
+                    ListOfComplaintBookCauses listOfComplaintBookCauses = new ListOfComplaintBookCauses();
+                    listOfComplaintBookEntriesExt.getCauses().add(listOfComplaintBookCauses);
+
+                    Criteria causeCriteria = persistenceSession.createCriteria(GoodComplaintBookCauses.class);
+                    causeCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
+                    List complaintCauses = causeCriteria.list();
+                    if (!complaintCauses.isEmpty()) {
+                        for (Object cause : complaintCauses) {
+                            GoodComplaintBookCauses goodComplaintBookCauses = (GoodComplaintBookCauses) cause;
+                            ListOfComplaintBookCausesExt listOfComplaintBookCausesExt = objectFactory.createListOfComplaintBookCausesExt();
+                            GoodComplaintBookCauses.ComplaintCauses c = goodComplaintBookCauses.getCause();
+                            listOfComplaintBookCausesExt.setCause(c.getCauseNumber());
+                            listOfComplaintBookCausesExt.setDescription(c.getTitle());
+                            listOfComplaintBookCausesExt.setDeletedState(goodComplaintBookCauses.getDeletedState());
+                            listOfComplaintBookCausesExt.setGuid(goodComplaintBookCauses.getGuid());
+                            listOfComplaintBookCausesExt.setOrgOwner(goodComplaintBookCauses.getOrgOwner());
+                            listOfComplaintBookCausesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBookCauses.getCreatedDate()));
+
+                            listOfComplaintBookCauses.getC().add(listOfComplaintBookCausesExt);
+                        }
+                    }
+
+                    listOfComplaintBookEntries.getE().add(listOfComplaintBookEntriesExt);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            result.listOfComplaintBookEntries = listOfComplaintBookEntries;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
     public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String comment) {
         authenticateRequest(null);
         IdChildResult idChildResult = new IdChildResult();
@@ -217,6 +334,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
                 setIdOfOrgs.addAll(longList);
             }
+
             ListOfProductGroups listOfProductGroups = new ListOfProductGroups();
 
             ObjectFactory objectFactory = new ObjectFactory();

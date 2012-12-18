@@ -85,6 +85,14 @@ public class ObjectFactory {
         return new ClientSummaryExt();
     }
 
+    public ListOfComplaintBookEntriesExt createListOfComplaintBookEntriesExt() {
+        return new ListOfComplaintBookEntriesExt();
+    }
+
+    public ListOfComplaintBookCausesExt createListOfComplaintBookCausesExt() {
+        return new ListOfComplaintBookCausesExt();
+    }
+
     public ListOfProductGroupsExt createListOfProductGroupsExt() {
         return new ListOfProductGroupsExt();
     }

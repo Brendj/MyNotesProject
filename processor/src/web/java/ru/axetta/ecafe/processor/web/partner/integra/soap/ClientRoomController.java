@@ -68,6 +68,10 @@ public interface ClientRoomController {
     @WebMethod(operationName = "excludeGoodGroupFromProhibition")
     IdResult excludeGoodGroupFromProhibition(@WebParam(name="orgId") Long orgId, @WebParam(name="idOfProhibition") Long idOfProhibition, @WebParam(name="idOfGoodGroup") Long idOfGoodGroup);
 
+    @WebMethod(operationName = "getListOfComplaintBookEntriesByOrg")
+    ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByOrg(@WebParam(name="orgId") Long orgId);
+    @WebMethod(operationName = "getListOfComplaintBookEntriesByClient")
+    ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByClient(@WebParam(name="contractId") Long contractId);
     @WebMethod(operationName = "addComplaintBookEntry")
     IdResult addComplaintBookEntry(@WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood, @WebParam(name="cause") Integer[] causes, @WebParam(name="comment") String comment);
 

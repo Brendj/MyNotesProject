@@ -107,7 +107,6 @@ public class GoodComplaintBookCauses extends DistributedObject {
     }
 
     public ComplaintCauses getCause() {
-        ComplaintCauses.CAUSE_TITLES_MAP.get(ComplaintCauses.badTaste);
         return cause;
     }
 
