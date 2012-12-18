@@ -73,7 +73,7 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getListOfComplaintBookEntriesByClient")
     ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByClient(@WebParam(name="contractId") Long contractId);
     @WebMethod(operationName = "addComplaintBookEntry")
-    IdResult addComplaintBookEntry(@WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood, @WebParam(name="cause") Integer[] causes, @WebParam(name="comment") String comment);
+    IdResult addComplaintBookEntry(@WebParam(name="contractId") Long contractId, @WebParam(name="idOfGood") Long idOfGood, @WebParam(name="cause") Integer[] causes, @WebParam(name="description") String description);
 
     @WebMethod (operationName = "getMenuList")
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);

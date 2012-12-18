@@ -178,7 +178,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
                     listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
                     listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getClient().getContractId());
-                    listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getGood().getGlobalId());
+                    Good g = goodComplaintBook.getGood();
+                    listOfComplaintBookEntriesExt.setIdOfGood(g.getGlobalId());
+                    listOfComplaintBookEntriesExt.setNameOfGood(g.getNameOfGood());
                     listOfComplaintBookEntriesExt.setComment(goodComplaintBook.getDescription());
 
                     ListOfComplaintBookCauses listOfComplaintBookCauses = new ListOfComplaintBookCauses();
@@ -224,7 +226,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String comment) {
+    public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String description) {
         authenticateRequest(null);
         IdChildResult idChildResult = new IdChildResult();
         idChildResult.resultCode = RC_OK;
@@ -246,7 +248,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
-            goodCriteria.add(Restrictions.eq("idOfGood", idOfGood));
+            goodCriteria.add(Restrictions.eq("globalId", idOfGood));
             Good good = (Good) goodCriteria.uniqueResult();
             if (good == null) {
                 idChildResult.resultCode = RC_INTERNAL_ERROR;
@@ -262,6 +264,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             goodComplaintBook.setCreatedDate(new Date());
             goodComplaintBook.setDeletedState(false);
             goodComplaintBook.setSendAll(SendToAssociatedOrgs.SendToMain);
+            goodComplaintBook.setDescription(description);
+            goodComplaintBook.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintBook.class.getSimpleName()));
+            persistenceSession.save(goodComplaintBook);
 
             List<Long> childIdList = new ArrayList<Long>(causes.length);
             for (Integer causeNumber : causes) {
@@ -287,9 +292,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             idChildResult.childIdList = childIdList;
 
-            goodComplaintBook.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintBook.class.getSimpleName()));
-
-            persistenceSession.save(goodComplaintBook);
 
             idChildResult.id = goodComplaintBook.getGlobalId();
 

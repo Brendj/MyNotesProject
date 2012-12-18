@@ -7,11 +7,15 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ListOfComplaintBookEntriesExt", propOrder = {
-        "guid", "deletedState", "createdDate", "orgOwner", "contractId", "idOfGood",
+        "idOfGood", "nameOfGood", "guid", "deletedState", "createdDate", "orgOwner", "contractId",
         "comment", "causes"
 })
 public class ListOfComplaintBookEntriesExt {
 
+    @XmlAttribute(name = "IdOfGood")
+    protected Long idOfGood;
+    @XmlAttribute(name = "NameOfGood")
+    protected String nameOfGood;
     @XmlAttribute(name = "Guid")
     protected String guid;
     @XmlAttribute(name = "DeletedState")
@@ -19,16 +23,30 @@ public class ListOfComplaintBookEntriesExt {
     @XmlAttribute(name = "CreatedDate")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar createdDate;
-    @XmlSchemaType(name = "OrgOwner")
+    @XmlAttribute(name = "OrgOwner")
     protected Long orgOwner;
     @XmlAttribute(name = "ContractId")
     protected Long contractId;
-    @XmlAttribute(name = "IdOfGood")
-    protected Long idOfGood;
     @XmlElement(name = "Comment")
     protected String comment;
     @XmlElement(name = "Causes")
     protected List<ListOfComplaintBookCauses> causes;
+
+    public Long getIdOfGood() {
+        return idOfGood;
+    }
+
+    public void setIdOfGood(Long idOfGood) {
+        this.idOfGood = idOfGood;
+    }
+
+    public String getNameOfGood() {
+        return nameOfGood;
+    }
+
+    public void setNameOfGood(String nameOfGood) {
+        this.nameOfGood = nameOfGood;
+    }
 
     public String getGuid() {
         return guid;
@@ -68,14 +86,6 @@ public class ListOfComplaintBookEntriesExt {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
-    }
-
-    public Long getIdOfGood() {
-        return idOfGood;
-    }
-
-    public void setIdOfGood(Long idOfGood) {
-        this.idOfGood = idOfGood;
     }
 
     public String getComment() {
