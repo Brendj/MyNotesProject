@@ -39,7 +39,7 @@
             <column name="IdOfGood" not-null="true" />
         </many-to-one>
 
-        <property name="comment" column="Comment" type="String" length="512"/>
+        <property name="description" column="Description" type="string" length="512"/>
 
     </class>
 </hibernate-mapping>

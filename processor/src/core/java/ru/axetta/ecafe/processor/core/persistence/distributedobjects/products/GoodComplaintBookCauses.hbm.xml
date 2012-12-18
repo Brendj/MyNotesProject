@@ -37,7 +37,7 @@
 
         <property name="cause" column="Cause">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBookCauses.ComplaintCauses</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBookCauses$ComplaintCauses</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>

@@ -39,7 +39,7 @@ CREATE TABLE cf_goods_complaintbook
   orgowner bigint,
   idofclient bigint NOT NULL,
   idofgood bigint NOT NULL,
-  comment character varying(512),
+  description character varying(512),
   CONSTRAINT cf_good_complaintbook_pk PRIMARY KEY (idofcomplaint),
   CONSTRAINT cf_goods_complaintbook_idofclient_fk FOREIGN KEY (idofclient)
       REFERENCES cf_clients (idofclient) MATCH SIMPLE
