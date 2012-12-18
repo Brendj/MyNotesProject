@@ -8,7 +8,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ListOfComplaintBookEntriesExt", propOrder = {
         "idOfGood", "nameOfGood", "guid", "deletedState", "createdDate", "orgOwner", "contractId",
-        "comment", "causes"
+        "description", "causes"
 })
 public class ListOfComplaintBookEntriesExt {
 
@@ -27,8 +27,8 @@ public class ListOfComplaintBookEntriesExt {
     protected Long orgOwner;
     @XmlAttribute(name = "ContractId")
     protected Long contractId;
-    @XmlElement(name = "Comment")
-    protected String comment;
+    @XmlElement(name = "Description")
+    protected String description;
     @XmlElement(name = "Causes")
     protected List<ListOfComplaintBookCauses> causes;
 
@@ -88,12 +88,12 @@ public class ListOfComplaintBookEntriesExt {
         this.contractId = contractId;
     }
 
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<ListOfComplaintBookCauses> getCauses() {

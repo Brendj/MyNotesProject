@@ -181,7 +181,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     Good g = goodComplaintBook.getGood();
                     listOfComplaintBookEntriesExt.setIdOfGood(g.getGlobalId());
                     listOfComplaintBookEntriesExt.setNameOfGood(g.getNameOfGood());
-                    listOfComplaintBookEntriesExt.setComment(goodComplaintBook.getDescription());
+                    listOfComplaintBookEntriesExt.setDescription(goodComplaintBook.getDescription());
 
                     ListOfComplaintBookCauses listOfComplaintBookCauses = new ListOfComplaintBookCauses();
                     listOfComplaintBookEntriesExt.getCauses().add(listOfComplaintBookCauses);
