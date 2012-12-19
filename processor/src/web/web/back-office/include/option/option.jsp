@@ -167,6 +167,8 @@
                <h:inputText value="#{optionPage.importMSRPassword}" styleClass="input-text" size="40"/>
                <h:outputText escape="true" value="Журналировать импортирование стоп-листов" styleClass="output-text" />
                <h:selectBooleanCheckbox value="#{optionPage.importMSRLogging}" styleClass="output-text" />
+               <h:outputText escape="true" value="Синхронизировать клиентов с Реестрами" styleClass="output-text" />
+               <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />
            </h:panelGrid>
        </rich:tab>
 

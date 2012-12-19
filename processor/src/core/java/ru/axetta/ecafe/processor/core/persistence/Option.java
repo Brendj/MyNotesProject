@@ -65,7 +65,9 @@ public class Option {
             OPTION_MSR_STOPLIST_LOGGING=10018,
             OPTION_PROJECT_STATE_REPORT_ON=10019,
             OPTION_EXTERNAL_URL=10020,
-            OPTION_BENEFITS_RECALC_ON=10020
+            OPTION_BENEFITS_RECALC_ON=10021,
+            OPTION_REGISTER_CL_ON=10022,
+            OPTION_REGISTER_CL_UPD_TIME=10023
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -94,7 +96,9 @@ public class Option {
             OPTION_MSR_STOPLIST_LOGGING, "0",
             OPTION_PROJECT_STATE_REPORT_ON, "0",
             OPTION_EXTERNAL_URL, "http://localhost:8080",
-            OPTION_BENEFITS_RECALC_ON, "0"
+            OPTION_BENEFITS_RECALC_ON, "0",
+            OPTION_REGISTER_CL_ON, "0",
+            OPTION_REGISTER_CL_UPD_TIME, null
     };
 
     private Long idOfOption;

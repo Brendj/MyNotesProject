@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 import generated.nsiws.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,6 +118,22 @@ public class MskNSIService {
             this.group = pi.group;
         }
     }
+
+
+    public static class ExpandedPupilInfo extends PupilInfo {
+        public boolean deleted;
+        public boolean created;
+
+        public boolean isDeleted ()
+            {
+            return deleted;
+            }
+
+        public boolean isCreated ()
+            {
+            return created;
+            }
+        }
 
     
     NSIServiceService nsiServicePort;
@@ -227,8 +246,42 @@ public class MskNSIService {
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
             pupilInfo.group = qr.getQrValue().get(5);
-list.add(pupilInfo);
-}
+            list.add(pupilInfo);
+            }
         return list;
-}
         }
+
+
+    public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org) throws Exception {
+        String query = "select \n"
+                        + "item['Реестр обучаемых линейный/Фамилия'],\n"
+                        + "item['Реестр обучаемых линейный/Имя'], \n"
+                        + "item['Реестр обучаемых линейный/Отчество'],\n"
+                        + "item['Реестр обучаемых линейный/GUID'],\n"
+                        + "item['Реестр обучаемых линейный/Дата рождения'], \n"
+                        + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
+                        + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
+                        + "item['Реестр обучаемых линейный/Дата отчисления']\n"
+                        + "from catalog('Реестр обучаемых')\n"
+                        + "where\n"
+                        + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
+                        + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
+                        + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime () + " and "
+                               + "item['РОУ XML/Краткое наименование учреждения']='" + org.getOfficialName() + "')\n";
+        List<QueryResult> queryResults = executeQuery(query);
+        LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
+        for (QueryResult qr : queryResults) {
+            ExpandedPupilInfo pupilInfo = new ExpandedPupilInfo();
+            pupilInfo.familyName = qr.getQrValue().get(0);
+            pupilInfo.firstName = qr.getQrValue().get(1);
+            pupilInfo.secondName = qr.getQrValue().get(2);
+            pupilInfo.guid = qr.getQrValue().get(3);
+            pupilInfo.birthDate = qr.getQrValue().get(4);
+            pupilInfo. group = qr.getQrValue().get(5);
+            pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals ("");
+            pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals ("");
+            list.add(pupilInfo);
+        }
+        return list;
+    }
+    }

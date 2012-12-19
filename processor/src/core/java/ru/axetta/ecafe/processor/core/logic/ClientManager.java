@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -16,7 +17,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Date;
 
 public class ClientManager {
@@ -126,7 +130,76 @@ public class ClientManager {
         }
     }
 
+
+    public static boolean deleteClient(Org org, ClientFieldConfigForUpdate fieldConfig)
+            throws Exception
+        {
+        fieldConfig.checkRequiredFields();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+
+            String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME);
+            String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME);
+            String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME);
+
+            long idOfClient = findClientByFullName (persistenceSession, org, surname, firstName, secondName);
+            Client client = DAOUtils.findClient (persistenceSession, idOfClient);
+            if (client==null) {
+                throw new Exception("Клиент не найден: "+idOfClient);
+            }
+
+            removeClient(persistenceSession, client);
+            return true;
+            }
+        catch (Exception e)
+            {
+            throw e;
+            }
+        }
+
+
+    @Transactional
+    public static void removeClient(Session persistenceSession, Client client) throws Exception {
+        if (!client.getOrders().isEmpty()) throw new Exception("Имеются зарегистрированные заказы");
+        if (!client.getClientPaymentOrders().isEmpty()) throw new Exception("Имеются зарегистрированные пополнения счета");
+        if (!client.getCards().isEmpty()) throw new Exception("Имеются зарегистрированные карты");
+        if (!client.getCategories().isEmpty()){
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                client.getCategories().remove(categoryDiscount);
+            }
+        }
+        persistenceSession.delete(client);
+    }
+
+
+    public static Long findClientByFullName(Session session, Org organization, String surname, String firstName, String secondName)
+            throws Exception {
+        org.hibernate.Query query = session.createQuery(
+                "select idOfClient from Client client where (client.org = :org) and (upper(client.person.surname) = :surname) and"
+                        + "(upper(client.person.firstName) = :firstName) and (upper(client.person.secondName) = :secondName)");
+        query.setParameter("org", organization);
+        query.setParameter("surname", StringUtils.upperCase(surname));
+        query.setParameter("firstName", StringUtils.upperCase(firstName));
+        query.setParameter("secondName", StringUtils.upperCase(secondName));
+        query.setMaxResults(2);
+        if (query.list().isEmpty()) return null;
+        if (query.list().size()==2) return -1L;
+        return (Long)query.list().get(0);
+    }
+
+
     public static long modifyClient(ClientFieldConfigForUpdate fieldConfig)
+            throws Exception {
+        return modifyClient (fieldConfig, null, null);
+    }
+
+
+    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig, Org org, String registerComentsAdds)
             throws Exception {
         fieldConfig.checkRequiredFields();
 
@@ -138,13 +211,36 @@ public class ClientManager {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             //tokens[0];
-            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID);
+            Client client;
+            long contractId = 0L;
+            if (fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID) != null &&
+                fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID).length () > 0)
+                {
+                String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID);
+                contractId = Long.parseLong(contractIdText);
+                client = DAOUtils.findClientByContractId(persistenceSession, contractId);
 
-            long contractId = Long.parseLong(contractIdText);
-            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
-            if (client==null) {
-                throw new Exception("Клиент не найден: "+contractId);
-            }
+                if (client==null) {
+                    throw new Exception("Клиент не найден: "+contractId);
+                }
+                }
+            else
+                {
+                String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME);
+                String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME);
+                String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME);
+
+                Long idOfClient = findClientByFullName (persistenceSession, org, surname, firstName, secondName);
+                if (idOfClient < 1 || idOfClient == null)
+                    {
+                    return -1L;
+                    }
+                client = DAOUtils.findClient (persistenceSession, idOfClient);
+
+                if (client==null) {
+                    throw new Exception("Клиент не найден: "+surname + ", " + firstName + ", " + secondName);
+                }
+                }
 
             //tokens[1];
             if (fieldConfig.getValue(ClientManager.FieldId.PASSWORD)!=null) {
@@ -235,7 +331,19 @@ public class ClientManager {
             }
             //tokens[20])
             if(fieldConfig.getValue(FieldId.COMMENTS)!=null)
+                {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
+                }
+            if (registerComentsAdds.length () > 0)
+                {
+                String comments = client.getRemarks ();
+                if (comments.indexOf ("{%") > -1)
+                    {
+                    comments = comments.substring (0, comments.indexOf ("{%")) +
+                               comments.substring (comments.indexOf ("%}") + 1);
+                    }
+                comments += registerComentsAdds;
+                }
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP)!=null) {

@@ -91,4 +91,11 @@
 
 
 
+    <task:scheduled-tasks scheduler="exportRegisterClSchedule">
+        <task:scheduled ref="exportRegisterClientsService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="exportRegisterClSchedule" pool-size="5"/>
+
+
+
 </beans>

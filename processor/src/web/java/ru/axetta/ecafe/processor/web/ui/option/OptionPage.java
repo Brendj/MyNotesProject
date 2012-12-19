@@ -61,6 +61,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean importMSRLogging;
     private String externalURL;
     private Boolean recalculateBenefits;
+    private Boolean syncRegisterClients;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -268,6 +269,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.recalculateBenefits = recalculateBenefits;
     }
 
+    public Boolean getSyncRegisterClients() {
+        return syncRegisterClients;
+    }
+
+    public void setSyncRegisterClients(Boolean syncRegisterClients) {
+        this.syncRegisterClients = syncRegisterClients;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -302,6 +311,7 @@ public class OptionPage extends BasicWorkspacePage {
         importMSRLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
         externalURL = runtimeContext.getOptionValueString(Option.OPTION_EXTERNAL_URL);
         recalculateBenefits = runtimeContext.getOptionValueBool(Option.OPTION_BENEFITS_RECALC_ON);
+        syncRegisterClients = runtimeContext.getOptionValueBool(Option.OPTION_REGISTER_CL_ON);
 
         bankListPage.onShow();
 
@@ -378,6 +388,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);
             runtimeContext.setOptionValue(Option.OPTION_BENEFITS_RECALC_ON, recalculateBenefits);
+            runtimeContext.setOptionValue(Option.OPTION_REGISTER_CL_ON, syncRegisterClients);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
