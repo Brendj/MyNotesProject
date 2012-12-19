@@ -44,53 +44,53 @@
     </f:subview>
 
     <f:subview id="technologicalMapSelectSubView">
-        <c:import url="include/option/configuration_provider/technologicalMap/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/select.jsp" />
     </f:subview>
 
     <f:subview id="productSelectSubView">
-        <c:import url="include/option/configuration_provider/product/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/product/select.jsp" />
     </f:subview>
 
 
     <f:subview id="technologicalMapGroupSelectSubView">
-        <c:import url="include/option/configuration_provider/technologicalMap/group/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/group/select.jsp" />
     </f:subview>
 
     <f:subview id="productGroupSelectSubView">
-        <c:import url="include/option/configuration_provider/product/group/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/product/group/select.jsp" />
     </f:subview>
 
     <f:subview id="goodGroupSelectSubView">
-        <c:import url="include/option/configuration_provider/good/group/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/good/group/select.jsp" />
     </f:subview>
 
 
     <f:subview id="configurationProviderSelectSubView">
-        <c:import url="include/option/configuration_provider/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/select.jsp" />
     </f:subview>
 
     <f:subview id="goodSelectSubView">
-        <c:import url="include/option/configuration_provider/good/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/good/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="goodGroupsSelectSubView">
-        <c:import url="include/option/configuration_provider/good/group/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/good/group/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="productDeleteSelectSubView">
-        <c:import url="include/option/configuration_provider/product/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/product/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="productGroupsSelectSubView">
-        <c:import url="include/option/configuration_provider/product/group/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/product/group/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="technologicalMapGroupsSelectSubView">
-        <c:import url="include/option/configuration_provider/technologicalMap/group/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="technologicalMapProductsSelectSubView">
-        <c:import url="include/option/configuration_provider/technologicalMap/product/select.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/product/select.jsp" />
     </f:subview>
 
     <f:subview id="orgSelectSubView">
@@ -166,11 +166,11 @@
     </f:subview>
 
     <f:subview id="configurationProviderItemDeleteSubView">
-        <c:import url="include/option/configuration_provider/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/confirm_delete.jsp" />
     </f:subview>
 
     <f:subview id="technologicalMapItemDeleteSubView">
-        <c:import url="include/option/configuration_provider/technologicalMap/confirm_delete.jsp" />
+        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.jsp" />
     </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
