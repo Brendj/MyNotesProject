@@ -148,8 +148,8 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
             Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
                     + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice, cf_orderdetails.discount, cf_orderdetails.qty"
                     + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
-                    + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND "
-                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson and cf_orders.sumbycash=0);"
+                    + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND "
+                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND  cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson and cf_orders.sumbycash=0);"
                     + " ");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
