@@ -430,7 +430,11 @@
       <entry name="*.sql" />
       <entry name="*.CharsetProvider" />
     </wildcardResourcePatterns>
-    <annotationProcessing enabled="false" useClasspath="true" />
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
   </component>
   <component name="CopyrightManager" default="ecafe">
     <copyright>
@@ -497,28 +501,6 @@
     <option name="HEAP_SIZE" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
-  </component>
-  <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
-    <option name="myDefaultNotNull" value="org.jetbrains.annotations.NotNull" />
-    <option name="myNullables">
-      <value>
-        <list size="3">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
-        </list>
-      </value>
-    </option>
-    <option name="myNotNulls">
-      <value>
-        <list size="3">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
-        </list>
-      </value>
-    </option>
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -691,9 +673,6 @@
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
-        <ADDITIONAL_INDENT_OPTIONS fileType="haml">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
         <codeStyleSettings language="CFML">
           <option name="KEEP_LINE_BREAKS" value="false" />
           <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
@@ -848,6 +827,10 @@
           <option name="ENUM_CONSTANTS_WRAP" value="2" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
+        <codeStyleSettings language="SQL">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
@@ -906,7 +889,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="jdk6x64" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">
