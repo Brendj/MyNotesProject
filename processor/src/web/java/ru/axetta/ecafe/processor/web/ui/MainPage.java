@@ -22,7 +22,7 @@ import ru.axetta.ecafe.processor.web.ui.client.*;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.*;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.*;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
