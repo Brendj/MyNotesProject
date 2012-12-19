@@ -23,18 +23,12 @@ public class GoodComplaintBook extends DistributedObject {
         }
         if (c == null) throw distributedObjectException;
         setClient(c);
-
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
-        if (g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
-        setGood(g);
     }
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Description", description);
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "IdOfClient", client.getIdOfClient());
-        setAttribute(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
@@ -42,23 +36,16 @@ public class GoodComplaintBook extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null) setOrgOwner(longOrgOwner);
         idOfClient = getLongAttributeValue(node, "IdOfClient");
-        guidOfGoods = getStringAttributeValue(node, "GuidOfGoods",36);
-        String stringDescription = getStringAttributeValue(node, "Comment", 36);
-        if (stringDescription != null) setDescription(stringDescription);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
-        setDescription(((GoodComplaintBook) distributedObject).getDescription());
     }
 
     private Client client;
     private Long idOfClient;
-    private Good good;
-    private String guidOfGoods;
-    private String description;
 
     public Client getClient() {
         return client;
@@ -74,30 +61,6 @@ public class GoodComplaintBook extends DistributedObject {
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Good getGood() {
-        return good;
-    }
-
-    public void setGood(Good good) {
-        this.good = good;
-    }
-
-    public String getGuidOfGoods() {
-        return guidOfGoods;
-    }
-
-    public void setGuidOfGoods(String guidOfGoods) {
-        this.guidOfGoods = guidOfGoods;
     }
 
 }

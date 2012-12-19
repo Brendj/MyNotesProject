@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBookCauses" table="cf_goods_complaintcauses">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintCauses" table="cf_goods_complaint_causes">
         <id name="globalId" column="IdOfCause" type="long">
             <generator class="identity"/>
         </id>
@@ -31,13 +31,13 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="complaint" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook" fetch="select" lazy="false">
-            <column name="IdOfComplaint" not-null="true" />
+        <many-to-one name="complaintIteration" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations" fetch="select" lazy="false">
+            <column name="IdOfIteration" not-null="true" />
         </many-to-one>
 
         <property name="cause" column="Cause">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBookCauses$ComplaintCauses</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintCauses$ComplaintCauses</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>

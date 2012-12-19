@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 
 import java.util.HashMap;
 
-public class GoodComplaintBookCauses extends DistributedObject {
+public class GoodComplaintCauses extends DistributedObject {
 
     public static enum ComplaintCauses {
 
@@ -25,12 +25,12 @@ public class GoodComplaintBookCauses extends DistributedObject {
 
         static {
             CAUSE_TITLES_MAP = new HashMap<ComplaintCauses, String>(ComplaintCauses.values().length);
-            CAUSE_TITLES_MAP.put(ComplaintCauses.badTaste,           "Неприятный вкус");
-            CAUSE_TITLES_MAP.put(ComplaintCauses.badSmell,           "Неприятный запах");
-            CAUSE_TITLES_MAP.put(ComplaintCauses.malaise,            "Недомогание после употребления");
-            CAUSE_TITLES_MAP.put(ComplaintCauses.badQualityProducts, "Подозрение на некачественные продукты в составе блюда");
-            CAUSE_TITLES_MAP.put(ComplaintCauses.overdue,            "Просроченность");
-            CAUSE_TITLES_MAP.put(ComplaintCauses.highPrice,          "Завышенная цена");
+            CAUSE_TITLES_MAP.put(badTaste,           "Неприятный вкус");
+            CAUSE_TITLES_MAP.put(badSmell,           "Неприятный запах");
+            CAUSE_TITLES_MAP.put(malaise,            "Недомогание после употребления");
+            CAUSE_TITLES_MAP.put(badQualityProducts, "Подозрение на некачественные продукты в составе блюда");
+            CAUSE_TITLES_MAP.put(overdue,            "Просроченность");
+            CAUSE_TITLES_MAP.put(highPrice,          "Завышенная цена");
         }
 
         private Integer causeNumber;
@@ -63,47 +63,59 @@ public class GoodComplaintBookCauses extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        GoodComplaintBook gcb = (GoodComplaintBook) DAOUtils.findDistributedObjectByRefGUID(session, complaintGuid);
-        if (gcb == null) throw new DistributedObjectException("Complaint NOT_FOUND_VALUE");
-        setComplaint(gcb);
+        GoodComplaintIterations gci = (GoodComplaintIterations) DAOUtils.findDistributedObjectByRefGUID(session, guidOfComplaintIteration);
+        if (gci == null) throw new DistributedObjectException("Complaint iteration NOT_FOUND_VALUE");
+        setComplaintIteration(gci);
 
-        ComplaintCauses cause = ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
-        if (cause == null) throw new DistributedObjectException("Complaint cause NOT_FOUND_VALUE");
-        setCause(cause);
+        try {
+            ComplaintCauses cause = ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
+            if (cause == null) throw new DistributedObjectException("Complaint cause NOT_FOUND_VALUE");
+            setCause(cause);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
 
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GuidOfComplaint", complaint.getGuid());
+        setAttribute(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
         setAttribute(element, "Cause", cause.getCauseNumber());
     }
 
     @Override
-    protected GoodComplaintBookCauses parseAttributes(Node node) throws Exception {
+    protected GoodComplaintCauses parseAttributes(Node node) throws Exception {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null) setOrgOwner(longOrgOwner);
-        complaintGuid = getStringAttributeValue(node, "GuidOfComplaint", 36);
+        guidOfComplaintIteration = getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
         causeNumber = getIntegerAttributeValue(node, "Cause");
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((GoodComplaintBookCauses) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
     }
 
-    private GoodComplaintBook complaint;
-    private String complaintGuid;
+    private GoodComplaintIterations complaintIteration;
+    private String guidOfComplaintIteration;
     private ComplaintCauses cause;
     private Integer causeNumber;
 
-    public GoodComplaintBook getComplaint() {
-        return complaint;
+    public GoodComplaintIterations getComplaintIteration() {
+        return complaintIteration;
     }
 
-    public void setComplaint(GoodComplaintBook complaint) {
-        this.complaint = complaint;
+    public void setComplaintIteration(GoodComplaintIterations complaintIteration) {
+        this.complaintIteration = complaintIteration;
+    }
+
+    public String getGuidOfComplaintIteration() {
+        return guidOfComplaintIteration;
+    }
+
+    public void setGuidOfComplaintIteration(String guidOfComplaintIteration) {
+        this.guidOfComplaintIteration = guidOfComplaintIteration;
     }
 
     public ComplaintCauses getCause() {
@@ -112,14 +124,6 @@ public class GoodComplaintBookCauses extends DistributedObject {
 
     public void setCause(ComplaintCauses cause) {
         this.cause = cause;
-    }
-
-    public String getComplaintGuid() {
-        return complaintGuid;
-    }
-
-    public void setComplaintGuid(String complaintGuid) {
-        this.complaintGuid = complaintGuid;
     }
 
     public Integer getCauseNumber() {

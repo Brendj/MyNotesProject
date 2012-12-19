@@ -21,7 +21,7 @@ public class Prohibition extends DistributedObject {
         distributedObjectException.setData(String.valueOf(idOfClient));
         Client c;
         try {
-            c = (Client) DAOUtils.findClient(session, idOfClient);
+            c = DAOUtils.findClient(session, idOfClient);
         } catch (Exception e) {
             throw distributedObjectException;
         }
