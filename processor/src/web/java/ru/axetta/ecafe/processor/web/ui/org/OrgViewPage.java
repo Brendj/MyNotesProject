@@ -4,19 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import com.sun.faces.taglib.jsf_core.SelectItemsTag;
-
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.option.configurationProvider.ConfigurationProviderCreatePage;
 
 import org.hibernate.Session;
 
-import javax.faces.model.SelectItem;
 import java.util.*;
 
 /**
