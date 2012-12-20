@@ -17,7 +17,7 @@
 --%>
 <%--@elvariable id="wayBillListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillListPage"--%>
 <%--@elvariable id="wayBillPositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillPositionListPage"--%>
-wayBillPositionListPage<%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
+<%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
 <h:panelGrid id="ctOfWayBillDifferencePositionListPage" binding="#{wayBillListPage.pageComponent}"
              styleClass="borderless-grid">
 
@@ -77,6 +77,12 @@ wayBillPositionListPage<%--@elvariable id="actOfWayBillDifferencePositionListPag
                 <h:outputText escape="true" value="Дата составления" />
             </f:facet>
             <h:outputText escape="true" value="#{wayBill.dateOfWayBill}" styleClass="output-text" converter="timeConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header" sortBy="#{wayBill.state}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Состояние" />
+            </f:facet>
+            <h:outputText escape="true" value="#{wayBill.state}" styleClass="output-text"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

@@ -36,7 +36,6 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
 
     private Org orgOwner;
     private String deletedState;
-    private static String[] states = {"Активно", "Удалено"};
 
     @Override
     public void fillForList(EntityManager entityManager, WayBill entity) {
