@@ -556,14 +556,32 @@
     <rich:panelMenuGroup id="documentsGroupMenu" binding="#{documentsGroupPage.mainMenuComponent}"
                          label="Документы">
         <a4j:support event="onclick" action="#{documentsGroupPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="wayBillGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillGroupPage"--%>
+        <rich:panelMenuGroup id="wayBillGroupMenu" label="Накладные"
+                            binding="#{wayBillGroupPage.mainMenuComponent}" reRender="workspaceForm" >
+            <a4j:support event="onclick" action="#{wayBillGroupPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="wayBillListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillListPage"--%>
+            <rich:panelMenuItem id="wayBillListMenuItem" label="Список"
+                                binding="#{wayBillListPage.mainMenuComponent}"
+                                action="#{wayBillListPage.show}" reRender="workspaceForm"/>
+            <%--@elvariable id="wayBillPositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillPositionListPage"--%>
+            <rich:panelMenuItem id="wayBillPositionListMenuItem" label="Подробно"
+                                binding="#{wayBillPositionListPage.mainMenuComponent}"
+                                action="#{wayBillPositionListPage.show}" reRender="workspaceForm" rendered="#{wayBillPositionListPage.wayBillItem!=null}"/>
+        </rich:panelMenuGroup>
+
         <%--@elvariable id="actOfInventarizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventarizationListPage"--%>
         <rich:panelMenuItem id="actOfInventarizationListMenuItem" label="Акты инвентаризации"
                             binding="#{actOfInventarizationListPage.mainMenuComponent}"
                             action="#{actOfInventarizationListPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
-        <rich:panelMenuItem id="actOfWayBillDifferencePositionListMenuItem" label="Акт о наличии расхождений"
+        <rich:panelMenuItem id="actOfWayBillDifferencePositionListMenuItem" label="Акты о наличии расхождений"
                             binding="#{actOfWayBillDifferencePositionListPage.mainMenuComponent}"
                             action="#{actOfWayBillDifferencePositionListPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="tradeMaterialGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.TradeMaterialGoodListPage"--%>
+        <rich:panelMenuItem id="tradeMaterialGoodListMenuItem" label="Товарно-материальные ценности"
+                            binding="#{tradeMaterialGoodListPage.mainMenuComponent}"
+                            action="#{tradeMaterialGoodListPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

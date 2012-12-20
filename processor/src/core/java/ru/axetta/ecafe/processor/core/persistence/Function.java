@@ -79,6 +79,8 @@ public class Function {
     public static final String FUNCD_MONITORING = "Мониторинг";
     public static final String FUNC_SUPPLIER = "supplier";
     public static final String FUNCD_SUPPLIER = "Поставщик";
+    public static final String FUNC_COMMODITY_ACCOUNTING = "commAcc";
+    public static final String FUNCD_COMMODITY_ACCOUNTING = "Товарный учет";
 
     private Long idOfFunction;
     private String functionName;

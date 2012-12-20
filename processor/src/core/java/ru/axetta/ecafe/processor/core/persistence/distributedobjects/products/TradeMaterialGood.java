@@ -25,6 +25,8 @@ import java.util.Date;
  */
 public class TradeMaterialGood extends DistributedObject {
 
+    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);

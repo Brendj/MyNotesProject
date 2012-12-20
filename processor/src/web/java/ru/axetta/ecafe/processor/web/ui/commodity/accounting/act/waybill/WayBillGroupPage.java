@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.commodity.accounting;
+package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill;
 
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("session")
-public class DocumentsGroupPage extends BasicWorkspacePage {
+public class WayBillGroupPage extends BasicWorkspacePage {
 
     public boolean getEligibleToWorkCommodityAccounting() throws Exception {
         return ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToCommodityAccounting();

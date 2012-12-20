@@ -24,13 +24,13 @@ import java.util.Date;
  */
 public class WayBill extends DistributedObject {
 
+    public static String[] STATES = {"Новая", "Отгружена", "Получена", "Получена с расхождениями"};
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfSt);
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
-        //ActOfWayBillDifference awd = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfWayBillDifference.class, guidOfAWD);
         ActOfWayBillDifference awd = (ActOfWayBillDifference) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAWD);
         if(awd!=null) setActOfWayBillDifference(awd);
     }

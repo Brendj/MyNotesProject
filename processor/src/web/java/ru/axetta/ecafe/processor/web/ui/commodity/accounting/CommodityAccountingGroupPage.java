@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class CommodityAccountingGroupPage extends BasicWorkspacePage {
 
     public boolean getEligibleToWorkCommodityAccounting() throws Exception {
-        return ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditReports();
+        return ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToCommodityAccounting();
     }
 
 

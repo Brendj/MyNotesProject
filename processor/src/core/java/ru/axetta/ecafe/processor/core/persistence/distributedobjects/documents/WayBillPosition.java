@@ -25,6 +25,8 @@ import java.util.Date;
  */
 public class WayBillPosition extends DistributedObject {
 
+    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
@@ -56,7 +58,7 @@ public class WayBillPosition extends DistributedObject {
     protected WayBillPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Long integerUnitsScale = getLongAttributeValue(node, "UnitsScale");
+        Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
         if(integerUnitsScale != null) setUnitsScale(integerUnitsScale);
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
@@ -90,7 +92,7 @@ public class WayBillPosition extends DistributedObject {
         setNds(((WayBillPosition) distributedObject).getNds());
     }
 
-    private Long unitsScale;
+    private Integer unitsScale;
     private Long totalCount;
     private Long netWeight;
     private Long grossWeight;
@@ -103,11 +105,11 @@ public class WayBillPosition extends DistributedObject {
     private WayBill wayBill;
     private String guidOfWB;
 
-    public Long getUnitsScale() {
+    public Integer getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Long unitsScale) {
+    public void setUnitsScale(Integer unitsScale) {
         this.unitsScale = unitsScale;
     }
 

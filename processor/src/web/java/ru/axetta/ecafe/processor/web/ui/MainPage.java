@@ -6932,6 +6932,10 @@ public User getCurrentUser() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_REPORT_EDIT);
     }
 
+    public boolean isEligibleToCommodityAccounting() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_COMMODITY_ACCOUNTING);
+    }
+
     public boolean isEligibleToEditOrgs() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_ORG_EDIT);
     }

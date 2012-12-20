@@ -30,7 +30,7 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
-        <property name="unitsScale" column="UnitsScale" type="long" not-null="true"/>
+        <property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>
         <property name="totalCount" column="TotalCount" type="long" not-null="true"/>
         <property name="netWeight" column="NetWeight" type="long" not-null="true"/>
         <property name="grossWeight" column="GrossWeight" type="long"/>
