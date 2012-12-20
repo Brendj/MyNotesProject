@@ -83,6 +83,12 @@
     <task:scheduler id="biDataExportSchedule" pool-size="5"/>-->
 
 
+    <task:scheduled-tasks scheduler="projectStateReportSchedule">
+        <task:scheduled ref="projectStateReportService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+    <task:scheduler id="projectStateReportSchedule" pool-size="5"/>
+
+
 
     <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
         <task:scheduled ref="benefitsRecalculationService" method="run" fixed-delay="86400000" />

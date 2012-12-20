@@ -350,7 +350,7 @@ public class ProjectStateReportService {
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Type, StringKey, StringValue) VALUES (?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=?";
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? order by Period DESC, StringKey";
-    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND Type=? order by StringKey";
+    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND Type=? order by StringKey";
     private static final String CHECK_SQL = "SELECT Period FROM cf_projectstate_data WHERE Type=? order by Period DESC";
 
 
@@ -511,7 +511,7 @@ public class ProjectStateReportService {
     public static Calendar getToday() {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
-        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -578,11 +578,11 @@ public class ProjectStateReportService {
             throw new IllegalArgumentException("RuntimeContext, Calendar and Type cannot be null(s)");
         }
 
-        dateAt.set(Calendar.HOUR, 0);
+        dateAt.set(Calendar.HOUR_OF_DAY, 0);
         dateAt.set(Calendar.MINUTE, 0);
         dateAt.set(Calendar.SECOND, 0);
         dateAt.set(Calendar.MILLISECOND, 0);
-        dateTo.set(Calendar.HOUR, 0);
+        dateTo.set(Calendar.HOUR_OF_DAY, 0);
         dateTo.set(Calendar.MINUTE, 0);
         dateTo.set(Calendar.SECOND, 0);
         dateTo.set(Calendar.MILLISECOND, 0);
