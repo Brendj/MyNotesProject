@@ -8,19 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ListOfComplaintBookCauses", propOrder = {
-        "c"
+@XmlType(name = "ListOfComplaintIterations", propOrder = {
+        "i"
 })
-public class ListOfComplaintBookCauses {
+public class ListOfComplaintIterations {
 
-    @XmlElement(name = "C")
-    protected List<ListOfComplaintBookCausesExt> c;
+    @XmlElement(name = "I")
+    protected List<ListOfComplaintIterationsExt> i;
 
-    public List<ListOfComplaintBookCausesExt> getC() {
-        if (c == null) {
-            c = new ArrayList<ListOfComplaintBookCausesExt>();
+    public List<ListOfComplaintIterationsExt> getI() {
+        if (i == null) {
+            i = new ArrayList<ListOfComplaintIterationsExt>();
         }
-        return this.c;
+        return this.i;
     }
 
 }

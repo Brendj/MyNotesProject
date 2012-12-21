@@ -2,22 +2,20 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ListOfComplaintBookEntriesExt", propOrder = {
-        "contractId", "idOfGood", "nameOfGood", "guid", "deletedState",
-        "createdDate", "orgOwner", "iterations"
+@XmlType(name = "ListOfComplaintOrdersExt", propOrder = {
+        "idOfOrderDetail", "menuDetailName", "dateOfOrder",
+        "guid", "deletedState", "createdDate", "orgOwner"
 })
-public class ListOfComplaintBookEntriesExt {
+public class ListOfComplaintOrdersExt {
 
-    @XmlAttribute(name = "ContractId")
-    protected Long contractId;
-    @XmlAttribute(name = "IdOfGood")
-    protected Long idOfGood;
-    @XmlAttribute(name = "NameOfGood")
-    protected String nameOfGood;
+    @XmlAttribute(name = "IdOfOrderDetail")
+    protected Long idOfOrderDetail;
+    @XmlAttribute(name = "MenuDetailName")
+    protected String menuDetailName;
+    @XmlAttribute(name = "DateOfOrder")
+    protected XMLGregorianCalendar dateOfOrder;
     @XmlAttribute(name = "Guid")
     protected String guid;
     @XmlAttribute(name = "DeletedState")
@@ -27,31 +25,29 @@ public class ListOfComplaintBookEntriesExt {
     protected XMLGregorianCalendar createdDate;
     @XmlAttribute(name = "OrgOwner")
     protected Long orgOwner;
-    @XmlElement(name = "Iterations")
-    protected List<ListOfComplaintIterations> iterations;
 
-    public Long getContractId() {
-        return contractId;
+    public Long getIdOfOrderDetail() {
+        return idOfOrderDetail;
     }
 
-    public void setContractId(Long contractId) {
-        this.contractId = contractId;
+    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+        this.idOfOrderDetail = idOfOrderDetail;
     }
 
-    public Long getIdOfGood() {
-        return idOfGood;
+    public String getMenuDetailName() {
+        return menuDetailName;
     }
 
-    public void setIdOfGood(Long idOfGood) {
-        this.idOfGood = idOfGood;
+    public void setMenuDetailName(String menuDetailName) {
+        this.menuDetailName = menuDetailName;
     }
 
-    public String getNameOfGood() {
-        return nameOfGood;
+    public XMLGregorianCalendar getDateOfOrder() {
+        return dateOfOrder;
     }
 
-    public void setNameOfGood(String nameOfGood) {
-        this.nameOfGood = nameOfGood;
+    public void setDateOfOrder(XMLGregorianCalendar dateOfOrder) {
+        this.dateOfOrder = dateOfOrder;
     }
 
     public String getGuid() {
@@ -84,13 +80,6 @@ public class ListOfComplaintBookEntriesExt {
 
     public void setOrgOwner(Long orgOwner) {
         this.orgOwner = orgOwner;
-    }
-
-    public List<ListOfComplaintIterations> getIterations() {
-        if (iterations == null) {
-            iterations = new ArrayList<ListOfComplaintIterations>();
-        }
-        return iterations;
     }
 
 }

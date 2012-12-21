@@ -107,6 +107,7 @@ ALTER TABLE cf_goods_complaint_causes
 CREATE TABLE cf_goods_complaint_orders
 (
   idoforder bigserial NOT NULL,
+  idoforderorg bigint NOT NULL,
   idoforderdetail bigint NOT NULL,
   globalversion bigint,
   deletedstate boolean DEFAULT FALSE,
@@ -115,12 +116,12 @@ CREATE TABLE cf_goods_complaint_orders
   deletedate bigint,
   createddate bigint NOT NULL,
   sendall integer DEFAULT 4,
-  orgowner bigint NOT NULL,
+  orgowner bigint,
   CONSTRAINT cf_goods_complaint_orders_pk PRIMARY KEY (idoforder),
-  CONSTRAINT cf_goods_complaint_orders_orgowner_fk FOREIGN KEY (orgowner)
+  CONSTRAINT cf_goods_complaint_orders_idoforderorg_fk FOREIGN KEY (idoforderorg)
       REFERENCES cf_orgs (idoforg) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_goods_complaint_orders_idoforderdetail_fk FOREIGN KEY (orgowner, idoforderdetail)
+  CONSTRAINT cf_goods_complaint_orders_idoforderdetail_fk FOREIGN KEY (idoforderorg, idoforderdetail)
       REFERENCES cf_orderdetails (idoforg, idoforderdetail) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )

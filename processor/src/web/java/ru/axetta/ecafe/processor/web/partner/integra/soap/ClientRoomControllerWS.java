@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
@@ -106,125 +107,281 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    //@Override
-    //public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByOrg(Long orgId) {
-    //    return getListOfComplaintBookEntriesByCriteria(orgId, null);
-    //}
-    //
-    //@Override
-    //public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByClient(Long contractId) {
-    //    return getListOfComplaintBookEntriesByCriteria(null, contractId);
-    //}
-    //
-    //private ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByCriteria(Long orgId, Long contractId) {
-    //    authenticateRequest(null);
-    //
-    //    ListOfComplaintBookEntriesResult result = new ListOfComplaintBookEntriesResult();
-    //    result.resultCode = RC_OK;
-    //    result.description = RC_OK_DESC;
-    //
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        persistenceSession = runtimeContext.createPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //
-    //        Set<Long> setIdOfOrgs = null;
-    //        Client client = null;
-    //        if ((orgId != null) && (contractId == null)) {
-    //            setIdOfOrgs = new HashSet<Long>();
-    //            Org org = (Org) persistenceSession.load(Org.class, orgId);
-    //            if (org == null) {
-    //                result.resultCode = RC_INTERNAL_ERROR;
-    //                result.description = "Организация не найдена";
-    //                return result;
-    //            }
-    //            setIdOfOrgs.add(orgId);
-    //            List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
-    //            setIdOfOrgs.addAll(longList);
-    //        } else if ((orgId == null) && (contractId != null)) {
-    //            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-    //            clientCriteria.add(Restrictions.eq("contractId", contractId));
-    //            client = (Client) clientCriteria.uniqueResult();
-    //            if (client == null) {
-    //                result.resultCode = RC_CLIENT_NOT_FOUND;
-    //                result.description = RC_CLIENT_NOT_FOUND_DESC;
-    //                return result;
-    //            }
-    //        } else {
-    //            result.resultCode = RC_INTERNAL_ERROR;
-    //            result.description = RC_INTERNAL_ERROR_DESC;
-    //            return result;
-    //        }
-    //
-    //        ListOfComplaintBookEntries listOfComplaintBookEntries = new ListOfComplaintBookEntries();
-    //
-    //        ObjectFactory objectFactory = new ObjectFactory();
-    //
-    //        Criteria bookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
-    //        if (setIdOfOrgs != null) {
-    //            bookCriteria.add(Restrictions.in("orgOwner", setIdOfOrgs));
-    //        } else {
-    //            bookCriteria.add(Restrictions.eq("client", client));
-    //        }
-    //        List bookEntries = bookCriteria.list();
-    //        if (!bookEntries.isEmpty()) {
-    //            for (Object entry : bookEntries) {
-    //                GoodComplaintBook goodComplaintBook = (GoodComplaintBook) entry;
-    //                ListOfComplaintBookEntriesExt listOfComplaintBookEntriesExt = objectFactory.createListOfComplaintBookEntriesExt();
-    //                listOfComplaintBookEntriesExt.setGuid(goodComplaintBook.getGuid());
-    //                listOfComplaintBookEntriesExt.setDeletedState(goodComplaintBook.getDeletedState());
-    //                listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
-    //                listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
-    //                listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getClient().getContractId());
-    //                Good g = goodComplaintBook.getGood();
-    //                listOfComplaintBookEntriesExt.setIdOfGood(g.getGlobalId());
-    //                listOfComplaintBookEntriesExt.setNameOfGood(g.getNameOfGood());
-    //                listOfComplaintBookEntriesExt.setDescription(goodComplaintBook.getDescription());
-    //
-    //                ListOfComplaintBookCauses listOfComplaintBookCauses = new ListOfComplaintBookCauses();
-    //                listOfComplaintBookEntriesExt.getCauses().add(listOfComplaintBookCauses);
-    //
-    //                Criteria causeCriteria = persistenceSession.createCriteria(GoodComplaintCauses.class);
-    //                causeCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
-    //                List complaintCauses = causeCriteria.list();
-    //                if (!complaintCauses.isEmpty()) {
-    //                    for (Object cause : complaintCauses) {
-    //                        GoodComplaintCauses goodComplaintBookCauses = (GoodComplaintCauses) cause;
-    //                        ListOfComplaintBookCausesExt listOfComplaintBookCausesExt = objectFactory.createListOfComplaintBookCausesExt();
-    //                        GoodComplaintCauses.ComplaintCauses c = goodComplaintBookCauses.getCause();
-    //                        listOfComplaintBookCausesExt.setCause(c.getCauseNumber());
-    //                        listOfComplaintBookCausesExt.setDescription(c.getTitle());
-    //                        listOfComplaintBookCausesExt.setDeletedState(goodComplaintBookCauses.getDeletedState());
-    //                        listOfComplaintBookCausesExt.setGuid(goodComplaintBookCauses.getGuid());
-    //                        listOfComplaintBookCausesExt.setOrgOwner(goodComplaintBookCauses.getOrgOwner());
-    //                        listOfComplaintBookCausesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBookCauses.getCreatedDate()));
-    //
-    //                        listOfComplaintBookCauses.getC().add(listOfComplaintBookCausesExt);
-    //                    }
-    //                }
-    //
-    //                listOfComplaintBookEntries.getE().add(listOfComplaintBookEntriesExt);
-    //            }
-    //        }
-    //
-    //        persistenceSession.flush();
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //
-    //        result.listOfComplaintBookEntries = listOfComplaintBookEntries;
-    //    } catch (Exception e) {
-    //        logger.error("Failed to process client room controller request", e);
-    //        result.resultCode = RC_INTERNAL_ERROR;
-    //        result.description = RC_INTERNAL_ERROR_DESC;
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return result;
-    //}
-    //
+    @Override
+    public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByOrg(Long orgId) {
+        return getListOfComplaintBookEntriesByCriteria(orgId, null);
+    }
+
+    @Override
+    public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByClient(Long contractId) {
+        return getListOfComplaintBookEntriesByCriteria(null, contractId);
+    }
+
+    private ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByCriteria(Long orgId, Long contractId) {
+        authenticateRequest(null);
+
+        ListOfComplaintBookEntriesResult result = new ListOfComplaintBookEntriesResult();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Set<Long> setIdOfOrgs = null;
+            Client client = null;
+            if ((orgId != null) && (contractId == null)) {
+                setIdOfOrgs = new HashSet<Long>();
+                Org org = (Org) persistenceSession.load(Org.class, orgId);
+                if (org == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Организация не найдена";
+                    return result;
+                }
+                setIdOfOrgs.add(orgId);
+                List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                setIdOfOrgs.addAll(longList);
+            } else if ((orgId == null) && (contractId != null)) {
+                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+                clientCriteria.add(Restrictions.eq("contractId", contractId));
+                client = (Client) clientCriteria.uniqueResult();
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+            } else {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = RC_INTERNAL_ERROR_DESC;
+                return result;
+            }
+
+            ListOfComplaintBookEntries listOfComplaintBookEntries = new ListOfComplaintBookEntries();
+
+            ObjectFactory objectFactory = new ObjectFactory();
+
+            Criteria bookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            if (setIdOfOrgs != null) {
+                bookCriteria.add(Restrictions.in("orgOwner", setIdOfOrgs));
+            } else {
+                bookCriteria.add(Restrictions.eq("client", client));
+            }
+            List bookEntries = bookCriteria.list();
+            if (!bookEntries.isEmpty()) {
+                for (Object entry : bookEntries) {
+                    GoodComplaintBook goodComplaintBook = (GoodComplaintBook) entry;
+                    ListOfComplaintBookEntriesExt listOfComplaintBookEntriesExt = objectFactory.createListOfComplaintBookEntriesExt();
+
+                    listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getClient().getContractId());
+                    listOfComplaintBookEntriesExt.setGuid(goodComplaintBook.getGuid());
+                    listOfComplaintBookEntriesExt.setDeletedState(goodComplaintBook.getDeletedState());
+                    listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
+                    listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
+
+                    ListOfComplaintIterations listOfComplaintIterations = new ListOfComplaintIterations();
+                    listOfComplaintBookEntriesExt.getIterations().add(listOfComplaintIterations);
+
+                    Criteria iterationCriteria = persistenceSession.createCriteria(GoodComplaintIterations.class);
+                    iterationCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
+                    List iterations = iterationCriteria.list();
+                    if (!iterations.isEmpty()) {
+                        for (Object iterObject : iterations) {
+                            GoodComplaintIterations iteration = (GoodComplaintIterations) iterObject;
+                            ListOfComplaintIterationsExt listOfComplaintIterationsExt = objectFactory.createListOfComplaintIterationsExt();
+
+                            listOfComplaintIterationsExt.setIterationNumber(iteration.getIterationNumber());
+                            listOfComplaintIterationsExt.setIterationStatus(
+                                    iteration.getIterationStatus().getStatusNumber());
+                            listOfComplaintIterationsExt.setProblemDescription(iteration.getProblemDescription());
+                            listOfComplaintIterationsExt.setConclusion(iteration.getConclusion());
+                            listOfComplaintIterationsExt.setGuid(iteration.getGuid());
+                            listOfComplaintIterationsExt.setDeletedState(iteration.getDeletedState());
+                            listOfComplaintIterationsExt.setCreatedDate(getXMLGregorianCalendarByDate(
+                                    iteration.getCreatedDate()));
+                            listOfComplaintIterationsExt.setOrgOwner(iteration.getOrgOwner());
+
+                            ListOfComplaintOrders listOfComplaintOrders = new ListOfComplaintOrders();
+                            listOfComplaintIterationsExt.getOrders().add(listOfComplaintOrders);
+
+                            Criteria orderCriteria = persistenceSession.createCriteria(GoodComplaintOrders.class);
+                            orderCriteria.add(Restrictions.eq("complaintIteration", iteration));
+                            List orders = orderCriteria.list();
+                            for (Object orderObject : orders) {
+                                GoodComplaintOrders order = (GoodComplaintOrders) orderObject;
+                                ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory.createListOfComplaintOrdersExt();
+
+                                listOfComplaintOrdersExt.setIdOfOrderDetail(order.getOrderDetail().getIdOfOrder());
+                                listOfComplaintOrdersExt.setMenuDetailName(order.getOrderDetail().getMenuDetailName());
+                                listOfComplaintOrdersExt.setDateOfOrder(getXMLGregorianCalendarByDate(order.getOrderDetail().getOrder().getCreateTime()));
+                                listOfComplaintOrdersExt.setGuid(order.getGuid());
+                                listOfComplaintOrdersExt.setCreatedDate(getXMLGregorianCalendarByDate(order.getCreatedDate()));
+                                listOfComplaintOrdersExt.setDeletedState(order.getDeletedState());
+                                listOfComplaintOrdersExt.setOrgOwner(order.getOrgOwner());
+
+                                listOfComplaintOrders.getO().add(listOfComplaintOrdersExt);
+                            }
+
+                            ListOfComplaintCauses listOfComplaintCauses = new ListOfComplaintCauses();
+                            listOfComplaintIterationsExt.getCauses().add(listOfComplaintCauses);
+
+                            Criteria causeCriteria = persistenceSession.createCriteria(GoodComplaintCauses.class);
+                            causeCriteria.add(Restrictions.eq("complaintIteration", iteration));
+                            List causes = causeCriteria.list();
+                            for (Object causeObject : causes) {
+                                GoodComplaintCauses cause = (GoodComplaintCauses) causeObject;
+                                ListOfComplaintCausesExt listOfComplaintCausesExt = objectFactory.createListOfComplaintCausesExt();
+
+                                listOfComplaintCausesExt.setCause(cause.getCause().getCauseNumber());
+                                listOfComplaintCausesExt.setCauseDescription(cause.getTitle());
+                                listOfComplaintCausesExt.setGuid(cause.getGuid());
+                                listOfComplaintCausesExt.setCreatedDate(getXMLGregorianCalendarByDate(cause.getCreatedDate()));
+                                listOfComplaintCausesExt.setDeletedState(cause.getDeletedState());
+                                listOfComplaintCausesExt.setOrgOwner(cause.getOrgOwner());
+
+                                listOfComplaintCauses.getC().add(listOfComplaintCausesExt);
+                            }
+
+                            listOfComplaintIterations.getI().add(listOfComplaintIterationsExt);
+                        }
+                    }
+
+                    listOfComplaintBookEntries.getE().add(listOfComplaintBookEntriesExt);
+                }
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            result.listOfComplaintBookEntries = listOfComplaintBookEntries;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public IdResult openComplaint(Long contractId, Long orderOrgId, List<Long> orderDetailIdList, List<Integer> causeNumberList, String description) {
+        authenticateRequest(null);
+
+        IdResult result = new IdResult();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            Criteria orderOrgCriteria = persistenceSession.createCriteria(Org.class);
+            orderOrgCriteria.add(Restrictions.eq("idOfOrg", orderOrgId));
+            Org orderOrg = (Org) orderOrgCriteria.uniqueResult();
+            if (orderOrg == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Организации с указанным идентификатором не существует";
+                return result;
+            }
+
+            GoodComplaintBook goodComplaintBook = new GoodComplaintBook();
+            goodComplaintBook.setClient(client);
+            fillDisctributedObjectsCommonDetails(goodComplaintBook, client);
+            persistenceSession.save(goodComplaintBook);
+
+            GoodComplaintIterations goodComplaintIterations = new GoodComplaintIterations();
+            goodComplaintIterations.setComplaint(goodComplaintBook);
+            goodComplaintIterations.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
+            goodComplaintIterations.setIterationNumber(0);
+            goodComplaintIterations.setProblemDescription(description);
+            fillDisctributedObjectsCommonDetails(goodComplaintIterations, client);
+            persistenceSession.save(goodComplaintIterations);
+
+            if (causeNumberList == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Не указаны причины подачи жалобы";
+                return result;
+            }
+            for (Integer causeNumber : causeNumberList) {
+                GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
+                        causeNumber);
+                if (cause == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                    return result;
+                }
+                GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
+                goodComplaintCauses.setCause(cause);
+                goodComplaintCauses.setComplaintIteration(goodComplaintIterations);
+                fillDisctributedObjectsCommonDetails(goodComplaintCauses, client);
+                persistenceSession.save(goodComplaintCauses);
+            }
+
+            if (orderDetailIdList == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
+                return result;
+            }
+            for (Long idOfOrderDetail : orderDetailIdList) {
+                CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
+                OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
+                if (orderDetail == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
+                    return result;
+                }
+                GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
+                goodComplaintOrders.setComplaintIteration(goodComplaintIterations);
+                goodComplaintOrders.setOrderOrg(orderOrg);
+                goodComplaintOrders.setOrderDetail(orderDetail);
+                fillDisctributedObjectsCommonDetails(goodComplaintOrders, client);
+                persistenceSession.save(goodComplaintOrders);
+            }
+
+            result.id = goodComplaintBook.getGlobalId();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return result;
+    }
+
+    private void fillDisctributedObjectsCommonDetails(DistributedObject distributedObject, Client client) {
+        distributedObject.setOrgOwner(client.getOrg().getIdOfOrg());
+        distributedObject.setGuid(UUID.randomUUID().toString());
+        distributedObject.setCreatedDate(new Date());
+        distributedObject.setDeletedState(false);
+        distributedObject.setSendAll(SendToAssociatedOrgs.SendToMain);
+        distributedObject.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(
+                distributedObject.getClass().getSimpleName()));
+    }
+
     //@Override
     //public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String description) {
     //    authenticateRequest(null);

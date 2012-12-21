@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfOrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -23,20 +24,27 @@ public class GoodComplaintOrders extends DistributedObject {
         if (gci == null) throw new DistributedObjectException("Complaint iteration NOT_FOUND_VALUE");
         setComplaintIteration(gci);
 
-        DistributedObjectException distributedObjectException = new DistributedObjectException("OrderDetail NOT_FOUND_VALUE");
-        distributedObjectException.setData(String.valueOf(idOfOrderDetail));
-        OrderDetail od;
-        Long idOfOrg = getOrgOwner();
-        if (idOfOrg == null) {
-            throw distributedObjectException;
+        DistributedObjectException orgNotFoundException = new DistributedObjectException("Org NOT_FOUND_VALUE");
+        orgNotFoundException.setData(String.valueOf(idOfOrderOrg));
+        Org o;
+        try {
+            o = DAOUtils.findOrg(session, idOfOrderOrg);
+        } catch (Exception e) {
+            throw orgNotFoundException;
         }
-        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(getOrgOwner(), idOfOrderDetail);
+        if (o == null) throw orgNotFoundException;
+        setOrderOrg(o);
+
+        DistributedObjectException orderDetailNotFoundException = new DistributedObjectException("OrderDetail NOT_FOUND_VALUE");
+        orderDetailNotFoundException.setData(String.valueOf(idOfOrderDetail));
+        OrderDetail od;
+        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(getOrderOrg().getIdOfOrg(), idOfOrderDetail);
         try {
             od = DAOUtils.findOrderDetail(session, compositeIdOfOrderDetail);
         } catch (Exception e) {
-            throw distributedObjectException;
+            throw orderDetailNotFoundException;
         }
-        if (od == null) throw distributedObjectException;
+        if (od == null) throw orderDetailNotFoundException;
         setOrderDetail(od);
     }
 
@@ -44,6 +52,7 @@ public class GoodComplaintOrders extends DistributedObject {
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
+        setAttribute(element, "IdOfOrg", orderOrg.getIdOfOrg());
         setAttribute(element, "IdOfOrderDetail", orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
     }
 
@@ -52,6 +61,7 @@ public class GoodComplaintOrders extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null) setOrgOwner(longOrgOwner);
         guidOfComplaintIteration = getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
+        idOfOrderDetail = getLongAttributeValue(node, "IdOfOrg");
         idOfOrderDetail = getLongAttributeValue(node, "IdOfOrderDetail");
         return this;
     }
@@ -63,6 +73,8 @@ public class GoodComplaintOrders extends DistributedObject {
 
     private GoodComplaintIterations complaintIteration;
     private String guidOfComplaintIteration;
+    private Org orderOrg;
+    private Long idOfOrderOrg;
     private OrderDetail orderDetail;
     private Long idOfOrderDetail;
 
@@ -80,6 +92,22 @@ public class GoodComplaintOrders extends DistributedObject {
 
     public void setGuidOfComplaintIteration(String guidOfComplaintIteration) {
         this.guidOfComplaintIteration = guidOfComplaintIteration;
+    }
+
+    public Org getOrderOrg() {
+        return orderOrg;
+    }
+
+    public void setOrderOrg(Org orderOrg) {
+        this.orderOrg = orderOrg;
+    }
+
+    public Long getIdOfOrderOrg() {
+        return idOfOrderOrg;
+    }
+
+    public void setIdOfOrderOrg(Long idOfOrderOrg) {
+        this.idOfOrderOrg = idOfOrderOrg;
     }
 
     public OrderDetail getOrderDetail() {

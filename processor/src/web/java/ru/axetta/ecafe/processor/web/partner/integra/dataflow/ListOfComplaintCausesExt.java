@@ -4,24 +4,32 @@ import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ListOfComplaintBookCausesExt", propOrder = {
-        "cause", "description", "guid", "orgOwner", "deletedState", "createdDate"
+@XmlType(name = "ListOfComplaintCausesExt", propOrder = {
+        "cause", "causeDescription", "guid", "deletedState", "createdDate", "orgOwner"
 })
-public class ListOfComplaintBookCausesExt {
+public class ListOfComplaintCausesExt {
 
     @XmlAttribute(name = "Cause")
     protected Integer cause;
-    @XmlAttribute(name = "Description")
-    protected String description;
+    @XmlAttribute(name = "CauseDescription")
+    protected String causeDescription;
     @XmlAttribute(name = "Guid")
     protected String guid;
-    @XmlAttribute(name = "OrgOwner")
-    protected Long orgOwner;
     @XmlAttribute(name = "DeletedState")
     protected Boolean deletedState;
     @XmlAttribute(name = "CreatedDate")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar createdDate;
+    @XmlAttribute(name = "OrgOwner")
+    protected Long orgOwner;
+
+    public Long getOrgOwner() {
+        return orgOwner;
+    }
+
+    public void setOrgOwner(Long orgOwner) {
+        this.orgOwner = orgOwner;
+    }
 
     public Integer getCause() {
         return cause;
@@ -31,12 +39,12 @@ public class ListOfComplaintBookCausesExt {
         this.cause = cause;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCauseDescription() {
+        return causeDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCauseDescription(String causeDescription) {
+        this.causeDescription = causeDescription;
     }
 
     public String getGuid() {
@@ -45,14 +53,6 @@ public class ListOfComplaintBookCausesExt {
 
     public void setGuid(String guid) {
         this.guid = guid;
-    }
-
-    public Long getOrgOwner() {
-        return orgOwner;
-    }
-
-    public void setOrgOwner(Long orgOwner) {
-        this.orgOwner = orgOwner;
     }
 
     public Boolean getDeletedState() {
