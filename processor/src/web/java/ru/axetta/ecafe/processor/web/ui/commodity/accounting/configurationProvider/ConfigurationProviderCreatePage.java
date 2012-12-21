@@ -79,7 +79,7 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     }
 
     @Transactional
-    private void onSave() throws Exception{
+    protected void onSave() throws Exception{
         currentConfigurationProvider.setCreatedDate(new Date());
 
         //Есть ли необходимость?

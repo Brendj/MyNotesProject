@@ -22,6 +22,71 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
 
+-- Таблица вариантов ответа
+CREATE TABLE cf_qa_answers
+(
+  idofanswer bigserial NOT NULL,
+  idofquestionary bigint NOT NULL,
+  answer character varying(255) NOT NULL,
+  weight integer NOT NULL DEFAULT 1,
+  createddate bigint NOT NULL,
+  updateddate bigint,
+  CONSTRAINT cf_qa_answers_pk PRIMARY KEY (idofanswer ),
+  CONSTRAINT cf_qa_answers_question_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+);
+
+-- Таблица ответов клиента
+CREATE TABLE cf_qa_clientanswerbyquestionary
+(
+  idofclientanswerbyquestionary bigint NOT NULL DEFAULT nextval('cf_qa_clientanswerbyquestiona_idofclientanswerbyquestionary_seq'::regclass),
+  idofclient bigint NOT NULL,
+  idofquestionary bigint NOT NULL,
+  idofanswer bigint NOT NULL,
+  createddate bigint NOT NULL,
+  updateddate bigint,
+  CONSTRAINT cf_qa_clientanswerbyquestionary_pk PRIMARY KEY (idofclientanswerbyquestionary ),
+  CONSTRAINT cf_qa_clientanswerbyquestionary_answer FOREIGN KEY (idofanswer) REFERENCES cf_qa_answers (idofanswer),
+  CONSTRAINT cf_qa_clientanswerbyquestionary_client FOREIGN KEY (idofclient) REFERENCES cf_clients (idofclient),
+  CONSTRAINT cf_qa_clientanswerbyquestionary_questionary FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+);
+-- Таблица отношений анкет и организаций
+CREATE TABLE cf_qa_organization_questionary
+(
+  idoforgquestionary bigserial NOT NULL,
+  idofquestionary bigint NOT NULL,
+  idoforg bigint NOT NULL,
+  CONSTRAINT cf_qa_organization_questionary_pk PRIMARY KEY (idoforgquestionary ),
+  CONSTRAINT cf_qa_organization_questionary_org_fk FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_qa_organization_questionary_questionary_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+);
+
+-- Таблица вопросов анкеты
+CREATE TABLE cf_qa_questionaries
+(
+  idofquestionary bigserial NOT NULL,
+  question character varying(255) NOT NULL,
+  status integer NOT NULL DEFAULT 0,
+  type integer DEFAULT 0,
+  createddate bigint NOT NULL,
+  updateddate bigint,
+  CONSTRAINT cf_qa_questionaries_pk PRIMARY KEY (idofquestionary )
+);
+-- Таблица промежуточных результатов ответа по организациям
+CREATE TABLE cf_qa_questionaryresultbyorg
+(
+  idoforgquestionary bigserial NOT NULL,
+  idoforg bigint NOT NULL,
+  idofquestionary bigint NOT NULL,
+  idofanswer bigint NOT NULL,
+  count bigint NOT NULL DEFAULT 0,
+  totalcount bigint NOT NULL DEFAULT 0,
+  updateddate bigint,
+  CONSTRAINT cf_qa_questionaryresultbyorg_pk PRIMARY KEY (idoforgquestionary ),
+  CONSTRAINT cf_qa_questionaryresultbyorg_answer FOREIGN KEY (idofanswer) REFERENCES cf_qa_answers (idofanswer),
+  CONSTRAINT cf_qa_questionaryresultbyorg_org FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_qa_questionaryresultbyorg_questionary FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+);
+
 -- Связь таблицы пунктов заказа и товаров
 ALTER TABLE cf_orderdetails ADD COLUMN idofgood bigint;
 ALTER TABLE cf_orderdetails ADD CONSTRAINT cf_orderdetails_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods(idofgood);

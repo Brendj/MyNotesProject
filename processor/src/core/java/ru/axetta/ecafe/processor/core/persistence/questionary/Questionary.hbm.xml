@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.questionary.Questionary" table="cf_qa_questionaries">
+        <id name="idOfQuestionary" column="IdOfQuestionary" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="question" column="Question" type="string" length="255"/>
+        <property name="status" column="Status" type="integer"/>
+        <property name="type" column="Type" type="integer"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <set name="answers" table="cf_qa_answers" inverse="true" lazy="true" fetch="subselect" cascade="delete">
+            <key>
+                <column name="IdOfAnswer" not-null="true" />
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.Answer" />
+        </set>
+    </class>
+</hibernate-mapping>
