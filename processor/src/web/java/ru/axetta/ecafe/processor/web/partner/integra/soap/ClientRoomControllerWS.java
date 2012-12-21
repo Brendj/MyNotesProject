@@ -306,56 +306,145 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             fillDisctributedObjectsCommonDetails(goodComplaintBook, client);
             persistenceSession.save(goodComplaintBook);
 
-            GoodComplaintIterations goodComplaintIterations = new GoodComplaintIterations();
-            goodComplaintIterations.setComplaint(goodComplaintBook);
-            goodComplaintIterations.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
-            goodComplaintIterations.setIterationNumber(0);
-            goodComplaintIterations.setProblemDescription(description);
-            fillDisctributedObjectsCommonDetails(goodComplaintIterations, client);
-            persistenceSession.save(goodComplaintIterations);
-
-            if (causeNumberList == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Не указаны причины подачи жалобы";
+            Result createIterationResult = createNewIteration(goodComplaintBook, description, 0, client, persistenceSession,
+                    orderOrg, orderDetailIdList, causeNumberList);
+            if (createIterationResult != null) {
                 return result;
-            }
-            for (Integer causeNumber : causeNumberList) {
-                GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
-                        causeNumber);
-                if (cause == null) {
-                    result.resultCode = RC_INTERNAL_ERROR;
-                    result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
-                    return result;
-                }
-                GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
-                goodComplaintCauses.setCause(cause);
-                goodComplaintCauses.setComplaintIteration(goodComplaintIterations);
-                fillDisctributedObjectsCommonDetails(goodComplaintCauses, client);
-                persistenceSession.save(goodComplaintCauses);
-            }
-
-            if (orderDetailIdList == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
-                return result;
-            }
-            for (Long idOfOrderDetail : orderDetailIdList) {
-                CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
-                OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
-                if (orderDetail == null) {
-                    result.resultCode = RC_INTERNAL_ERROR;
-                    result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
-                    return result;
-                }
-                GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
-                goodComplaintOrders.setComplaintIteration(goodComplaintIterations);
-                goodComplaintOrders.setOrderOrg(orderOrg);
-                goodComplaintOrders.setOrderDetail(orderDetail);
-                fillDisctributedObjectsCommonDetails(goodComplaintOrders, client);
-                persistenceSession.save(goodComplaintOrders);
             }
 
             result.id = goodComplaintBook.getGlobalId();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return result;
+    }
+
+    private Result createNewIteration(GoodComplaintBook goodComplaintBook, String description, Integer iterationNumber, Client client,
+            Session persistenceSession, Org orderOrg, List<Long> orderDetailIdList, List<Integer> causeNumberList) throws Exception {
+        Result result = new Result();
+
+        GoodComplaintIterations goodComplaintIterations = new GoodComplaintIterations();
+        goodComplaintIterations.setComplaint(goodComplaintBook);
+        goodComplaintIterations.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
+        goodComplaintIterations.setIterationNumber(iterationNumber);
+        goodComplaintIterations.setProblemDescription(description);
+        fillDisctributedObjectsCommonDetails(goodComplaintIterations, client);
+        persistenceSession.save(goodComplaintIterations);
+
+        if (causeNumberList == null) {
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = "Не указаны причины подачи жалобы";
+            return result;
+        }
+        for (Integer causeNumber : causeNumberList) {
+            GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
+                    causeNumber);
+            if (cause == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                return result;
+            }
+            GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
+            goodComplaintCauses.setCause(cause);
+            goodComplaintCauses.setComplaintIteration(goodComplaintIterations);
+            fillDisctributedObjectsCommonDetails(goodComplaintCauses, client);
+            persistenceSession.save(goodComplaintCauses);
+        }
+
+        if (orderDetailIdList == null) {
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
+            return result;
+        }
+        for (Long idOfOrderDetail : orderDetailIdList) {
+            CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
+            OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
+            if (orderDetail == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
+                return result;
+            }
+            GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
+            goodComplaintOrders.setComplaintIteration(goodComplaintIterations);
+            goodComplaintOrders.setOrderOrg(orderOrg);
+            goodComplaintOrders.setOrderDetail(orderDetail);
+            fillDisctributedObjectsCommonDetails(goodComplaintOrders, client);
+            persistenceSession.save(goodComplaintOrders);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Result reopenComplaint(Long complaintId, Long orderOrgId, List<Long> orderDetailIdList, List<Integer> causeNumberList, String description) {
+        authenticateRequest(null);
+
+        Result result = new Result();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria complaintCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            complaintCriteria.add(Restrictions.eq("globalId", complaintId));
+            GoodComplaintBook goodComplaintBook = (GoodComplaintBook) complaintCriteria.uniqueResult();
+            if (goodComplaintBook == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Жалобы с указанным идентификатором не существует";
+                return result;
+            }
+
+            Criteria orderOrgCriteria = persistenceSession.createCriteria(Org.class);
+            orderOrgCriteria.add(Restrictions.eq("idOfOrg", orderOrgId));
+            Org orderOrg = (Org) orderOrgCriteria.uniqueResult();
+            if (orderOrg == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Организации с указанным идентификатором не существует";
+                return result;
+            }
+
+            Criteria iterationCriteria = persistenceSession.createCriteria(GoodComplaintIterations.class);
+            iterationCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
+            List iterationObjects = iterationCriteria.list();
+            GoodComplaintIterations iteration = null;
+            for (Object iterationObject : iterationObjects) {
+                GoodComplaintIterations goodComplaintIterations = (GoodComplaintIterations) iterationObject;
+                if ((null == iteration) || (goodComplaintIterations.getIterationNumber() > iteration.getIterationNumber())) {
+                    iteration = goodComplaintIterations;
+                }
+            }
+            if (iteration == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = RC_INTERNAL_ERROR_DESC;
+                return result;
+            }
+            if (!GoodComplaintIterations.IterationStatus.conclusion.equals(iteration.getIterationStatus())) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "По жалобе с указанным идентификатором еще не было вынесено заключения";
+                return result;
+            }
+            int iterationNumber = iteration.getIterationNumber() + 1;
+
+            Result createIterationResult = createNewIteration(goodComplaintBook, description, iterationNumber,
+                    goodComplaintBook.getClient(), persistenceSession, orderOrg, orderDetailIdList, causeNumberList);
+            if (null != createIterationResult){
+                return createIterationResult;
+            }
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -382,89 +471,80 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 distributedObject.getClass().getSimpleName()));
     }
 
-    //@Override
-    //public IdResult addComplaintBookEntry(Long contractId, Long idOfGood, Integer[] causes, String description) {
-    //    authenticateRequest(null);
-    //    IdChildResult idChildResult = new IdChildResult();
-    //    idChildResult.resultCode = RC_OK;
-    //    idChildResult.description = RC_OK_DESC;
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        persistenceSession = runtimeContext.createPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //
-    //        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-    //        clientCriteria.add(Restrictions.eq("contractId", contractId));
-    //        Client client = (Client) clientCriteria.uniqueResult();
-    //        if (client == null) {
-    //            idChildResult.resultCode = RC_CLIENT_NOT_FOUND;
-    //            idChildResult.description = RC_CLIENT_NOT_FOUND_DESC;
-    //            return idChildResult;
-    //        }
-    //
-    //        Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
-    //        goodCriteria.add(Restrictions.eq("globalId", idOfGood));
-    //        Good good = (Good) goodCriteria.uniqueResult();
-    //        if (good == null) {
-    //            idChildResult.resultCode = RC_INTERNAL_ERROR;
-    //            idChildResult.description = "Товара с указанным id не существует";
-    //            return idChildResult;
-    //        }
-    //
-    //        GoodComplaintBook goodComplaintBook = new GoodComplaintBook();
-    //        goodComplaintBook.setClient(client);
-    //        goodComplaintBook.setGood(good);
-    //        goodComplaintBook.setOrgOwner(client.getOrg().getIdOfOrg());
-    //        goodComplaintBook.setGuid(UUID.randomUUID().toString());
-    //        goodComplaintBook.setCreatedDate(new Date());
-    //        goodComplaintBook.setDeletedState(false);
-    //        goodComplaintBook.setSendAll(SendToAssociatedOrgs.SendToMain);
-    //        goodComplaintBook.setDescription(description);
-    //        goodComplaintBook.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintBook.class.getSimpleName()));
-    //        persistenceSession.save(goodComplaintBook);
-    //
-    //        List<Long> childIdList = new ArrayList<Long>(causes.length);
-    //        for (Integer causeNumber : causes) {
-    //            GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
-    //            if (cause == null) {
-    //                idChildResult.resultCode = RC_INTERNAL_ERROR;
-    //                idChildResult.description = "Причины жалобы с указанным номером " + causeNumber + " не существует";
-    //                return idChildResult;
-    //            }
-    //            GoodComplaintCauses goodComplaintBookCauses = new GoodComplaintCauses();
-    //            goodComplaintBookCauses.setComplaint(goodComplaintBook);
-    //            goodComplaintBookCauses.setCause(cause);
-    //            goodComplaintBookCauses.setOrgOwner(client.getOrg().getIdOfOrg());
-    //            goodComplaintBookCauses.setGuid(UUID.randomUUID().toString());
-    //            goodComplaintBookCauses.setCreatedDate(new Date());
-    //            goodComplaintBookCauses.setDeletedState(false);
-    //            goodComplaintBookCauses.setSendAll(SendToAssociatedOrgs.SendToMain);
-    //            goodComplaintBookCauses.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(GoodComplaintCauses.class.getSimpleName()));
-    //
-    //            persistenceSession.save(goodComplaintBookCauses);
-    //
-    //            childIdList.add(goodComplaintBookCauses.getGlobalId());
-    //        }
-    //        idChildResult.childIdList = childIdList;
-    //
-    //
-    //        idChildResult.id = goodComplaintBook.getGlobalId();
-    //
-    //        persistenceSession.flush();
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //    } catch (Exception e) {
-    //        logger.error("Failed to process client room controller request", e);
-    //        idChildResult.resultCode = RC_INTERNAL_ERROR;
-    //        idChildResult.description = RC_INTERNAL_ERROR_DESC;
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return idChildResult;
-    //}
+    @Override
+    public Result changeComplaintStatusToConsideration(Long complaintId) {
+        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.consideration, null);
+    }
+
+    @Override
+    public Result changeComplaintStatusToInvestigation(Long complaintId) {
+        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.investigation, null);
+    }
+
+    @Override
+    public Result giveConclusionOnComplaint(Long complaintId, String conclusion) {
+        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.conclusion, conclusion);
+    }
+
+    private Result changeComplaintStatus(Long complaintId, GoodComplaintIterations.IterationStatus status, String conclusion) {
+        authenticateRequest(null);
+
+        Result result = new Result();
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Criteria complaintCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            complaintCriteria.add(Restrictions.eq("globalId", complaintId));
+            GoodComplaintBook goodComplaintBook = (GoodComplaintBook) complaintCriteria.uniqueResult();
+            if (goodComplaintBook == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Жалобы с указанным идентификатором не существует";
+                return result;
+            }
+
+            Criteria iterationCriteria = persistenceSession.createCriteria(GoodComplaintIterations.class);
+            iterationCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
+            List iterationObjects = iterationCriteria.list();
+            GoodComplaintIterations iteration = null;
+            for (Object iterationObject : iterationObjects) {
+                GoodComplaintIterations goodComplaintIterations = (GoodComplaintIterations) iterationObject;
+                if ((null == iteration) || (goodComplaintIterations.getIterationNumber() > iteration.getIterationNumber())) {
+                    iteration = goodComplaintIterations;
+                }
+            }
+            if (iteration == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = RC_INTERNAL_ERROR_DESC;
+                return result;
+            }
+
+            iteration.setIterationStatus(status);
+            if (conclusion != null) {
+                iteration.setConclusion(conclusion);
+            }
+            persistenceSession.save(iteration);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return result;
+    }
 
     @Override
     public ListOfProductsResult getListOfProducts(Long orgId) {
