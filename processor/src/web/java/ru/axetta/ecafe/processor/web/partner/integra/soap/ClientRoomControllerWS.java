@@ -377,6 +377,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
             return result;
         }
+        Good problematicGood = null;
         for (Long idOfOrderDetail : orderDetailIdList) {
             CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
             OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
@@ -385,6 +386,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
                 return result;
             }
+
+            if (problematicGood == null) {
+                problematicGood = orderDetail.getGood();
+            } else if (orderDetail.getGood().equals(problematicGood)) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "У каждого заказа из списка должна быть ссылка на один и тот же товар";
+                return result;
+            }
+
             GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
             goodComplaintOrders.setComplaintIteration(goodComplaintIterations);
             goodComplaintOrders.setOrderOrg(orderOrg);
