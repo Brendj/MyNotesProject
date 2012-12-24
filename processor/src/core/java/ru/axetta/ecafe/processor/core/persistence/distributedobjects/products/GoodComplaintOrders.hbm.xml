@@ -31,6 +31,8 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
+        <many-to-one name="complaintIteration" column="IdOfIteration" lazy="proxy" update="false"/>
+
         <many-to-one name="orderDetail" class="ru.axetta.ecafe.processor.core.persistence.OrderDetail" lazy="proxy" update="false">
             <column name="IdOfOrderOrg" not-null="true"/>
             <column name="IdOfOrderDetail" not-null="true"/>
