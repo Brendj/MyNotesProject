@@ -35,5 +35,9 @@
             <column name="IdOfClient" not-null="true" />
         </many-to-one>
 
+        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
+            <column name="IdOfGood" not-null="true" />
+        </many-to-one>
+
     </class>
 </hibernate-mapping>

@@ -138,7 +138,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Org org = (Org) persistenceSession.load(Org.class, orgId);
                 if (org == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
-                    result.description = "Организация не найдена";
+                    result.description = "Организация с указанным идентификатором не найдена";
                     return result;
                 }
                 setIdOfOrgs.add(orgId);
@@ -180,6 +180,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     listOfComplaintBookEntriesExt.setDeletedState(goodComplaintBook.getDeletedState());
                     listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
                     listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
+                    listOfComplaintBookEntriesExt.setGuidOfGood(goodComplaintBook.getGood().getGuid());
+                    listOfComplaintBookEntriesExt.setNameOfGood(goodComplaintBook.getGood().getNameOfGood());
 
                     ListOfComplaintIterations listOfComplaintIterations = new ListOfComplaintIterations();
                     listOfComplaintBookEntriesExt.getIterations().add(listOfComplaintIterations);
@@ -209,7 +211,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             Criteria orderCriteria = persistenceSession.createCriteria(GoodComplaintOrders.class);
                             orderCriteria.add(Restrictions.eq("complaintIteration", iteration));
                             List orders = orderCriteria.list();
-                            boolean goodIsSet = false;
                             for (Object orderObject : orders) {
                                 GoodComplaintOrders order = (GoodComplaintOrders) orderObject;
                                 ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory.createListOfComplaintOrdersExt();
@@ -222,13 +223,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 listOfComplaintOrdersExt.setCreatedDate(getXMLGregorianCalendarByDate(order.getCreatedDate()));
                                 listOfComplaintOrdersExt.setDeletedState(order.getDeletedState());
                                 listOfComplaintOrdersExt.setOrgOwner(order.getOrgOwner());
-
-                                if (!goodIsSet) {
-                                    Good problematicGood = orderDetail.getGood();
-                                    listOfComplaintBookEntriesExt.setIdOfGood(problematicGood.getGlobalId());
-                                    listOfComplaintBookEntriesExt.setNameOfGood(problematicGood.getNameOfGood());
-                                    goodIsSet = true;
-                                }
 
                                 listOfComplaintOrders.getO().add(listOfComplaintOrdersExt);
                             }
@@ -310,13 +304,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
+            Criteria goodComplaintBookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            goodComplaintBookCriteria.add(Restrictions.eq("client", client));
+            List existingComplaintObjectList = goodComplaintBookCriteria.list();
+            List<Good> listOfGoodsWithComplaint = new ArrayList<Good>();
+            for (Object complaintObject : existingComplaintObjectList) {
+                listOfGoodsWithComplaint.add(((GoodComplaintBook) complaintObject).getGood());
+            }
+
             GoodComplaintBook goodComplaintBook = new GoodComplaintBook();
             goodComplaintBook.setClient(client);
             fillDisctributedObjectsCommonDetails(goodComplaintBook, client);
             persistenceSession.save(goodComplaintBook);
 
-            Result createIterationResult = createNewIteration(goodComplaintBook, description, 0, client, persistenceSession,
-                    orderOrg, orderDetailIdList, causeNumberList);
+            Result createIterationResult = createNewIteration(goodComplaintBook, listOfGoodsWithComplaint, description,
+                    0, client, persistenceSession, orderOrg, orderDetailIdList, causeNumberList);
             if (createIterationResult != null) {
                 result.resultCode = createIterationResult.resultCode;
                 result.description = createIterationResult.description;
@@ -340,8 +342,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private Result createNewIteration(GoodComplaintBook goodComplaintBook, String description, Integer iterationNumber, Client client,
-            Session persistenceSession, Org orderOrg, List<Long> orderDetailIdList, List<Integer> causeNumberList) throws Exception {
+    private Result createNewIteration(GoodComplaintBook goodComplaintBook, List<Good> existingGoodsWithComplaint, String description,
+            Integer iterationNumber, Client client, Session persistenceSession, Org orderOrg, List<Long> orderDetailIdList,
+            List<Integer> causeNumberList) throws Exception {
         Result result = new Result();
 
         GoodComplaintIterations goodComplaintIterations = new GoodComplaintIterations();
@@ -377,7 +380,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
             return result;
         }
-        Good problematicGood = null;
+        Good firstGoodFromOrders = null;
         for (Long idOfOrderDetail : orderDetailIdList) {
             CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
             OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
@@ -387,12 +390,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            if (problematicGood == null) {
-                problematicGood = orderDetail.getGood();
-            } else if (orderDetail.getGood().equals(problematicGood)) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "У каждого заказа из списка должна быть ссылка на один и тот же товар";
-                return result;
+            Good goodFromOrder = orderDetail.getGood();
+
+            if (firstGoodFromOrders == null) {
+                firstGoodFromOrders = goodFromOrder;
+            } else if (!goodFromOrder.equals(firstGoodFromOrders)) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Требуется передавать список деталей заказа, ссылающиеся на один и тот же товар";
+                    return result;
             }
 
             GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
@@ -402,6 +407,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             fillDisctributedObjectsCommonDetails(goodComplaintOrders, client);
             persistenceSession.save(goodComplaintOrders);
         }
+        if (existingGoodsWithComplaint != null) {
+            // для случая открытия новой заявки
+
+            if (existingGoodsWithComplaint.contains(firstGoodFromOrders)) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Жалоба на данный товар, составленная указанным пользователем, уже существует";
+                return result;
+            } else {
+                goodComplaintBook.setGood(firstGoodFromOrders);
+                persistenceSession.save(goodComplaintBook);
+            }
+        } else if ((goodComplaintBook.getGood() != null) && !firstGoodFromOrders.equals(goodComplaintBook.getGood())) {
+            // для случая повторного открытия заявки
+
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = "Требуется передавать список деталей заказа, ссылающиеся на тот же товар, что указан в жалобе";
+            return result;
+        }
+
 
         return null;
     }
@@ -461,7 +485,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             int iterationNumber = iteration.getIterationNumber() + 1;
 
-            Result createIterationResult = createNewIteration(goodComplaintBook, description, iterationNumber,
+            Result createIterationResult = createNewIteration(goodComplaintBook, null, description, iterationNumber,
                     goodComplaintBook.getClient(), persistenceSession, orderOrg, orderDetailIdList, causeNumberList);
             if (null != createIterationResult){
                 return createIterationResult;

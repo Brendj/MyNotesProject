@@ -91,11 +91,12 @@ CREATE TABLE cf_qa_questionaryresultbyorg
 ALTER TABLE cf_orderdetails ADD COLUMN idofgood bigint;
 ALTER TABLE cf_orderdetails ADD CONSTRAINT cf_orderdetails_idofgood_fk FOREIGN KEY (idofgood) REFERENCES cf_goods(idofgood);
 
--- Таблиц жалоб на товары из совершенных заказов
+-- Таблица жалоб на товары из совершенных заказов
 CREATE TABLE cf_goods_complaintbook
 (
   idofcomplaint bigserial NOT NULL,
   idofclient bigint NOT NULL,
+  idofgood bigint NOT NULL,
   globalversion bigint,
   guid character varying(36) NOT NULL,
   deletedstate boolean DEFAULT FALSE,
@@ -107,6 +108,9 @@ CREATE TABLE cf_goods_complaintbook
   CONSTRAINT cf_good_complaintbook_pk PRIMARY KEY (idofcomplaint),
   CONSTRAINT cf_goods_complaintbook_idofclient_fk FOREIGN KEY (idofclient)
       REFERENCES cf_clients (idofclient) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_good_complaintbook_idofgood_fk FOREIGN KEY (idofgood)
+      REFERENCES cf_goods (idofgood) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
