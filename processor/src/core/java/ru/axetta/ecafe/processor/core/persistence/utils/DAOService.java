@@ -477,7 +477,7 @@ public class DAOService {
         q.setParameter("state", state);
         q.setParameter("reason", reason);
         q.setParameter("idOfCard", idOfCard);
-        return q.executeUpdate () > 0;
+        return q.executeUpdate() > 0;
     }
 
 
@@ -574,13 +574,13 @@ public class DAOService {
 
 
     @SuppressWarnings("unchecked")
-    public Map <Long, Integer> getProposalOrgDiscounsCountByGroupType (Date at, Date to, int groupType)
-    {
+    public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
             sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
                     "from cf_clients " +
-                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
+                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
+                    +
                     "where cf_clients.idOfClientGroup<:studentsMaxValue " +
                     //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
                     "group by idoforg " +
@@ -588,16 +588,17 @@ public class DAOService {
         } else {
             sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
                     "from cf_clients " +
-                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient " +
-                    "where cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
+                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
+                    +
+                    "where cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
                     //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
                     "group by idoforg " +
                     "having count(cf_clientscomplexdiscounts.idofclient)<>0";
         }
-        try
-        {
+        try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = em.createNativeQuery (sql);
+            Query q = em.createNativeQuery(sql);
             /*q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());*/
             if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
@@ -620,31 +621,28 @@ public class DAOService {
 
 
     @SuppressWarnings("unchecked")
-    public Map <Long, Integer> getOrgUniqueOrdersCountByGroupType (Date at, Date to, int groupType)
-        {
+    public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) "+
-                  "from cf_orders "+
-                  "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient "+
-                  "where createddate between :dateAt and :dateTo and "+
-                        "cf_clients.idOfClientGroup<:studentsMaxValue and cf_orders.socdiscount<>0 "+
-                  "group by cf_orders.idoforg";
-            }
-        else
-            {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) "+
-                    "from cf_orders "+
-                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient "+
-                    "where createddate between :dateAt and :dateTo and cf_orders.socdiscount<>0 and "+
-                          "cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "+
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
+                    "from cf_orders " +
+                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient " +
+                    "where createddate between :dateAt and :dateTo and " +
+                    "cf_clients.idOfClientGroup<:studentsMaxValue and cf_orders.socdiscount<>0 " +
                     "group by cf_orders.idoforg";
-            }
+        } else {
+            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
+                    "from cf_orders " +
+                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient " +
+                    "where createddate between :dateAt and :dateTo and cf_orders.socdiscount<>0 and " +
+                    "cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "group by cf_orders.idoforg";
+        }
 
-        try
-        {
+        try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = em.createNativeQuery (sql);
+            Query q = em.createNativeQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
             if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
@@ -663,7 +661,7 @@ public class DAOService {
             logger.error("Failed to load data", e);
         }
         return Collections.EMPTY_MAP;
-        }
+    }
 
 
     @SuppressWarnings("unchecked")
@@ -687,5 +685,25 @@ public class DAOService {
             logger.error("Failed to load data", e);
         }
         return Collections.EMPTY_MAP;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public boolean bindClientToGroup(long idofclient, long idofclientgroup) {
+        if (idofclient < 0) {
+            return false;
+        }
+
+        try {
+            Query q = em.createNativeQuery(
+                    "update cf_clients set cf_clients.idofclientgroup=:idofclientgroup where cf_clients.idofclient=:idofclient");
+            q.setParameter("idofclient", idofclient);
+            q.setParameter("idofclientgroup", idofclientgroup);
+            return q.executeUpdate() > 0;
+        } catch (Exception e) {
+            logger.error("Failed to rebind client " + idofclient + " to group " + idofclientgroup, e);
+        }
+        return false;
     }
 }

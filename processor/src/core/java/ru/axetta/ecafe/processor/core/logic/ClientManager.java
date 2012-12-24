@@ -177,6 +177,17 @@ public class ClientManager {
     }
 
 
+    public static Long findClientByFullName(Org organization, ClientManager.ClientFieldConfigForUpdate fieldConfig)
+            throws Exception {
+        String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME);
+        String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME);
+        String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = runtimeContext.createPersistenceSession();
+        return findClientByFullName (persistenceSession, organization, surname, firstName, secondName);
+    }
+
+
     public static Long findClientByFullName(Session session, Org organization, String surname, String firstName, String secondName)
             throws Exception {
         org.hibernate.Query query = session.createQuery(
