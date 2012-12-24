@@ -209,17 +209,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             Criteria orderCriteria = persistenceSession.createCriteria(GoodComplaintOrders.class);
                             orderCriteria.add(Restrictions.eq("complaintIteration", iteration));
                             List orders = orderCriteria.list();
+                            boolean goodIsSet = false;
                             for (Object orderObject : orders) {
                                 GoodComplaintOrders order = (GoodComplaintOrders) orderObject;
                                 ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory.createListOfComplaintOrdersExt();
 
-                                listOfComplaintOrdersExt.setIdOfOrderDetail(order.getOrderDetail().getIdOfOrder());
-                                listOfComplaintOrdersExt.setMenuDetailName(order.getOrderDetail().getMenuDetailName());
+                                OrderDetail orderDetail = order.getOrderDetail();
+                                listOfComplaintOrdersExt.setIdOfOrderDetail(orderDetail.getIdOfOrder());
+                                listOfComplaintOrdersExt.setMenuDetailName(orderDetail.getMenuDetailName());
                                 listOfComplaintOrdersExt.setDateOfOrder(getXMLGregorianCalendarByDate(order.getOrderDetail().getOrder().getCreateTime()));
                                 listOfComplaintOrdersExt.setGuid(order.getGuid());
                                 listOfComplaintOrdersExt.setCreatedDate(getXMLGregorianCalendarByDate(order.getCreatedDate()));
                                 listOfComplaintOrdersExt.setDeletedState(order.getDeletedState());
                                 listOfComplaintOrdersExt.setOrgOwner(order.getOrgOwner());
+
+                                if (!goodIsSet) {
+                                    Good problematicGood = orderDetail.getGood();
+                                    listOfComplaintBookEntriesExt.setIdOfGood(problematicGood.getGlobalId());
+                                    listOfComplaintBookEntriesExt.setNameOfGood(problematicGood.getNameOfGood());
+                                    goodIsSet = true;
+                                }
 
                                 listOfComplaintOrders.getO().add(listOfComplaintOrdersExt);
                             }
