@@ -31,11 +31,9 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="orderOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrderOrg" not-null="true"/>
-
-        <many-to-one name="orderDetail" class="ru.axetta.ecafe.processor.core.persistence.OrderDetail" insert="false" update="false">
-            <column name="IdOfOrderDetail" not-null="true"/>
+        <many-to-one name="orderDetail" class="ru.axetta.ecafe.processor.core.persistence.OrderDetail" lazy="proxy" update="false">
             <column name="IdOfOrderOrg" not-null="true"/>
+            <column name="IdOfOrderDetail" not-null="true"/>
         </many-to-one>
 
     </class>

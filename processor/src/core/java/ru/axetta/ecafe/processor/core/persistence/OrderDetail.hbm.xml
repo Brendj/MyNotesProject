@@ -38,7 +38,7 @@
         <property name="itemCode" column="ItemCode" type="string" length="32" not-null="true"
                   update="false"/>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfGood"
+        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" column="IdOfGood"
                      insert="false" update="false"/>
 
     </class>
