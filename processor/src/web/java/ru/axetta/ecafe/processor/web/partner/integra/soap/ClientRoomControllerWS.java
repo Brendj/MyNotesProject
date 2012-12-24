@@ -309,6 +309,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Result createIterationResult = createNewIteration(goodComplaintBook, description, 0, client, persistenceSession,
                     orderOrg, orderDetailIdList, causeNumberList);
             if (createIterationResult != null) {
+                result.resultCode = createIterationResult.resultCode;
+                result.description = createIterationResult.description;
                 return result;
             }
 
