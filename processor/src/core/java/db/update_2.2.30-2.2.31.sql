@@ -111,7 +111,8 @@ CREATE TABLE cf_goods_complaintbook
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT cf_good_complaintbook_idofgood_fk FOREIGN KEY (idofgood)
       REFERENCES cf_goods (idofgood) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_goods_complaintbook_idofclient_idofgood_key UNIQUE (idofclient, idofgood)
 )
 WITH (
   OIDS=FALSE
@@ -139,7 +140,8 @@ CREATE TABLE cf_goods_complaint_iterations
   CONSTRAINT cf_goods_complaint_iterations_pk PRIMARY KEY (idofiteration),
   CONSTRAINT cf_goods_complaint_iterations_idofcomplaint_fk FOREIGN KEY (idofcomplaint)
       REFERENCES cf_goods_complaintbook (idofcomplaint) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_goods_complaint_iterations_idofcomplaint_iterationnumber_key UNIQUE (idofcomplaint, iterationnumber)
 )
 WITH (
   OIDS=FALSE
@@ -164,7 +166,8 @@ CREATE TABLE cf_goods_complaint_causes
   CONSTRAINT cf_goods_complaint_causes_pk PRIMARY KEY (idofcause),
   CONSTRAINT cf_goods_complaint_causes_idofiteration_fk FOREIGN KEY (idofiteration)
       REFERENCES cf_goods_complaint_iterations (idofiteration) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_goods_complaint_causes_idofiteration_cause_key UNIQUE (idofiteration, cause)
 )
 WITH (
   OIDS=FALSE
@@ -196,7 +199,8 @@ CREATE TABLE cf_goods_complaint_orders
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT cf_goods_complaint_orders_idoforderdetail_fk FOREIGN KEY (idoforderorg, idoforderdetail)
       REFERENCES cf_orderdetails (idoforg, idoforderdetail) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_goods_complaint_orders_idofiteration_idoforderorg_idoforderd UNIQUE (idofiteration, idoforderorg, idoforderdetail)
 )
 WITH (
   OIDS=FALSE

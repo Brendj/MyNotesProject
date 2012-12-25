@@ -216,7 +216,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory.createListOfComplaintOrdersExt();
 
                                 OrderDetail orderDetail = order.getOrderDetail();
-                                listOfComplaintOrdersExt.setIdOfOrderDetail(orderDetail.getIdOfOrder());
+                                listOfComplaintOrdersExt.setIdOfOrderDetail(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                                 listOfComplaintOrdersExt.setMenuDetailName(orderDetail.getMenuDetailName());
                                 listOfComplaintOrdersExt.setDateOfOrder(getXMLGregorianCalendarByDate(order.getOrderDetail().getOrder().getCreateTime()));
                                 listOfComplaintOrdersExt.setGuid(order.getGuid());
@@ -304,192 +304,129 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            Criteria goodComplaintBookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
-            goodComplaintBookCriteria.add(Restrictions.eq("client", client));
-            List existingComplaintObjectList = goodComplaintBookCriteria.list();
-            List<Good> listOfGoodsWithComplaint = new ArrayList<Good>();
-            for (Object complaintObject : existingComplaintObjectList) {
-                listOfGoodsWithComplaint.add(((GoodComplaintBook) complaintObject).getGood());
-            }
-
-            GoodComplaintBook goodComplaintBook = new GoodComplaintBook();
-            goodComplaintBook.setClient(client);
-            fillDisctributedObjectsCommonDetails(goodComplaintBook, client);
-            persistenceSession.save(goodComplaintBook);
-
-            Result createIterationResult = createNewIteration(goodComplaintBook, listOfGoodsWithComplaint, description,
-                    0, client, persistenceSession, orderOrg, orderDetailIdList, causeNumberList);
-            if (createIterationResult != null) {
-                result.resultCode = createIterationResult.resultCode;
-                result.description = createIterationResult.description;
-                return result;
-            }
-
-            result.id = goodComplaintBook.getGlobalId();
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to process client room controller request", e);
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = RC_INTERNAL_ERROR_DESC;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-
-        return result;
-    }
-
-    private Result createNewIteration(GoodComplaintBook goodComplaintBook, List<Good> existingGoodsWithComplaint, String description,
-            Integer iterationNumber, Client client, Session persistenceSession, Org orderOrg, List<Long> orderDetailIdList,
-            List<Integer> causeNumberList) throws Exception {
-        Result result = new Result();
-
-        GoodComplaintIterations goodComplaintIterations = new GoodComplaintIterations();
-        goodComplaintIterations.setComplaint(goodComplaintBook);
-        goodComplaintIterations.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
-        goodComplaintIterations.setIterationNumber(iterationNumber);
-        goodComplaintIterations.setProblemDescription(description);
-        fillDisctributedObjectsCommonDetails(goodComplaintIterations, client);
-        persistenceSession.save(goodComplaintIterations);
-
-        if (causeNumberList == null) {
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = "Не указаны причины подачи жалобы";
-            return result;
-        }
-        for (Integer causeNumber : causeNumberList) {
-            GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
-                    causeNumber);
-            if (cause == null) {
+            // Проверяем, ссылаются ли все элементы списка деталей заказов на один и тот же товар,
+            // и запоминаем этот товар
+            if ((orderDetailIdList == null) || orderDetailIdList.isEmpty()) {
                 result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                result.description = "Список деталей заказов не может быть пустым";
                 return result;
             }
-            GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
-            goodComplaintCauses.setCause(cause);
-            goodComplaintCauses.setComplaintIteration(goodComplaintIterations);
-            fillDisctributedObjectsCommonDetails(goodComplaintCauses, client);
-            persistenceSession.save(goodComplaintCauses);
-        }
+            Good problematicGood = null;
+            List<GoodComplaintOrders> goodComplaintOrdersList = new ArrayList<GoodComplaintOrders>(orderDetailIdList.size());
+            for (Long idOfOrderDetail : orderDetailIdList) {
+                CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
+                OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
+                if (orderDetail == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
+                    return result;
+                }
 
-        if (orderDetailIdList == null) {
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = "Не указаны элементы деталей заказов, на которые подается жалоба";
-            return result;
-        }
-        Good firstGoodFromOrders = null;
-        for (Long idOfOrderDetail : orderDetailIdList) {
-            CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
-            OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
-            if (orderDetail == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Не найден элемент деталей заказов с указанным идентификатором и номером организации";
-                return result;
-            }
+                Good goodFromOrder = orderDetail.getGood();
+                if (goodFromOrder == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "У переданного элемента списка деталей заказов с идентификатором " +
+                            + orderDetail.getIdOfOrder() + " не указана ссылка на товар";
+                    return result;
+                }
 
-            Good goodFromOrder = orderDetail.getGood();
-
-            if (firstGoodFromOrders == null) {
-                firstGoodFromOrders = goodFromOrder;
-            } else if (!goodFromOrder.equals(firstGoodFromOrders)) {
+                if (problematicGood == null) {
+                    problematicGood = goodFromOrder;
+                } else if (!goodFromOrder.equals(problematicGood)) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "Требуется передавать список деталей заказа, ссылающиеся на один и тот же товар";
                     return result;
-            }
-
-            GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
-            goodComplaintOrders.setComplaintIteration(goodComplaintIterations);
-            goodComplaintOrders.setOrderOrg(orderOrg);
-            goodComplaintOrders.setOrderDetail(orderDetail);
-            fillDisctributedObjectsCommonDetails(goodComplaintOrders, client);
-            persistenceSession.save(goodComplaintOrders);
-        }
-        if (existingGoodsWithComplaint != null) {
-            // для случая открытия новой заявки
-
-            if (existingGoodsWithComplaint.contains(firstGoodFromOrders)) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Жалоба на данный товар, составленная указанным пользователем, уже существует";
-                return result;
-            } else {
-                goodComplaintBook.setGood(firstGoodFromOrders);
-                persistenceSession.save(goodComplaintBook);
-            }
-        } else if ((goodComplaintBook.getGood() != null) && !firstGoodFromOrders.equals(goodComplaintBook.getGood())) {
-            // для случая повторного открытия заявки
-
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = "Требуется передавать список деталей заказа, ссылающиеся на тот же товар, что указан в жалобе";
-            return result;
-        }
-
-
-        return null;
-    }
-
-    @Override
-    public Result reopenComplaint(Long complaintId, Long orderOrgId, List<Long> orderDetailIdList, List<Integer> causeNumberList, String description) {
-        authenticateRequest(null);
-
-        Result result = new Result();
-        result.resultCode = RC_OK;
-        result.description = RC_OK_DESC;
-
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Criteria complaintCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
-            complaintCriteria.add(Restrictions.eq("globalId", complaintId));
-            GoodComplaintBook goodComplaintBook = (GoodComplaintBook) complaintCriteria.uniqueResult();
-            if (goodComplaintBook == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Жалобы с указанным идентификатором не существует";
-                return result;
-            }
-
-            Criteria orderOrgCriteria = persistenceSession.createCriteria(Org.class);
-            orderOrgCriteria.add(Restrictions.eq("idOfOrg", orderOrgId));
-            Org orderOrg = (Org) orderOrgCriteria.uniqueResult();
-            if (orderOrg == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Организации с указанным идентификатором не существует";
-                return result;
-            }
-
-            Criteria iterationCriteria = persistenceSession.createCriteria(GoodComplaintIterations.class);
-            iterationCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
-            List iterationObjects = iterationCriteria.list();
-            GoodComplaintIterations iteration = null;
-            for (Object iterationObject : iterationObjects) {
-                GoodComplaintIterations goodComplaintIterations = (GoodComplaintIterations) iterationObject;
-                if ((null == iteration) || (goodComplaintIterations.getIterationNumber() > iteration.getIterationNumber())) {
-                    iteration = goodComplaintIterations;
                 }
-            }
-            if (iteration == null) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = RC_INTERNAL_ERROR_DESC;
-                return result;
-            }
-            if (!GoodComplaintIterations.IterationStatus.conclusion.equals(iteration.getIterationStatus())) {
-                result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "По жалобе с указанным идентификатором еще не было вынесено заключения";
-                return result;
-            }
-            int iterationNumber = iteration.getIterationNumber() + 1;
 
-            Result createIterationResult = createNewIteration(goodComplaintBook, null, description, iterationNumber,
-                    goodComplaintBook.getClient(), persistenceSession, orderOrg, orderDetailIdList, causeNumberList);
-            if (null != createIterationResult){
-                return createIterationResult;
+                GoodComplaintOrders goodComplaintOrders = new GoodComplaintOrders();
+                goodComplaintOrders.setOrderOrg(orderOrg);
+                goodComplaintOrders.setOrderDetail(orderDetail);
+                fillDisctributedObjectsCommonDetails(goodComplaintOrders, client.getOrg());
+
+                goodComplaintOrdersList.add(goodComplaintOrders);
             }
+
+            // Проверяем, подавалась ли ранее указанным клиентом жалоба на данный товар
+            Criteria goodComplaintBookCriteria = persistenceSession.createCriteria(GoodComplaintBook.class);
+            goodComplaintBookCriteria.add(Restrictions.eq("client", client));
+            goodComplaintBookCriteria.add(Restrictions.eq("good", problematicGood));
+            GoodComplaintBook goodComplaintBook = (GoodComplaintBook) goodComplaintBookCriteria.uniqueResult();
+
+            int newIterationNumber;
+            if (goodComplaintBook == null) {
+                goodComplaintBook = new GoodComplaintBook();
+                goodComplaintBook.setClient(client);
+                goodComplaintBook.setGood(problematicGood);
+                fillDisctributedObjectsCommonDetails(goodComplaintBook, client.getOrg());
+
+                persistenceSession.save(goodComplaintBook);
+
+                newIterationNumber = 0;
+            } else {
+                // Нахождение последней итерации по жалобе указанного клиента на данный товар
+                // и проверка, было ли вынесено заключение по текущей итерации, т.к. до вынесения заключенися
+                // переоткрывать жалобу запрещено
+                Criteria iterationCriteria = persistenceSession.createCriteria(GoodComplaintIterations.class);
+                iterationCriteria.add(Restrictions.eq("complaint", goodComplaintBook));
+                List iterationObjects = iterationCriteria.list();
+                GoodComplaintIterations lastIteration = null;
+                for (Object iterationObject : iterationObjects) {
+                    GoodComplaintIterations currentIteration = (GoodComplaintIterations) iterationObject;
+                    if ((null == lastIteration) || (currentIteration.getIterationNumber() > lastIteration.getIterationNumber())) {
+                        lastIteration = currentIteration;
+                    }
+                }
+                if (lastIteration == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = RC_INTERNAL_ERROR_DESC;
+                    return result;
+                }
+                if (!GoodComplaintIterations.IterationStatus.conclusion.equals(lastIteration.getIterationStatus())) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "По жалобе с указанным идентификатором еще не было вынесено заключения";
+                    return result;
+                }
+                newIterationNumber = lastIteration.getIterationNumber() + 1;
+            }
+
+            // Выяснили, какой номер итерации назначать новой итерации
+            GoodComplaintIterations newIteration = new GoodComplaintIterations();
+            newIteration.setComplaint(goodComplaintBook);
+            newIteration.setIterationNumber(newIterationNumber);
+            newIteration.setProblemDescription(description);
+            newIteration.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
+            fillDisctributedObjectsCommonDetails(newIteration, client.getOrg());
+            persistenceSession.save(newIteration);
+
+            // Получили сохраненную итерацию, следовательно, можно привязать
+            // элементы деталей заказов из списка, полученного ранее, и сохранить их
+            for (GoodComplaintOrders order : goodComplaintOrdersList) {
+                order.setComplaintIteration(newIteration);
+                persistenceSession.save(order);
+            }
+
+            // Осталось записать причины подачи жалобы
+            if (causeNumberList == null) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Не указаны причины подачи жалобы";
+                return result;
+            }
+            for (Integer causeNumber : causeNumberList) {
+                GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
+                        causeNumber);
+                if (cause == null) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                    return result;
+                }
+                GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
+                goodComplaintCauses.setCause(cause);
+                goodComplaintCauses.setComplaintIteration(newIteration);
+                fillDisctributedObjectsCommonDetails(goodComplaintCauses, client.getOrg());
+                persistenceSession.save(goodComplaintCauses);
+            }
+
+            result.id =  goodComplaintBook.getGlobalId();
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -506,8 +443,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private void fillDisctributedObjectsCommonDetails(DistributedObject distributedObject, Client client) {
-        distributedObject.setOrgOwner(client.getOrg().getIdOfOrg());
+    private void fillDisctributedObjectsCommonDetails(DistributedObject distributedObject, Org org) {
+        distributedObject.setOrgOwner(org.getIdOfOrg());
         distributedObject.setGuid(UUID.randomUUID().toString());
         distributedObject.setCreatedDate(new Date());
         distributedObject.setDeletedState(false);

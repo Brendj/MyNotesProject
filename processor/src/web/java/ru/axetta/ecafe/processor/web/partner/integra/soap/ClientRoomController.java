@@ -81,8 +81,6 @@ public interface ClientRoomController {
     Result changeComplaintStatusToInvestigation(@WebParam(name = "complaintId") Long complaintId);
     @WebMethod(operationName = "giveConclusionOnComplaint")
     Result giveConclusionOnComplaint(@WebParam(name = "complaintId") Long complaintId, @WebParam(name = "conclusion") String conclusion);
-    @WebMethod(operationName = "reopenComplaint")
-    Result reopenComplaint(@WebParam(name = "complaintId") Long complaintId, @WebParam(name="orderOrgId") Long orderOrgId, @WebParam(name="idOfOrderDetail") List<Long> orderDetailIdList, @WebParam(name = "causeNumber") List<Integer> causeNumberList, @WebParam(name="description") String description);
 
     @WebMethod (operationName = "getMenuList")
     MenuListResult getMenuList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
