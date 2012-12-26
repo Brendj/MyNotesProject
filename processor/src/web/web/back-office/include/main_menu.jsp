@@ -81,6 +81,30 @@
                         rendered="#{mainPage.eligibleToEditOrgs}"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="questionariesGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.QuestionariesGroupPage"--%>
+    <rich:panelMenuGroup id="questionariesMenuGroup" binding="#{questionariesGroupPage.mainMenuComponent}" label="Анкетирование"
+                         reRender="workspaceForm">
+        <a4j:support event="onclick" action="#{questionariesGroupPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="questionaryListPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryListPage"--%>
+        <rich:panelMenuItem id="questionaryListMenuItem" binding="#{questionaryListPage.mainMenuComponent}" label="Анкеты"
+                            action="#{questionaryListPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="questionaryGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryGroupPage"--%>
+        <rich:panelMenuGroup id="questionaryMenuGroup" binding="#{questionaryGroupPage.mainMenuComponent}" label="#{questionaryGroupPage.title}"
+                             reRender="workspaceForm" rendered="false">
+            <a4j:support event="onclick" action="#{questionaryGroupPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="questionaryViewPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryViewPage"--%>
+            <rich:panelMenuItem id="questionaryViewMenuItem" binding="#{questionaryViewPage.mainMenuComponent}" label="Просмотр"
+                                action="#{questionaryViewPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="questionaryEditPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryEditPage"--%>
+            <rich:panelMenuItem id="questionaryEditMenuItem" binding="#{questionaryEditPage.mainMenuComponent}" label="Редактирование"
+                                action="#{questionaryEditPage.show}" reRender="workspaceForm"/>
+        </rich:panelMenuGroup>
+
+        <%--@elvariable id="questionaryLoadPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryLoadPage"--%>
+        <rich:panelMenuItem id="questionaryLoadMenuItem" binding="#{questionaryLoadPage.mainMenuComponent}" label="Загрузить с файла"
+                            action="#{questionaryLoadPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}" label="Правила распространения"
                         action="#{distributionRulesPage.show}" reRender="workspaceForm" />
 

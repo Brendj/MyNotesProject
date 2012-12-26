@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -85,6 +87,15 @@ public class Org {
     private String longitude;
     private String latitude;
     private Integer refectoryType;
+    private Set<Questionary> questionaries = new HashSet<Questionary>();
+
+    public Set<Questionary> getQuestionaries() {
+        return questionaries;
+    }
+
+    public void setQuestionaries(Set<Questionary> questionaries) {
+        this.questionaries = questionaries;
+    }
 
     public Integer getRefectoryType() {
         return refectoryType;

@@ -25,19 +25,41 @@ public class Answer {
     protected Answer() {}
 
     public Answer(String answer, Questionary questionary) throws Exception{
-        if(questionary==null) throw new Exception("You lost question");
+        if(questionary==null) throw new NullPointerException("Не выбрана анкета для ответа");
+        if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
         this.answer = answer;
         this.questionary = questionary;
         this.weight = 1;
-        this.createdDate = new Date();
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
     }
 
     public Answer(String answer, Questionary questionary, Integer weight) throws Exception{
-        if(questionary==null) throw new Exception("You lost question");
+        if(questionary==null) throw new NullPointerException("Не выбрана анкета для ответа");
+        if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
         this.answer = answer;
         this.questionary = questionary;
         this.weight = weight;
-        this.createdDate = new Date();
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
+    }
+
+    public Answer update(String answer) throws Exception{
+        if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        this.answer = answer;
+        this.weight = 1;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public Answer update(String answer, Integer weight) throws Exception{
+        if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        this.answer = answer;
+        this.weight = weight;
+        this.updatedDate = new Date();
+        return this;
     }
 
     public Long getIdOfAnswer() {

@@ -22,6 +22,23 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
 
+-- разрешает клиенту подтверждать оплату групового питания, он будет доступен для клиентов входящих в группы: пед состав, администрация
+ALTER TABLE cf_clients ADD COLUMN canconfirmgrouppayment integer NOT NULL Default 0;
+-- Тип категории скидок
+ALTER TABLE cf_categorydiscounts ADD COLUMN categorytype integer;
+
+-- Таблица вопросов анкеты
+CREATE TABLE cf_qa_questionaries
+(
+  idofquestionary bigserial NOT NULL,
+  question character varying(255) NOT NULL,
+  status integer NOT NULL DEFAULT 0,
+  type integer DEFAULT 0,
+  createddate bigint NOT NULL,
+  updateddate bigint,
+  CONSTRAINT cf_qa_questionaries_pk PRIMARY KEY (idofquestionary )
+);
+
 -- Таблица вариантов ответа
 CREATE TABLE cf_qa_answers
 (
@@ -38,7 +55,7 @@ CREATE TABLE cf_qa_answers
 -- Таблица ответов клиента
 CREATE TABLE cf_qa_clientanswerbyquestionary
 (
-  idofclientanswerbyquestionary bigint NOT NULL DEFAULT nextval('cf_qa_clientanswerbyquestiona_idofclientanswerbyquestionary_seq'::regclass),
+  idofclientanswerbyquestionary bigserial NOT NULL,
   idofclient bigint NOT NULL,
   idofquestionary bigint NOT NULL,
   idofanswer bigint NOT NULL,
@@ -60,17 +77,6 @@ CREATE TABLE cf_qa_organization_questionary
   CONSTRAINT cf_qa_organization_questionary_questionary_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
 );
 
--- Таблица вопросов анкеты
-CREATE TABLE cf_qa_questionaries
-(
-  idofquestionary bigserial NOT NULL,
-  question character varying(255) NOT NULL,
-  status integer NOT NULL DEFAULT 0,
-  type integer DEFAULT 0,
-  createddate bigint NOT NULL,
-  updateddate bigint,
-  CONSTRAINT cf_qa_questionaries_pk PRIMARY KEY (idofquestionary )
-);
 -- Таблица промежуточных результатов ответа по организациям
 CREATE TABLE cf_qa_questionaryresultbyorg
 (

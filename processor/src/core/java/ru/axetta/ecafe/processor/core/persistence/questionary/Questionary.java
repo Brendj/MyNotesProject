@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.questionary;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,37 +21,100 @@ public class Questionary {
 
     private Long idOfQuestionary;
     private String question;
-    private Integer status;
+    private QuestionaryStatus status;
     private Integer type;
     private Date createdDate;
     private Date updatedDate;
-    private Set<Answer> answers;
+    private Set<Answer> answers = new HashSet<Answer>();
+    private Set<Org> orgs = new HashSet<Org>();
 
     protected Questionary() {}
 
-    public Questionary(String question) throws Exception{
+    public Questionary(String question) throws Exception {
+        if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
-        this.status = 0;
+        this.status = QuestionaryStatus.INACTIVE;
         this.type = 0;
-        this.createdDate = new Date();
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
     }
 
-    public Questionary(String question, Integer status) throws Exception {
+    public Questionary(String question, Integer type) throws Exception {
+        if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
-        this.status = status;
-        this.type = 0;
-        this.createdDate = new Date();
-    }
-
-    public Questionary(String question, Integer status, Integer type) throws Exception {
-        this.question = question;
-        this.status = status;
+        this.status = QuestionaryStatus.INACTIVE;
         this.type = type;
-        this.createdDate = new Date();
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
+    }
+
+    public Questionary(String question, Integer type, Integer status) throws Exception {
+        if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
+        this.question = question;
+        this.status = QuestionaryStatus.INACTIVE;
+        this.type = type;
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
+    }
+
+    public Questionary update(String question) throws Exception {
+        if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
+        this.question = question;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public Questionary update(String question, Integer type) throws Exception {
+        if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
+        this.question = question;
+        this.type = type;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public Questionary start() throws Exception {
+        if(status == QuestionaryStatus.START) throw new Exception("Ошибка при старте анкетирования, возможно анкетирование уже идет");
+        this.status = QuestionaryStatus.START;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public Questionary stop() throws Exception {
+        if(this.status != QuestionaryStatus.START) throw new Exception("Не возможно остановить анкетирование");
+        this.status = QuestionaryStatus.STOP;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public boolean getInactiveStatus() throws Exception {
+        return this.status == QuestionaryStatus.INACTIVE;
+    }
+
+    public boolean getStartStatus() throws Exception {
+        return this.status == QuestionaryStatus.START;
+    }
+
+    public boolean getStopStatus() {
+        return  this.status == QuestionaryStatus.STOP;
+    }
+
+    public Set<Org> getOrgs() {
+        return orgs;
+    }
+
+    public void setOrgs(Set<Org> orgs) {
+        this.orgs = orgs;
     }
 
     public Set<Answer> getAnswers() {
         return answers;
+    }
+
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
     }
 
     public Date getUpdatedDate() {
@@ -65,7 +130,7 @@ public class Questionary {
         return type;
     }
 
-    public Integer getStatus() {
+    public QuestionaryStatus getStatus() {
         return status;
     }
 
@@ -75,10 +140,6 @@ public class Questionary {
 
     public Long getIdOfQuestionary() {
         return idOfQuestionary;
-    }
-
-    protected void setAnswers(Set<Answer> answers) {
-        this.answers = answers;
     }
 
     protected void setUpdatedDate(Date updatedDate) {
@@ -93,7 +154,7 @@ public class Questionary {
         this.type = type;
     }
 
-    protected void setStatus(Integer status) {
+    protected void setStatus(QuestionaryStatus status) {
         this.status = status;
     }
 
