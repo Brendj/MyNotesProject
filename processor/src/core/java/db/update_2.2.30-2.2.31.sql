@@ -52,6 +52,17 @@ CREATE TABLE cf_qa_answers
   CONSTRAINT cf_qa_answers_question_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
 );
 
+-- Таблица отношений анкет и организаций
+CREATE TABLE cf_qa_organization_questionary
+(
+  idoforgquestionary bigserial NOT NULL,
+  idofquestionary bigint NOT NULL,
+  idoforg bigint NOT NULL,
+  CONSTRAINT cf_qa_organization_questionary_pk PRIMARY KEY (idoforgquestionary ),
+  CONSTRAINT cf_qa_organization_questionary_org_fk FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_qa_organization_questionary_questionary_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+);
+
 -- Таблица ответов клиента
 CREATE TABLE cf_qa_clientanswerbyquestionary
 (
@@ -65,16 +76,6 @@ CREATE TABLE cf_qa_clientanswerbyquestionary
   CONSTRAINT cf_qa_clientanswerbyquestionary_answer FOREIGN KEY (idofanswer) REFERENCES cf_qa_answers (idofanswer),
   CONSTRAINT cf_qa_clientanswerbyquestionary_client FOREIGN KEY (idofclient) REFERENCES cf_clients (idofclient),
   CONSTRAINT cf_qa_clientanswerbyquestionary_questionary FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
-);
--- Таблица отношений анкет и организаций
-CREATE TABLE cf_qa_organization_questionary
-(
-  idoforgquestionary bigserial NOT NULL,
-  idofquestionary bigint NOT NULL,
-  idoforg bigint NOT NULL,
-  CONSTRAINT cf_qa_organization_questionary_pk PRIMARY KEY (idoforgquestionary ),
-  CONSTRAINT cf_qa_organization_questionary_org_fk FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
-  CONSTRAINT cf_qa_organization_questionary_questionary_fk FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
 );
 
 -- Таблица промежуточных результатов ответа по организациям
