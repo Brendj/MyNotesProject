@@ -236,28 +236,27 @@ public class ProjectStateReportService {
                         {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов"}},
                         INFORMING_CHART_DATA));
         TYPES.put("BenefitPartChart",
-                new SimpleType("select \'Льготные категории 1-4 класс\', count(cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient " +
-                        "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
-                        "where cf_cards.state=0 AND CAST(substring(groupname FROM \'[0-9]+\') AS INTEGER)<>0 and CAST(substring(groupname FROM \'[0-9]+\') AS INTEGER)<=4 "
-                        +
+                new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
 
-                        "union " +
+                        + "union "
 
-                        "select \'Прочите льготные категории\', count(cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "where cf_clients.discountmode<>0 " +
+                        + "select 'Прочие льготные категории', count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>4 "
 
-                        "union " +
+                        + "union "
 
-                        "select \'Не имеющие льгот\', count(distinct cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient " +
-                        "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
-                        "where cf_cards.state=0 AND CAST(substring(groupname FROM \'[0-9]+\') AS INTEGER)<>0",
+                        + "select 'Не имеющие льгот', count(distinct cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
                         new Object[][]{
                                 {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
                                 {ValueType.NUMBER, "Количество учащихся"}}, BENEFIT_PART_CHART_DATA));
