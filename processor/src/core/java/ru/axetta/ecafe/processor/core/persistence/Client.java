@@ -89,6 +89,15 @@ public class Client {
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
     private String fax;
+    private Boolean canConfirmGroupPayment;
+
+    public Boolean getCanConfirmGroupPayment() {
+        return canConfirmGroupPayment;
+    }
+
+    public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
+        this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
 
     public String getFax() {
         return fax;

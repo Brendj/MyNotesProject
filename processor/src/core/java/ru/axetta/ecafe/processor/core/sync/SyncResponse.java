@@ -313,6 +313,7 @@ public class SyncResponse {
             private final boolean notifyViaEmail;
             private final boolean notifyViaSMS;
             private final String remarks;
+            private final boolean canConfirmGroupPayment;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -334,6 +335,7 @@ public class SyncResponse {
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
                 this.remarks = client.getRemarks();
+                this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
@@ -389,6 +391,10 @@ public class SyncResponse {
                 return categoriesDiscounts;
             }
 
+            public boolean isCanConfirmGroupPayment() {
+                return canConfirmGroupPayment;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
@@ -404,6 +410,7 @@ public class SyncResponse {
                 element.setAttribute("Fax", this.fax);
                 element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
+                element.setAttribute("CanConfirmGroupPayment", this.canConfirmGroupPayment?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
@@ -1437,12 +1444,15 @@ public class SyncResponse {
         public static class DCI {
             private long idOfCategoryDiscount;
             private String categoryName;
+            private Integer categoryType;
+
             private String discountRules;
 
-            public DCI(long idOfCategoryDiscount, String categoryName, String discountRules) {
+            public DCI(long idOfCategoryDiscount, String categoryName, Integer categoryType, String discountRules) {
                 this.idOfCategoryDiscount = idOfCategoryDiscount;
                 this.categoryName = categoryName;
                 this.discountRules = discountRules;
+                this.categoryType = categoryType;
             }
 
             public long getIdOfCategoryDiscount() {
@@ -1453,6 +1463,10 @@ public class SyncResponse {
                 return categoryName;
             }
 
+            public Integer getCategoryType() {
+                return categoryType;
+            }
+
             public String getDiscountRules() {
                 return discountRules;
             }
@@ -1461,6 +1475,7 @@ public class SyncResponse {
                 Element element = document.createElement("DCI");
                 element.setAttribute("IdOfCategoryDiscount", Long.toString(this.idOfCategoryDiscount));
                 element.setAttribute("CategoryName", this.categoryName);
+                element.setAttribute("CategoryType", Integer.toString(this.categoryType));
                 return element;
             }
 

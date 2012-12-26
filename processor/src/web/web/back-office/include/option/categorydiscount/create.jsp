@@ -12,6 +12,7 @@
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель создания категории --%>
+<%--@elvariable id="categoryDiscountCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountCreatePage"--%>
 <h:panelGrid id="categoryCreatePanel" binding="#{categoryDiscountCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
     <%--
@@ -22,10 +23,13 @@
     <h:inputText value="#{categoryDiscountCreatePage.categoryName}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание" styleClass="output-text" />
     <h:inputText value="#{categoryDiscountCreatePage.description}" maxlength="32" styleClass="input-text" />
-
+    <h:outputText escape="true" value="Тип категории" styleClass="output-text" />
+    <h:selectOneMenu value="#{categoryDiscountCreatePage.categoryType}" styleClass="input-text">
+        <f:selectItems value="#{categoryDiscountCreatePage.categoryDiscountEnumTypeMenu.items}" />
+    </h:selectOneMenu>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryDiscountCreatePage.createCategory}"
+    <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryDiscountCreatePage.onSave}"
                        reRender="categoryCreatePanel" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

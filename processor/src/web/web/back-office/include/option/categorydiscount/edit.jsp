@@ -13,14 +13,17 @@
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель редактирования категории --%>
-
+<%--@elvariable id="categoryDiscountEditPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage"--%>
 <h:panelGrid id="categoryEditPanel" binding="#{categoryDiscountEditPage.pageComponent}"
              styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
     <h:inputText value="#{categoryDiscountEditPage.categoryName}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание" styleClass="output-text" />
     <h:inputText value="#{categoryDiscountEditPage.description}" maxlength="32" styleClass="input-text" />
-
+    <h:outputText escape="true" value="Тип категории" styleClass="output-text" />
+    <h:selectOneMenu value="#{categoryDiscountEditPage.categoryType}" styleClass="input-text">
+        <f:selectItems value="#{categoryDiscountEditPage.categoryDiscountEnumTypeMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Используется в правилах" styleClass="output-text" />
     <h:panelGroup>
         <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{categoryDiscountEditPage.filter}}" />

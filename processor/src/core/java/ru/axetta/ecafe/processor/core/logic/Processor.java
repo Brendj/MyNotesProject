@@ -1008,6 +1008,8 @@ public class Processor implements SyncProcessor,
             if (clientParamItem.getNotifyViaSMS()!=null) client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
             /* FAX клиента */
             if (clientParamItem.getFax() != null) client.setFax(clientParamItem.getFax());
+            /* разрешает клиенту подтверждать оплату групового питания */
+            if (clientParamItem.getCanConfirmGroupPayment() != null) client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
 
             /* заносим клиента в группу */
             if(clientParamItem.getGroupName() != null){
@@ -1936,7 +1938,7 @@ public class Processor implements SyncProcessor,
             List<CategoryDiscount> categoryDiscounts = criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
                 SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
-                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
+                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(), categoryDiscount.getCategoryType().getValue(),
                         categoryDiscount.getDiscountRules());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }

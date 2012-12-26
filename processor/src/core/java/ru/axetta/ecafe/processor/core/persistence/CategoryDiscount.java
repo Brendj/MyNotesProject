@@ -23,8 +23,17 @@ public class CategoryDiscount {
     private Date createdDate;
     private Date lastUpdate;
     private String discountRules;
+    private CategoryDiscountEnumType categoryType;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
+
+    public CategoryDiscountEnumType getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(CategoryDiscountEnumType categoryType) {
+        this.categoryType = categoryType;
+    }
 
     public Set<Client> getClients(){
         return getClientsInternal();

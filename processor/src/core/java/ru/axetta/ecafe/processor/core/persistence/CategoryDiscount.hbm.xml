@@ -25,6 +25,13 @@
 
         <property name="discountRules" column="DiscountRules" type="string" length="60" not-null="true"/>
 
+        <property name="categoryType" column="CategoryType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
         <set name="discountRulesInternal" table="CF_DiscountRules_CategoryDiscounts" >
             <key column="IdOfCategoryDiscount"/>
