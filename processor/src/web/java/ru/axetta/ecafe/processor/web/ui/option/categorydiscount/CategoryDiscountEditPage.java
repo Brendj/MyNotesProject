@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -33,9 +34,23 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private String categoryName;
     private String discountRules;
     private String description;
+    private Integer categoryType;
+    private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
     private String filter = "-";
     private List<Long> idOfRuleList = new ArrayList<Long>();
     private Set<DiscountRule> discountRuleSet;
+
+    public Integer getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(Integer categoryType) {
+        this.categoryType = categoryType;
+    }
+
+    public CategoryDiscountEnumTypeMenu getCategoryDiscountEnumTypeMenu() {
+        return categoryDiscountEnumTypeMenu;
+    }
 
     public String getEntityName() {
         return categoryName;
@@ -103,6 +118,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         categoryDiscount.setIdOfCategoryDiscount(idOfCategoryDiscount);
         categoryDiscount.setCategoryName(categoryName);
         categoryDiscount.setDescription(description);
+        categoryDiscount.setCategoryType(CategoryDiscountEnumType.fromInteger(categoryType));
         categoryDiscount.setLastUpdate(new Date());
         entityManager.persist(categoryDiscount);
         printMessage("Данные обновлены.");
@@ -121,6 +137,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRules = categoryDiscount.getDiscountRules();
         this.description = categoryDiscount.getDescription();
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
+        this.categoryType = categoryDiscount.getCategoryType().getValue();
         if(categoryDiscount.getDiscountsRules().isEmpty()){
             this.setFilter("-");
         } else {

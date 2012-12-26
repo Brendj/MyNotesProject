@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
@@ -12,9 +13,13 @@ import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,6 +28,8 @@ import java.util.*;
 @Component
 @Scope("session")
 public class CategoryDiscountCreatePage extends BasicWorkspacePage {
+
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -33,6 +40,21 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     private long idOfCategoryDiscount;
     private String categoryName;
     private String description;
+    private Integer categoryType;
+    private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
+
+    public CategoryDiscountEnumTypeMenu getCategoryDiscountEnumTypeMenu() {
+        return categoryDiscountEnumTypeMenu;
+    }
+
+    public Integer getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(Integer categoryType) {
+        this.categoryType = categoryType;
+    }
+
     //private Set<DiscountRule> discountRuleSet;
 
     /*public Set<DiscountRule> getDiscountRuleSet() {
@@ -43,15 +65,13 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
         this.discountRuleSet = discountRuleSet;
     }  */
 
-    @PersistenceContext
-    EntityManager em;
-
     @Override
     public void onShow() throws Exception {
-        idOfCategoryDiscount = DAOUtils.getCategoryDiscountMaxId(em)+1;
+        idOfCategoryDiscount = DAOUtils.getCategoryDiscountMaxId(entityManager)+1;
         if (idOfCategoryDiscount<1) idOfCategoryDiscount=1;
         categoryName = "";
         description ="";
+        categoryType = CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT.getValue();
     }
 
     public long getIdOfCategoryDiscount() {
@@ -78,9 +98,13 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
         this.description = description;
     }
 
-    @Transactional
-    public void createCategory() {
-        idOfCategoryDiscount = DAOUtils.getCategoryDiscountMaxId(em)+1;
+    public Object onSave(){
+        createCategory();
+        return null;
+    }
+
+    protected void createCategory() {
+        idOfCategoryDiscount = DAOUtils.getCategoryDiscountMaxId(entityManager)+1;
         if (idOfCategoryDiscount<1) idOfCategoryDiscount=1;
         if (idOfCategoryDiscount<0) {
             printError("Идентификатор должен быть больше 0");
@@ -94,16 +118,22 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
             return;
         } */
         try {
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            TransactionStatus status = transactionManager.getTransaction(def);
             Date createdDate = new Date();
             CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, "", description,
-                createdDate, createdDate);
-
+                    createdDate, createdDate);
+            categoryDiscount.setCategoryType(CategoryDiscountEnumType.fromInteger(categoryType));
             entityManager.persist(categoryDiscount);
-            printMessage("Категория успешно создана");
+            transactionManager.commit(status);
             categoryName = "";
             description = "";
+            printMessage("Категория успешно создана");
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при создании категории", e);
         }
     }
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 }
