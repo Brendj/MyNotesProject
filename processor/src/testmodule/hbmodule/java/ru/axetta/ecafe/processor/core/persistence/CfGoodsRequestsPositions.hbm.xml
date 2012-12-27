@@ -42,7 +42,7 @@
             <column name="unitsscale" sql-type="int4" length="10" not-null="true"/>
         </property>
         <property name="totalcount">
-            <column name="totalcount" sql-type="int8" length="19" not-null="true"/>
+            <column name="totalCount" sql-type="int8" length="19" not-null="true"/>
         </property>
         <property name="netweight">
             <column name="netweight" sql-type="int8" length="19" not-null="true"/>
