@@ -215,58 +215,38 @@ WITH (
 ALTER TABLE cf_goods_complaint_orders
   OWNER TO postgres;
 
---! Предыдущая версия книги жалоб
+-- Возможные причины подачи жалоб
+CREATE TABLE cf_possible_complaint_causes
+(
+  causenumber bigint NOT NULL,
+  description character varying NOT NULL,
+  CONSTRAINT cf_possible_complaint_causes_pk PRIMARY KEY (causenumber)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE cf_possible_complaint_causes
+  OWNER TO postgres;
+INSERT INTO cf_possible_complaint_causes VALUES ('0', 'Неприятный вкус');
+INSERT INTO cf_possible_complaint_causes VALUES ('1', 'Неприятный запах');
+INSERT INTO cf_possible_complaint_causes VALUES ('2', 'Недомогание после употребления');
+INSERT INTO cf_possible_complaint_causes VALUES ('3', 'Подозрение на некачественные продукты в составе блюда');
+INSERT INTO cf_possible_complaint_causes VALUES ('4', 'Просроченность');
+INSERT INTO cf_possible_complaint_causes VALUES ('5', 'Завышенная цена');
 
--- -- Жалобная книга на товары
--- CREATE TABLE cf_goods_complaintbook
--- (
---   idofcomplaint bigserial NOT NULL,
---   globalversion bigint,
---   deletedstate boolean,
---   guid character varying(36) NOT NULL,
---   lastupdate bigint,
---   deletedate bigint,
---   createddate bigint NOT NULL,
---   sendall integer DEFAULT 4,
---   orgowner bigint,
---   idofclient bigint NOT NULL,
---   idofgood bigint NOT NULL,
---   description character varying(512),
---   CONSTRAINT cf_good_complaintbook_pk PRIMARY KEY (idofcomplaint),
---   CONSTRAINT cf_goods_complaintbook_idofclient_fk FOREIGN KEY (idofclient)
---       REFERENCES cf_clients (idofclient) MATCH SIMPLE
---       ON UPDATE NO ACTION ON DELETE NO ACTION,
---   CONSTRAINT cf_goods_complaintbook_idofgood_fk FOREIGN KEY (idofgood)
---       REFERENCES cf_goods (idofgood) MATCH SIMPLE
---       ON UPDATE NO ACTION ON DELETE NO ACTION
--- )
--- WITH (
---   OIDS=FALSE
--- );
--- ALTER TABLE cf_goods_complaintbook
---   OWNER TO postgres;
---
--- -- Причины жалобы на товар
--- CREATE TABLE cf_goods_complaintcauses
--- (
---   idofcause bigserial NOT NULL,
---   globalversion bigint,
---   deletedstate boolean,
---   guid character varying(36) NOT NULL,
---   lastupdate bigint,
---   deletedate bigint,
---   createddate bigint NOT NULL,
---   sendall integer DEFAULT 4,
---   orgowner bigint,
---   idofcomplaint bigint NOT NULL,
---   cause integer NOT NULL,
---   CONSTRAINT cf_goods_complaintcauses_pk PRIMARY KEY (idofcause),
---   CONSTRAINT cf_goods_complaintcauses_idofcomplaint_fk FOREIGN KEY (idofcomplaint)
---       REFERENCES cf_goods_complaintbook (idofcomplaint) MATCH SIMPLE
---       ON UPDATE NO ACTION ON DELETE NO ACTION
--- )
--- WITH (
---   OIDS=FALSE
--- );
--- ALTER TABLE cf_goods_complaintcauses
---   OWNER TO postgres;
+-- Названия статусов итераций жалоб
+CREATE TABLE cf_possible_complaint_iteration_statuses
+(
+  statusnumber bigint NOT NULL,
+  description character varying NOT NULL,
+  CONSTRAINT cf_possible_complaint_iteration_statuses_pk PRIMARY KEY (statusnumber)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE cf_possible_complaint_iteration_statuses
+  OWNER TO postgres;
+INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('0', 'Создание');
+INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('1', 'Рассмотрение');
+INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('2', 'Расследование');
+INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('3', 'Заключение');
