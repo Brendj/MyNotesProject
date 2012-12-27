@@ -24,6 +24,12 @@ import java.util.List;
 @WebService
 public interface ClientRoomController {
 
+    @WebMethod(operationName = "getActiveQuestionaries")
+    QuestionaryResultList getActiveQuestionaries(@WebParam(name="contractId") Long contractId);
+
+    @WebMethod(operationName = "setAnswerFromQuestionary")
+    Result setAnswerFromQuestionary(@WebParam(name="contractId") Long contractId,@WebParam(name="IdOfAnswer") Long idOfAnswer);
+
     @WebMethod (operationName = "getGroupListByOrg")
     ClientGroupListResult getGroupListByOrg(@WebParam(name="idOfOrg") Long idOfOrg);
 

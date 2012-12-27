@@ -52,7 +52,8 @@ import javax.xml.bind.annotation.XmlType;
     "cardList",
     "enterEventList",
     "circulationItemList",
-      "complexDateList"
+    "complexDateList",
+    "questionaryList"
 })
 @XmlRootElement(name = "Data")
 public class Data {
@@ -85,6 +86,8 @@ public class Data {
     protected Long resultCode;
     @XmlAttribute(name = "Description")
     protected String description;
+    @XmlElement(name = "QuestionaryList")
+    protected QuestionaryList questionaryList;
 
 
     public ComplexDateList getComplexDateList() {
@@ -407,4 +410,11 @@ public class Data {
         this.description = value;
     }
 
+    public QuestionaryList getQuestionaryList() {
+        return questionaryList;
+    }
+
+    public void setQuestionaryList(QuestionaryList questionaryList) {
+        this.questionaryList = questionaryList;
+    }
 }

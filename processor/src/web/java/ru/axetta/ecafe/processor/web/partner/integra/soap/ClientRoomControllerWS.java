@@ -20,8 +20,13 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ci
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
+import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
@@ -3181,9 +3186,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
-
     @WebMethod(operationName = "getHiddenPages")
-
     public HiddenPagesResult getHiddenPages() {
         RuntimeContext runtimeContext = null;
         HiddenPagesResult r = new HiddenPagesResult();
@@ -3194,6 +3197,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
         r.hiddenPages = hiddenPages;
         return r;
+    }
+
+
+    @Override
+    public QuestionaryResultList getActiveQuestionaries(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                processQuestionaryList(client, data, objectFactory, session);
+            }
+        });
+
+        QuestionaryResultList questionaryResultList = new QuestionaryResultList();
+        questionaryResultList.questionaryList = data.getQuestionaryList();
+        questionaryResultList.resultCode = data.getResultCode();
+        questionaryResultList.description = data.getDescription();
+        return questionaryResultList;
+    }
+
+    @Override
+    public Result setAnswerFromQuestionary(@WebParam(name = "contractId") Long contractId, @WebParam(name="IdOfAnswer") Long idOfAnswer) {
+        authenticateRequest(contractId);
+        Result r = new Result();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        QuestionaryService questionaryService = RuntimeContext.getAppContext().getBean(QuestionaryService.class);
+        if (questionaryService.checkClientToQuestionary(contractId, idOfAnswer)) {
+            r.resultCode = 200L;
+            r.description = "Клиент ответил на данное анкетирование";
+            return r;
+        }
+        questionaryService.registrationAnswerByClient(contractId, idOfAnswer);
+        return r;
+    }
+
+    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session){
+        Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
+        clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
+        List<ClientAnswerByQuestionary> clientAnswerByQuestionaryList = clientAnswerByQuestionaryCriteria.list();
+        List<Long> questionariesOut = new ArrayList<Long>();
+        for (ClientAnswerByQuestionary clientAnswerByQuestionary: clientAnswerByQuestionaryList){
+            Questionary questionary = clientAnswerByQuestionary.getAnswer().getQuestionary();
+            questionariesOut.add(questionary.getIdOfQuestionary());
+        }
+        Criteria questionaryCriteria = session.createCriteria(Questionary.class);
+        if(!questionariesOut.isEmpty()){
+            questionaryCriteria.add(Restrictions.not(Restrictions.in("idOfQuestionary", questionariesOut)));
+        }
+        questionaryCriteria.add(Restrictions.eq("status", QuestionaryStatus.START));
+        List<Questionary> questionaries = questionaryCriteria.list();
+        QuestionaryList questionaryList = objectFactory.createQuestionaryList();
+        for (Questionary questionary: questionaries){
+            if(questionary.getOrgs().contains(client.getOrg())){
+                QuestionaryItem questionaryItem = new QuestionaryItem(questionary);
+                Criteria answerCriteria = session.createCriteria(Answer.class);
+                answerCriteria.add(Restrictions.eq("questionary", questionary));
+                List<Answer> answerList = answerCriteria.list();
+                questionaryItem.addAnswers(answerList);
+                questionaryList.getQ().add(questionaryItem);
+            }
+        }
+        data.setQuestionaryList(questionaryList);
     }
 
 }

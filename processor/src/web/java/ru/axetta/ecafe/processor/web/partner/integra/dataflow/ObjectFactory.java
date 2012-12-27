@@ -269,4 +269,7 @@ public class ObjectFactory {
         return new CardList();
     }
 
+    public QuestionaryList createQuestionaryList() {
+        return new QuestionaryList();
+    }
 }
