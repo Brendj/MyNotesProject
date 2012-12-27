@@ -95,7 +95,6 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     public Object save(){
         try {
             /* update answers */
-
             if (questionaryService.getStatus(questionary)){
                 List<Answer> answerList = new ArrayList<Answer>(answers.size());
                 for (AnswerItem answerItem: answers){

@@ -51,10 +51,10 @@ public class QuestionaryListPage extends BasicWorkspacePage {
     public Object remove(){
         try {
             Questionary questionary = getEntityFromRequestParam();
-            if(questionary.getStatus()== QuestionaryStatus.INACTIVE || questionary.getStatus()== QuestionaryStatus.STOP){
-                questionaryService.extractQuestionary(questionary);
+            if(questionary.getStatus()== QuestionaryStatus.STOP || questionary.getStatus() == QuestionaryStatus.INACTIVE){
+                questionaryService.changeStatusQuestionary(questionary, QuestionaryStatus.DELETED);
                 reload();
-                printMessage("Анкета успешно удалена");
+                printMessage("Анкета отправлена на удаление");
             } else {
                 printError("Нельзя удалть задествованный опросник");
             }
