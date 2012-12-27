@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.questionary;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,6 +22,15 @@ public class Answer {
     private Date createdDate;
     private Date updatedDate;
     private Questionary questionary;
+    private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
+
+    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
+        return clientAnswerByQuestionary;
+    }
+
+    public void setClientAnswerByQuestionary(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
+        this.clientAnswerByQuestionary = clientAnswerByQuestionary;
+    }
 
     protected Answer() {}
 
@@ -108,5 +118,37 @@ public class Answer {
 
     public void setQuestionary(Questionary questionary) {
         this.questionary = questionary;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Answer answer1 = (Answer) o;
+
+        if (!answer.equals(answer1.answer)) {
+            return false;
+        }
+        if (!idOfAnswer.equals(answer1.idOfAnswer)) {
+            return false;
+        }
+        if (!weight.equals(answer1.weight)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (idOfAnswer==null?Long.valueOf(-1L).hashCode():idOfAnswer.hashCode());
+        result = 31 * result + answer.hashCode();
+        result = 31 * result + weight.hashCode();
+        return result;
     }
 }

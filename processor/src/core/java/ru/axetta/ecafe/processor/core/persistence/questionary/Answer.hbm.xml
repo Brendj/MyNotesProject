@@ -18,5 +18,9 @@
         <many-to-one name="questionary" class="ru.axetta.ecafe.processor.core.persistence.questionary.Questionary" lazy="false" fetch="select" cascade="all">
             <column name="IdOfQuestionary" not-null="true" />
         </many-to-one>
+        <set name="clientAnswerByQuestionary" inverse="true" cascade="all">
+            <key column="IdOfAnswer"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary"/>
+        </set>
     </class>
 </hibernate-mapping>

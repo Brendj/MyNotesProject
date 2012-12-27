@@ -89,11 +89,20 @@ public class Questionary {
         return this;
     }
 
-    public boolean getInactiveStatus() throws Exception {
+    public Questionary deleted() throws Exception {
+        if(!(this.status == QuestionaryStatus.INACTIVE || this.status == QuestionaryStatus.STOP)) {
+            throw new Exception("Не возможно удалить анкетирование");
+        }
+        this.status = QuestionaryStatus.DELETED;
+        this.updatedDate = new Date();
+        return this;
+    }
+
+    public boolean getInactiveStatus() {
         return this.status == QuestionaryStatus.INACTIVE;
     }
 
-    public boolean getStartStatus() throws Exception {
+    public boolean getStartStatus() {
         return this.status == QuestionaryStatus.START;
     }
 

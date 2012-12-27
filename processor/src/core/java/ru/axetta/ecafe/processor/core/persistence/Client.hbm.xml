@@ -112,6 +112,12 @@
             <key column="IdOfClient"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
         </set>
+
+        <set name="clientAnswerByQuestionary" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary"/>
+        </set>
+
     </class>
 </hibernate-mapping>
 

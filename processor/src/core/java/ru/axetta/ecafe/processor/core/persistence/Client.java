@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -90,6 +92,15 @@ public class Client {
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
     private String fax;
     private Boolean canConfirmGroupPayment;
+    private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
+
+    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
+        return clientAnswerByQuestionary;
+    }
+
+    public void setClientAnswerByQuestionary(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
+        this.clientAnswerByQuestionary = clientAnswerByQuestionary;
+    }
 
     public Boolean getCanConfirmGroupPayment() {
         return canConfirmGroupPayment;

@@ -4,10 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.questionaryservice;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
-import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
+import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
@@ -49,6 +48,63 @@ public class QuestionaryService {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    /* истена если клиент не ответил на данный вопрос или нет доступных для него анкет*/
+    public Boolean checkClientToQuestionary(Long contractId, Long idOfAnswer){
+        TypedQuery<Client> clientTypedQuery = entityManager.createQuery("from Client where contractId=:contractId",Client.class);
+        clientTypedQuery.setParameter("contractId",contractId);
+        Client client = clientTypedQuery.getSingleResult();
+        Answer answer = entityManager.find(Answer.class, idOfAnswer);
+        if(answer==null) return true;
+        Questionary questionary = entityManager.find(Questionary.class, answer.getQuestionary().getIdOfQuestionary());
+        if(!questionary.getStartStatus()) return false;
+        TypedQuery<Answer> q = entityManager.createQuery("from Answer where questionary=:questionary", Answer.class);
+        q.setParameter("questionary",questionary);
+        List<Answer> answers = q.getResultList();
+        //StringBuilder stringBuilder = new StringBuilder();
+        //for (Answer a:answers){
+        //    stringBuilder.append(a.getIdOfAnswer());
+        //    stringBuilder.append(",");
+        //}
+        //String substring = stringBuilder.toString();
+        //substring = substring.substring(0,substring.length()-1);
+        TypedQuery<ClientAnswerByQuestionary> clientAnswerByQuestionaryTypedQuery = entityManager.createQuery("from ClientAnswerByQuestionary where client=:client and answer in :answer",ClientAnswerByQuestionary.class);
+        clientAnswerByQuestionaryTypedQuery.setParameter("client",client);
+        clientAnswerByQuestionaryTypedQuery.setParameter("answer",answers);
+        return !clientAnswerByQuestionaryTypedQuery.getResultList().isEmpty();
+    }
+
+
+    public void registrationAnswerByClient(Long contractId, Long idOfAnswer){
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(def);
+
+        TypedQuery<Client> clientTypedQuery = entityManager.createQuery("from Client where contractId=:contractId",Client.class);
+        clientTypedQuery.setParameter("contractId",contractId);
+        Client client = clientTypedQuery.getSingleResult();
+
+        Answer answer = entityManager.find(Answer.class,idOfAnswer);
+        Questionary questionary = entityManager.getReference(Questionary.class,
+                answer.getQuestionary().getIdOfQuestionary());
+
+        ClientAnswerByQuestionary clientAnswerByQuestionary = new ClientAnswerByQuestionary(answer,client);
+        entityManager.persist(clientAnswerByQuestionary);
+
+        TypedQuery<QuestionaryResultByOrg> questionaryResultByOrgTypedQuery = entityManager.createQuery(
+                "from QuestionaryResultByOrg where answer=:answer and org=:org", QuestionaryResultByOrg.class);
+        questionaryResultByOrgTypedQuery.setParameter("answer",answer);
+        questionaryResultByOrgTypedQuery.setParameter("org",client.getOrg());
+        List<QuestionaryResultByOrg> questionaryResultByOrgList = questionaryResultByOrgTypedQuery.getResultList();
+        QuestionaryResultByOrg questionaryResultByOrg = null;
+        if(questionaryResultByOrgList==null || questionaryResultByOrgList.isEmpty()){
+            questionaryResultByOrg = new QuestionaryResultByOrg(answer,questionary,client.getOrg());
+        } else {
+            questionaryResultByOrg = questionaryResultByOrgList.get(0);
+            questionaryResultByOrg.addAnswer(answer);
+        }
+        entityManager.persist(questionaryResultByOrg);
+        transactionManager.commit(status);
+    }
+
     public List<Answer> getAnswers(Questionary questionary){
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
@@ -62,7 +118,8 @@ public class QuestionaryService {
     public List<Questionary> getQuestionaries(){
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
-        TypedQuery<Questionary> query = entityManager.createQuery("from Questionary", Questionary.class);
+        TypedQuery<Questionary> query = entityManager.createQuery("from Questionary where status!=:status", Questionary.class);
+        query.setParameter("status",QuestionaryStatus.DELETED);
         List<Questionary> questionaries = query.getResultList();
         transactionManager.commit(status);
         return questionaries;
@@ -171,6 +228,7 @@ public class QuestionaryService {
         switch (status){
             case START: questionary = questionary.start(); break;
             case STOP: questionary = questionary.stop(); break;
+            case DELETED: questionary = questionary.deleted(); break;
         }
         entityManager.persist(questionary);
         transactionManager.commit(transactionStatus);
@@ -181,7 +239,7 @@ public class QuestionaryService {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus transactionStatus = transactionManager.getTransaction(def);
         questionary = entityManager.merge(questionary);
-        result = questionary.getStatus() != QuestionaryStatus.START;
+        result = questionary.getStatus() == QuestionaryStatus.INACTIVE;
         transactionManager.commit(transactionStatus);
         return result;
     }

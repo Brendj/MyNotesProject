@@ -18,7 +18,8 @@ public enum QuestionaryStatus {
 
     INACTIVE(0,"Неактивен"),
     START(1,"Активен"),
-    STOP(2,"Завершен");
+    STOP(2,"Завершен"),
+    DELETED(3,"Удален");
 
     private final Integer value;
     private final String description;
