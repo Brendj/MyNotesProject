@@ -68,27 +68,24 @@ CREATE TABLE cf_qa_clientanswerbyquestionary
 (
   idofclientanswerbyquestionary bigserial NOT NULL,
   idofclient bigint NOT NULL,
-  idofquestionary bigint NOT NULL,
   idofanswer bigint NOT NULL,
   createddate bigint NOT NULL,
   updateddate bigint,
   CONSTRAINT cf_qa_clientanswerbyquestionary_pk PRIMARY KEY (idofclientanswerbyquestionary ),
   CONSTRAINT cf_qa_clientanswerbyquestionary_answer FOREIGN KEY (idofanswer) REFERENCES cf_qa_answers (idofanswer),
-  CONSTRAINT cf_qa_clientanswerbyquestionary_client FOREIGN KEY (idofclient) REFERENCES cf_clients (idofclient),
-  CONSTRAINT cf_qa_clientanswerbyquestionary_questionary FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
+  CONSTRAINT cf_qa_clientanswerbyquestionary_client FOREIGN KEY (idofclient) REFERENCES cf_clients (idofclient)
 );
 
 -- Таблица промежуточных результатов ответа по организациям
 CREATE TABLE cf_qa_questionaryresultbyorg
 (
-  idoforgquestionary bigserial NOT NULL,
+  idofquestionaryresultbyorg bigserial NOT NULL,
   idoforg bigint NOT NULL,
   idofquestionary bigint NOT NULL,
   idofanswer bigint NOT NULL,
   count bigint NOT NULL DEFAULT 0,
-  totalcount bigint NOT NULL DEFAULT 0,
   updateddate bigint,
-  CONSTRAINT cf_qa_questionaryresultbyorg_pk PRIMARY KEY (idoforgquestionary ),
+  CONSTRAINT cf_qa_questionaryresultbyorg_pk PRIMARY KEY (idofquestionaryresultbyorg ),
   CONSTRAINT cf_qa_questionaryresultbyorg_answer FOREIGN KEY (idofanswer) REFERENCES cf_qa_answers (idofanswer),
   CONSTRAINT cf_qa_questionaryresultbyorg_org FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
   CONSTRAINT cf_qa_questionaryresultbyorg_questionary FOREIGN KEY (idofquestionary) REFERENCES cf_qa_questionaries (idofquestionary)
