@@ -235,18 +235,19 @@ INSERT INTO cf_possible_complaint_causes VALUES ('4', 'Просроченнос�
 INSERT INTO cf_possible_complaint_causes VALUES ('5', 'Завышенная цена');
 
 -- Названия статусов итераций жалоб
-CREATE TABLE cf_possible_complaint_iteration_statuses
+CREATE TABLE cf_possible_complaint_iteration_states
 (
-  statusnumber bigint NOT NULL,
+  statenumber bigint NOT NULL,
   description character varying NOT NULL,
-  CONSTRAINT cf_possible_complaint_iteration_statuses_pk PRIMARY KEY (statusnumber)
+  CONSTRAINT cf_possible_complaint_iteration_states_pk PRIMARY KEY (statenumber )
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE cf_possible_complaint_iteration_statuses
+ALTER TABLE cf_possible_complaint_iteration_states
   OWNER TO postgres;
-INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('0', 'Создание');
-INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('1', 'Рассмотрение');
-INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('2', 'Расследование');
-INSERT INTO cf_possible_complaint_iteration_statuses VALUES ('3', 'Заключение');
+
+INSERT INTO cf_possible_complaint_iteration_states VALUES ('0', 'Создание');
+INSERT INTO cf_possible_complaint_iteration_states VALUES ('1', 'Рассмотрение');
+INSERT INTO cf_possible_complaint_iteration_states VALUES ('2', 'Расследование');
+INSERT INTO cf_possible_complaint_iteration_states VALUES ('3', 'Заключение');
