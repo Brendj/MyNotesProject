@@ -144,6 +144,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 setIdOfOrgs.add(orgId);
                 List<Long> longList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
                 setIdOfOrgs.addAll(longList);
+                for (Org friendlyOrg : org.getFriendlyOrg()) {
+                    setIdOfOrgs.add(friendlyOrg.getIdOfOrg());
+                }
             } else if ((orgId == null) && (contractId != null)) {
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.eq("contractId", contractId));
