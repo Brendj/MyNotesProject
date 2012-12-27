@@ -27,27 +27,27 @@
                     captionClass="center-aligned-column">
         <rich:column sortBy="#{questionary.idOfQuestionary}">
             <f:facet name="header">
-                <h:outputText value="id"/>
+                <h:outputText value="Идентификатор"/>
             </f:facet>
             <h:outputText value="#{questionary.idOfQuestionary}"/>
         </rich:column>
         <rich:column sortBy="#{questionary.question}">
             <f:facet name="header">
-                <h:outputText value="question"/>
+                <h:outputText value="Текст опросника"/>
             </f:facet>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{questionary.question}" action="#{questionaryViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
-        <rich:column>
+        <%--<rich:column>
             <f:facet name="header">
-                <h:outputText value="type"/>
+                <h:outputText value="Тип"/>
             </f:facet>
             <h:outputText value="#{questionary.type}"/>
-        </rich:column>
+        </rich:column>--%>
         <rich:column sortBy="#{questionary.createdDate}">
             <f:facet name="header">
-                <h:outputText value="createdDate"/>
+                <h:outputText value="Дата регистрации"/>
             </f:facet>
             <h:outputText value="#{questionary.createdDate}" converter="timeConverter"/>
         </rich:column>
@@ -63,10 +63,10 @@
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/stop.png" style="border: 0;" />
             </a4j:commandLink>
-            <a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.stopStatus}" reRender="mainMenu, workspaceForm">
+            <%--<a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.stopStatus}" reRender="mainMenu, workspaceForm">
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/play.png" style="border: 0;" />
-            </a4j:commandLink>
+            </a4j:commandLink>--%>
         </rich:column>
         <rich:column>
             <f:facet name="header">
