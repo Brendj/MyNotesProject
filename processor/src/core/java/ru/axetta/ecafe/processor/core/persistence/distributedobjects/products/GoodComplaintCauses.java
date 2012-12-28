@@ -12,31 +12,21 @@ import java.util.HashMap;
 
 public class GoodComplaintCauses extends DistributedObject {
 
-    public static enum ComplaintCauses {
+    public enum ComplaintCauses {
 
-        badTaste(0),
-        badSmell(1),
-        malaise(2),
-        badQualityProducts(3),
-        overdue(4),
-        highPrice(5);
-
-        private static final HashMap<ComplaintCauses, String> CAUSE_TITLES_MAP;
-
-        static {
-            CAUSE_TITLES_MAP = new HashMap<ComplaintCauses, String>(ComplaintCauses.values().length);
-            CAUSE_TITLES_MAP.put(badTaste,           "Неприятный вкус");
-            CAUSE_TITLES_MAP.put(badSmell,           "Неприятный запах");
-            CAUSE_TITLES_MAP.put(malaise,            "Недомогание после употребления");
-            CAUSE_TITLES_MAP.put(badQualityProducts, "Подозрение на некачественные продукты в составе блюда");
-            CAUSE_TITLES_MAP.put(overdue,            "Просроченность");
-            CAUSE_TITLES_MAP.put(highPrice,          "Завышенная цена");
-        }
+        badTaste(0, "Неприятный вкус"),
+        badSmell(1, "Неприятный запах"),
+        malaise(2, "Недомогание после употребления"),
+        badQualityProducts(3, "Подозрение на некачественные продукты в составе блюда"),
+        overdue(4, "Просроченность"),
+        highPrice(5, "Завышенная цена");
 
         private Integer causeNumber;
+        private String title;
 
-        private ComplaintCauses(Integer causeNumber) {
+        private ComplaintCauses(Integer causeNumber, String title) {
             this.causeNumber = causeNumber;
+            this.title = title;
         }
 
         public Integer getCauseNumber() {
@@ -44,7 +34,12 @@ public class GoodComplaintCauses extends DistributedObject {
         }
 
         public String getTitle() {
-            return CAUSE_TITLES_MAP.get(this);
+            return title;
+        }
+
+        @Override
+        public String toString() {
+            return title;
         }
 
         public static ComplaintCauses getCauseByNumberNullSafe(Integer causeNumber) {

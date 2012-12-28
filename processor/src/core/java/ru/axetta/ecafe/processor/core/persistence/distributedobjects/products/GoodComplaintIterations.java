@@ -16,27 +16,19 @@ import java.util.HashMap;
 
 public class GoodComplaintIterations extends DistributedObject {
 
-    public static enum IterationStatus {
+    public enum IterationStatus {
 
-        creation(0),
-        consideration(1),
-        investigation(2),
-        conclusion(3);
-
-        private static final HashMap<IterationStatus, String> ITERATION_STATUS_TITLES_MAP;
-
-        static {
-            ITERATION_STATUS_TITLES_MAP = new HashMap<IterationStatus, String>(IterationStatus.values().length);
-            ITERATION_STATUS_TITLES_MAP.put(creation,      "Создание");
-            ITERATION_STATUS_TITLES_MAP.put(consideration, "Рассмотрение");
-            ITERATION_STATUS_TITLES_MAP.put(investigation, "Расследование");
-            ITERATION_STATUS_TITLES_MAP.put(conclusion,    "Заключение");
-        }
+        creation(0, "Создание"),
+        consideration(1, "Рассмотрение"),
+        investigation(2, "Расследование"),
+        conclusion(3, "Заключение");
 
         private Integer statusNumber;
+        private String title;
 
-        private IterationStatus(Integer statusNumber) {
+        private IterationStatus(Integer statusNumber, String title) {
             this.statusNumber = statusNumber;
+            this.title = title;
         }
 
         public Integer getStatusNumber() {
@@ -44,7 +36,7 @@ public class GoodComplaintIterations extends DistributedObject {
         }
 
         public String getTitle() {
-            return ITERATION_STATUS_TITLES_MAP.get(this);
+            return title;
         }
 
         public static IterationStatus getStatusByNumberNullSafe(Integer statusNumber) {

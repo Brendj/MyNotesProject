@@ -330,6 +330,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
 
+                // Проверка, существует ли Заказ, совершенный указанным клиентом и содержащий данную деталь заказа
+                CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(client.getOrg().getIdOfOrg(), orderDetail.getIdOfOrder());
+                Criteria orderCriteria = persistenceSession.createCriteria(Order.class);
+                orderCriteria.add(Restrictions.eq("compositeIdOfOrder", compositeIdOfOrder));
+                Order order = (Order) orderCriteria.uniqueResult();
+                if ((order == null) || !order.getClient().equals(client)) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Указанный клиент не совершал данного заказа";
+                    return result;
+                }
+
                 Good goodFromOrder = orderDetail.getGood();
                 if (goodFromOrder == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
@@ -406,7 +417,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             fillDisctributedObjectsCommonDetails(newIteration, client.getOrg());
             persistenceSession.save(newIteration);
 
-            // Получили сохраненную итерацию, следовательно, можно привязать
+            // Получили сохраненную итерацию, следовательно, можно привязать к этой итерации
             // элементы деталей заказов из списка, полученного ранее, и сохранить их
             for (GoodComplaintOrders order : goodComplaintOrdersList) {
                 order.setComplaintIteration(newIteration);
@@ -419,12 +430,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = "Не указаны причины подачи жалобы";
                 return result;
             }
+            List<Integer> parsedCauseNumberList = new ArrayList<Integer>();
             for (Integer causeNumber : causeNumberList) {
+                if (parsedCauseNumberList.contains(causeNumber)) {
+                    result.resultCode = RC_INTERNAL_ERROR;
+                    result.description = "Список причин подачи жалобы должен содержать уникальные значения";
+                    return result;
+                } else {
+                    parsedCauseNumberList.add(causeNumber);
+                }
                 GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
                         causeNumber);
                 if (cause == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
-                    result.description = "Указанный номера причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                    result.description = "Номер причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
                     return result;
                 }
                 GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
@@ -515,6 +534,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
+            if (status.getStatusNumber() - iteration.getIterationStatus().getStatusNumber() != 1) {
+                result.resultCode = RC_INTERNAL_ERROR;
+                result.description = "Нельзя назначать итерации со статусом " + iteration.getIterationStatus().getTitle()
+                        + " статус " + status.getTitle();
+                return result;
+            }
             iteration.setIterationStatus(status);
             if (conclusion != null) {
                 iteration.setConclusion(conclusion);
