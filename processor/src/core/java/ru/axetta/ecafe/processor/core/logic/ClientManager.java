@@ -424,7 +424,7 @@ public class ClientManager {
             String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME); //tokens[10];
 
             if (checkFullNameUnique && existClient(persistenceSession, organization, firstName, surname, secondName)) {
-                throw new Exception("Клиент с данными ФИО уже зарегистрирован в организации", null);
+                throw new Exception("Клиент с данными ФИО уже зарегистрирован в организации: "+surname+" "+firstName+" "+secondName, null);
             }
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);

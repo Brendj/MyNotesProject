@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.service;
@@ -12,8 +12,10 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,9 +24,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -42,27 +42,28 @@ public class ExportRegisterClientsService {
     MskNSIService nsiService;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExportRegisterClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
 
 
     public static boolean isOn() {
-        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_REGISTER_CL_ON);
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
     }
 
 
     public static void setOn(boolean on) {
-        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_REGISTER_CL_ON, "" + (on ? "1" : "0"));
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_MSK_NSI_AUTOSYNC_ON, "" + (on ? "1" : "0"));
     }
 
 
     private void setLastUpdateDate(Date date) {
         RuntimeContext.getInstance()
-                .setOptionValueWithSave(Option.OPTION_REGISTER_CL_UPD_TIME, dateFormat.format(date));
+                .setOptionValueWithSave(Option.OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, dateFormat.format(date));
     }
 
 
     private Date getLastUpdateDate() {
         try {
-            String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REGISTER_CL_UPD_TIME);
+            String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_AUTOSYNC_UPD_TIME);
             if (d == null || d.length() < 1) {
                 return new Date(0);
             }
@@ -82,7 +83,7 @@ public class ExportRegisterClientsService {
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
         for (Org org : orgs) {
             try {
-                if (org.getTag() == null || org.getTag().toUpperCase().indexOf("СИНХРОНИЗАЦИЯ_РЕЕСТРЫ") < 0) {
+                if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
                     continue;
                 }
                 loadClients(lastUpd, org);
@@ -96,60 +97,105 @@ public class ExportRegisterClientsService {
 
     public void loadClients(java.util.Date lastUpd, Org org) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
         List<MskNSIService.ExpandedPupilInfo> pupils = nsiService.getChangedClients(lastUpd, org);
 
-
+        Session session = null;
+        Transaction transaction = null;
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-        } catch (Exception e) {
-            throw e;
-        }
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
 
-        for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
-            FieldProcessor.Config fieldConfig;
-            boolean exists = ClientManager.existClient(persistenceSession, org, emptyIfNull(pupil.getFirstName()),
-                    emptyIfNull(pupil.getFamilyName()), emptyIfNull(pupil.getSecondName()));
-            //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
-            if (/*pupil.isCreated() && */!exists && !pupil.isDeleted()) {
-                fieldConfig = new ClientManager.ClientFieldConfig();
-            } else {
-                fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-            }
-            fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
-            fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(pupil.getFamilyName()));
-            fieldConfig.setValue(ClientManager.FieldId.NAME, emptyIfNull(pupil.getFirstName()));
-            fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(pupil.getSecondName()));
-            if (pupil.getGroup() != null) {
-                fieldConfig.setValue(ClientManager.FieldId.GROUP, pupil.getGroup());
-            }
-            try {
-                if (pupil.isDeleted()) {
-                    DAOService.getInstance().bindClientToGroup (ClientManager.findClientByFullName(org,
-                            (ClientManager.ClientFieldConfigForUpdate) fieldConfig),
-                            ClientGroup.Predefined.CLIENT_LEAVING.getValue ());
-                }
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+
+            for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
+                FieldProcessor.Config fieldConfig;
+                boolean exists = ClientManager.existClient(session, org, emptyIfNull(pupil.getFirstName()),
+                        emptyIfNull(pupil.getFamilyName()), emptyIfNull(pupil.getSecondName()));
                 //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
-                else if (/*pupil.isCreated() && */!exists) {
-                    try {
-                        fieldConfig.setValue(ClientManager.FieldId.COMMENTS, "{%Добавлено из Регистров " + date + "%}");
-                        ClientManager
-                                .registerClient(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig, true);
-                    } catch (Exception e) {
-                    }
+                if (/*pupil.isCreated() && */!exists && !pupil.isDeleted()) {
+                    fieldConfig = new ClientManager.ClientFieldConfig();
                 } else {
-                    ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
-                            "{%Изменено из Регистров " + date + "%}");
+                    fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                 }
-            } catch (Exception e) {
-                // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
-                logger.error("Failed to add client for " + org.getIdOfOrg() + " org", e);
+                fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+                fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(pupil.getFamilyName()));
+                fieldConfig.setValue(ClientManager.FieldId.NAME, emptyIfNull(pupil.getFirstName()));
+                fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(pupil.getSecondName()));
+                if (pupil.getGroup() != null) {
+                    fieldConfig.setValue(ClientManager.FieldId.GROUP, pupil.getGroup());
+                }
+                try {
+                    if (pupil.isDeleted()) {
+                        DAOService.getInstance().bindClientToGroup(ClientManager
+                                .findClientByFullName(org, (ClientManager.ClientFieldConfigForUpdate) fieldConfig),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                        ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
+                                String.format(MskNSIService.COMMENT_AUTO_DELETED, date));
+                    }
+                    //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
+                    else if (/*pupil.isCreated() && */!exists) {
+                        try {
+                            fieldConfig.setValue(ClientManager.FieldId.COMMENTS, String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
+                            ClientManager
+                                    .registerClient(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
+                                            true);
+                        } catch (Exception e) {
+                            // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
+                        }
+                    } else {
+                        ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
+                                String.format(MskNSIService.COMMENT_AUTO_MODIFY, date));
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to add client for " + org.getIdOfOrg() + " org", e);
+                }
             }
+            ////
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
     private String emptyIfNull(String str) {
         return str == null ? "" : str;
     }
+
+    /*
+    // Скедулинг идет через Spring
+    // возможно если нужно будет настраиваемое расписание взять этот код
+
+    public static class SyncJob implements Job {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            RuntimeContext.getAppContext().getBean(NSISyncService.class).doSync();
+        }
+    }
+
+    final static String JOB_NAME="sync";
+
+
+    public void scheduleSync() throws Exception {
+        mskNSIService.init();
+
+        String syncSchedule = RuntimeContext.getInstance().getNsiServiceConfig().syncSchedule;
+        logger.info("Scheduling NSI sync job: "+syncSchedule);
+        JobDetail jobDetail = new JobDetail(JOB_NAME,Scheduler.DEFAULT_GROUP, SyncJob.class);
+
+        CronTrigger trigger = new CronTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
+        //trigger.setStartTime(new Date());
+        //trigger.setEndTime(new Date(new Date().getTime() + 10 * 60 * 1000));
+        trigger.setCronExpression(syncSchedule);
+
+        SchedulerFactory sfb = new StdSchedulerFactory();
+        Scheduler scheduler = sfb.getScheduler();
+        if (scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP)!=null) {
+            scheduler.deleteJob(JOB_NAME, Scheduler.DEFAULT_GROUP);
+        }
+        scheduler.scheduleJob(jobDetail, trigger);
+        scheduler.start();
+    } */
+
 }

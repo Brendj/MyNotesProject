@@ -459,7 +459,7 @@ public class DAOUtils {
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
             Date fromDateTime, Date toDateTime, int sourceType) {
         Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
-                + "where at.transactionTime>:sinceTime and at.transactionTime<=:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idOfOrg=:idOfOrg");
+                + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("sinceTime", fromDateTime);
         query.setParameter("tillTime", toDateTime);

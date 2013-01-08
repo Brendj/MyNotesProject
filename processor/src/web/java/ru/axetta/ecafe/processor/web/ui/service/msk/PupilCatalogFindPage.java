@@ -68,6 +68,23 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         return null;
     }
 
+    public Integer getClientTotalCount() {
+        return pupilInfos==null?0:pupilInfos.size();
+    }
+
+    public void markAllForRegistration() {
+        if (pupilInfos==null) return;
+        for (Item i : pupilInfos) {
+            i.toAdd=true;
+        }
+    }
+    public void unmarkAllForRegistration() {
+        if (pupilInfos==null) return;
+        for (Item i : pupilInfos) {
+            i.toAdd=false;
+        }
+    }
+
     public static class Item extends MskNSIService.PupilInfo {
         boolean toAdd, toBind;
         Long idOfClient, idOfClientForBind;
@@ -181,6 +198,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(i.getFamilyName()));
                 fieldConfig.setValue(ClientManager.FieldId.NAME, emptyIfNull(i.getFirstName()));
                 fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(i.getSecondName()));
+                fieldConfig.setValue(ClientManager.FieldId.COMMENTS, MskNSIService.COMMENT_MANUAL_IMPORT);
                 if (i.getGroup()!=null) fieldConfig.setValue(ClientManager.FieldId.GROUP, i.getGroup());
                 i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true);
                 ++nItems;

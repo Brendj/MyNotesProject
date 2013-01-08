@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.partner.nsi.NSISyncService;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -171,14 +170,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
-    private MskNSIService.Config nsiServiceConfig;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
-    }
-
-    public MskNSIService.Config getNsiServiceConfig() {
-        return nsiServiceConfig;
     }
 
     public SBRTConfig getPartnerSBRTConfig() {
@@ -433,15 +427,6 @@ public class RuntimeContext implements ApplicationContextAware {
                 this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
                 logger.error("Failed to load partner config: "+e);
-                criticalErrors = true;
-            }
-            try {
-                this.nsiServiceConfig = new MskNSIService.Config(properties, PROCESSOR_PARAM_BASE);
-                if (this.nsiServiceConfig.syncEnabled && isMainNode()) {
-                    getAppContext().getBean(NSISyncService.class).scheduleSync();
-                }
-            } catch (Exception e) {
-                logger.error("Failed to init NSI services", e);
                 criticalErrors = true;
             }
 

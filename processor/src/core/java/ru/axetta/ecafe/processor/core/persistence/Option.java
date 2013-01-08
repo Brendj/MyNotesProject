@@ -66,8 +66,12 @@ public class Option {
             OPTION_PROJECT_STATE_REPORT_ON=10019,
             OPTION_EXTERNAL_URL=10020,
             OPTION_BENEFITS_RECALC_ON=10021,
-            OPTION_REGISTER_CL_ON=10022,
-            OPTION_REGISTER_CL_UPD_TIME=10023
+            OPTION_MSK_NSI_AUTOSYNC_ON =10022,
+            OPTION_MSK_NSI_AUTOSYNC_UPD_TIME =10023,
+            OPTION_MSK_NSI_URL=100024,
+            OPTION_MSK_NSI_USER=100025,
+            OPTION_MSK_NSI_PASSWORD=100026,
+            OPTION_MSK_NSI_COMPANY=100027
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -96,10 +100,12 @@ public class Option {
             OPTION_MSR_STOPLIST_LOGGING, "0",
             OPTION_PROJECT_STATE_REPORT_ON, "0",
             OPTION_EXTERNAL_URL, "http://localhost:8080",
-            OPTION_BENEFITS_RECALC_ON, "0",
-            OPTION_REGISTER_CL_ON, "0",
-            OPTION_REGISTER_CL_UPD_TIME, null
-    };
+            OPTION_BENEFITS_RECALC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, null,
+            OPTION_MSK_NSI_URL, "http://localhost:2000/nsiws/services/NSIService",
+            OPTION_MSK_NSI_USER, "UEK_SOAP",
+            OPTION_MSK_NSI_PASSWORD, "la0d6xxw",
+            OPTION_MSK_NSI_COMPANY, "dogm_nsi"
+};
 
     private Long idOfOption;
     private String optionText;

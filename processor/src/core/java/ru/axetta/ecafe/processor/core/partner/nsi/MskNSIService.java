@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 import generated.nsiws.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.slf4j.Logger;
@@ -21,44 +22,43 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 @Component
 @Scope("singleton")
 public class MskNSIService {
+
     private static final Logger logger = LoggerFactory.getLogger(MskNSIService.class);
+    public static final String COMMENT_MANUAL_IMPORT = "{Ручной импорт из Реестров}";
+    public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
+    public static final String COMMENT_AUTO_MODIFY = "{Изменено из Реестров %s}";
+    public static final String COMMENT_AUTO_DELETED = "{Исключен по Реестру %s}";
 
     public static class Config {
-        private static final String PARAM_BASE = ".nsi.";
-        private static final String PARAM_SYNC_SCHEDULE ="sync.schedule";
-        private static final String PARAM_URL ="url";
-        private static final String PARAM_USER = "user";
-        private static final String PARAM_PASSWORD = "pass";
-        private static final String PARAM_COMPANY = "company";
 
-        public Config(Properties properties, String paramBaseName) throws Exception {
-            paramBaseName+=PARAM_BASE;
-            url = properties.getProperty(paramBaseName+PARAM_URL, url);
-            user = properties.getProperty(paramBaseName+PARAM_USER, user);
-            password = properties.getProperty(paramBaseName+PARAM_PASSWORD, password);
-            company = properties.getProperty(paramBaseName+PARAM_COMPANY, company);
-            syncEnabled = properties.containsKey(paramBaseName+ PARAM_SYNC_SCHEDULE);
-            if (syncEnabled) {
-                syncSchedule = properties.getProperty(paramBaseName+ PARAM_SYNC_SCHEDULE, "");
-            }
+        public static String getUrl() {
+            return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_URL);
         }
 
-        public boolean syncEnabled; String syncSchedule;
-        public String url="http://localhost:2000/nsiws/services/NSIService", user="UEK_SOAP", password="la0d6xxw", company="dogm_nsi";
+        public static String getUser() {
+            return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_USER);
+        }
+
+        public static String getPassword() {
+            return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_PASSWORD);
+        }
+
+        public static String getCompany() {
+            return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_COMPANY);
+        }
+
     }
-    
+
     public static class OrgInfo {
-        public String guid, number, shortName, longName;
+
+        public String guid, number, shortName, address;
 
         public String getGuid() {
             return guid;
@@ -72,12 +72,13 @@ public class MskNSIService {
             return shortName;
         }
 
-        public String getLongName() {
-            return longName;
+        public String getAddress() {
+            return address;
         }
     }
-    
+
     public static class PupilInfo {
+
         public String familyName, firstName, secondName, guid, group;
         public String birthDate;
 
@@ -108,7 +109,7 @@ public class MskNSIService {
         public void setBirthDate(String birthDate) {
             this.birthDate = birthDate;
         }
-        
+
         public void copyFrom(PupilInfo pi) {
             this.birthDate = pi.birthDate;
             this.firstName = pi.firstName;
@@ -121,41 +122,43 @@ public class MskNSIService {
 
 
     public static class ExpandedPupilInfo extends PupilInfo {
+
         public boolean deleted;
         public boolean created;
 
-        public boolean isDeleted ()
-            {
+        public boolean isDeleted() {
             return deleted;
-            }
-
-        public boolean isCreated ()
-            {
-            return created;
-            }
         }
 
-    
+        public boolean isCreated() {
+            return created;
+        }
+    }
+
+
     NSIServiceService nsiServicePort;
     NSIService nsiService;
+
     public void init() throws Exception {
-        if (nsiService!=null) return;
-        Config config = RuntimeContext.getInstance().getNsiServiceConfig(); //http://10.126.216.2:2000/nsiws/services/NSIService
-        String url = config.url;
-        logger.info("Trying NSI service: "+url);
-        nsiServicePort = new NSIServiceService(new URL(url+"?wsdl"), new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
+        if (nsiService != null) {
+            return;
+        }
+        String url = Config.getUrl();
+        logger.info("Trying NSI service: " + url);
+        nsiServicePort = new NSIServiceService(new URL(url + "?wsdl"),
+                new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
 
     }
-    
+
     public List<QueryResult> executeQuery(String queryText) throws Exception {
         init();
-        
-        Config config = RuntimeContext.getInstance().getNsiServiceConfig();
-        String url = config.url;
+
+        String url = Config.getUrl();
         NSIRequestType request = new NSIRequestType();
-        BindingProvider provider = (BindingProvider)nsiService;
+        BindingProvider provider = (BindingProvider) nsiService;
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+        provider.getRequestContext().put("com.sun.xml.ws.request.timeout", 15000);
         provider.getRequestContext().put("set-jaxb-validation-event-handler", false);
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
 
@@ -177,63 +180,61 @@ public class MskNSIService {
         request.setMessageData(new MessageDataType());
         request.getMessageData().setAppData(new AppDataType());
         request.getMessageData().getAppData().setContext(new Context());
-        request.getMessageData().getAppData().getContext().setUser(config.user);
-        request.getMessageData().getAppData().getContext().setPassword(config.password);
-        request.getMessageData().getAppData().getContext().setCompany(config.company);
+        request.getMessageData().getAppData().getContext().setUser(Config.getUser());
+        request.getMessageData().getAppData().getContext().setPassword(Config.getPassword());
+        request.getMessageData().getAppData().getContext().setCompany(Config.getCompany());
         request.getMessageData().getAppData().setQuery(queryText);
 
         NSIResponseType response = nsiService.getQueryResults(request);
-        if (response.getMessageData().getAppData()!=null && response.getMessageData().getAppData().getGeneralResponse()!=null &&
-                response.getMessageData().getAppData().getGeneralResponse().getQueryResult()!=null) {
+        if (response.getMessageData().getAppData() != null
+                && response.getMessageData().getAppData().getGeneralResponse() != null &&
+                response.getMessageData().getAppData().getGeneralResponse().getQueryResult() != null) {
             return response.getMessageData().getAppData().getGeneralResponse().getQueryResult();
-        }
-        else {
+        } else {
             JAXBContext jc = JAXBContext.newInstance(NSIResponseType.class.getPackage().getName());
-            Marshaller m  = jc.createMarshaller();
+            Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             m.marshal(response, bos);
-            throw new Exception("Ошибка при получении данных из сервиса НСИ. Ответ: "+bos.toString());
+            throw new Exception("Ошибка при получении данных из сервиса НСИ. Ответ: " + bos.toString());
         }
     }
-    
+
     public List<OrgInfo> getOrgByName(String orgName) throws Exception {
-        List<QueryResult> queryResults = executeQuery("select \n"
-                + "item['РОУ XML/GUID Образовательного учреждения'],\n"
-                + "item['РОУ XML/Номер  учреждения'], \n"
-                + "item['РОУ XML/Краткое наименование учреждения'],\n"
-                + "item['РОУ XML/Краткое наименование учреждения'],\n"
-                + "item['РОУ XML/Дата изменения (число)']\n"
-                + "from catalog('Реестр образовательных учреждений') where \n"
-                + "item['РОУ XML/Краткое наименование учреждения'] like '%"+orgName+"%'");
+        List<QueryResult> queryResults = executeQuery(
+                "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
+                        + "item['РОУ XML/Номер  учреждения'], \n" + "item['РОУ XML/Краткое наименование учреждения'],\n"
+                        + "item['РОУ XML/Официальный адрес'],\n"
+                        + "item['РОУ XML/Дата изменения (число)']\n"
+                        + "from catalog('Реестр образовательных учреждений') where \n"
+                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'");
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
             orgInfo.guid = qr.getQrValue().get(0);
             orgInfo.number = qr.getQrValue().get(1);
             orgInfo.shortName = qr.getQrValue().get(2);
-            orgInfo.longName = qr.getQrValue().get(3);
+            orgInfo.address = qr.getQrValue().get(3);
             list.add(orgInfo);
         }
         return list;
     }
+
     public List<PupilInfo> getPupilsByOrgGUID(String orgName, String familyName, Long updateTime) throws Exception {
         String select = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
-                        + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
-                        + "item['Реестр обучаемых линейный/GUID'],\n"
-                        + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                        + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" +
-                        "from catalog('Реестр обучаемых')\n"
-                        + "where\n"
-                        //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
-                        + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
-                        + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
-                        + "where  item['РОУ XML/Краткое наименование учреждения']='" + orgName + "')\n";
-        if (familyName!=null && familyName.length()>0) {
-            select += " and item['Реестр обучаемых линейный/Фамилия'] like '%"+familyName+"%'";
+                + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
+                + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" +
+                "from catalog('Реестр обучаемых')\n" + "where\n"
+                //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
+                + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
+                + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
+                + "where  item['РОУ XML/Краткое наименование учреждения']='" + orgName + "')\n";
+        if (familyName != null && familyName.length() > 0) {
+            select += " and item['Реестр обучаемых линейный/Фамилия'] like '%" + familyName + "%'";
         }
-        if (updateTime!=null) {
-            select += " and  item['Реестр обучаемых линейный/Дата изменения (число)']  &gt; "+(updateTime/1000);
+        if (updateTime != null) {
+            select += " and  item['Реестр обучаемых линейный/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
         //select += " order by item['Реестр обучаемых линейный/Фамилия'], item['Реестр обучаемых линейный/Имя'], item['Реестр обучаемых линейный/Отчество']";
         List<QueryResult> queryResults = executeQuery(select);
@@ -247,27 +248,22 @@ public class MskNSIService {
             pupilInfo.birthDate = qr.getQrValue().get(4);
             pupilInfo.group = qr.getQrValue().get(5);
             list.add(pupilInfo);
-            }
-        return list;
         }
+        return list;
+    }
 
 
     public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org) throws Exception {
-        String query = "select \n"
-                        + "item['Реестр обучаемых линейный/Фамилия'],\n"
-                        + "item['Реестр обучаемых линейный/Имя'], \n"
-                        + "item['Реестр обучаемых линейный/Отчество'],\n"
-                        + "item['Реестр обучаемых линейный/GUID'],\n"
-                        + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                        + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
-                        + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
-                        + "item['Реестр обучаемых линейный/Дата отчисления']\n"
-                        + "from catalog('Реестр обучаемых')\n"
-                        + "where\n"
-                        + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
-                        + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
-                        + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime () + " and "
-                               + "item['РОУ XML/Краткое наименование учреждения']='" + org.getOfficialName() + "')\n";
+        String query = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
+                + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
+                + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
+                + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
+                + "item['Реестр обучаемых линейный/Дата отчисления']\n" + "from catalog('Реестр обучаемых')\n"
+                + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
+                + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
+                + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime() + " and "
+                + "item['РОУ XML/Краткое наименование учреждения']='" + org.getOfficialName() + "')\n";
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
@@ -277,11 +273,11 @@ public class MskNSIService {
             pupilInfo.secondName = qr.getQrValue().get(2);
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
-            pupilInfo. group = qr.getQrValue().get(5);
-            pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals ("");
-            pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals ("");
+            pupilInfo.group = qr.getQrValue().get(5);
+            pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
+            pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
             list.add(pupilInfo);
         }
         return list;
     }
-    }
+}

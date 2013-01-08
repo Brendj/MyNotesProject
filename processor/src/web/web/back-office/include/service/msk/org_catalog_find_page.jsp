@@ -45,9 +45,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Полное наименование" />
+                <h:outputText escape="true" value="Адрес" />
             </f:facet>
-            <h:outputText value="#{item.longName}" />
+            <h:outputText value="#{item.address}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

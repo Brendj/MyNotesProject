@@ -32,21 +32,33 @@
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
 
-            <a4j:commandButton value="Найти в реестрах" action="#{pupilCatalogFindPage.updateList}" reRender="workspaceTogglePanel"
-                               styleClass="command-button" />
+            <a4j:commandButton value="Найти в реестрах" action="#{pupilCatalogFindPage.updateList}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
 
         </h:panelGrid>
     </rich:simpleTogglePanel>
     <h:panelGroup>
-        <a4j:commandButton value="Исключить найденные по GUID" action="#{pupilCatalogFindPage.removeFoundClientsByGUID}" reRender="workspaceTogglePanel"
+        <a4j:commandButton value="Исключить найденные по GUID" action="#{pupilCatalogFindPage.removeFoundClientsByGUID}"
+                           reRender="workspaceTogglePanel" styleClass="command-button" />
+        <a4j:commandButton value="Исключить найденные по Ф.И.О."
+                           action="#{pupilCatalogFindPage.removeFoundClientsByFullName}" reRender="workspaceTogglePanel"
                            styleClass="command-button" />
-        <a4j:commandButton value="Исключить найденные по Ф.И.О." action="#{pupilCatalogFindPage.removeFoundClientsByFullName}" reRender="workspaceTogglePanel"
+    </h:panelGroup>
+    <h:panelGroup style="text-align: right">
+        <h:outputText value="Всего в списке: #{pupilCatalogFindPage.clientTotalCount}" styleClass="output-text"/>
+        <rich:spacer width="20px"/>
+        <a4j:commandLink value="Отметить все записи к регистрации"
+                           action="#{pupilCatalogFindPage.markAllForRegistration}" reRender="workspaceTogglePanel"
+                           styleClass="command-button" />
+        <rich:spacer width="20px"/>
+        <a4j:commandLink value="Снять все записи c регистрации"
+                           action="#{pupilCatalogFindPage.unmarkAllForRegistration}" reRender="workspaceTogglePanel"
                            styleClass="command-button" />
     </h:panelGroup>
 
 
-    <rich:dataTable id="pupilCatalogFindTable" footerClass="data-table-footer" value="#{pupilCatalogFindPage.pupilInfos}"
-                    var="item" rows="50"
+    <rich:dataTable id="pupilCatalogFindTable" footerClass="data-table-footer"
+                    value="#{pupilCatalogFindPage.pupilInfos}" var="item" rows="50"
                     columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -106,12 +118,13 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="К связи" />
             </f:facet>
-            <h:selectBooleanCheckbox readonly="#{item.idOfClientForBind!=null}}" value="#{item.toBind}" styleClass="output-text" />
+            <h:selectBooleanCheckbox readonly="#{item.idOfClientForBind!=null}}" value="#{item.toBind}"
+                                     styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
             <h:panelGroup>
-                <rich:datascroller for="pupilCatalogFindTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
+                <rich:datascroller for="pupilCatalogFindTable" renderIfSinglePage="false" maxPages="5"
+                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
                     <f:facet name="previous">
                         <h:graphicImage value="/images/16x16/left-arrow.png" />
                     </f:facet>
@@ -119,13 +132,13 @@
                         <h:graphicImage value="/images/16x16/right-arrow.png" />
                     </f:facet>
                 </rich:datascroller>
-                <a4j:commandButton value="Найти по Ф.И.О." action="#{pupilCatalogFindPage.checkFullNameDuplicates}" reRender="workspaceTogglePanel"
-                                   styleClass="command-button" />
-                <a4j:commandButton value="Связать" action="#{pupilCatalogFindPage.bindClients}" reRender="workspaceTogglePanel"
-                                   styleClass="command-button" />
-                <rich:spacer width="20px"/>
-                <a4j:commandButton value="Зарегистрировать" action="#{pupilCatalogFindPage.registerClients}" reRender="workspaceTogglePanel"
-                                   styleClass="command-button" />
+                <a4j:commandButton value="Найти по Ф.И.О." action="#{pupilCatalogFindPage.checkFullNameDuplicates}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                <a4j:commandButton value="Связать" action="#{pupilCatalogFindPage.bindClients}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                <rich:spacer width="20px" />
+                <a4j:commandButton value="Зарегистрировать" action="#{pupilCatalogFindPage.registerClients}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
             </h:panelGroup>
         </f:facet>
 

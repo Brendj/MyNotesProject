@@ -162,6 +162,7 @@ public class Client {
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
+        this.canConfirmGroupPayment = false;
     }
 
     public String getGuardSan() {

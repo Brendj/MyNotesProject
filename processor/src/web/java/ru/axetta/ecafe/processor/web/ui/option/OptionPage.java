@@ -62,6 +62,10 @@ public class OptionPage extends BasicWorkspacePage {
     private String externalURL;
     private Boolean recalculateBenefits;
     private Boolean syncRegisterClients;
+    private String syncRegisterURL;
+    private String syncRegisterUser;
+    private String syncRegisterPassword;
+    private String syncRegisterCompany;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -277,6 +281,38 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncRegisterClients = syncRegisterClients;
     }
 
+    public String getSyncRegisterURL() {
+        return syncRegisterURL;
+    }
+
+    public void setSyncRegisterURL(String syncRegisterURL) {
+        this.syncRegisterURL = syncRegisterURL;
+    }
+
+    public String getSyncRegisterUser() {
+        return syncRegisterUser;
+    }
+
+    public void setSyncRegisterUser(String syncRegisterUser) {
+        this.syncRegisterUser = syncRegisterUser;
+    }
+
+    public String getSyncRegisterPassword() {
+        return syncRegisterPassword;
+    }
+
+    public void setSyncRegisterPassword(String syncRegisterPassword) {
+        this.syncRegisterPassword = syncRegisterPassword;
+    }
+
+    public String getSyncRegisterCompany() {
+        return syncRegisterCompany;
+    }
+
+    public void setSyncRegisterCompany(String syncRegisterCompany) {
+        this.syncRegisterCompany = syncRegisterCompany;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -311,7 +347,11 @@ public class OptionPage extends BasicWorkspacePage {
         importMSRLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSR_STOPLIST_LOGGING);
         externalURL = runtimeContext.getOptionValueString(Option.OPTION_EXTERNAL_URL);
         recalculateBenefits = runtimeContext.getOptionValueBool(Option.OPTION_BENEFITS_RECALC_ON);
-        syncRegisterClients = runtimeContext.getOptionValueBool(Option.OPTION_REGISTER_CL_ON);
+        syncRegisterClients = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
+        syncRegisterURL = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_URL);
+        syncRegisterUser = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_USER);
+        syncRegisterPassword = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_PASSWORD);
+        syncRegisterCompany = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_COMPANY);
 
         bankListPage.onShow();
 
@@ -388,7 +428,11 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_URL, importMSRURL);
             runtimeContext.setOptionValue(Option.OPTION_MSR_STOPLIST_LOGGING, importMSRLogging);
             runtimeContext.setOptionValue(Option.OPTION_BENEFITS_RECALC_ON, recalculateBenefits);
-            runtimeContext.setOptionValue(Option.OPTION_REGISTER_CL_ON, syncRegisterClients);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_AUTOSYNC_ON, syncRegisterClients);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_URL, syncRegisterURL);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_USER, syncRegisterUser);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_PASSWORD, syncRegisterPassword);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_COMPANY, syncRegisterCompany);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
