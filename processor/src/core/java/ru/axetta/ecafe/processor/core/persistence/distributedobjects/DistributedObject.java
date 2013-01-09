@@ -33,6 +33,8 @@ public abstract class DistributedObject{
     protected Long globalId;
     /* версия объекта */
     protected Long globalVersion;
+    /* версия объекта на момент его создания */
+    protected Long globalVersionOnCreate;
      /* дата создания объекта */
     protected Date createdDate;
     /* дата мзминения объекта */
@@ -282,7 +284,19 @@ public abstract class DistributedObject{
     }
 
     public void setGlobalVersion(Long globalVersion) {
+        if (globalVersionOnCreate == null) {
+            globalVersionOnCreate = globalVersion;
+        }
         this.globalVersion = globalVersion;
+    }
+
+    public Long getGlobalVersionOnCreate() {
+        return globalVersionOnCreate;
+    }
+
+    protected void setGlobalVersionOnCreate(Long globalVersionOnCreate) {
+        // for Hibernate only
+        this.globalVersionOnCreate = globalVersionOnCreate;
     }
 
     public Date getCreatedDate() {

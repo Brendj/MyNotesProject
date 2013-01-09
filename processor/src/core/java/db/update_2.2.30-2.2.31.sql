@@ -237,3 +237,48 @@ WITH (
 );
 ALTER TABLE cf_possible_complaint_iteration_states
   OWNER TO postgres;
+
+-- Добавление атрибута "Версия на момент создания" для всех распределенных объектов
+ALTER TABLE cf_acts_of_inventarization ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_acts_of_waybill_difference ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_acts_of_waybill_difference_positions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_requests ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_requests_positions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_internal_disposing_documents ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_internal_incoming_documents ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_internal_incoming_document_positions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_staffs ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_state_changes ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_waybills ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_waybills_positions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_accompanyingdocuments ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_circulations ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_funds ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_instances ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_inventorybooks ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_issuable ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_journals ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_journalitems ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_ksu1records ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_ksu2records ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_libvisits ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_publications ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_retirementreasons ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_sources ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_typesofaccompanyingdocuments ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_complaintbook ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_complaint_causes ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_complaint_iterations ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_complaint_orders ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_goods_groups ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_products ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_product_groups ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_dish_prohibitions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_dish_prohibition_exclusions ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_technological_map ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_technological_map_groups ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_technological_map_products ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_trade_material_goods ADD COLUMN globalversiononcreate bigint;
+ALTER TABLE cf_ECafeSettings ADD COLUMN globalversiononcreate bigint;
