@@ -539,12 +539,12 @@ public class DAOUtils {
 
     public static void clearGoodComplaintIterationStatus(EntityManager em) {
         javax.persistence.Query q = em.createQuery("delete from GoodComplaintIterationStatus");
-        q.getResultList();
+        q.executeUpdate();
     }
 
     public static void clearGoodComplaintPossibleCauses(EntityManager em) {
         javax.persistence.Query q = em.createQuery("delete from GoodComplaintPossibleCauses");
-        q.getResultList();
+        q.executeUpdate();
     }
 
     public static boolean getOptionValueBool(Session session, long nOption, boolean defaultValue) {

@@ -21,15 +21,35 @@ public class SyncHistory {
     private Date syncEndTime;
     private Integer syncResult;
     private Long idOfPacket;
+    private String clientVersion;
+    private String remoteAddress;
+
+    public String getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    private void setRemoteAddress(String remoteAddress) {
+        this.remoteAddress = remoteAddress;
+    }
+
+    public String getClientVersion() {
+        return clientVersion;
+    }
+
+    private void setClientVersion(String clientVersion) {
+        this.clientVersion = clientVersion;
+    }
 
     SyncHistory() {
         // For Hibernate only
     }
 
-    public SyncHistory(Org org, Date syncStartTime, long idOfPacket) throws Exception {
+    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress) throws Exception {
         this.org = org;
         this.syncStartTime = syncStartTime;
         this.idOfPacket = idOfPacket;
+        this.clientVersion = clientVersion;
+        this.remoteAddress = remoteAddress;
     }
 
     public Long getIdOfSync() {

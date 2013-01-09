@@ -197,7 +197,7 @@ public class Processor implements SyncProcessor,
                 // Generate IdOfPacket
                 idOfPacket = generateIdOfPacket(request.getIdOfOrg());
                 // Register sync history
-                idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime);
+                idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),request.getRemoteAddr());
 
                 // Process paymentRegistry
                 try {
@@ -424,6 +424,24 @@ public class Processor implements SyncProcessor,
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
         return response;
+    }
+
+    private void registryClientVersionAndRemoteAddress(Long idOfOrg, String clientVersion, String remoteAddr) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            org.setClientVersion(clientVersion);
+            org.setRemoteAddress(remoteAddr);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
     public PaymentResponse processPayRequest(PaymentRequest request) throws Exception {
@@ -1238,7 +1256,7 @@ public class Processor implements SyncProcessor,
         return false;
     }
 
-    private Long addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime) throws Exception {
+    private Long addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion, String remoteAddress) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1246,7 +1264,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket);
+            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion, remoteAddress);
             persistenceSession.save(syncHistory);
             Long idOfSync = syncHistory.getIdOfSync();
 
@@ -1863,10 +1881,6 @@ public class Processor implements SyncProcessor,
 
         return resEnterEvents;
     }
-
-
-
-
 
     /* private static String createKey(String author, String title, String title2, String publisher)
            throws NoSuchAlgorithmException {

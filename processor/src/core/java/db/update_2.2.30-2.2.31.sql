@@ -22,6 +22,11 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 --! Выше скрипт выполнен на тестовом процесинге (78.46.34.200)
 
+-- версия администратора/кассира
+ALTER TABLE CF_SyncHistory ADD COLUMN clientversion character varying(16);
+-- ip адресс клинта
+ALTER TABLE CF_SyncHistory ADD COLUMN remoteaddress character varying(20);
+
 -- разрешает клиенту подтверждать оплату групового питания, он будет доступен для клиентов входящих в группы: пед состав, администрация
 ALTER TABLE cf_clients ADD COLUMN canconfirmgrouppayment integer NOT NULL Default 0;
 -- Тип категории скидок
@@ -111,18 +116,11 @@ CREATE TABLE cf_goods_complaintbook
   orgowner bigint,
   CONSTRAINT cf_good_complaintbook_pk PRIMARY KEY (idofcomplaint),
   CONSTRAINT cf_goods_complaintbook_idofclient_fk FOREIGN KEY (idofclient)
-      REFERENCES cf_clients (idofclient) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_clients (idofclient),
   CONSTRAINT cf_good_complaintbook_idofgood_fk FOREIGN KEY (idofgood)
-      REFERENCES cf_goods (idofgood) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_goods (idofgood),
   CONSTRAINT cf_goods_complaintbook_idofclient_idofgood_key UNIQUE (idofclient, idofgood)
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_goods_complaintbook
-  OWNER TO postgres;
 
 -- Таблица итераций подачи жалоб
 CREATE TABLE cf_goods_complaint_iterations
@@ -143,15 +141,9 @@ CREATE TABLE cf_goods_complaint_iterations
   orgowner bigint,
   CONSTRAINT cf_goods_complaint_iterations_pk PRIMARY KEY (idofiteration),
   CONSTRAINT cf_goods_complaint_iterations_idofcomplaint_fk FOREIGN KEY (idofcomplaint)
-      REFERENCES cf_goods_complaintbook (idofcomplaint) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_goods_complaintbook (idofcomplaint),
   CONSTRAINT cf_goods_complaint_iterations_idofcomplaint_iterationnumber_key UNIQUE (idofcomplaint, iterationnumber)
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_goods_complaint_iterations
-  OWNER TO postgres;
 
 -- Таблица списков причин подачи жалобы
 CREATE TABLE cf_goods_complaint_causes
@@ -169,15 +161,9 @@ CREATE TABLE cf_goods_complaint_causes
   orgowner bigint,
   CONSTRAINT cf_goods_complaint_causes_pk PRIMARY KEY (idofcause),
   CONSTRAINT cf_goods_complaint_causes_idofiteration_fk FOREIGN KEY (idofiteration)
-      REFERENCES cf_goods_complaint_iterations (idofiteration) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_goods_complaint_iterations (idofiteration),
   CONSTRAINT cf_goods_complaint_causes_idofiteration_cause_key UNIQUE (idofiteration, cause)
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_goods_complaint_causes
-  OWNER TO postgres;
 
 -- Таблица деталей заказов, к товарам из состава которых у клиента возникли претензии
 CREATE TABLE cf_goods_complaint_orders
@@ -196,21 +182,13 @@ CREATE TABLE cf_goods_complaint_orders
   orgowner bigint,
   CONSTRAINT cf_goods_complaint_orders_pk PRIMARY KEY (idoforder),
   CONSTRAINT cf_goods_complaint_orders_idofiteration_fk FOREIGN KEY (idofiteration)
-      REFERENCES cf_goods_complaint_iterations (idofiteration) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_goods_complaint_iterations (idofiteration),
   CONSTRAINT cf_goods_complaint_orders_idoforderorg_fk FOREIGN KEY (idoforderorg)
-      REFERENCES cf_orgs (idoforg) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_orgs (idoforg),
   CONSTRAINT cf_goods_complaint_orders_idoforderdetail_fk FOREIGN KEY (idoforderorg, idoforderdetail)
-      REFERENCES cf_orderdetails (idoforg, idoforderdetail) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+      REFERENCES cf_orderdetails (idoforg, idoforderdetail),
   CONSTRAINT cf_goods_complaint_orders_idofiteration_idoforderorg_idoforderd UNIQUE (idofiteration, idoforderorg, idoforderdetail)
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_goods_complaint_orders
-  OWNER TO postgres;
 
 -- Возможные причины подачи жалоб
 CREATE TABLE cf_possible_complaint_causes
@@ -218,12 +196,7 @@ CREATE TABLE cf_possible_complaint_causes
   causenumber bigint NOT NULL,
   description character varying NOT NULL,
   CONSTRAINT cf_possible_complaint_causes_pk PRIMARY KEY (causenumber)
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_possible_complaint_causes
-  OWNER TO postgres;
 
 -- Названия статусов итераций жалоб
 CREATE TABLE cf_possible_complaint_iteration_states
@@ -231,12 +204,7 @@ CREATE TABLE cf_possible_complaint_iteration_states
   statenumber bigint NOT NULL,
   description character varying NOT NULL,
   CONSTRAINT cf_possible_complaint_iteration_states_pk PRIMARY KEY (statenumber )
-)
-WITH (
-  OIDS=FALSE
 );
-ALTER TABLE cf_possible_complaint_iteration_states
-  OWNER TO postgres;
 
 -- Добавление атрибута "Версия на момент создания" для всех распределенных объектов
 ALTER TABLE cf_acts_of_inventarization ADD COLUMN globalversiononcreate bigint;

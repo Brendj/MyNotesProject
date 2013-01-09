@@ -21,6 +21,8 @@
         <property name="syncEndTime" column="SyncEndTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="syncResult" column="SyncResult" type="int"/>
         <property name="idOfPacket" column="IdOfPacket" type="long" not-null="true" update="false"/>
+        <property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>
+        <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
     </class>
 </hibernate-mapping>
 

@@ -3021,6 +3021,11 @@ public class SyncRequest {
             return namedNodeMap.getNamedItem("Date").getTextContent();
         }
 
+        public static String getClientVersion(NamedNodeMap namedNodeMap) throws Exception {
+            if(namedNodeMap.getNamedItem("ClientVersion")==null) return null;
+            return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
+        }
+
         public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
             return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
         }
@@ -3034,6 +3039,8 @@ public class SyncRequest {
             }
             String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
             int type = parseSyncType(sSyncType);
+
+            String clientVersion = getClientVersion(namedNodeMap);
 
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getLongValueNullSafe(namedNodeMap, "IdOfPacket");
@@ -3149,7 +3156,7 @@ public class SyncRequest {
             }
 
 
-            return new SyncRequest(remoteAddr, version, type, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(remoteAddr, version, type, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, libraryData, libraryData2, manager);
         }
@@ -3207,12 +3214,13 @@ public class SyncRequest {
     private final ReqDiary reqDiary;
     private final String message;
     private final int type;
+    private final String clientVersion;
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
     private final Manager manager;
 
-    public SyncRequest(String remoteAddr, long protoVersion, int type, Org org, Date syncTime, Long idOfPacket,
+    public SyncRequest(String remoteAddr, long protoVersion, int type, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
@@ -3221,6 +3229,7 @@ public class SyncRequest {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.type = type;
+        this.clientVersion = clientVersion;
         this.manager = manager;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
@@ -3238,6 +3247,10 @@ public class SyncRequest {
         this.enterEvents = enterEvents;
         this.libraryData = libraryData;
         this.libraryData2 = libraryData2;
+    }
+
+    public String getClientVersion() {
+        return clientVersion;
     }
 
     public String getRemoteAddr() {
