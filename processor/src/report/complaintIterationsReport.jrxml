@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.331000000000004"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="6"/>
 	<style name="table" isDefault="false">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -50,7 +50,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Отчет по частоте указания той или иной причины подачи жалобы на товары" + ((($P{day} != null) && ($P{month} != null) && ($P{year} != null))?String.format(" за %02d.%02d.%d", $P{day}, $P{month}, $P{year}):"")]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["Отчет по количеству жалоб на товары в каждой итерации" + ((($P{day} != null) && ($P{month} != null) && ($P{year} != null))?String.format(" за %02d.%02d.%d", $P{day}, $P{month}, $P{year}):"")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="55" width="802" height="24"/>
