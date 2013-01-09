@@ -24,6 +24,9 @@ import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
@@ -568,6 +571,16 @@ public class RuntimeContext implements ApplicationContextAware {
                 if (cd==null) {
                     createCategoryDiscount((Long) me.getKey(), String.valueOf(me.getValue()),"", "");
                 }
+            }
+
+            DAOUtils.clearGoodComplaintIterationStatus(em);
+            for (GoodComplaintIterationStatus iterationStatus : GoodComplaintIterationStatus.values()) {
+                em.persist(iterationStatus);
+            }
+
+            DAOUtils.clearGoodComplaintPossibleCauses(em);
+            for (GoodComplaintPossibleCauses possibleCauses : GoodComplaintPossibleCauses.values()) {
+                em.persist(possibleCauses);
             }
 
         } catch (Exception e) {

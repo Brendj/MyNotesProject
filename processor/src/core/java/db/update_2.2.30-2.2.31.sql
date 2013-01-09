@@ -224,12 +224,6 @@ WITH (
 );
 ALTER TABLE cf_possible_complaint_causes
   OWNER TO postgres;
-INSERT INTO cf_possible_complaint_causes VALUES ('0', 'Неприятный вкус');
-INSERT INTO cf_possible_complaint_causes VALUES ('1', 'Неприятный запах');
-INSERT INTO cf_possible_complaint_causes VALUES ('2', 'Недомогание после употребления');
-INSERT INTO cf_possible_complaint_causes VALUES ('3', 'Подозрение на некачественные продукты в составе блюда');
-INSERT INTO cf_possible_complaint_causes VALUES ('4', 'Просроченность');
-INSERT INTO cf_possible_complaint_causes VALUES ('5', 'Завышенная цена');
 
 -- Названия статусов итераций жалоб
 CREATE TABLE cf_possible_complaint_iteration_states
@@ -243,8 +237,3 @@ WITH (
 );
 ALTER TABLE cf_possible_complaint_iteration_states
   OWNER TO postgres;
-
-INSERT INTO cf_possible_complaint_iteration_states VALUES ('0', 'Создание');
-INSERT INTO cf_possible_complaint_iteration_states VALUES ('1', 'Рассмотрение');
-INSERT INTO cf_possible_complaint_iteration_states VALUES ('2', 'Расследование');
-INSERT INTO cf_possible_complaint_iteration_states VALUES ('3', 'Заключение');

@@ -204,7 +204,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                             listOfComplaintIterationsExt.setIterationNumber(iteration.getIterationNumber());
                             listOfComplaintIterationsExt.setIterationStatus(
-                                    iteration.getIterationStatus().getStatusNumber());
+                                    iteration.getGoodComplaintIterationStatus().getStatusNumber());
                             listOfComplaintIterationsExt.setProblemDescription(iteration.getProblemDescription());
                             listOfComplaintIterationsExt.setConclusion(iteration.getConclusion());
                             listOfComplaintIterationsExt.setGuid(iteration.getGuid());
@@ -400,7 +400,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_INTERNAL_ERROR_DESC;
                     return result;
                 }
-                if (!GoodComplaintIterations.IterationStatus.conclusion.equals(lastIteration.getIterationStatus())) {
+                if (!GoodComplaintIterationStatus
+                        .conclusion.equals(lastIteration.getGoodComplaintIterationStatus())) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "По жалобе с указанным идентификатором еще не было вынесено заключения";
                     return result;
@@ -413,7 +414,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             newIteration.setComplaint(goodComplaintBook);
             newIteration.setIterationNumber(newIterationNumber);
             newIteration.setProblemDescription(description);
-            newIteration.setIterationStatus(GoodComplaintIterations.IterationStatus.creation);
+            newIteration.setGoodComplaintIterationStatus(GoodComplaintIterationStatus.creation);
             fillDisctributedObjectsCommonDetails(newIteration, client.getOrg());
             persistenceSession.save(newIteration);
 
@@ -439,8 +440,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else {
                     parsedCauseNumberList.add(causeNumber);
                 }
-                GoodComplaintCauses.ComplaintCauses cause = GoodComplaintCauses.ComplaintCauses.getCauseByNumberNullSafe(
-                        causeNumber);
+                GoodComplaintPossibleCauses cause = GoodComplaintPossibleCauses
+                        .getCauseByNumberNullSafe(causeNumber);
                 if (cause == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "Номер причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
@@ -482,20 +483,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result changeComplaintStatusToConsideration(Long complaintId) {
-        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.consideration, null);
+        return changeComplaintStatus(complaintId, GoodComplaintIterationStatus.consideration, null);
     }
 
     @Override
     public Result changeComplaintStatusToInvestigation(Long complaintId) {
-        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.investigation, null);
+        return changeComplaintStatus(complaintId, GoodComplaintIterationStatus.investigation, null);
     }
 
     @Override
     public Result giveConclusionOnComplaint(Long complaintId, String conclusion) {
-        return changeComplaintStatus(complaintId, GoodComplaintIterations.IterationStatus.conclusion, conclusion);
+        return changeComplaintStatus(complaintId, GoodComplaintIterationStatus.conclusion, conclusion);
     }
 
-    private Result changeComplaintStatus(Long complaintId, GoodComplaintIterations.IterationStatus status, String conclusion) {
+    private Result changeComplaintStatus(Long complaintId, GoodComplaintIterationStatus status, String conclusion) {
         authenticateRequest(null);
 
         Result result = new Result();
@@ -534,13 +535,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            if (status.getStatusNumber() - iteration.getIterationStatus().getStatusNumber() != 1) {
+            if (status.getStatusNumber() - iteration.getGoodComplaintIterationStatus().getStatusNumber() != 1) {
                 result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Нельзя назначать итерации со статусом " + iteration.getIterationStatus().getTitle()
+                result.description = "Нельзя назначать итерации со статусом " + iteration.getGoodComplaintIterationStatus().getTitle()
                         + " статус " + status.getTitle();
                 return result;
             }
-            iteration.setIterationStatus(status);
+            iteration.setGoodComplaintIterationStatus(status);
             if (conclusion != null) {
                 iteration.setConclusion(conclusion);
             }

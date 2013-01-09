@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -533,6 +535,16 @@ public class DAOUtils {
         List l = q.getResultList();
         if (l.size()==0) return null;
         return (CategoryDiscount)l.get(0);
+    }
+
+    public static void clearGoodComplaintIterationStatus(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("delete from GoodComplaintIterationStatus");
+        q.getResultList();
+    }
+
+    public static void clearGoodComplaintPossibleCauses(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("delete from GoodComplaintPossibleCauses");
+        q.getResultList();
     }
 
     public static boolean getOptionValueBool(Session session, long nOption, boolean defaultValue) {

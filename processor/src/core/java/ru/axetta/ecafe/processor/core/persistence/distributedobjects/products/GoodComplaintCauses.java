@@ -8,53 +8,7 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.HashMap;
-
 public class GoodComplaintCauses extends DistributedObject {
-
-    public enum ComplaintCauses {
-
-        badTaste(0, "Неприятный вкус"),
-        badSmell(1, "Неприятный запах"),
-        malaise(2, "Недомогание после употребления"),
-        badQualityProducts(3, "Подозрение на некачественные продукты в составе блюда"),
-        overdue(4, "Просроченность"),
-        highPrice(5, "Завышенная цена");
-
-        private Integer causeNumber;
-        private String title;
-
-        private ComplaintCauses(Integer causeNumber, String title) {
-            this.causeNumber = causeNumber;
-            this.title = title;
-        }
-
-        public Integer getCauseNumber() {
-            return causeNumber;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        @Override
-        public String toString() {
-            return title;
-        }
-
-        public static ComplaintCauses getCauseByNumberNullSafe(Integer causeNumber) {
-            if (causeNumber == null) {
-                return null;
-            }
-            for (ComplaintCauses cause : ComplaintCauses.values()) {
-                if (causeNumber.equals(cause.getCauseNumber())) {
-                    return cause;
-                }
-            }
-            return null;
-        }
-
-    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
@@ -63,7 +17,7 @@ public class GoodComplaintCauses extends DistributedObject {
         setComplaintIteration(gci);
 
         try {
-            ComplaintCauses cause = ComplaintCauses.getCauseByNumberNullSafe(causeNumber);
+            GoodComplaintPossibleCauses cause = GoodComplaintPossibleCauses.getCauseByNumberNullSafe(causeNumber);
             if (cause == null) throw new DistributedObjectException("Complaint cause NOT_FOUND_VALUE");
             setCause(cause);
         } catch (Exception e) {
@@ -94,7 +48,7 @@ public class GoodComplaintCauses extends DistributedObject {
 
     private GoodComplaintIterations complaintIteration;
     private String guidOfComplaintIteration;
-    private ComplaintCauses cause;
+    private GoodComplaintPossibleCauses cause;
     private Integer causeNumber;
 
     public GoodComplaintIterations getComplaintIteration() {
@@ -113,11 +67,11 @@ public class GoodComplaintCauses extends DistributedObject {
         this.guidOfComplaintIteration = guidOfComplaintIteration;
     }
 
-    public ComplaintCauses getCause() {
+    public GoodComplaintPossibleCauses getCause() {
         return cause;
     }
 
-    public void setCause(ComplaintCauses cause) {
+    public void setCause(GoodComplaintPossibleCauses cause) {
         this.cause = cause;
     }
 

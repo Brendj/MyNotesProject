@@ -39,9 +39,9 @@
         <property name="problemDescription" column="ProblemDescription" type="string" length="512"/>
         <property name="conclusion" column="Conclusion" type="string" length="512"/>
 
-        <property name="iterationStatus" column="IterationStatus">
+        <property name="goodComplaintIterationStatus" column="IterationStatus">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations$IterationStatus</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>

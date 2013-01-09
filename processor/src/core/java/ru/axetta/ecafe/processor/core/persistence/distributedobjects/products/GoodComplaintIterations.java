@@ -12,46 +12,7 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.HashMap;
-
 public class GoodComplaintIterations extends DistributedObject {
-
-    public enum IterationStatus {
-
-        creation(0, "Создание"),
-        consideration(1, "Рассмотрение"),
-        investigation(2, "Расследование"),
-        conclusion(3, "Заключение");
-
-        private Integer statusNumber;
-        private String title;
-
-        private IterationStatus(Integer statusNumber, String title) {
-            this.statusNumber = statusNumber;
-            this.title = title;
-        }
-
-        public Integer getStatusNumber() {
-            return statusNumber;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public static IterationStatus getStatusByNumberNullSafe(Integer statusNumber) {
-            if (statusNumber == null) {
-                return null;
-            }
-            for (IterationStatus status : IterationStatus.values()) {
-                if (statusNumber.equals(status.getStatusNumber())) {
-                    return status;
-                }
-            }
-            return null;
-        }
-
-    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
@@ -60,9 +21,10 @@ public class GoodComplaintIterations extends DistributedObject {
         setComplaint(gcb);
 
         try {
-            IterationStatus is = IterationStatus.getStatusByNumberNullSafe(iterationStatusNumber);
+            GoodComplaintIterationStatus is = GoodComplaintIterationStatus
+                    .getStatusByNumberNullSafe(iterationStatusNumber);
             if (is == null) throw new Exception("Iteration status NOT_FOUND_VALUE");
-            setIterationStatus(is);
+            setGoodComplaintIterationStatus(is);
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
@@ -73,7 +35,7 @@ public class GoodComplaintIterations extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GuidOfComplaint", complaint.getGuid());
         setAttribute(element, "IterationNumber", iterationNumber);
-        setAttribute(element, "Status", iterationStatus.getStatusNumber());
+        setAttribute(element, "Status", goodComplaintIterationStatus.getStatusNumber());
         setAttribute(element, "ProblemDescription", problemDescription);
         setAttribute(element, "Conclusion", conclusion);
     }
@@ -101,7 +63,7 @@ public class GoodComplaintIterations extends DistributedObject {
     private GoodComplaintBook complaint;
     private String guidOfComplaint;
     private Integer iterationNumber;
-    private IterationStatus iterationStatus;
+    private GoodComplaintIterationStatus goodComplaintIterationStatus;
     private Integer iterationStatusNumber;
     private String problemDescription;
     private String conclusion;
@@ -130,12 +92,12 @@ public class GoodComplaintIterations extends DistributedObject {
         this.iterationNumber = iterationNumber;
     }
 
-    public IterationStatus getIterationStatus() {
-        return iterationStatus;
+    public GoodComplaintIterationStatus getGoodComplaintIterationStatus() {
+        return goodComplaintIterationStatus;
     }
 
-    public void setIterationStatus(IterationStatus iterationStatus) {
-        this.iterationStatus = iterationStatus;
+    public void setGoodComplaintIterationStatus(GoodComplaintIterationStatus goodComplaintIterationStatus) {
+        this.goodComplaintIterationStatus = goodComplaintIterationStatus;
     }
 
     public Integer getIterationStatusNumber() {

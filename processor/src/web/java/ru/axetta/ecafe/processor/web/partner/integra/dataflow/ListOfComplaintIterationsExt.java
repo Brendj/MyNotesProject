@@ -14,7 +14,7 @@ public class ListOfComplaintIterationsExt {
 
     @XmlAttribute(name = "IterationNumber")
     protected Integer iterationNumber;
-    @XmlAttribute(name = "IterationStatus")
+    @XmlAttribute(name = "GoodComplaintIterationStatus")
     protected Integer iterationStatus;
     @XmlAttribute(name = "Conclusion")
     protected String conclusion;
