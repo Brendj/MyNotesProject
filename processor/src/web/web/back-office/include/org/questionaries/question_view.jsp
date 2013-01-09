@@ -36,8 +36,8 @@
     <h:outputText value="#{questionaryViewPage.questionary.question}" styleClass="output-text"/>
     <h:outputText value="Статус" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.status}" styleClass="output-text"/>
-    <%--<h:outputText value="Тип" styleClass="output-text"/>--%>
-    <%--<h:outputText value="#{questionaryViewPage.questionary.type}" styleClass="output-text"/>--%>
+    <h:outputText value="Тип" styleClass="output-text"/>
+    <h:outputText value="#{questionaryViewPage.questionary.questionaryType}" styleClass="output-text"/>
     <h:outputText value="Дата регистрации" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.createdDate}" converter="timeConverter" styleClass="output-text"/>
     <h:outputText value="Дата последних изменений" styleClass="output-text"/>

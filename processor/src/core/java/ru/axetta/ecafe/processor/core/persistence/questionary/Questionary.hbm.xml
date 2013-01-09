@@ -17,7 +17,13 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
-        <property name="type" column="Type" type="integer"/>
+        <property name="questionaryType" column="Type">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <!--<property name="type" column="Type" type="integer"/>-->
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

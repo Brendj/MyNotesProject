@@ -39,8 +39,10 @@
 
         <%--<h:outputText value="Статус" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.status}" styleClass="output-text"/>--%>
-        <%-- <h:outputText value="Тип" styleClass="output-text"/>
-         <h:inputText value="#{questionaryEditPage.questionary.type}" styleClass="output-text"/>--%>
+        <h:outputText escape="true" value="Тип" styleClass="output-text" />
+        <h:selectOneMenu value="#{questionaryEditPage.type}" styleClass="input-text">
+            <f:selectItems value="#{questionaryEditPage.questionaryEnumTypeMenu.items}" />
+        </h:selectOneMenu>
         <h:outputText value="Дата регистрации" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.createdDate}" converter="timeConverter" styleClass="output-text" readonly="true"/>
         <h:outputText value="Дата последних изменений" styleClass="output-text"/>

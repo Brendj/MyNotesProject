@@ -22,7 +22,8 @@ public class Questionary {
     private Long idOfQuestionary;
     private String question;
     private QuestionaryStatus status;
-    private Integer type;
+    //private Integer type;
+    private QuestionaryType questionaryType;
     private Date createdDate;
     private Date updatedDate;
     private Set<Answer> answers = new HashSet<Answer>();
@@ -34,27 +35,30 @@ public class Questionary {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
         this.status = QuestionaryStatus.INACTIVE;
-        this.type = 0;
+        //this.type = 0;
+        this.questionaryType = QuestionaryType.DEFAULT;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
     }
 
-    public Questionary(String question, Integer type) throws Exception {
+    public Questionary(String question, QuestionaryType type) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
         this.status = QuestionaryStatus.INACTIVE;
-        this.type = type;
+        //this.type = type;
+        this.questionaryType = type;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
     }
 
-    public Questionary(String question, Integer type, Integer status) throws Exception {
+    public Questionary(String question, QuestionaryType type, QuestionaryStatus status) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
-        this.status = QuestionaryStatus.INACTIVE;
-        this.type = type;
+        this.status = status;
+        //this.type = type;
+        this.questionaryType = type;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
@@ -67,10 +71,11 @@ public class Questionary {
         return this;
     }
 
-    public Questionary update(String question, Integer type) throws Exception {
+    public Questionary update(String question, QuestionaryType type) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
-        this.type = type;
+        //this.type = type;
+        this.questionaryType = type;
         this.updatedDate = new Date();
         return this;
     }
@@ -135,8 +140,8 @@ public class Questionary {
         return createdDate;
     }
 
-    public Integer getType() {
-        return type;
+    public QuestionaryType getQuestionaryType() {
+        return questionaryType;
     }
 
     public QuestionaryStatus getStatus() {
@@ -159,8 +164,8 @@ public class Questionary {
         this.createdDate = createdDate;
     }
 
-    protected void setType(Integer type) {
-        this.type = type;
+    public void setQuestionaryType(QuestionaryType questionaryType) {
+        this.questionaryType = questionaryType;
     }
 
     protected void setStatus(QuestionaryStatus status) {

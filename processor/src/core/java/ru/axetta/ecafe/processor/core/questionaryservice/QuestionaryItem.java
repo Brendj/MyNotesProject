@@ -41,7 +41,7 @@ public class QuestionaryItem {
         this.idOfQuestionary = questionary.getIdOfQuestionary();
         this.question = questionary.getQuestion();
         this.status =  questionary.getStatus().getValue();
-        this.type = questionary.getType();
+        this.type = questionary.getQuestionaryType().getValue();
         answers = new ArrayList<AnswerItem>();
     }
 

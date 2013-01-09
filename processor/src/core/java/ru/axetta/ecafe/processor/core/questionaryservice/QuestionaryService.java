@@ -137,7 +137,7 @@ public class QuestionaryService {
         for (QuestionaryItem questionaryItem: questionaryItemList){
             try{
                 Integer type = (questionaryItem.getType()==null?0:questionaryItem.getType());
-                Questionary questionary = new Questionary(questionaryItem.getQuestion(), type);
+                Questionary questionary = new Questionary(questionaryItem.getQuestion(), QuestionaryType.fromInteger(type));
                 for (AnswerItem answerItem: questionaryItem.getAnswers()){
                     Answer answer = new Answer(answerItem.getAnswer(),questionary, answerItem.getWeight());
                     questionary.getAnswers().add(answer);
@@ -164,7 +164,7 @@ public class QuestionaryService {
         return orgs;
     }
 
-    public Questionary updateQuestionary(Long id,String question, List<Long> idOfOrgList, List<Answer> answers) throws Exception{
+    public Questionary updateQuestionary(Long id,String question, List<Long> idOfOrgList, Integer type, List<Answer> answers) throws Exception{
         if(answers.isEmpty()) throw new  Exception("Questionnaire can not be registered without answers");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
@@ -173,6 +173,7 @@ public class QuestionaryService {
         currentQuestionary.getOrgs().clear();
         Set<Org> orgs = getOrgs(idOfOrgList);
         currentQuestionary.setOrgs(orgs);
+        currentQuestionary.setQuestionaryType(QuestionaryType.fromInteger(type));
         entityManager.persist(currentQuestionary);
         Query q = entityManager.createQuery("delete from Answer where questionary=:questionary");
         q.setParameter("questionary",currentQuestionary);

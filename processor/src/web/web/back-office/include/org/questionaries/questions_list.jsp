@@ -39,12 +39,12 @@
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
-        <%--<rich:column>
+        <rich:column>
             <f:facet name="header">
                 <h:outputText value="Тип"/>
             </f:facet>
-            <h:outputText value="#{questionary.type}"/>
-        </rich:column>--%>
+            <h:outputText value="#{questionary.questionaryType}"/>
+        </rich:column>
         <rich:column sortBy="#{questionary.createdDate}">
             <f:facet name="header">
                 <h:outputText value="Дата регистрации"/>

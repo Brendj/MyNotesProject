@@ -38,6 +38,8 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
     private Questionary questionary;
     private String question;
+    private Integer type;
+    private final QuestionaryEnumTypeMenu questionaryEnumTypeMenu = new QuestionaryEnumTypeMenu();
     private List<OrgItem> orgItemList;
     private List<AnswerItem> answers;
     private AnswerItem removeAnswer;
@@ -100,7 +102,7 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
                 for (AnswerItem answerItem: answers){
                     answerList.add(new Answer(answerItem.getAnswer(),questionary,answerItem.getWeight()));
                 }
-                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question,idOfOrgList, answerList);
+                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question,idOfOrgList, type, answerList);
                 questionaryGroupPage.setQuestionary(questionary);
                 load();
                 printMessage("Изменения успешно сохраны");
@@ -168,5 +170,17 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
 
     public void setRemoveAnswer(AnswerItem removeAnswer) {
         this.removeAnswer = removeAnswer;
+    }
+
+    public QuestionaryEnumTypeMenu getQuestionaryEnumTypeMenu() {
+        return questionaryEnumTypeMenu;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }
