@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Панель просмотра списка клиентов --%>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
@@ -243,22 +244,11 @@
                     <rich:spacer/>
                     <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaSMS}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
-
-                    <h:outputText value="Запретить редактирование SMS-уведомлений" styleClass="output-text"/>
-                    <h:selectBooleanCheckbox value="#{mainPage.clientListPage.readOnlyNotifyViaSMS}" styleClass="output-text" />
-                    <rich:spacer/>
-                    <a4j:commandButton value="Применить" action="#{mainPage.applyReadOnlyNotifyViaSMS}"
-                                       reRender="workspaceTogglePanel" styleClass="command-button" />
                 </h:panelGrid>
             </rich:tab>
         </rich:tabPanel>
     </rich:simpleTogglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
-</h:panelGrid>
-
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
 </h:panelGrid>
 
 <rich:modalPanel id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
