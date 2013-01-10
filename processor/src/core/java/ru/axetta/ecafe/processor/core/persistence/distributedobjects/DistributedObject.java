@@ -74,12 +74,6 @@ public abstract class DistributedObject{
         }
         if(this.getGlobalVersion()!=null) element.setAttribute("V", Long.toString(this.getGlobalVersion()));
         if(this.distributedObjectException != null){
-            //if(distributedObjectException.equals(DistributedObjectException.ErrorType.DATA_EXIST_VALUE)){
-            //    element.setAttribute("ErrorType", );
-            //} else {
-            //    String error = String.format("%d : %s", errorType.getValue(), errorType.name());
-            //    element.setAttribute("ErrorType", error);
-            //}
             element.setAttribute("ErrorType", distributedObjectException.getMessage());
             if(distributedObjectException.getData()!=null){
                 element.setAttribute("ErrorData", distributedObjectException.getData());
@@ -347,31 +341,9 @@ public abstract class DistributedObject{
         this.timeFormat = timeFormat;
     }
 
-    //public DistributedObjectException.ErrorType getErrorType() {
-    //    return errorType;
-    //}
-    //
-    //public void setErrorType(DistributedObjectException.ErrorType errorType) {
-    //    this.errorType = errorType;
-    //}
-
     public DateFormat getDateFormat() {
         return timeFormat;
     }
-
-    //public DateFormat getDateFormat() {
-    //    TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-    //    DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    //    timeFormat1.setTimeZone(localTimeZone);
-    //    return timeFormat1;
-    //}
-    //
-    //public DateFormat getTimeFormat() {
-    //    TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-    //    DateFormat timeFormat1 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    //    timeFormat1.setTimeZone(localTimeZone);
-    //    return timeFormat1;
-    //}
 
     public SendToAssociatedOrgs getSendAll() {
         return sendAll;
