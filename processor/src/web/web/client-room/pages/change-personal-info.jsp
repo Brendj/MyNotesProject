@@ -100,11 +100,9 @@
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
                 Client client = (Client) clientCriteria.uniqueResult();
-                logger.info("work");
                 try {
                     dataProcessSucceed = false;
                     if (client.hasPassword(currPassword)) {
-                        logger.info("Work start");
                         client.setAddress(address);
                         client.setPhone(phone);
                         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
@@ -114,7 +112,9 @@
                         else {
                             client.setMobile(mobilePhone);
                             client.setEmail(email);
-                            client.setNotifyViaSMS(notifyViaSms);
+                            if(client.getReadOnlyNotifyViaSMS()){
+                                client.setNotifyViaSMS(notifyViaSms);
+                            }
                             client.setNotifyViaEmail(notifyViaEmail);
                             client.setUpdateTime(new Date());
                             client.setExpenditureLimit(expenditureLimit);
@@ -295,7 +295,8 @@
             </td>
             <td>
                 <input type="checkbox" name="<%=NOTIFY_VIA_SMS_PARAM%>" size="16" maxlength="64" class="input-text"
-                <%=client.isNotifyViaSMS() ? HTML_CHECKED : ""%> />
+                <%=client.isNotifyViaSMS() ? HTML_CHECKED : ""%>
+                <%=client.getReadOnlyNotifyViaSMS() ? "disabled=\"disabled\" onclick=\"return false\" onkeydown=\"return false\"" : ""%>/>
             </td>
         </tr>
         <tr>
