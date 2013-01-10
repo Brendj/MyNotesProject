@@ -9,8 +9,8 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.331000000000004"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="6"/>
+	<property name="ireport.x" value="18"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table" isDefault="false">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -44,16 +44,16 @@
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
 	<title>
-		<band height="79">
+		<band height="48">
 			<textField>
-				<reportElement x="0" y="0" width="802" height="41"/>
+				<reportElement x="0" y="0" width="802" height="24"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Отчет по количеству жалоб на товары в каждой итерации" + ((($P{day} != null) && ($P{month} != null) && ($P{year} != null))?String.format(" за %02d.%02d.%d", $P{day}, $P{month}, $P{year}):"")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="55" width="802" height="24"/>
+				<reportElement x="0" y="24" width="802" height="24"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -62,10 +62,16 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="50">
+		<band height="30">
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement style="table" mode="Opaque" x="0" y="14" width="224" height="23"/>
-				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<reportElement style="table" mode="Opaque" x="0" y="4" width="802" height="23"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -88,7 +94,7 @@
 				<text><![CDATA[Название статуса]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="238" y="0" width="210" height="20" backcolor="#CCCCFF"/>
+				<reportElement mode="Opaque" x="238" y="0" width="253" height="20" backcolor="#CCCCFF"/>
 				<box topPadding="2" leftPadding="5" bottomPadding="2" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -100,7 +106,7 @@
 				<text><![CDATA[Количество итераций в указанном статусе]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="448" y="0" width="156" height="20" backcolor="#CCCCFF"/>
+				<reportElement mode="Opaque" x="491" y="0" width="223" height="20" backcolor="#CCCCFF"/>
 				<box topPadding="2" leftPadding="5" bottomPadding="2" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -140,7 +146,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="238" y="0" width="210" height="20"/>
+				<reportElement x="238" y="0" width="253" height="20"/>
 				<box topPadding="2" leftPadding="5" bottomPadding="2" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -152,7 +158,7 @@
 				<textFieldExpression class="java.lang.Long"><![CDATA[$F{state_count}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Auto" pattern="#,##0.00 %">
-				<reportElement x="448" y="0" width="156" height="20"/>
+				<reportElement x="491" y="0" width="223" height="20"/>
 				<box topPadding="2" leftPadding="5" bottomPadding="2" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -181,7 +187,7 @@
 		<band height="241">
 			<pieChart>
 				<chart isShowLegend="false">
-					<reportElement x="0" y="0" width="802" height="241"/>
+					<reportElement x="0" y="5" width="802" height="230"/>
 					<chartTitle/>
 					<chartSubtitle/>
 					<chartLegend/>
