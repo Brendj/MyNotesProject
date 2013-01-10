@@ -38,6 +38,8 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
     private Questionary questionary;
     private String question;
+    private String questionName;
+    private String description;
     private Integer type;
     private final QuestionaryEnumTypeMenu questionaryEnumTypeMenu = new QuestionaryEnumTypeMenu();
     private List<OrgItem> orgItemList;
@@ -56,6 +58,8 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
 
     public void load() {
         question = questionary.getQuestion();
+        questionName = questionary.getQuestionName();
+        description = questionary.getDescription();
         List<Answer> answerList = questionaryService.getAnswers(questionary);
         List<AnswerItem> answerItems = new ArrayList<AnswerItem>(answerList.size());
         for (Answer answer: answerList){
@@ -100,12 +104,12 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
             if (questionaryService.getStatus(questionary)){
                 List<Answer> answerList = new ArrayList<Answer>(answers.size());
                 for (AnswerItem answerItem: answers){
-                    answerList.add(new Answer(answerItem.getAnswer(),questionary,answerItem.getWeight()));
+                    answerList.add(new Answer(answerItem.getAnswer(),answerItem.getDescription(),questionary,answerItem.getWeight()));
                 }
-                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question,idOfOrgList, type, answerList);
+                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question, questionName,description,idOfOrgList, type, answerList);
                 questionaryGroupPage.setQuestionary(questionary);
                 load();
-                printMessage("Изменения успешно сохраны");
+                printMessage("Изменения успешно сохранены");
             } else {
                 printWarn("Необходимо остановить анкетирование перед редактированием");
             }
@@ -182,5 +186,21 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getQuestionName() {
+        return questionName;
+    }
+
+    public void setQuestionName(String questionName) {
+        this.questionName = questionName;
     }
 }

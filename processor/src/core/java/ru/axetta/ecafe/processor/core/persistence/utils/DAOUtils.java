@@ -827,35 +827,22 @@ public class DAOUtils {
             throw new Exception("Ошибка при изменении параметров SMS уведомления");
     }
 
+    public static void changeReadOnlyNotifyViaSMS(Session session, boolean readOnlyNotifyViaSMS, List<Long> clientsId)
+            throws Exception {
+        org.hibernate.Query q = session.createQuery(
+                "update Client set readOnlyNotifyViaSMS = :readOnlyNotifyViaSMS, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
+        q.setBoolean("readOnlyNotifyViaSMS", readOnlyNotifyViaSMS);
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при изменении параметров SMS уведомления");
+    }
+
     public static long getNextVersion(Session session) {
         SQLQuery query = session.createSQLQuery("SELECT nextval('version')");
         long version = ((BigInteger) query.uniqueResult()).longValue();
         return version;
-    }
-
-    public static Object findProductGuide(Session session, Long id) {
-        //Criteria criteria = session.createCriteria(ProductGuide.class);
-        ////criteria.add(Restrictions.eq("idOfProductGuide", id));
-        //criteria.add(Restrictions.eq("globalId", id));
-        //return criteria.uniqueResult();
-        return session.get(Product.class, id);
-    }
-
-    public static List findConfigurationProvider(Session session) {
-        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
-        return criteria.list();
-    }
-
-    public static Object findConfigurationProvider(Session session, Long id) {
-        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
-        criteria.add(Restrictions.eq("idOfConfigurationProvider", id));
-        return criteria.uniqueResult();
-    }
-
-    public static Object findConfigurationProvider(Session session, String name) {
-        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
-        criteria.add(Restrictions.eq("name", name));
-        return criteria.uniqueResult();
     }
 
     public static List getClientGroupsByIdOfOrg(Session session, Long idOfOrg) {

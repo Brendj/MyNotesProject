@@ -22,59 +22,66 @@ public class Questionary {
     private Long idOfQuestionary;
     private String question;
     private QuestionaryStatus status;
-    //private Integer type;
     private QuestionaryType questionaryType;
     private Date createdDate;
     private Date updatedDate;
     private Set<Answer> answers = new HashSet<Answer>();
     private Set<Org> orgs = new HashSet<Org>();
+    private String questionName;
+    private String description;
 
     protected Questionary() {}
 
-    public Questionary(String question) throws Exception {
+    public Questionary(String questionName, String question, String description) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
+        this.questionName = questionName;
+        this.description = description;
         this.status = QuestionaryStatus.INACTIVE;
-        //this.type = 0;
         this.questionaryType = QuestionaryType.DEFAULT;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
     }
 
-    public Questionary(String question, QuestionaryType type) throws Exception {
+    public Questionary(String questionName, String question, String description, QuestionaryType type) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
+        this.questionName = questionName;
+        this.description = description;
         this.status = QuestionaryStatus.INACTIVE;
-        //this.type = type;
         this.questionaryType = type;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
     }
 
-    public Questionary(String question, QuestionaryType type, QuestionaryStatus status) throws Exception {
+    public Questionary(String questionName, String question, String description, QuestionaryType type, QuestionaryStatus status) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
+        this.questionName = questionName;
+        this.description = description;
         this.status = status;
-        //this.type = type;
         this.questionaryType = type;
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
     }
 
-    public Questionary update(String question) throws Exception {
+    public Questionary update(String questionName, String question, String description) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
+        this.questionName = questionName;
+        this.description = description;
         this.updatedDate = new Date();
         return this;
     }
 
-    public Questionary update(String question, QuestionaryType type) throws Exception {
+    public Questionary update(String questionName, String question, String description, QuestionaryType type) throws Exception {
         if(question==null || question.isEmpty()) throw new NullPointerException("Отсутствует текст опросника");
         this.question = question;
-        //this.type = type;
+        this.questionName = questionName;
+        this.description = description;
         this.questionaryType = type;
         this.updatedDate = new Date();
         return this;
@@ -178,5 +185,21 @@ public class Questionary {
 
     protected void setIdOfQuestionary(Long idOfQuestionary) {
         this.idOfQuestionary = idOfQuestionary;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    protected void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getQuestionName() {
+        return questionName;
+    }
+
+    protected void setQuestionName(String questionName) {
+        this.questionName = questionName;
     }
 }

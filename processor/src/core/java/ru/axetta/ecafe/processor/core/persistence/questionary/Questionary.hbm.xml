@@ -10,7 +10,9 @@
         <id name="idOfQuestionary" column="IdOfQuestionary" type="long">
             <generator class="identity"/>
         </id>
-        <property name="question" column="Question" type="string" length="255"/>
+        <property name="questionName" column="QuestionName" type="string" length="90"/>
+        <property name="question" column="Question" type="string" length="90"/>
+        <property name="description" column="Description" type="string" length="255"/>
         <property name="status" column="Status">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus</param>
@@ -23,7 +25,6 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
-        <!--<property name="type" column="Type" type="integer"/>-->
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

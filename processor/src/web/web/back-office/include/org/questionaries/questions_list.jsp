@@ -33,11 +33,17 @@
         </rich:column>
         <rich:column sortBy="#{questionary.question}">
             <f:facet name="header">
-                <h:outputText value="Текст опросника"/>
+                <h:outputText value="Наименование"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{questionary.question}" action="#{questionaryViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{questionary.questionName}" action="#{questionaryViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
+        </rich:column>
+        <rich:column sortBy="#{questionary.question}">
+            <f:facet name="header">
+                <h:outputText value="Вопрос"/>
+            </f:facet>
+            <h:outputText value="#{questionary.question}"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">
@@ -63,10 +69,6 @@
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/stop.png" style="border: 0;" />
             </a4j:commandLink>
-            <%--<a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.stopStatus}" reRender="mainMenu, workspaceForm">
-                <f:param name="id" value="#{questionary.idOfQuestionary}"/>
-                <h:graphicImage value="/images/16x16/play.png" style="border: 0;" />
-            </a4j:commandLink>--%>
         </rich:column>
         <rich:column>
             <f:facet name="header">

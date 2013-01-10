@@ -10,7 +10,8 @@
         <id name="idOfAnswer" column="IdOfAnswer" type="long">
             <generator class="identity"/>
         </id>
-        <property name="answer" column="Answer" type="string" length="255"/>
+        <property name="answer" column="Answer" type="string" length="90"/>
+        <property name="description" column="Description" type="string" length="255"/>
         <property name="weight" column="Weight" type="integer"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>

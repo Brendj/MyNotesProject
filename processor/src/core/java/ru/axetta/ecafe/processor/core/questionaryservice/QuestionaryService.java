@@ -60,13 +60,6 @@ public class QuestionaryService {
         TypedQuery<Answer> q = entityManager.createQuery("from Answer where questionary=:questionary", Answer.class);
         q.setParameter("questionary",questionary);
         List<Answer> answers = q.getResultList();
-        //StringBuilder stringBuilder = new StringBuilder();
-        //for (Answer a:answers){
-        //    stringBuilder.append(a.getIdOfAnswer());
-        //    stringBuilder.append(",");
-        //}
-        //String substring = stringBuilder.toString();
-        //substring = substring.substring(0,substring.length()-1);
         TypedQuery<ClientAnswerByQuestionary> clientAnswerByQuestionaryTypedQuery = entityManager.createQuery("from ClientAnswerByQuestionary where client=:client and answer in :answer",ClientAnswerByQuestionary.class);
         clientAnswerByQuestionaryTypedQuery.setParameter("client",client);
         clientAnswerByQuestionaryTypedQuery.setParameter("answer",answers);
@@ -137,9 +130,9 @@ public class QuestionaryService {
         for (QuestionaryItem questionaryItem: questionaryItemList){
             try{
                 Integer type = (questionaryItem.getType()==null?0:questionaryItem.getType());
-                Questionary questionary = new Questionary(questionaryItem.getQuestion(), QuestionaryType.fromInteger(type));
+                Questionary questionary = new Questionary(questionaryItem.getQuestion(), questionaryItem.getQuestionName(), questionaryItem.getDescription(), QuestionaryType.fromInteger(type));
                 for (AnswerItem answerItem: questionaryItem.getAnswers()){
-                    Answer answer = new Answer(answerItem.getAnswer(),questionary, answerItem.getWeight());
+                    Answer answer = new Answer(answerItem.getAnswer(), answerItem.getDescription(), questionary, answerItem.getWeight());
                     questionary.getAnswers().add(answer);
                 }
                 registrationQuestionary(questionary,idOfOrgList);
@@ -164,12 +157,12 @@ public class QuestionaryService {
         return orgs;
     }
 
-    public Questionary updateQuestionary(Long id,String question, List<Long> idOfOrgList, Integer type, List<Answer> answers) throws Exception{
+    public Questionary updateQuestionary(Long id,String question, String name, String description, List<Long> idOfOrgList, Integer type, List<Answer> answers) throws Exception{
         if(answers.isEmpty()) throw new  Exception("Questionnaire can not be registered without answers");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
         Questionary currentQuestionary = entityManager.find(Questionary.class,id);
-        currentQuestionary = currentQuestionary.update(question);
+        currentQuestionary = currentQuestionary.update(name, question, description);
         currentQuestionary.getOrgs().clear();
         Set<Org> orgs = getOrgs(idOfOrgList);
         currentQuestionary.setOrgs(orgs);

@@ -20,9 +20,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-//@XmlType(name = "AnswerItem")
 @XmlType(name = "AnswerItem", propOrder = {
-        "idOfAnswer", "answer", "weight"
+        "idOfAnswer", "answer", "weight", "description"
 })
 public class AnswerItem {
 
@@ -30,6 +29,8 @@ public class AnswerItem {
     protected Long idOfAnswer;
     @XmlAttribute(name = "answer", required = true)
     protected String answer;
+    @XmlAttribute(name = "description", required = false)
+    protected String description;
     @XmlAttribute(name = "weight", required = false)
     protected Integer weight;
 
@@ -39,6 +40,7 @@ public class AnswerItem {
         this.idOfAnswer = answer.getIdOfAnswer();
         this.answer = answer.getAnswer();
         this.weight = answer.getWeight();
+        this.description = answer.getDescription();
     }
 
     public Long getIdOfAnswer() {
@@ -63,5 +65,13 @@ public class AnswerItem {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

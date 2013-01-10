@@ -24,8 +24,14 @@
         <h:outputText value="Идентификатор" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.idOfQuestionary}" styleClass="output-text" readonly="true"/>
 
-        <h:outputText value="Текст опросника" styleClass="output-text long-field required-field"/>
+        <h:outputText value="Наименование" styleClass="output-text long-field required-field"/>
+        <h:inputText value="#{questionaryEditPage.questionName}" styleClass="output-text"/>
+
+        <h:outputText value="Вопрос" styleClass="output-text long-field required-field"/>
         <h:inputText value="#{questionaryEditPage.question}" styleClass="output-text"/>
+
+        <h:outputText value="Описание" styleClass="output-text long-field"/>
+        <h:inputTextarea value="#{questionaryEditPage.description}" styleClass="output-text"/>
 
         <h:outputText escape="true" value="Организации" styleClass="output-text" />
         <h:panelGrid columns="2">

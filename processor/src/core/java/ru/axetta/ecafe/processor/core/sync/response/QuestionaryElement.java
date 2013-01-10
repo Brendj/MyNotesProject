@@ -4,8 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,37 +21,43 @@ import org.w3c.dom.Element;
  */
 public class QuestionaryElement {
 
-    private final Long idOfClient;
-    private final String answer;
+    private final String questionaryName;
+    private final String questionary;
+    private List<ClientAnswerElement> clientAnswerElementList;
 
-    public QuestionaryElement(String answer, Long idOfClient) {
-        this.answer = answer;
-        this.idOfClient = idOfClient;
+    public QuestionaryElement( String questionaryName, String questionary) {
+        this.questionaryName = questionaryName;
+        this.questionary = questionary;
+        clientAnswerElementList = new ArrayList<ClientAnswerElement>();
+    }
+
+    public QuestionaryElement(Questionary questionary) {
+        this.questionaryName = questionary.getQuestionName();
+        this.questionary = questionary.getQuestion();
+        clientAnswerElementList = new ArrayList<ClientAnswerElement>();
     }
 
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("ClientAnswers");
-        element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
-        element.setAttribute("Answer", answer);
+        Element element = document.createElement("Questionary");
+        element.setAttribute("Text", questionary);
+        element.setAttribute("Name", questionaryName);
+        for (ClientAnswerElement clientAnswerElement: clientAnswerElementList){
+            element.appendChild(clientAnswerElement.toElement(document));
+        }
         return element;
     }
 
-    public String getAnswer() {
-        return answer;
+    public List<ClientAnswerElement> getClientAnswerElementList() {
+        return clientAnswerElementList;
     }
 
-    public Long getIdOfClient() {
-        return idOfClient;
+    public String getQuestionary() {
+        return questionary;
     }
 
-    @Override
-    public String toString() {
-        return "QuestionaryElement{" +
-                "answer='" + answer + '\'' +
-                ", idOfClient=" + idOfClient +
-                '}';
+    public String getQuestionaryName() {
+        return questionaryName;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -59,10 +70,14 @@ public class QuestionaryElement {
 
         QuestionaryElement that = (QuestionaryElement) o;
 
-        if (answer != null ? !answer.equals(that.answer) : that.answer != null) {
+        if (clientAnswerElementList != null ? !clientAnswerElementList.equals(that.clientAnswerElementList)
+                : that.clientAnswerElementList != null) {
             return false;
         }
-        if (idOfClient != null ? !idOfClient.equals(that.idOfClient) : that.idOfClient != null) {
+        if (questionary != null ? !questionary.equals(that.questionary) : that.questionary != null) {
+            return false;
+        }
+        if (questionaryName != null ? !questionaryName.equals(that.questionaryName) : that.questionaryName != null) {
             return false;
         }
 
@@ -71,8 +86,18 @@ public class QuestionaryElement {
 
     @Override
     public int hashCode() {
-        int result = idOfClient != null ? idOfClient.hashCode() : 0;
-        result = 31 * result + (answer != null ? answer.hashCode() : 0);
+        int result = questionaryName != null ? questionaryName.hashCode() : 0;
+        result = 31 * result + (questionary != null ? questionary.hashCode() : 0);
+        result = 31 * result + (clientAnswerElementList != null ? clientAnswerElementList.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "QuestionaryElement{" +
+                "clientAnswerElementList=" + clientAnswerElementList +
+                ", questionaryName='" + questionaryName + '\'' +
+                ", questionary='" + questionary + '\'' +
+                '}';
     }
 }

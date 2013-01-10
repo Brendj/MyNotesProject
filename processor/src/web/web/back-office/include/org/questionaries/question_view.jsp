@@ -32,8 +32,16 @@
     </h:panelGroup>
     <h:outputText value="Идентификатор" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.idOfQuestionary}" styleClass="output-text"/>
-    <h:outputText value="Текст опросника" styleClass="output-text"/>
+
+    <h:outputText value="Наименование" styleClass="output-text"/>
+    <h:outputText value="#{questionaryViewPage.questionary.questionName}" styleClass="output-text"/>
+
+    <h:outputText value="Вопрос" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.question}" styleClass="output-text"/>
+
+    <h:outputText value="Описание" styleClass="output-text"/>
+    <h:outputText value="#{questionaryViewPage.questionary.description}" styleClass="output-text"/>
+
     <h:outputText value="Статус" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.status}" styleClass="output-text"/>
     <h:outputText value="Тип" styleClass="output-text"/>

@@ -23,6 +23,15 @@ public class Answer {
     private Date updatedDate;
     private Questionary questionary;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
         return clientAnswerByQuestionary;
@@ -34,10 +43,14 @@ public class Answer {
 
     protected Answer() {}
 
-    public Answer(String answer, Questionary questionary) throws Exception{
+    public Answer(String answer,String description, Questionary questionary) throws Exception{
         if(questionary==null) throw new NullPointerException("Не выбрана анкета для ответа");
         if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        if(answer.length()>90){
+            answer = answer.substring(0,90);
+        }
         this.answer = answer;
+        this.description =description;
         this.questionary = questionary;
         this.weight = 1;
         Date date = new Date();
@@ -45,10 +58,14 @@ public class Answer {
         this.updatedDate = date;
     }
 
-    public Answer(String answer, Questionary questionary, Integer weight) throws Exception{
+    public Answer(String answer,String description, Questionary questionary, Integer weight) throws Exception{
         if(questionary==null) throw new NullPointerException("Не выбрана анкета для ответа");
         if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        if(answer.length()>90){
+            answer = answer.substring(0,90);
+        }
         this.answer = answer;
+        this.description =description;
         this.questionary = questionary;
         this.weight = weight;
         Date date = new Date();
@@ -56,17 +73,25 @@ public class Answer {
         this.updatedDate = date;
     }
 
-    public Answer update(String answer) throws Exception{
+    public Answer update(String answer, String description) throws Exception{
         if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        if(answer.length()>90){
+            answer = answer.substring(0,90);
+        }
         this.answer = answer;
+        this.description =description;
         this.weight = 1;
         this.updatedDate = new Date();
         return this;
     }
 
-    public Answer update(String answer, Integer weight) throws Exception{
+    public Answer update(String answer, String description, Integer weight) throws Exception{
         if(answer==null || answer.isEmpty()) throw new NullPointerException("Не задано текстовое значение для ответа");
+        if(answer.length()>90){
+            answer = answer.substring(0,90);
+        }
         this.answer = answer;
+        this.description =description;
         this.weight = weight;
         this.updatedDate = new Date();
         return this;
@@ -134,7 +159,7 @@ public class Answer {
         if (!answer.equals(answer1.answer)) {
             return false;
         }
-        if (!idOfAnswer.equals(answer1.idOfAnswer)) {
+        if (!createdDate.equals(answer1.createdDate)) {
             return false;
         }
         if (!weight.equals(answer1.weight)) {
@@ -146,9 +171,9 @@ public class Answer {
 
     @Override
     public int hashCode() {
-        int result = (idOfAnswer==null?Long.valueOf(-1L).hashCode():idOfAnswer.hashCode());
-        result = 31 * result + answer.hashCode();
+        int result = answer.hashCode();
         result = 31 * result + weight.hashCode();
+        result = 31 * result + createdDate.hashCode();
         return result;
     }
 }

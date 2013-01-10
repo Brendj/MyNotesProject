@@ -29,6 +29,8 @@ public class AnswerItem {
     protected String answer;
     @XmlAttribute(name = "weight", required = false)
     protected Integer weight;
+    @XmlAttribute(name = "description", required = false)
+    protected String description;
 
     public AnswerItem() {}
 
@@ -36,6 +38,7 @@ public class AnswerItem {
         this.idOfAnswer = answer.getIdOfAnswer();
         this.answer = answer.getAnswer();
         this.weight = answer.getWeight();
+        this.description = answer.getDescription();
     }
 
     public Long getIdOfAnswer() {
@@ -60,5 +63,13 @@ public class AnswerItem {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

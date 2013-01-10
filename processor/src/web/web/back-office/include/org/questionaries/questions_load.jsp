@@ -70,7 +70,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Опросник" styleClass="output-text"/>
+                <h:outputText value="Наименование" styleClass="output-text"/>
             </f:facet>
             <h:outputText value="#{item.questionaryItem}" styleClass="output-text" rendered="#{item.questionaryItem!=null}"/>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.questionary.question}"

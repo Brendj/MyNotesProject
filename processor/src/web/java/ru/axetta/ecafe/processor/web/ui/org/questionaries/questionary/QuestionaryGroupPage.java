@@ -30,14 +30,7 @@ public class QuestionaryGroupPage extends BasicWorkspacePage {
     }
 
     public String getTitle(){
-        if(questionary!=null){
-            if(questionary.getQuestion().length()>15){
-                return questionary.getQuestion().substring(0,13)+"...";
-            } else {
-                return questionary.getQuestion();
-            }
-        }
-        return "";
+        return  questionary.getQuestionName();
     }
 
     public Questionary getQuestionary() {

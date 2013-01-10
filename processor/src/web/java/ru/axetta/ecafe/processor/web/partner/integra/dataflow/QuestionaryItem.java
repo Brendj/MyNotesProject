@@ -20,7 +20,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QuestionaryItem", propOrder = {
-        "idOfQuestionary", "question", "status", "type", "answers"
+        "idOfQuestionary", "question", "name", "description", "status", "type", "answers"
 })
 public class QuestionaryItem {
 
@@ -28,6 +28,10 @@ public class QuestionaryItem {
     protected Long idOfQuestionary;
     @XmlAttribute(name = "Question", required = true)
     protected String question;
+    @XmlAttribute(name = "Name", required = true)
+    protected String name;
+    @XmlAttribute(name = "Description", required = false)
+    protected String description;
     @XmlAttribute(name = "Status", required = false)
     protected Integer status;
     @XmlAttribute(name = "Type", required = false)
@@ -42,6 +46,8 @@ public class QuestionaryItem {
     public QuestionaryItem(Questionary questionary) {
         this.idOfQuestionary = questionary.getIdOfQuestionary();
         this.question = questionary.getQuestion();
+        this.name = questionary.getQuestionName();
+        this.description = questionary.getDescription();
         this.status =  questionary.getStatus().getValue();
         this.type = questionary.getQuestionaryType().getValue();
         answers = new ArrayList<AnswerItem>();
@@ -89,10 +95,30 @@ public class QuestionaryItem {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "QuestionaryItem{" +
+                "idOfQuestionary=" + idOfQuestionary +
                 ", question='" + question + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
                 ", type=" + type +
                 '}';
     }
