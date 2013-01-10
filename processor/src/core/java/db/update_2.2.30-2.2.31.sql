@@ -36,7 +36,9 @@ ALTER TABLE cf_categorydiscounts ADD COLUMN categorytype integer;
 CREATE TABLE cf_qa_questionaries
 (
   idofquestionary bigserial NOT NULL,
-  question character varying(255) NOT NULL,
+  questionname character varying(90) NOT NULL,
+  question character varying(90) NOT NULL,
+  description character varying(255),
   status integer NOT NULL DEFAULT 0,
   type integer DEFAULT 0,
   createddate bigint NOT NULL,
@@ -49,7 +51,8 @@ CREATE TABLE cf_qa_answers
 (
   idofanswer bigserial NOT NULL,
   idofquestionary bigint NOT NULL,
-  answer character varying(255) NOT NULL,
+  answer character varying(90) NOT NULL,
+  description character varying(255),
   weight integer NOT NULL DEFAULT 1,
   createddate bigint NOT NULL,
   updateddate bigint,
@@ -250,3 +253,8 @@ ALTER TABLE cf_technological_map_groups ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_technological_map_products ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_trade_material_goods ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_ECafeSettings ADD COLUMN globalversiononcreate bigint;
+
+-- настройка по отключению возможности включать/отключать СМС-информирование в личном кабинете клиента
+ALTER TABLE cf_clients ADD COLUMN readonlynotifyviasms integer;
+ALTER TABLE cf_clients ALTER COLUMN readonlynotifyviasms SET NOT NULL;
+ALTER TABLE cf_clients ALTER COLUMN readonlynotifyviasms SET DEFAULT 0;
