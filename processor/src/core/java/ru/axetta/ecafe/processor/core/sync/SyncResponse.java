@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1698,6 +1699,7 @@ public class SyncResponse {
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
     private final OrgOwnerData orgOwnerData;
+    private final QuestionaryData questionaryData;
     private final Manager manager;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
@@ -1709,7 +1711,7 @@ public class SyncResponse {
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData) {
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData, QuestionaryData questionaryData) {
         this.type = type;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1732,6 +1734,7 @@ public class SyncResponse {
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
         this.manager = manager;
         this.orgOwnerData = orgOwnerData;
+        this.questionaryData = questionaryData;
     }
 
     public Document toDocument() throws Exception {
@@ -1834,6 +1837,10 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(orgOwnerData.toElement(document));
         }
 
+        if(questionaryData != null) {
+            ecafeEnvelopeElement.appendChild(questionaryData.toElement(document));
+        }
+
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);
         document.appendChild(dataElement);
@@ -1896,16 +1903,16 @@ public class SyncResponse {
         return resLibraryData;
     }
 
-    //public DistributionManager getDistributionManager() {
-    //    return distributionManager;
-    //}
-
     public Manager getManager(){
         return manager;
     }
 
     public OrgOwnerData getOrgOwnerData() {
         return orgOwnerData;
+    }
+
+    public QuestionaryData getQuestionaryData() {
+        return questionaryData;
     }
 
     @Override

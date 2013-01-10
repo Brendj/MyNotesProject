@@ -16,16 +16,8 @@ import org.w3c.dom.Element;
  */
 public class OrgOwner {
 
-    public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("OrgOwner");
-        element.setAttribute("IdOfOrg", Long.toString(this.idOfOrg));
-        element.setAttribute("ShortName", shortName);
-        element.setAttribute("OfficialName", officialName);
-        element.setAttribute("IsSupplier", supplier?"1":"0");
-        return element;
-    }
-
     private final Long idOfOrg;
+
     private final String shortName;
     private final String officialName;
     /* логическое значение определяющее является лми данная организация поставщиком: false -не является , true - является  */
@@ -36,6 +28,15 @@ public class OrgOwner {
         this.shortName = shortName;
         this.officialName = officialName;
         this.supplier = supplier;
+    }
+
+    public Element toElement(Document document) throws Exception {
+        Element element = document.createElement("OrgOwner");
+        element.setAttribute("IdOfOrg", Long.toString(this.idOfOrg));
+        element.setAttribute("ShortName", shortName);
+        element.setAttribute("OfficialName", officialName);
+        element.setAttribute("IsSupplier", supplier?"1":"0");
+        return element;
     }
 
     public Boolean getSupplier() {

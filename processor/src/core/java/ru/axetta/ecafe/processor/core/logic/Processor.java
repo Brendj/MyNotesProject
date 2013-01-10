@@ -27,12 +27,19 @@ import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -190,6 +197,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
         try {
             setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
             ////
@@ -342,7 +350,14 @@ public class Processor implements SyncProcessor,
                 try {
                     orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
+                    logger.error(String.format("Failed to process org owner data, IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
+                }
+
+                try {
+                    questionaryData = processQuestionaryData(request.getIdOfOrg());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process questionary data, IdOfOrg == %s",
                             request.getIdOfOrg()), e);
                 }
 
@@ -353,7 +368,7 @@ public class Processor implements SyncProcessor,
                     }
                 } catch (Exception e) {
                     logger.error(
-                            String.format("Failed to process numbers of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
+                            String.format("Failed to process of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
                 }
 
@@ -419,29 +434,11 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, manager, orgOwnerData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
         return response;
-    }
-
-    private void registryClientVersionAndRemoteAddress(Long idOfOrg, String clientVersion, String remoteAddr) {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-            org.setClientVersion(clientVersion);
-            org.setRemoteAddress(remoteAddr);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
     }
 
     public PaymentResponse processPayRequest(PaymentRequest request) throws Exception {
@@ -587,6 +584,23 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return orgOwnerData;
+    }
+
+    private QuestionaryData processQuestionaryData(Long idOfOrg) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        QuestionaryData questionaryData = new QuestionaryData();
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            questionaryData.process(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return questionaryData;
     }
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
