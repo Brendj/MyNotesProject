@@ -87,7 +87,7 @@ public class BIDataExportService {
 
         TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
                 "from cf_orgs " +
-                "where cf_orgs.officialname<>'' " +
+                //"where cf_orgs.officialname<>'' " +
                 "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
 
         TYPES.add(new BIDataExportType("contagents",
@@ -295,7 +295,8 @@ public class BIDataExportService {
             }
 
             try {
-                String date = f.getName().substring(0, f.getName().indexOf("_"));
+                //String date = f.getName().substring(0, f.getName().indexOf("_"));
+                String date = f.getName().substring(0, f.getName().indexOf(" "));
                 Calendar that = new GregorianCalendar();
                 that.setTimeInMillis(FILES_FORMAT.parse(date).getTime());
 
@@ -408,7 +409,8 @@ public class BIDataExportService {
 
     public static String parseFileName(Calendar cal, String type) {
         String date = FILES_FORMAT.format(cal.getTime());
-        return date + "_" + type + ".csv";
+        //return date + "_" + type + ".csv";
+        return date + " " + type + ".csv";
     }
 
 
