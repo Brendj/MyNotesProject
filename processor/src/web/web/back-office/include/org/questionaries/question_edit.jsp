@@ -76,6 +76,18 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
+                <h:outputText value="Пояснения"/>
+            </f:facet>
+            <rich:inplaceInput layout="block" value="#{answer.description}"
+                               id="inplace" required="true"
+                               changedHoverClass="hover" viewHoverClass="hover"
+                               viewClass="inplace" changedClass="inplace"
+                               selectOnEdit="true" editEvent="ondblclick">
+                <a4j:support event="onviewactivated" reRender="answerTable"/>
+            </rich:inplaceInput>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
                 <h:outputText value="Балл"/>
             </f:facet>
             <rich:inputNumberSpinner value="#{answer.weight}" id="answerWeightSpinner"/>
