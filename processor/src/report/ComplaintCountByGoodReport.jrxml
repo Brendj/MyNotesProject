@@ -38,9 +38,9 @@
 		<![CDATA[]]>
 	</queryString>
 	<field name="nameofgood" class="java.lang.String"/>
-	<field name="good_count" class="java.lang.Long"/>
+	<field name="goodcount" class="java.lang.Long"/>
 	<variable name="total_sum" class="java.lang.Long" calculation="Sum">
-		<variableExpression><![CDATA[$F{good_count}]]></variableExpression>
+		<variableExpression><![CDATA[$F{goodcount}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
 	<title>
@@ -157,7 +157,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
-				<textFieldExpression class="java.lang.Long"><![CDATA[$F{good_count}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{goodcount}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Auto" pattern="#,##0.00 %">
 				<reportElement x="470" y="0" width="232" height="20"/>
@@ -169,7 +169,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
-				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{good_count}) / Double.valueOf($V{total_sum})]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{goodcount}) / Double.valueOf($V{total_sum})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="0" width="25" height="20"/>
@@ -186,23 +186,6 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="241">
-			<pieChart>
-				<chart isShowLegend="false">
-					<reportElement x="0" y="5" width="802" height="230"/>
-					<chartTitle/>
-					<chartSubtitle/>
-					<chartLegend/>
-				</chart>
-				<pieDataset>
-					<keyExpression><![CDATA[$F{nameofgood}]]></keyExpression>
-					<valueExpression><![CDATA[$F{good_count}]]></valueExpression>
-				</pieDataset>
-				<piePlot isCircular="true" labelFormat="{0} ({1}, {2})">
-					<plot/>
-					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
-				</piePlot>
-			</pieChart>
-		</band>
+		<band height="30"/>
 	</summary>
 </jasperReport>

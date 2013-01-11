@@ -37,10 +37,10 @@
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="description" class="java.lang.String"/>
-	<field name="cause_count" class="java.lang.Long"/>
+	<field name="complaintcause" class="java.lang.String"/>
+	<field name="causecount" class="java.lang.Long"/>
 	<variable name="total_sum" class="java.lang.Long" calculation="Sum">
-		<variableExpression><![CDATA[$F{cause_count}]]></variableExpression>
+		<variableExpression><![CDATA[$F{causecount}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
 	<title>
@@ -145,7 +145,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{complaintcause}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="283" y="0" width="133" height="20"/>
@@ -157,7 +157,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
-				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cause_count}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{causecount}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Auto" pattern="#,##0.00 %">
 				<reportElement x="416" y="0" width="156" height="20"/>
@@ -169,7 +169,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
-				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{cause_count}) / Double.valueOf($V{total_sum})]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[Double.valueOf($F{causecount}) / Double.valueOf($V{total_sum})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="0" width="25" height="20"/>
@@ -186,23 +186,6 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="241">
-			<pieChart>
-				<chart isShowLegend="false">
-					<reportElement x="0" y="5" width="802" height="230"/>
-					<chartTitle/>
-					<chartSubtitle/>
-					<chartLegend/>
-				</chart>
-				<pieDataset>
-					<keyExpression><![CDATA[$F{description}]]></keyExpression>
-					<valueExpression><![CDATA[$F{cause_count}]]></valueExpression>
-				</pieDataset>
-				<piePlot isCircular="true" labelFormat="{0} ({1}, {2})">
-					<plot/>
-					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
-				</piePlot>
-			</pieChart>
-		</band>
+		<band height="30"/>
 	</summary>
 </jasperReport>

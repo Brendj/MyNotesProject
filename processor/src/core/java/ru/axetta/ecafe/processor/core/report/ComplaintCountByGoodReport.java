@@ -29,29 +29,29 @@ public class ComplaintCountByGoodReport extends BasicReportForOrgJob {
         public static class ComplaintReportItem {
 
             // Имя проблемного товара
-            private String nameOfGood;
+            private String nameofgood;
             // Количество поданных жалоб на данный товар
-            private Long goodCount;
+            private Long goodcount;
 
-            public ComplaintReportItem(String nameOfGood, Long goodCount) {
-                this.nameOfGood = nameOfGood;
-                this.goodCount = goodCount;
+            public ComplaintReportItem(String nameofgood, Long goodcount) {
+                this.nameofgood = nameofgood;
+                this.goodcount = goodcount;
             }
 
-            public String getNameOfGood() {
-                return nameOfGood;
+            public String getNameofgood() {
+                return nameofgood;
             }
 
-            public void setNameOfGood(String nameOfGood) {
-                this.nameOfGood = nameOfGood;
+            public void setNameofgood(String nameofgood) {
+                this.nameofgood = nameofgood;
             }
 
-            public Long getGoodCount() {
-                return goodCount;
+            public Long getGoodcount() {
+                return goodcount;
             }
 
-            public void setGoodCount(Long goodCount) {
-                this.goodCount = goodCount;
+            public void setGoodcount(Long goodcount) {
+                this.goodcount = goodcount;
             }
 
         }
@@ -134,6 +134,6 @@ public class ComplaintCountByGoodReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_TODAY;
+        return REPORT_PERIOD_PREV_MONTH;
     }
 }

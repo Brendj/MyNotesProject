@@ -29,29 +29,29 @@ public class ComplaintCausesReport extends BasicReportForOrgJob {
         public static class ComplaintCauseReportItem {
 
             // Причина подачи жалобы
-            private String complaintCause;
+            private String complaintcause;
             // Количество жалоб, поданных с указанием данной причины
-            private Long causeCount;
+            private Long causecount;
 
-            public ComplaintCauseReportItem(String complaintCause, Long causeCount) {
-                this.complaintCause = complaintCause;
-                this.causeCount = causeCount;
+            public ComplaintCauseReportItem(String complaintcause, Long causecount) {
+                this.complaintcause = complaintcause;
+                this.causecount = causecount;
             }
 
-            public String getComplaintCause() {
-                return complaintCause;
+            public String getComplaintcause() {
+                return complaintcause;
             }
 
-            public void setComplaintCause(String complaintCause) {
-                this.complaintCause = complaintCause;
+            public void setComplaintcause(String complaintcause) {
+                this.complaintcause = complaintcause;
             }
 
-            public Long getCauseCount() {
-                return causeCount;
+            public Long getCausecount() {
+                return causecount;
             }
 
-            public void setCauseCount(Long causeCount) {
-                this.causeCount = causeCount;
+            public void setCausecount(Long causecount) {
+                this.causecount = causecount;
             }
 
         }
@@ -91,7 +91,7 @@ public class ComplaintCausesReport extends BasicReportForOrgJob {
                     + " FROM cf_possible_complaint_causes d"
                     + " LEFT OUTER JOIN cf_goods_complaint_causes c"
                     + " ON d.causenumber = c.cause"
-                    + " WHERE c.orgowner = :idoforg AND c.createddate >= :startDate AND c.createddate <= :endDate"
+                    + " AND c.orgowner = :idoforg AND c.createddate >= :startTime AND c.createddate <= :endTime"
                     + " GROUP BY d.description"
                     + " ORDER BY cause_count DESC, d.description;");
             query.setParameter("startTime", startTime.getTime());
@@ -135,6 +135,6 @@ public class ComplaintCausesReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_TODAY;
+        return REPORT_PERIOD_PREV_MONTH;
     }
 }

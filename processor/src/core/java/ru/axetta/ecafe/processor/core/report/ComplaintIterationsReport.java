@@ -29,29 +29,29 @@ public class ComplaintIterationsReport extends BasicReportForOrgJob {
         public static class ComplaintIterationReportItem {
 
             // Статус жалобы
-            private String iterationState;
+            private String iterstate;
             // Количество итераций в указанном статусе
-            private Long stateCount;
+            private Long statecount;
 
-            public ComplaintIterationReportItem(String iterationState, Long stateCount) {
-                this.iterationState = iterationState;
-                this.stateCount = stateCount;
+            public ComplaintIterationReportItem(String iterstate, Long statecount) {
+                this.iterstate = iterstate;
+                this.statecount = statecount;
             }
 
-            public String getIterationState() {
-                return iterationState;
+            public String getIterstate() {
+                return iterstate;
             }
 
-            public void setIterationState(String iterationState) {
-                this.iterationState = iterationState;
+            public void setIterstate(String iterstate) {
+                this.iterstate = iterstate;
             }
 
-            public Long getStateCount() {
-                return stateCount;
+            public Long getStatecount() {
+                return statecount;
             }
 
-            public void setStateCount(Long stateCount) {
-                this.stateCount = stateCount;
+            public void setStatecount(Long statecount) {
+                this.statecount = statecount;
             }
 
         }
@@ -91,7 +91,7 @@ public class ComplaintIterationsReport extends BasicReportForOrgJob {
                     + " FROM cf_possible_complaint_iteration_states d"
                     + " LEFT OUTER JOIN cf_goods_complaint_iterations i"
                     + " ON d.statenumber = i.iterationstatus"
-                    + " WHERE i.orgowner = :idoforg AND i.createddate >= :startDate AND i.createddate <= :endDate"
+                    + " AND i.orgowner = :idoforg AND i.createddate >= :startTime AND i.createddate <= :endTime"
                     + " GROUP BY d.description"
                     + " ORDER BY d.description, state_count;");
             query.setParameter("startTime", startTime.getTime());
@@ -135,6 +135,6 @@ public class ComplaintIterationsReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_TODAY;
+        return REPORT_PERIOD_PREV_MONTH;
     }
 }
