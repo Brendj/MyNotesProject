@@ -24,8 +24,11 @@ ALTER TABLE cf_goods ADD COLUMN idofuserdelete bigint;
 
 -- версия администратора/кассира
 ALTER TABLE CF_SyncHistory ADD COLUMN clientversion character varying(16);
+ALTER TABLE CF_Orgs ADD COLUMN clientversion character varying(16);
 -- ip адресс клинта
 ALTER TABLE CF_SyncHistory ADD COLUMN remoteaddress character varying(20);
+ALTER TABLE CF_Orgs ADD COLUMN remoteaddress character varying(20);
+
 
 -- разрешает клиенту подтверждать оплату групового питания, он будет доступен для клиентов входящих в группы: пед состав, администрация
 ALTER TABLE cf_clients ADD COLUMN canconfirmgrouppayment integer NOT NULL Default 0;
