@@ -38,7 +38,7 @@ public class ProjectStateReportServlet extends DataSourceServlet {
 
     @Override
     public DataTable generateDataTable(Query query, HttpServletRequest request) throws TypeMismatchException {
-        logger.info("Parsing request");
+        //logger.info("Parsing request");
         RuntimeContext runtimeContext = null;
         ProjectStateReportService.Type t = null;
         try {
