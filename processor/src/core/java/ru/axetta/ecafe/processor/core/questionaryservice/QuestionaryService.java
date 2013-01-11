@@ -130,7 +130,7 @@ public class QuestionaryService {
         for (QuestionaryItem questionaryItem: questionaryItemList){
             try{
                 Integer type = (questionaryItem.getType()==null?0:questionaryItem.getType());
-                Questionary questionary = new Questionary(questionaryItem.getQuestion(), questionaryItem.getQuestionName(), questionaryItem.getDescription(), QuestionaryType.fromInteger(type));
+                Questionary questionary = new Questionary(questionaryItem.getQuestionName(),questionaryItem.getQuestion(), questionaryItem.getDescription(), QuestionaryType.fromInteger(type));
                 for (AnswerItem answerItem: questionaryItem.getAnswers()){
                     Answer answer = new Answer(answerItem.getAnswer(), answerItem.getDescription(), questionary, answerItem.getWeight());
                     questionary.getAnswers().add(answer);

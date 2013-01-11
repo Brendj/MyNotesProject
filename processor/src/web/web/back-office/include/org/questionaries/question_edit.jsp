@@ -67,7 +67,7 @@
                 <h:outputText value="Вариант ответа"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{answer.answer}"
-                               id="inplace" required="true"
+                               id="answerText" required="true"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
                                selectOnEdit="true" editEvent="ondblclick">
@@ -79,7 +79,7 @@
                 <h:outputText value="Пояснения"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{answer.description}"
-                               id="inplace" required="true"
+                               id="answerDescription"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
                                selectOnEdit="true" editEvent="ondblclick">
