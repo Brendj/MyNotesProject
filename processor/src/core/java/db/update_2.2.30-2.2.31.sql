@@ -255,6 +255,5 @@ ALTER TABLE cf_trade_material_goods ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_ECafeSettings ADD COLUMN globalversiononcreate bigint;
 
 -- настройка по отключению возможности включать/отключать СМС-информирование в личном кабинете клиента
-ALTER TABLE cf_clients ADD COLUMN readonlynotifyviasms integer;
+ALTER TABLE cf_clients ADD COLUMN readonlynotifyviasms integer DEFAULT 0;
 ALTER TABLE cf_clients ALTER COLUMN readonlynotifyviasms SET NOT NULL;
-ALTER TABLE cf_clients ALTER COLUMN readonlynotifyviasms SET DEFAULT 0;
