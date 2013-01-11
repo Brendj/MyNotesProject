@@ -88,6 +88,24 @@ public class Org {
     private String latitude;
     private Integer refectoryType;
     private Set<Questionary> questionaries = new HashSet<Questionary>();
+    private String clientVersion;
+    private String remoteAddress;
+
+    public String getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    public void setRemoteAddress(String remoteAddress) {
+        this.remoteAddress = remoteAddress;
+    }
+
+    public String getClientVersion() {
+        return clientVersion;
+    }
+
+    public void setClientVersion(String clientVersion) {
+        this.clientVersion = clientVersion;
+    }
 
     public Set<Questionary> getQuestionaries() {
         return questionaries;

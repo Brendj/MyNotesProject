@@ -66,6 +66,15 @@
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
+                    <h:outputText escape="true" value="Версия клиента" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.version}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
                     <h:outputText escape="true" value="IP-адрес" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.remoteAddr}"

@@ -541,9 +541,12 @@ public class DashboardServiceBean {
         LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         for (Org org : orgs) {
+            //items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
+            //        org.getLastUnSuccessfulBalanceSync(),
+            //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
             items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
-                    org.getLastUnSuccessfulBalanceSync(),
-                    runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
+                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
+
         }
         orgSyncStats.setOrgSyncStatItems(items);
         return orgSyncStats;

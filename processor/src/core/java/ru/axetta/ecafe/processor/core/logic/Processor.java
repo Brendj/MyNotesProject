@@ -206,7 +206,7 @@ public class Processor implements SyncProcessor,
                 idOfPacket = generateIdOfPacket(request.getIdOfOrg());
                 // Register sync history
                 idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),request.getRemoteAddr());
-
+                addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),request.getRemoteAddr());
                 // Process paymentRegistry
                 try {
                     if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
@@ -1071,8 +1071,6 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    // 12-01-2012 Kadyrov D.I.
-
     private SyncResponse.CorrectingNumbersOrdersRegistry processSyncCorrectingNumbersOrdersRegistry(Long idOfOrg)
             throws Exception {
         Session persistenceSession = null;
@@ -1268,6 +1266,26 @@ public class Processor implements SyncProcessor,
             }
         }
         return false;
+    }
+
+    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAdress){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org organization = (Org) persistenceSession.get(Org.class, idOfOrg);
+            organization.setRemoteAddress(remoteAdress);
+            organization.setClientVersion(clientVersion);
+            persistenceSession.save(organization);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
     private Long addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion, String remoteAddress) throws Exception {

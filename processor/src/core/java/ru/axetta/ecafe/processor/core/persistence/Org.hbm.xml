@@ -53,6 +53,9 @@
         <property name="longitude" column="Longitude" type="string" length="12" unique="true" not-null="false"/>
         <property name="latitude" column="Latitude" type="string" length="12" unique="true" not-null="false"/>
 
+        <property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>
+        <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
+
         <property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
