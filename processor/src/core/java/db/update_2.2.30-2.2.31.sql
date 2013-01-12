@@ -29,11 +29,10 @@ ALTER TABLE CF_Orgs ADD COLUMN clientversion character varying(16);
 ALTER TABLE CF_SyncHistory ADD COLUMN remoteaddress character varying(20);
 ALTER TABLE CF_Orgs ADD COLUMN remoteaddress character varying(20);
 
-
 -- разрешает клиенту подтверждать оплату групового питания, он будет доступен для клиентов входящих в группы: пед состав, администрация
 ALTER TABLE cf_clients ADD COLUMN canconfirmgrouppayment integer NOT NULL Default 0;
 -- Тип категории скидок
-ALTER TABLE cf_categorydiscounts ADD COLUMN categorytype integer;
+ALTER TABLE cf_categorydiscounts ADD COLUMN categorytype integer Default 0;
 
 -- Таблица вопросов анкеты
 CREATE TABLE cf_qa_questionaries
@@ -256,7 +255,3 @@ ALTER TABLE cf_technological_map_groups ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_technological_map_products ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_trade_material_goods ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_ECafeSettings ADD COLUMN globalversiononcreate bigint;
-
--- настройка по отключению возможности включать/отключать СМС-информирование в личном кабинете клиента
-ALTER TABLE cf_clients ADD COLUMN readonlynotifyviasms integer DEFAULT 0;
-ALTER TABLE cf_clients ALTER COLUMN readonlynotifyviasms SET NOT NULL;
