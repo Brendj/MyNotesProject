@@ -493,7 +493,7 @@ public class RuntimeContext implements ApplicationContextAware {
         java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance().getBean("wsCryptoProperties");
         String params[]={"keystore.type", "keystore.password", "file", "truststore.type", "truststore.password", "truststore.file"};
         for (String s : params) signatureProps.setProperty("org.apache.ws.security.crypto.merlin."+s, configProperties.getProperty(WS_CRYPTO_BASE+"."+s, ""));
-        /*<prop key="org.apache.ws.security.crypto.merlin.keystore.type">JKS</prop>
+        /*<prop key="org.apache.ws.secnurity.crypto.merlin.keystore.type">JKS</prop>
         <prop key="org.apache.ws.security.crypto.merlin.keystore.password">123456</prop>
         <prop key="org.apache.ws.security.crypto.merlin.file">/temp/certs/alice.jks</prop>
         <prop key="org.apache.ws.security.crypto.merlin.truststore.type">PKCS12</prop>

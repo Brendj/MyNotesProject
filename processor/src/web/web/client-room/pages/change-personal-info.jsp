@@ -25,6 +25,7 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" %>
 <%@ page import="java.util.*" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -112,7 +113,8 @@
                         else {
                             client.setMobile(mobilePhone);
                             client.setEmail(email);
-                            if(client.getReadOnlyNotifyViaSMS()){
+                            if (!RuntimeContext.getInstance().getOptionValueBool(
+                                                    Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM)) {
                                 client.setNotifyViaSMS(notifyViaSms);
                             }
                             client.setNotifyViaEmail(notifyViaEmail);
@@ -296,7 +298,8 @@
             <td>
                 <input type="checkbox" name="<%=NOTIFY_VIA_SMS_PARAM%>" size="16" maxlength="64" class="input-text"
                 <%=client.isNotifyViaSMS() ? HTML_CHECKED : ""%>
-                <%=client.getReadOnlyNotifyViaSMS() ? "disabled=\"disabled\" onclick=\"return false\" onkeydown=\"return false\"" : ""%>/>
+                <%=RuntimeContext.getInstance().getOptionValueBool(
+                        Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM) ? "disabled=\"disabled\" onclick=\"return false\" onkeydown=\"return false\"" : ""%>/>
             </td>
         </tr>
         <tr>

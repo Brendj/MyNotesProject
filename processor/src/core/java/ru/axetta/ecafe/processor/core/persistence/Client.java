@@ -93,15 +93,6 @@ public class Client {
     private String fax;
     private Boolean canConfirmGroupPayment;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
-    private Boolean readOnlyNotifyViaSMS;
-
-    public Boolean getReadOnlyNotifyViaSMS() {
-        return readOnlyNotifyViaSMS;
-    }
-
-    public void setReadOnlyNotifyViaSMS(Boolean readOnlyNotifyViaSMS) {
-        this.readOnlyNotifyViaSMS = readOnlyNotifyViaSMS;
-    }
 
     public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
         return clientAnswerByQuestionary;

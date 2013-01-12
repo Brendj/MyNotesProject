@@ -216,6 +216,12 @@
             <h:selectBooleanCheckbox value="#{optionPage.exportProjectStateData}" styleClass="output-text" />
         </h:panelGrid>
     </rich:tab>
+    <rich:tab label="Личный кабинет">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Запретить пользователю включать/отключать СМС-информирование" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.disableSMSNotifyEditInClientRoom}" styleClass="output-text" />
+        </h:panelGrid>
+    </rich:tab>
 </rich:tabPanel>
 
 <h:panelGroup style="margin-top: 10px">

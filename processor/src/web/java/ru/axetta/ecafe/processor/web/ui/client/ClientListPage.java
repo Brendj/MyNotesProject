@@ -107,7 +107,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private Long expenditureLimit;
         private final Integer discountMode;
         private final String discountAsString;
-        private boolean readOnlyNotifyViaSMS;
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -173,7 +172,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             } else {
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
             }
-            this.readOnlyNotifyViaSMS = client.getReadOnlyNotifyViaSMS();
         }
 
         public Long getIdOfClient() {
@@ -244,13 +242,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return clientGroupName;
         }
 
-        public boolean isReadOnlyNotifyViaSMS() {
-            return readOnlyNotifyViaSMS;
-        }
-
-        public void setReadOnlyNotifyViaSMS(boolean readOnlyNotifyViaSMS) {
-            this.readOnlyNotifyViaSMS = readOnlyNotifyViaSMS;
-        }
 
         public String getIdOfClientString() {
             return this.getIdOfClient().toString();
@@ -266,7 +257,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long limit = 0L;
     private Long expenditureLimit = 0L;
     private boolean notifyViaSMS = false;
-    private boolean readOnlyNotifyViaSMS = false;
 
 
     public Long getExpenditureLimit() {
@@ -291,14 +281,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setNotifyViaSMS(boolean notifyViaSMS) {
         this.notifyViaSMS = notifyViaSMS;
-    }
-
-    public boolean isReadOnlyNotifyViaSMS() {
-        return readOnlyNotifyViaSMS;
-    }
-
-    public void setReadOnlyNotifyViaSMS(boolean readOnlyNotifyViaSMS) {
-        this.readOnlyNotifyViaSMS = readOnlyNotifyViaSMS;
     }
 
     public String getPageFilename() {
@@ -455,11 +437,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         printMessage("Данные обновлены.");
     }
 
-    /**
-     * Включить SMS-уведомления
-     * @param session
-     * @throws Exception
-     */
     public void setNotifyViaSMS(Session session) throws Exception {
         if (this.items.isEmpty())
             return;
@@ -473,24 +450,4 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         printMessage("Данные обновлены.");
     }
-
-    /**
-     * Запретить редактирование SMS-уведомления
-     * @param session
-     * @throws Exception
-     */
-    public void applyReadOnlyNotifyViaSMS(Session session) throws Exception {
-        if (this.items.isEmpty())
-            return;
-        List<Long> clientsId = new ArrayList<Long>();
-        for (Item item : this.items) {
-            clientsId.add(item.getIdOfClient());
-        }
-        DAOUtils.changeReadOnlyNotifyViaSMS(session, readOnlyNotifyViaSMS, clientsId);
-        for (Item item : this.getItems()) {
-            item.setReadOnlyNotifyViaSMS(readOnlyNotifyViaSMS);
-        }
-        printMessage("Данные обновлены.");
-    }
-
 }

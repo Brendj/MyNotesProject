@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public enum CategoryDiscountEnumType {
 
-    CATEGORY_WITH_DISCOUNT(0,"Категория со скидкой"),
-    FEE_CATEGORY(1,"Платная");
+    CATEGORY_WITH_DISCOUNT(0,"Льгота"),
+    FEE_CATEGORY(1,"Платное питание");
 
     private final Integer value;
     private final String description;
