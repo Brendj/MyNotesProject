@@ -56,6 +56,7 @@ public class Manager {
     private List<DOConfirm> confirmDistributedObject = new ArrayList<DOConfirm>();
     private Document document;
     private Long idOfOrg;
+    private List<Long> idOfOrgOwners;
     private final DateFormat dateOnlyFormat;
     private final DateFormat timeFormat;
 
@@ -134,6 +135,9 @@ public class Manager {
 
     }
 
+    public Boolean isEmpty(){
+        return distributedObjectsListMap.isEmpty();
+    }
     public Element toElement(Document document) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("RO section begin generate XML node");

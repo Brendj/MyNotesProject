@@ -36,10 +36,7 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -362,7 +359,7 @@ public class Processor implements SyncProcessor,
                 }
 
                 try {
-                    if(request.getManager() != null){
+                    if(!request.getManager().isEmpty()){
                         manager = request.getManager();
                         manager.process(persistenceSessionFactory);
                     }
@@ -1268,17 +1265,18 @@ public class Processor implements SyncProcessor,
         return false;
     }
 
-    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAdress){
+    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = (Org) persistenceSession.get(Org.class, idOfOrg);
-            organization.setRemoteAddress(remoteAdress);
-            organization.setClientVersion(clientVersion);
-            persistenceSession.save(organization);
+            Query query = persistenceSession.createQuery("update Org set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
+            query.setParameter("remoteAddress", remoteAddress);
+            query.setParameter("clientVersion", clientVersion);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.executeUpdate();
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
