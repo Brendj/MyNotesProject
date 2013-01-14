@@ -691,6 +691,9 @@ public class ProjectStateReportService {
             TableRow r = new TableRow();
             List<String> vals = data.get(k);
 
+            if (vals == null || vals.size() < 1) {
+                continue;
+            }
 
             if (t.getColumns()[0][0] == ValueType.TEXT) {
                 r.addCell(k);
