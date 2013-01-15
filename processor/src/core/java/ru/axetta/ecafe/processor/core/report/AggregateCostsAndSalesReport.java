@@ -32,6 +32,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 Criteria orgCriteria = session.createCriteria(Org.class);
                 orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
                 Org org = (Org) orgCriteria.uniqueResult();
+                if (org == null) {
+                    break;
+                }
 
                 // Проверка того, является ли указанная организация поставщиком
                 // Если да - работать с организациями, для которых поставщиком указана данная организация
@@ -50,25 +53,30 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                             }
                         }
                     }
-                } else {
-                    Org curOrg = getOrgById(session, idOfOrg);
-                    if (curOrg != null) {
-                        workingOrgSet.add(curOrg);
-                    }
+                }
+                else {
+                    workingOrgSet.add(org);
                 }
 
-                StringBuffer queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.sumByCard), sum(o.sumByCash) from Order o where"
-                        + " ((o.sumByCard > 0) or (o.sumByCash > 0))  and (");
+                StringBuffer queryStringBuffer;
+                String queryString;
+                Query query;
+                List resultList;
+
+                // объем продаж и средний чек
+                queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.sumByCard), sum(o.sumByCash) from Order o where"
+                        + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
+                        + " and (o.sumByCard > 0 or o.sumByCash > 0) and (");
                 for (Org curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
                     queryStringBuffer.append(curOrg.getIdOfOrg());
                     queryStringBuffer.append(" or ");
                 }
-                String queryString = queryStringBuffer.toString();
+                queryString = queryStringBuffer.toString();
                 queryString = queryString.substring(0, queryString.length() - 4);
                 queryString += ") group by o.id.idOfOrg order by o.id.idOfOrg";
-                Query query = session.createQuery(queryString);
-                List resultList = query.list();
+                query = session.createQuery(queryString);
+                resultList = query.list();
 
                 double salesVolume = 0.0;
                 double totalCountOfPaidOrders = 0.0;
@@ -77,12 +85,12 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                     Object[] result = (Object[]) resultObject;
 
                     Double currentOrgCountOfPaidOrders = Double.valueOf((Long) result[0]);
-                    Long sumByCard = (Long) result[1];
-                    Long sumByCash = (Long) result[2];
+                    Long sumByCash = (Long) result[1];
+                    Long sumByCard = (Long) result[2];
 
                     Double curentOrgSalesValue = 0.0;
-                    curentOrgSalesValue += sumByCard;
                     curentOrgSalesValue += sumByCash;
+                    curentOrgSalesValue += sumByCard;
 
                     totalCountOfPaidOrders += currentOrgCountOfPaidOrders;
                     salesVolume += curentOrgSalesValue;
@@ -95,7 +103,61 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                     averageReceipt = 0.0;
                 }
 
-                costsAndSalesItems.add(new CostsAndSales(idOfOrg, org.getOfficialName(), salesVolume, averageReceipt, 0.0, 0.0, 0.0));
+                // средняя цена комплексов
+                queryStringBuffer = new StringBuffer("select count(ci.org.idOfOrg), sum(ci.currentPrice) from ComplexInfo ci,"
+                        + " ComplexInfoDetail cid, MenuDetail md, Menu m where"
+                        + " ci.idOfComplexInfo = cid.complexInfo.idOfComplexInfo"
+                        + " and cid.menuDetail.idOfMenuDetail = md.idOfMenuDetail"
+                        + " and md.menu.idOfMenu = m.idOfMenu"
+                        + " and m.createTime > " + startDate.getTime() + " and m.createTime < " + endDate.getTime()
+                        + " and ci.currentPrice IS NOT NULL and (");
+                for (Org curOrg : workingOrgSet) {
+                    queryStringBuffer.append("ci.org.idOfOrg = ");
+                    queryStringBuffer.append(curOrg.getIdOfOrg());
+                    queryStringBuffer.append(" or ");
+                }
+                queryString = queryStringBuffer.toString();
+                queryString = queryString.substring(0, queryString.length() - 4);
+                queryString += ") group by ci.org.idOfOrg order by ci.org.idOfOrg";
+                query = session.createQuery(queryString);
+                resultList = query.list();
+
+                double averageComplexPrice = 0.0;
+                double orgWithComplexesCount = 0.0;
+
+                for (Object resultObject : resultList) {
+                    Object[] result = (Object[]) resultObject;
+
+                    orgWithComplexesCount++;
+                    Double currentOrgCountOfComplexes = Double.valueOf((Long) result[0]);
+                    if (currentOrgCountOfComplexes > 0) {
+                        Double currentOrgAverageComplexPrice = Double.valueOf((Long) result[1]) / currentOrgCountOfComplexes;
+                        averageComplexPrice += currentOrgAverageComplexPrice;
+                    }
+
+                }
+                if (orgWithComplexesCount > 0.0) {
+                    averageComplexPrice = averageComplexPrice / orgWithComplexesCount / 100.0;
+                }
+
+                //// средняя месячная трата
+                //queryStringBuffer = new StringBuffer("select sum(o.rsum) from Order o where"
+                //        + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
+                //        + " and o.rsum > 0 and (");
+                //for (Org curOrg : workingOrgSet) {
+                //    queryStringBuffer.append("o.id.idOfOrg = ");
+                //    queryStringBuffer.append(curOrg.getIdOfOrg());
+                //    queryStringBuffer.append(" or ");
+                //}
+                //queryString = queryStringBuffer.toString();
+                //queryString = queryString.substring(0, queryString.length() - 4);
+                //queryString += ") group by o.client.idOfClient order by o.client.idOfClient";
+                //query = session.createQuery(queryString);
+                //resultList = query.list();
+
+
+
+                costsAndSalesItems.add(new CostsAndSales(idOfOrg, org.getOfficialName(), salesVolume, averageReceipt, 0.0, averageComplexPrice, 0.0));
             }
             return new AggregateCostsAndSalesReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     costsAndSalesItems);
