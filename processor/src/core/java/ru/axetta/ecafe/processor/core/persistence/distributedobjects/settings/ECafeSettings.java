@@ -27,6 +27,7 @@ public class ECafeSettings extends DistributedObject{
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Value", settingValue);
+        setAttribute(element,"Text", settingText);
         setAttribute(element,"Id", identificator);
     }
 
@@ -38,6 +39,8 @@ public class ECafeSettings extends DistributedObject{
         if(stringValue!=null) setSettingValue(stringValue);
         Long longId = getLongAttributeValue(node, "Id");
         if(longId!=null) setIdentificator(longId);
+        String stringSettingText = getStringAttributeValue(node, "Text", 128);
+        if(stringSettingText!=null) setSettingText(stringSettingText);
         return this;
     }
 
@@ -45,12 +48,23 @@ public class ECafeSettings extends DistributedObject{
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((ECafeSettings) distributedObject).getOrgOwner());
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
+        setSettingText(((ECafeSettings) distributedObject).getSettingText());
         setIdentificator(((ECafeSettings) distributedObject).getIdentificator());
     }
 
     private String settingValue;
+
     private Long orgOwner;
     private Long identificator;
+    private String settingText;
+
+    public String getSettingText() {
+        return settingText;
+    }
+
+    public void setSettingText(String settingText) {
+        this.settingText = settingText;
+    }
 
 
     public String getSettingValue() {

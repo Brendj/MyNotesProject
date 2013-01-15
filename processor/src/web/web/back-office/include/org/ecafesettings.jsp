@@ -56,7 +56,19 @@
                 <h:outputText value="Значение"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{setting.settingValue}"
-                               id="inplace" required="true"
+                               id="inplaceSettingValue" required="true"
+                               changedHoverClass="hover" viewHoverClass="hover"
+                               viewClass="inplace" changedClass="inplace"
+                               selectOnEdit="true" editEvent="ondblclick">
+                <a4j:support event="onviewactivated" reRender="ecafeSettingsEditListTable"/>
+            </rich:inplaceInput>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Текстовое сообщение"/>
+            </f:facet>
+            <rich:inplaceInput layout="block" value="#{setting.settingText}"
+                               id="inplaceSettingText" required="true"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
                                selectOnEdit="true" editEvent="ondblclick">
