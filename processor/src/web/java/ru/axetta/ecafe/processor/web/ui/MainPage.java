@@ -28,7 +28,6 @@ import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.org.goodRequest.GoodRequestListPage;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
@@ -110,9 +109,6 @@ public class MainPage {
     private final MenuExchangePage menuExchangePage = new MenuExchangePage();
     private Long selectedIdOfMenu;
     private String selectedMenuDataXML;
-
-    // Good requests manipulation
-    private final GoodRequestListPage goodRequestListPage = new GoodRequestListPage();
 
     // Contragent manipulation
     private final BasicWorkspacePage contragentGroupPage = new BasicWorkspacePage();
@@ -1127,23 +1123,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
-        }
-        return null;
-    }
-
-    public GoodRequestListPage getGoodRequestListPage() {
-        return goodRequestListPage;
-    }
-
-    public Object showGoodRequestListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        try {
-            goodRequestListPage.setIdOfOrg(selectedIdOfOrg);
-            currentWorkspacePage = goodRequestListPage;
-        } catch (Exception e) {
-            logger.error("Failed to load good requests from table", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по запросам продуктов", null));
         }
         return null;
     }
