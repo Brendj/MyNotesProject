@@ -196,6 +196,23 @@ public class Manager {
         return elementRO;
     }
 
+    private List<Long> getMenuExchangeRuleList(SessionFactory sessionFactory){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        List<Long> menuExchangeRuleList = new ArrayList<Long>();
+        try {
+            persistenceSession = sessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return menuExchangeRuleList;
+    }
+
     public void process(SessionFactory sessionFactory) {
         if (logger.isDebugEnabled()) {
             logger.debug("RO begin process section");
@@ -205,9 +222,10 @@ public class Manager {
         Arrays.sort(array, distributedObjectsEnumComparator);
         clearConfirmTable(sessionFactory);
         Map<DistributedObjectsEnum, List<DistributedObject>> currentDistributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
+        ConfigurationProvider configurationProvider = getConfigurationProvider(sessionFactory);
+        List<Long> menuExchangeRuleList = getMenuExchangeRuleList(sessionFactory);
         for (DistributedObjectsEnum anArray : array) {
-            ConfigurationProvider configurationProvider = getConfigurationProvider(sessionFactory);
-            List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()),configurationProvider);
+            List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()),configurationProvider, menuExchangeRuleList);
             resultDistributedObjectsListMap.put(anArray, currentResultDistributedObjectsList);
             if (!(distributedObjectsListMap.get(anArray) == null || distributedObjectsListMap.get(anArray).isEmpty())) {
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
@@ -375,8 +393,8 @@ public class Manager {
         return configurationProvider;
     }
 
-    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion, ConfigurationProvider configurationProvider){
-        List<DistributedObject> result = new LinkedList<DistributedObject>();
+    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion, ConfigurationProvider configurationProvider, List<Long> menuExchangeRuleList){
+        List<DistributedObject> result = new ArrayList<DistributedObject>();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -389,7 +407,7 @@ public class Manager {
                 where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
             }
             // вытянем номер организации поставщика если есть.
-            List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
+            //List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
             String whereOrgSource = "";
             if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
                 whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
@@ -410,7 +428,14 @@ public class Manager {
             List list = query.list();
             if(!(list==null || list.isEmpty())){
                 for (Object object: list){
-                    result.add((DistributedObject) object);
+                    DistributedObject distributedObject = (DistributedObject) object;
+                    List clazzs = Arrays.asList(distributedObject.getClass().getInterfaces());
+                    if(clazzs.contains(IConfigProvider.class)){
+                         if (configurationProvider==null){
+                             distributedObject.setDistributedObjectException(new DistributedObjectException("CONFIGURATION_PROVIDER_NOT_FOUND"));
+                         }
+                    }
+                    result.add(distributedObject);
                 }
             }
             persistenceTransaction.commit();

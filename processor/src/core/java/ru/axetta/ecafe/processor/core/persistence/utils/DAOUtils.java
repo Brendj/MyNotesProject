@@ -6,12 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -19,12 +15,14 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.Query;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -939,7 +937,7 @@ public class DAOUtils {
     }
 
     public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
-        List<Long> resultList = new LinkedList<Long>();
+        List<Long> resultList = new ArrayList<Long>();
         Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
         List list = query.list();
