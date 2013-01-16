@@ -4,12 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
-import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgEditPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -20,8 +17,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import javax.faces.context.FacesContext;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -203,6 +198,21 @@ public class OrgListSelectPage extends BasicPage {
             }
             criteria.add(criterion);
         }
+
+        deselectAllItems();
         return criteria.list();
     }
+
+    public void deselectAllItems() {
+        for (Item item : items) {
+            item.setSelected(false);
+        }
+    }
+
+    public void selectAllItems() {
+        for (Item item : items) {
+            item.setSelected(true);
+        }
+    }
+
 }

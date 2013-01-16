@@ -33,12 +33,18 @@
                     </h:panelGrid>
                     <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
                                       styleClass="output-text" >
-                        <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPage}" reRender="modalOrgListSelectorForm"/>
+                        <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}" reRender="modalOrgListSelectorForm"/>
 
                         <f:selectItem itemValue="0" itemLabel="Любые организации" />
                         <f:selectItem itemValue="1" itemLabel="Только ОУ" />
                         <f:selectItem itemValue="2" itemLabel="Только поставщики" />
                     </h:selectOneRadio>
+                    <h:panelGrid columns="2" styleClass="borderless-grid">
+                        <a4j:commandButton action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"
+                                         styleClass="command-link" value="Выбрать все" />
+                        <a4j:commandButton action="#{mainPage.clearOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"
+                                         styleClass="command-link" value="Очистить выбор" />
+                    </h:panelGrid>
                 </td>
             </tr>
             <tr>

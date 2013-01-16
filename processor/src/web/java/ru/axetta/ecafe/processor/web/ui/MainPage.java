@@ -1624,6 +1624,22 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
+    public Object updateOrgListSelectPageWithItemDeselection() {
+        updateOrgListSelectPage();
+        orgListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object clearOrgListSelectedItemsList() {
+        orgListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object selectAllOrgListSelectedItemsList() {
+        orgListSelectPage.selectAllItems();
+        return null;
+    }
+
     public Object completeOrgSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
