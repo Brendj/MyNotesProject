@@ -90,7 +90,7 @@
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
                     footerClass="data-table-footer">
-        <rich:column headerClass="column-header" >
+        <rich:column headerClass="column-header" sortBy="#{item.idOfClient}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Ид." />
             </f:facet>
@@ -100,7 +100,7 @@
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.contractId}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Л/с" />
             </f:facet>
@@ -126,7 +126,7 @@
                           value="#{item.person.surname} #{item.person.firstName} #{item.person.secondName}"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Группа" />
             </f:facet>

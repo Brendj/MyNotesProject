@@ -14,10 +14,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import javax.faces.model.SelectItem;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -270,5 +269,6 @@ public class ClientFilter {
         if (StringUtils.isNotEmpty(this.filterClientId)) {
             criteria.add(Restrictions.eq("idOfClient", Long.parseLong(this.filterClientId.replaceAll("\\s", ""))));
         }
+       criteria.addOrder(Order.asc("contractId"));
     }
 }
