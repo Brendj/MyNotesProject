@@ -19,6 +19,7 @@
         <h:outputText escape="false" value=";"/>
         <h:outputText escape="false" value="#{item.expenditureLimit}" converter="copeckSumConverter" />
         <h:outputText escape="false" value=";#{item.discountMode}"/>
+        <h:outputText escape="false" value=";#{item.guid}"/>
         <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     </a4j:repeat>
 </f:view>

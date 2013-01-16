@@ -12,9 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -107,6 +105,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private Long expenditureLimit;
         private final Integer discountMode;
         private final String discountAsString;
+        private final String guid;
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -142,6 +141,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public Item(Client client) {
             this.idOfClient = client.getIdOfClient();
+            this.guid = client.getClientGUID();
             this.org = new OrgItem(client.getOrg());
             this.person = new PersonItem(client.getPerson());
             this.contractPerson = new PersonItem(client.getContractPerson());
@@ -249,6 +249,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public void setNotifyViaSMS(boolean notifyViaSMS) {
             this.notifyViaSMS = notifyViaSMS;
+        }
+
+        public String getGuid() {
+            return guid;
         }
     }
 
