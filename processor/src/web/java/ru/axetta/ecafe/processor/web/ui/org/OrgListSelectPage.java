@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgEditPage;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -79,6 +81,7 @@ public class OrgListSelectPage extends BasicPage {
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private List<Item> items = Collections.emptyList();
     private String filter;
+    private Integer supplierFilter = 0;
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
@@ -112,6 +115,14 @@ public class OrgListSelectPage extends BasicPage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public Integer getSupplierFilter() {
+        return supplierFilter;
+    }
+
+    public void setSupplierFilter(Integer supplierFilter) {
+        this.supplierFilter = supplierFilter;
     }
 
     public void fill(Session session, String orgFilter) throws Exception {
@@ -174,6 +185,23 @@ public class OrgListSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
+        }
+        if (supplierFilter != null && supplierFilter != 0) {
+            Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
+            List menuExchangeRuleList = destMenuExchangeCriteria.list();
+            HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
+            for (Object object : menuExchangeRuleList) {
+                MenuExchangeRule menuExchangeRule = (MenuExchangeRule) object;
+                Long idOfSourceOrg = menuExchangeRule.getIdOfSourceOrg();
+                if (idOfSourceOrg != null) {
+                    idOfSourceOrgSet.add(idOfSourceOrg);
+                }
+            }
+            Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
+            if (supplierFilter == 1) {
+                criterion = Restrictions.not(criterion);
+            }
+            criteria.add(criterion);
         }
         return criteria.list();
     }

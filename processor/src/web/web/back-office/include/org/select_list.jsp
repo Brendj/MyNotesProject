@@ -31,6 +31,14 @@
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}" />
                         </a4j:commandLink>
                     </h:panelGrid>
+                    <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
+                                      styleClass="output-text" >
+                        <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPage}" reRender="modalOrgListSelectorForm"/>
+
+                        <f:selectItem itemValue="0" itemLabel="Любые организации" />
+                        <f:selectItem itemValue="1" itemLabel="Только ОУ" />
+                        <f:selectItem itemValue="2" itemLabel="Только поставщики" />
+                    </h:selectOneRadio>
                 </td>
             </tr>
             <tr>

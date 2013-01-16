@@ -64,9 +64,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 List resultList;
 
                 // объем продаж и средний чек
-                queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.sumByCard), sum(o.sumByCash) from Order o where"
+                queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.RSum) from Order o where"
                         + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
-                        + " and (o.sumByCard > 0 or o.sumByCash > 0) and (");
+                        + " and (o.RSum > 0) and (");
                 for (Org curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
                     queryStringBuffer.append(curOrg.getIdOfOrg());
@@ -79,18 +79,16 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 resultList = query.list();
 
                 double salesVolume = 0.0;
-                double totalCountOfPaidOrders = 0.0;
+                long totalCountOfPaidOrders = 0L;
 
                 for (Object resultObject : resultList) {
                     Object[] result = (Object[]) resultObject;
 
-                    Double currentOrgCountOfPaidOrders = Double.valueOf((Long) result[0]);
-                    Long sumByCash = (Long) result[1];
-                    Long sumByCard = (Long) result[2];
+                    Long currentOrgCountOfPaidOrders = (Long) result[0];
+                    Long rSum = (Long) result[1];
 
                     Double curentOrgSalesValue = 0.0;
-                    curentOrgSalesValue += sumByCash;
-                    curentOrgSalesValue += sumByCard;
+                    curentOrgSalesValue += rSum;
 
                     totalCountOfPaidOrders += currentOrgCountOfPaidOrders;
                     salesVolume += curentOrgSalesValue;
@@ -98,7 +96,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 salesVolume /= 100.0;
                 double averageReceipt;
                 if (salesVolume > 0.0) {
-                    averageReceipt = salesVolume / totalCountOfPaidOrders;
+                    averageReceipt = salesVolume / ((double) totalCountOfPaidOrders);
                 } else {
                     averageReceipt = 0.0;
                 }
@@ -123,7 +121,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 resultList = query.list();
 
                 double averageComplexPrice = 0.0;
-                double orgWithComplexesCount = 0.0;
+                int orgWithComplexesCount = 0;
 
                 for (Object resultObject : resultList) {
                     Object[] result = (Object[]) resultObject;
@@ -136,31 +134,68 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                     }
 
                 }
-                if (orgWithComplexesCount > 0.0) {
-                    averageComplexPrice = averageComplexPrice / orgWithComplexesCount / 100.0;
+                if (orgWithComplexesCount > 0) {
+                    averageComplexPrice = averageComplexPrice / ((double) orgWithComplexesCount) / 100.0;
                 }
 
-                //// средняя месячная трата
-                //queryStringBuffer = new StringBuffer("select sum(o.rsum) from Order o where"
-                //        + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
-                //        + " and o.rsum > 0 and (");
-                //for (Org curOrg : workingOrgSet) {
-                //    queryStringBuffer.append("o.id.idOfOrg = ");
-                //    queryStringBuffer.append(curOrg.getIdOfOrg());
-                //    queryStringBuffer.append(" or ");
-                //}
-                //queryString = queryStringBuffer.toString();
-                //queryString = queryString.substring(0, queryString.length() - 4);
-                //queryString += ") group by o.client.idOfClient order by o.client.idOfClient";
-                //query = session.createQuery(queryString);
-                //resultList = query.list();
+                // средняя месячная трата
+                queryStringBuffer = new StringBuffer("select sum(o.RSum) from Order o where"
+                        + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
+                        + " and o.RSum > 0 and (");
+                for (Org curOrg : workingOrgSet) {
+                    queryStringBuffer.append("o.id.idOfOrg = ");
+                    queryStringBuffer.append(curOrg.getIdOfOrg());
+                    queryStringBuffer.append(" or ");
+                }
+                queryString = queryStringBuffer.toString();
+                queryString = queryString.substring(0, queryString.length() - 4);
+                queryString += ") group by o.client.idOfClient order by o.client.idOfClient";
+                query = session.createQuery(queryString);
+                resultList = query.list();
+                long daysCount = countDaysBetween(startDate, endDate);
+                long clientsCount = 0L;
+                double averageMonthlyExpense = 0.0;
+                for (Object resultObject : resultList) {
+                    Long clientExpenses = (Long) resultObject;
+                    clientsCount++;
+                    averageMonthlyExpense += clientExpenses;
+                }
+                if (clientsCount > 0) {
+                    averageMonthlyExpense = averageMonthlyExpense / ((double) clientsCount) / ((double) daysCount) * 30.0;
+                }
 
-
-
-                costsAndSalesItems.add(new CostsAndSales(idOfOrg, org.getOfficialName(), salesVolume, averageReceipt, 0.0, averageComplexPrice, 0.0));
+                costsAndSalesItems.add(new CostsAndSales(idOfOrg, org.getOfficialName(), salesVolume, averageReceipt, averageMonthlyExpense, averageComplexPrice, 0.0));
             }
             return new AggregateCostsAndSalesReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     costsAndSalesItems);
+        }
+
+        private long countDaysBetween(Date startDate, Date endDate) {
+            final double MILLISECONDS_IN_DAY = 1000.0 * 60.0 * 60.0 * 24.0;
+
+            if (endDate.before(startDate)) {
+                Date tempDate = endDate;
+                endDate = startDate;
+                startDate = tempDate;
+            }
+
+            Calendar startCal = GregorianCalendar.getInstance();
+            startCal.setTime(startDate);
+            startCal.set(Calendar.HOUR_OF_DAY, 0);
+            startCal.set(Calendar.MINUTE, 0);
+            startCal.set(Calendar.SECOND, 0);
+            long startTime = startCal.getTimeInMillis();
+
+            Calendar endCal = GregorianCalendar.getInstance();
+            endCal.setTime(endDate);
+            endCal.set(Calendar.HOUR_OF_DAY, 0);
+            endCal.set(Calendar.MINUTE, 0);
+            endCal.set(Calendar.SECOND, 0);
+            long endTime = endCal.getTimeInMillis();
+
+            double tmpDays = (endTime - startTime) / MILLISECONDS_IN_DAY;
+            long result = Math.round(tmpDays);
+            return result;
         }
 
         private Org getOrgById(Session session, Long idOfOrg) {
@@ -209,6 +244,13 @@ public class AggregateCostsAndSalesReport extends BasicReport {
             this.basicBasketPrice = basicBasketPrice;
         }
 
+        private String formatOutput(double value) {
+            if (value > 0) {
+                return String.format(format, value);
+            }
+            return "-";
+        }
+
         public long getIdOfOrg() {
             return idOfOrg;
         }
@@ -230,7 +272,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
         }
 
         public String getFormattedSalesVolume() {
-            return String.format(format, salesVolume);
+            return formatOutput(salesVolume);
         }
 
         public void setSalesVolume(double salesVolume) {
@@ -242,7 +284,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
         }
 
         public String getFormattedAverageMonthlyExpense() {
-            return String.format(format, averageMonthlyExpense);
+            return formatOutput(averageMonthlyExpense);
         }
 
         public void setAverageMonthlyExpense(double averageMonthlyExpense) {
@@ -254,7 +296,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
         }
 
         public String getFormattedAverageReceipt() {
-            return String.format(format, averageReceipt);
+            return formatOutput(averageReceipt);
         }
 
         public void setAverageReceipt(double averageReceipt) {
@@ -266,7 +308,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
         }
 
         public String getFormattedAverageComplexPrice() {
-            return String.format(format, averageComplexPrice);
+            return formatOutput(averageComplexPrice);
         }
 
         public void setAverageComplexPrice(double averageComplexPrice) {
@@ -278,7 +320,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
         }
 
         public String getFormattedBasicBacketPrice() {
-            return String.format(format, basicBasketPrice);
+            return formatOutput(basicBasketPrice);
         }
 
         public void setBasicBasketPrice(double basicBasketPrice) {
