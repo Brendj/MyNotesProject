@@ -135,9 +135,9 @@ public class Manager {
 
     }
 
-    public Boolean isEmpty(){
-        return distributedObjectsListMap.isEmpty();
-    }
+    //public Boolean isEmpty(){
+    //    return distributedObjectsListMap.isEmpty();
+    //}
     public Element toElement(Document document) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("RO section begin generate XML node");
@@ -206,11 +206,12 @@ public class Manager {
         clearConfirmTable(sessionFactory);
         Map<DistributedObjectsEnum, List<DistributedObject>> currentDistributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
         for (DistributedObjectsEnum anArray : array) {
-            List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()));
+            ConfigurationProvider configurationProvider = getConfigurationProvider(sessionFactory);
+            List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()),configurationProvider);
             resultDistributedObjectsListMap.put(anArray, currentResultDistributedObjectsList);
             if (!(distributedObjectsListMap.get(anArray) == null || distributedObjectsListMap.get(anArray).isEmpty())) {
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
-                        distributedObjectsListMap.get(anArray), anArray);
+                        distributedObjectsListMap.get(anArray), anArray, configurationProvider);
                 currentDistributedObjectsListMap.put(anArray, distributedObjectsList);
             }
             addConfirms(sessionFactory, currentResultDistributedObjectsList);
@@ -276,7 +277,7 @@ public class Manager {
         }
     }
 
-    private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory, List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass){
+    private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory, List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, ConfigurationProvider configurationProvider){
         List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>(0);
         if(!(distributedObjects==null || distributedObjects.isEmpty())){
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
@@ -285,7 +286,7 @@ public class Manager {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Process: "+distributedObject.toString());
                 }
-                DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion);
+                DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion, configurationProvider);
                 distributedObjectList.add(currentDistributedObject);
             }
             /* generate result list */
@@ -299,18 +300,21 @@ public class Manager {
         return distributedObjectList;
     }
 
-    private DistributedObject processCurrentObject(SessionFactory sessionFactory,DistributedObject distributedObject,Long currentMaxVersion){
+    private DistributedObject processCurrentObject(SessionFactory sessionFactory,DistributedObject distributedObject,Long currentMaxVersion, ConfigurationProvider configurationProvider){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
             if(distributedObject.getDistributedObjectException()==null){
+                persistenceSession = sessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
                 if (!(distributedObject.getDeletedState()==null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession);
                     if(distributedObject instanceof IConfigProvider){
-                        ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, distributedObject.getClass());
-                        ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                        if(configurationProvider == null) {
+                            throw new DistributedObjectException("CONFIGURATION_PROVIDER_NOT_FOUND");
+                        } else {
+                            ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                        }
                     }
                     distributedObject.setDateOnlyFormat(dateOnlyFormat);
                     distributedObject.setTimeFormat(timeFormat);
@@ -322,16 +326,14 @@ public class Manager {
                     distributedObject.setDateOnlyFormat(dateOnlyFormat);
                     distributedObject.setTimeFormat(timeFormat);
                 }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
             }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         } catch (DistributedObjectException e){
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
-            //distributedObject.setError(e.getErrorType());
             distributedObject.setDistributedObjectException(e);
             logger.error(distributedObject.toString(), e);
         } catch (Exception e){
-            //distributedObject.setError(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             logger.error(distributedObject.toString(), e);
         } finally {
@@ -341,34 +343,39 @@ public class Manager {
         return distributedObject;
     }
 
-    private ConfigurationProvider getConfigurationProvider(Session session, Class<? extends DistributedObject> clazz) throws Exception{
-        List classList = Arrays.asList(clazz.getInterfaces());
+    private ConfigurationProvider getConfigurationProvider(SessionFactory sessionFactory){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         ConfigurationProvider configurationProvider = null;
-        if(classList.contains(IConfigProvider.class)){
-            Org org = DAOUtils.findOrg(session,idOfOrg);
+        try {
+            persistenceSession = sessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Org org = DAOUtils.findOrg(persistenceSession,idOfOrg);
             configurationProvider = org.getConfigurationProvider();
             /* Если есть конфигурация синхронизируемой организации */
             if(configurationProvider==null){
-                Query query = session.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg");
+                Query query = persistenceSession.createQuery("from MenuExchangeRule where idOfDestOrg=:idOfOrg");
                 query.setParameter("idOfOrg",idOfOrg);
                 List list = query.list();
                 if(!(list == null || list.isEmpty())){
-                    Org sourceOrg = DAOUtils.findOrg(session, ((MenuExchangeRule) list.get(0)).getIdOfSourceOrg());
+                    Org sourceOrg = DAOUtils.findOrg(persistenceSession, ((MenuExchangeRule) list.get(0)).getIdOfSourceOrg());
                     if(sourceOrg != null){
                         configurationProvider = sourceOrg.getConfigurationProvider();
                     }
                 }
             }
-            if(configurationProvider == null) {
-                //return new ArrayList<DistributedObject>(0);
-                // При выбрасывании исключения падает вся синхронизация как быть с библиотекой?
-                throw new DistributedObjectException("CONFIGURATION_PROVIDER_NOT_FOUND");
-            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        }  catch (Exception e){
+            logger.error("");
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return configurationProvider;
     }
 
-    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion){
+    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion, ConfigurationProvider configurationProvider){
         List<DistributedObject> result = new LinkedList<DistributedObject>();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -377,8 +384,8 @@ public class Manager {
             persistenceTransaction = persistenceSession.beginTransaction();
             List classList = Arrays.asList(clazz.getInterfaces());
             String where = "";
-            if(classList.contains(IConfigProvider.class)){
-                ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
+            if(classList.contains(IConfigProvider.class) && configurationProvider!=null){
+                //ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
                 where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
             }
             // вытянем номер организации поставщика если есть.
@@ -536,6 +543,7 @@ public class Manager {
         }
         distributedObject.setCreatedDate(new Date());
         distributedObject.setGlobalVersion(currentVersion);
+        distributedObject.setGlobalVersionOnCreate(currentVersion);
         distributedObject.setDeletedState(distributedObject.getDeletedState());
         return (DistributedObject) session.merge(distributedObject);
     }

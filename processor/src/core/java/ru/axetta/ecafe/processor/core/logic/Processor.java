@@ -359,7 +359,7 @@ public class Processor implements SyncProcessor,
                 }
 
                 try {
-                    if(!request.getManager().isEmpty()){
+                    if(request.getManager()!=null){
                         manager = request.getManager();
                         manager.process(persistenceSessionFactory);
                     }

@@ -10,14 +10,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -278,9 +272,6 @@ public abstract class DistributedObject{
     }
 
     public void setGlobalVersion(Long globalVersion) {
-        if (globalVersionOnCreate == null) {
-            globalVersionOnCreate = globalVersion;
-        }
         this.globalVersion = globalVersion;
     }
 
@@ -288,8 +279,7 @@ public abstract class DistributedObject{
         return globalVersionOnCreate;
     }
 
-    protected void setGlobalVersionOnCreate(Long globalVersionOnCreate) {
-        // for Hibernate only
+    public void setGlobalVersionOnCreate(Long globalVersionOnCreate) {
         this.globalVersionOnCreate = globalVersionOnCreate;
     }
 
