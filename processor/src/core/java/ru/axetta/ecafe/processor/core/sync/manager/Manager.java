@@ -402,12 +402,15 @@ public class Manager {
             persistenceTransaction = persistenceSession.beginTransaction();
             List classList = Arrays.asList(clazz.getInterfaces());
             String where = "";
-            if(classList.contains(IConfigProvider.class) && configurationProvider!=null){
+            if(classList.contains(IConfigProvider.class)){
                 //ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
-                where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+                if ( configurationProvider!=null){
+                    where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+                } else {
+                    where = " idOfConfigurationProvider = null";
+                }
             }
             // вытянем номер организации поставщика если есть.
-            //List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
             String whereOrgSource = "";
             if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
                 whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
