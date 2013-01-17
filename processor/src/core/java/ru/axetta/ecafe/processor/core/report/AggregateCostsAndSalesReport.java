@@ -38,6 +38,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
 
                 // Проверка того, является ли указанная организация поставщиком
                 // Если да - работать с организациями, для которых поставщиком указана данная организация
+                boolean orgIsSourceFlag = false;
                 HashSet<Org> workingOrgSet = new HashSet<Org>();
                 Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
                 destMenuExchangeCriteria.add(Restrictions.eq("idOfSourceOrg", idOfOrg));
@@ -53,6 +54,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                             }
                         }
                     }
+                    orgIsSourceFlag = true;
                 }
                 else {
                     workingOrgSet.add(org);
@@ -164,7 +166,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                     averageMonthlyExpense = averageMonthlyExpense / ((double) clientsCount) / ((double) daysCount) * 30.0;
                 }
 
-                costsAndSalesItems.add(new CostsAndSales(idOfOrg, org.getOfficialName(), salesVolume, averageReceipt, averageMonthlyExpense, averageComplexPrice, 0.0));
+                costsAndSalesItems.add(new CostsAndSales(idOfOrg, orgIsSourceFlag, org.getOfficialName(), salesVolume, averageReceipt, averageMonthlyExpense, averageComplexPrice, 0.0));
             }
             return new AggregateCostsAndSalesReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     costsAndSalesItems);
@@ -224,6 +226,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
     public static class CostsAndSales {
 
         private long idOfOrg;
+        private boolean orgIsSourceFlag;
         private String officialName;
         private double salesVolume;
         private double averageReceipt;
@@ -233,9 +236,10 @@ public class AggregateCostsAndSalesReport extends BasicReport {
 
         private String format = "%.2f";
 
-        public CostsAndSales(long idOfOrg, String officialName, double salesVolume, double averageReceipt,
-                double averageMonthlyExpense, double averageComplexPrice, double basicBasketPrice) {
+        public CostsAndSales(long idOfOrg, boolean orgIsSourceFlag, String officialName, double salesVolume,
+                double averageReceipt, double averageMonthlyExpense, double averageComplexPrice, double basicBasketPrice) {
             this.idOfOrg = idOfOrg;
+            this.orgIsSourceFlag = orgIsSourceFlag;
             this.officialName = officialName;
             this.salesVolume = salesVolume;
             this.averageReceipt = averageReceipt;
@@ -257,6 +261,18 @@ public class AggregateCostsAndSalesReport extends BasicReport {
 
         public void setIdOfOrg(long idOfOrg) {
             this.idOfOrg = idOfOrg;
+        }
+
+        public String getOrgType() {
+            if (orgIsSourceFlag) {
+                return "Поставщик";
+            } else {
+                return "ОУ";
+            }
+        }
+
+        public void setOrgIsSourceFlag(boolean orgIsSourceFlag) {
+            this.orgIsSourceFlag = orgIsSourceFlag;
         }
 
         public String getOfficialName() {

@@ -47,9 +47,15 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="ИД учреждения" />
+                    <h:outputText escape="true" value="ИД организации" />
                 </f:facet>
                 <h:outputText escape="true" value="#{costsAndSales.idOfOrg}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Тип организации" />
+                </f:facet>
+                <h:outputText escape="true" value="#{costsAndSales.orgType}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
