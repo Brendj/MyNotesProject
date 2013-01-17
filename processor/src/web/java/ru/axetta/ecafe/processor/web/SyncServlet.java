@@ -15,8 +15,8 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -108,13 +108,13 @@ public class SyncServlet extends HttpServlet {
             PublicKey publicKey;
             try {
                 org = findOrg(runtimeContext, idOfOrg);
-                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+                //publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             /* Must be commented for testing!!!  */
-            try {
+           /* try {
                 if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -124,7 +124,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
-            }
+            }*/
 
             // Parse XML request
             SyncRequest syncRequest;

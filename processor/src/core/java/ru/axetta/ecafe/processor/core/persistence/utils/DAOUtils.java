@@ -97,7 +97,7 @@ public class DAOUtils {
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
-    public static List findNewerClients(Session persistenceSession, Set<Org> organizations, long clientRegistryVersion)
+    public static List findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.in("org", organizations));
@@ -220,6 +220,28 @@ public class DAOUtils {
         List l = clientGroupCriteria.add(
                 Restrictions.and(
                         Restrictions.eq("groupName", groupName).ignoreCase(),
+                        Restrictions.eq("org.idOfOrg",idOfOrg)
+                )
+        ).list();
+        if (l.size()>0) return (ClientGroup)l.get(0);
+        return null;
+    }
+
+    /**
+     * производит выборку Группы клиента по номеру организации и имени группы
+     * игнорируя регистр имени группы
+     * @author Kadyrov Damir
+     * @since  2012-03-06
+     * @param persistenceSession ссылка на сессию
+     * @param idOfOrg идентификатор организации
+     * @param idOfClientGroup имя группы
+     * @return null если таблица пуста, сущность ClientGroup
+     */
+    public static ClientGroup findClientGroupByIdOfClientGroupAndIdOfOrg(Session persistenceSession,Long idOfOrg, Long idOfClientGroup) throws Exception{
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        List l = clientGroupCriteria.add(
+                Restrictions.and(
+                        Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", idOfClientGroup),
                         Restrictions.eq("org.idOfOrg",idOfOrg)
                 )
         ).list();
@@ -456,11 +478,11 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
+    public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Set<Long> idOfOrgs,
             Date fromDateTime, Date toDateTime, int sourceType) {
         Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
-                + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idOfOrg=:idOfOrg");
-        query.setParameter("idOfOrg", idOfOrg);
+                + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idOfOrg in :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrgs);
         query.setParameter("sinceTime", fromDateTime);
         query.setParameter("tillTime", toDateTime);
         query.setParameter("sourceType", sourceType);
@@ -967,5 +989,14 @@ public class DAOUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession,Long idOfOrg, String clientVersion,
+            String remoteAddress) {
+        Query query = persistenceSession.createQuery("update Org set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
+        query.setParameter("remoteAddress", remoteAddress);
+        query.setParameter("clientVersion", clientVersion);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
     }
 }

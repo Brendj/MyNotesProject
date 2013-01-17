@@ -36,7 +36,10 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -1271,13 +1274,7 @@ public class Processor implements SyncProcessor,
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            Query query = persistenceSession.createQuery("update Org set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
-            query.setParameter("remoteAddress", remoteAddress);
-            query.setParameter("clientVersion", clientVersion);
-            query.setParameter("idOfOrg", idOfOrg);
-            query.executeUpdate();
-
+            DAOUtils.updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -1338,15 +1335,12 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Set<Long> idOfOrgSet = new HashSet<Long>();
+            idOfOrgSet.add(idOfOrg);
 
             Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet  = org.getFriendlyOrg();
             //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
             /* совместимость организаций которые не имеют дружественных организаций */
-            if (orgSet==null || orgSet.isEmpty()){
-                orgSet = new HashSet<Org>();
-                orgSet.add(org);
-            }
             for (Org o: orgSet){
                 idOfOrgSet.add(o.getIdOfOrg());
             }
@@ -1380,9 +1374,18 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date currentDate = new Date();
-            for (AccountTransaction accountTransaction : DAOUtils
-                    .getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
-                            AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE)) {
+            Set<Long> idOfOrgSet = new HashSet<Long>();
+            idOfOrgSet.add(idOfOrg);
+            Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
+            Set<Org> orgSet  = org.getFriendlyOrg();
+            //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
+            /* совместимость организаций которые не имеют дружественных организаций */
+            for (Org o: orgSet){
+                idOfOrgSet.add(o.getIdOfOrg());
+            }
+            List<AccountTransaction> accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrgSet, fromDateTime, currentDate,
+                            AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
+            for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
                         accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
                         accountTransaction.getTransactionTime(), accountTransaction.getTransactionSum());
@@ -1415,8 +1418,10 @@ public class Processor implements SyncProcessor,
                 clients = DAOUtils
                         .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             } else {
+                List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
+                orgList.add(organization);
                 clients = DAOUtils
-                        .findNewerClients(persistenceSession, organization.getFriendlyOrg(), clientRegistryRequest.getCurrentVersion());
+                        .findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
             }
 
             for (Object object : clients) {

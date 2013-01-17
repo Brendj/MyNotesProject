@@ -186,7 +186,7 @@ public class SyncResponse {
             }
         }
 
-        private final List<Item> items = new LinkedList<Item>();
+        private final List<Item> items = new ArrayList<Item>();
 
         public void addItem(Item item) throws Exception {
             this.items.add(item);
@@ -259,7 +259,7 @@ public class SyncResponse {
         }
 
         private Date date;
-        private final List<Item> items = new LinkedList<Item>();
+        private final List<Item> items = new ArrayList<Item>();
 
         public AccIncRegistry() {
         }
