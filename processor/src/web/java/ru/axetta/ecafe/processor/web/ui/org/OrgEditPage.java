@@ -173,10 +173,6 @@ public class OrgEditPage extends BasicWorkspacePage
         }
         else{
             /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/
-            /* принудительно внести в список и текущую организацию */
-            //if(!idOfOrgList.contains(org.getIdOfOrg())){
-            //    idOfOrgList.add(org.getIdOfOrg());
-            //}
             Map<Long,Org> friendlyOrgMap = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
             /* списки не совпали то добавляем */
             Boolean containsOrg = friendlyIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(
@@ -189,10 +185,17 @@ public class OrgEditPage extends BasicWorkspacePage
                     client.setClientRegistryVersion(version);
                     session.update(client);
                 }
-                for (Org o: friendlyOrgMap.values()){
-                    o.getFriendlyOrg().add(org);
+                /* связываем между собой организации */
+                //org.getFriendlyOrg().addAll(friendlyOrgMap.values());
+                friendlyOrgMap.put(org.getIdOfOrg(),org);
+                Collection<Org> orgCollection = friendlyOrgMap.values();
+                //orgCollection.add(org);
+                for (Org o: orgCollection){
+                    List<Org> os = new ArrayList<Org>(orgCollection);
+                    os.remove(o);
+                    //o.getFriendlyOrg().add(org);
+                    o.getFriendlyOrg().addAll(os);
                 }
-                org.getFriendlyOrg().addAll(friendlyOrgMap.values());
             }
         }
 

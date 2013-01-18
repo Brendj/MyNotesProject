@@ -118,6 +118,11 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary"/>
         </set>
 
+        <set name="clientMigration" lazy="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientMigration"/>
+        </set>
+
     </class>
 </hibernate-mapping>
 

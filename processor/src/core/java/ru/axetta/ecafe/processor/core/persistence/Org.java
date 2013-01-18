@@ -90,6 +90,15 @@ public class Org {
     private Set<Questionary> questionaries = new HashSet<Questionary>();
     private String clientVersion;
     private String remoteAddress;
+    private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
+
+    public Set<ClientMigration> getClientMigration() {
+        return clientMigration;
+    }
+
+    public void setClientMigration(Set<ClientMigration> clientMigration) {
+        this.clientMigration = clientMigration;
+    }
 
     public String getRemoteAddress() {
         return remoteAddress;

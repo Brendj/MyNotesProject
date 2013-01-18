@@ -9,10 +9,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
@@ -48,12 +46,9 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public BasicReportJob() {
     }
 
-
-
     public interface AutoReportRunner {
         public void run(AutoReportBuildTask autoReportBuildTask);
     }
-
 
     public static abstract class Builder {
         protected Contragent contragent;

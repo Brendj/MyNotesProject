@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS cf_projectstate_data
+CREATE TABLE cf_projectstate_data
 (
   Period bigint NOT NULL,
   Type int NOT NULL,

@@ -925,14 +925,8 @@ public class Processor implements SyncProcessor,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
             Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet  = org.getFriendlyOrg();
-            //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
             /* совместимость организаций которые не имеют дружественных организаций */
-            if (orgSet==null || orgSet.isEmpty()){
-                //orgSet = new TreeSet<Long>();
-                //orgSet.add(idOfOrg);
-                orgSet = new HashSet<Org>();
-                orgSet.add(org);
-            }
+            orgSet.add(org);
             for (Org o: orgSet){
                 List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
                 HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
@@ -1335,7 +1329,6 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Set<Long> idOfOrgSet = new HashSet<Long>();
-            idOfOrgSet.add(idOfOrg);
 
             Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet  = org.getFriendlyOrg();
@@ -1344,6 +1337,7 @@ public class Processor implements SyncProcessor,
             for (Org o: orgSet){
                 idOfOrgSet.add(o.getIdOfOrg());
             }
+            idOfOrgSet.add(idOfOrg);
 
             for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet)) {
                 accRegistry.addItem(new SyncResponse.AccRegistry.Item((Client) v[0], (Card) v[1]));

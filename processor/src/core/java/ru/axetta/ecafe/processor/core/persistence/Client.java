@@ -93,6 +93,15 @@ public class Client {
     private String fax;
     private Boolean canConfirmGroupPayment;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
+    private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
+
+    public Set<ClientMigration> getClientMigration() {
+        return clientMigration;
+    }
+
+    public void setClientMigration(Set<ClientMigration> clientMigration) {
+        this.clientMigration = clientMigration;
+    }
 
     public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
         return clientAnswerByQuestionary;

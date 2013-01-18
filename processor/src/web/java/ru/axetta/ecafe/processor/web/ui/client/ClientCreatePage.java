@@ -532,6 +532,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
 
         persistenceSession.save(client);
+
+        ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
+        persistenceSession.save(clientMigration);
     }
 
     private String filter = "Не выбрано";

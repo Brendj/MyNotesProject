@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -364,7 +361,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
      * @param session
      * @throws Exception
      */
-    public void setNewOrg(Session session) throws Exception {
+    public void setOldOrg(Session session) throws Exception {
         if (this.items.isEmpty())
             return;
         Org org = null;
@@ -403,6 +400,12 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         if (!(this.items.isEmpty() || org==null)){
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
             ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+            if(clientGroup==null){
+                clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+                if(clientGroup!=null){
+                    clientGroup.setGroupName(ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+                }
+            }
             if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             for (Item item : this.items) {
                 org.hibernate.Query query = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
@@ -411,6 +414,8 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 query.setLong("idOfClient", item.getIdOfClient());
                 query.setLong("clientRegistryVersion", clientRegistryVersion);
                 query.executeUpdate();
+                ClientMigration clientMigration = new ClientMigration(DAOUtils.getClientReference(session,item.idOfClient),org);
+                session.save(clientMigration);
             }
             printMessage("Данные обновлены.");
         }

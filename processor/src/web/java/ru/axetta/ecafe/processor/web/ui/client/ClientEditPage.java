@@ -596,9 +596,18 @@ public class ClientEditPage extends BasicWorkspacePage
         client.setCategories(categoryDiscountSet);
         if(isReplaceOrg){
             ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+            if(clientGroup==null){
+                clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+                if(clientGroup!=null){
+                    clientGroup.setGroupName(ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+                }
+            }
+            getLogger().info(org.getShortName());
             if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             client.setIdOfClientGroup(this.idOfClientGroup);
+            ClientMigration clientMigration = new ClientMigration(client,org);
+            persistenceSession.save(clientMigration);
         } else{
             if(this.idOfClientGroup != null){
                 client.setIdOfClientGroup(this.idOfClientGroup);
@@ -606,6 +615,7 @@ public class ClientEditPage extends BasicWorkspacePage
         }
 
         persistenceSession.update(client);
+
         fill(client);
     }
 

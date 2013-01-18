@@ -131,6 +131,7 @@ public class ReportJobConstants {
             new ReportHint(ComplaintIterationsReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ProductPopularityReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(QuestionaryResultByOrgReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(ClientMigrationHistoryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ClientSelectedAnswerResultByOrgReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),

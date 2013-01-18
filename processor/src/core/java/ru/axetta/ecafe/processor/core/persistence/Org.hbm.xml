@@ -147,6 +147,11 @@
             </many-to-many>
         </set>
 
+        <set name="clientMigration" cascade="all">
+            <key column="IdOfOrg"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientMigration"/>
+        </set>
+
     </class>
 </hibernate-mapping>
 

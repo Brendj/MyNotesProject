@@ -512,6 +512,9 @@ public class ClientManager {
             }
             ///
 
+            ClientMigration clientMigration = new ClientMigration(client,organization,contractDate);
+            persistenceSession.save(clientMigration);
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
