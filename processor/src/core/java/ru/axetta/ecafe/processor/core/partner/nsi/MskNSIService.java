@@ -224,7 +224,8 @@ public class MskNSIService {
         String select = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа']\n" +
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n" +
+                "item['Реестр обучаемых линейный/Класс или группа зачисления'] \n"+
                 "from catalog('Реестр обучаемых')\n" + "where\n"
                 //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
                 + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
@@ -247,6 +248,9 @@ public class MskNSIService {
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
             pupilInfo.group = qr.getQrValue().get(5);
+            String grp = qr.getQrValue().get(6);
+            pupilInfo.group = pupilInfo.group == null || pupilInfo.group.length () < 1 ? grp : pupilInfo.group;
+            pupilInfo.group = pupilInfo.group.replaceAll ("[- ]", "");
             list.add(pupilInfo);
         }
         return list;
@@ -257,10 +261,10 @@ public class MskNSIService {
         String query = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Класс или группа зачисления'], \n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
                 + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
                 + "item['Реестр обучаемых линейный/Дата отчисления'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа'] \n"
+                + "item['Реестр обучаемых линейный/Класс или группа зачисления'] \n"
                 + "from catalog('Реестр обучаемых')\n"
                 + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
@@ -280,6 +284,7 @@ public class MskNSIService {
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
             String grp = qr.getQrValue().get(8);
             pupilInfo.group = pupilInfo.group == null || pupilInfo.group.length () < 1 ? grp : pupilInfo.group;
+            pupilInfo.group = pupilInfo.group.replaceAll ("[- ]", "");
             list.add(pupilInfo);
         }
         return list;
