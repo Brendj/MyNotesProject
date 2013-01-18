@@ -257,9 +257,11 @@ public class MskNSIService {
         String query = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
+                + "item['Реестр обучаемых линейный/Класс или группа зачисления'], \n"
                 + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
-                + "item['Реестр обучаемых линейный/Дата отчисления']\n" + "from catalog('Реестр обучаемых')\n"
+                + "item['Реестр обучаемых линейный/Дата отчисления'], \n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'] \n"
+                + "from catalog('Реестр обучаемых')\n"
                 + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
                 + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime() + " and "
@@ -276,6 +278,8 @@ public class MskNSIService {
             pupilInfo.group = qr.getQrValue().get(5);
             pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
+            String grp = qr.getQrValue().get(8);
+            pupilInfo.group = pupilInfo.group == null || pupilInfo.group.length () < 1 ? grp : pupilInfo.group;
             list.add(pupilInfo);
         }
         return list;
