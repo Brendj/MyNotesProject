@@ -224,9 +224,9 @@ public class MskNSIService {
         String select = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n" +
-                "item['Реестр обучаемых линейный/Класс или группа зачисления'] \n"+
-                "from catalog('Реестр обучаемых')\n" + "where\n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'],\n"
+                + "item['Реестр обучаемых линейный/Класс или группа зачисления']\n"
+                + "from catalog('Реестр обучаемых')\n" + "where\n"
                 //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
                 + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
@@ -247,13 +247,18 @@ public class MskNSIService {
             pupilInfo.secondName = qr.getQrValue().get(2);
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
-            pupilInfo.group = qr.getQrValue().get(5);
-            String grp = qr.getQrValue().get(6);
-            pupilInfo.group = pupilInfo.group == null || pupilInfo.group.length () < 1 ? grp : pupilInfo.group;
-            pupilInfo.group = pupilInfo.group.replaceAll ("[- ]", "");
+            pupilInfo.group = getGroup(qr.getQrValue().get(5), qr.getQrValue().get(6));
+            
             list.add(pupilInfo);
         }
         return list;
+    }
+
+    private String getGroup(String currentGroup, String initialGroup) {
+        String group = currentGroup;
+        if (group==null || group.trim().length()==0) group=initialGroup;
+        if (group!=null) group = group.replaceAll("[ -]", "");
+        return group;
     }
 
 
@@ -261,15 +266,15 @@ public class MskNSIService {
         String query = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа'], \n"
+                + "item['Реестр обучаемых линейный/Класс или группа зачисления'], \n"
                 + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
                 + "item['Реестр обучаемых линейный/Дата отчисления'], \n"
-                + "item['Реестр обучаемых линейный/Класс или группа зачисления'] \n"
+                + "item['Реестр обучаемых линейный/Текущий класс или группа'] \n"
                 + "from catalog('Реестр обучаемых')\n"
                 + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
                 + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime() + " and "
-                + "item['РОУ XML/Краткое наименование учреждения']='" + org.getOfficialName() + "')\n";
+                + "item['РОУ XML/Краткое наименование учреждения']='" + org.getShortName() + "')\n";
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
@@ -279,12 +284,9 @@ public class MskNSIService {
             pupilInfo.secondName = qr.getQrValue().get(2);
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
-            pupilInfo.group = qr.getQrValue().get(5);
+            pupilInfo.group = getGroup(qr.getQrValue().get(8), qr.getQrValue().get(5));
             pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
-            String grp = qr.getQrValue().get(8);
-            pupilInfo.group = pupilInfo.group == null || pupilInfo.group.length () < 1 ? grp : pupilInfo.group;
-            pupilInfo.group = pupilInfo.group.replaceAll ("[- ]", "");
             list.add(pupilInfo);
         }
         return list;
