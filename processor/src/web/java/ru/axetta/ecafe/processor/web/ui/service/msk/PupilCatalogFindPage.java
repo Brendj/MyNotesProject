@@ -150,7 +150,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound=0;
-            List<MskNSIService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getOfficialName()/*.getGuid()*/, familyName, null);
+            List<MskNSIService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getShortName()/*.getGuid()*/, familyName, null);
             for (MskNSIService.PupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
