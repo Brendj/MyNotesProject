@@ -480,8 +480,8 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
             Date fromDateTime, Date toDateTime, int sourceType) {
-        Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c, Org o "
-                + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idoforg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg)");
+        Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
+                + " where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and (c.org.idOfOrg=:idOfOrg or c.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg))");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("sinceTime", fromDateTime);
         query.setParameter("tillTime", toDateTime);
@@ -525,7 +525,7 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrganization(Session persistenceSession, Long idOfOrg) {
-        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idoforg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg)");
+        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and (cl.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg) or (cl.idOfOrg=:idOfOrg))");
         query.setParameter("idOfOrg", idOfOrg);
         return (List<Object[]>)query.list();
     }
