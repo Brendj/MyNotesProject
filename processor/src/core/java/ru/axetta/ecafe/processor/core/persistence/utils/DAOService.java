@@ -530,21 +530,21 @@ public class DAOService {
 
 
     @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType) {
+    public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
             sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
                     "from cf_orders " +
                     "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
                     "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
-                    +
+                    + (notDiscounted ? " and cf_orders.socdiscount=0" : "") +
                     "group by cf_orders.idoforg";
         } else {
             sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
                     "from cf_orders " +
                     "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
                     "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
-                    +
+                    + (notDiscounted ? " and cf_orders.socdiscount=0" : "") +
                     "group by cf_orders.idoforg";
         }
 
@@ -705,5 +705,16 @@ public class DAOService {
             logger.error("Failed to rebind client " + idofclient + " to group " + idofclientgroup, e);
         }
         return false;
+    }
+
+    @Transactional
+    public List<Contragent> getContragentsList() {
+        TypedQuery<Contragent> query = em.createQuery("from Contragent", Contragent.class);
+        List<Contragent> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result;
     }
 }

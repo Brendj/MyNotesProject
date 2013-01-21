@@ -217,9 +217,9 @@ public class DashboardServiceBean {
             Map<Long, Integer> employeeEnters = daoService
                     .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
             Map<Long, Integer> studentOrders = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
+                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, true);
             Map<Long, Integer> employeeOrders = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
+                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, true);
             Map<Long, Integer> studentDiscounts = daoService
                     .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
             Map<Long, Integer> employeeDiscounts = daoService
