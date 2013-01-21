@@ -345,7 +345,7 @@ public class ClientManager {
                 {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
                 }
-            if (registerComentsAdds.length () > 0)
+            if (registerComentsAdds !=null && registerComentsAdds.length () > 0)
                 {
                 String comments = client.getRemarks ();
                 if (comments.indexOf ("{%") > -1)
