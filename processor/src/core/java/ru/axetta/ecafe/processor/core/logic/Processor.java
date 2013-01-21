@@ -36,10 +36,7 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -692,11 +689,18 @@ public class Processor implements SyncProcessor,
             }
             // If client is specified - check if client is registered for the specified organization
             // or for one of friendly organizations of specified one
-            Set<Org> friendlyOrgsSet = organization.getFriendlyOrg();
+            //Set<Org> friendlyOrgsSet = organization.getFriendlyOrg();
+            Query query = persistenceSession.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
+            query.setParameter("idOfOrg",idOfOrg);
+            List list = query.list();
+            Set<Long> idOfFriendlyOrgsSet = new TreeSet<Long>();
+            for (Object object: list){
+                idOfFriendlyOrgsSet.add((Long) object);
+            }
             if (null != client) {
                 Org clientOrg = client.getOrg();
                 if (!clientOrg.getIdOfOrg().equals(idOfOrg)
-                        || (friendlyOrgsSet != null && !friendlyOrgsSet.isEmpty() && !friendlyOrgsSet.contains(clientOrg))) {
+                        && !idOfFriendlyOrgsSet.contains(clientOrg.getIdOfOrg())) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
                             "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
@@ -1368,16 +1372,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date currentDate = new Date();
-            Set<Long> idOfOrgSet = new HashSet<Long>();
-            idOfOrgSet.add(idOfOrg);
-            Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
-            Set<Org> orgSet  = org.getFriendlyOrg();
-            //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
-            /* совместимость организаций которые не имеют дружественных организаций */
-            for (Org o: orgSet){
-                idOfOrgSet.add(o.getIdOfOrg());
-            }
-            List<AccountTransaction> accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrgSet, fromDateTime, currentDate,
+            List<AccountTransaction> accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
                             AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(

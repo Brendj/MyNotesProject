@@ -478,6 +478,18 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
+            Date fromDateTime, Date toDateTime, int sourceType) {
+        Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c, Org o "
+                + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idoforg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg)");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("sinceTime", fromDateTime);
+        query.setParameter("tillTime", toDateTime);
+        query.setParameter("sourceType", sourceType);
+        return (List<AccountTransaction>)query.list();
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Set<Long> idOfOrgs,
             Date fromDateTime, Date toDateTime, int sourceType) {
         Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
@@ -506,11 +518,18 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
-        String idOfOrg = idOfOrgs.toString().replaceAll("[^0-9,]", "");
-        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in ("+idOfOrg+")");
-        //query.setParameter("idOfOrg", idOfOrg);
+        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg)");
+        query.setParameterList("idOfOrg", idOfOrgs);
         return (List<Object[]>)query.list();
     }
+
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> getClientsAndCardsForOrganization(Session persistenceSession, Long idOfOrg) {
+        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idoforg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg)");
+        query.setParameter("idOfOrg", idOfOrg);
+        return (List<Object[]>)query.list();
+    }
+
 
     public static EnterEvent findEnterEvent(Session persistenceSession, CompositeIdOfEnterEvent compositeIdOfEnterEvent) throws Exception {
         return (EnterEvent) persistenceSession.get(EnterEvent.class, compositeIdOfEnterEvent);
