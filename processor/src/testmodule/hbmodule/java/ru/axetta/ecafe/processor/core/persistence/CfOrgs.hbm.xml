@@ -219,5 +219,11 @@
             </key>
             <one-to-many not-found="ignore" class="ru.axetta.ecafe.processor.core.persistence.CfSynchistory"/>
         </set>
+
+        <set name="friendlyOrg" table="cf_friendly_organization" lazy="true">
+            <key column="currentOrg"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CfOrgs" column="friendlyOrg"/>
+        </set>
+
     </class>
 </hibernate-mapping>

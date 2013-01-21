@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,6 +13,15 @@ import java.util.Collection;
 public class CfOrgs {
 
     private long idoforg;
+    private Set<CfOrgs> friendlyOrg;
+
+    public Set<CfOrgs> getFriendlyOrg() {
+        return friendlyOrg;
+    }
+
+    public void setFriendlyOrg(Set<CfOrgs> friendlyOrg) {
+        this.friendlyOrg = friendlyOrg;
+    }
 
     public long getIdoforg() {
         return idoforg;
