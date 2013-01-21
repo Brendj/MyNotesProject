@@ -256,3 +256,4 @@ ALTER TABLE cf_technological_map_products ADD COLUMN globalversiononcreate bigin
 ALTER TABLE cf_trade_material_goods ADD COLUMN globalversiononcreate bigint;
 ALTER TABLE cf_ECafeSettings ADD COLUMN globalversiononcreate bigint;
 
+--! ФИНАЛИЗИРОВАН (Кадыров, 130110) НЕ МЕНЯТЬ

@@ -2326,8 +2326,17 @@ CREATE TABLE cf_possible_complaint_iteration_states
   CONSTRAINT cf_possible_complaint_iteration_states_pk PRIMARY KEY (statenumber )
 );
 
+create table CF_ClientMigrationHistory
+(
+  IdOfClientMigration bigserial,
+  IdOfClient bigint not null,
+  IdOfOrg bigint not null,
+  RegistrationDate bigint not null,
+  CONSTRAINT CF_ClientMigrationHistory_pk PRIMARY KEY (IdOfClientMigration)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-        VALUES(2, 2, 31, 130115, 0, '');
+        VALUES(2, 2, 32, 130121, 0, '');
 
 
