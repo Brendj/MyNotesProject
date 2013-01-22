@@ -689,18 +689,17 @@ public class Processor implements SyncProcessor,
             }
             // If client is specified - check if client is registered for the specified organization
             // or for one of friendly organizations of specified one
-            //Set<Org> friendlyOrgsSet = organization.getFriendlyOrg();
             Query query = persistenceSession.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
             query.setParameter("idOfOrg",idOfOrg);
             List list = query.list();
-            Set<Long> idOfFriendlyOrgsSet = new TreeSet<Long>();
+            Set<Long> idOfFriendlyOrgSet = new TreeSet<Long>();
             for (Object object: list){
-                idOfFriendlyOrgsSet.add((Long) object);
+                idOfFriendlyOrgSet.add((Long) object);
             }
             if (null != client) {
                 Org clientOrg = client.getOrg();
                 if (!clientOrg.getIdOfOrg().equals(idOfOrg)
-                        && !idOfFriendlyOrgsSet.contains(clientOrg.getIdOfOrg())) {
+                        && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
                             "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
