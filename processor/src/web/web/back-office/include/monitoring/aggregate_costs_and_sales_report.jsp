@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
+<%--@elvariable id="orgListSelectPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage"--%>
 <h:panelGrid id="aggregateCostsAndSalesReportPanelGrid" binding="#{aggregateCostsAndSalesReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
@@ -21,7 +22,10 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="3" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
+
             <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateCostsAndSalesReportPage.filter}}" />
         </h:panelGrid>
         <a4j:commandButton value="Генерировать отчет" action="#{aggregateCostsAndSalesReportPage.buildReport}"
@@ -87,12 +91,6 @@
                 </f:facet>
                 <h:outputText escape="true" value="#{costsAndSales.formattedAverageComplexPrice}" styleClass="output-text" />
             </rich:column>
-            <%--<rich:column headerClass="column-header">--%>
-                <%--<f:facet name="header">--%>
-                    <%--<h:outputText escape="true" value="Стоимость базовой корзины, руб." />--%>
-                <%--</f:facet>--%>
-                <%--<h:outputText escape="true" value="#{costsAndSales.formattedBasicBacketPrice}" styleClass="output-text" />--%>
-            <%--</rich:column>--%>
 
             <f:facet name="footer">
                 <rich:datascroller for="costsAndSalesReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"

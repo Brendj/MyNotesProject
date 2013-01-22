@@ -8,6 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<%--@elvariable id="orgListSelectPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage"--%>
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор организаций" />
@@ -35,9 +36,9 @@
                                       styleClass="output-text" >
                         <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}" reRender="modalOrgListSelectorForm"/>
 
-                        <f:selectItem itemValue="0" itemLabel="Любые организации" />
-                        <f:selectItem itemValue="1" itemLabel="Только ОУ" />
-                        <f:selectItem itemValue="2" itemLabel="Только поставщики" />
+                        <f:selectItem itemValue="0" itemLabel="Любые организации" itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}"/>
+                        <f:selectItem itemValue="1" itemLabel="Только ОУ" itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}"/>
+                        <f:selectItem itemValue="2" itemLabel="Только поставщики" itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}"/>
                     </h:selectOneRadio>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"

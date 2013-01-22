@@ -76,13 +76,30 @@ public class OrgListSelectPage extends BasicPage {
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private List<Item> items = Collections.emptyList();
     private String filter;
-    private Integer supplierFilter = 0;
+    /*
+       0               - нет фильтра
+       1               - фильтр "только ОУ"
+       другое значение - фильтр "только поставщики"
+    */
+    private int  supplierFilter = 0;
+    /*
+       0 - доступны все фильтры
+       1 - доступен только фильтр по ОУ
+       2 - доступен только фильтр по поставщикам
+       3 - доступны только фильтры по ОУ и по поставщикам
+    */
+    private int filterMode = 0;
+    private boolean allOrgFilterDisabled = false;
+    private boolean schoolFilterDisabled = false;
+    private boolean supplierFilterDisabled = false;
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
     }
 
     public void completeOrgListSelection(boolean ok) throws Exception {
+        setFilterMode(0);
+
         Map<Long, String> orgMap = null;
         if (ok) {
             updateSelectedOrgs();
@@ -112,12 +129,57 @@ public class OrgListSelectPage extends BasicPage {
         this.filter = filter;
     }
 
-    public Integer getSupplierFilter() {
+    public int getSupplierFilter() {
         return supplierFilter;
     }
 
-    public void setSupplierFilter(Integer supplierFilter) {
+    public void setSupplierFilter(int supplierFilter) {
         this.supplierFilter = supplierFilter;
+    }
+
+    public int getFilterMode() {
+        return filterMode;
+    }
+
+    public void setFilterMode(int filterMode) {
+        this.filterMode = filterMode;
+        switch (filterMode) {
+            case 1:
+                setOrgFilterModeParameters(true, false, true);
+                supplierFilter = 1;
+                break;
+            case 2:
+                setOrgFilterModeParameters(true, true, false);
+                supplierFilter = 2;
+                break;
+            case 3:
+                setOrgFilterModeParameters(true, false, false);
+                supplierFilter = 1;
+                break;
+            default:
+                setOrgFilterModeParameters(false, false, false);
+                supplierFilter = 0;
+                break;
+        }
+    }
+
+    private void setOrgFilterModeParameters(boolean allOrgFilterDisabled, boolean schoolFilterDisabled, boolean supplierFilterDisabled) {
+        this.allOrgFilterDisabled = allOrgFilterDisabled;
+        this.schoolFilterDisabled = schoolFilterDisabled;
+        this.supplierFilterDisabled = supplierFilterDisabled;
+    }
+
+    public boolean getAllOrgFilterDisabled() {
+        return allOrgFilterDisabled;
+    }
+
+    public boolean getSchoolFilterDisabled() {
+        return schoolFilterDisabled;
+    }
+
+
+    public boolean getSupplierFilterDisabled() {
+        return supplierFilterDisabled;
     }
 
     public void fill(Session session, String orgFilter) throws Exception {
@@ -181,7 +243,7 @@ public class OrgListSelectPage extends BasicPage {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
         }
-        if (supplierFilter != null && supplierFilter != 0) {
+        if (supplierFilter != 0) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
             List menuExchangeRuleList = destMenuExchangeCriteria.list();
             HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
