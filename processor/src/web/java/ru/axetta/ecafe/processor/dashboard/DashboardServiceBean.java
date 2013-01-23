@@ -212,6 +212,33 @@ public class DashboardServiceBean {
                 }
                 statItem.setNumberOfPayOrders((Long) result[1]);
             }
+            ////
+            queryText = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder where lower(cf_orderdetails.menugroup)=:groupName AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
+            query = entityManager.createNativeQuery(queryText);
+            query.setParameter("groupName", "вендинг");
+            query.setParameter("dayStart", dayStartDate.getTime());
+            query.setParameter("dayEnd", dayEndDate.getTime());
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long) result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfVendingOrders((Long) result[1]);
+            }
+            for (Long orgID : orgStats.keySet()) {
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
+                if (statItem.getNumberOfVendingOrders () == null)
+                    {
+                    statItem.setNumberOfVendingOrders(0L);
+                    }
+            }
+
+
+
+            //  Заполняем процентные показатели
             Map<Long, Integer> studentEnters = daoService
                     .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
             Map<Long, Integer> employeeEnters = daoService
@@ -544,8 +571,8 @@ public class DashboardServiceBean {
             //items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
             //        org.getLastUnSuccessfulBalanceSync(),
             //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
-            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
-                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
+            /*items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
+                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));*/
 
         }
         orgSyncStats.setOrgSyncStatItems(items);

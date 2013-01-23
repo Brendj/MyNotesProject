@@ -38,6 +38,7 @@ public class DashboardResponse {
         double numberOfStudentsWithPayedOrdersPercent;
         double numberOfEmployeesWithPayedOrdersPercent;
         private Long numberOfClientsWithoutCard;
+        Long numberOfVendingOrders;
 
         public long getIdOfOrg() {
             return idOfOrg;
@@ -189,6 +190,14 @@ public class DashboardResponse {
 
         public void setNumberOfEmployeesWithDiscountOrdersPercent(double numberOfEmployeesWithDiscountOrdersPercent) {
             this.numberOfEmployeesWithDiscountOrdersPercent = numberOfEmployeesWithDiscountOrdersPercent;
+        }
+
+        public Long getNumberOfVendingOrders() {
+            return numberOfVendingOrders;
+        }
+
+        public void setNumberOfVendingOrders(Long numberOfVendingOrders) {
+            this.numberOfVendingOrders = numberOfVendingOrders;
         }
     }
 

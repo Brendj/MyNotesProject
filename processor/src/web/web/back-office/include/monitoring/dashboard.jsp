@@ -101,13 +101,13 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfDiscountOrders}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfStudentsWithDiscountOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%С" styleClass="output-text" escape="true"/>
                      </f:facet>
@@ -131,6 +131,17 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfEmployeesWithPayedOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
                  </rich:column>
+
+
+
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfVendingOrders}" width="120px">
+                     <f:facet name="header">
+                         <h:outputText value="Продажи вендинг" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfVendingOrders}"/>
+                 </rich:column>
+
+
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgDistrict}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="Район" styleClass="output-text" escape="true"/>
