@@ -53,7 +53,7 @@
                         var="contragentCompletionItem" rowKeyVar="row">
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="ОУ"/>
+                    <h:outputText value="Организация / Агент"/>
                 </f:facet>
                 <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
             </rich:column>
@@ -61,13 +61,17 @@
                 <f:facet name="header">
                     <h:outputText value="#{contragent.contragentName}"/>
                 </f:facet>
-                <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent)}"/>
+                <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent) /100}">
+                    <f:convertNumber pattern="#0.00"/>
+                </h:outputText>
             </rich:columns>
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value=""/>
+                    <h:outputText value="Итого"/>
                 </f:facet>
-                <h:outputText value="#{contragentCompletionItem.totalSumByOrg}"/>
+                <h:outputText value="#{contragentCompletionItem.totalSumByOrg / 100}">
+                    <f:convertNumber pattern="#0.00"/>
+                </h:outputText>
             </rich:column>
         </rich:dataTable>
     </h:panelGrid>
