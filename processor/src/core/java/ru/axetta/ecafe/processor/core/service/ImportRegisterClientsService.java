@@ -36,11 +36,11 @@ import java.util.List;
  */
 @Component
 @Scope("singleton")
-public class ExportRegisterClientsService {
+public class ImportRegisterClientsService {
 
     @Autowired
     MskNSIService nsiService;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExportRegisterClientsService.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
 
@@ -135,7 +135,8 @@ public class ExportRegisterClientsService {
                     //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
                     else if (/*pupil.isCreated() && */!exists) {
                         try {
-                            fieldConfig.setValue(ClientManager.FieldId.COMMENTS, String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
+                            fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
+                                    String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
                             ClientManager
                                     .registerClient(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
                                             true);

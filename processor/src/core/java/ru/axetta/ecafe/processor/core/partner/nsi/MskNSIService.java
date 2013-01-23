@@ -274,7 +274,8 @@ public class MskNSIService {
                 + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
                 + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime() + " and "
-                + "item['РОУ XML/Краткое наименование учреждения']='" + org.getShortName() + "')\n";
+                + "item['РОУ XML/GUID Образовательного учреждения']='" + org.getGuid() + "')\n";
+        //org.getGuid()
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
