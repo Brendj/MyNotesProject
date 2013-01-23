@@ -740,6 +740,11 @@
                         reRender="workspaceForm" />
     <!-- внесено изменние -->
 
+    <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
+    <rich:panelMenuItem id="contragentCompletionReportMenuItem" binding="#{contragentCompletionReportPage.mainMenuComponent}"
+                        label="Отчет по пополнениям" action="#{contragentCompletionReportPage.show}"
+                        reRender="workspaceForm" />
+
     <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                         label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
     <rich:panelMenuItem id="currentPositionReportMenuItem"
