@@ -13,18 +13,17 @@
 
 package wss4j.wss4j1_6_3.tests.forum;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.crypto.KeySelector;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -41,6 +40,11 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.ws.security.message.WSSecHeader;
@@ -51,7 +55,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import generated.rnip.roskazna.smevunifoservice.UnifoTransferMsg;
+import generated.rnip.roskazna.xsd.exportpaymentsresponse.ExportPaymentsResponse;
+import generated.rnip.roskazna.xsd.paymentinfo.PaymentInfoType;
+import generated.rnip.roskazna.xsd.responsetemplate.ResponseTemplate;
 import ru.CryptoPro.JCP.JCP;
 import ru.CryptoPro.JCP.tools.Array;
 import ru.CryptoPro.JCPxml.xmldsig.JCPXMLDSigInit;
@@ -62,16 +71,25 @@ import wss4j.gosuslugi.smev.SignatureTool.xsd.VerifySignatureRequestType;
 import wss4j.gosuslugi.smev.SignatureTool.xsd.VerifySignatureResponseType;
 import wss4j.utility.SpecUtility;
 
+import ru.axetta.ecafe.processor.core.utils.Base64;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 public class SMEVExample {
 
     /**
      * Файл с документом для подписи.
      */
-    private final static String inSOAPFile = System.getProperty("user.dir") + "/data/soap_net.xml";
+    //private final static String inSOAPFile = System.getProperty("user.dir") + "/data/soap_net.xml";
+    //private final static String inSOAPFile = "D:/2/editCategory.xml";
+    private final static String inSOAPFile = "D:/2/getPayments_byDate.xml";
     /**
      * Адрес тестового сервиса СМЭВ.
      */
-    private final static String smevService = "http://localhost:7777/gateway/services/SID0003038";
+    private final static String smevService = "http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
+    //private final static String smevService = "http://localhost:7777/gateway/services/SID0003038";
     //private final static String smevService = "http://188.254.16.92:7777/gateway/services/SID0003038";
     /**
      * Нужно ли проверять подпись онлайн в сервисе СМЭВ.
@@ -83,24 +101,33 @@ public class SMEVExample {
 	 */
 	public static void main(String[] args) throws Exception {
 
+        String v = "ddd [RNIP_CODE=00402] dqw";
+        String cc = "";
+        if (v.indexOf ("[RNIP_CODE=") > -1)
+            {
+            cc = v.substring (v.indexOf ("[RNIP_CODE=") + "[RNIP_CODE=".length (),
+                                     v.indexOf ("]", v.indexOf ("[RNIP_CODE=")));
+            }
+
         /*** Инициализация ***/
+        org.apache.xml.security.Init.init();
 
 		// Инициализация Transforms алгоритмов.
 		com.sun.org.apache.xml.internal.security.Init.init();
 		
 		// Инициализация JCP XML провайдера.
-		if(!JCPXMLDSigInit.isInitialized()) {
+		/*if(!JCPXMLDSigInit.isInitialized()) {
     		JCPXMLDSigInit.init();
-		}
+		}*/
 
         // Инициализация ключевого контейнера.
         KeyStore keyStore = KeyStore.getInstance(JCP.HD_STORE_NAME);
         keyStore.load(null, null);
 
         // Получение ключа и сертификата.
-        PrivateKey privateKey = (PrivateKey)keyStore.getKey(SpecUtility.DEFAULT_ALIAS,
-                SpecUtility.DEFAULT_PASSWORD);
-        X509Certificate cert = (X509Certificate) keyStore.getCertificate(SpecUtility.DEFAULT_ALIAS);
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("test",
+                "test".toCharArray());
+        X509Certificate cert = (X509Certificate) keyStore.getCertificate("test");
 
         /*** Подготовка документа ***/
 
@@ -111,8 +138,7 @@ public class SMEVExample {
 
         // Читаем сообщение из файла.
         FileInputStream is = new FileInputStream(inSOAPFile);
-        soapPart.setContent(new StreamSource(is));
-
+        soapPart.setContent(doMacroReplacement (new StreamSource(is)));
         message.getSOAPPart().getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#");
 
         // Формируем заголовок.
@@ -194,7 +220,13 @@ public class SMEVExample {
         header.getSecurityHeader().appendChild(sigE);
 
         // Получение документа в виде строки и сохранение в файл.
-        String msg = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        //String msg = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
         Array.writeFile(inSOAPFile + ".signed.uri.xml", msg.getBytes("utf-8"));
 
@@ -267,12 +299,141 @@ public class SMEVExample {
             SignatureTool st = sts.getSignatureToolPort(new URL(smevService));
 
             // Передаем документ, при этом зарещаем проверять сертификат.
-            VerifySignatureRequestType vsrType = new VerifySignatureRequestType(msg, true, "http://smev.gosuslugi.ru/actors/smev");
-                    VerifySignatureResponseType result = st.verifySignature(vsrType);
+            send (msg, message);
+            /*VerifySignatureRequestType vsrType = new VerifySignatureRequestType(msg, true, "http://smev.gosuslugi.ru/actors/smev");
+            VerifySignatureResponseType result = st.verifySignature(vsrType);
 
-                    // Результат проверки подписи сервисом СМЭВ.
-                    System.out.println("Verified by SMEV: code = " + result.getError().getErrorCode() +
-                    ", message = " + result.getError().getErrorMessage());
+            // Результат проверки подписи сервисом СМЭВ.
+            System.out.println("Verified by SMEV: code = " + result.getError().getErrorCode() +
+            ", message = " + result.getError().getErrorMessage());*/
         }
 	}
-}
+
+    public static void send (String xmlText, SOAPMessage mmm)
+        {
+            try {
+                // Load the XML text into a DOM Document
+                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+                builderFactory.setNamespaceAware(true);
+                /*InputStream stream  = new ByteArrayInputStream(xmlText.getBytes());
+                Document doc = builderFactory.newDocumentBuilder().parse(stream);*/
+
+                // Use SAAJ to convert Document to SOAPElement
+                SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
+                SOAPConnection connection = sfc.createConnection();
+                /*MessageFactory msgFactory = MessageFactory.newInstance();
+                SOAPMessage    message    = msgFactory.createMessage();
+                SOAPBody       soapBody   = message.getSOAPBody();*/
+
+                /*SOAPHeader sh = sm.getSOAPHeader();
+                SOAPBody sb = sm.getSOAPBody();
+                sh.detachNode();
+                QName bodyName = new QName("http://quoteCompany.com", "GetQuote", "d");
+                SOAPBodyElement bodyElement = sb.addBodyElement(bodyName);
+                QName qn = new QName("aName");
+                SOAPElement quotation = bodyElement.addChildElement(qn);
+
+                quotation.addTextNode("TextMode");
+
+                System.out.println("\n Soap Request:\n");
+                sm.writeTo(System.out);
+                System.out.println();*/
+
+                URL endpoint = new URL("http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService");
+
+
+                SOAPMessage response = connection.call(mmm, endpoint);
+
+
+
+                JAXBContext jc = JAXBContext.newInstance(UnifoTransferMsg.class);
+                Unmarshaller u = jc.createUnmarshaller();
+                Object o = u.unmarshal(response.getSOAPBody().getFirstChild());
+
+                System.out.println(o);
+
+                UnifoTransferMsg m = (UnifoTransferMsg)o;
+                jc = JAXBContext.newInstance(PaymentInfoType.class);
+                u = jc.createUnmarshaller();
+                List <ExportPaymentsResponse.Payments.PaymentInfo> piList = ((ExportPaymentsResponse)m.getMessageData().getAppData().getExportDataResponse().getResponseTemplate()).getPayments().getPaymentInfo();
+                for (ExportPaymentsResponse.Payments.PaymentInfo pi : piList)
+                    {
+                    String paymentInfoStr = new String (pi.getPaymentData (), "UTF-8");
+                    InputStream stream  = new ByteArrayInputStream (paymentInfoStr.getBytes());
+                    InputSource is = new InputSource (stream);
+                    is.setEncoding("UTF-8");
+                    Document doc = builderFactory.newDocumentBuilder ().parse (is);
+                    parsePayment (doc);
+                    }
+                /*for (ExportPaymentsResponse.Payments.PaymentInfo pi : ((ExportPaymentsResponse)m.getMessageData().getAppData().getExportDataResponse().getResponseTemplate()).getPayments().getPaymentInfo()) {
+                    Object payment = u.unmarshal(new ByteArrayInputStream(pi.getPaymentData()));
+                    System.out.println(payment);
+                }*/
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
+    public static List <String> PAYMENT_PARAMS = new ArrayList <String> ();
+    static
+        {
+        PAYMENT_PARAMS.add ("SupplierBillID");
+        PAYMENT_PARAMS.add ("Amount");
+        PAYMENT_PARAMS.add ("PaymentDate");
+        PAYMENT_PARAMS.add ("NUM_DOGOVOR");  // Это номер договора в нашей БД
+        PAYMENT_PARAMS.add ("SRV_CODE");     // Здесь содержится
+        }
+    public static void parsePayment (Document doc)
+        {
+        Map<String, String> vals = new HashMap<String, String>();
+        Node root = doc.getFirstChild ();
+        for (int i=0; i<root.getChildNodes ().getLength(); i++)
+            {
+                Node n = root.getChildNodes().item(i);
+                for (String param : PAYMENT_PARAMS)
+                {
+                    if (n.getNodeName().equals(param) ||
+                            n.getNodeName().equals("AdditionalData"))
+                    {
+                        String v = n.getFirstChild().getNodeValue();
+                        if (n.getNodeName().equals("AdditionalData"))
+                        {
+                            if (n.getFirstChild().getFirstChild().getNodeValue().equals("NUM_DOGOVOR"))
+                            {
+                                v = n.getChildNodes().item(1).getFirstChild().getNodeValue();
+                                param = "NUM_DOGOVOR";
+                            }
+                            if (n.getFirstChild().getFirstChild().getNodeValue().equals("SRV_CODE"))
+                            {
+                                v = n.getChildNodes().item(1).getFirstChild().getNodeValue();
+                                param = "SRV_CODE";
+                            }
+                        }
+                        if (!vals.containsKey (param))
+                        {
+                            vals.put(param, v);
+                        }
+                    }
+                }
+            }
+        int dwq =1;
+        }
+
+
+    public static StreamSource doMacroReplacement (StreamSource ss) throws Exception
+    {
+        InputStream is = ss.getInputStream ();
+        byte[] data = new byte[is.available()];
+        is.read (data);
+
+        String content = new String(data);
+        if (content.indexOf ("%START_DATE%") > 1)
+        {
+            content.replaceAll ("%START_DATE%", "2011-03-11T09:15:25.0Z");
+        }
+        StreamSource res = new StreamSource ();
+        res.setReader (new StringReader (content));
+        return res;
+    }
+    }

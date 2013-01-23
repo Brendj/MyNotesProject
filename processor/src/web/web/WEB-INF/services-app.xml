@@ -83,10 +83,22 @@
     <task:scheduler id="biDataExportSchedule" pool-size="5"/>-->
 
 
+    <task:scheduler id="importRegistereClientsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegistereClientsSchedule">
+        <task:scheduled ref="importRegisterClientsService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+
+
     <task:scheduler id="benefitsRecalculationSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
         <task:scheduled ref="benefitsRecalculationService" method="run" fixed-delay="86400000" />
-        <task:scheduled ref="exportRegisterClientsService" method="run" fixed-delay="86400000" />
+        <task:scheduled ref="importRegisterClientsService" method="run" fixed-delay="86400000" />
+    </task:scheduled-tasks>
+
+
+    <task:scheduler id="rnipPaymentsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="rnipPaymentsSchedule">
+        <task:scheduled ref="loadPaymentsService" method="run" fixed-delay="86400000" />
     </task:scheduled-tasks>
 
 

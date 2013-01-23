@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xsd:schema xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pguchgrs="http://roskazna.ru/xsd/ExportCatSrvsResponse" xmlns:ns1="http://www.bssys.com/xsd/Catalog" targetNamespace="http://roskazna.ru/xsd/ExportCatSrvsResponse" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.bssys.com/xsd/Catalog" schemaLocation="../entity/document/Catalog.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/ResponseTemplate" schemaLocation="ResponseTemplate.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="ExportCatalogResponse">
+		<xsd:annotation>
+			<xsd:documentation>Результат экспорта Каталога услуг ОПУ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="rst:ResponseTemplate">
+				<xsd:sequence>
+					<xsd:element name="Catalog">
+						<xsd:complexType>
+							<xsd:sequence minOccurs="0">
+								<xsd:element name="Service" type="ns1:Service_Type" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Описание услуги</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ExportCatalogResponse" type="pguchgrs:ExportCatalogResponse"/>
+</xsd:schema>

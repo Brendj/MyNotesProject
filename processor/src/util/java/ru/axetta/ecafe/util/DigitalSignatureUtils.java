@@ -71,7 +71,7 @@ public class DigitalSignatureUtils {
     public static void sign(PrivateKey privateKey, Document document) throws Exception {
         // Create sign context
         DOMSignContext signContext = new DOMSignContext(privateKey, document.getDocumentElement());
-        String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        String providerName = System.getProperty("jsr105Provider", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
         XMLSignatureFactory signatureFactory = XMLSignatureFactory
                 .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
         // Specify digest method
@@ -99,7 +99,7 @@ public class DigitalSignatureUtils {
         // Create validation context
         DOMValidateContext validateContext = new DOMValidateContext(publicKey, signatureNode);
         // Unmarshaling the XML Signature
-        String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        String providerName = System.getProperty("jsr105Provider", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
         XMLSignatureFactory signatureFactory = XMLSignatureFactory
                 .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
         XMLSignature signature = signatureFactory.unmarshalXMLSignature(validateContext);

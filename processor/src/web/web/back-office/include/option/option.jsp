@@ -184,6 +184,16 @@
                     <h:selectBooleanCheckbox value="#{optionPage.importMSRLogging}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
+
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Импорт из РНИП" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Импортировать платежи из РНИП"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.importRNIPPayments}" styleClass="output-text" />
+                </h:panelGrid>
+            </rich:panel>
+
             <rich:panel>
                 <f:facet name="header"><h:outputText styleClass="column-header"
                                                      value="Импорт данных из АИС Реестры" /></f:facet>
@@ -199,6 +209,15 @@
                     <h:inputText value="#{optionPage.syncRegisterPassword}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Организация" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterCompany}" styleClass="input-text" size="40" />
+                </h:panelGrid>
+            </rich:panel>
+
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Импорт из РНИП" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Импортировать платежи из РНИП"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.importRNIPPayments}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
 
