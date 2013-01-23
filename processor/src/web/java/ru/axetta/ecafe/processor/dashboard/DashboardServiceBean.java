@@ -221,12 +221,12 @@ public class DashboardServiceBean {
             queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
-                Long curIdOfOrg = (Long) result[0];
+                Long curIdOfOrg = Long.parseLong(""+result[0]);
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
                 if (statItem == null) {
                     continue;
                 }
-                statItem.setNumberOfVendingOrders((Long) result[1]);
+                statItem.setNumberOfVendingOrders(Long.parseLong(""+ result[1]));
             }
             for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
