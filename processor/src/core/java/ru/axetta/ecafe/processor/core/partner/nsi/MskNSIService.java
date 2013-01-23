@@ -220,17 +220,17 @@ public class MskNSIService {
         return list;
     }
 
-    public List<PupilInfo> getPupilsByOrgGUID(String orgName, String familyName, Long updateTime) throws Exception {
+    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
         String select = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
                 + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
                 + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
                 + "item['Реестр обучаемых линейный/Текущий класс или группа'],\n"
                 + "item['Реестр обучаемых линейный/Класс или группа зачисления']\n"
                 + "from catalog('Реестр обучаемых')\n" + "where\n"
-                //+ "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";Полное наименование учреждения
-                + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
+                + "item['Реестр обучаемых линейный/GUID образовательного учреждения']='"+orgGuid+"'";//Полное наименование учреждения
+                /*+ "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
                 + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
-                + "where  item['РОУ XML/Краткое наименование учреждения']='" + orgName + "')\n";
+                + "where  item['РОУ XML/Краткое наименование учреждения']='" + orgName + "')\n";*/
         if (familyName != null && familyName.length() > 0) {
             select += " and item['Реестр обучаемых линейный/Фамилия'] like '%" + familyName + "%'";
         }
