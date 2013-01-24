@@ -93,7 +93,7 @@ public class LoadPaymentsService {
      */
     //private final static String inSOAPFile = System.getProperty("user.dir") + "/data/soap_net.xml";
     private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static String inSOAPFile = "META-INF/rnip/getPayments_byDate.xml";
+    private final static String inSOAPFile = "META-INF/rnip/getPayments_byDate.xml";//;
     /**
      * Адрес тестового сервиса СМЭВ.
      */
@@ -145,7 +145,7 @@ public class LoadPaymentsService {
 
     public void run() {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            return;
+            //return;
         }
         Date updateTime = new Date(System.currentTimeMillis());
 
@@ -199,7 +199,8 @@ public class LoadPaymentsService {
         SOAPPart soapPart = message.getSOAPPart();
 
         // Читаем сообщение из файла.
-        FileInputStream is = new FileInputStream(inSOAPFile);
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(inSOAPFile);
+        //FileInputStream fis = new FileInputStream(is);
         soapPart.setContent(doMacroReplacement(updateTime, new StreamSource(is)));
         message.getSOAPPart().getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#");
 
@@ -279,7 +280,7 @@ public class LoadPaymentsService {
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
-        Array.writeFile(inSOAPFile + ".signed.uri.xml", msg.getBytes("utf-8"));
+        //Array.writeFile(inSOAPFile + ".signed.uri.xml", msg.getBytes("utf-8"));
 
         /*** а) Проверка подписи (локально) ***/
         // Получение блока, содержащего сертификат.
