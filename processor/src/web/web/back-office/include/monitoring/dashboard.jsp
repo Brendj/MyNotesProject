@@ -4,6 +4,12 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+
+<style type="text/css">
+    .extdt-innerdiv
+    { overflow-x:auto !important; overflow-y:hidden; }
+</style>
+
 <%--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"--%>
 <h:panelGrid id="dashboardPanelGrid" binding="#{dashboardPage.pageComponent}" styleClass="borderless-grid">
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
