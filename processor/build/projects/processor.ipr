@@ -446,7 +446,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" compressed="false" hash="1801101060" />
+  <component name="DataSourceManagerImpl" compressed="false" hash="1792873702" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -1268,7 +1268,9 @@
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web.servlet-3.0.5.RELEASE.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="jar://D:/lib/spring-framework-3.1.1.RELEASE-with-docs/src/org.springframework.orm-3.0.5.RELEASE-sources.jar!/" />
+      </SOURCES>
     </library>
   </component>
 </project>
