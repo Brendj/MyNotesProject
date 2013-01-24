@@ -1149,12 +1149,21 @@
     </library>
     <library name="cryptopro">
       <CLASSES>
-        <root url="file://$PROJECT_DIR$/../lib/cryptopro" />
-        <root url="file://$PROJECT_DIR$/../lib/cryptopro" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/asn1rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/AsnLite.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/forms_rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCP.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCP_ASN.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPinst.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRequest.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRevCheck.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRevTools.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPxml.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCryptoP.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/XMLDSigRI.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
-      <jarDirectory url="file://$PROJECT_DIR$/../lib/cryptopro" recursive="false" />
     </library>
     <library name="cxf">
       <CLASSES>

@@ -16,14 +16,48 @@
 	<resource-root path="jxl.jar"/>
 	<resource-root path="poi-3.6-20091214.jar"/>
 	<resource-root path="quartz-1.8.1.jar"/>
-	<resource-root path="xmldsig.jar"/>
-	<resource-root path="xmlsec.jar"/> 
+	<resource-root path="XMLDSigRI.jar"/>
+	<resource-root path="xmldsig.jar" /> 
+	<resource-root path="xmlsec.jar" /> 
   </resources>
     <dependencies>
+       <module name="org.apache.santuario.xmlsec" />
        <module name="javax.api"/>
        <module name="javax.servlet.api"/>
        <module name="org.apache.commons.logging"/>
        <module name="org.apache.commons.collections"/>
        <module name="org.slf4j"/>
+	   <system export="true">
+                <paths>
+                    <path name="com/sun/org/apache/xml/internal/security"/>
+                    <path name="com/sun/org/apache/xml/internal/security/transforms"/>
+                    <path name="com/sun/org/apache/xml/internal/security/transforms/implementations"/>
+                    <path name="com/sun/org/apache/xml/internal/security/transforms/params"/>
+                    <path name="com/sun/org/apache/xml/internal/security/algorithms"/>
+                    <path name="com/sun/org/apache/xml/internal/security/algorithms/implementations"/>
+                    <path name="com/sun/org/apache/xml/internal/security/c14n"/>
+                    <path name="com/sun/org/apache/xml/internal/security/c14n/implementations"/>
+                    <path name="com/sun/org/apache/xml/internal/security/c14n/helper"/>
+                    <path name="com/sun/org/apache/xml/internal/security/encryption"/>
+                    <path name="com/sun/org/apache/xml/internal/security/exceptions"/>
+                    <path name="com/sun/org/apache/xml/internal/security/keys"/>
+                    <path name="com/sun/org/apache/xml/internal/security/signature"/>
+                    <path name="com/sun/org/apache/xml/internal/security/utils"/>
+                    <path name="com/sun/org/apache/xpath/internal"/>
+                    <path name="com/sun/org/apache/xpath/internal/axes"/>
+                    <path name="com/sun/org/apache/xpath/internal/compiler"/>
+                    <path name="com/sun/org/apache/xpath/internal/domapi"/>
+                    <path name="com/sun/org/apache/xpath/internal/functions"/>
+                    <path name="com/sun/org/apache/xpath/internal/jaxp"/>
+                    <path name="com/sun/org/apache/xpath/internal/objects"/>
+                    <path name="com/sun/org/apache/xpath/internal/operations"/>
+                    <path name="com/sun/org/apache/xpath/internal/patterns"/>
+                    <path name="com/sun/org/apache/xpath/internal/res"/>
+                    <path name="ru/CryptoPro/JCP/tools"/>
+                    <path name="com/sun/management"/>
+                </paths>
+            </system>
     </dependencies>
+	
+	
 </module>
