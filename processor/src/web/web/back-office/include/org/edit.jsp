@@ -126,7 +126,7 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Дружественные организации" styleClass="output-text" />
+    <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-div" columns="2">
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"

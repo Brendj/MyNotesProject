@@ -105,7 +105,7 @@
     <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.configurationProviderName}" styleClass="input-text" />
 
-    <h:outputText escape="true" value="Дружественные организации" styleClass="output-text" />
+    <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:outputText value="{#{mainPage.orgViewPage.friendlyFilterOrgs}}" styleClass="output-text"/>
 
     <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />

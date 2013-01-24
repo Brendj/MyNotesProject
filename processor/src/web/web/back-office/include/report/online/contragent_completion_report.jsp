@@ -19,7 +19,7 @@
 <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
 <h:panelGrid binding="#{contragentCompletionReportPage.pageComponent}" id="enterEventReportPanelGrid" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text required-field" />
+        <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{contragentCompletionReportPage.defaultSupplier.contragentName}" readonly="true"
                          styleClass="input-text" style="margin-right: 2px;" />
