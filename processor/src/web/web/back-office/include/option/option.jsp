@@ -212,15 +212,6 @@
                 </h:panelGrid>
             </rich:panel>
 
-            <rich:panel>
-                <f:facet name="header"><h:outputText styleClass="column-header" value="Импорт из РНИП" /></f:facet>
-                <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText escape="true" value="Импортировать платежи из РНИП"
-                                  styleClass="output-text" />
-                    <h:selectBooleanCheckbox value="#{optionPage.importRNIPPayments}" styleClass="output-text" />
-                </h:panelGrid>
-            </rich:panel>
-
         </h:panelGrid>
     </rich:tab>
 
