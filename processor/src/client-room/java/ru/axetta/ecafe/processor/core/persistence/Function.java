@@ -95,7 +95,7 @@ public class Function {
     @ManyToMany(targetEntity = User.class)
     private Set<User> users = new HashSet<User>();
 
-    Function() {
+    protected Function() {
         // For Hibernate
     }
 

@@ -64,7 +64,7 @@ public class User {
     @ManyToMany(targetEntity = Function.class,fetch = FetchType.EAGER)
     private Set<Function> functions = new HashSet<Function>();
 
-    User() {
+    protected User() {
         // For Hibernate
     }
 
