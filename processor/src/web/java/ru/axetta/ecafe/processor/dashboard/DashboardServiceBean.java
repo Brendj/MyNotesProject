@@ -256,13 +256,14 @@ public class DashboardServiceBean {
                     .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
             Map<Long, Integer> employeeUniqueOrders = daoService
                     .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
+
             for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
                 if (statItem == null) {
                     continue;
                 }
-                Integer studentsCount = studentEnters.get(orgID);
-                Integer employeesCount = employeeEnters.get(orgID);
+                Integer studentsEntersCount = studentEnters.get(orgID);
+                Integer employeesEntersCount = employeeEnters.get(orgID);
                 Integer studentsOrdersCount = studentOrders.get(orgID);
                 Integer employeeOrdersCount = employeeOrders.get(orgID);
                 Integer studentsDiscountsCount = studentDiscounts.get(orgID);
@@ -270,42 +271,30 @@ public class DashboardServiceBean {
                 Integer studentsUniqueCount = studentUniqueOrders.get(orgID);
                 Integer employeeUniqueCount = employeeUniqueOrders.get(orgID);
                 double per1 = 0D, per2 = 0D, per3 = 0D, per4 = 0D, per5 = 0D, per6 = 0D;
-                if (studentsCount != null && studentsCount != 0 &&
-                        (statItem.getNumberOfStudentClients() + statItem.getNumberOfNonStudentClients()) != 0) {
-                    per1 = (double) studentsCount / (double) (statItem.getNumberOfStudentClients() + statItem
-                            .getNumberOfNonStudentClients());
+                if (studentsEntersCount != null && statItem.getNumberOfEnterEvents() != 0) {
+                    per1 = (double) studentsEntersCount / (double) statItem.getNumberOfEnterEvents();
                 }
-                if (employeesCount != null && employeesCount != 0 &&
-                        (statItem.getNumberOfStudentClients() + statItem.getNumberOfNonStudentClients()) != 0) {
-                    per2 = (double) employeesCount / (double) (statItem.getNumberOfStudentClients() + statItem
-                            .getNumberOfNonStudentClients());
+                if (employeesEntersCount != null && statItem.getNumberOfEnterEvents() != 0) {
+                    per2 = (double) employeesEntersCount / (double) statItem.getNumberOfEnterEvents();
                 }
-                if (studentsOrdersCount != null && studentsOrdersCount != 0 && statItem.getNumberOfPayOrders() != 0) {
+                if (studentsOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
                     per3 = (double) studentsOrdersCount / (double) statItem.getNumberOfPayOrders();
                 }
-                if (employeeOrdersCount != null && employeeOrdersCount != 0 && statItem.getNumberOfPayOrders() != 0) {
+                if (employeeOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
                     per4 = (double) employeeOrdersCount / (double) statItem.getNumberOfPayOrders();
                 }
-                if (studentsDiscountsCount != null && studentsDiscountsCount != 0 &&
-                        studentsUniqueCount != null && studentsUniqueCount != 0) {
+                if (studentsUniqueCount != null && studentsDiscountsCount != 0) {
                     per5 = (double) studentsUniqueCount / (double) studentsDiscountsCount;
                 }
-                if (employeeDiscountsCount != null && employeeDiscountsCount != 0 &&
-                        employeeUniqueCount != null && employeeUniqueCount != 0) {
+                if (employeeUniqueCount != null && employeeDiscountsCount != 0) {
                     per6 = (double) employeeUniqueCount / (double) employeeDiscountsCount;
                 }
-                statItem.setNumberOfStudentsWithEnterEventsPercent(
-                        new BigDecimal(per1).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                statItem.setNumberOfEmployeesWithEnterEventsPercent(
-                        new BigDecimal(per2).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                statItem.setNumberOfStudentsWithPayedOrdersPercent(
-                        new BigDecimal(per3).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                statItem.setNumberOfEmployeesWithPayedOrdersPercent(
-                        new BigDecimal(per4).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                statItem.setNumberOfStudentsWithDiscountOrdersPercent(
-                        new BigDecimal(per5).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                statItem.setNumberOfEmployeesWithDiscountOrdersPercent(
-                        new BigDecimal(per6).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+                statItem.setNumberOfStudentsWithEnterEventsPercent(beautifyPercent (per1));
+                statItem.setNumberOfEmployeesWithEnterEventsPercent(beautifyPercent (per2));
+                statItem.setNumberOfStudentsWithPayedOrdersPercent(beautifyPercent (per3));
+                statItem.setNumberOfEmployeesWithPayedOrdersPercent(beautifyPercent (per4));
+                statItem.setNumberOfStudentsWithDiscountOrdersPercent(beautifyPercent (per5));
+                statItem.setNumberOfEmployeesWithDiscountOrdersPercent(beautifyPercent (per6));
             }
             ////
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {
@@ -384,6 +373,12 @@ public class DashboardServiceBean {
         txManager.commit(status);
         return basicStats;
     }
+
+
+    public double beautifyPercent (double percent)
+        {
+        return new BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        }
 
     public DashboardResponse getOrgInfo(DashboardResponse dashboardResponse, Date dt, Long idOfOrg) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
