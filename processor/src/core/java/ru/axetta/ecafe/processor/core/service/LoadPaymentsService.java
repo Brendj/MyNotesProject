@@ -145,7 +145,7 @@ public class LoadPaymentsService {
 
     public void run() {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            //return;
+            return;
         }
         Date updateTime = new Date(System.currentTimeMillis());
 
