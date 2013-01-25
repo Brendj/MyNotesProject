@@ -335,12 +335,13 @@ public class DAOUtils {
     public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName)
             throws Exception {
         javax.persistence.Query query = em.createQuery(
-                "select idOfClient from Client client where (client.org = :org) and (upper(client.person.surname) = :surname) and"
-                        + "(upper(client.person.firstName) = :firstName) and (upper(client.person.secondName) = :secondName)");
+                "select idOfClient from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg)) and "
+                + "(trim(upper(client.person.surname)) = :surname) and "
+                + "(trim(upper(client.person.firstName)) = :firstName) and (trim(upper(client.person.secondName)) = :secondName)");
         query.setParameter("org", organization);
-        query.setParameter("surname", StringUtils.upperCase(surname));
-        query.setParameter("firstName", StringUtils.upperCase(firstName));
-        query.setParameter("secondName", StringUtils.upperCase(secondName));
+        query.setParameter("surname", StringUtils.upperCase(surname).trim());
+        query.setParameter("firstName", StringUtils.upperCase(firstName).trim());
+        query.setParameter("secondName", StringUtils.upperCase(secondName).trim());
         query.setMaxResults(2);
         if (query.getResultList().isEmpty()) return null;
         if (query.getResultList().size()==2) return -1L;
