@@ -125,7 +125,7 @@ public class UpdateClientSmsDeliveryStatusJob extends ExecutorServiceWrappedJob 
         }
     }
 
-    private static void updateSmsDeliveryStatus(Date currentTime, Session session, ClientSms clientSms,
+    public static void updateSmsDeliveryStatus(Date currentTime, Session session, ClientSms clientSms,
             DeliveryResponse deliveryResponse) throws Exception {
         boolean updated = false;
         if (null == deliveryResponse) {

@@ -59,6 +59,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>SMSStatusServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.sms.altarix.SMSStatusServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>PaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.PaymentServlet</servlet-class>
     </servlet>
@@ -105,6 +110,11 @@
     <servlet-mapping>
         <servlet-name>ProjectStateReportServlet</servlet-name>
         <url-pattern>/prj-state</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SMSStatusServlet</servlet-name>
+        <url-pattern>/sms-status</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
