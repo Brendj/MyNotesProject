@@ -213,7 +213,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfPayOrders((Long) result[1]);
             }
             ////
-            queryText = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder where lower(cf_orderdetails.menugroup)=:groupName AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
+            queryText = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg where lower(cf_orderdetails.menugroup)=:groupName AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
             query = entityManager.createNativeQuery(queryText);
             query.setParameter("groupName", "вендинг");
             query.setParameter("dayStart", dayStartDate.getTime());

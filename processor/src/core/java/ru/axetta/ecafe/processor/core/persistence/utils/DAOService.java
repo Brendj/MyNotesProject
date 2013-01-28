@@ -331,7 +331,15 @@ public class DAOService {
         }
         Client cl = em.find(Client.class, idOfClient);
         if (cl == null) {
-            throw new Exception("Клиент не найден: " + idOfClient);
+            throw new Ex                if (res==-1L) {
+                i.findByFIOResult=">1 записи";
+            }
+            else {
+                i.findByFIOResult = res+"";
+                i.idOfClientForBind = res;
+                i.toBind = i.idOfClientForBind!=null;
+            }
+            ception("Клиент не найден: " + idOfClient);
         }
         if (cl.getOrg().getIdOfOrg() == orgId) {
             return true;
