@@ -689,6 +689,11 @@
                         label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
                         reRender="workspaceForm" />
 
+    <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateGoodRequestReportPage"--%>
+    <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem" binding="#{aggregateGoodRequestReportPage.mainMenuComponent}"
+                        label="Сводный отчет по заякам" action="#{aggregateGoodRequestReportPage.show}"
+                        reRender="workspaceForm" />
+
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')"/>
 </rich:panelMenuGroup>
