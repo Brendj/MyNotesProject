@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -167,6 +168,9 @@ public class IntegroServlet extends HttpServlet {
                 Element dataElement = document.createElement("Data");
                 document.appendChild(dataElement);
                 dataElement.appendChild(manager.toElement(document));
+                OrgOwnerData orgOwnerData = new OrgOwnerData();
+                orgOwnerData.process(runtimeContext.createPersistenceSession(), idOfOrg);
+                dataElement.appendChild(orgOwnerData.toElement(document));
                 responseDocument = document;
             } catch (Exception e) {
                 logger.error("Failed to serialize response", e);
