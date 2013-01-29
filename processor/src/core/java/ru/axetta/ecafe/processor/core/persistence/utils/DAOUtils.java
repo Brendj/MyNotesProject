@@ -1019,4 +1019,17 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
     }
+
+    /* Венуть список идентификаторов корпусов организации */
+    public static Set<Long> getIdOfFriendlyOrg(Session persistenceSession, Long idOfOrg){
+        Query query = persistenceSession.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        List list = query.list();
+        Set<Long> idOfFriendlyOrgSet = new TreeSet<Long>();
+        for (Object object: list){
+            idOfFriendlyOrgSet.add((Long) object);
+        }
+        return idOfFriendlyOrgSet;
+    }
+
 }

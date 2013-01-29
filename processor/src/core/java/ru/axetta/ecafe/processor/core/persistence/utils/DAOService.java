@@ -331,15 +331,7 @@ public class DAOService {
         }
         Client cl = em.find(Client.class, idOfClient);
         if (cl == null) {
-            throw new Ex                if (res==-1L) {
-                i.findByFIOResult=">1 записи";
-            }
-            else {
-                i.findByFIOResult = res+"";
-                i.idOfClientForBind = res;
-                i.toBind = i.idOfClientForBind!=null;
-            }
-            ception("Клиент не найден: " + idOfClient);
+            throw new Exception("Клиент не найден: " + idOfClient);
         }
         if (cl.getOrg().getIdOfOrg() == orgId) {
             return true;
@@ -409,54 +401,54 @@ public class DAOService {
 
     @Transactional
     public long getStatClientsCount() {
-        Query q = em.createNativeQuery("select count(*) from cf_clients");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clients");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatClientsWithMobile() {
-        Query q = em.createNativeQuery("select count(*) from cf_clients where mobile is not null and mobile<>''");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE mobile IS NOT NULL AND mobile<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatClientsWithEmail() {
-        Query q = em.createNativeQuery("select count(*) from cf_clients where email is not null and email<>''");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE email IS NOT NULL AND email<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatUniqueClientsWithPaymentTransaction() {
-        Query q = em.createNativeQuery("select count(distinct idOfClient) from cf_transactions");
+        Query q = em.createNativeQuery("SELECT COUNT(DISTINCT idOfClient) FROM cf_transactions");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatUniqueClientsWithEnterEvent() {
-        Query q = em.createNativeQuery("select count(distinct idOfClient) from cf_enterevents");
+        Query q = em.createNativeQuery("SELECT COUNT(DISTINCT idOfClient) FROM cf_enterevents");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatClientPaymentsCount() {
-        Query q = em.createNativeQuery("select count(*) from cf_clientpayments");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clientpayments");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatOrdersCount() {
-        Query q = em.createNativeQuery("select count(*) from cf_orders");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_orders");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getEnterEventsCount() {
-        Query q = em.createNativeQuery("select count(*) from cf_enterevents");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_enterevents");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getClientSmsCount() {
-        Query q = em.createNativeQuery("select count(*) from cf_clientsms");
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clientsms");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     @SuppressWarnings("unchecked")
     public List<Object[]> getStatPaymentsByContragents(Date fromDate, Date toDate) {
         Query q = em.createNativeQuery(
-                "select contragentName, paymentMethod, avg(paysum), sum(paysum), count(*) from cf_clientpayments cp join cf_contragents cc on cp.idOfContragent=cc.idOfContragent where cp.createdDate>=:fromDate and cp.createdDate<:toDate group by contragentName, paymentMethod order by contragentName, paymentMethod");
+                "SELECT contragentName, paymentMethod, AVG(paysum), SUM(paysum), COUNT(*) FROM cf_clientpayments cp JOIN cf_contragents cc ON cp.idOfContragent=cc.idOfContragent WHERE cp.createdDate>=:fromDate AND cp.createdDate<:toDate GROUP BY contragentName, paymentMethod ORDER BY contragentName, paymentMethod");
         q.setParameter("fromDate", fromDate.getTime());
         q.setParameter("toDate", toDate.getTime());
         return (List<Object[]>) q.getResultList();
@@ -465,14 +457,14 @@ public class DAOService {
     @SuppressWarnings("unchecked")
     public List<Object[]> getMonitoringPayLastTransactionStats() {
         Query q = em.createNativeQuery(
-                "select cp.idOfContragent, cc.contragentName, max(cp.createddate) from cf_clientpayments cp, cf_contragents cc where cp.idOfContragent=cc.idOfContragent and cc.classid=1 group by cp.idOfContragent, cc.contragentName");
+                "SELECT cp.idOfContragent, cc.contragentName, MAX(cp.createddate) FROM cf_clientpayments cp, cf_contragents cc WHERE cp.idOfContragent=cc.idOfContragent AND cc.classid=1 GROUP BY cp.idOfContragent, cc.contragentName");
         return (List<Object[]>) q.getResultList();
     }
 
     @SuppressWarnings("unchecked")
     public List<Object[]> getMonitoringPayDayTransactionsStats(Date fromDate, Date toDate) {
         Query q = em.createNativeQuery(
-                "select cp.idOfContragent, cc.contragentName, count(*) from cf_clientpayments cp, cf_contragents cc where cp.idOfContragent=cc.idOfContragent and cc.classid=1 and cp.createdDate>=:fromDate and cp.createdDate<:toDate group by cp.idOfContragent, cc.contragentName");
+                "SELECT cp.idOfContragent, cc.contragentName, COUNT(*) FROM cf_clientpayments cp, cf_contragents cc WHERE cp.idOfContragent=cc.idOfContragent AND cc.classid=1 AND cp.createdDate>=:fromDate AND cp.createdDate<:toDate GROUP BY cp.idOfContragent, cc.contragentName");
         q.setParameter("fromDate", fromDate.getTime());
         q.setParameter("toDate", toDate.getTime());
         return (List<Object[]>) q.getResultList();
@@ -481,7 +473,7 @@ public class DAOService {
 
     @Transactional
     public boolean setCardStatus(long idOfCard, int state, String reason) {
-        Query q = em.createNativeQuery("UPDATE cf_cards set state=:state, lockreason=:reason where idofCard=:idOfCard");
+        Query q = em.createNativeQuery("UPDATE cf_cards SET state=:state, lockreason=:reason WHERE idofCard=:idOfCard");
         q.setParameter("state", state);
         q.setParameter("reason", reason);
         q.setParameter("idOfCard", idOfCard);
@@ -495,21 +487,21 @@ public class DAOService {
     public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
-            sql = "select cf_enterevents.idoforg, count(cf_enterevents.idofclient) " +
-                    "from cf_enterevents " +
-                    "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient "
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
-                    "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
                     +
-                    "group by cf_enterevents.idoforg";
+                    "GROUP BY cf_enterevents.idoforg";
         } else {
-            sql = "select cf_enterevents.idoforg, count(cf_enterevents.idofclient) " +
-                    "from cf_enterevents " +
-                    "left join cf_clients on cf_enterevents.idoforg=cf_clients.idoforg and cf_enterevents.idofclient=cf_clients.idofclient "
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
-                    "where cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
                     +
-                    "group by cf_enterevents.idoforg";
+                    "GROUP BY cf_enterevents.idoforg";
         }
 
         try {
@@ -541,19 +533,19 @@ public class DAOService {
     public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
-            sql = "select cf_orders.idoforg, count(cf_orders.idofclient) " +
-                    "from cf_orders " +
-                    "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
-                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue "
-                    + (notDiscounted ? " and cf_orders.socdiscount=0" : "") +
-                    "group by cf_orders.idoforg";
+            sql = "SELECT cf_orders.idoforg, COUNT(cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
+                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
+                    + (notDiscounted ? " AND cf_orders.socdiscount=0" : "") +
+                    "GROUP BY cf_orders.idoforg";
         } else {
-            sql = "select cf_orders.idoforg, count(cf_orders.idofclient) " +
-                    "from cf_orders " +
-                    "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient " +
-                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
-                    + (notDiscounted ? " and cf_orders.socdiscount=0" : "") +
-                    "group by cf_orders.idoforg";
+            sql = "SELECT cf_orders.idoforg, COUNT(cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
+                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
+                    + (notDiscounted ? " AND cf_orders.socdiscount=0" : "") +
+                    "GROUP BY cf_orders.idoforg";
         }
 
         try {
@@ -585,24 +577,24 @@ public class DAOService {
     public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
-            sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
-                    "from cf_clients " +
-                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
+            sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
+                    "FROM cf_clients " +
+                    "LEFT JOIN cf_clientscomplexdiscounts ON cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                     +
-                    "where cf_clients.idOfClientGroup<:studentsMaxValue " +
+                    "WHERE cf_clients.idOfClientGroup<:studentsMaxValue " +
                     //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
-                    "group by idoforg " +
-                    "having count(cf_clientscomplexdiscounts.idofclient)<>0";
+                    "GROUP BY idoforg " +
+                    "HAVING COUNT(cf_clientscomplexdiscounts.idofclient)<>0";
         } else {
-            sql = "select idoforg, count(distinct cf_clientscomplexdiscounts.idofclient) " +
-                    "from cf_clients " +
-                    "left join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
+            sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
+                    "FROM cf_clients " +
+                    "LEFT JOIN cf_clientscomplexdiscounts ON cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                     +
-                    "where cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+                    "WHERE cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
                     +
                     //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
-                    "group by idoforg " +
-                    "having count(cf_clientscomplexdiscounts.idofclient)<>0";
+                    "GROUP BY idoforg " +
+                    "HAVING COUNT(cf_clientscomplexdiscounts.idofclient)<>0";
         }
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
@@ -632,20 +624,20 @@ public class DAOService {
     public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
-                    "from cf_orders " +
-                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient " +
-                    "where createddate between :dateAt and :dateTo and " +
-                    "cf_clients.idOfClientGroup<:studentsMaxValue and cf_orders.socdiscount<>0 " +
-                    "group by cf_orders.idoforg";
+            sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
+                    "WHERE createddate BETWEEN :dateAt AND :dateTo AND " +
+                    "cf_clients.idOfClientGroup<:studentsMaxValue AND cf_orders.socdiscount<>0 " +
+                    "GROUP BY cf_orders.idoforg";
         } else {
-            sql = "select cf_orders.idoforg, count(distinct cf_orders.idofclient) " +
-                    "from cf_orders " +
-                    "left join cf_clients on cf_clients.idofclient=cf_orders.idofclient " +
-                    "where createddate between :dateAt and :dateTo and cf_orders.socdiscount<>0 and " +
-                    "cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup "
+            sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
+                    "WHERE createddate BETWEEN :dateAt AND :dateTo AND cf_orders.socdiscount<>0 AND " +
+                    "cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
                     +
-                    "group by cf_orders.idoforg";
+                    "GROUP BY cf_orders.idoforg";
         }
 
         try {
@@ -676,10 +668,10 @@ public class DAOService {
     public Map<Long, Integer> getOrgOrdersCount(Date at, Date to) {
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = em.createNativeQuery("select cf_orders.idoforg, count(distinct cf_orders.idoforder) " +
-                    "from cf_orders " +
-                    "where cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
-                    "group by cf_orders.idoforg");
+            Query q = em.createNativeQuery("SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idoforder) " +
+                    "FROM cf_orders " +
+                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
+                    "GROUP BY cf_orders.idoforg");
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
             List resultList = q.getResultList();
@@ -705,7 +697,7 @@ public class DAOService {
 
         try {
             Query q = em.createNativeQuery(
-                    "update cf_clients set cf_clients.idofclientgroup=:idofclientgroup where cf_clients.idofclient=:idofclient");
+                    "UPDATE cf_clients SET cf_clients.idofclientgroup=:idofclientgroup WHERE cf_clients.idofclient=:idofclient");
             q.setParameter("idofclient", idofclient);
             q.setParameter("idofclientgroup", idofclientgroup);
             return q.executeUpdate() > 0;
@@ -724,5 +716,9 @@ public class DAOService {
             return null;
         }
         return result;
+    }
+
+    public ReportInfo getReportInfo(Long idOfOrg, Date startDate, Date endDate) {
+        return null;
     }
 }

@@ -689,13 +689,7 @@ public class Processor implements SyncProcessor,
             }
             // If client is specified - check if client is registered for the specified organization
             // or for one of friendly organizations of specified one
-            Query query = persistenceSession.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
-            query.setParameter("idOfOrg",idOfOrg);
-            List list = query.list();
-            Set<Long> idOfFriendlyOrgSet = new TreeSet<Long>();
-            for (Object object: list){
-                idOfFriendlyOrgSet.add((Long) object);
-            }
+            Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, idOfOrg);
             if (null != client) {
                 Org clientOrg = client.getOrg();
                 if (!clientOrg.getIdOfOrg().equals(idOfOrg)
@@ -1224,19 +1218,18 @@ public class Processor implements SyncProcessor,
         }*/
 
         // Добавляем в группу клиентов согласно запросу
-        Enumeration<Long> reqClients = reqGroup.getClients();
-        while (reqClients.hasMoreElements()) {
-            Long idOfClient = reqClients.nextElement();
+        for (Long idOfClient : reqGroup.getClients()) {
             Long idOfClientGroup = DAOUtils.getClientGroup(persistenceSession, idOfClient, organization.getIdOfOrg());
-            if (idOfClientGroup!=null &&
-                    (idOfClientGroup.longValue() == clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue())) {
+            if (idOfClientGroup != null && (idOfClientGroup.longValue() == clientGroup.getCompositeIdOfClientGroup()
+                    .getIdOfClientGroup().longValue())) {
                 continue;
             }
             ////
             Client client = DAOUtils.findClient(persistenceSession, idOfClient);
+            Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
-            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg())) {
+            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) || !idOfFriendlyOrgSet.contains(client.getOrg().getIdOfOrg())) {
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
                         idOfClient, client, organization.getIdOfOrg()));
@@ -1256,9 +1249,8 @@ public class Processor implements SyncProcessor,
     }
 
     private static boolean find(Client client, SyncRequest.OrgStructure.Group reqGroup) throws Exception {
-        Enumeration<Long> reqClients = reqGroup.getClients();
-        while (reqClients.hasMoreElements()) {
-            if (client.getIdOfClient().equals(reqClients.nextElement())) {
+        for (Long aLong : reqGroup.getClients()) {
+            if (client.getIdOfClient().equals(aLong)) {
                 return true;
             }
         }
