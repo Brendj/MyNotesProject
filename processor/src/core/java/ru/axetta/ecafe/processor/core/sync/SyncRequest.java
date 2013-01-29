@@ -6,8 +6,6 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
 import org.apache.commons.lang.StringUtils;
@@ -655,8 +653,8 @@ public class SyncRequest {
                 return name;
             }
 
-            public Enumeration<Long> getClients() {
-                return Collections.enumeration(clients);
+            public List<Long> getClients() {
+                return clients;
             }
 
             @Override
