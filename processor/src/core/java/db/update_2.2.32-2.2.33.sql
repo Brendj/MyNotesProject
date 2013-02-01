@@ -37,3 +37,19 @@ ALTER TABLE CF_Goods ADD COLUMN IdOfBasicGood bigint;
 --! Дата последнего обновления базового товара на момент назначения ссылки на него товару поставщика
 ALTER TABLE CF_Goods ADD COLUMN BasicGoodLastUpdate bigint;
 ALTER TABLE CF_Goods ADD CONSTRAINT CF_Goods_IdOfBasicGood_FK FOREIGN KEY (IdOfBasicGood) REFERENCES CF_Goods_BasicBasket(IdOfBasicGood);
+
+-- Добавлена секция OrgOwnerData в котором содержится список обслуживаемых организаций, при синхронизации внешних систем в качестве поставщиков с подсистемой координации и процессинга
+
+
+-- CREATE OR REPLACE VIEW cf_contragents2cf_orgs AS
+-- SELECT
+--    c3_.IdOfContragent || '-' || org.IdOfOrg as Key,
+--    sum(this_.paysum) AS sumbypaysum,
+--    c3_.idofcontragent AS contragentid,
+--    c3_.contragentname, org.idoforg AS organizationid
+--    FROM cf_contragents c3_
+--    LEFT JOIN cf_clientpayments this_ ON this_.idofcontragent = c3_.idofcontragent
+--    LEFT JOIN cf_transactions tr1_ ON this_.idoftransaction = tr1_.idoftransaction
+--    LEFT JOIN cf_clients cl2_ ON tr1_.idofclient = cl2_.idofclient
+--    LEFT JOIN cf_orgs org ON cl2_.idoforg = org.idoforg
+--   GROUP BY c3_.idofcontragent, org.idoforg;

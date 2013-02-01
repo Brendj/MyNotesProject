@@ -718,7 +718,17 @@ public class DAOService {
         return result;
     }
 
-    public ReportInfo getReportInfo(Long idOfOrg, Date startDate, Date endDate) {
-        return null;
+    public ReportInfo getReportInfo(Long idOfOrg, Date startDate, Date endDate, String reportName) {
+        String sql = "from ReportInfo where idOfOrg=:idOfOrg and startDate=:startDate and endDate=:endDate and reportFile like '%"+reportName+"%'";
+        TypedQuery<ReportInfo> query = em.createQuery(sql, ReportInfo.class);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("startDate",startDate);
+        query.setParameter("endDate",endDate);
+        List<ReportInfo> reportInfoList = query.getResultList();
+        if (reportInfoList.isEmpty()){
+            return null;
+        } else {
+            return reportInfoList.get(0);
+        }
     }
 }

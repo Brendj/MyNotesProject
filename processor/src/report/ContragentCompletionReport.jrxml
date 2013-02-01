@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
+	<property name="ireport.zoom" value="1.2100000000000095"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="6"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="contragentName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT org.shortname, contragent.contragentname, SUM(clientpayments.PaySum) AS SUM
+FROM CF_ClientPayments clientpayments
+LEFT OUTER JOIN CF_Contragents contragent ON clientpayments.IdOfContragent=contragent.IdOfContragent AND contragent.ClassId=1
+ LEFT OUTER JOIN CF_Transactions tr ON clientpayments.IdOfTransaction = tr.IdOfTransaction
+ LEFT OUTER JOIN CF_Clients cl ON tr.IdOfClient = cl.IdOfClient
+LEFT OUTER JOIN CF_Orgs org ON org.idoforg = cl.idoforg
+ LEFT OUTER JOIN CF_Contragents orgContragent ON org.defaultSupplier = orgContragent.IdOfContragent AND orgContragent.IdOfContragent = 4
+GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg]]>
+	</queryString>
+	<field name="paySum" class="java.lang.Long"/>
+	<field name="educationalInstitutionName" class="java.lang.String"/>
+	<field name="contragentName" class="java.lang.String"/>
+	<group name="orgname">
+		<groupExpression><![CDATA[$F{educationalInstitutionName}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="67" splitType="Stretch">
+			<textField>
+				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="0" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Поставщик: %s",$P{contragentName})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="32" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Дата формирования: %02d/%02d/%d", $P{day}, $P{month}, $P{year})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="232" splitType="Stretch">
+			<crosstab>
+				<reportElement uuid="b29a841c-8fd6-4c93-b992-f04ce39e280e" x="0" y="0" width="802" height="232"/>
+				<crosstabDataset>
+					<dataset resetType="None"/>
+				</crosstabDataset>
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="c2c846b0-c846-4d04-a533-208f178c1aab" style="Crosstab Data Text" x="0" y="0" width="70" height="30"/>
+							<textElement/>
+							<text><![CDATA[Организация / Агент]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="educationalInstitutionName" width="70" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{educationalInstitutionName}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement uuid="15e00f49-a8e9-4e32-985a-7d3afaabbe0e" style="Crosstab Data Text" x="0" y="0" width="70" height="25"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{educationalInstitutionName}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement uuid="e37169f4-05ed-4a0e-ab03-2a33e4798e7e" x="0" y="0" width="70" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Итого]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="contragentName" height="30" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{contragentName}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement uuid="4bad17db-3a74-40aa-ac05-aa846d46efdd" style="Crosstab Data Text" x="0" y="0" width="50" height="30"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{contragentName}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement uuid="cfcb9c72-5e9e-4ffa-97ef-8147b74e214d" x="0" y="0" width="50" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Итого]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="paySumMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{paySum}]]></measureExpression>
+				</measure>
+				<crosstabCell width="52" height="25">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="14af9ac6-7767-4b90-9c4b-666c606092fc" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{paySumMeasure}/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="52" height="25" rowTotalGroup="educationalInstitutionName">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="c19b94a9-403d-4516-9c0a-508e6edd5127" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{paySumMeasure}/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="contragentName">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="e802e769-ccb2-4b16-a02a-de1359aebc37" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{paySumMeasure}/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="educationalInstitutionName" columnTotalGroup="contragentName">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="62bc3830-42a6-4cd1-8a7f-82d768973bee" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{paySumMeasure}/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="39" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="27" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="27" splitType="Stretch"/>
+	</summary>
+</jasperReport>

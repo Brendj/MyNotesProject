@@ -377,7 +377,7 @@
     <%--@elvariable id="selectedGoodGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.SelectedGoodGroupPage"--%>
 
     <rich:panelMenuGroup id="goodGroupMenu" binding="#{mainPage.goodGroupPage.mainMenuComponent}"
-                         label="Справочник товаров" rendered="#{mainPage.eligibleToViewRule}">
+                         label="Справочник товаров" rendered="#{commodityAccountingGroupPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{mainPage.showGoodGroupPage}" reRender="workspaceForm" />
         <%--@elvariable id="goodGroupCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupCreatePage"--%>
         <%--@elvariable id="goodGroupListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage"--%>
@@ -443,7 +443,7 @@
                         binding="#{basicGoodListPage.mainMenuComponent}" action="#{basicGoodListPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
-                         label="Справочник продуктов" rendered="#{mainPage.eligibleToViewRule}">
+                         label="Справочник продуктов" rendered="#{commodityAccountingGroupPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{mainPage.showProductGuideGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="productGroupsGroupMenu" binding="#{mainPage.productGroupsGroupPage.mainMenuComponent}"

@@ -53,6 +53,36 @@ public class ContragentDAOService extends AbstractDAOService {
         return contragentCompletionItem;
     }
 
+    public List<ContragentCompletionReportItem> generateContragentCompletionReportItems(Long idOfContragent, Date startDate, Date endDate){
+        List<ContragentCompletionReportItem> contragentCompletionReportItems;
+        String sql =" SELECT org.shortname, contragent.contragentname, SUM(clientpayments.PaySum) AS SUM "
+                + " FROM CF_ClientPayments clientpayments "
+                + " LEFT OUTER JOIN CF_Contragents contragent ON clientpayments.IdOfContragent=contragent.IdOfContragent AND contragent.ClassId=1 "
+                + " LEFT OUTER JOIN CF_Transactions tr ON clientpayments.IdOfTransaction = tr.IdOfTransaction "
+                + " LEFT OUTER JOIN CF_Clients cl ON tr.IdOfClient = cl.IdOfClient "
+                + " LEFT OUTER JOIN CF_Orgs org ON org.idoforg = cl.idoforg "
+                + " LEFT OUTER JOIN CF_Contragents orgContragent ON org.defaultSupplier = orgContragent.IdOfContragent AND orgContragent.IdOfContragent = :idOfContragent "
+                + " WHERE clientpayments.createddate BETWEEN :startDate AND :endDate "
+                + " GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idOfContragent",idOfContragent);
+        query.setParameter("startDate",startDate.getTime());
+        query.setParameter("endDate",endDate.getTime());
+        List list = query.list();
+        contragentCompletionReportItems = new ArrayList<ContragentCompletionReportItem>(list.size());
+        for (Object object: list){
+            Object[] values = (Object[]) object;
+            String orgName = String.valueOf(values[0]);
+            String contragentName = String.valueOf(values[1]);
+            Long paySum = Long.valueOf(values[2].toString());
+            ContragentCompletionReportItem contragentCompletionReportItem = new ContragentCompletionReportItem(contragentName,orgName,paySum);
+            contragentCompletionReportItems.add(contragentCompletionReportItem);
+        }
+        return contragentCompletionReportItems;
+    }
+
+
+
     //@SuppressWarnings("unchecked")
     //public List<OrgItem> findDistributionOrganizationBySource(Long idOfOrg){
     //    Query query = getSession().createQuery("select org.idOfOrg, org.shortName from Org org where org.idOfOrg in (select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg)");

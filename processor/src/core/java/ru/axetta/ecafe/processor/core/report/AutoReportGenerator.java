@@ -643,6 +643,30 @@ public class AutoReportGenerator {
         );
 
 
+        REPORT_DEFS.add(new ReportDef(ContragentCompletionReport.class, ContragentCompletionReport.AutoReportBuildJob.class, new  JobDetailCreator(){
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentCompletionReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
+                        new ContragentCompletionReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(ContragentCompletionReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        })
+        );
+
+
         REPORT_DEFS.add(new ReportDef(HalfYearSummaryReport.class, HalfYearSummaryReport.Builder.class, new  JobDetailCreator(){
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;

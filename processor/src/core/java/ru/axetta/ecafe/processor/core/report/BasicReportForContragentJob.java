@@ -139,7 +139,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                 transaction.commit();
                 transaction = null;
             } catch (Exception e) {
-                getLogger().error(String.format("Failed at report lazy-build \"%s\"", BasicReportForOrgJob.class),
+                getLogger().error(String.format("Failed at report lazy-build \"%s\"", BasicReportForContragentJob.class),
                         e);
             } finally {
                 HibernateUtils.rollback(transaction, getLogger());
