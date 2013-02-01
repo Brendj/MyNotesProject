@@ -39,6 +39,10 @@
         <property name="lifeTime" column="LifeTime" type="long"/>
         <property name="margin" column="Margin" type="long"/>
 
+        <many-to-one name="basicGood" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket" column="IdOfBasicGood"
+                     not-null="true" lazy="proxy"
+                     update="false"/>
+
         <many-to-one name="goodGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup" fetch="select" lazy="false">
             <column name="IdOfGoodsGroup" not-null="true" />
         </many-to-one>

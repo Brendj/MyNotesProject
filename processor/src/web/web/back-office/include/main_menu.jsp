@@ -438,6 +438,10 @@
 
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basicGood.BasicGoodListPage"--%>
+    <rich:panelMenuItem id="viewBasicGoodMenuItem" label="Справочник базовых товаров"
+                        binding="#{basicGoodListPage.mainMenuComponent}" action="#{basicGoodListPage.show}" reRender="workspaceForm" />
+
     <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
                          label="Справочник продуктов" rendered="#{mainPage.eligibleToViewRule}">
         <a4j:support event="onclick" action="#{mainPage.showProductGuideGroupPage}" reRender="workspaceForm" />

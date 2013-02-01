@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -38,6 +39,17 @@ public class Good extends DistributedObject {
         if(p == null && tm == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
+
+        DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
+        distributedObjectException.setData(String.valueOf(idOfBasicGood));
+        GoodsBasicBasket basicGood;
+        try {
+            basicGood = (GoodsBasicBasket) DAOUtils.findBasicGood(session, idOfBasicGood);
+        } catch (Exception e) {
+            throw distributedObjectException;
+        }
+        if (basicGood == null) throw distributedObjectException;
+        setBasicGood(basicGood);
     }
 
     @Override
@@ -53,6 +65,7 @@ public class Good extends DistributedObject {
         setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
         if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
         if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
+        if(basicGood != null) setAttribute(element, "IdOfBasicGood", basicGood.getIdOfBasicGood());
     }
     @Override
     protected Good parseAttributes(Node node) throws Exception {
@@ -75,6 +88,7 @@ public class Good extends DistributedObject {
         guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
         guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
         guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
+        idOfBasicGood = getLongAttributeValue(node, "IdOfBasicGood");
         return this;
     }
 
@@ -103,10 +117,28 @@ public class Good extends DistributedObject {
     private String guidOfP;
     private TechnologicalMap technologicalMap;
     private String guidOfTM;
+    private GoodsBasicBasket basicGood;
+    private Long idOfBasicGood;
 
     private User userCreate;
     private User userEdit;
     private User userDelete;
+
+    public GoodsBasicBasket getBasicGood() {
+        return basicGood;
+    }
+
+    public void setBasicGood(GoodsBasicBasket basicGood) {
+        this.basicGood = basicGood;
+    }
+
+    public Long getIdOfBasicGood() {
+        return idOfBasicGood;
+    }
+
+    public void setIdOfBasicGood(Long idOfBasicGood) {
+        this.idOfBasicGood = idOfBasicGood;
+    }
 
     public String getGuidOfP() {
         return guidOfP;

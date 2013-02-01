@@ -70,6 +70,10 @@ public class DAOUtils {
         return (Client) persistenceSession.get(Client.class, idOfClient);
     }
 
+    public static GoodsBasicBasket findBasicGood(Session persistenceSession, long idOfBasicGood) throws Exception {
+        return (GoodsBasicBasket) persistenceSession.get(GoodsBasicBasket.class, idOfBasicGood);
+    }
+
     public static Client getClientReference(Session persistenceSession, long idOfClient) throws Exception {
         return (Client) persistenceSession.load(Client.class, idOfClient);
     }
