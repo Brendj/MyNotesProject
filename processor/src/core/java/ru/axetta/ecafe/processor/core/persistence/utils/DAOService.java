@@ -110,6 +110,17 @@ public class DAOService {
     }
 
     @Transactional
+    public void updateGoodsBasicBasket(GoodsBasicBasket goodsBasicBasket){
+        Query query = em.createQuery("update GoodsBasicBasket set lastUpdate=:lastUpdate, nameOfGood=:nameOfGood, unitsScale=:unitsScale, netWeight=:netWeight where idOfBasicGood=:idOfBasicGood ");
+        query.setParameter("lastUpdate", new Date());
+        query.setParameter("nameOfGood", goodsBasicBasket.getNameOfGood());
+        query.setParameter("unitsScale", goodsBasicBasket.getUnitsScale());
+        query.setParameter("netWeight", goodsBasicBasket.getNetWeight());
+        query.setParameter("idOfBasicGood", goodsBasicBasket.getIdOfBasicGood());
+        query.executeUpdate();
+    }
+
+    @Transactional
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
         TypedQuery<DistributedObject> query = em.createQuery(
                 "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()

@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basicGood;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -98,12 +99,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
                 printError("Поле 'Масса нетто' обязательное.");
                 return null;
             }
-            GoodsBasicBasket goodsBasicBasket = entityManager.find(GoodsBasicBasket.class, editBasicGood.getIdOfBasicGood());
-            goodsBasicBasket.setLastUpdate(new Date());
-            goodsBasicBasket.setNameOfGood(editBasicGood.getNameOfGood());
-            goodsBasicBasket.setUnitsScale(editBasicGood.getUnitsScale());
-            goodsBasicBasket.setNetWeight(editBasicGood.getNetWeight());
-            daoService.persistEntity(goodsBasicBasket);
+            daoService.updateGoodsBasicBasket(editBasicGood);
             reload();
             printMessage("Изменения внесены успешно");
         } catch (Exception e) {
