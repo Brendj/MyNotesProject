@@ -45,7 +45,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="67" splitType="Stretch">
+		<band height="52" splitType="Stretch">
 			<textField>
 				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="0" width="802" height="20"/>
 				<textElement verticalAlignment="Middle">
@@ -54,7 +54,7 @@
 				<textFieldExpression><![CDATA[String.format("Поставщик: %s",$P{contragentName})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="32" width="802" height="20"/>
+				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="25" width="802" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -66,10 +66,10 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="2" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="13" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</detail>
 	<columnFooter>
 		<band splitType="Stretch"/>
@@ -78,9 +78,9 @@
 		<band splitType="Stretch"/>
 	</pageFooter>
 	<summary>
-		<band height="272" splitType="Stretch">
+		<band height="89" splitType="Stretch">
 			<crosstab>
-				<reportElement uuid="b29a841c-8fd6-4c93-b992-f04ce39e280e" x="0" y="0" width="802" height="272"/>
+				<reportElement uuid="b29a841c-8fd6-4c93-b992-f04ce39e280e" x="0" y="0" width="802" height="89"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
