@@ -63,7 +63,7 @@ public class ContragentDAOService extends AbstractDAOService {
                 + " LEFT OUTER JOIN CF_Orgs org ON org.idoforg = cl.idoforg "
                 + " LEFT OUTER JOIN CF_Contragents orgContragent ON org.defaultSupplier = orgContragent.IdOfContragent AND orgContragent.IdOfContragent = :idOfContragent "
                 + " WHERE clientpayments.createddate BETWEEN :startDate AND :endDate "
-                + " GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg ";
+                + " GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idOfContragent",idOfContragent);
         query.setParameter("startDate",startDate.getTime());

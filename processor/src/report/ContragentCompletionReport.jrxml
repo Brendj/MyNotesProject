@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
 	<property name="ireport.zoom" value="1.2100000000000095"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="6"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -33,14 +33,7 @@
 	<parameter name="year" class="java.lang.Integer"/>
 	<parameter name="day" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[SELECT org.shortname, contragent.contragentname, SUM(clientpayments.PaySum) AS SUM
-FROM CF_ClientPayments clientpayments
-LEFT OUTER JOIN CF_Contragents contragent ON clientpayments.IdOfContragent=contragent.IdOfContragent AND contragent.ClassId=1
- LEFT OUTER JOIN CF_Transactions tr ON clientpayments.IdOfTransaction = tr.IdOfTransaction
- LEFT OUTER JOIN CF_Clients cl ON tr.IdOfClient = cl.IdOfClient
-LEFT OUTER JOIN CF_Orgs org ON org.idoforg = cl.idoforg
- LEFT OUTER JOIN CF_Contragents orgContragent ON org.defaultSupplier = orgContragent.IdOfContragent AND orgContragent.IdOfContragent = 4
-GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg]]>
+		<![CDATA[]]>
 	</queryString>
 	<field name="paySum" class="java.lang.Long"/>
 	<field name="educationalInstitutionName" class="java.lang.String"/>
@@ -73,15 +66,21 @@ GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg]]>
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="17" splitType="Stretch"/>
+		<band height="2" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="232" splitType="Stretch">
+		<band height="13" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="272" splitType="Stretch">
 			<crosstab>
-				<reportElement uuid="b29a841c-8fd6-4c93-b992-f04ce39e280e" x="0" y="0" width="802" height="232"/>
-				<crosstabDataset>
-					<dataset resetType="None"/>
-				</crosstabDataset>
+				<reportElement uuid="b29a841c-8fd6-4c93-b992-f04ce39e280e" x="0" y="0" width="802" height="272"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -202,14 +201,5 @@ GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg]]>
 				</crosstabCell>
 			</crosstab>
 		</band>
-	</detail>
-	<columnFooter>
-		<band height="39" splitType="Stretch"/>
-	</columnFooter>
-	<pageFooter>
-		<band height="27" splitType="Stretch"/>
-	</pageFooter>
-	<summary>
-		<band height="27" splitType="Stretch"/>
 	</summary>
 </jasperReport>
