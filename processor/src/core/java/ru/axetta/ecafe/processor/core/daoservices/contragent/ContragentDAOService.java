@@ -5,16 +5,17 @@
 package ru.axetta.ecafe.processor.core.daoservices.contragent;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,32 +54,30 @@ public class ContragentDAOService extends AbstractDAOService {
         return contragentCompletionItem;
     }
 
+    @SuppressWarnings("unchecked")
     public List<ContragentCompletionReportItem> generateContragentCompletionReportItems(Long idOfContragent, Date startDate, Date endDate){
-        List<ContragentCompletionReportItem> contragentCompletionReportItems;
-        String sql =" SELECT org.shortname, contragent.contragentname, SUM(clientpayments.PaySum) AS SUM "
-                + " FROM CF_ClientPayments clientpayments "
-                + " LEFT OUTER JOIN CF_Contragents contragent ON clientpayments.IdOfContragent=contragent.IdOfContragent AND contragent.ClassId=1 "
-                + " LEFT OUTER JOIN CF_Transactions tr ON clientpayments.IdOfTransaction = tr.IdOfTransaction "
-                + " LEFT OUTER JOIN CF_Clients cl ON tr.IdOfClient = cl.IdOfClient "
-                + " LEFT OUTER JOIN CF_Orgs org ON org.idoforg = cl.idoforg "
-                + " LEFT OUTER JOIN CF_Contragents orgContragent ON org.defaultSupplier = orgContragent.IdOfContragent AND orgContragent.IdOfContragent = :idOfContragent "
-                + " WHERE clientpayments.createddate BETWEEN :startDate AND :endDate "
-                + " GROUP BY contragent.IdOfContragent, org.idoforg ORDER BY org.idoforg";
-        Query query = getSession().createSQLQuery(sql);
-        query.setParameter("idOfContragent",idOfContragent);
-        query.setParameter("startDate",startDate.getTime());
-        query.setParameter("endDate",endDate.getTime());
-        List list = query.list();
-        contragentCompletionReportItems = new ArrayList<ContragentCompletionReportItem>(list.size());
-        for (Object object: list){
-            Object[] values = (Object[]) object;
-            String orgName = String.valueOf(values[0]);
-            String contragentName = String.valueOf(values[1]);
-            Long paySum = Long.valueOf(values[2].toString());
-            ContragentCompletionReportItem contragentCompletionReportItem = new ContragentCompletionReportItem(contragentName,orgName,paySum);
-            contragentCompletionReportItems.add(contragentCompletionReportItem);
-        }
-        return contragentCompletionReportItems;
+        Criteria criteria = getSession().createCriteria(ClientPayment.class);
+        /* Условия запроса */
+        criteria.createAlias("transaction", "tr")
+                .createAlias("tr.client", "cl", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("cl.org", "o", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("o.defaultSupplier", "defaultSupplier", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+        criteria.createAlias("contragent", "c", JoinType.LEFT_OUTER_JOIN).add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+        /* отображение сгрупированных полей */
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("o.shortName"), "educationalInstitutionName")
+                .add(Projections.property("c.contragentName"),"contragentName")
+                .add(Projections.sum("paySum"),"paySum")
+                .add(Projections.groupProperty("c.idOfContragent"))
+                .add(Projections.groupProperty("o.idOfOrg"))
+        );
+        criteria.add(Restrictions.between("createTime", startDate, endDate));
+        criteria.addOrder(Order.asc("o.idOfOrg"));
+        criteria.addOrder(Order.asc("c.idOfContragent"));
+        /* Трансформируем к нужному бину */
+        criteria.setResultTransformer(Transformers.aliasToBean(ContragentCompletionReportItem.class));
+        return  (List<ContragentCompletionReportItem>) criteria.list();
     }
 
 
