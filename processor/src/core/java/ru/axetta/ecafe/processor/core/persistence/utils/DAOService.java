@@ -6,10 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -427,7 +426,7 @@ public class DAOService {
     }
 
     public long getStatUniqueClientsWithPaymentTransaction() {
-        Query q = em.createNativeQuery("SELECT COUNT(DISTINCT idOfClient) FROM cf_transactions");
+        Query q = em.createNativeQuery("select count(distinct idofclient) from cf_clientpayments cp, cf_transactions t where cp.idoftransaction=t.idoftransaction");
         return Long.parseLong("" + q.getSingleResult());
     }
 
@@ -453,6 +452,21 @@ public class DAOService {
 
     public long getClientSmsCount() {
         Query q = em.createNativeQuery("SELECT COUNT(*) FROM cf_clientsms");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
+    public long callClientsWithPurchaseOfFoodPayPurchaseReducedPriceMeals() {
+        Query q = em.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg ");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
+    public long callClientsWithPurchaseOfMealBenefits() {
+        Query q = em.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype>50");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
+    public long callClientsPayPowerPurchase() {
+        Query q = em.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype=0");
         return Long.parseLong("" + q.getSingleResult());
     }
 
