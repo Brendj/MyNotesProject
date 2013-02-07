@@ -22,10 +22,10 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Параметр"/>
+                        <h:outputText styleClass="column-header" escape="true" value="Параметр"/>
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Значение" />
+                        <h:outputText styleClass="column-header" escape="true" value="Значение"/>
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

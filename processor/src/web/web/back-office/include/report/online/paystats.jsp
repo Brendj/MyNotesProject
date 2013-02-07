@@ -38,19 +38,19 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Контрагент" />
+                        <h:outputText styleClass="column-header" escape="true" value="Контрагент" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Метод платежа" />
+                        <h:outputText styleClass="column-header" escape="true" value="Метод платежа" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Количество" />
+                        <h:outputText styleClass="column-header" escape="true" value="Количество" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Средняя сумма" />
+                        <h:outputText styleClass="column-header" escape="true" value="Средняя сумма" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Всего сумма" />
+                        <h:outputText styleClass="column-header" escape="true" value="Всего сумма" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
