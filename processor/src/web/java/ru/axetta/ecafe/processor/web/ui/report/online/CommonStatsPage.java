@@ -4,17 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Scope(value = "session")
@@ -49,9 +47,9 @@ public class CommonStatsPage extends BasicWorkspacePage {
         }
     }
 
-    LinkedList<StatItem> statItems;
+    private List<StatItem> statItems;
 
-    public LinkedList<StatItem> getStatItems() {
+    public List<StatItem> getStatItems() {
         return statItems;
     }
 
@@ -62,16 +60,19 @@ public class CommonStatsPage extends BasicWorkspacePage {
     }
     
     private void loadData(boolean loadFromDb) {
-        statItems = new LinkedList<StatItem>();
+        statItems = new ArrayList<StatItem>(12);
         statItems.add(new StatItem("Клиентов", !loadFromDb?"-":(""+daoService.getStatClientsCount())));
         statItems.add(new StatItem("Клиентов с мобильным телефоном", !loadFromDb?"-":(""+daoService.getStatClientsWithMobile())));
         statItems.add(new StatItem("Клиентов с e-mail", !loadFromDb?"-":(""+daoService.getStatClientsWithEmail())));
-        statItems.add(new StatItem("Клиентов с платежными операциями", !loadFromDb?"-":(""+daoService.getStatUniqueClientsWithPaymentTransaction())));
+        statItems.add(new StatItem("Клиентов с пополнениями", !loadFromDb?"-":(""+daoService.getStatUniqueClientsWithPaymentTransaction())));
         statItems.add(new StatItem("Клиентов с проходами", !loadFromDb?"-":(""+daoService.getStatUniqueClientsWithEnterEvent())));
         statItems.add(new StatItem("Пополнений лицевых счетов", !loadFromDb?"-":(""+daoService.getStatClientPaymentsCount())));
         statItems.add(new StatItem("Оплаченных заказов", !loadFromDb?"-":(""+daoService.getStatOrdersCount())));
         statItems.add(new StatItem("Проходов", !loadFromDb?"-":(""+daoService.getEnterEventsCount())));
         statItems.add(new StatItem("Отправлено SMS", !loadFromDb?"-":(""+daoService.getClientSmsCount())));
+        statItems.add(new StatItem("Клиентов с покупкой платного питания", !loadFromDb?"-":(""+daoService.callClientsPayPowerPurchase())));
+        statItems.add(new StatItem("Клиентов с покупкой льготного питания", !loadFromDb?"-":(""+daoService.callClientsWithPurchaseOfMealBenefits())));
+        statItems.add(new StatItem("Клиентов с покупкой платного питания / покупкой льготного питания", !loadFromDb?"-":(""+daoService.callClientsWithPurchaseOfFoodPayPurchaseReducedPriceMeals())));
     }
 
 }
