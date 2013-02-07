@@ -408,14 +408,19 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             for (Item item : this.items) {
+                Client client =  DAOUtils.findClient(session,item.idOfClient);
+                Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(session, client.getOrg().getIdOfOrg());
+                Boolean flag = !idOfFriendlyOrg.contains(org.getIdOfOrg());
                 org.hibernate.Query query = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
                 query.setLong("newOrg", org.getIdOfOrg());
                 query.setLong("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 query.setLong("idOfClient", item.getIdOfClient());
                 query.setLong("clientRegistryVersion", clientRegistryVersion);
                 query.executeUpdate();
-                ClientMigration clientMigration = new ClientMigration(DAOUtils.getClientReference(session,item.idOfClient),org);
-                session.save(clientMigration);
+                if(flag){
+                    ClientMigration clientMigration = new ClientMigration(client,org);
+                    session.save(clientMigration);
+                }
             }
             printMessage("Данные обновлены.");
         }

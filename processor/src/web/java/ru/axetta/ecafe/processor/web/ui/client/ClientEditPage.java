@@ -533,8 +533,14 @@ public class ClientEditPage extends BasicWorkspacePage
         this.contractPerson.copyTo(contractPerson);
         persistenceSession.update(contractPerson);
 
-        Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
-        Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(this.org.getIdOfOrg()));
+        Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
+        Org org = null;
+        if(idOfFriendlyOrg.contains(this.org.getIdOfOrg())){
+            org = (Org) persistenceSession.load(Org.class, client.getOrg().getIdOfOrg());
+        } else {
+            org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
+        }
+        Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);

@@ -9,15 +9,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ClientMigrationItemInfo;
-import ru.axetta.ecafe.processor.core.client.ClientService;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientMigration;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.daoservices.client.ClientDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.client.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,16 +65,10 @@ public class ClientMigrationHistoryReport extends BasicReportForOrgJob{
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
-            Query clientMigrationTypedQuery = session.createQuery("from ClientMigration where org.idOfOrg=:idOfOrg and registrationDate BETWEEN :startDate AND :endDate order by client.idOfClient");
-            clientMigrationTypedQuery.setParameter("idOfOrg",org.getIdOfOrg());
-            clientMigrationTypedQuery.setParameter("startDate",startTime);
-            clientMigrationTypedQuery.setParameter("endDate",endTime);
-            List clientMigrationList = clientMigrationTypedQuery.list();
-            List<ClientMigrationItemInfo> clientMigrationItemInfoList = new ArrayList<ClientMigrationItemInfo>(clientMigrationList.size());
-            for (Object object: clientMigrationList){
-                clientMigrationItemInfoList.add(new ClientMigrationItemInfo((ClientMigration) object));
-            }
-            return new JRBeanCollectionDataSource(clientMigrationItemInfoList);
+            ClientDAOService service = new ClientDAOService();
+            service.setSession(session);
+            List<ClientMigrationHistoryReportItem> clientMigrationHistoryReportItems = service.generate(org.getIdOfOrg(),startTime,endTime);
+            return new JRBeanCollectionDataSource(clientMigrationHistoryReportItems);
         }
 
     }
