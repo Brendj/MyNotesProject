@@ -13,7 +13,7 @@
 	<resource-root path="iText-2.1.7.jar"/>
 	<resource-root path="jasperreports-4.7.1.jar"/>
 	<resource-root path="jasperreports-fonts-4.7.1.jar"/>
-	<resource-root path="groovy-all-1.5.5.jar"/>
+	<resource-root path="groovy-all-1.7.5.jar"/>
 	<resource-root path="jxl.jar"/>
 	<resource-root path="poi-3.6-20091214.jar"/>
 	<resource-root path="quartz-1.8.1.jar"/>
