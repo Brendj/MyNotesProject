@@ -13,7 +13,7 @@ import java.util.Date;
  * Time: 15:19
  * To change this template use File | Settings | File Templates.
  */
-public final class ClientMigration {
+public class ClientMigration {
 
     private Long idOfClientMigration;
     private Date registrationDate;
