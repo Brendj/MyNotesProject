@@ -21,6 +21,10 @@ import java.util.*;
  */
 public class FunctionSelector {
 
+    public static Set<Function> SUPPLIER_FUNCTIONS = null;
+    public static Set<Function> MONITORING_FUNCTIONS = null;
+    public static Set<Function> ADMIN_FUNCTIONS = null;
+
     public static class Item {
 
         private boolean selected;
@@ -63,19 +67,39 @@ public class FunctionSelector {
     }
 
     public void fill(Session session) throws Exception {
-        List<Item> items = new LinkedList<Item>();
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
+        List<Item> items = new ArrayList<Item>(allFunctions.size());
+        SUPPLIER_FUNCTIONS = new HashSet<Function>();
+        MONITORING_FUNCTIONS = new HashSet<Function>();
+        ADMIN_FUNCTIONS = new HashSet<Function>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
             items.add(item);
+            if(function.getFunctionName().equalsIgnoreCase(Function.FUNC_MONITORING)){
+                MONITORING_FUNCTIONS.add(function);
+            }
+            if(        function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CLIENT_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_EDIT)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_RULE_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_EDIT)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
+               ){
+                SUPPLIER_FUNCTIONS.add(function);
+            }
+            ADMIN_FUNCTIONS.add(function);
         }
         this.items = items;
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
-        List<Item> items = new LinkedList<Item>();
+        List<Item> items = new ArrayList<Item>();
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
         for (Object object : allFunctions) {

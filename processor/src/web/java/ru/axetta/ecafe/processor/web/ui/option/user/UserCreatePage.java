@@ -31,6 +31,30 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
     private String email;
     private ContragentItem contragentItem;
     private final FunctionSelector functionSelector = new FunctionSelector();
+    private Integer idOfRole;
+    private String roleName;
+    private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
+    private Contragent currentContragent;
+
+    public void setIdOfRole(Integer idOfRole) {
+        this.idOfRole = idOfRole;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public Integer getIdOfRole() {
+        return idOfRole;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public UserRoleEnumTypeMenu getUserRoleEnumTypeMenu() {
+        return userRoleEnumTypeMenu;
+    }
 
     public String getPageFilename() {
         return "option/user/create";
@@ -98,19 +122,51 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
 
     public void fill(Session session) throws Exception {
         this.functionSelector.fill(session);
+        this.idOfRole = User.DefaultRole.DEFAULT.getIdentification();
     }
 
     public void createUser(Session session) throws Exception {
         User user = new User(userName, plainPassword, phone, new Date());
-        user.setFunctions(functionSelector.getSelected(session));
         user.setEmail(email);
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        user.setIdOfRole(idOfRole);
+        if(User.DefaultRole.DEFAULT.equals(role)){
+            if(this.roleName==null || this.roleName.isEmpty()){
+                throw new Exception("Role name fields is null");
+            }
+            user.setRoleName(this.roleName);
+            user.setFunctions(functionSelector.getSelected(session));
+        }
+        if(role.equals(User.DefaultRole.SUPPLIER)){
+            user.setFunctions(FunctionSelector.SUPPLIER_FUNCTIONS);
+            if(currentContragent==null){
+                throw new Exception("Contragent fields is null");
+            }
+            user.setContragent(currentContragent);
+        }
+        if(role.equals(User.DefaultRole.MONITORING)){
+            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+        }
+        if(role.equals(User.DefaultRole.ADMIN)){
+            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+        }
         session.save(user);
+    }
+
+    public Boolean getIsSupplier(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.SUPPLIER);
+    }
+
+    public Boolean getIsDefault(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            this.contragentItem = new ContragentItem(contragent);
+            currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            this.contragentItem = new ContragentItem(currentContragent);
         }
     }
 

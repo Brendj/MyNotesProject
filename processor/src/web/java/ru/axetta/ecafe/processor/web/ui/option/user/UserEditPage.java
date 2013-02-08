@@ -30,7 +30,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
     private String phone;
     private String email;
     private ContragentItem contragentItem;
+    private Integer idOfRole;
+    private String roleName;
+    private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
     private FunctionSelector functionSelector = new FunctionSelector();
+
+    public UserRoleEnumTypeMenu getUserRoleEnumTypeMenu() {
+        return userRoleEnumTypeMenu;
+    }
 
     public String getPageFilename() {
         return "option/user/edit";
@@ -100,6 +107,22 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
         this.contragentItem = contragentItem;
     }
 
+    public Integer getIdOfRole() {
+        return idOfRole;
+    }
+
+    public void setIdOfRole(Integer idOfRole) {
+        this.idOfRole = idOfRole;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     public FunctionSelector getFunctionSelector() {
         return functionSelector;
     }
@@ -121,11 +144,31 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
         }
         user.setPhone(phone);
         user.setEmail(email);
-        user.setFunctions(functionSelector.getSelected(session));
         user.setUpdateTime(new Date());
-        if(contragentItem!=null){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        if(User.DefaultRole.SUPPLIER.equals(role)){
+            if(contragentItem==null){
+                throw new Exception("Contragent fields is null");
+            }
             Contragent contragent = (Contragent) session.get(Contragent.class,contragentItem.getIdOfContragent());
+            user.setFunctions(FunctionSelector.SUPPLIER_FUNCTIONS);
             user.setContragent(contragent);
+            user.setRoleName(role.toString());
+        }
+        if(role.equals(User.DefaultRole.MONITORING)){
+            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setRoleName(role.toString());
+        }
+        if(role.equals(User.DefaultRole.ADMIN)){
+            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setRoleName(role.toString());
+        }
+        if(User.DefaultRole.DEFAULT.equals(role)){
+            if(this.roleName==null || this.roleName.isEmpty()){
+                throw new Exception("Role name fields is null");
+            }
+            user.setFunctions(functionSelector.getSelected(session));
+            user.setRoleName(this.roleName);
         }
         session.update(user);
         fill(session, user);
@@ -140,7 +183,20 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
         if(user.getContragent()!=null){
             this.contragentItem = new ContragentItem(user.getContragent());
         }
+        this.idOfRole = user.getIdOfRole();
+        this.roleName = user.getRoleName();
     }
+
+    public Boolean getIsSupplier(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.SUPPLIER);
+    }
+
+    public Boolean getIsDefault(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT);
+    }
+
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
