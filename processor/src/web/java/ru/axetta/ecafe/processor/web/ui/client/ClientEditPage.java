@@ -157,7 +157,7 @@ public class ClientEditPage extends BasicWorkspacePage
         return categoryDiscounts.isEmpty();
     }
 
-    private List<CategoryDiscount> categoryDiscountList = new LinkedList<CategoryDiscount>();
+    private List<CategoryDiscount> categoryDiscountList = new ArrayList<CategoryDiscount>();
 
     public List<CategoryDiscount> getCategoryDiscountList() {
         return categoryDiscountList;
@@ -196,7 +196,7 @@ public class ClientEditPage extends BasicWorkspacePage
     private Long externalId;
     private String clientGUID;
     private Integer discountMode;
-    private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+    private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
     private String san;
     private String guardsan;
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
@@ -482,7 +482,7 @@ public class ClientEditPage extends BasicWorkspacePage
             }
         }
 
-        this.selectItemList = new LinkedList<SelectItem>();
+        this.selectItemList = new ArrayList<SelectItem>();
         /* если у клиента уже выбрана льгота то она будет первой */
         if(null!=client.getDiscountMode() && client.getDiscountMode()>0){
             this.selectItemList.add(new SelectItem(client.getDiscountMode(),Client.DISCOUNT_MODE_NAMES[client.getDiscountMode()]));
