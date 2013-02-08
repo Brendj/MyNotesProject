@@ -123,12 +123,23 @@ public class SMSStatusServlet extends HttpServlet {
 
     public void requestSubscriberInfo(String subscriber, HttpServletResponse response, Session session)
             throws Exception {
+        StringBuilder responseText = new StringBuilder("");
         Client client = null;
         Criteria clientSmsCriteria = session.createCriteria(Client.class);
         clientSmsCriteria.add(Restrictions.eq("mobile", subscriber));
         List clientsList = clientSmsCriteria.list();
-        if (clientsList.size() > 0) {
-            client = (Client) clientsList.get(0);
+        for (Object cObj : clientsList) {
+            client = (Client) cObj;
+            String nextStr = getSubscriberInfo(client, session);
+            if (nextStr.length() < 1)
+            {
+                continue;
+            }
+            if (responseText.length() > 1)
+                {
+                responseText.append('\n');
+                }
+            responseText.append(nextStr);
         }
         if (client == null) {
             response.getWriter()
@@ -136,7 +147,13 @@ public class SMSStatusServlet extends HttpServlet {
             return;
         }
 
+    response.getWriter().write(responseText.toString());
+    }
 
+
+
+    public String getSubscriberInfo (Client client, Session session)
+        {
         StringBuilder responseText = new StringBuilder("");
         org.hibernate.Query q = session.createSQLQuery(
                 "select cf_persons.firstname, cf_persons.secondname, cf_persons.surname, to_timestamp(cf_enterevents.evtdatetime / 1000), cf_enterevents.passdirection, cf_clients.balance "
@@ -144,7 +161,7 @@ public class SMSStatusServlet extends HttpServlet {
                         "from cf_clients " +
                         "left join cf_persons on cf_persons.idofperson=cf_clients.idofperson " +
                         "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient " +
-                        "where cf_clients.idofclient=:idofclient " +
+                        "where cf_clients.idofclient=:idofclient and cf_enterevents.evtdatetime<>0 and cf_enterevents.passdirection<>0 " +
                         "order by evtdatetime desc " +
                         "limit 1");
         q.setParameter("idofclient", client.getIdOfClient());
@@ -193,11 +210,10 @@ public class SMSStatusServlet extends HttpServlet {
                     append(secondName).append(" ").
                     append(surname).append(" ").
                     append(passType).append(" ").
-                    append(new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(evtDate)).append(" ").
+                    append(new SimpleDateFormat("yyyy.MM.dd HH:mm").format(evtDate)).append(" ").
                     append(beautifyBalance(balance)).append(" ");
         }
-
-        response.getWriter().write(responseText.toString());
+    return responseText.toString();
     }
 
 
