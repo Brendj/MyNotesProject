@@ -6868,7 +6868,8 @@ public User getCurrentUser() throws Exception {
     }
 
     public String getUserRole() throws Exception {
-        return (isEligibleToEditOrgs() && isEligibleToEditClients())?"администратор":"поставщик питания";
+       //return (isEligibleToEditOrgs() && isEligibleToEditClients())?"администратор":"поставщик питания";
+       return getCurrentUser().getRoleName();
     }
 
     public boolean isEligibleToViewOrgs() throws Exception {

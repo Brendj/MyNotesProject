@@ -26,8 +26,17 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.userCreatePage.email}" maxlength="128" styleClass="input-text"/>
-    <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" />
-    <h:panelGroup styleClass="borderless-div">
+
+    <h:outputText escape="true" value="Роль" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.userCreatePage.idOfRole}" styleClass="input-text">
+        <a4j:support event="onchange" reRender="userCreateGrid" ajaxSingle="true" />
+        <f:selectItems value="#{mainPage.userCreatePage.userRoleEnumTypeMenu.items}" />
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Имя роли" styleClass="output-text required-field" rendered="#{mainPage.userCreatePage.isDefault}"/>
+    <h:inputText value="#{mainPage.userCreatePage.roleName}" maxlength="128" styleClass="input-text required-field" rendered="#{mainPage.userCreatePage.isDefault}"/>
+
+    <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" rendered="#{mainPage.userCreatePage.isSupplier}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userCreatePage.isSupplier}">
         <h:inputText value="#{mainPage.userCreatePage.contragentItem.contragentName}" readonly="true"
                      styleClass="input-text" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
@@ -40,8 +49,8 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
-    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" />
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.items}" var="item">
+    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.items}" var="item" rendered="#{mainPage.userCreatePage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
         </rich:column>

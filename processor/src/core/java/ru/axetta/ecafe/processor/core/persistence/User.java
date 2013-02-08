@@ -27,6 +27,45 @@ import java.util.*;
  */
 public class User {
 
+    public enum DefaultRole{
+        DEFAULT(0,"настраиваемая роль"),
+        ADMIN(1,"администратор"),
+        SUPPLIER(2,"поставщик питания"),
+        MONITORING(3,"АРМ мониторинг");
+
+        private Integer identification;
+        private String description;
+
+        static Map<Integer,DefaultRole> integerDefaultRoleMap = new HashMap<Integer, DefaultRole>();
+        static {
+            for (DefaultRole defaultRole: DefaultRole.values()){
+                integerDefaultRoleMap.put(defaultRole.identification,defaultRole);
+            }
+        }
+
+        private DefaultRole(Integer identification, String description) {
+            this.description = description;
+            this.identification = identification;
+        }
+
+        public static DefaultRole parse(Integer identification){
+            return integerDefaultRoleMap.get(identification);
+        }
+
+        public Integer getIdentification() {
+            return identification;
+        }
+
+        public static Boolean isDefault(Integer identification){
+            return DEFAULT.equals(integerDefaultRoleMap.get(identification));
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+    }
+
     private Long idOfUser;
     private long version;
     private String userName;
@@ -36,6 +75,28 @@ public class User {
     private Contragent contragent;
     private Set<Function> functions = new HashSet<Function>();
     private String email;
+    private Integer idOfRole;
+    private String roleName;
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public Integer getIdOfRole() {
+        return idOfRole;
+    }
+
+    public void setIdOfRole(Integer idOfRole) {
+        this.idOfRole = idOfRole;
+    }
+
+    public Boolean isDefaultRole(){
+         return DefaultRole.isDefault(idOfRole);
+    }
 
     public String getEmail() {
         return email;
@@ -45,7 +106,7 @@ public class User {
         this.email = email;
     }
 
-    User() {
+    protected User() {
         // For Hibernate
     }
 

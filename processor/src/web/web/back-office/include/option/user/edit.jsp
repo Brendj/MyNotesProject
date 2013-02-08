@@ -35,8 +35,17 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.email}" maxlength="128" styleClass="input-text"/>
-    <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" />
-    <h:panelGroup styleClass="borderless-div">
+
+    <h:outputText escape="true" value="Роль" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.userEditPage.idOfRole}" styleClass="input-text">
+        <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+        <f:selectItems value="#{mainPage.userEditPage.userRoleEnumTypeMenu.items}" />
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Имя роли" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.getIsDefault}"/>
+    <h:inputText value="#{mainPage.userEditPage.roleName}" maxlength="128" styleClass="input-text" rendered="#{mainPage.userEditPage.getIsDefault}"/>
+
+    <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.isSupplier}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userEditPage.isSupplier}">
         <h:inputText value="#{mainPage.userEditPage.contragentItem.contragentName}" readonly="true"
                      styleClass="input-text" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
@@ -49,8 +58,8 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
-    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" />
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item">
+    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userEditPage.getIsDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item" rendered="#{mainPage.userEditPage.getIsDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
         </rich:column>
