@@ -31,3 +31,5 @@ ALTER TABLE CF_Goods ADD COLUMN BasicGoodLastUpdate bigint;
 ALTER TABLE CF_Goods ADD CONSTRAINT CF_Goods_IdOfBasicGood_FK FOREIGN KEY (IdOfBasicGood) REFERENCES CF_Goods_BasicBasket(IdOfBasicGood);
 
 -- Добавлена секция OrgOwnerData в котором содержится список обслуживаемых организаций, при синхронизации внешних систем в качестве поставщиков с подсистемой координации и процессинга
+
+-- Удаляем право пользователя
