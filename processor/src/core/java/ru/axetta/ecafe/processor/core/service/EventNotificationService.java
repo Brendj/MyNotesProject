@@ -8,7 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -17,15 +23,17 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.StringReader;
-import java.util.Properties;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 @Scope("singleton")
 public class EventNotificationService {
     Logger logger = LoggerFactory.getLogger(MaintananceService.class);
 
-    public static String NOTIFICATION_ENTER_EVENT="enterEvent", NOTIFICATION_BALANCE_TOPUP="balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED="linkingToken", MESSAGE_RESTORE_PASSWORD ="restorePassword";
+    public static String NOTIFICATION_ENTER_EVENT="enterEvent", NOTIFICATION_BALANCE_TOPUP="balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED="linkingToken", MESSAGE_RESTORE_PASSWORD ="restorePassword", MESSAGE_PAYMENT ="payment";
     public static String TYPE_SMS="sms", TYPE_EMAIL_TEXT="email.text", TYPE_EMAIL_SUBJECT="email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -195,5 +203,76 @@ public class EventNotificationService {
         RuntimeContext.getInstance().setOptionValue(Option.OPTION_NOTIFICATION_TEXT, stringBuilder.toString());
         RuntimeContext.getInstance().saveOptionValues();
         notificationText = properties;
+    }
+
+
+    public void sendPaymentNotificationSMS (long idOfOrg, SyncRequest.PaymentRegistry.Payment payment)
+        {
+        if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON))
+            {
+            return;
+            }
+
+
+        RuntimeContext runtimeContext = null;
+        Session session = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+        } catch (Exception e) {
+            logger.error("Failed to receive session using RuntimeContext");
+            return;
+        }
+
+
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.eq("idOfClient", payment.getIdOfClient()));
+        List clientsList = clientCriteria.list();
+        if (clientsList.size() < 1)
+            {
+            logger.error("Failed to receive clients with id " +
+                         payment.getIdOfClient() + " to send SMS payment notification");
+            return;
+            }
+        Client cl = (Client) clientsList.get(0);
+
+        //  Если у пользователя не стоит флажка отправлять СМС, то пропускаем его
+        if (!cl.isNotifyViaSMS())
+            {
+            return;
+            }
+
+
+        long complexes = 0L;
+        long others = 0L;
+        Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+        while (purchases.hasMoreElements())
+            {
+            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
+            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_0 &&
+                purchase.getType() <= OrderDetail.TYPE_COMPLEX_9)
+                {
+                complexes += purchase.getSocDiscount() + purchase.getRPrice();
+                }
+            else
+                {
+                others += purchase.getSocDiscount() + purchase.getRPrice();
+                }
+            }
+
+
+        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
+        String msg = "Столовая " + date + "\n" +
+                     "Л/с:" + cl.getContractId() + "\n" +
+                     "Буфет:" + beautifyAmount (others) + "\n" +
+                     "Комплекс:" + beautifyAmount (complexes);
+        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                    .sendMessageAsync(cl, EventNotificationService.MESSAGE_PAYMENT,
+                            new String[]{EventNotificationService.MESSAGE_PAYMENT, msg});
+        }
+
+    public String beautifyAmount(long amt) {
+        String balanceStr = NumberFormat.getCurrencyInstance().format((double) amt / 100) + "р.";
+        return balanceStr;
     }
 }
