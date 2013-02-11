@@ -34,6 +34,12 @@
                           styleClass="output-text" />
             <h:inputText value="#{optionPage.defaultExpenditureLimit}" styleClass="input-text" size="5" />
         </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Отправлять СМС оповещение о покупке"
+                          styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.sendSMSPaymentNotification}" styleClass="output-text" />
+        </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

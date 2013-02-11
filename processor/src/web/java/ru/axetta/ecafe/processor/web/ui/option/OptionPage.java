@@ -68,6 +68,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String syncRegisterCompany;
     private Boolean disableSMSNotifyEditInClientRoom;
     private Boolean importRNIPPayments;
+    private Boolean sendSMSPaymentNotification;
 
 
     @PersistenceContext
@@ -332,6 +333,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.importRNIPPayments = importRNIPPayments;
     }
 
+    public Boolean getSendSMSPaymentNotification() {
+        return sendSMSPaymentNotification;
+    }
+
+    public void setSendSMSPaymentNotification(Boolean sendSMSPaymentNotification) {
+        this.sendSMSPaymentNotification = sendSMSPaymentNotification;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -373,6 +382,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterCompany = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_COMPANY);
         disableSMSNotifyEditInClientRoom = runtimeContext.getOptionValueBool(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM);
         importRNIPPayments = runtimeContext.getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
+        sendSMSPaymentNotification = runtimeContext.getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON);
 
         bankListPage.onShow();
 
@@ -456,7 +466,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_COMPANY, syncRegisterCompany);
             runtimeContext.setOptionValue(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM, disableSMSNotifyEditInClientRoom);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, importRNIPPayments);
-
+            runtimeContext.setOptionValue(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, sendSMSPaymentNotification);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

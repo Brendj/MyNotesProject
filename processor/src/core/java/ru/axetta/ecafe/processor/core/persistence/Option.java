@@ -74,7 +74,8 @@ public class Option {
             OPTION_MSK_NSI_PASSWORD=100026,
             OPTION_MSK_NSI_COMPANY=100027,
             OPTION_IMPORT_RNIP_PAYMENTS_ON=100028,
-            OPTION_IMPORT_RNIP_PAYMENTS_TIME=100029
+            OPTION_IMPORT_RNIP_PAYMENTS_TIME=100029,
+            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON=100030
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -110,7 +111,8 @@ public class Option {
             OPTION_MSK_NSI_PASSWORD, "la0d6xxw",
             OPTION_MSK_NSI_COMPANY, "dogm_nsi",
             OPTION_IMPORT_RNIP_PAYMENTS_ON, "0",
-            OPTION_IMPORT_RNIP_PAYMENTS_TIME, null
+            OPTION_IMPORT_RNIP_PAYMENTS_TIME, null,
+            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, "0"
 };
 
     private Long idOfOption;

@@ -17,6 +17,7 @@ import com.google.visualization.datasource.query.Query;
 import com.google.visualization.datasource.render.JsonRenderer;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.hibernate.Session;
@@ -61,12 +62,49 @@ public class ProjectStateReportService {
     private static final int UNIQUE_CHART_4_DATA = 204;
     private static final int CONTENTS_CHART_DATA = 300;
     private static final int REFILL_CHART_DATA = 400;
+    private static final int REFILL_CHART_01_DATA = 401;
+    private static final int REFILL_CHART_02_DATA = 402;
     private static final int INFORMING_CHART_DATA = 500;
     private static final int BENEFIT_PART_CHART_DATA = 600;
     private static final int BENEFITS_CHART_DATA = 700;
     private static final int VISITORS_CHART_DATA = 800;
     private static final int VISITORS_CHART_1_DATA = 801;
     private static final int VISITORS_CHART_2_DATA = 802;
+    private static final int RATING_CHART_DATA   = 900;
+    private static final int RATING_CHART_1_DATA = 901;
+    private static final int RATING_CHART_2_DATA = 902;
+    private static final int RATING_CHART_3_DATA = 903;
+    private static final int RATING_CHART_4_DATA = 904;
+    private static final int REFILL_PROGRESS_CHART = 1000;
+    private static final int REFILL_PROGRESS_0_CHART = 1001;
+    private static final int REFILL_PROGRESS_1_CHART = 1002;
+    private static final int REFILL_PROGRESS_2_CHART = 1003;
+
+
+
+    //  Для возможности отбора данных по регионам, достаточно указать два макро-заменителя
+    //  в соответствующих местах - %REGION_SENSITIVE_JOIN% перед where и REGION_SENSITIVE_CLAUSE
+    //  в любой части where. Для определения какие регионы участвуют и как они воздействуют на
+    //  id типа данных, используется карта REGIONS_LIST (указанное значение будет прибавляться к
+    //  изначальному id типа, например, в карте указан ЮВАО со значением 50, и обработка идет
+    //  данных для ACTIVE_CHART_1_DATA с id типа 101, тогда 101 + 50 будет давать нужный id типа
+    //  для ЮВАО); если нужны все регионы, необходимо указывать 0; следите за правильностью
+    //  сбора id типа, в собранном виде значение не должно превышать исходное на 100, иначе
+    //  будет нарушение id типа, например 101 + 100 - нельзя, т.к. в 201 может находиться
+    //  другой тип
+    //  Так же для каждого типа необходимо
+    public static final String REGION_SENSITIVE_JOIN = "%REGION_SENSITIVE_JOIN%";
+    public static final String REGION_SENSITIVE_CLAUSE = "%REGION_SENSITIVE_CLAUSE%";
+    public static Map <String, Integer> REGIONS_LIST;
+
+    //  Используется для выполнения запросов для всех платежных агентов. Обязательно должно
+    //  использоваться совместно с ComplexType (а не SimpleType). В перечислении столбцов
+    //  так же должен быть указан только один столбез значений с именем PAY_AGENTS_COLUMNS.
+    //  Для каждого агента, ID типа будет увеличиваться на 1 от изначального
+    public static final String PAY_AGENTS_COLUMNS = "%PAY_AGENT_COLUMNS%";
+    public static final String PAY_AGENTS_CLAUSE = "%PAY_AGENT_ID%";
+    public static final int PAY_AGENT_MULTI_ID = 10000;
+    public static List <Object []> PAY_AGENTS_LIST;
 
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM");
@@ -78,56 +116,61 @@ public class ProjectStateReportService {
         TYPES = new HashMap<String, Type>();
         TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_enterevents.idoforg as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
+                        "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
-                        "from cf_enterevents " +
-                        "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_enterevents as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                        +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        REGION_SENSITIVE_CLAUSE + " " +
                         "union " +
-                        "select distinct cf_orders.idoforg as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000) as oo "
-                        +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_1_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_enterevents.idoforg as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
+                        "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
-                        "from cf_enterevents " +
-                        "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_enterevents as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 ) as oo "
-                        +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_2_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_orders.idoforg as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
                         +
-                        "      cf_orders.socdiscount=0) as oo " +
+                        "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", ACTIVE_CHART_3_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_orders.idoforg as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
                         +
-                        "      cf_orders.socdiscount<>0) as oo " +
+                        "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", ACTIVE_CHART_4_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте"},
@@ -136,56 +179,61 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));
         TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_enterevents.idofclient as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
+                        "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
-                        "from cf_enterevents " +
-                        "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_enterevents as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                        +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE + " "+
                         "union " +
-                        "select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000) as oo "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " + REGION_SENSITIVE_CLAUSE + ") as oo "
                         +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_1_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_enterevents.idofclient as v, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
+                        "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
-                        "from cf_enterevents " +
-                        "where cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_enterevents as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000) as oo "
-                        +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_2_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
                         +
-                        "      cf_orders.socdiscount=0) as oo " +
+                        "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_3_DATA).setIncremental(true),
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
-                        "from (select distinct cf_orders.idofclient as v, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d "
+                        "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
-                        "from cf_orders " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "from cf_orders as regOrgSrc " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
                         +
-                        "      cf_orders.socdiscount<>0) as oo " +
+                        "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_4_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Число уникальных пользователей в день"},
@@ -194,10 +242,10 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "Число уникальных пользователей, получивших льготное питание"}}, UNIQUE_CHART_DATA));
         TYPES.put("ContentsChart",
                 new SimpleType("select cf_orderdetails.menugroup as g, count(cf_orderdetails.idoforder) as c " +
-                        "from cf_orders  " +
-                        "left join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder "
+                        "from cf_orders as regOrgSrc " +
+                        "left join cf_orderdetails on regOrgSrc.idoforg=cf_orderdetails.idoforg and regOrgSrc.idoforder=cf_orderdetails.idoforder "
                         +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
                         +
@@ -208,33 +256,107 @@ public class ProjectStateReportService {
         TYPES.put("RefillChart",
                 new SimpleType("select cf_contragents.contragentname, count(cf_clientpayments.idofclientpayment) " +
                         "from cf_contragents " +
-                        "left join cf_clientpayments on cf_contragents.idofcontragent=cf_clientpayments.idofcontragent "
-                        +
-                        "where cf_clientpayments.paysum<>0 " +
+                        "left join cf_clientpayments on cf_contragents.idofcontragent=cf_clientpayments.idofcontragent "+
+                        "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "+
+                        "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "+
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where cf_clientpayments.paysum<>0 " +REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_contragents.contragentname " +
                         "order by 1", new Object[][]{
                         {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, "Количество пополнений"}},
                         REFILL_CHART_DATA).setPostReportMethod("parseRefillChart"));
+        TYPES.put("RefillAvgChart", new ComplexType(new Type[]{
+                new SimpleType("select 'Средняя сумма пополнения' as title, avg(cf_clientpayments.paysum) / 1000 " +
+                        "from cf_contragents " +
+                        "left join cf_clientpayments on cf_contragents.idofcontragent=cf_clientpayments.idofcontragent "+
+                        "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "+
+                        "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "+
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where cf_clientpayments.idofcontragent=" + PAY_AGENTS_CLAUSE + " and cf_clientpayments.paysum<>0 " +REGION_SENSITIVE_CLAUSE + " " +
+                        "group by cf_contragents.contragentname " +
+                        "order by 1", REFILL_CHART_02_DATA).setValueType(Double.class), },
+                        new Object[][]{
+                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS}}, REFILL_CHART_01_DATA));
+        TYPES.put("RefillProgressChart", new ComplexType(new Type[]{
+                new SimpleType("select bycontr.dat, bycontr.cnt / byall.cnt * 100 "
+                        + "from (select '' || EXTRACT(EPOCH FROM ooo.dat) * 1000 as dat, sum(ooo.cnt) as cnt "
+                        + "from ( "
+                        + "select date_trunc('day', to_timestamp(cf_clientpayments.createddate / 1000)) as dat, count(cf_clientpayments.idofclientpayment) as cnt "
+                        + "from cf_clientpayments "
+                        + "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
+                        + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "where cf_clientpayments.idofcontragent=" + PAY_AGENTS_CLAUSE + " and "
+                        + "      cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE + " "
+                        + "group by cf_clientpayments.createddate) as ooo "
+                        + "group by ooo.dat) as bycontr, "
+                        + "(select '' || EXTRACT(EPOCH FROM kkk.dat) * 1000 as dat, sum(kkk.cnt) as cnt "
+                        + "from ("
+                        + "select date_trunc('day', to_timestamp(cf_clientpayments.createddate / 1000)) as dat, count(cf_clientpayments.idofclientpayment) as cnt "
+                        + "from cf_clientpayments "
+                        + "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
+                        + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "where cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE + " "
+                        + "group by cf_clientpayments.createddate) as kkk "
+                        + "group by kkk.dat) as byall "
+                        + "where bycontr.dat = byall.dat "
+                        + "order by bycontr.dat", REFILL_PROGRESS_0_CHART).setIncremental(true).setValueType (Double.class)},
+                new Object[][]{
+                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS}},
+                REFILL_PROGRESS_CHART));
         TYPES.put("InformingChart",
-                new SimpleType("select 'Не предоставлены данные для информирования', count(cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "left join cf_cards on cf_clients.idofclient=cf_cards.idofclient " +
-                        "where cf_clients.email='' and cf_clients.mobile='' and cf_cards.state=0 " +
+                new SimpleType("select 'Не предоставлены данные для информирования', count(regOrgSrc.idofclient) " +
+                        "from cf_clients as regOrgSrc " +
+                        "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.email='' and regOrgSrc.mobile='' and cf_cards.state=0 " +
+                        REGION_SENSITIVE_CLAUSE + " " +
 
                         "union " +
-                        "select 'В систему внесен электронный почтовый адрес', count(cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "left join cf_cards on cf_clients.idofclient=cf_cards.idofclient " +
-                        "where cf_clients.email<>'' and cf_cards.state=0 " +
+                        "select 'В систему внесен электронный почтовый адрес', count(regOrgSrc.idofclient) " +
+                        "from cf_clients as regOrgSrc " +
+                        "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.email<>'' and cf_cards.state=0 " +
+                        REGION_SENSITIVE_CLAUSE + " " +
 
                         "union " +
 
-                        "select 'В систему внесен номер мобильного телефона', count(cf_clients.idofclient) " +
-                        "from cf_clients " +
-                        "left join cf_cards on cf_clients.idofclient=cf_cards.idofclient " +
-                        "where cf_clients.mobile<>'' and cf_cards.state=0", new Object[][]{
+                        "select 'В систему внесен номер мобильного телефона', count(regOrgSrc.idofclient) " +
+                        "from cf_clients as regOrgSrc " +
+                        "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
+                        "where regOrgSrc.mobile<>'' and cf_cards.state=0", new Object[][]{
                         {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов"}},
                         INFORMING_CHART_DATA));
+                new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
+
+                        + "union "
+
+                        + "select 'Прочие льготные категории', count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>4 "
+
+                        + "union "
+
+                        + "select 'Не имеющие льгот', count(distinct cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
+                        new Object[][]{
+                                {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
+                                {ValueType.NUMBER, "Количество учащихся"}}, BENEFIT_PART_CHART_DATA);
         TYPES.put("BenefitPartChart",
                 new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
                         + "from cf_clients "
@@ -290,23 +412,23 @@ public class ProjectStateReportService {
                         "       int8(sum(evnt_count) / sum(all_count) * 100) as visited " +
                         "from (select events.d as d, overall.o, overall.c as all_count, count(events.c) as evnt_count, cast(count(events.c) as float8)/cast(overall.c as float8) "
                         +
-                        "from (select cf_clients.idoforg as o, count(cf_clients.idofclient) as c " +
-                        "      from cf_clients " +
-                        "      left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient " +
-                        "      left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
+                        "from (select regOrgSrc.idoforg as o, count(regOrgSrc.idofclient) as c " +
+                        "      from cf_clients as regOrgSrc " +
+                        "      left join cf_cards on regOrgSrc.idOfClient=cf_cards.idOfClient " +
+                        "      left join cf_clientgroups on regOrgSrc.idofclientgroup=cf_clientgroups.idofclientgroup and regOrgSrc.idoforg=cf_clientgroups.idoforg "
+                        + REGION_SENSITIVE_JOIN + " " +
                         "      where cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
-                        +
-                        "      group by cf_clients.idoforg) as overall " +
+                        + REGION_SENSITIVE_CLAUSE + " " +
+                        "      group by regOrgSrc.idoforg) as overall " +
                         "join " +
                         "(select DISTINCT cf_enterevents.idofclient as c, cf_enterevents.idoforg as o, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
                         +
                         "from cf_enterevents " +
-                        "left join cf_clients on cf_clients.idOfClient=cf_enterevents.idOfClient " +
-                        "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
+                        "left join cf_clients as regOrgSrc on regOrgSrc.idOfClient=cf_enterevents.idOfClient " +
+                        "left join cf_clientgroups on regOrgSrc.idofclientgroup=cf_clientgroups.idofclientgroup and regOrgSrc.idoforg=cf_clientgroups.idoforg " +
+                        REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
-                        +
+                        + REGION_SENSITIVE_CLAUSE + " " +
                         "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
                         +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
@@ -318,25 +440,25 @@ public class ProjectStateReportService {
                         "       int8(sum(evnt_count) / sum(all_count) * 100) as visited " +
                         "from (select events.d as d, overall.o, overall.c as all_count, count(events.c) as evnt_count, cast(count(events.c) as float8)/cast(overall.c as float8) "
                         +
-                        "from (select cf_clients.idoforg as o, count(cf_clients.idofclient) as c " +
-                        "      from cf_clients " +
-                        "      left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient " +
-                        "      left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
+                        "from (select regOrgSrc.idoforg as o, count(regOrgSrc.idofclient) as c " +
+                        "      from cf_clients as regOrgSrc " +
+                        "      left join cf_cards on regOrgSrc.idOfClient=cf_cards.idOfClient " +
+                        "      left join cf_clientgroups on regOrgSrc.idofclientgroup=cf_clientgroups.idofclientgroup and regOrgSrc.idoforg=cf_clientgroups.idoforg "
+                        +      REGION_SENSITIVE_JOIN + " " +
                         "      where cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=5 "
-                        +
-                        "      group by cf_clients.idoforg) as overall " +
+                        +      REGION_SENSITIVE_CLAUSE + " " +
+                        "      group by regOrgSrc.idoforg) as overall " +
                         "join " +
                         "(select DISTINCT cf_enterevents.idofclient as c, cf_enterevents.idoforg as o, date_trunc('day', to_timestamp(cf_enterevents.evtdatetime / 1000)) as d "
                         +
                         "from cf_enterevents " +
-                        "left join cf_clients on cf_clients.idOfClient=cf_enterevents.idOfClient " +
-                        "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
+                        "left join cf_clients as regOrgSrc on regOrgSrc.idOfClient=cf_enterevents.idOfClient " +
+                        "left join cf_clientgroups on regOrgSrc.idofclientgroup=cf_clientgroups.idofclientgroup and regOrgSrc.idoforg=cf_clientgroups.idoforg "
+                        + REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=5 "
                         +
                         "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                        +
+                        + REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
                         +
                         "group by events.d, overall.o, overall.c " +
@@ -344,13 +466,32 @@ public class ProjectStateReportService {
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс"}, {ValueType.NUMBER, "5-11 класс"}},
                 VISITORS_CHART_DATA));
+
+        TYPES.put("OrgsRatingChart", new ComplexType(new Type[]
+                { new SimpleType("", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("", RATING_CHART_2_DATA).setPreSelectSQLMethod("parseOrgsPayments").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("", RATING_CHART_3_DATA).setPreSelectSQLMethod("parseOrgsDiscounts").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("", RATING_CHART_4_DATA).setPreSelectSQLMethod("parseOrgsRating").setPeriodDaysInc (-7).setIncremental (true) },
+                new Object[][] { {ValueType.TEXT, "УО"},
+                                 {ValueType.NUMBER, "Проход (%)"},
+                                 {ValueType.NUMBER, "Платное питание (%)"},
+                                 {ValueType.NUMBER, "Льготное питание (%)"},
+                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );
     }
 
-    private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Type, StringKey, StringValue) VALUES (?, ?, ?, ?, ?)";
-    private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=?";
-    private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? order by Period DESC, StringKey";
-    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? order by StringKey";
-    private static final String CHECK_SQL = "SELECT Period FROM cf_projectstate_data WHERE Type=? order by Period DESC";
+    private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
+    private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
+    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
+    private static final String PERIODIC_AVG_SELECT_SQL =
+                      "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), sum(cast(StringValue as double precision)) / least(count(distinct period), %PERIOD_LENGTH%) || '' "
+                    + "FROM cf_projectstate_data "
+                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and "
+                    + "      period >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                    + "      Type=? and Region=? and substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') <> '' "
+                    + "group by StringKey order by 2 desc, 1";
+    private static final String CHECK_SQL = "SELECT Period FROM cf_projectstate_data WHERE Type=? and Region=? order by Period DESC";
+
 
 
     public static boolean isOn() {
@@ -365,38 +506,97 @@ public class ProjectStateReportService {
 
 
     public void run() {
+        RuntimeContext runtimeContext = null;
+        Session session = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+
+            initRegions (session);
+            initPayContragents(session);
+            }
+        catch (Exception e)
+            {
+            }
+
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+            //if (1 == 1) {
             //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
             return;
         }
 
-
-        RuntimeContext runtimeContext = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            Session session = runtimeContext.createPersistenceSession();
+        Map <Integer,Boolean> clearedTypes = new HashMap <Integer, Boolean> ();
+        try
+            {
             for (String t : TYPES.keySet()) {
-                parseType(session, TYPES.get(t));
+                parseType(session, TYPES.get(t), clearedTypes);
             }
         } catch (Exception e) {
         }
+        logger.info("Project state data builing is complete");
     }
 
 
-    public void parseType(Session session, Type t) {
+    public void parseType(Session session, Type t, Map <Integer,Boolean> clearedTypes) {
         try {
             if (t instanceof SimpleType) {
-                Map<String, String> data = loadData(session, (SimpleType) t);
-                if (data == null) {
-                    return;
-                }
-                executePostMethod((SimpleType) t, data, ((SimpleType) t).getPostSelectSQLMethod());
-                saveData(session, data, t);
+                //  Если в SQL есть использование полатежного агента, то необходимо
+                //  выполнять данный запрос ко всем существующим платежным агентам
+                int agentCount = 0;
+                if (((SimpleType) t).getSQL().indexOf(PAY_AGENTS_CLAUSE) > 0)
+                    {
+                    agentCount = PAY_AGENTS_LIST.size();
+                    }
+
+                int agentI=0;
+                do
+                    {
+                    for (String regionName : REGIONS_LIST.keySet())
+                        {
+                        //  Если регион не "Все" и в запросе типа не указано что должен учитываться регион,
+                        //  то пропускаем этот регион. Будем дожидаться региона "Все", у которого id типа
+                        //  не увеличивается
+                        int regionTypeInc = REGIONS_LIST.get (regionName);
+                        if (regionTypeInc != 0 &&
+                            ((SimpleType) t).getSQL().indexOf(REGION_SENSITIVE_CLAUSE) < 0)
+                            {
+                            continue;
+                            }
+                        // Платежный агент, иногда необходимо для макро-подставноки
+                        Integer idOfContragent = agentCount == 0 ? 0 : (Integer) PAY_AGENTS_LIST.get(agentI) [0];
+
+                        //  Получаем даты для запуска
+                        Calendar lastUpload      = getLastUploadData(session, (SimpleType) t, regionName, idOfContragent);
+                        Calendar today           = getToday();
+
+                        Map<String, String> data = null;
+                        if (((SimpleType) t).getPreSelectSQLMethod() != null)
+                            {
+                            data = new HashMap <String, String> ();
+                            executeDataMethod((SimpleType) t, data, session,
+                                              addMethodParameters (lastUpload, today, regionName,
+                                              idOfContragent, t.getReportType(), null),
+                                              ((SimpleType) t).getPreSelectSQLMethod());
+                            }
+                        else
+                            {
+                            data = loadData(session, (SimpleType) t, regionName, lastUpload, today, idOfContragent);
+                            }
+                        if (data == null) {
+                            return;
+                        }
+                        executeDataMethod((SimpleType) t, data, session,
+                                          addMethodParameters (lastUpload, today, t.getReportType(), null),
+                                          ((SimpleType) t).getPostSelectSQLMethod());
+                        saveData(session, data, regionName, t, clearedTypes, idOfContragent);
+                        }
+                    agentI++;
+                    } while (agentI < agentCount);
             } else if (t instanceof ComplexType) {
                 ComplexType ct = (ComplexType) t;
                 Type types[] = ct.getTypes();
                 for (Type t2 : types) {
-                    parseType(session, t2);
+                        parseType(session, t2, clearedTypes);
                 }
             }
         } catch (Exception e) {
@@ -406,7 +606,8 @@ public class ProjectStateReportService {
 
 
     @Transactional
-    public void saveData(Session session, Map<String, String> data, Type t) {
+    public void saveData(Session session, Map<String, String> data, String regionName,
+                         Type t, Map <Integer,Boolean> clearedTypes, int contragentInc) {
         try {
             if (data.isEmpty()) {
                 return;
@@ -416,19 +617,27 @@ public class ProjectStateReportService {
             Calendar cal = getToday();
 
 
-            org.hibernate.Query q = session.createSQLQuery(DELETE_SQL);
-            q.setLong(0, cal.getTimeInMillis());
-            q.setInteger(1, t.getReportType());
-            q.executeUpdate();
+            org.hibernate.Query q;
+            if (!clearedTypes.containsKey (t.getReportType()))
+                {
+                q = session.createSQLQuery(DELETE_SQL);
+                q.setLong(0, cal.getTimeInMillis());
+                q.setInteger(1, t.getReportType() + buildPayAgentTypeInc (contragentInc)); //  Увеличиваем ID типа, если это агент
+                q.setString(2, regionName);
+                q.executeUpdate();
+                clearedTypes.put(t.getReportType(), true);
+                }
 
 
             q = session.createSQLQuery(INSERT_SQL);
             q.setLong(0, ms);
             q.setLong(1, cal.getTimeInMillis());
-            q.setInteger(2, t.getReportType());
+            q.setString(2, regionName);
+            q.setInteger(3, t.getReportType() + buildPayAgentTypeInc (contragentInc)); //  Увеличиваем ID типа, если это агент
+            q.setString (6, "Base: " + t.getReportType() + "; agent: " + buildPayAgentTypeInc (contragentInc));
             for (String k : data.keySet()) {
-                q.setString(3, k);
-                q.setString(4, data.get(k));
+                q.setString(4, k);
+                q.setString(5, data.get(k));
                 q.executeUpdate();
             }
         } catch (Exception e) {
@@ -437,10 +646,11 @@ public class ProjectStateReportService {
     }
 
 
-    public Calendar getLastUploadData(Session session, SimpleType t) {
+    public Calendar getLastUploadData(Session session, SimpleType t, String regionName, int idofcontragent) {
         try {
-            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(CHECK_SQL));
-            q.setInteger(0, t.getReportType());
+            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(CHECK_SQL, t.getReportType()));
+            q.setInteger(0, t.getReportType() + buildPayAgentTypeInc (idofcontragent));
+            q.setString(1, regionName);
             List resultList = q.list();
             for (Object entry : resultList) {
                 BigInteger e = (BigInteger) entry;
@@ -456,16 +666,18 @@ public class ProjectStateReportService {
     }
 
 
-    public Map<String, String> loadData(Session session, SimpleType t) {
+    public Map<String, String> loadData(Session session, SimpleType t, String regionName,
+                                        Calendar lastUpload, Calendar today, Integer idOfContragent) {
         try {
             Map<String, String> result = new TreeMap<String, String>();
-            Calendar lastUpload = getLastUploadData(session, t);
-            Calendar today = getToday();
             if (t.isIncremental() && today.getTimeInMillis() <= lastUpload.getTimeInMillis()) {
                 return result;
             }
-            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(t.getSQL(), lastUpload, today));
-            List resultList = q.list();
+            String finalSQL = applyMacroReplace(t.getSQL(), t.getReportType(),
+                                                lastUpload, today, 0, regionName, idOfContragent);
+            org.hibernate.Query q = session.createSQLQuery(finalSQL);
+            //logger.info(t.getReportType() + " :: " + regionName + " :: SQL:__ " + finalSQL);
+            List resultList = q.list();//Collections.EMPTY_LIST;
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
                 String key = (String) e[0];
@@ -490,13 +702,6 @@ public class ProjectStateReportService {
     }
 
 
-    public String applyMacroReplace(String sql) {
-        Calendar min = getStartDate();
-        Calendar max = getToday();
-        return applyMacroReplace(sql, min, max);
-    }
-
-
     public static Calendar getStartDate() {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
@@ -514,69 +719,85 @@ public class ProjectStateReportService {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
+
+
+        cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 3);
+
         return cal;
     }
 
 
-    public static String applyMacroReplace(String sql, Calendar min, Calendar max) {
+    public String applyMacroReplace(String sql, int type) {
+        Calendar min = getStartDate();
+        Calendar max = getToday();
+        return applyMacroReplace(sql, type, min, max);
+    }
+
+
+    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max)
+        {
+        return applyMacroReplace (sql, type, min, max, 0, null);
+        }
+
+
+    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc) {
+        return applyMacroReplace (sql, type, min, max, daysInc, null);
+    }
+
+
+    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName) {
+        return applyMacroReplace (sql, type, min, max, daysInc, regionName, null);
+    }
+
+
+    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName, Integer idOfContragent) {
         if (sql.indexOf("%MINIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MINIMUM_DATE%", DB_DATE_FORMAT.format(min.getTime()));
         }
         if (sql.indexOf("%MAXIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MAXIMUM_DATE%", DB_DATE_FORMAT.format(max.getTime()));
         }
+        if (sql.indexOf("%PERIOD_LENGTH%") > -1) {
+            sql = sql.replaceAll("%PERIOD_LENGTH%", "" + daysInc);
+        }
+        if (sql.indexOf(REGION_SENSITIVE_JOIN) > -1)
+            {
+            String replaceRegionSQL = "";
+            if (regionName != null && regionName.length() > 0)
+                {
+                int inc = REGIONS_LIST.get(regionName);
+                replaceRegionSQL = inc == 0 ? "" : " left join cf_orgs as regOrg on regOrg.idoforg=regOrgSrc.idoforg ";
+                }
+            sql = sql.replaceAll(REGION_SENSITIVE_JOIN, replaceRegionSQL);
+            }
+        if (sql.indexOf(REGION_SENSITIVE_CLAUSE) > -1)
+        {
+            String replaceRegionSQL = "";
+            if (regionName != null && regionName.length() > 0)
+            {
+                int inc = REGIONS_LIST.get(regionName);
+                replaceRegionSQL = inc == 0 ? "" : " and regOrg.district='" + regionName + "' ";
+            }
+            sql = sql.replaceAll(REGION_SENSITIVE_CLAUSE, replaceRegionSQL);
+        }
+        if (sql.indexOf(PAY_AGENTS_CLAUSE) > -1)
+            {
+            sql = sql.replaceAll(PAY_AGENTS_CLAUSE, "" + idOfContragent);
+            }
         return sql;
     }
 
 
-    public static void parseContentsChart(Object dataSource) {
-        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
-
-        List<String> list = data.get("Соб. Произв.");
-        data.put("Собственное производство", list);
-        data.remove("Соб. Произв.");
-
-        list = data.get("Напитки уп.");
-        data.put("Напитки упакованные", list);
-        data.remove("Напитки уп.");
-
-        list = data.get("Молочная прод.");
-        data.put("Молочная продукция", list);
-        data.remove("Молочная прод.");
-
-        list = data.get("Гор. блюда");
-        data.put("Горячие блюда", list);
-        data.remove("Гор. блюда");
-    }
-
-
-    public static void parseRefillChart(Object dataSource) {
-        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
-        List<String> list = data.get("Банк Москвы");
-        data.put("Через Банк Москвы", list);
-        data.remove("Банк Москвы");
-
-        list = data.get("Конкорд-ПА");
-        data.put("Через терминалы поставщика питания", list);
-        data.remove("Конкорд-ПА");
-
-        list = data.get("Сбербанк-Москва");
-        data.put("Через Сбербанк-Москва", list);
-        data.remove("Сбербанк-Москва");
-    }
-
-
-    public static void parse1_4Visitors(Object dataSource) {
-        Map<String, String> data = (Map<String, String>) dataSource;
-    }
-
-
-    public static DataTable generateReport(RuntimeContext runtimeContext, Calendar dateAt, Calendar dateTo, Type t)
+    public static DataTable generateReport(RuntimeContext runtimeContext, Calendar dateAt, Calendar dateTo, String regionName, Type t)
             throws IllegalArgumentException {
         if (runtimeContext == null || dateTo == null || dateAt == null || t == null) {
             throw new IllegalArgumentException("RuntimeContext, Calendar and Type cannot be null(s)");
         }
 
+
+        if (regionName == null) regionName = "Все";
         dateAt.set(Calendar.HOUR_OF_DAY, 0);
         dateAt.set(Calendar.MINUTE, 0);
         dateAt.set(Calendar.SECOND, 0);
@@ -588,11 +809,13 @@ public class ProjectStateReportService {
 
         try {
             Session session = runtimeContext.createPersistenceSession();
-            Map<String, List<String>> data = loadReportData(session, dateAt, dateTo, t);
+            Map<String, List<String>> data = loadReportData(session, dateAt, dateTo, regionName, t);
             session.close();
 
             if (t instanceof SimpleType) {
-                executePostMethod((SimpleType) t, data, ((SimpleType) t).getPostReportSQLMethod());
+                executeDataMethod((SimpleType) t, data, session,
+                                  addMethodParameters(dateAt, dateTo, t.getReportType(), null),
+                                  ((SimpleType) t).getPostReportSQLMethod());
             }
             DataTable dataTable = buildDataTable(data, t);
             return dataTable;
@@ -603,46 +826,50 @@ public class ProjectStateReportService {
     }
 
 
-    public static void executePostMethod(SimpleType t, Map data, String method) {
-        if (method == null || method.length() < 1) {
-            return;
-        }
-
-        java.lang.reflect.Method meth;
-        try {
-            meth = ProjectStateReportService.class.getDeclaredMethod(method, Object.class);
-            meth.invoke(null, data);
-        } catch (Exception e) {
-            logger.error("Failed to execute support method " + t.getPostReportSQLMethod());
-        }
+    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+                                                            String regionName, Type t) {
+        return loadReportData(session, dateAt, dateTo, regionName, t, new TreeMap<String, List<String>>());
     }
 
 
-    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo, Type t) {
-        return loadReportData(session, dateAt, dateTo, t, new TreeMap<String, List<String>>());
-    }
-
-
-    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo, Type t,
+    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+                                                            String regionName, Type t,
             Map<String, List<String>> result) {
         try {
             if (t instanceof SimpleType) {
-                Map<String, String> res = loadReportData(session, dateAt, dateTo, (SimpleType) t);
-                if (res == null) {
-                    return result;
+                //  Если в SQL есть использование полатежного агента, то необходимо
+                //  выполнять данный запрос ко всем существующим платежным агентам
+                int agentCount = 0;
+                if (((SimpleType) t).getSQL().indexOf(PAY_AGENTS_CLAUSE) > 0)
+                {
+                    agentCount = PAY_AGENTS_LIST.size();
                 }
-                for (String k : res.keySet()) {
-                    List<String> vals = result.get(k);
-                    if (vals == null) {
-                        vals = new ArrayList<String>();
-                        result.put(k, vals);
+
+                int agentI=0;
+                do
+                    {
+                    // Платежный агент, иногда необходимо для макро-подставноки
+                    Integer idOfContragent = agentCount == 0 ? 0 : (Integer) PAY_AGENTS_LIST.get(agentI) [0];
+
+                    Map<String, String> res = loadReportData(session, dateAt, dateTo, regionName,
+                                                             idOfContragent, (SimpleType) t);
+                    if (res == null) {
+                        return result;
                     }
-                    vals.add(res.get(k));
-                }
+                    for (String k : res.keySet()) {
+                        List<String> vals = result.get(k);
+                        if (vals == null) {
+                            vals = new ArrayList<String>();
+                            result.put(k, vals);
+                        }
+                        vals.add(res.get(k));
+                    }
+                        agentI++;
+                } while (agentI < agentCount);
             } else if (t instanceof ComplexType) {
                 Type types[] = ((ComplexType) t).getTypes();
                 for (Type t2 : types) {
-                    loadReportData(session, dateAt, dateTo, (SimpleType) t2, result);
+                    loadReportData(session, dateAt, dateTo, regionName, (SimpleType) t2, result);
                 }
             }
         } catch (Exception e) {
@@ -652,17 +879,30 @@ public class ProjectStateReportService {
     }
 
 
-    private static Map<String, String> loadReportData(Session session, Calendar dateAt, Calendar dateTo, SimpleType t) {
+    private static Map<String, String> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+                                                      String regionName, int payAgentInc, SimpleType t) {
         try {
+            int regionSQLPos = 1;
             Map<String, String> result = new TreeMap<String, String>();
             org.hibernate.Query q = null;
             if (t.isIncremental()) {
-                q = session.createSQLQuery(applyMacroReplace(PERIODIC_SELECT_SQL, dateAt, dateTo));
+                String certainSQL = PERIODIC_SELECT_SQL;
+                if (t.getPeriodDaysInc () != 0)
+                    {
+                    certainSQL = PERIODIC_AVG_SELECT_SQL;
+                    // Убираем N дней, если это указано у типа
+                    dateAt.setTimeInMillis(dateTo.getTimeInMillis() + 86400000 * t.getPeriodDaysInc ());
+                    }
+                q = session.createSQLQuery(applyMacroReplace(certainSQL, t.getReportType(),
+                                                             dateAt, dateTo, Math.abs (t.getPeriodDaysInc ()),
+                                                             regionName));
             } else {
                 q = session.createSQLQuery(SELECT_SQL);
                 q.setLong(1, dateTo.getTimeInMillis());
+                regionSQLPos++;
             }
-            q.setInteger(0, t.getReportType());
+            q.setInteger(0, t.getReportType() + buildPayAgentTypeInc (payAgentInc)); //  Увеличиваем ID типа, если это конрагент или регион
+            q.setString (regionSQLPos, regionName);
             List resultList = q.list();
 
             for (Object entry : resultList) {
@@ -683,7 +923,22 @@ public class ProjectStateReportService {
         for (int i = 0; i < t.getColumns().length; i++) {
             Object col[] = t.getColumns()[i];
             ValueType vt = (ValueType) col[0];
-            cd.add(new ColumnDescription("col" + (i + 1), vt == ValueType.DATE ? ValueType.TEXT : vt, (String) col[1]));
+            //  Если необходимо показать информацию по платежным агентам, то заменяем колонку PAY_AGENTS_COLUMNS
+            //  всему доступными платежными агентами, тип оставляем по умолчанию
+            if (((String) col[1]).equals(PAY_AGENTS_COLUMNS))
+                {
+                int y = 1;
+                for (Object [] ag : PAY_AGENTS_LIST)
+                    {
+                    cd.add(new ColumnDescription("col" + (i + 1 + y*1000), vt == ValueType.DATE ? ValueType.TEXT : vt,
+                                                 (String) ag[1]));
+                    y++;
+                    }
+                }
+            else
+                {
+                cd.add(new ColumnDescription("col" + (i + 1), vt == ValueType.DATE ? ValueType.TEXT : vt, (String) col[1]));
+                }
         }
         dt.addColumns(cd);
 
@@ -707,8 +962,13 @@ public class ProjectStateReportService {
                 r.addCell(Integer.parseInt(k));
             }
 
-            for (int i = 1; i < t.getColumns().length; i++) {
-                Object col[] = t.getColumns()[i];
+            int agentInc = 0;
+            if (t.getColumns().length > 0 && ((String) t.getColumns() [1][1]).equals(PAY_AGENTS_COLUMNS))
+                {
+                agentInc = PAY_AGENTS_LIST.size() - 1;
+                }
+            for (int i = 1; i < t.getColumns().length + agentInc; i++) {
+                Object col[] = t.getColumns()[agentInc != 0 ? 1 : i];       // Подсчет переделать
                 if ((ValueType) col[0] == ValueType.TEXT) {
                     if (i - 1 >= vals.size()) {
                         r.addCell("");
@@ -719,7 +979,11 @@ public class ProjectStateReportService {
                     if (i - 1 >= vals.size()) {
                         r.addCell(0);
                     } else {
-                        r.addCell(Integer.parseInt(vals.get(i - 1)));
+                        try {
+                            r.addCell(Integer.parseInt(vals.get(i - 1)));
+                        } catch (NumberFormatException nfe) {
+                            r.addCell(new BigDecimal (Double.parseDouble(vals.get(i - 1))).setScale (1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                        }
                     }
                 }
             }
@@ -768,7 +1032,7 @@ public class ProjectStateReportService {
 
 
     protected static class SimpleType implements Type {
-
+        private String preSelectSQL;
         private String postSelectSQL;
         private String postReport;
         private String sql;
@@ -776,6 +1040,9 @@ public class ProjectStateReportService {
         private int type;
         private Class valueType;
         private boolean incremental = false;
+        private String parsingMethod = null;
+        private int periodDaysInc = 0;
+        private boolean regionSensitive;
 
 
         public SimpleType(String sql, int type) {
@@ -799,7 +1066,7 @@ public class ProjectStateReportService {
             this.valueType = valueType;
         }
 
-        public SimpleType stValueType(Class valueType) {
+        public SimpleType setValueType(Class valueType) {
             this.valueType = valueType;
             return this;
         }
@@ -838,6 +1105,15 @@ public class ProjectStateReportService {
             return postReport;
         }
 
+        public SimpleType setPreSelectSQLMethod (String preSelectSQL){
+            this.preSelectSQL = preSelectSQL;
+            return this;
+        }
+
+        public String getPreSelectSQLMethod(){
+            return preSelectSQL;
+        }
+
         public SimpleType setIncremental(boolean incremental) {
             this.incremental = incremental;
             return this;
@@ -846,6 +1122,26 @@ public class ProjectStateReportService {
         public boolean isIncremental() {
             return incremental;
         }
+
+        public SimpleType setPeriodDaysInc (int periodDaysInc){
+            this.periodDaysInc = periodDaysInc;
+            return this;
+        }
+
+        public int getPeriodDaysInc () {
+            return periodDaysInc;
+        }
+
+
+        public SimpleType setRegionSensitive (boolean regionSensitive) {
+            this.regionSensitive = regionSensitive;
+            return this;
+        }
+
+        public boolean getRegionSensitive ()
+            {
+            return regionSensitive;
+            }
     }
 
 
@@ -857,4 +1153,302 @@ public class ProjectStateReportService {
 
         public boolean isIncremental();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+                                                            int reportType, Map <String, Object> params)
+        {
+        return addMethodParameters (dateAt, dateTo, "", reportType, params);
+        }
+
+
+    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+                                                            String regionName, int reportType,
+                                                            Map <String, Object> params)
+    {
+        return addMethodParameters (dateAt, dateTo, "", null, reportType, params);
+    }
+
+
+    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+                                                            String regionName, Integer idOfContragent, int reportType,
+                                                            Map <String, Object> params)
+        {
+        if (params == null)
+            {
+            params = new HashMap <String, Object> ();
+            }
+        params.put ("dateAt", dateAt);
+        params.put ("dateTo", dateTo);
+        params.put ("regionName", regionName);
+        params.put ("reportType", reportType);
+        params.put ("idOfContragent", idOfContragent);
+        return params;
+        }
+
+
+    public static void executeDataMethod(SimpleType t, Map data, Session session, Map<String, Object> params, String method) {
+        if (method == null || method.length() < 1) {
+            return;
+        }
+
+        java.lang.reflect.Method meth;
+        try {
+            meth = ProjectStateReportService.class.getDeclaredMethod(method, Object.class, Object.class, Object.class);
+            meth.invoke(null, data, session, params);
+        } catch (Exception e) {
+            logger.error("Failed to execute support method " + t.getPostReportSQLMethod());
+        }
+    }
+
+
+    public static void parseOrgsPayments(Object dataSource, Object sessionObj, Object paramsObj) {
+        parseOrgsRequest(dataSource, sessionObj, paramsObj,
+                         "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
+                         "from cf_orders, cf_orgs " +
+                         "where cf_orders.socdiscount=0 and cf_orgs.idoforg=cf_orders.idoforg and " +
+                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "+
+                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "+
+                         "group by cf_orgs.idoforg " +
+                         "order by cf_orgs.idoforg", false);
+    }
+
+
+    public static void parseOrgsDiscounts(Object dataSource, Object sessionObj, Object paramsObj) {
+        parseOrgsRequest(dataSource, sessionObj, paramsObj,
+                         "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
+                         "from cf_orders, cf_orgs " +
+                         "where cf_orders.socdiscount<>0 and cf_orgs.idoforg=cf_orders.idoforg and " +
+                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "+
+                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "+
+                         "group by cf_orgs.idoforg " +
+                         "order by cf_orgs.idoforg", true);
+    }
+
+
+    public static void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
+        parseOrgsRequest(dataSource, sessionObj, paramsObj,
+                         "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
+                         "from cf_enterevents, cf_orgs " +
+                         "where cf_orgs.idoforg=cf_enterevents.idoforg and " +
+                         "cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
+                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "+
+                         "group by cf_orgs.idoforg " +
+                         "order by cf_orgs.idoforg", false);
+    }
+
+    public static void parseOrgsRequest (Object dataSource, Object sessionObj, Object paramsObj, String sql, boolean absoluteIfExists) {
+        Map <String, Object> params = (Map <String, Object>) paramsObj;
+        Map<String, String> data    = (Map<String, String>) dataSource;
+        Calendar dateAt             = (Calendar) params.get ("dateAt");
+        Calendar dateTo             = (Calendar) params.get ("dateTo");
+        String regionName           = (String) params.get ("regionName");
+        Integer reportType          = (Integer) params.get ("reportType");
+        data.clear();
+
+        Session session = (Session) sessionObj;
+        try {
+            Map<Object [], Long> clientsCount = getClientsCount (session);
+            Map<Long, Long> targetsCount = new HashMap <Long, Long> ();
+            String finalSQL = applyMacroReplace (sql, reportType, dateAt, dateTo);
+            org.hibernate.Query q = session.createSQLQuery(finalSQL);
+            //logger.info(reportType + " :: " + regionName + " :: SQL:__ " + finalSQL);
+            List resultList = q.list();//Collections.EMPTY_LIST;
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                targetsCount.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).longValue());
+            }
+
+            for (Object key [] : clientsCount.keySet()) {
+                Long id     = (Long) key [0];
+                String name = (String) key [1];
+
+                double clientCount = new Double (clientsCount.get(key));
+                double targetCount = new Double (targetsCount.get(id) == null ? 0L : targetsCount.get(id));
+                double percent     = targetCount / clientCount;
+                if (absoluteIfExists)
+                    {
+                    percent = targetCount > 0 ? 1 : 0;
+                    }
+                data.put (name, "" + new BigDecimal (Math.min (100D, Math.max (0D, percent * 100))).setScale (1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+            }
+        }
+        catch (Exception e)
+            {
+            logger.error ("Failed to load events from database", e);
+            }
+    }
+
+
+    public static void parseOrgsRating(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map <String, Object> params = (Map <String, Object>) paramsObj;
+        Map<String, String> data    = (Map<String, String>) dataSource;
+        Calendar dateAt             = (Calendar) params.get ("dateAt");
+        Calendar dateTo             = (Calendar) params.get ("dateTo");
+        data.clear();
+
+        Session session = (Session) sessionObj;
+        try {
+            Map<String, String> paymentsCount  = new HashMap <String, String> ();
+            Map<String, String> discountsCount = new HashMap <String, String> ();
+            Map<String, String> eventsCount    = new HashMap <String, String> ();
+
+            parseOrgsPayments (paymentsCount, sessionObj, paramsObj);
+            parseOrgsDiscounts (discountsCount, sessionObj, paramsObj);
+            parseOrgsEvents (eventsCount, sessionObj, paramsObj);
+
+
+            for (String orgName : eventsCount.keySet ())
+                {
+                double paymentCount  = new Double (paymentsCount.get(orgName) == null ? "0" : paymentsCount.get(orgName));
+                double discountCount = new Double (discountsCount.get(orgName) == null ? "0" : discountsCount.get(orgName));
+                double eventCount    = new Double (eventsCount.get(orgName) == null ? "0" : eventsCount.get(orgName));
+
+                double rating = (eventCount + paymentCount + discountCount) / 3;
+                data.put (orgName, "" + new BigDecimal (Math.min (100D, Math.max (0D, rating))).setScale (1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public static Map<Object [], Long> getClientsCount (Session session) {
+        Map<Object [], Long> clientsCount = new HashMap <Object [], Long> ();
+        org.hibernate.Query q = session.createSQLQuery("select cf_orgs.idoforg, cf_orgs.officialname, count(cf_clients.idofclient) " +
+                "from cf_clients, cf_orgs " +
+                "where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' " +
+                "group by cf_orgs.idoforg, cf_orgs.officialname " +
+                "order by cf_orgs.officialname");
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object e[] = (Object[]) entry;
+            clientsCount.put(new Object [] { ((BigInteger) e[0]) .longValue(), ((String) e[1]).trim()},
+                    ((BigInteger) e[2]).longValue());
+        }
+        return clientsCount;
+    }
+
+
+    public static void parseContentsChart(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
+
+        List<String> list = data.get("Соб. Произв.");
+        data.put("Собственное производство", list);
+        data.remove("Соб. Произв.");
+
+        list = data.get("Напитки уп.");
+        data.put("Напитки упакованные", list);
+        data.remove("Напитки уп.");
+
+        list = data.get("Молочная прод.");
+        data.put("Молочная продукция", list);
+        data.remove("Молочная прод.");
+
+        list = data.get("Гор. блюда");
+        data.put("Горячие блюда", list);
+        data.remove("Гор. блюда");
+    }
+
+
+    public static void parseRefillChart(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
+        List<String> list = data.get("Банк Москвы");
+        data.put("Через Банк Москвы", list);
+        data.remove("Банк Москвы");
+
+        list = data.get("Конкорд-ПА");
+        data.put("Через терминалы поставщика питания", list);
+        data.remove("Конкорд-ПА");
+
+        list = data.get("Сбербанк-Москва");
+        data.put("Через Сбербанк-Москва", list);
+        data.remove("Сбербанк-Москва");
+    }
+
+    public static void parseRefillAvgChart(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map<String, String> data = (Map<String, String>) dataSource;
+
+        String list = data.get("Конкорд-ПА");
+        data.put("Терминалы поставщика питания", list);
+        data.remove("Конкорд-ПА");
+    }
+
+
+
+    public static void parse1_4Visitors(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map<String, String> data = (Map<String, String>) dataSource;
+    }
+
+
+    public static String getRegionByTypeInc (int regionTypeInc)
+        {
+        for (String reg : REGIONS_LIST.keySet())
+            {
+            if (REGIONS_LIST.get (reg) == regionTypeInc)
+                {
+                    return reg;
+                }
+            }
+        return "";
+        }
+
+
+    public void initRegions (Session session) throws Exception
+    {
+        try
+        {
+            int i = 0;
+            REGIONS_LIST = new HashMap <String, Integer> ();
+            REGIONS_LIST.put ("Все", i);
+            org.hibernate.Query q = session.createSQLQuery("select distinct district from cf_orgs where district <> '' order by district");
+            List resultList = q.list();
+            for (Object entry : resultList) {
+                String n = (String) entry;
+                i += 10;
+                REGIONS_LIST.put (n, i);
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+
+    public void initPayContragents (Session session) throws Exception
+    {
+        try
+        {
+            PAY_AGENTS_LIST = new ArrayList <Object []> ();
+            org.hibernate.Query q = session.createSQLQuery("select idofcontragent, contragentname from cf_contragents where classid=" + Contragent.PAY_AGENT + " order by idofcontragent");
+            List resultList = q.list();
+            for (Object entry : resultList) {
+                Object [] vals = (Object []) entry;
+                PAY_AGENTS_LIST.add(new Object[] { ((BigInteger) vals [0]).intValue(), (String) vals[1] });
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to load pay agents from database", e);
+            throw e;
+        }
+    }
+
+    public static int buildPayAgentTypeInc (int idofcontragent)
+        {
+        return idofcontragent == 0 ? 0 : PAY_AGENT_MULTI_ID + idofcontragent;
+        }
 }

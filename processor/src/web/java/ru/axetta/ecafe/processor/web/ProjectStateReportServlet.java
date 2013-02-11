@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 
 import org.slf4j.LoggerFactory;
 
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,6 +61,11 @@ public class ProjectStateReportServlet extends DataSourceServlet {
         Calendar dateTo = new GregorianCalendar();
         dateTo.setTimeInMillis(System.currentTimeMillis());
         String period = request.getParameter("period");
+        String region = request.getParameter("region");
+        try
+            {
+            region = URLDecoder.decode(new String (region.getBytes("iso-8859-1"), "UTF-8"));
+            } catch (Exception e) {}
         if (period != null && period.length() > 0) {
             period = period.trim();
             try {
@@ -82,7 +88,7 @@ public class ProjectStateReportServlet extends DataSourceServlet {
             }
         }
 
-        DataTable data = ProjectStateReportService.generateReport(runtimeContext, dateAt, dateTo, t);
+        DataTable data = ProjectStateReportService.generateReport(runtimeContext, dateAt, dateTo, region, t);
         return data;
     }
 

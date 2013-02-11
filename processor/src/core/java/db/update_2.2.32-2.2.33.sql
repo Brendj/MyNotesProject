@@ -39,3 +39,12 @@ ALTER TABLE cf_users ADD COLUMN rolename character varying(128);
 --! Задаем имена по умолчаеию
 UPDATE cf_users SET rolename=username
 
+
+
+--! Добавление колонки региона для project state, чтобы было удобнее анализировать таблицу
+alter table cf_projectstate_data add region char(128) default 'Все';
+--! Добавление колонки комментариев для project state, чтобы было удобнее анализировать таблицу
+alter table cf_projectstate_data add comments char(255) default '';
+--! Обновление ключа - добавляем в него регион
+alter table cf_projectstate_data drop constraint cf_projectstate_data_pk;
+alter table cf_projectstate_data add constraint cf_projectstate_data_pk primary key (Period, Type, Region, StringKey);
