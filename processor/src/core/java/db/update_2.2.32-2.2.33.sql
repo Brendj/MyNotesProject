@@ -33,7 +33,7 @@ ALTER TABLE CF_Goods ADD CONSTRAINT CF_Goods_IdOfBasicGood_FK FOREIGN KEY (IdOfB
 -- Добавлена секция OrgOwnerData в котором содержится список обслуживаемых организаций, при синхронизации внешних систем в качестве поставщиков с подсистемой координации и процессинга
 
 -- Добавляем поля ролей для пользователей
-ALTER TABLE cf_users ADD COLUMN idofrole bigint NOT NULL DEFAULT 1;
+ALTER TABLE cf_users ADD COLUMN idofrole bigint NOT NULL DEFAULT 0;
 ALTER TABLE cf_users ADD COLUMN rolename character varying(128);
 
 --! Задаем имена по умолчаеию

@@ -41,8 +41,8 @@
         <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
         <f:selectItems value="#{mainPage.userEditPage.userRoleEnumTypeMenu.items}" />
     </h:selectOneMenu>
-    <h:outputText escape="true" value="Имя роли" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.getIsDefault}"/>
-    <h:inputText value="#{mainPage.userEditPage.roleName}" maxlength="128" styleClass="input-text" rendered="#{mainPage.userEditPage.getIsDefault}"/>
+    <h:outputText escape="true" value="Имя роли" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <h:inputText value="#{mainPage.userEditPage.roleName}" maxlength="128" styleClass="input-text" rendered="#{mainPage.userEditPage.isDefault}"/>
 
     <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.isSupplier}"/>
     <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userEditPage.isSupplier}">
@@ -58,8 +58,8 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
-    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userEditPage.getIsDefault}"/>
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item" rendered="#{mainPage.userEditPage.getIsDefault}">
+    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
         </rich:column>

@@ -160,7 +160,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
             user.setRoleName(role.toString());
         }
         if(role.equals(User.DefaultRole.ADMIN)){
-            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setFunctions(FunctionSelector.ADMIN_FUNCTIONS);
             user.setRoleName(role.toString());
         }
         if(User.DefaultRole.DEFAULT.equals(role)){
