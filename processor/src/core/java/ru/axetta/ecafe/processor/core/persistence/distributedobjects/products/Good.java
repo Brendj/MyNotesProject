@@ -28,13 +28,10 @@ public class Good extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //GoodGroup gg = DAOService.getInstance().findDistributedObjectByRefGUID(GoodGroup.class, guidOfGG);
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
         if(gg == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGoodGroup(gg);
-        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
         Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
-        //TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
         TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
         if(p == null && tm == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(p != null) setProduct(p);
@@ -44,7 +41,7 @@ public class Good extends DistributedObject {
         distributedObjectException.setData(String.valueOf(idOfBasicGood));
         GoodsBasicBasket basicGood;
         try {
-            basicGood = (GoodsBasicBasket) DAOUtils.findBasicGood(session, idOfBasicGood);
+            basicGood = DAOUtils.findBasicGood(session, idOfBasicGood);
         } catch (Exception e) {
             throw distributedObjectException;
         }
