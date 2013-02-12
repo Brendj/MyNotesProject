@@ -19,6 +19,12 @@ public class ContragentCompletionItem {
 
     /* короткое наименование образовательного учереждения */
     private String educationalInstitutionName;
+    /* короткое наименование образовательного учереждения */
+    private String educationalCity;
+    /* короткое наименование образовательного учереждения */
+    private String educationalLocation;
+    /* короткое наименование образовательного учереждения */
+    private String educationalTags;
 
     /* имена контрагентов по приему платежей */
     private HashMap<Long,Long> contragentPayItems = new HashMap<Long, Long>();
@@ -81,5 +87,29 @@ public class ContragentCompletionItem {
 
     public Long getTotalSumByOrg() {
         return totalSumByOrg;
+    }
+
+    public String getEducationalCity() {
+        return educationalCity;
+    }
+
+    public void setEducationalCity(String educationalCity) {
+        this.educationalCity = educationalCity;
+    }
+
+    public String getEducationalLocation() {
+        return educationalLocation;
+    }
+
+    public void setEducationalLocation(String educationalLocation) {
+        this.educationalLocation = educationalLocation;
+    }
+
+    public String getEducationalTags() {
+        return educationalTags;
+    }
+
+    public void setEducationalTags(String educationalTags) {
+        this.educationalTags = educationalTags;
     }
 }

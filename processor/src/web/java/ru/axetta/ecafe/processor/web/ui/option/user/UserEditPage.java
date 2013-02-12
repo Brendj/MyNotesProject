@@ -146,21 +146,22 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentSelect
         user.setEmail(email);
         user.setUpdateTime(new Date());
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        user.setIdOfRole(role.getIdentification());
         if(User.DefaultRole.SUPPLIER.equals(role)){
             if(contragentItem==null){
                 throw new Exception("Contragent fields is null");
             }
             Contragent contragent = (Contragent) session.get(Contragent.class,contragentItem.getIdOfContragent());
-            user.setFunctions(FunctionSelector.SUPPLIER_FUNCTIONS);
+            user.setFunctions(functionSelector.getSupplierFunctions(session));
             user.setContragent(contragent);
             user.setRoleName(role.toString());
         }
         if(role.equals(User.DefaultRole.MONITORING)){
-            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setFunctions(functionSelector.getMonitoringFunctions(session));
             user.setRoleName(role.toString());
         }
         if(role.equals(User.DefaultRole.ADMIN)){
-            user.setFunctions(FunctionSelector.ADMIN_FUNCTIONS);
+            user.setFunctions(functionSelector.getAdminFunctions(session));
             user.setRoleName(role.toString());
         }
         if(User.DefaultRole.DEFAULT.equals(role)){

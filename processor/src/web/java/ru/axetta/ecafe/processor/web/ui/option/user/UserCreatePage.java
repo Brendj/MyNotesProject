@@ -138,17 +138,20 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
             user.setFunctions(functionSelector.getSelected(session));
         }
         if(role.equals(User.DefaultRole.SUPPLIER)){
-            user.setFunctions(FunctionSelector.SUPPLIER_FUNCTIONS);
+            user.setFunctions(functionSelector.getSupplierFunctions(session));
+            user.setRoleName(role.toString());
             if(currentContragent==null){
                 throw new Exception("Contragent fields is null");
             }
             user.setContragent(currentContragent);
         }
         if(role.equals(User.DefaultRole.MONITORING)){
-            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setFunctions(functionSelector.getMonitoringFunctions(session));
+            user.setRoleName(role.toString());
         }
         if(role.equals(User.DefaultRole.ADMIN)){
-            user.setFunctions(FunctionSelector.MONITORING_FUNCTIONS);
+            user.setFunctions(functionSelector.getAdminFunctions(session));
+            user.setRoleName(role.toString());
         }
         session.save(user);
     }

@@ -21,10 +21,6 @@ import java.util.*;
  */
 public class FunctionSelector {
 
-    public static Set<Function> SUPPLIER_FUNCTIONS = null;
-    public static Set<Function> MONITORING_FUNCTIONS = null;
-    public static Set<Function> ADMIN_FUNCTIONS = null;
-
     public static class Item {
 
         private boolean selected;
@@ -66,20 +62,31 @@ public class FunctionSelector {
         return items;
     }
 
-    public void fill(Session session) throws Exception {
+    public Set<Function> getAdminFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        return new HashSet<Function>((List<Function>)allFunctionsCriteria.list());
+    }
+
+    public Set<Function> getMonitoringFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
-        List<Item> items = new ArrayList<Item>(allFunctions.size());
-        SUPPLIER_FUNCTIONS = new HashSet<Function>();
-        MONITORING_FUNCTIONS = new HashSet<Function>();
-        ADMIN_FUNCTIONS = new HashSet<Function>();
+        Set<Function> monitoringFunctions = new HashSet<Function>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
-            Item item = new Item(function);
-            items.add(item);
             if(function.getFunctionName().equalsIgnoreCase(Function.FUNC_MONITORING)){
-                MONITORING_FUNCTIONS.add(function);
+                monitoringFunctions.add(function);
             }
+        }
+        return monitoringFunctions;
+    }
+
+    public Set<Function> getSupplierFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List allFunctions = allFunctionsCriteria.list();
+        Set<Function> supplierFunctions = new HashSet<Function>();
+        for (Object object : allFunctions) {
+            Function function = (Function) object;
+
             if(        function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW)
                     || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW)
                     || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CLIENT_VIEW)
@@ -90,10 +97,21 @@ public class FunctionSelector {
                     || function.getFunctionName().equalsIgnoreCase(Function.FUNC_RULE_VIEW)
                     || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_EDIT)
                     || function.getFunctionName().equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
-               ){
-                SUPPLIER_FUNCTIONS.add(function);
+                    ){
+                supplierFunctions.add(function);
             }
-            ADMIN_FUNCTIONS.add(function);
+        }
+        return supplierFunctions;
+    }
+
+    public void fill(Session session) throws Exception {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List allFunctions = allFunctionsCriteria.list();
+        List<Item> items = new ArrayList<Item>(allFunctions.size());
+        for (Object object : allFunctions) {
+            Function function = (Function) object;
+            Item item = new Item(function);
+            items.add(item);
         }
         this.items = items;
     }
@@ -105,7 +123,7 @@ public class FunctionSelector {
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
-            if (selectedFunctions.contains(function)) {
+            if (selectedFunctions!=null && selectedFunctions.contains(function)) {
                 item.setSelected(true);
             }
             items.add(item);

@@ -44,37 +44,37 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column rowspan="2">
-                        <h:outputText value="№"/>
+                        <h:outputText styleClass="column-header" value="№"/>
                     </rich:column>
                     <rich:column colspan="2">
-                        <h:outputText value="Поставщик"/>
+                        <h:outputText styleClass="column-header" value="Поставщик"/>
                     </rich:column>
                     <rich:column colspan="6">
-                        <h:outputText value="Заявки"/>
+                        <h:outputText styleClass="column-header" value="Заявки"/>
                     </rich:column>
                     <rich:column breakBefore="true">
-                        <h:outputText value="ID поставщика"/>
+                        <h:outputText styleClass="column-header" value="ID поставщика"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Название поставщика"/>
+                        <h:outputText styleClass="column-header" value="Название поставщика"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Товар/продукт"/>
+                        <h:outputText styleClass="column-header" value="Товар/продукт"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Общее количество заказов"/>
+                        <h:outputText styleClass="column-header" value="Общее количество заказов"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="ID учреждения"/>
+                        <h:outputText styleClass="column-header" value="ID учреждения"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Название учреждения"/>
+                        <h:outputText styleClass="column-header" value="Название учреждения"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Кол-во заказов"/>
+                        <h:outputText styleClass="column-header" value="Кол-во заказов"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Дата к исполнению"/>
+                        <h:outputText styleClass="column-header" value="Дата к исполнению"/>
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

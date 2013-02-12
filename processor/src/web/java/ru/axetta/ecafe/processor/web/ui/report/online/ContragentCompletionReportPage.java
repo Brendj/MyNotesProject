@@ -44,13 +44,14 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     private List<ContragentCompletionItem> contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
     private List<Contragent> contragentList;
     private Contragent defaultSupplier;
+    private Integer contragentListCount = 0;
 
     @Override
     public void onShow() throws Exception {
         contragentDAOService.setSession((Session) entityManager.getDelegate());
         contragentList = contragentDAOService.getPayAgentContragent();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-
+        contragentListCount = contragentList.size();
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Calendar localCalendar = runtimeContext
                 .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
@@ -79,9 +80,14 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
         return null;
     }
 
+    public Integer getContragentListCount() {
+        return contragentListCount;
+    }
+
     public List<Contragent> getContragentList() {
         return contragentList;
     }
+
 
     public List<ContragentCompletionItem> getContragentCompletionItems() {
         return contragentCompletionItems;

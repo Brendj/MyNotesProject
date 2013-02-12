@@ -51,6 +51,9 @@ public class ContragentDAOService extends AbstractDAOService {
         List list = criteria.list();
         contragentCompletionItem.setContragentPayItems(list);
         contragentCompletionItem.setEducationalInstitutionName(org.getShortName());
+        contragentCompletionItem.setEducationalCity(org.getCity());
+        contragentCompletionItem.setEducationalLocation(org.getLocation());
+        contragentCompletionItem.setEducationalTags(org.getTag());
         return contragentCompletionItem;
     }
 

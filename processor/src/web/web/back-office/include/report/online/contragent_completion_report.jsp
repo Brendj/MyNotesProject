@@ -48,7 +48,64 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
+    <rich:dataTable id="contragentCompletionReportTableTemp" value="#{contragentCompletionReportPage.contragentCompletionItems}"
+                    var="contragentCompletionItem" rowKeyVar="row">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column colspan="4">
+                    <h:outputText value="Организация"/>
+                </rich:column>
+                <rich:column colspan="#{contragentCompletionReportPage.contragentListCount+1}">
+                    <h:outputText value="Агент" />
+                </rich:column>
+                <rich:column rowspan="2">
+                    <h:outputText value="Итого"/>
+                </rich:column>
+                <rich:column breakBefore="true">
+                    <h:outputText value="Наименование"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="Город"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="Район"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="Тэги"/>
+                </rich:column>
+                <rich:column>
+                    <rich:columns var="contragent" value="#{contragentCompletionReportPage.contragentList}">
+                        <h:outputText value="#{contragent.contragentName}"/>
+                    </rich:columns>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalCity}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalLocation}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalTags}"/>
+        </rich:column>
+        <rich:column width="0">
+        </rich:column>
+        <rich:columns  var="contragent" value="#{contragentCompletionReportPage.contragentList}">
+            <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent) /100}">
+                <f:convertNumber pattern="#0.00"/>
+            </h:outputText>
+        </rich:columns>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.totalSumByOrg / 100}">
+                <f:convertNumber pattern="#0.00"/>
+            </h:outputText>
+        </rich:column>
+    </rich:dataTable>
+    <%--<h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="contragentCompletionReportTable" value="#{contragentCompletionReportPage.contragentCompletionItems}"
                         var="contragentCompletionItem" rowKeyVar="row">
             <rich:column>
@@ -73,6 +130,6 @@
                     <f:convertNumber pattern="#0.00"/>
                 </h:outputText>
             </rich:column>
-        </rich:dataTable>
+        </rich:dataTable>--%>
     </h:panelGrid>
 </h:panelGrid>

@@ -40,19 +40,19 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                        <h:outputText styleClass="column-header" escape="true" value="№" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Номер учреждения" />
+                        <h:outputText styleClass="column-header" escape="true" value="Номер учреждения" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Название учреждения" />
+                        <h:outputText styleClass="column-header" escape="true" value="Название учреждения" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Время начала синхронизации" />
+                        <h:outputText styleClass="column-header" escape="true" value="Время начала синхронизации" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Время завершения синхронизации" />
+                        <h:outputText styleClass="column-header" escape="true" value="Время завершения синхронизации" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
