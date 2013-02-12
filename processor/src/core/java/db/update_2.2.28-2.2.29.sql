@@ -9,13 +9,13 @@ CREATE TABLE cf_projectstate_data
 );
 
 -- Добавление колонки currentprice к таблице cf_complexinfo
-ALTER TABLE cf_complexinfo ADD COLUMN currentprice bigint;
+ALTER TABLE CF_ComplexInfo ADD COLUMN CurrentPrice bigint;
 
 -- Добавление колонки count к таблице cf_complexinfodetail
-ALTER TABLE cf_complexinfodetail ADD COLUMN count integer;
+ALTER TABLE CF_ComplexInfoDetail ADD COLUMN Count integer;
 
 -- Добавленна свяска к документу
-ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN IdOfGood bigint NOT NULL;
-ALTER TABLE cf_internal_disposing_document_positions ADD CONSTRAINT cf_internal_disposing_document_positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES cf_goods (IdOfGood);
+ALTER TABLE CF_Internal_Disposing_Document_Positions ADD COLUMN IdOfGood bigint NOT NULL;
+ALTER TABLE CF_Internal_Disposing_Document_Positions ADD CONSTRAINT cf_internal_disposing_document_positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES CF_Goods (IdOfGood);
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 121123) НЕ МЕНЯТЬ

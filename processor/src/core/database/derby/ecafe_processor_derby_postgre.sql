@@ -223,11 +223,15 @@ CREATE TABLE CF_Users (
   LastChange              BIGINT            NOT NULL,
   Phone                   VARCHAR(32)       NOT NULL,
   IdOfContragent          BIGINT,
-  email character varying(128), --v14
+  email                   VARCHAR(128),                           --v14
+  IdOfRole                BIGINT            NOT NULL DEFAULT 0,   --v32
+  RoleName                VARCHAR(128),                           --v32
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
   CONSTRAINT CF_Users_ShortName UNIQUE (UserName),
   CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
+
+
 
 CREATE TABLE CF_Functions (
   IdOfFunction  BIGINT        NOT NULL,
@@ -261,11 +265,12 @@ CREATE TABLE  cf_goods_groups (
 );
 
 --v24
-CREATE TABLE  cf_goods (
+CREATE TABLE  CF_Goods (
   IdOfGood BigSerial NOT NULL,
   IdOfGoodsGroup bigint NOT NULL,
   IdOfTechnologicalMaps bigint,
   IdOfProducts bigint,
+  IdOfBasicGood bigint,
   GUID character varying(36) NOT NULL,
   DeletedState boolean NOT NULL DEFAULT false,
   GlobalVersion BIGINT DEFAULT NULL,
@@ -285,10 +290,13 @@ CREATE TABLE  cf_goods (
   IdOfUserCreate bigint,
   IdOfUserEdit bigint,
   IdOfUserDelete bigint,
+  BasicGoodLastUpdate bigint,
   CONSTRAINT cf_goods_pk PRIMARY KEY (IdOfGood ),
   CONSTRAINT cf_goods_group_fk FOREIGN KEY (IdOfGoodsGroup)
-  REFERENCES cf_goods_groups (IdOfGoodsGroup),
-  CONSTRAINT cf_goods_guid_key UNIQUE (guid )
+    REFERENCES cf_goods_groups (IdOfGoodsGroup),
+  CONSTRAINT CF_Goods_IdOfBasicGood_FK FOREIGN KEY (IdOfBasicGood)
+    REFERENCES CF_Goods_BasicBasket(IdOfBasicGood),
+CONSTRAINT cf_goods_guid_key UNIQUE (guid )
 );
 
 CREATE TABLE CF_Menu (
@@ -352,16 +360,18 @@ CREATE TABLE CF_ComplexInfo (
   ModeGrant               INT               NOT NULL,
   ModeOfAdd               INT               NOT NULL,
   UseTrDiscount           INT               DEFAULT 0,
+  CurrentPrice            BIGINT,
   CONSTRAINT CF_ComplexInfo_pk PRIMARY KEY (IdOfComplexInfo),
   CONSTRAINT CF_ComplexInfo_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_ComplexInfo_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES Cf_MenuDetails (IdOfMenuDetail),
-  CONSTRAINT CF_ComplexInfo_IdOfGood_fk FOREIGN KEY (IdOfGood) REFERENCES Cf_Goods (IdOfGood)
+  CONSTRAINT CF_ComplexInfo_IdOfGood_fk FOREIGN KEY (IdOfGood) REFERENCES CF_Goods (IdOfGood)
 );
 
 CREATE TABLE CF_ComplexInfoDetail (
   IdOfComplexInfoDetail   BIGINT            NOT NULL,
   IdOfComplexInfo         BIGINT            NOT NULL,
   IdOfMenuDetail          BIGINT            NOT NULL,
+  Count                   INT,
   CONSTRAINT CF_ComplexInfoDetail_pk PRIMARY KEY (IdOfComplexInfoDetail),
   CONSTRAINT CF_ComplexInfoDetail_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES CF_MenuDetails (IdOfMenuDetail)
 );
@@ -1278,7 +1288,7 @@ CREATE TABLE  cf_trade_material_goods (
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_trade_material_goods_pk PRIMARY KEY (IdOfTradeMaterialGood ),
   CONSTRAINT cf_trade_material_goods_good_fk FOREIGN KEY (IdOfGood)
-      REFERENCES cf_goods (IdOfGood),
+      REFERENCES CF_Goods (IdOfGood),
   CONSTRAINT cf_trade_material_goods_guid_key UNIQUE (guid )
 );
 
@@ -1400,7 +1410,7 @@ CREATE TABLE  cf_acts_of_waybill_difference_positions (
   CONSTRAINT cf_acts_of_waybill_difference_positions_act_of_waybill_difference_fk FOREIGN KEY (IdOfActOfDifference)
       REFERENCES cf_acts_of_waybill_difference (IdOfActOfDifference),
   CONSTRAINT cf_acts_of_waybill_difference_positions_good_fk FOREIGN KEY (IdOfGood)
-      REFERENCES cf_goods (IdOfGood),
+      REFERENCES CF_Goods (IdOfGood),
   CONSTRAINT cf_acts_of_waybill_difference_positions_guid_key UNIQUE (guid )
 );
 
@@ -1454,7 +1464,7 @@ CREATE TABLE  cf_waybills_positions (
   CONSTRAINT cf_waybills_positions_waybill_fk FOREIGN KEY (IdOfWayBill)
       REFERENCES cf_waybills (IdOfWayBill),
   CONSTRAINT cf_waybills_positions_good_fk FOREIGN KEY (IdOfGood)
-      REFERENCES cf_goods (IdOfGood),
+      REFERENCES CF_Goods (IdOfGood),
   CONSTRAINT cf_waybills_positions_guid_key UNIQUE (guid )
 );
 
@@ -1499,10 +1509,11 @@ CREATE TABLE  cf_internal_disposing_documents (
   CONSTRAINT cf_internal_disposing_documents_guid_key UNIQUE (guid )
 );
 
-CREATE TABLE  cf_internal_disposing_document_positions (
+CREATE TABLE  CF_Internal_Disposing_Document_Positions (
   IdOfInternalDisposingDocumentPositions BigSerial NOT NULL,
   IdOfInternalDisposingDocument bigint NOT NULL,
   IdOfTradeMaterialGood bigint,
+  IdOfGood bigint NOT NULL,
   GUID character varying(36) NOT NULL,
   GlobalVersion BIGINT DEFAULT NULL,
   globalversiononcreate BIGINT DEFAULT NULL,
@@ -1517,10 +1528,11 @@ CREATE TABLE  cf_internal_disposing_document_positions (
   DisposePrice bigint NOT NULL,
   NDS bigint NOT NULL,
   SendAll integer DEFAULT 0,
-  CONSTRAINT cf_internal_disposing_document_positions_pk PRIMARY KEY (IdOfInternalDisposingDocumentPositions ),
-  CONSTRAINT cf_internal_disposing_document_positions_internal_disposing_document_fk FOREIGN KEY (IdOfInternalDisposingDocument)
+  CONSTRAINT CF_Internal_Disposing_Document_Positionscf_internal_disposing_document_positions_pk PRIMARY KEY (IdOfInternalDisposingDocumentPositions ),
+  CONSTRAINT CF_Internal_Disposing_Document_Positions_internal_disposing_document_fk FOREIGN KEY (IdOfInternalDisposingDocument)
       REFERENCES cf_internal_disposing_documents (IdOfInternalDisposingDocument),
-  CONSTRAINT cf_internal_disposing_document_positions_guid_key UNIQUE (guid )
+  CONSTRAINT CF_Internal_Disposing_Document_Positions_fk_good FOREIGN KEY (IdOfGood) REFERENCES CF_Goods (IdOfGood),
+  CONSTRAINT CF_Internal_Disposing_Document_Positions_guid_key UNIQUE (guid )
 );
 
 CREATE TABLE  cf_internal_incoming_documents (
@@ -1571,7 +1583,7 @@ CREATE TABLE  cf_internal_incoming_document_positions (
   CONSTRAINT cf_internal_incoming_document_positions_internal_incoming_document_fk FOREIGN KEY (IdOfInternalIncomingDocument)
       REFERENCES cf_internal_incoming_documents (IdOfInternalIncomingDocument),
   CONSTRAINT cf_internal_incoming_document_positions_good_fk FOREIGN KEY (IdOfGood)
-      REFERENCES cf_goods (IdOfGood),
+      REFERENCES CF_Goods (IdOfGood),
   CONSTRAINT cf_internal_incoming_document_positions_guid_key UNIQUE (guid )
 );
 
@@ -1842,6 +1854,7 @@ CREATE TABLE cf_ksu1records (
   CONSTRAINT cf_ksu1record_pk PRIMARY KEY (IdOfKSU1Record ),
   CONSTRAINT cf_ksu1records_guid_key UNIQUE (guid )
 );
+
 --причина выбытия из фонда
 --RetirementReasonName - название причины (в макулатуру, потерялось, съели)
 CREATE TABLE cf_retirementreasons (
@@ -2080,7 +2093,7 @@ CREATE TABLE CF_Dish_Prohibitions
   CONSTRAINT CF_Dish_Prohibitions_IdOfClient_fk FOREIGN KEY (IdOfClient)
   REFERENCES CF_clients (IdOfClient),
   CONSTRAINT CF_Dish_Prohibitions_idofgood_fk FOREIGN KEY (IdOfGood)
-  REFERENCES CF_goods (IdOfGood),
+  REFERENCES CF_Goods (IdOfGood),
   CONSTRAINT CF_Dish_Prohibitions_IdOfGoodsGroup_fk FOREIGN KEY (IdOfGoodsGroup)
   REFERENCES CF_goods_groups (IdOfGoodsGroup),
   CONSTRAINT CF_Dish_Prohibitions_IdOfProductGroups_fk FOREIGN KEY (IdOfProductGroups)
@@ -2134,6 +2147,19 @@ CREATE TABLE CF_Dish_Prohibition_Exclusions
   CONSTRAINT CF_Dish_Prohibition_Exclusions_Check_OneIsNotNull CHECK (COALESCE(IdOfGood, IdOfGoodsGroup) IS NOT NULL),
   CONSTRAINT CF_Dish_Prohibition_Exclusions_Check_OneIsNull CHECK ((IdOfGood + IdOfGoodsGroup) IS NULL)
 );
+
+CREATE TABLE CF_ProjectState_Data
+(
+  Period bigint NOT NULL,
+  Type int NOT NULL,
+  StringKey character varying(128),
+  StringValue character varying(128),
+  GenerationDate bigint NOT NULL,
+  Region char(128) default 'Все',
+  Comments char(255) default '',
+  CONSTRAINT CF_ProjectState_Data_PK PRIMARY KEY (Period, Type, Region, StringKey)
+);
+
 
 CREATE TABLE CF_ClientsComplexDiscounts
 (
@@ -2335,8 +2361,27 @@ create table CF_ClientMigrationHistory
   CONSTRAINT CF_ClientMigrationHistory_pk PRIMARY KEY (IdOfClientMigration)
 );
 
+-- Справочник базовых товаров
+CREATE TABLE CF_Goods_BasicBasket
+(
+  IdOfBasicGood   bigserial              NOT NULL,
+  Guid            character varying(36)  NOT NULL,
+  CreatedDate     bigint                 NOT NULL,
+  --! Значение даты последнего обновления при создании объекта равно дате из поля CreatedDate,
+  --! используется в качестве версии базового товара
+  LastUpdate      bigint                 NOT NULL,
+  NameOfGood      character varying(512) NOT NULL,
+  UnitsScale      integer                NOT NULL  DEFAULT 0,
+  NetWeight       bigint                 NOT NULL,
+
+  CONSTRAINT CF_Goods_BasicBasket_PK                  PRIMARY KEY (IdOfBasicGood),
+  CONSTRAINT CF_Goods_BasicBasket_BasicGoodNumber_Key UNIQUE      (Guid),
+  CONSTRAINT CF_Goods_BasicBasket_NameOfGood_Key      UNIQUE      (NameOfGood)
+
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-        VALUES(2, 2, 32, 130121, 0, '');
+        VALUES(2, 2, 33, 130212, 0, '');
 
 

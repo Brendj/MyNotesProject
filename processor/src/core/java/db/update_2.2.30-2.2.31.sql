@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
   priority int NOT NULL,
   operationar int NOT NULL,
   idofcomplex int NOT NULL,
-
   CONSTRAINT cf_clientscomplexdiscounts_pk PRIMARY KEY (idofclientcomplexdiscount),
   CONSTRAINT cf_clientscomplexdiscounts_u_key UNIQUE (idofclient, idofrule, idofcategoryorg, priority, idofcomplex)
   );
