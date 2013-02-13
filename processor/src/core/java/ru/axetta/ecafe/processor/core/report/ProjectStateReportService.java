@@ -330,7 +330,8 @@ public class ProjectStateReportService {
                         "select 'В систему внесен номер мобильного телефона', count(regOrgSrc.idofclient) " +
                         "from cf_clients as regOrgSrc " +
                         "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
-                        "where regOrgSrc.mobile<>'' and cf_cards.state=0", new Object[][]{
+                        REGION_SENSITIVE_JOIN + " "+
+                        "where regOrgSrc.mobile<>'' and cf_cards.state=0 " + REGION_SENSITIVE_CLAUSE, new Object[][]{
                         {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов"}},
                         INFORMING_CHART_DATA));
                 new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
@@ -721,9 +722,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        cal.set(Calendar.YEAR, 2013);
+        /*cal.set(Calendar.YEAR, 2013);
         cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 3);
+        cal.set(Calendar.DAY_OF_MONTH, 3);*/
 
         return cal;
     }

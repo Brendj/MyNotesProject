@@ -263,10 +263,10 @@ function drawVisitorsChart()
     var region = document.getElementById('select_region_04');
     var period = document.getElementById('select_period_02');
     var container = document.getElementById('visitorsChart');
-    var chart = new google.visualization.LineChart(container);
+    var chart = new google.visualization.AreaChart(container);
     var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=VisitorsChart&period=' + period.value + '&region=' + region.value);
-    var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {minValue: 0, maxValue: 100, gridlines: {color: 'black', count: 3}, minorGridlines: {color: 'eeeeee', count: 1}}, width: '100%', height: '100%', legend: {position: 'bottom'},
-        chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11 };
+    var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
+        chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
 }
@@ -415,8 +415,8 @@ function addPeriod (container, title, value)
         <div id="benefitsChart" style="width: 100%; height: 310px;"></div>
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option>Все</option><option>ЮВАО</option><option>САО</option></select></div>
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw(drawVisitorsChart)"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option>Все</option><option>ЮВАО</option><option>САО</option></select></div>
         <div id="visitorsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-7" style="padding: 0px; margin: 0px">
