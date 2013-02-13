@@ -266,7 +266,7 @@ public class ProjectStateReportService {
                         {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, "Количество пополнений"}},
                         REFILL_CHART_DATA).setPostReportMethod("parseRefillChart"));
         TYPES.put("RefillAvgChart", new ComplexType(new Type[]{
-                new SimpleType("select 'Средняя сумма пополнения' as title, avg(cf_clientpayments.paysum) / 1000 " +
+                new SimpleType("select 'Средняя сумма пополнения' as title, avg(cf_clientpayments.paysum) / 100 " +
                         "from cf_contragents " +
                         "left join cf_clientpayments on cf_contragents.idofcontragent=cf_clientpayments.idofcontragent "+
                         "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "+
@@ -534,7 +534,7 @@ public class ProjectStateReportService {
             }
         } catch (Exception e) {
         }
-        logger.info("Project state data builing is complete");
+        //logger.info("Project state data builing is complete");
     }
 
 
@@ -1328,11 +1328,32 @@ public class ProjectStateReportService {
 
     public static Map<Object [], Long> getClientsCount (Session session) {
         Map<Object [], Long> clientsCount = new HashMap <Object [], Long> ();
-        org.hibernate.Query q = session.createSQLQuery("select cf_orgs.idoforg, cf_orgs.officialname, count(cf_clients.idofclient) " +
-                "from cf_clients, cf_orgs " +
-                "where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' " +
-                "group by cf_orgs.idoforg, cf_orgs.officialname " +
-                "order by cf_orgs.officialname");
+        org.hibernate.Query q = session.createSQLQuery("select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
+                                                    + "from (select dat.idoforg, dat.officialname, sum(dat.cnt) as cnt "
+                                                    + "      from (select cf_orgs.idoforg, cf_orgs.officialname, friends.cnt "
+                                                    + "            from cf_orgs "
+                                                    + "            left join (select cf_friendly_organization.friendlyorg, count(cf_clients) as cnt "
+                                                    + "                       from cf_clients, cf_friendly_organization "
+                                                    + "                       where cf_clients.idoforg=cf_friendly_organization.currentorg and cf_clients.idoforg=cf_friendly_organization.friendlyorg "
+                                                    + "                       group by cf_friendly_organization.friendlyorg) as friends on friends.friendlyorg=cf_orgs.idoforg "
+                                                    + "            where cf_orgs.officialname<>'' "
+                                                    + "            union all "
+                                                    + "            select cf_orgs.idoforg, cf_orgs.officialname, friends.cnt "
+                                                    + "            from cf_orgs "
+                                                    + "            left join (select cf_friendly_organization.friendlyorg, count(cf_clients) as cnt "
+                                                    + "                       from cf_clients, cf_friendly_organization "
+                                                    + "                       where cf_clients.idoforg=cf_friendly_organization.currentorg and cf_clients.idoforg<>cf_friendly_organization.friendlyorg "
+                                                    + "                       group by cf_friendly_organization.friendlyorg) as friends on friends.friendlyorg=cf_orgs.idoforg "
+                                                    + "            where cf_orgs.officialname<>'') as dat "
+                                                    + "      group by dat.idoforg, dat.officialname "
+                                                    + "      union "
+                                                    + "      select cf_orgs.idoforg, cf_orgs.officialname, count(cf_clients.idofclient) as cnt "
+                                                    + "      from cf_clients, cf_orgs "
+                                                    + "      where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' "
+                                                    + "      group by cf_orgs.idoforg, cf_orgs.officialname) as dat "
+                                                    + " where dat.cnt<>0 "
+                                                    + "group by dat.idoforg, dat.officialname "
+                                                    + "order by 1");
         List resultList = q.list();
         for (Object entry : resultList) {
             Object e[] = (Object[]) entry;
