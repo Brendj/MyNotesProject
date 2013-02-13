@@ -266,8 +266,8 @@ public class DashboardServiceBean {
                 Integer employeesEntersCount = employeeEnters.get(orgID);
                 Integer studentsOrdersCount = studentOrders.get(orgID);
                 Integer employeeOrdersCount = employeeOrders.get(orgID);
-                Integer studentsDiscountsCount = studentDiscounts.get(orgID);
-                Integer employeeDiscountsCount = employeeDiscounts.get(orgID);
+                Integer studentsDiscountsCount = zeroIfNull (studentDiscounts.get(orgID));
+                Integer employeeDiscountsCount = zeroIfNull (employeeDiscounts.get(orgID));
                 Integer studentsUniqueCount = studentUniqueOrders.get(orgID);
                 Integer employeeUniqueCount = employeeUniqueOrders.get(orgID);
                 double per1 = 0D, per2 = 0D, per3 = 0D, per4 = 0D, per5 = 0D, per6 = 0D;
@@ -373,6 +373,12 @@ public class DashboardServiceBean {
         txManager.commit(status);
         return basicStats;
     }
+
+
+    public int zeroIfNull (Integer val)
+        {
+        return val == null ? 0 : val;
+        }
 
 
     public double beautifyPercent (double percent)
