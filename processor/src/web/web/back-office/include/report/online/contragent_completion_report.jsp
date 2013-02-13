@@ -55,7 +55,7 @@
                 <rich:column colspan="4">
                     <h:outputText value="Организация"/>
                 </rich:column>
-                <rich:column colspan="#{contragentCompletionReportPage.contragentListCount+1}">
+                <rich:column colspan="#{contragentCompletionReportPage.contragentListCount}">
                     <h:outputText value="Агент" />
                 </rich:column>
                 <rich:column rowspan="2">
@@ -73,11 +73,9 @@
                 <rich:column>
                     <h:outputText value="Тэги"/>
                 </rich:column>
-                <rich:column>
-                    <rich:columns var="contragent" value="#{contragentCompletionReportPage.contragentList}">
-                        <h:outputText value="#{contragent.contragentName}"/>
-                    </rich:columns>
-                </rich:column>
+                <rich:columns var="contragent" value="#{contragentCompletionReportPage.contragentList}">
+                    <h:outputText value="#{contragent.contragentName}"/>
+                </rich:columns>
             </rich:columnGroup>
         </f:facet>
         <rich:column>
@@ -92,8 +90,6 @@
         <rich:column>
             <h:outputText value="#{contragentCompletionItem.educationalTags}"/>
         </rich:column>
-        <rich:column width="0">
-        </rich:column>
         <rich:columns  var="contragent" value="#{contragentCompletionReportPage.contragentList}">
             <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent) /100}">
                 <f:convertNumber pattern="#0.00"/>
@@ -105,31 +101,4 @@
             </h:outputText>
         </rich:column>
     </rich:dataTable>
-    <%--<h:panelGrid styleClass="borderless-grid">
-        <rich:dataTable id="contragentCompletionReportTable" value="#{contragentCompletionReportPage.contragentCompletionItems}"
-                        var="contragentCompletionItem" rowKeyVar="row">
-            <rich:column>
-                <f:facet name="header">
-                    <h:outputText value="Организация / Агент"/>
-                </f:facet>
-                <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
-            </rich:column>
-            <rich:columns  var="contragent" value="#{contragentCompletionReportPage.contragentList}">
-                <f:facet name="header">
-                    <h:outputText value="#{contragent.contragentName}"/>
-                </f:facet>
-                <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent) /100}">
-                    <f:convertNumber pattern="#0.00"/>
-                </h:outputText>
-            </rich:columns>
-            <rich:column>
-                <f:facet name="header">
-                    <h:outputText value="Итого"/>
-                </f:facet>
-                <h:outputText value="#{contragentCompletionItem.totalSumByOrg / 100}">
-                    <f:convertNumber pattern="#0.00"/>
-                </h:outputText>
-            </rich:column>
-        </rich:dataTable>--%>
-    </h:panelGrid>
 </h:panelGrid>
