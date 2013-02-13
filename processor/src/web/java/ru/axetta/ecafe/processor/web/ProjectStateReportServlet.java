@@ -88,7 +88,8 @@ public class ProjectStateReportServlet extends DataSourceServlet {
             }
         }
 
-        DataTable data = ProjectStateReportService.generateReport(runtimeContext, dateAt, dateTo, region, t);
+        ProjectStateReportService projectStateReportService = RuntimeContext.getAppContext().getBean(ProjectStateReportService.class);
+        DataTable data = projectStateReportService.generateReport(runtimeContext, dateAt, dateTo, region, t);
         return data;
     }
 

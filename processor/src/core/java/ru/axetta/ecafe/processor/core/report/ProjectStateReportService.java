@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -95,7 +97,7 @@ public class ProjectStateReportService {
     //  Так же для каждого типа необходимо
     public static final String REGION_SENSITIVE_JOIN = "%REGION_SENSITIVE_JOIN%";
     public static final String REGION_SENSITIVE_CLAUSE = "%REGION_SENSITIVE_CLAUSE%";
-    public static Map <String, Integer> REGIONS_LIST;
+    public Map <String, Integer> REGIONS_LIST;
 
     //  Используется для выполнения запросов для всех платежных агентов. Обязательно должно
     //  использоваться совместно с ComplexType (а не SimpleType). В перечислении столбцов
@@ -104,7 +106,7 @@ public class ProjectStateReportService {
     public static final String PAY_AGENTS_COLUMNS = "%PAY_AGENT_COLUMNS%";
     public static final String PAY_AGENTS_CLAUSE = "%PAY_AGENT_ID%";
     public static final int PAY_AGENT_MULTI_ID = 10000;
-    public static List <Object []> PAY_AGENTS_LIST;
+    public List <Object []> PAY_AGENTS_LIST;
 
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM");
@@ -473,7 +475,7 @@ public class ProjectStateReportService {
                   new SimpleType("", RATING_CHART_2_DATA).setPreSelectSQLMethod("parseOrgsPayments").setPeriodDaysInc (-7).setIncremental (true),
                   new SimpleType("", RATING_CHART_3_DATA).setPreSelectSQLMethod("parseOrgsDiscounts").setPeriodDaysInc (-7).setIncremental (true),
                   new SimpleType("", RATING_CHART_4_DATA).setPreSelectSQLMethod("parseOrgsRating").setPeriodDaysInc (-7).setIncremental (true) },
-                new Object[][] { {ValueType.TEXT, "УО"},
+                new Object[][] { {ValueType.TEXT, "ОУ"},
                                  {ValueType.NUMBER, "Проход (%)"},
                                  {ValueType.NUMBER, "Платное питание (%)"},
                                  {ValueType.NUMBER, "Льготное питание (%)"},
@@ -482,7 +484,8 @@ public class ProjectStateReportService {
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
-    private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
+    //private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
+    private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
     private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
                       "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), sum(cast(StringValue as double precision)) / least(count(distinct period), %PERIOD_LENGTH%) || '' "
@@ -513,8 +516,7 @@ public class ProjectStateReportService {
             runtimeContext = RuntimeContext.getInstance();
             session = runtimeContext.createPersistenceSession();
 
-            initRegions (session);
-            initPayContragents(session);
+            initDictionaries(session);
             }
         catch (Exception e)
             {
@@ -535,6 +537,12 @@ public class ProjectStateReportService {
         } catch (Exception e) {
         }
         //logger.info("Project state data builing is complete");
+    }
+
+    private synchronized void initDictionaries(Session session) throws Exception {
+        if (PAY_AGENTS_LIST!=null) return;
+        initRegions (session);
+        initPayContragents(session);
     }
 
 
@@ -737,23 +745,23 @@ public class ProjectStateReportService {
     }
 
 
-    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max)
+    public String applyMacroReplace(String sql, int type, Calendar min, Calendar max)
         {
         return applyMacroReplace (sql, type, min, max, 0, null);
         }
 
 
-    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc) {
+    public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc) {
         return applyMacroReplace (sql, type, min, max, daysInc, null);
     }
 
 
-    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName) {
+    public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName) {
         return applyMacroReplace (sql, type, min, max, daysInc, regionName, null);
     }
 
 
-    public static String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName, Integer idOfContragent) {
+    public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName, Integer idOfContragent) {
         if (sql.indexOf("%MINIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MINIMUM_DATE%", DB_DATE_FORMAT.format(min.getTime()));
         }
@@ -790,13 +798,11 @@ public class ProjectStateReportService {
         return sql;
     }
 
-
-    public static DataTable generateReport(RuntimeContext runtimeContext, Calendar dateAt, Calendar dateTo, String regionName, Type t)
+    public DataTable generateReport(RuntimeContext runtimeContext, Calendar dateAt, Calendar dateTo, String regionName, Type t)
             throws IllegalArgumentException {
         if (runtimeContext == null || dateTo == null || dateAt == null || t == null) {
             throw new IllegalArgumentException("RuntimeContext, Calendar and Type cannot be null(s)");
         }
-
 
         if (regionName == null) regionName = "Все";
         dateAt.set(Calendar.HOUR_OF_DAY, 0);
@@ -810,6 +816,9 @@ public class ProjectStateReportService {
 
         try {
             Session session = runtimeContext.createPersistenceSession();
+            
+            initDictionaries(session);
+            
             Map<String, List<String>> data = loadReportData(session, dateAt, dateTo, regionName, t);
             session.close();
 
@@ -827,13 +836,13 @@ public class ProjectStateReportService {
     }
 
 
-    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+    private Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
                                                             String regionName, Type t) {
         return loadReportData(session, dateAt, dateTo, regionName, t, new TreeMap<String, List<String>>());
     }
 
 
-    private static Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+    private Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
                                                             String regionName, Type t,
             Map<String, List<String>> result) {
         try {
@@ -880,12 +889,12 @@ public class ProjectStateReportService {
     }
 
 
-    private static Map<String, String> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+    private Map<String, String> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
                                                       String regionName, int payAgentInc, SimpleType t) {
         try {
-            int regionSQLPos = 1;
             Map<String, String> result = new TreeMap<String, String>();
             org.hibernate.Query q = null;
+            int type=t.getReportType() + buildPayAgentTypeInc (payAgentInc); //  Увеличиваем ID типа, если это конрагент или регион
             if (t.isIncremental()) {
                 String certainSQL = PERIODIC_SELECT_SQL;
                 if (t.getPeriodDaysInc () != 0)
@@ -897,16 +906,16 @@ public class ProjectStateReportService {
                 q = session.createSQLQuery(applyMacroReplace(certainSQL, t.getReportType(),
                                                              dateAt, dateTo, Math.abs (t.getPeriodDaysInc ()),
                                                              regionName));
+                q.setString (1, regionName);
             } else {
                 q = session.createSQLQuery(SELECT_SQL);
-                q.setLong(1, dateTo.getTimeInMillis());
-                regionSQLPos++;
+                q.setInteger(1, type);
+                q.setString (2, regionName);
+                q.setString (3, regionName);
             }
-            q.setInteger(0, t.getReportType() + buildPayAgentTypeInc (payAgentInc)); //  Увеличиваем ID типа, если это конрагент или регион
-            q.setString (regionSQLPos, regionName);
-            List resultList = q.list();
+            q.setInteger(0, type);
 
-            for (Object entry : resultList) {
+            for (Object entry : q.list()) {
                 Object e[] = (Object[]) entry;
                 result.put(((String) e[0]).trim(), ((String) e[1]).trim());
             }
@@ -918,7 +927,7 @@ public class ProjectStateReportService {
     }
 
 
-    private static DataTable buildDataTable(Map<String, List<String>> data, Type t) throws TypeMismatchException {
+    private DataTable buildDataTable(Map<String, List<String>> data, Type t) throws TypeMismatchException {
         DataTable dt = new DataTable();
         ArrayList cd = new ArrayList();
         for (int i = 0; i < t.getColumns().length; i++) {
@@ -1167,14 +1176,14 @@ public class ProjectStateReportService {
 
 
 
-    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+    public Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
                                                             int reportType, Map <String, Object> params)
         {
         return addMethodParameters (dateAt, dateTo, "", reportType, params);
         }
 
 
-    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+    public Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
                                                             String regionName, int reportType,
                                                             Map <String, Object> params)
     {
@@ -1182,7 +1191,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
+    public Map <String, Object> addMethodParameters (Calendar dateAt, Calendar dateTo,
                                                             String regionName, Integer idOfContragent, int reportType,
                                                             Map <String, Object> params)
         {
@@ -1199,7 +1208,7 @@ public class ProjectStateReportService {
         }
 
 
-    public static void executeDataMethod(SimpleType t, Map data, Session session, Map<String, Object> params, String method) {
+    public void executeDataMethod(SimpleType t, Map data, Session session, Map<String, Object> params, String method) {
         if (method == null || method.length() < 1) {
             return;
         }
@@ -1214,7 +1223,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseOrgsPayments(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseOrgsPayments(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                          "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                          "from cf_orders, cf_orgs " +
@@ -1226,7 +1235,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseOrgsDiscounts(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseOrgsDiscounts(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                          "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                          "from cf_orders, cf_orgs " +
@@ -1238,7 +1247,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                          "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
                          "from cf_enterevents, cf_orgs " +
@@ -1249,7 +1258,7 @@ public class ProjectStateReportService {
                          "order by cf_orgs.idoforg", false);
     }
 
-    public static void parseOrgsRequest (Object dataSource, Object sessionObj, Object paramsObj, String sql, boolean absoluteIfExists) {
+    public void parseOrgsRequest (Object dataSource, Object sessionObj, Object paramsObj, String sql, boolean absoluteIfExists) {
         Map <String, Object> params = (Map <String, Object>) paramsObj;
         Map<String, String> data    = (Map<String, String>) dataSource;
         Calendar dateAt             = (Calendar) params.get ("dateAt");
@@ -1292,7 +1301,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseOrgsRating(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseOrgsRating(Object dataSource, Object sessionObj, Object paramsObj) {
         Map <String, Object> params = (Map <String, Object>) paramsObj;
         Map<String, String> data    = (Map<String, String>) dataSource;
         Calendar dateAt             = (Calendar) params.get ("dateAt");
@@ -1326,7 +1335,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static Map<Object [], Long> getClientsCount (Session session) {
+    public Map<Object [], Long> getClientsCount (Session session) {
         Map<Object [], Long> clientsCount = new HashMap <Object [], Long> ();
         org.hibernate.Query q = session.createSQLQuery("select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
                                                     + "from (select dat.idoforg, dat.officialname, sum(dat.cnt) as cnt "
@@ -1364,7 +1373,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseContentsChart(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseContentsChart(Object dataSource, Object sessionObj, Object paramsObj) {
         Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
 
         List<String> list = data.get("Соб. Произв.");
@@ -1385,7 +1394,7 @@ public class ProjectStateReportService {
     }
 
 
-    public static void parseRefillChart(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseRefillChart(Object dataSource, Object sessionObj, Object paramsObj) {
         Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
         List<String> list = data.get("Банк Москвы");
         data.put("Через Банк Москвы", list);
@@ -1400,7 +1409,7 @@ public class ProjectStateReportService {
         data.remove("Сбербанк-Москва");
     }
 
-    public static void parseRefillAvgChart(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parseRefillAvgChart(Object dataSource, Object sessionObj, Object paramsObj) {
         Map<String, String> data = (Map<String, String>) dataSource;
 
         String list = data.get("Конкорд-ПА");
@@ -1410,12 +1419,12 @@ public class ProjectStateReportService {
 
 
 
-    public static void parse1_4Visitors(Object dataSource, Object sessionObj, Object paramsObj) {
+    public void parse1_4Visitors(Object dataSource, Object sessionObj, Object paramsObj) {
         Map<String, String> data = (Map<String, String>) dataSource;
     }
 
 
-    public static String getRegionByTypeInc (int regionTypeInc)
+    public String getRegionByTypeInc (int regionTypeInc)
         {
         for (String reg : REGIONS_LIST.keySet())
             {
@@ -1428,7 +1437,7 @@ public class ProjectStateReportService {
         }
 
 
-    public void initRegions (Session session) throws Exception
+    private void initRegions (Session session) throws Exception
     {
         try
         {
@@ -1450,7 +1459,7 @@ public class ProjectStateReportService {
     }
 
 
-    public void initPayContragents (Session session) throws Exception
+    private void initPayContragents (Session session) throws Exception
     {
         try
         {
@@ -1469,7 +1478,7 @@ public class ProjectStateReportService {
         }
     }
 
-    public static int buildPayAgentTypeInc (int idofcontragent)
+    public int buildPayAgentTypeInc (int idofcontragent)
         {
         return idofcontragent == 0 ? 0 : PAY_AGENT_MULTI_ID + idofcontragent;
         }
