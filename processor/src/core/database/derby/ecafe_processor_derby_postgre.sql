@@ -2379,19 +2379,15 @@ CREATE TABLE CF_Goods_BasicBasket
   CONSTRAINT CF_Goods_BasicBasket_NameOfGood_Key      UNIQUE      (NameOfGood)
 
 );
-
--- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
-insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-        VALUES(2, 2, 33, 130212, 0, '');
-
--- Справочник цен базовых товаров
+-- Добавлен расчет суммы базовой корзины
+--! Добавлен справочник цен базовых товаров
 CREATE TABLE Cf_Good_Basic_Basket_Price
 (
   IdOfGoodBasicBasketPrice bigserial NOT NULL,
   IdOfBasicGood bigint NOT NULL,
   IdOfGood bigint NOT NULL,
   GlobalVersion bigint,
-  globalversiononcreate bigint,
+  GlobalVersionOnCreate bigint,
   GUID character varying(36) NOT NULL,
   DeletedState boolean DEFAULT FALSE,
   DeleteDate bigint,
@@ -2399,8 +2395,14 @@ CREATE TABLE Cf_Good_Basic_Basket_Price
   CreatedDate bigint NOT NULL,
   SendAll integer DEFAULT 1,
   OrgOwner bigint,
-  price bigint,
+  Price bigint,
   CONSTRAINT Cf_Good_Basic_Basket_Price_PK                  PRIMARY KEY (IdOfBasicGood),
   CONSTRAINT Cf_Good_Basic_Basket_Price_BasicGoodNumber_Key UNIQUE      (Guid)
 );
+
+
+-- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
+insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
+VALUES(2, 2, 33, 130212, 0, '');
+
 
