@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -195,6 +196,7 @@ public class Processor implements SyncProcessor,
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
         QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
         try {
             setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
             ////
@@ -359,6 +361,13 @@ public class Processor implements SyncProcessor,
                 }
 
                 try {
+                    goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to process goods basic basket data , IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
+                }
+
+                try {
                     if(request.getManager()!=null){
                         manager = request.getManager();
                         manager.process(persistenceSessionFactory);
@@ -431,7 +440,7 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
         if (request.getType() == SyncRequest.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
@@ -598,6 +607,23 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return questionaryData;
+    }
+
+    private GoodsBasicBasketData processGoodsBasicBasketData(Long idOfOrg) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        GoodsBasicBasketData goodsBasicBasketData = new GoodsBasicBasketData();
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            goodsBasicBasketData.process(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return goodsBasicBasketData;
     }
 
     private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,

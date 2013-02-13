@@ -92,6 +92,13 @@
                 <h:outputText escape="true" value="#{costsAndSales.formattedAverageComplexPrice}" styleClass="output-text" />
             </rich:column>
 
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Стоимость базовой корзины платных блюд, руб." />
+                </f:facet>
+                <h:outputText escape="true" value="#{costsAndSales.formattedBasicBacketPrice}" styleClass="output-text" />
+            </rich:column>
+
             <f:facet name="footer">
                 <rich:datascroller for="costsAndSalesReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                    stepControls="auto" boundaryControls="hide">

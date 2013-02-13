@@ -13,5 +13,6 @@
         <property name="nameOfGood" column="NameOfGood" type="string" not-null="true" update="false" length="512"/>
         <property name="unitsScale" column="UnitsScale" type="int" not-null="true" update="false"/>
         <property name="netWeight" column="NetWeight" type="long" not-null="true" update="false"/>
+
     </class>
 </hibernate-mapping>

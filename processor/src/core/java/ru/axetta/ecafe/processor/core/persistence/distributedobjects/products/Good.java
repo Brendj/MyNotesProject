@@ -29,19 +29,19 @@ public class Good extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
-        if(gg == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
         setGoodGroup(gg);
         Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
         TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
-        if(p == null && tm == null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(p == null && tm == null) throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
 
         DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        distributedObjectException.setData(String.valueOf(idOfBasicGood));
+        distributedObjectException.setData(guidOfBasicGood);
         GoodsBasicBasket basicGood;
         try {
-            basicGood = DAOUtils.findBasicGood(session, idOfBasicGood);
+            basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
         } catch (Exception e) {
             throw distributedObjectException;
         }
@@ -62,7 +62,7 @@ public class Good extends DistributedObject {
         setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
         if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
         if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
-        if(basicGood != null) setAttribute(element, "IdOfBasicGood", basicGood.getIdOfBasicGood());
+        if(basicGood != null) setAttribute(element, "GuidOfBasicGood", basicGood.getGuid());
     }
     @Override
     protected Good parseAttributes(Node node) throws Exception {
@@ -85,7 +85,7 @@ public class Good extends DistributedObject {
         guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
         guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
         guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
-        idOfBasicGood = getLongAttributeValue(node, "IdOfBasicGood");
+        guidOfBasicGood = getStringAttributeValue(node, "GuidOfBasicGood", 36);
         return this;
     }
 
@@ -115,7 +115,7 @@ public class Good extends DistributedObject {
     private TechnologicalMap technologicalMap;
     private String guidOfTM;
     private GoodsBasicBasket basicGood;
-    private Long idOfBasicGood;
+    private String guidOfBasicGood;
 
     private User userCreate;
     private User userEdit;
@@ -129,12 +129,12 @@ public class Good extends DistributedObject {
         this.basicGood = basicGood;
     }
 
-    public Long getIdOfBasicGood() {
-        return idOfBasicGood;
+    public String getGuidOfBasicGood() {
+        return guidOfBasicGood;
     }
 
-    public void setIdOfBasicGood(Long idOfBasicGood) {
-        this.idOfBasicGood = idOfBasicGood;
+    public void setGuidOfBasicGood(String guidOfBasicGood) {
+        this.guidOfBasicGood = guidOfBasicGood;
     }
 
     public String getGuidOfP() {

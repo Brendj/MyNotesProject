@@ -2384,4 +2384,23 @@ CREATE TABLE CF_Goods_BasicBasket
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
         VALUES(2, 2, 33, 130212, 0, '');
 
+-- Справочник цен базовых товаров
+CREATE TABLE Cf_Good_Basic_Basket_Price
+(
+  IdOfGoodBasicBasketPrice bigserial NOT NULL,
+  IdOfBasicGood bigint NOT NULL,
+  IdOfGood bigint NOT NULL,
+  GlobalVersion bigint,
+  globalversiononcreate bigint,
+  GUID character varying(36) NOT NULL,
+  DeletedState boolean DEFAULT FALSE,
+  DeleteDate bigint,
+  LastUpdate bigint,
+  CreatedDate bigint NOT NULL,
+  SendAll integer DEFAULT 1,
+  OrgOwner bigint,
+  price bigint,
+  CONSTRAINT Cf_Good_Basic_Basket_Price_PK                  PRIMARY KEY (IdOfBasicGood),
+  CONSTRAINT Cf_Good_Basic_Basket_Price_BasicGoodNumber_Key UNIQUE      (Guid)
+);
 

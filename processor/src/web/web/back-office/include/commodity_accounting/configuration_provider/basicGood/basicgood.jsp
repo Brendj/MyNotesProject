@@ -4,6 +4,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <script type="text/javascript" language="JavaScript">
     var previousComponentId;
@@ -28,6 +29,7 @@
     }
 </script>
 <%--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basicGood.BasicGoodListPage"--%>
+
 <h:panelGrid id="basicGoodListPage" binding="#{basicGoodListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
@@ -84,6 +86,19 @@
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{good}" target="#{basicGoodListPage.editBasicGood}" />
             </a4j:commandLink>
+        </rich:column>
+
+        <rich:column headerClass="column-header" width="50px">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Удалить" styleClass="output-text"/>
+            </f:facet>
+
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             oncomplete="#{rich:component('removedBasicGoodItemDeletePanel')}.show()">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener target="#{basicGoodListPage.idOfBasicGood}" value="#{good.idOfBasicGood}" />
+            </a4j:commandLink>
+
         </rich:column>
 
         <f:facet name="footer">

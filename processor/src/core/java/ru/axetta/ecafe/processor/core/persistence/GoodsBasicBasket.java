@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +19,15 @@ public class GoodsBasicBasket {
     private String nameOfGood;
     private Integer unitsScale;
     private Long netWeight;
+    private GoodBasicBasketPrice goodBasicBasketPrice;
+
+    public GoodBasicBasketPrice getGoodBasicBasketPrice() {
+        return goodBasicBasketPrice;
+    }
+
+    public void setGoodBasicBasketPrice(GoodBasicBasketPrice goodBasicBasketPrice) {
+        this.goodBasicBasketPrice = goodBasicBasketPrice;
+    }
 
     public GoodsBasicBasket() {
 

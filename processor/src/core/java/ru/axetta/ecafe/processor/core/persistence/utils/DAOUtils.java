@@ -70,8 +70,10 @@ public class DAOUtils {
         return (Client) persistenceSession.get(Client.class, idOfClient);
     }
 
-    public static GoodsBasicBasket findBasicGood(Session persistenceSession, long idOfBasicGood) throws Exception {
-        return (GoodsBasicBasket) persistenceSession.get(GoodsBasicBasket.class, idOfBasicGood);
+    public static GoodsBasicBasket findBasicGood(Session persistenceSession, String guidOfBasicGood) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(GoodsBasicBasket.class);
+        criteria.add(Restrictions.eq("guid",guidOfBasicGood));
+        return (GoodsBasicBasket) criteria.uniqueResult();
     }
 
     public static Client getClientReference(Session persistenceSession, long idOfClient) throws Exception {

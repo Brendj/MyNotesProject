@@ -36,6 +36,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
     private UIComponent createGoodDiv;
     private UIComponent editGoodDiv;
     private List<SelectItem> unitsScaleSelectItemList;
+    private Long idOfBasicGood;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -105,6 +106,18 @@ public class BasicGoodListPage extends BasicWorkspacePage {
         } catch (Exception e) {
             printError("Ошибка при редактировании базового товара");
             logger.error("Error editing basic good", e);
+        }
+        return null;
+    }
+
+    public Object onRemove(){
+        try {
+            daoService.removeGoodsBasicBasket(getIdOfBasicGood());
+            reload();
+            printMessage("Товар базовой корзины успешно удален");
+        } catch (Exception e) {
+            printError("Ошибка при удалении базового товара");
+            logger.error("Error deleted basic good", e);
         }
         return null;
     }
@@ -184,4 +197,11 @@ public class BasicGoodListPage extends BasicWorkspacePage {
         return component.getClientId(context);
     }
 
+    public Long getIdOfBasicGood() {
+        return idOfBasicGood;
+    }
+
+    public void setIdOfBasicGood(Long idOfBasicGood) {
+        this.idOfBasicGood = idOfBasicGood;
+    }
 }

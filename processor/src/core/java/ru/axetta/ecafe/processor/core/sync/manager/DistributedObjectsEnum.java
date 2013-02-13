@@ -47,6 +47,7 @@ public enum DistributedObjectsEnum {
     TradeMaterialGood(TradeMaterialGood.class,3),
     Prohibition(Prohibition.class, 3),
     ProhibitionExclusion(ProhibitionExclusion.class, 4),
+    GoodBasicBasketPrice(GoodBasicBasketPrice.class,3),
     // настойки
     ECafeSettings(ECafeSettings.class,0),
     // библиоткека

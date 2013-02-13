@@ -31,7 +31,7 @@ public class User {
         DEFAULT(0,"настраиваемая роль"),
         ADMIN(1,"администратор"),
         SUPPLIER(2,"поставщик питания"),
-        MONITORING(3,"АРМ мониторинг");
+        MONITORING(3,"мониторинг");
 
         private Integer identification;
         private String description;

@@ -120,6 +120,13 @@ public class DAOService {
     }
 
     @Transactional
+    public void removeGoodsBasicBasket(Long idOfBasicGood){
+        Query query = em.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood ");
+        query.setParameter("idOfBasicGood", idOfBasicGood);
+        query.executeUpdate();
+    }
+
+    @Transactional
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
         TypedQuery<DistributedObject> query = em.createQuery(
                 "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()

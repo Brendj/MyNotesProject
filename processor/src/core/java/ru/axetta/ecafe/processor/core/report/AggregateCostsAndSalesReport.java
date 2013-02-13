@@ -7,11 +7,13 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 
@@ -39,7 +41,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 // Проверка того, является ли указанная организация поставщиком
                 // Если да - работать с организациями, для которых поставщиком указана данная организация
                 boolean orgIsSourceFlag = false;
-                HashSet<Org> workingOrgSet = new HashSet<Org>();
+                HashSet<Long> workingOrgSet = new HashSet<Long>();
                 Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
                 destMenuExchangeCriteria.add(Restrictions.eq("idOfSourceOrg", idOfOrg));
                 List menuExchangeRuleList = destMenuExchangeCriteria.list();
@@ -50,14 +52,14 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                         if (idOfDestOrg != null) {
                             Org curOrg = getOrgById(session, idOfDestOrg);
                             if (curOrg != null) {
-                                workingOrgSet.add(curOrg);
+                                workingOrgSet.add(curOrg.getIdOfOrg());
                             }
                         }
                     }
                     orgIsSourceFlag = true;
                 }
                 else {
-                    workingOrgSet.add(org);
+                    workingOrgSet.add(org.getIdOfOrg());
                 }
 
                 StringBuffer queryStringBuffer;
@@ -69,9 +71,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.RSum) from Order o where"
                         + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
                         + " and (o.RSum > 0) and (");
-                for (Org curOrg : workingOrgSet) {
+                for (Long curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
-                    queryStringBuffer.append(curOrg.getIdOfOrg());
+                    queryStringBuffer.append(curOrg);
                     queryStringBuffer.append(" or ");
                 }
                 queryString = queryStringBuffer.toString();
@@ -111,9 +113,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                         + " and md.menu.idOfMenu = m.idOfMenu"
                         + " and m.createTime > " + startDate.getTime() + " and m.createTime < " + endDate.getTime()
                         + " and ci.currentPrice IS NOT NULL and (");
-                for (Org curOrg : workingOrgSet) {
+                for (Long curOrg : workingOrgSet) {
                     queryStringBuffer.append("ci.org.idOfOrg = ");
-                    queryStringBuffer.append(curOrg.getIdOfOrg());
+                    queryStringBuffer.append(curOrg);
                     queryStringBuffer.append(" or ");
                 }
                 queryString = queryStringBuffer.toString();
@@ -144,9 +146,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 queryStringBuffer = new StringBuffer("select sum(o.RSum) from Order o where"
                         + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
                         + " and o.RSum > 0 and (");
-                for (Org curOrg : workingOrgSet) {
+                for (Long curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
-                    queryStringBuffer.append(curOrg.getIdOfOrg());
+                    queryStringBuffer.append(curOrg);
                     queryStringBuffer.append(" or ");
                 }
                 queryString = queryStringBuffer.toString();
@@ -166,8 +168,27 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                     averageMonthlyExpense = averageMonthlyExpense / ((double) clientsCount) / ((double) daysCount) * 30.0;
                 }
 
-                costsAndSalesItems.add(new CostsAndSales(idOfOrg, orgIsSourceFlag, org.getOfficialName(), salesVolume, averageReceipt, averageMonthlyExpense, averageComplexPrice, 0.0));
-            }
+                // Базовая корзина
+                Long id;
+                Criteria ruleCriteria = session.createCriteria(MenuExchangeRule.class);
+                ruleCriteria.add(Restrictions.eq("idOfSourceOrg",idOfOrg));
+                List list = ruleCriteria.list();
+                if(list.isEmpty()){
+                    Criteria destCriteria = session.createCriteria(MenuExchangeRule.class);
+                    destCriteria.add(Restrictions.eq("idOfDestOrg",idOfOrg));
+                    destCriteria.setProjection(Projections.property("idOfSourceOrg"));
+                    id = (Long) destCriteria.uniqueResult();
+                }  else {
+                    id = idOfOrg;
+                }
+                Criteria criteria = session.createCriteria(GoodBasicBasketPrice.class);
+                criteria.add(Restrictions.eq("orgOwner", id));
+                criteria.setProjection(Projections.sum("price"));
+                Object result = criteria.uniqueResult();
+                Double sum = result==null?0.0: (Long) result * 1.0 /100 ;
+
+
+                costsAndSalesItems.add(new CostsAndSales(idOfOrg, orgIsSourceFlag, org.getShortName(), salesVolume, averageReceipt, averageMonthlyExpense, averageComplexPrice, sum ));            }
             return new AggregateCostsAndSalesReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     costsAndSalesItems);
         }
