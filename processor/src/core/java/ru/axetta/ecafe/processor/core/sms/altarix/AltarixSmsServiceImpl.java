@@ -114,6 +114,9 @@ public class AltarixSmsServiceImpl extends ISmsService {
             while (statusCode == HttpStatus.SC_OK && attempts <= 3) {
                 statusCode = httpClient.executeMethod(httpMethod);
                 attempts++;
+                if (statusCode == HttpStatus.SC_OK) {
+                    break;
+                }
             }
             if (attempts == 3 && statusCode != HttpStatus.SC_OK) {
                 throw new HttpException(String.format("HTTP status is: %d", statusCode));
