@@ -566,8 +566,8 @@ public class DashboardServiceBean {
             //items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
             //        org.getLastUnSuccessfulBalanceSync(),
             //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
-            /*items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
-                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));*/
+            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
+                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
 
         }
         orgSyncStats.setOrgSyncStatItems(items);
