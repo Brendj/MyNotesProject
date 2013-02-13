@@ -109,8 +109,13 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
             HttpClient httpClient = new HttpClient();
             httpClient.getParams().setContentCharset("UTF-8");
-            int statusCode = httpClient.executeMethod(httpMethod);
-            if (HttpStatus.SC_OK != statusCode) {
+            int statusCode = HttpStatus.SC_BAD_REQUEST;
+            int attempts = 1;
+            while (statusCode == HttpStatus.SC_OK && attempts <= 3) {
+                statusCode = httpClient.executeMethod(httpMethod);
+                attempts++;
+            }
+            if (attempts == 3 && statusCode != HttpStatus.SC_OK) {
                 throw new HttpException(String.format("HTTP status is: %d", statusCode));
             }
 
