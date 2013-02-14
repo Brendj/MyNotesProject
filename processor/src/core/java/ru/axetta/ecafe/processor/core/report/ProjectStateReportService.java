@@ -116,7 +116,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -178,7 +178,7 @@ public class ProjectStateReportService {
                 {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте"},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД"},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету"},
-                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));
+                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));*/
         TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
@@ -242,7 +242,7 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "Число уникальных пользователей услуги ПРОХОД"},
                 {ValueType.NUMBER, "Число уникальных пользователей, получивших платное питание"},
                 {ValueType.NUMBER, "Число уникальных пользователей, получивших льготное питание"}}, UNIQUE_CHART_DATA));
-        TYPES.put("ContentsChart",
+        /*TYPES.put("ContentsChart",
                 new SimpleType("select cf_orderdetails.menugroup as g, count(cf_orderdetails.idoforder) as c " +
                         "from cf_orders as regOrgSrc " +
                         "left join cf_orderdetails on regOrgSrc.idoforg=cf_orderdetails.idoforg and regOrgSrc.idoforder=cf_orderdetails.idoforder "
@@ -479,7 +479,7 @@ public class ProjectStateReportService {
                                  {ValueType.NUMBER, "Проход (%)"},
                                  {ValueType.NUMBER, "Платное питание (%)"},
                                  {ValueType.NUMBER, "Льготное питание (%)"},
-                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );
+                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );*/
     }
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -562,8 +562,8 @@ public class ProjectStateReportService {
                     {
                     for (String regionName : REGIONS_LIST.keySet())
                         {
-                        //  Если регион не "Все" и в запросе типа не указано что должен учитываться регион,
-                        //  то пропускаем этот регион. Будем дожидаться региона "Все", у которого id типа
+                        //  Если регион не "Все округа" и в запросе типа не указано что должен учитываться регион,
+                        //  то пропускаем этот регион. Будем дожидаться региона "Все округа", у которого id типа
                         //  не увеличивается
                         int regionTypeInc = REGIONS_LIST.get (regionName);
                         if (regionTypeInc != 0 &&
@@ -804,7 +804,7 @@ public class ProjectStateReportService {
             throw new IllegalArgumentException("RuntimeContext, Calendar and Type cannot be null(s)");
         }
 
-        if (regionName == null) regionName = "Все";
+        if (regionName == null) regionName = "Все округа";
         dateAt.set(Calendar.HOUR_OF_DAY, 0);
         dateAt.set(Calendar.MINUTE, 0);
         dateAt.set(Calendar.SECOND, 0);
@@ -1443,7 +1443,7 @@ public class ProjectStateReportService {
         {
             int i = 0;
             REGIONS_LIST = new HashMap <String, Integer> ();
-            REGIONS_LIST.put ("Все", i);
+            REGIONS_LIST.put ("Все округа", i);
             org.hibernate.Query q = session.createSQLQuery("select distinct district from cf_orgs where district <> '' order by district");
             List resultList = q.list();
             for (Object entry : resultList) {
