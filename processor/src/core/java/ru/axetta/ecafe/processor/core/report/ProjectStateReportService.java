@@ -116,7 +116,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -178,7 +178,7 @@ public class ProjectStateReportService {
                 {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте"},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД"},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету"},
-                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));*/
+                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));
         TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
@@ -242,7 +242,7 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "Число уникальных пользователей услуги ПРОХОД"},
                 {ValueType.NUMBER, "Число уникальных пользователей, получивших платное питание"},
                 {ValueType.NUMBER, "Число уникальных пользователей, получивших льготное питание"}}, UNIQUE_CHART_DATA));
-        /*TYPES.put("ContentsChart",
+        TYPES.put("ContentsChart",
                 new SimpleType("select cf_orderdetails.menugroup as g, count(cf_orderdetails.idoforder) as c " +
                         "from cf_orders as regOrgSrc " +
                         "left join cf_orderdetails on regOrgSrc.idoforg=cf_orderdetails.idoforg and regOrgSrc.idoforder=cf_orderdetails.idoforder "
@@ -479,7 +479,7 @@ public class ProjectStateReportService {
                                  {ValueType.NUMBER, "Проход (%)"},
                                  {ValueType.NUMBER, "Платное питание (%)"},
                                  {ValueType.NUMBER, "Льготное питание (%)"},
-                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );*/
+                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );
     }
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
