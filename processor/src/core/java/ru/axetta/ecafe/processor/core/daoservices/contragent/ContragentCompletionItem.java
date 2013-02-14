@@ -28,37 +28,25 @@ public class ContragentCompletionItem {
 
     /* имена контрагентов по приему платежей */
     private HashMap<Long,Long> contragentPayItems = new HashMap<Long, Long>();
-
-    private HashMap<Long, Integer> map = new HashMap<Long,Integer>();
     private Long totalSumByOrg;
-
-    private List<Long> values;
 
     public ContragentCompletionItem(List<Contragent> contragentList) {
         Integer i=0;
         for (Contragent contragent: contragentList){
             contragentPayItems.put(contragent.getIdOfContragent(), 0L);
-            map.put(contragent.getIdOfContragent(),i);
             i++;
         }
-        values = new ArrayList<Long>(i);
         totalSumByOrg = 0L;
     }
 
     public void setContragentPayItems(List list){
-        Integer i=0;
         for (Object ob: list){
             Object[] objects = (Object[]) ob;
             Long id = (Long) objects[1];
             Long value = (Long) objects[0];
             contragentPayItems.put(id, value);
-            values.add(map.get(id),value);
             totalSumByOrg+=value;
         }
-    }
-
-    public List<Long> getValues() {
-        return values;
     }
 
     public Long getContragentPayValue(Long idOfContragent){

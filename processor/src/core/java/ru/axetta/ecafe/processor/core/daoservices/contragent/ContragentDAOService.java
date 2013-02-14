@@ -84,21 +84,6 @@ public class ContragentDAOService extends AbstractDAOService {
     }
 
 
-
-    //@SuppressWarnings("unchecked")
-    //public List<OrgItem> findDistributionOrganizationBySource(Long idOfOrg){
-    //    Query query = getSession().createQuery("select org.idOfOrg, org.shortName from Org org where org.idOfOrg in (select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg)");
-    //    query.setParameter("idOfOrg",idOfOrg);
-    //    List list = query.list();
-    //    List<OrgItem> resultList = new ArrayList<OrgItem>(list.size());
-    //    for (Object object: list){
-    //        Object[] objects = (Object[]) object;
-    //        resultList.add(new OrgItem((Long) objects[0],(String) objects[1]));
-    //    }
-    //    return resultList;
-    //
-    //}
-
     @SuppressWarnings("unchecked")
     public List<Org> findDistributionOrganizationByDefaultSupplier(Contragent defaultSupplier){
         Criteria criteria = getSession().createCriteria(Org.class);
