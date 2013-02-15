@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -14,7 +16,9 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.model.SelectItem;
 import java.util.*;
@@ -26,8 +30,9 @@ import java.util.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientEditPage extends BasicWorkspacePage
-        implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList, ClientGroupSelectPage.CompleteHandler {
+public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
+        CategoryListSelectPage.CompleteHandlerList,
+        ClientGroupSelectPage.CompleteHandler {
 
 
     private String fax;
@@ -120,6 +125,7 @@ public class ClientEditPage extends BasicWorkspacePage
     }
 
     public static class CategoryDiscountItem {
+
         private long idOfCategoryDiscount;
         private Boolean selected;
         private String categoryName;
@@ -147,10 +153,62 @@ public class ClientEditPage extends BasicWorkspacePage
         }
     }
 
+
+    public static class NotificationSettingItem {
+
+        private Long notifyType;
+        private String notifyName;
+        private boolean enabled;
+
+        public Long getNotifyType() {
+            return notifyType;
+        }
+
+        public String getNotifyName() {
+            return notifyName;
+        }
+
+        public boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public NotificationSettingItem(ClientNotificationSetting.Predefined type,
+                Set<ClientNotificationSetting> settings) {
+            this.enabled = false;
+            this.notifyType = type.getValue();
+            this.notifyName = type.getName();
+            for (ClientNotificationSetting setting : settings) {
+                if (setting.getNotifyType() == this.notifyType) {
+                    this.enabled = true;
+                    break;
+                }
+            }
+        }
+    }
+
     private List<CategoryDiscountItem> categoryDiscounts;
+    private List<NotificationSettingItem> notificationSettings;
 
     public List<CategoryDiscountItem> getCategoryDiscounts() {
         return categoryDiscounts;
+    }
+
+    public List<NotificationSettingItem> getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public int getNotificationSettingsCount() {
+        int cnt = 0;
+        for (NotificationSettingItem i : notificationSettings) {
+            if (i.enabled) {
+                cnt++;
+            }
+        }
+        return cnt;
     }
 
     public boolean isCategoriesEmpty() {
@@ -212,7 +270,7 @@ public class ClientEditPage extends BasicWorkspacePage
     }
 
     /* Является ли данный тип льгот как "Льгота по категорям" если да то TRUE, False в противном случает */
-    public Boolean getDiscountModeIsCategory(){
+    public Boolean getDiscountModeIsCategory() {
         return discountMode == Client.DISCOUNT_MODE_BY_CATEGORY;
     }
 
@@ -469,14 +527,31 @@ public class ClientEditPage extends BasicWorkspacePage
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscounts.add(new CategoryDiscountItem(
                     clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + ""),
-                    categoryDiscount.getIdOfCategoryDiscount(),
-                    categoryDiscount.getCategoryName()));
+                    categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName()));
+        }
+        Set<ClientNotificationSetting> settings = client.getNotificationSettings();
+        //  Если настройки пустые изначально, это обозначает, что у пользователя настройки по умолчанию, а
+        //  следовательно необходимо указать их (в список включенных помещаем все, у которых стоит флаг default)
+        if (settings.isEmpty()) {
+            for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+                if (!predefined.isEnabledAtDefault()) {
+                    continue;
+                }
+                settings.add(new ClientNotificationSetting(client, predefined.getValue()));
+            }
+        }
+        notificationSettings = new ArrayList<NotificationSettingItem>();
+        for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+            if (predefined.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+                continue;
+            }
+            notificationSettings.add(new NotificationSettingItem(predefined, settings));
         }
 
         idOfCategoryList.clear();
         categoryDiscountList.clear();
-        if(!client.getCategories().isEmpty()){
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
+        if (!client.getCategories().isEmpty()) {
+            for (CategoryDiscount categoryDiscount : client.getCategories()) {
                 idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
                 this.categoryDiscountList.add(categoryDiscount);
             }
@@ -484,22 +559,27 @@ public class ClientEditPage extends BasicWorkspacePage
 
         this.selectItemList = new ArrayList<SelectItem>();
         /* если у клиента уже выбрана льгота то она будет первой */
-        if(null!=client.getDiscountMode() && client.getDiscountMode()>0){
-            this.selectItemList.add(new SelectItem(client.getDiscountMode(),Client.DISCOUNT_MODE_NAMES[client.getDiscountMode()]));
+        if (null != client.getDiscountMode() && client.getDiscountMode() > 0) {
+            this.selectItemList.add(new SelectItem(client.getDiscountMode(),
+                    Client.DISCOUNT_MODE_NAMES[client.getDiscountMode()]));
         }
-        this.selectItemList.add(new SelectItem(0,Client.DISCOUNT_MODE_NAMES[0]));
-        for (Integer i=1;i<Client.DISCOUNT_MODE_NAMES.length; i++){
-            SelectItem selectItem = new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]);
-            if(!i.equals(client.getDiscountMode())) this.selectItemList.add(selectItem);
+        this.selectItemList.add(new SelectItem(0, Client.DISCOUNT_MODE_NAMES[0]));
+        for (Integer i = 1; i < Client.DISCOUNT_MODE_NAMES.length; i++) {
+            SelectItem selectItem = new SelectItem(i, Client.DISCOUNT_MODE_NAMES[i]);
+            if (!i.equals(client.getDiscountMode())) {
+                this.selectItemList.add(selectItem);
+            }
         }
-        this.clientGroupName =client.getClientGroup() == null? "" : client.getClientGroup().getGroupName();
+        this.clientGroupName = client.getClientGroup() == null ? "" : client.getClientGroup().getGroupName();
         fill(client);
     }
 
-    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception{
-        if(null != idOfClientGroup){
-             this.idOfClientGroup = idOfClientGroup;
-             this.clientGroupName = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup)).getGroupName();
+    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
+        if (null != idOfClientGroup) {
+            this.idOfClientGroup = idOfClientGroup;
+            this.clientGroupName = DAOUtils
+                    .findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup))
+                    .getGroupName();
         }
     }
 
@@ -511,7 +591,7 @@ public class ClientEditPage extends BasicWorkspacePage
     }
 
     public Object changeClientCategory() {
-        if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
+        if (this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY) {
             this.idOfCategoryList = new ArrayList<Long>(0);
             filter = "Не выбрано";
         }
@@ -520,7 +600,9 @@ public class ClientEditPage extends BasicWorkspacePage
 
     public void updateClient(Session persistenceSession, Long idOfClient) throws Exception {
         String mobile = Client.checkAndConvertMobile(this.mobile);
-        if (mobile==null) throw new Exception("Неверный формат мобильного телефона");
+        if (mobile == null) {
+            throw new Exception("Неверный формат мобильного телефона");
+        }
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -535,7 +617,7 @@ public class ClientEditPage extends BasicWorkspacePage
 
         Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
         Org org = null;
-        if(idOfFriendlyOrg.contains(this.org.getIdOfOrg())){
+        if (idOfFriendlyOrg.contains(this.org.getIdOfOrg())) {
             org = (Org) persistenceSession.load(Org.class, client.getOrg().getIdOfOrg());
         } else {
             org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
@@ -563,25 +645,33 @@ public class ClientEditPage extends BasicWorkspacePage
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
         client.setGuardSan(this.guardsan);
-        if (this.externalId==null || this.externalId==0) client.setExternalId(null);
-        else client.setExternalId(this.externalId);
-        if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
-        else client.setClientGUID(this.clientGUID);
+        if (this.externalId == null || this.externalId == 0) {
+            client.setExternalId(null);
+        } else {
+            client.setExternalId(this.externalId);
+        }
+        if (this.clientGUID == null || this.clientGUID.isEmpty()) {
+            client.setClientGUID(null);
+        } else {
+            client.setClientGUID(this.clientGUID);
+        }
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
         client.setPayForSMS(this.payForSMS);
-        if(null != discountMode) client.setDiscountMode(discountMode);
-        if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){
+        if (null != discountMode) {
+            client.setDiscountMode(discountMode);
+        }
+        if (discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size() == 0) {
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
         /* категори скидок */
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         StringBuilder clientCategories = new StringBuilder();
-        if (this.idOfCategoryList.size()!=0) {
+        if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
-            for (Object object: categoryCriteria.list()){
+            for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
@@ -590,7 +680,7 @@ public class ClientEditPage extends BasicWorkspacePage
         } else {
             /* очистить список если он не пуст */
             Set<CategoryDiscount> categories = client.getCategories();
-            for (CategoryDiscount categoryDiscount: categories){
+            for (CategoryDiscount categoryDiscount : categories) {
                 categoryDiscount.getClients().remove(client);
                 persistenceSession.update(categoryDiscount);
             }
@@ -598,24 +688,45 @@ public class ClientEditPage extends BasicWorkspacePage
             //Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
-        client.setCategoriesDiscounts(clientCategories.length()==0?"":clientCategories.substring(0, clientCategories.length()-1));
+        client.setCategoriesDiscounts(
+                clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
         client.setCategories(categoryDiscountSet);
-        if(isReplaceOrg){
-            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
-            if(clientGroup==null){
-                clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
-                if(clientGroup!=null){
+        /* Удаление всех существующих настроек оповещения смс */
+        removeSMSSettings(client.getNotificationSettings());
+        /* настройки смс оповещений */
+        this.notificationSettingsSet = new HashSet<ClientNotificationSetting>();
+        for (NotificationSettingItem item : notificationSettings) {
+            if (item.enabled) {
+                ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
+                notificationSettingsSet.add(newSetting);
+            }
+        }
+        ClientNotificationSetting newSetting = new ClientNotificationSetting(client,
+                ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
+        notificationSettingsSet.add(newSetting);
+        client.setNotificationSettings(notificationSettingsSet);
+        if (isReplaceOrg) {
+            ClientGroup clientGroup = DAOUtils
+                    .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
+                            ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
+                        ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+                if (clientGroup != null) {
                     clientGroup.setGroupName(ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
                 }
             }
             getLogger().info(org.getShortName());
-            if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(),
+                        ClientGroup.Predefined.CLIENT_DISPLACED);
+            }
             this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             client.setIdOfClientGroup(this.idOfClientGroup);
-            ClientMigration clientMigration = new ClientMigration(client,org);
+            ClientMigration clientMigration = new ClientMigration(client, org);
             persistenceSession.save(clientMigration);
-        } else{
-            if(this.idOfClientGroup != null){
+        } else {
+            if (this.idOfClientGroup != null) {
                 client.setIdOfClientGroup(this.idOfClientGroup);
             }
         }
@@ -625,13 +736,43 @@ public class ClientEditPage extends BasicWorkspacePage
         fill(client);
     }
 
+    @Transactional
+    public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            for (ClientNotificationSetting currentSetting : notificationSettings) {
+                currentSetting = (ClientNotificationSetting) persistenceSession.merge(currentSetting);
+                persistenceSession.delete(currentSetting);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            getLogger().error("Failed to remove active settings", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
+
+        }
+    }
+
     public void removeClient(Session persistenceSession) throws Exception {
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
-        if (!client.getOrders().isEmpty()) throw new Exception("Имеются зарегистрированные заказы");
-        if (!client.getClientPaymentOrders().isEmpty()) throw new Exception("Имеются зарегистрированные пополнения счета");
-        if (!client.getCards().isEmpty()) throw new Exception("Имеются зарегистрированные карты");
-        if (!client.getCategories().isEmpty()){
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
+        if (!client.getOrders().isEmpty()) {
+            throw new Exception("Имеются зарегистрированные заказы");
+        }
+        if (!client.getClientPaymentOrders().isEmpty()) {
+            throw new Exception("Имеются зарегистрированные пополнения счета");
+        }
+        if (!client.getCards().isEmpty()) {
+            throw new Exception("Имеются зарегистрированные карты");
+        }
+        if (!client.getCategories().isEmpty()) {
+            for (CategoryDiscount categoryDiscount : client.getCategories()) {
                 client.getCategories().remove(categoryDiscount);
             }
         }
@@ -667,25 +808,26 @@ public class ClientEditPage extends BasicWorkspacePage
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
         StringBuilder categoriesFilter = new StringBuilder();
-        if(!client.getCategories().isEmpty()){
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
+        if (!client.getCategories().isEmpty()) {
+            for (CategoryDiscount categoryDiscount : client.getCategories()) {
                 categoriesFilter.append(categoryDiscount.getCategoryName());
                 categoriesFilter.append("; ");
                 this.categoryDiscountList.add(categoryDiscount);
             }
-        }  else {
+        } else {
             categoriesFilter.append("Не выбрано");
         }
-        this.filter=categoriesFilter.toString();
+        this.filter = categoriesFilter.toString();
     }
 
     public String getIdOfCategoryListString() {
-        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
+        return idOfCategoryList.toString().replaceAll("[^(0-9-),]", "");
     }
 
     private String filter = "Не выбрано";
     private List<Long> idOfCategoryList = new ArrayList<Long>();
-    private Set<CategoryDiscount> categoryDiscountSet=new HashSet<CategoryDiscount>();
+    private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+    private Set<ClientNotificationSetting> notificationSettingsSet = new HashSet<ClientNotificationSetting>();
 
     public String getFilter() {
         return filter;
@@ -713,17 +855,17 @@ public class ClientEditPage extends BasicWorkspacePage
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
         //To change body of implemented methods use File | Settings | File Templates.
-        if(null != categoryMap) {
+        if (null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
-            if(categoryMap.isEmpty()){
+            if (categoryMap.isEmpty()) {
                 filter = "Не выбрано";
             } else {
-                filter="";
-                for(Long idOfCategory: categoryMap.keySet()){
+                filter = "";
+                for (Long idOfCategory : categoryMap.keySet()) {
                     idOfCategoryList.add(idOfCategory);
-                    filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
+                    filter = filter.concat(categoryMap.get(idOfCategory) + "; ");
                 }
-                filter = filter.substring(0,filter.length()-1);
+                filter = filter.substring(0, filter.length() - 1);
             }
 
         }

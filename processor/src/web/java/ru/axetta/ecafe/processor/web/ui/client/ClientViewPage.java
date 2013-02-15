@@ -12,7 +12,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -139,6 +138,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     }
 
     private final ClientCardListViewPage clientCardListViewPage = new ClientCardListViewPage();
+    private final ClientNotificationSettingViewPage clientNotificationSettingViewPage = new ClientNotificationSettingViewPage();
 
     public String getPageFilename() {
         return "client/view";
@@ -252,6 +252,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         return clientCardListViewPage;
     }
 
+    public ClientNotificationSettingViewPage getClientNotificationSettingPage () {
+        return clientNotificationSettingViewPage;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         Org org = client.getOrg();
@@ -279,6 +283,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.lastFreePayTime = client.getLastFreePayTime();
         this.discountMode = client.getDiscountMode();
         this.clientCardListViewPage.fill(client);
+        this.clientNotificationSettingViewPage.fill(client);
         this.balance = client.getBalance();
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();

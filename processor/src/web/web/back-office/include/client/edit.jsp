@@ -115,6 +115,24 @@
     <h:inputText value="#{mainPage.clientEditPage.email}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaEmail}" styleClass="output-text" />
+    <h:outputText escape="true" value="Правила оповещения" styleClass="output-text" />
+    <rich:dataTable id="clientNotificationSetting" value="#{mainPage.clientEditPage.notificationSettings}" var="it"
+                    rows="8"
+                    columnClasses="left-aligned-column, center-aligned-column"
+                    footerClass="data-table-footer">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Тип оповещения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{it.enabled}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
 

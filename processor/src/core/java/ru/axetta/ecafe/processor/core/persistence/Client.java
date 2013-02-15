@@ -94,6 +94,7 @@ public class Client {
     private Boolean canConfirmGroupPayment;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
+    private Set<ClientNotificationSetting> notificationSettings = new HashSet<ClientNotificationSetting>();
 
     public Set<ClientMigration> getClientMigration() {
         return clientMigration;
@@ -127,7 +128,7 @@ public class Client {
         this.fax = fax;
     }
 
-    public Set<CategoryDiscount> getCategories(){
+    public Set<CategoryDiscount> getCategories() {
         return getCategoriesInternal();
     }
 
@@ -189,8 +190,9 @@ public class Client {
     public void setSan(String san) {
         this.san = san;
     }
+
     public void setSanWithConvert(String san) {
-        if (san!=null) {
+        if (san != null) {
             san = san.replaceAll("[\\s-]", "");
         }
         this.san = san;
@@ -534,6 +536,7 @@ public class Client {
     public boolean hasPassword(String plainPassword) throws Exception {
         return StringUtils.equals(this.cypheredPassword, encryptPassword(plainPassword));
     }
+
     public boolean hasEncryptedPassword(String encryptedPassword) throws Exception {
         return StringUtils.equals(this.cypheredPassword, encryptedPassword);
     }
@@ -636,6 +639,14 @@ public class Client {
         return Collections.unmodifiableSet(getEnterEventsInternal());
     }
 
+    public Set<ClientNotificationSetting> getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public void setNotificationSettings(Set<ClientNotificationSetting> notificationSettings) {
+        this.notificationSettings = notificationSettings;
+    }
+
     public Card findActiveCard(Session session, Card failCard) throws Exception {
         // Ищем активную карту
         Criteria activeClientCardCriteria = session.createCriteria(Card.class);
@@ -683,13 +694,13 @@ public class Client {
                 + idOfClientGroup + ", clientRegistryVersion=" + clientRegistryVersion + ", clientGroup=" + clientGroup
                 + ", person=" + person + ", contractPerson=" + contractPerson + ", flags=" + flags + ", address='"
                 + address + '\'' + ", phone='" + phone + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email
-                + '\'' + ", notifyViaEmail=" + notifyViaEmail + ", notifyViaSMS=" + notifyViaSMS
-                + ", remarks='" + remarks + '\'' + ", updateTime=" + updateTime + ", contractId=" + contractId
-                + ", contractTime=" + contractTime + ", contractState=" + contractState + ", cypheredPassword='"
-                + cypheredPassword + '\'' + ", payForSMS=" + payForSMS + ", freePayMaxCount=" + freePayMaxCount
-                + ", freePayCount=" + freePayCount + ", lastFreePayTime=" + lastFreePayTime + ", discountMode="
-                + discountMode + ", balance=" + balance + ", limit=" + limit + ", expenditureLimit="
-                + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts +'}';
+                + '\'' + ", notifyViaEmail=" + notifyViaEmail + ", notifyViaSMS=" + notifyViaSMS + ", remarks='"
+                + remarks + '\'' + ", updateTime=" + updateTime + ", contractId=" + contractId + ", contractTime="
+                + contractTime + ", contractState=" + contractState + ", cypheredPassword='" + cypheredPassword + '\''
+                + ", payForSMS=" + payForSMS + ", freePayMaxCount=" + freePayMaxCount + ", freePayCount=" + freePayCount
+                + ", lastFreePayTime=" + lastFreePayTime + ", discountMode=" + discountMode + ", balance=" + balance
+                + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit + ", categoriesDiscounts="
+                + categoriesDiscounts + '}';
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
@@ -703,9 +714,9 @@ public class Client {
 
     public String getClientGroupTypeAsString() {
         long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-        if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER){
+        if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER) {
             return "Другое";
-        } else if(idOfClientGroup>=ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+        } else if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
             return "Сотрудники";
         } else {
             return "Ученик";
@@ -713,37 +724,48 @@ public class Client {
     }
 
     public static String checkAndConvertMobile(String mobilePhone) {
-        if (mobilePhone==null || mobilePhone.length()==0) return mobilePhone;
-        mobilePhone=mobilePhone.replaceAll("[+ -()]", "");
-        if (mobilePhone.startsWith("8")) mobilePhone="7"+mobilePhone.substring(1);
-        if (mobilePhone.length()==10) mobilePhone="7"+mobilePhone;
-        else if (mobilePhone.length()!=11) return null;
+        if (mobilePhone == null || mobilePhone.length() == 0) {
+            return mobilePhone;
+        }
+        mobilePhone = mobilePhone.replaceAll("[+ -()]", "");
+        if (mobilePhone.startsWith("8")) {
+            mobilePhone = "7" + mobilePhone.substring(1);
+        }
+        if (mobilePhone.length() == 10) {
+            mobilePhone = "7" + mobilePhone;
+        } else if (mobilePhone.length() != 11) {
+            return null;
+        }
         return mobilePhone;
     }
 
     public boolean hasIntegraPartnerAccessPermission(String id) {
-        return getRemarks()!=null && getRemarks().contains("{integra.access:"+id+"}");
+        return getRemarks() != null && getRemarks().contains("{integra.access:" + id + "}");
     }
+
     public void addIntegraPartnerAccessPermission(String id) {
         if (!hasIntegraPartnerAccessPermission(id)) {
             String r = getRemarks();
-            String accessMarker = "{integra.access:"+id+"}";
-            if (r==null) r=accessMarker;
-            else r+="\n"+accessMarker;
+            String accessMarker = "{integra.access:" + id + "}";
+            if (r == null) {
+                r = accessMarker;
+            } else {
+                r += "\n" + accessMarker;
+            }
             setRemarks(r);
         }
     }
 
     public boolean hasMobile() {
-        return mobile!=null && mobile.length()>0;
+        return mobile != null && mobile.length() > 0;
     }
 
     public boolean hasEmail() {
-        return email!=null && email.length()>0;
+        return email != null && email.length() > 0;
     }
 
     public static boolean isValidContractState(int contractState) {
-        return contractState>=0 && contractState<CONTRACT_STATE_NAMES.length;
+        return contractState >= 0 && contractState < CONTRACT_STATE_NAMES.length;
     }
-    
+
 }
