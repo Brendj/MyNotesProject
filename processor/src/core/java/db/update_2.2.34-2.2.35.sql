@@ -16,3 +16,5 @@ CREATE TABLE CF_ClientsNotificationSettings
 );
 
 update cf_projectstate_data set region='Все округа' where region='Все';
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 130218) НЕ МЕНЯТЬ

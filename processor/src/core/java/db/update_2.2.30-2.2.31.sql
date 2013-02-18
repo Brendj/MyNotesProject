@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS cf_clientscomplexdiscounts
+CREATE TABLE cf_clientscomplexdiscounts
   (
   idofclientcomplexdiscount bigserial NOT NULL,
   createdate bigint NOT NULL,
