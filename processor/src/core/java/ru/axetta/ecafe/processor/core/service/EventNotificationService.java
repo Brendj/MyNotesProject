@@ -171,7 +171,7 @@ public class EventNotificationService {
                     "where idofclient=?");
             q.setLong(0, client.getIdOfClient());
             List resultList = q.list();
-            if (resultList.size() < 1) {
+            if (resultList.size() < 1 && predefined.isEnabledAtDefault()) {
                 return true;
             }
             for (Object o : resultList) {
