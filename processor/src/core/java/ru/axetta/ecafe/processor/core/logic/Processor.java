@@ -37,7 +37,10 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -1255,7 +1258,7 @@ public class Processor implements SyncProcessor,
             Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
-            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) || !idOfFriendlyOrgSet.contains(client.getOrg().getIdOfOrg())) {
+            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet.contains(client.getOrg().getIdOfOrg())) {
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
                         idOfClient, client, organization.getIdOfOrg()));
