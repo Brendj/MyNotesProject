@@ -77,6 +77,7 @@ public class ProjectStateReportService {
     private static final int RATING_CHART_2_DATA = 902;
     private static final int RATING_CHART_3_DATA = 903;
     private static final int RATING_CHART_4_DATA = 904;
+    private static final int RATING_CHART_5_DATA = 905;
     private static final int REFILL_PROGRESS_CHART = 1000;
     private static final int REFILL_PROGRESS_0_CHART = 1001;
     private static final int REFILL_PROGRESS_1_CHART = 1002;
@@ -107,6 +108,8 @@ public class ProjectStateReportService {
     public static final String PAY_AGENTS_CLAUSE = "%PAY_AGENT_ID%";
     public static final int PAY_AGENT_MULTI_ID = 10000;
     public List <Object []> PAY_AGENTS_LIST;
+    public static String PERIODIC_AVG_COL = "%PERIODIC_AVG_COL%";
+    public static String PERIODIC_AVG_GROUP = "%PERIODIC_AVG_GROUP%";
 
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM");
@@ -471,15 +474,17 @@ public class ProjectStateReportService {
                 VISITORS_CHART_DATA));
 
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]
-                { new SimpleType("", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents").setPeriodDaysInc (-7).setIncremental (true),
-                  new SimpleType("", RATING_CHART_2_DATA).setPreSelectSQLMethod("parseOrgsPayments").setPeriodDaysInc (-7).setIncremental (true),
-                  new SimpleType("", RATING_CHART_3_DATA).setPreSelectSQLMethod("parseOrgsDiscounts").setPeriodDaysInc (-7).setIncremental (true),
-                  new SimpleType("", RATING_CHART_4_DATA).setPreSelectSQLMethod("parseOrgsRating").setPeriodDaysInc (-7).setIncremental (true) },
+                { new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("payments", RATING_CHART_2_DATA).setPreSelectSQLMethod("parseOrgsPayments").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("discounts", RATING_CHART_3_DATA).setPreSelectSQLMethod("parseOrgsDiscounts").setPeriodDaysInc (-7).setIncremental (true).setPostReportMethod ("parseRatingChart"),
+                  new SimpleType("rating", RATING_CHART_4_DATA).setPreSelectSQLMethod("parseOrgsRating").setPeriodDaysInc (-7).setIncremental (true),
+                  new SimpleType("regions", RATING_CHART_5_DATA).setPreSelectSQLMethod("parseOrgsRegions").setPeriodDaysInc (-7).setIncremental (true) },
                 new Object[][] { {ValueType.TEXT, "ОУ"},
                                  {ValueType.NUMBER, "Проход (%)"},
                                  {ValueType.NUMBER, "Платное питание (%)"},
-                                 {ValueType.NUMBER, "Льготное питание (%)"},
-                                 {ValueType.NUMBER, "Рейтинг (%)"} }, RATING_CHART_DATA) );
+                                 {ValueType.TEXT, "Льготное питание"},
+                                 {ValueType.NUMBER, "Рейтинг (%)"},
+                                 {ValueType.TEXT, "Регион"},}, RATING_CHART_DATA) );
     }
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -488,12 +493,12 @@ public class ProjectStateReportService {
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
     private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
-                      "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), sum(cast(StringValue as double precision)) / least(count(distinct period), %PERIOD_LENGTH%) || '' "
+                      "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
                     + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and "
                     + "      period >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                     + "      Type=? and Region=? and substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') <> '' "
-                    + "group by StringKey order by 2 desc, 1";
+                    + PERIODIC_AVG_GROUP + " order by 2 desc, 1";
     private static final String CHECK_SQL = "SELECT Period FROM cf_projectstate_data WHERE Type=? and Region=? order by Period DESC";
 
 
@@ -768,6 +773,20 @@ public class ProjectStateReportService {
         if (sql.indexOf("%MAXIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MAXIMUM_DATE%", DB_DATE_FORMAT.format(max.getTime()));
         }
+        if (sql.indexOf(PERIODIC_AVG_COL) > -1)
+        {
+            if (type == RATING_CHART_5_DATA)
+                sql = sql.replaceAll(PERIODIC_AVG_COL, " StringValue ");
+            else
+                sql = sql.replaceAll(PERIODIC_AVG_COL, " sum(cast(StringValue as double precision)) / least(count(distinct period), %PERIOD_LENGTH%) || '' ");
+        }
+        if (sql.indexOf(PERIODIC_AVG_GROUP) > -1)
+        {
+            if (type != RATING_CHART_5_DATA)
+                sql = sql.replaceAll(PERIODIC_AVG_GROUP, " group by StringKey ");
+            else
+                sql = sql.replaceAll(PERIODIC_AVG_GROUP, " ");
+        }
         if (sql.indexOf("%PERIOD_LENGTH%") > -1) {
             sql = sql.replaceAll("%PERIOD_LENGTH%", "" + daysInc);
         }
@@ -795,6 +814,8 @@ public class ProjectStateReportService {
             {
             sql = sql.replaceAll(PAY_AGENTS_CLAUSE, "" + idOfContragent);
             }
+
+        //
         return sql;
     }
 
@@ -825,8 +846,18 @@ public class ProjectStateReportService {
             if (t instanceof SimpleType) {
                 executeDataMethod((SimpleType) t, data, session,
                                   addMethodParameters(dateAt, dateTo, t.getReportType(), null),
-                                  ((SimpleType) t).getPostReportSQLMethod());
+                                  ((SimpleType) t).getPostReportMethod());
             }
+            else if (t instanceof ComplexType)
+                {
+                ComplexType ct = (ComplexType) t;
+                for (Type t2 : ct.getTypes())
+                    {
+                    executeDataMethod((SimpleType) t2, data, session,
+                            addMethodParameters(dateAt, dateTo, t.getReportType(), null),
+                            ((SimpleType) t2).getPostReportMethod());
+                    }
+                }
             DataTable dataTable = buildDataTable(data, t);
             return dataTable;
         } catch (Exception e) {
@@ -1111,7 +1142,7 @@ public class ProjectStateReportService {
             return this;
         }
 
-        public String getPostReportSQLMethod() {
+        public String getPostReportMethod() {
             return postReport;
         }
 
@@ -1216,9 +1247,9 @@ public class ProjectStateReportService {
         java.lang.reflect.Method meth;
         try {
             meth = ProjectStateReportService.class.getDeclaredMethod(method, Object.class, Object.class, Object.class);
-            meth.invoke(null, data, session, params);
+            meth.invoke(this, data, session, params);
         } catch (Exception e) {
-            logger.error("Failed to execute support method " + t.getPostReportSQLMethod());
+            logger.error("Failed to execute support method " + method);
         }
     }
 
@@ -1298,6 +1329,35 @@ public class ProjectStateReportService {
             {
             logger.error ("Failed to load events from database", e);
             }
+    }
+
+    public void parseOrgsRegions(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map <String, Object> params = (Map <String, Object>) paramsObj;
+        Map<String, String> data    = (Map<String, String>) dataSource;
+        Calendar dateAt             = (Calendar) params.get ("dateAt");
+        Calendar dateTo             = (Calendar) params.get ("dateTo");
+        Integer reportType          = (Integer) params.get ("reportType");
+        data.clear();
+
+        Session session = (Session) sessionObj;
+        try {
+            String sql = "SELECT cf_orgs.officialname, cf_orgs.district, count(cf_clients.idofclient) from cf_orgs left join cf_clients on  cf_clients.idoforg=cf_orgs.idoforg where officialname<>'' group by cf_orgs.officialname, cf_orgs.district order by cf_orgs.officialname";
+            Map<Long, Long> targetsCount = new HashMap <Long, Long> ();
+            String finalSQL = applyMacroReplace (sql, reportType, dateAt, dateTo);
+            org.hibernate.Query q = session.createSQLQuery(finalSQL);
+            List resultList = q.list();//Collections.EMPTY_LIST;
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                if (((BigInteger) e[2   ]).longValue() > 0)
+                    {
+                    data.put((String) e[0], (String) e[1]);
+                    }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error ("Failed to load events from database", e);
+        }
     }
 
 
@@ -1408,6 +1468,25 @@ public class ProjectStateReportService {
         data.put("Через Сбербанк-Москва", list);
         data.remove("Сбербанк-Москва");
     }
+
+
+    public void parseRatingChart(Object dataSource, Object sessionObj, Object paramsObj) {
+        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
+        for (String k : data.keySet())
+            {
+            List <String> dat = data.get(k);
+            if (dat.get(2).indexOf("0") == 0)
+                {
+                dat.set(2, "Нет");
+                }
+            else
+                {
+                dat.set(2, "Да");
+                }
+            }
+    }
+
+
 
     public void parseRefillAvgChart(Object dataSource, Object sessionObj, Object paramsObj) {
         Map<String, String> data = (Map<String, String>) dataSource;

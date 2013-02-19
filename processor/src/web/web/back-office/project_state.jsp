@@ -42,6 +42,7 @@
                 dataTable.setProperty(i, 2, 'style', 'background-color: #cf5050;');
                 dataTable.setProperty(i, 3, 'style', 'background-color: #cf5050;');
                 dataTable.setProperty(i, 4, 'style', 'background-color: #cf5050;');
+                dataTable.setProperty(i, 5, 'style', 'background-color: #cf5050;');
             }
             else if (dataTable.getValue (i, 4) < 66) {
                 dataTable.setProperty(i, 0, 'style', 'background-color: #cbcf50;');
@@ -49,6 +50,7 @@
                 dataTable.setProperty(i, 2, 'style', 'background-color: #cbcf50;');
                 dataTable.setProperty(i, 3, 'style', 'background-color: #cbcf50;');
                 dataTable.setProperty(i, 4, 'style', 'background-color: #cbcf50;');
+                dataTable.setProperty(i, 5, 'style', 'background-color: #cbcf50;');
             }
             else {
                 dataTable.setProperty(i, 0, 'style', 'background-color: #90d050;');
@@ -56,6 +58,7 @@
                 dataTable.setProperty(i, 2, 'style', 'background-color: #90d050;');
                 dataTable.setProperty(i, 3, 'style', 'background-color: #90d050;');
                 dataTable.setProperty(i, 4, 'style', 'background-color: #90d050;');
+                dataTable.setProperty(i, 5, 'style', 'background-color: #90d050;');
             }
         }
     }
@@ -280,7 +283,7 @@ function drawRatingDescChart()
     var container = document.getElementById('orgsRatingChartDesc');
     var table = new google.visualization.Table(container);
     var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=OrgsRatingChart');
-    var options = { title: 'Рейтинг ОУ', sortColumn: 4, sortAscending: false, allowHtml: true };
+    var options = { title: 'Рейтинг ОУ', sortColumn: 4, sortAscending: false, allowHtml: true, showRowNumber: true };
 
     //	Start drawing
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
@@ -295,7 +298,7 @@ function drawRatingAscChart()
     var container = document.getElementById('orgsRatingChartAsc');
     var table = new google.visualization.Table(container);
     var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=OrgsRatingChart');
-    var options = { title: 'Рейтинг ОУ', sortColumn: 4, sortAscending: true, allowHtml: true };
+    var options = { title: 'Рейтинг ОУ', sortColumn: 4, sortAscending: true, allowHtml: true, showRowNumber: true };
 
     //	Start drawing
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
