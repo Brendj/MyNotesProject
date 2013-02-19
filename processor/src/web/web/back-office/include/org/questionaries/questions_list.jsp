@@ -28,41 +28,32 @@
                     captionClass="center-aligned-column">
         <f:facet name="header">
              <rich:columnGroup>
-                 <rich:column rowspan="2" sortBy="#{questionary.idOfQuestionary}">
+                 <rich:column  sortBy="#{questionary.idOfQuestionary}">
                      <h:outputText value="Идентификатор"/>
                  </rich:column>
-                 <rich:column rowspan="2" sortBy="#{questionary.question}">
+                 <rich:column  sortBy="#{questionary.question}">
                      <h:outputText value="Наименование"/>
                  </rich:column>
-                 <rich:column rowspan="2" sortBy="#{questionary.question}">
+                 <rich:column  sortBy="#{questionary.question}">
                      <h:outputText value="Вопрос"/>
                  </rich:column>
-                 <rich:column rowspan="2">
+                 <rich:column >
                      <h:outputText value="Тип"/>
                  </rich:column>
-                 <rich:column rowspan="2" sortBy="#{questionary.createdDate}">
+                 <rich:column  sortBy="#{questionary.createdDate}">
                      <h:outputText value="Дата регистрации"/>
                  </rich:column>
-                 <rich:column rowspan="2" sortBy="#{questionary.status}">
+                 <rich:column  sortBy="#{questionary.status}">
                      <h:outputText value="Запуск"/>
                  </rich:column>
-
-                 <rich:column colspan="2">
+                 <rich:column>
                      <h:outputText value="Дни работы"/>
                  </rich:column>
-
-                 <rich:column rowspan="2">
+                 <rich:column >
                      <h:outputText value="Редактировать"/>
                  </rich:column>
-                 <rich:column rowspan="2">
+                 <rich:column >
                      <h:outputText value="Удалить"/>
-                 </rich:column>
-
-                 <rich:column breakBefore="true">
-                     <h:outputText value="С (включительно)"/>
-                 </rich:column>
-                 <rich:column>
-                     <h:outputText value="По (исключительно)"/>
                  </rich:column>
              </rich:columnGroup>
         </f:facet>
@@ -95,10 +86,7 @@
         </rich:column>
 
         <rich:column>
-            <h:outputText value="#{questionary.startDate}" converter="dateConverter"/>
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{questionary.endDate}" converter="dateConverter"/>
+            <h:outputText value="#{questionary.viewDate}" converter="dateConverter"/>
         </rich:column>
 
         <rich:column>

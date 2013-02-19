@@ -46,11 +46,9 @@
     <h:outputText value="#{questionaryViewPage.questionary.status}" styleClass="output-text"/>
     <h:outputText value="Тип" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.questionaryType}" styleClass="output-text"/>
-    <h:outputText value="Дата запуска" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.startDate}" converter="dateConverter" styleClass="output-text"/>
+    <h:outputText value="Дата показа" styleClass="output-text"/>
+    <h:outputText value="#{questionaryViewPage.questionary.viewDate}" converter="dateConverter" styleClass="output-text"/>
     <h:outputText value="Дата остановки" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.endDate}" converter="dateConverter" styleClass="output-text"/>
-    <h:outputText value="Дата регистрации" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.createdDate}" converter="timeConverter" styleClass="output-text"/>
     <h:outputText value="Дата последних изменений" styleClass="output-text"/>
     <h:outputText value="#{questionaryViewPage.questionary.updatedDate}" converter="timeConverter" styleClass="output-text"/>

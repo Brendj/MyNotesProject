@@ -25,9 +25,8 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
-        <property name="startDate" column="StartDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+        <property name="viewDate" column="ViewDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
-        <property name="endDate" column="EndDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

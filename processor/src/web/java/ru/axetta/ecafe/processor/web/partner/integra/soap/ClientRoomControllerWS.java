@@ -17,14 +17,12 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
-import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
-import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
+import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
@@ -39,6 +37,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -3230,7 +3229,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processQuestionaryList(client, data, objectFactory, session, currentDate);
+                processQuestionaryList(client, data, objectFactory, session, currentDate, QuestionaryType.MENU);
             }
         });
 
@@ -3257,29 +3256,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
-    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session, Date currentDate){
-        Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
-        clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
-        List<ClientAnswerByQuestionary> clientAnswerByQuestionaryList = clientAnswerByQuestionaryCriteria.list();
-        List<Long> questionariesOut = new ArrayList<Long>();
-        for (ClientAnswerByQuestionary clientAnswerByQuestionary: clientAnswerByQuestionaryList){
-            Questionary questionary = clientAnswerByQuestionary.getAnswer().getQuestionary();
-            questionariesOut.add(questionary.getIdOfQuestionary());
-        }
+    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session, Date currentDate, QuestionaryType type){
+        //Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
+        //clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
+        //List<ClientAnswerByQuestionary> clientAnswerByQuestionaryList = clientAnswerByQuestionaryCriteria.list();
+        //List<Long> questionariesOut = new ArrayList<Long>();
+        //for (ClientAnswerByQuestionary clientAnswerByQuestionary: clientAnswerByQuestionaryList){
+        //    Questionary questionary = clientAnswerByQuestionary.getAnswer().getQuestionary();
+        //    questionariesOut.add(questionary.getIdOfQuestionary());
+        //}
         Criteria questionaryCriteria = session.createCriteria(Questionary.class);
-        if(!questionariesOut.isEmpty()){
-            questionaryCriteria.add(Restrictions.not(Restrictions.in("idOfQuestionary", questionariesOut)));
-        }
+        //if(!questionariesOut.isEmpty()){
+        //    questionaryCriteria.add(Restrictions.not(Restrictions.in("idOfQuestionary", questionariesOut)));
+        //}
         questionaryCriteria.add(Restrictions.eq("status", QuestionaryStatus.START));
+        questionaryCriteria.add(Restrictions.eq("questionaryType", type));
+        //Date date24add = CalendarUtils.addDays(currentDate,24);
+        questionaryCriteria.add(Restrictions.gt("viewDate",currentDate));
+        questionaryCriteria.createAlias("answers","answer", JoinType.LEFT_OUTER_JOIN);
+        questionaryCriteria.setMaxResults(24);
         List<Questionary> questionaries = questionaryCriteria.list();
         QuestionaryList questionaryList = objectFactory.createQuestionaryList();
         for (Questionary questionary: questionaries){
             if(questionary.getOrgs().contains(client.getOrg())){
                 QuestionaryItem questionaryItem = new QuestionaryItem(questionary);
-                Criteria answerCriteria = session.createCriteria(Answer.class);
-                answerCriteria.add(Restrictions.eq("questionary", questionary));
-                List<Answer> answerList = answerCriteria.list();
-                questionaryItem.addAnswers(answerList);
+                //Criteria answerCriteria = session.createCriteria(Answer.class);
+                //answerCriteria.add(Restrictions.eq("questionary", questionary));
+                Set<Answer> answerList = questionary.getAnswers();
+                questionaryItem.addAnswers(new ArrayList<Answer>(answerList));
                 questionaryList.getQ().add(questionaryItem);
             }
         }

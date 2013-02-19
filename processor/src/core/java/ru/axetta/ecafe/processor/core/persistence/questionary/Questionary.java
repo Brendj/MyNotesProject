@@ -31,23 +31,14 @@ public class Questionary {
     private Set<Org> orgs = new HashSet<Org>();
     private String questionName;
     private String description;
-    private Date startDate;
-    private Date endDate;
+    private Date viewDate;
 
-    public Date getEndDate() {
-        return endDate;
+    public Date getViewDate() {
+        return viewDate;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setViewDate(Date viewDate) {
+        this.viewDate = viewDate;
     }
 
     protected Questionary() {}
@@ -63,9 +54,7 @@ public class Questionary {
         this.createdDate = date;
         this.updatedDate = date;
         date = CalendarUtils.truncateToDayOfMonth(date);
-        this.startDate = date;
-        date = CalendarUtils.addOneDay(date);
-        this.endDate = date;
+        this.viewDate = date;
     }
 
     public Questionary(String questionName, String question, String description, QuestionaryType type) throws Exception {
@@ -79,9 +68,7 @@ public class Questionary {
         this.createdDate = date;
         this.updatedDate = date;
         date = CalendarUtils.truncateToDayOfMonth(date);
-        this.startDate = date;
-        date = CalendarUtils.addOneDay(date);
-        this.endDate = date;
+        this.viewDate = date;
     }
 
     public Questionary(String questionName, String question, String description, QuestionaryType type, QuestionaryStatus status) throws Exception {
@@ -95,9 +82,7 @@ public class Questionary {
         this.createdDate = date;
         this.updatedDate = date;
         date = CalendarUtils.truncateToDayOfMonth(date);
-        this.startDate = date;
-        date = CalendarUtils.addOneDay(date);
-        this.endDate = date;
+        this.viewDate = date;
     }
 
     public Questionary update(String questionName, String question, String description) throws Exception {
