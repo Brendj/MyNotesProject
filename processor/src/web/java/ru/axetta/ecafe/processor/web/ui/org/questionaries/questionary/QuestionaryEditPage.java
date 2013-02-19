@@ -41,6 +41,8 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     private String questionName;
     private String description;
     private Integer type;
+    private Date startDate;
+    private Date endDate;
     private final QuestionaryEnumTypeMenu questionaryEnumTypeMenu = new QuestionaryEnumTypeMenu();
     private List<OrgItem> orgItemList;
     private List<AnswerItem> answers;
@@ -60,6 +62,9 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
         question = questionary.getQuestion();
         questionName = questionary.getQuestionName();
         description = questionary.getDescription();
+        startDate = questionary.getStartDate();
+        endDate = questionary.getEndDate();
+        type = questionary.getQuestionaryType().getValue();
         List<Answer> answerList = questionaryService.getAnswers(questionary);
         List<AnswerItem> answerItems = new ArrayList<AnswerItem>(answerList.size());
         for (Answer answer: answerList){
@@ -106,7 +111,7 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
                 for (AnswerItem answerItem: answers){
                     answerList.add(new Answer(answerItem.getAnswer(),answerItem.getDescription(),questionary,answerItem.getWeight()));
                 }
-                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question, questionName,description,idOfOrgList, type, answerList);
+                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question, questionName,description,idOfOrgList, type, answerList,startDate,endDate);
                 questionaryGroupPage.setQuestionary(questionary);
                 load();
                 printMessage("Изменения успешно сохранены");
@@ -202,5 +207,21 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
 
     public void setQuestionName(String questionName) {
         this.questionName = questionName;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 }

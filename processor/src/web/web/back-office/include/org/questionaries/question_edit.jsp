@@ -49,10 +49,17 @@
         <h:selectOneMenu value="#{questionaryEditPage.type}" styleClass="input-text">
             <f:selectItems value="#{questionaryEditPage.questionaryEnumTypeMenu.items}" />
         </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Дата начало показа" styleClass="output-text" />
+        <rich:calendar value="#{questionaryEditPage.startDate}" datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+        <h:outputText escape="true" value="Дата окончания показа" styleClass="output-text" />
+        <rich:calendar value="#{questionaryEditPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
         <h:outputText value="Дата регистрации" styleClass="output-text"/>
-        <h:inputText value="#{questionaryEditPage.questionary.createdDate}" converter="timeConverter" styleClass="output-text" readonly="true"/>
+        <h:inputText value="#{questionaryEditPage.questionary.createdDate}" converter="dateConverter" styleClass="output-text" readonly="true"/>
         <h:outputText value="Дата последних изменений" styleClass="output-text"/>
-        <h:inputText value="#{questionaryEditPage.questionary.updatedDate}" converter="timeConverter" styleClass="output-text" readonly="true"/>
+        <h:inputText value="#{questionaryEditPage.questionary.updatedDate}" converter="dateConverter" styleClass="output-text" readonly="true"/>
     </h:panelGrid>
     <rich:dataTable value="#{questionaryEditPage.answers}" var="answer" id="answerTable" rowKeyVar="row"
             columnClasses="right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">

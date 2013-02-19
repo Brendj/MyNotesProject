@@ -157,7 +157,9 @@ public class QuestionaryService {
         return orgs;
     }
 
-    public Questionary updateQuestionary(Long id,String question, String name, String description, List<Long> idOfOrgList, Integer type, List<Answer> answers) throws Exception{
+    public Questionary updateQuestionary(Long id,String question, String name, String description,
+            List<Long> idOfOrgList, Integer type, List<Answer> answers,
+            Date startDate, Date endDate) throws Exception{
         if(answers.isEmpty()) throw new  Exception("Questionnaire can not be registered without answers");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
@@ -167,6 +169,8 @@ public class QuestionaryService {
         Set<Org> orgs = getOrgs(idOfOrgList);
         currentQuestionary.setOrgs(orgs);
         currentQuestionary.setQuestionaryType(QuestionaryType.fromInteger(type));
+        currentQuestionary.setStartDate(startDate);
+        currentQuestionary.setEndDate(endDate);
         entityManager.persist(currentQuestionary);
         Query q = entityManager.createQuery("delete from Answer where questionary=:questionary");
         q.setParameter("questionary",currentQuestionary);

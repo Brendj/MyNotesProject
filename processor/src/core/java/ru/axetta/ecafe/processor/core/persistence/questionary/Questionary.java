@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.questionary;
 
+import ru.axetta.ecafe.processor.core.persistence.DateType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -29,6 +31,24 @@ public class Questionary {
     private Set<Org> orgs = new HashSet<Org>();
     private String questionName;
     private String description;
+    private Date startDate;
+    private Date endDate;
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
 
     protected Questionary() {}
 
@@ -42,6 +62,10 @@ public class Questionary {
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
+        date = CalendarUtils.truncateToDayOfMonth(date);
+        this.startDate = date;
+        date = CalendarUtils.addOneDay(date);
+        this.endDate = date;
     }
 
     public Questionary(String questionName, String question, String description, QuestionaryType type) throws Exception {
@@ -54,6 +78,10 @@ public class Questionary {
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
+        date = CalendarUtils.truncateToDayOfMonth(date);
+        this.startDate = date;
+        date = CalendarUtils.addOneDay(date);
+        this.endDate = date;
     }
 
     public Questionary(String questionName, String question, String description, QuestionaryType type, QuestionaryStatus status) throws Exception {
@@ -66,6 +94,10 @@ public class Questionary {
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;
+        date = CalendarUtils.truncateToDayOfMonth(date);
+        this.startDate = date;
+        date = CalendarUtils.addOneDay(date);
+        this.endDate = date;
     }
 
     public Questionary update(String questionName, String question, String description) throws Exception {

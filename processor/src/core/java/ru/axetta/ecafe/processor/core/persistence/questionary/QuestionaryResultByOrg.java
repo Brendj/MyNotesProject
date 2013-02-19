@@ -15,7 +15,7 @@ import java.util.Date;
  * Time: 11:29
  * To change this template use File | Settings | File Templates.
  */
-public final class QuestionaryResultByOrg {
+public class QuestionaryResultByOrg {
 
     private Long idOfQuestionaryResultByOrg;
     private Integer count;

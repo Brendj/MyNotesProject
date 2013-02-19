@@ -23,44 +23,67 @@
 <%--@elvariable id="questionaryEditPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryEditPage"--%>
 <%--@elvariable id="questionaryGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryGroupPage"--%>
 <h:panelGrid id="questionaryListPanelGrid" binding="#{questionaryListPage.pageComponent}" styleClass="borderless-grid">
+
     <rich:dataTable value="#{questionaryListPage.questionary}" var="questionary"
                     captionClass="center-aligned-column">
-        <rich:column sortBy="#{questionary.idOfQuestionary}">
-            <f:facet name="header">
-                <h:outputText value="Идентификатор"/>
-            </f:facet>
+        <f:facet name="header">
+             <rich:columnGroup>
+                 <rich:column rowspan="2" sortBy="#{questionary.idOfQuestionary}">
+                     <h:outputText value="Идентификатор"/>
+                 </rich:column>
+                 <rich:column rowspan="2" sortBy="#{questionary.question}">
+                     <h:outputText value="Наименование"/>
+                 </rich:column>
+                 <rich:column rowspan="2" sortBy="#{questionary.question}">
+                     <h:outputText value="Вопрос"/>
+                 </rich:column>
+                 <rich:column rowspan="2">
+                     <h:outputText value="Тип"/>
+                 </rich:column>
+                 <rich:column rowspan="2" sortBy="#{questionary.createdDate}">
+                     <h:outputText value="Дата регистрации"/>
+                 </rich:column>
+                 <rich:column rowspan="2" sortBy="#{questionary.status}">
+                     <h:outputText value="Запуск"/>
+                 </rich:column>
+
+                 <rich:column colspan="2">
+                     <h:outputText value="Дни работы"/>
+                 </rich:column>
+
+                 <rich:column rowspan="2">
+                     <h:outputText value="Редактировать"/>
+                 </rich:column>
+                 <rich:column rowspan="2">
+                     <h:outputText value="Удалить"/>
+                 </rich:column>
+
+                 <rich:column breakBefore="true">
+                     <h:outputText value="С (включительно)"/>
+                 </rich:column>
+                 <rich:column>
+                     <h:outputText value="По (исключительно)"/>
+                 </rich:column>
+             </rich:columnGroup>
+        </f:facet>
+        <rich:column>
             <h:outputText value="#{questionary.idOfQuestionary}"/>
         </rich:column>
-        <rich:column sortBy="#{questionary.question}">
-            <f:facet name="header">
-                <h:outputText value="Наименование"/>
-            </f:facet>
+        <rich:column>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{questionary.questionName}" action="#{questionaryViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
-        <rich:column sortBy="#{questionary.question}">
-            <f:facet name="header">
-                <h:outputText value="Вопрос"/>
-            </f:facet>
+        <rich:column>
             <h:outputText value="#{questionary.question}"/>
         </rich:column>
         <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Тип"/>
-            </f:facet>
             <h:outputText value="#{questionary.questionaryType}"/>
         </rich:column>
-        <rich:column sortBy="#{questionary.createdDate}">
-            <f:facet name="header">
-                <h:outputText value="Дата регистрации"/>
-            </f:facet>
+        <rich:column>
             <h:outputText value="#{questionary.createdDate}" converter="timeConverter"/>
         </rich:column>
-        <rich:column sortBy="#{questionary.status}">
-            <f:facet name="header">
-                <h:outputText value="Запуск"/>
-            </f:facet>
+        <rich:column>
             <a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.inactiveStatus}" reRender="mainMenu, workspaceForm">
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/play.png" style="border: 0;" />
@@ -70,19 +93,21 @@
                 <h:graphicImage value="/images/16x16/stop.png" style="border: 0;" />
             </a4j:commandLink>
         </rich:column>
+
         <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Редактировать"/>
-            </f:facet>
+            <h:outputText value="#{questionary.startDate}" converter="dateConverter"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{questionary.endDate}" converter="dateConverter"/>
+        </rich:column>
+
+        <rich:column>
             <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{questionaryEditPage.show}">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Удалить"/>
-            </f:facet>
             <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{questionaryListPage.remove}"
                              rendered="#{!questionary.startStatus}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
