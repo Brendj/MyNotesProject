@@ -8,6 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online"--%>
 <h:panelGrid id="reportPanelGrid" binding="#{totalServicesReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
@@ -45,7 +46,7 @@
                         <h:outputText styleClass="output-text" escape="true" value="Получают льготное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Находятся в ОУ" />
+                        <h:outputText styleClass="output-text" escape="true" value="Зафиксирован проход" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
                         <h:outputText styleClass="output-text" escape="true" value="Получили льготное питание" />
@@ -54,7 +55,7 @@
                         <h:outputText styleClass="output-text" escape="true" value="Получили платное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Получили питение сейчас" />
+                        <h:outputText styleClass="output-text" escape="true" value="Получили питание (льготное + платное)" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
