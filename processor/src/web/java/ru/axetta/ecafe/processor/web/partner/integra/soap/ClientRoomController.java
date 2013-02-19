@@ -25,7 +25,7 @@ import java.util.List;
 public interface ClientRoomController {
 
     @WebMethod(operationName = "getActiveQuestionaries")
-    QuestionaryResultList getActiveQuestionaries(@WebParam(name="contractId") Long contractId);
+    QuestionaryResultList getActiveQuestionaries(@WebParam(name="contractId") Long contractId, @WebParam(name = "currentDate") Date currentDate);
 
     @WebMethod(operationName = "setAnswerFromQuestionary")
     Result setAnswerFromQuestionary(@WebParam(name="contractId") Long contractId,@WebParam(name="IdOfAnswer") Long idOfAnswer);

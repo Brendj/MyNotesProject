@@ -12,13 +12,10 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
-
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
-
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
@@ -3227,13 +3224,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
     @Override
-    public QuestionaryResultList getActiveQuestionaries(@WebParam(name = "contractId") Long contractId) {
+    public QuestionaryResultList getActiveQuestionaries(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") final Date currentDate) {
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processQuestionaryList(client, data, objectFactory, session);
+                processQuestionaryList(client, data, objectFactory, session, currentDate);
             }
         });
 
@@ -3260,7 +3257,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
-    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session){
+    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session, Date currentDate){
         Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
         clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
         List<ClientAnswerByQuestionary> clientAnswerByQuestionaryList = clientAnswerByQuestionaryCriteria.list();
