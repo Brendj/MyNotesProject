@@ -30,7 +30,9 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -210,11 +212,39 @@ public class SMSStatusServlet extends HttpServlet {
                     append(secondName).append(" ").
                     append(surname).append(" ").
                     append(passType).append(" ").
-                    append(new SimpleDateFormat("yyyy.MM.dd HH:mm").format(evtDate)).append(" ").
+                    append(parseDate (evtDate)).append(" ").
                     append(beautifyBalance(balance)).append(" ");
         }
     return responseText.toString();
     }
+
+
+    public String parseDate (Date evt)
+        {
+        Calendar event = new GregorianCalendar();
+        event.setTimeInMillis(evt.getTime());
+
+        Calendar today = new GregorianCalendar();
+        today.setTimeInMillis(System.currentTimeMillis());
+
+        if (today.get(Calendar.YEAR) == event.get(Calendar.YEAR) &&
+            today.get(Calendar.MONTH) == event.get(Calendar.MONTH) &&
+            today.get(Calendar.DAY_OF_MONTH) == event.get(Calendar.DAY_OF_MONTH))
+            {
+            return "сегодня " + new SimpleDateFormat("HH:mm").format(evt);
+            }
+
+        today.setTimeInMillis(System.currentTimeMillis() - 86400000);
+
+        if (today.get(Calendar.YEAR) == event.get(Calendar.YEAR) &&
+            today.get(Calendar.MONTH) == event.get(Calendar.MONTH) &&
+            today.get(Calendar.DAY_OF_MONTH) == event.get(Calendar.DAY_OF_MONTH))
+            {
+            return "вчера " + new SimpleDateFormat("HH:mm").format(evt);
+            }
+
+        return new SimpleDateFormat("yyyy.MM.dd HH:mm").format(evt);
+        }
 
 
     public void updateSMSStatusRequest(String subscriber, String idofsms, String status, HttpServletResponse response,
