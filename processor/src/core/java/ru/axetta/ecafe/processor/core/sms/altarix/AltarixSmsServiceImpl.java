@@ -150,7 +150,8 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
         int status = getStatus(responseString);
 
-        return new SendResponse(translateSendStatus(status), null, messageId);
+        return new SendResponse(translateSendStatus(status), null, responseString);
+        //return new SendResponse(translateSendStatus(status), null, messageId);
 
     }
 
