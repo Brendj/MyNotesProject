@@ -11,11 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.LinkingToken;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.GenerateLinkingTokenResult;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
-import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.ws.security.WSSecurityEngineResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +121,11 @@ public class FrontController extends HttpServlet {
         for (ClientDesc cd : clientDescList) {
             try {
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
-                if (cd.contractSurname!=null) fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, cd.contractSurname);
+                if (cd.contractSurname!=null) {
+                    fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, cd.contractSurname);
+                }  else {
+                    fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, " ");
+                }
                 if (cd.contractName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_NAME, cd.contractName);
                 if (cd.contractSecondName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME, cd.contractSecondName);
                 if (cd.contractDoc!=null) fc.setValue(ClientManager.FieldId.CONTRACT_DOC, cd.contractDoc);
