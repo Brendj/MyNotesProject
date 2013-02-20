@@ -162,58 +162,60 @@ public class SMSStatusServlet extends HttpServlet {
                         +
                         "from cf_clients " +
                         "left join cf_persons on cf_persons.idofperson=cf_clients.idofperson " +
-                        "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient " +
-                        "where cf_clients.idofclient=:idofclient and cf_enterevents.evtdatetime<>0 and cf_enterevents.passdirection<>0 " +
+                        "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.evtdatetime<>0 and cf_enterevents.passdirection<>0  " +
+                        "where cf_clients.idofclient=:idofclient " +
                         "order by evtdatetime desc " +
                         "limit 1");
         q.setParameter("idofclient", client.getIdOfClient());
         List resultList = q.list();
         if (resultList.size() > 0) {
-            Object e[] = (Object[]) resultList.get(0);
-            String firstName = (String) e[0];
-            String secondName = (String) e[1];
-            String surname = (String) e[2];
-            Date evtDate = new Date(((Timestamp) e[3]).getTime());
-            int passTypeCode = ((Integer) e[4]).intValue();
-            long balance = ((BigInteger) e[5]).longValue();
-            String passType = "";
-            switch (passTypeCode) {
-                case EnterEvent.ENTRY:
-                    passType = "Вход";
-                    break;
-                case EnterEvent.EXIT:
-                    passType = "Выход";
-                    break;
-                case EnterEvent.PASSAGE_IS_FORBIDDEN:
-                    passType = "Проход запрещен";
-                    break;
-                case EnterEvent.TURNSTILE_IS_BROKEN:
-                    passType = "Взлом турникета";
-                    break;
-                case EnterEvent.EVENT_WITHOUT_PASSAGE:
-                    passType = "Событие без прохода";
-                    break;
-                case EnterEvent.PASSAGE_RUFUSAL:
-                    passType = "Отказ от прохода";
-                    break;
-                case EnterEvent.RE_ENTRY:
-                    passType = "Повторный вход";
-                    break;
-                case EnterEvent.RE_EXIT:
-                    passType = "Повторный выход";
-                    break;
-                case EnterEvent.DETECTED_INSIDE:
-                    passType = "Обнаружен на подносе карты внутри здания";
-                    break;
+            Object e[]           = (Object[]) resultList.get(0);
+            String firstName     = (String) e[0];
+            String secondName    = (String) e[1];
+            String surname       = (String) e[2];
+            Date evtDate         = e[3] == null ? null : new Date(((Timestamp) e[3]).getTime());
+            Integer passTypeCode = e[4] == null ? null : ((Integer) e[4]).intValue();
+            Long balance         = e[5] == null ? null : ((BigInteger) e[5]).longValue();
+            String passType      = null;
+            if (passTypeCode != null) {
+                switch (passTypeCode) {
+                    case EnterEvent.ENTRY:
+                        passType = "Вход";
+                        break;
+                    case EnterEvent.EXIT:
+                        passType = "Выход";
+                        break;
+                    case EnterEvent.PASSAGE_IS_FORBIDDEN:
+                        passType = "Проход запрещен";
+                        break;
+                    case EnterEvent.TURNSTILE_IS_BROKEN:
+                        passType = "Взлом турникета";
+                        break;
+                    case EnterEvent.EVENT_WITHOUT_PASSAGE:
+                        passType = "Событие без прохода";
+                        break;
+                    case EnterEvent.PASSAGE_RUFUSAL:
+                        passType = "Отказ от прохода";
+                        break;
+                    case EnterEvent.RE_ENTRY:
+                        passType = "Повторный вход";
+                        break;
+                    case EnterEvent.RE_EXIT:
+                        passType = "Повторный выход";
+                        break;
+                    case EnterEvent.DETECTED_INSIDE:
+                        passType = "Обнаружен на подносе карты внутри здания";
+                        break;
+                }
             }
 
 
             responseText.append(firstName).append(" ").
                     append(secondName).append(" ").
                     append(surname).append(" ").
-                    append(passType).append(" ").
-                    append(parseDate (evtDate)).append(" ").
-                    append(beautifyBalance(balance)).append(" ");
+                    append(passType == null ? "" : passType + " ").
+                    append(evtDate == null ? "" : parseDate (evtDate) + " ").
+                    append(balance == null ? "" : beautifyBalance(balance));
         }
     return responseText.toString();
     }
