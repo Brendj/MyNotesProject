@@ -125,7 +125,7 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
             String response = httpMethod.getResponseBodyAsString();
 
-            int sentStatus = getStatus(response);
+            //int sentStatus = getStatus(response);
             //sentParameters.put(messageId, new SentParameters(sentDate, sentStatus));
 
             logger.info(String.format("Retrieved response from SMS service: %s", response));
@@ -148,10 +148,17 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
         String responseString = sendServiceRequest(queryParameters, messageId);
 
-        int status = getStatus(responseString);
+        int status = SendResponse.COMMON_FAILURE;
+        if (responseString != null) {
+            StringTokenizer st = new StringTokenizer(responseString, "|");
+            if (!st.hasMoreTokens()) {
+                return null;
+            }
+            status = Integer.parseInt(st.nextToken());
+            messageId = st.nextToken();
+        }
 
-        return new SendResponse(translateSendStatus(status), null, responseString);
-        //return new SendResponse(translateSendStatus(status), null, messageId);
+        return new SendResponse(translateSendStatus(status), null, messageId);
 
     }
 
@@ -189,24 +196,6 @@ public class AltarixSmsServiceImpl extends ISmsService {
 
     }
 
-    /**
-     * Извлекает из ответа шлюза статус отправки
-     *
-     * @param response ответ шлюза
-     * @return статус отправки СМС
-     */
-    private Integer getStatus(String response) {
-        if (response == null) {
-            return null;
-        }
-        StringTokenizer st = new StringTokenizer(response, "|");
-        if (!st.hasMoreTokens()) {
-            return null;
-        }
-        return Integer.parseInt(st.nextToken());
-
-
-    }
 
     /**
      * По ответу серверу делает вывод о статусе доставки

@@ -72,9 +72,7 @@ public class DigitalSignatureUtils {
         // Create sign context
         DOMSignContext signContext = new DOMSignContext(privateKey, document.getDocumentElement());
         // "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"
-        String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-        XMLSignatureFactory signatureFactory = XMLSignatureFactory
-                .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+        XMLSignatureFactory signatureFactory = getXMLSignatureFactory();
         // Specify digest method
         DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
         Transform transform = signatureFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null);
@@ -94,16 +92,27 @@ public class DigitalSignatureUtils {
         signature.sign(signContext);
     }
 
+    private static XMLSignatureFactory getXMLSignatureFactory() throws Exception {
+        // "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"
+
+        String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        try {
+            Class.forName(providerName);
+        } catch (ClassNotFoundException e) {
+            providerName = "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI";
+            Class.forName(providerName);
+        }
+        return  XMLSignatureFactory
+                .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+    }
+
     public static boolean verify(PublicKey publicKey, Document document) throws Exception {
         // Find single Signature element
         Node signatureNode = findSignatureNode(document);
         // Create validation context
         DOMValidateContext validateContext = new DOMValidateContext(publicKey, signatureNode);
         // Unmarshaling the XML Signature
-        // "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"
-        String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-        XMLSignatureFactory signatureFactory = XMLSignatureFactory
-                .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+        XMLSignatureFactory signatureFactory = getXMLSignatureFactory();
         XMLSignature signature = signatureFactory.unmarshalXMLSignature(validateContext);
         // Perform validation
         return signature.validate(validateContext);

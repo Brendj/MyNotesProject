@@ -8,3 +8,5 @@ ALTER TABLE cf_qa_questionaries ADD COLUMN viewdate bigint;
 
 --!
 DROP TABLE IF EXISTS cf_qa_questionaryresultbyorg;
+
+ALTER TABLE CF_ClientSms ALTER COLUMN IdOfSms type CHAR(40);

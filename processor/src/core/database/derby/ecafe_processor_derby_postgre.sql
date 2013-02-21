@@ -637,7 +637,7 @@ CREATE TABLE CF_RuleConditions (
 );
 
 CREATE TABLE CF_ClientSms (
-  IdOfSms                 CHAR(32)        NOT NULL,
+  IdOfSms                 CHAR(40)        NOT NULL, -- v36
   Version                 BIGINT          NOT NULL,
   IdOfClient              BIGINT          NOT NULL,
   IdOfTransaction         BIGINT,
