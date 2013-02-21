@@ -51,6 +51,10 @@
             <column name="IdOfTechnologicalMaps" not-null="false" />
         </many-to-one>
 
+        <many-to-one name="basicGood" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket" fetch="select" lazy="false">
+            <column name="idOfBasicGood" not-null="false" />
+        </many-to-one>
+
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />

@@ -26,8 +26,11 @@ public class GoodBasicBasketPrice extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
-        if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
-        setGood(g);
+        //if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
+        //setGood(g);
+        if(g != null){
+            setGood(g);
+        }
         DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
         distributedObjectException.setData(guidOfGoodsBasicBasket);
         GoodsBasicBasket basicGood;
@@ -62,6 +65,8 @@ public class GoodBasicBasketPrice extends DistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((GoodBasicBasketPrice) distributedObject).getOrgOwner());
         setPrice(((GoodBasicBasketPrice) distributedObject).getPrice());
+        setGoodsBasicBasket(((GoodBasicBasketPrice) distributedObject).getGoodsBasicBasket());
+        setGood(((GoodBasicBasketPrice) distributedObject).getGood());
     }
 
     private String guidOfGood;

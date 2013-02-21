@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
 
@@ -121,9 +122,13 @@ public class DAOService {
 
     @Transactional
     public void removeGoodsBasicBasket(Long idOfBasicGood){
-        Query query = em.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood ");
-        query.setParameter("idOfBasicGood", idOfBasicGood);
+        GoodsBasicBasket goodsBasicBasket = em.find(GoodsBasicBasket.class,idOfBasicGood);
+        Query query = em.createQuery("delete from GoodBasicBasketPrice where goodsBasicBasket=:goodsBasicBasket");
+        query.setParameter("goodsBasicBasket",goodsBasicBasket);
         query.executeUpdate();
+        //em.remove(goodsBasicBasket);
+        //Query query = em.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood ");
+        //query.setParameter("idOfBasicGood", idOfBasicGood);
     }
 
     @Transactional

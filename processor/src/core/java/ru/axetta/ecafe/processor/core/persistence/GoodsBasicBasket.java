@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 public class GoodsBasicBasket {
 
@@ -20,6 +21,15 @@ public class GoodsBasicBasket {
     private Integer unitsScale;
     private Long netWeight;
     private GoodBasicBasketPrice goodBasicBasketPrice;
+    private Set<Good> good;
+
+    public Set<Good> getGood() {
+        return good;
+    }
+
+    public void setGood(Set<Good> good) {
+        this.good = good;
+    }
 
     public GoodBasicBasketPrice getGoodBasicBasketPrice() {
         return goodBasicBasketPrice;
