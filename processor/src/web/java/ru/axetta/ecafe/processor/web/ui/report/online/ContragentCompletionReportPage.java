@@ -41,7 +41,7 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     protected Date startDate;
     protected Date endDate;
     private ContragentDAOService contragentDAOService = new ContragentDAOService();
-    private List<ContragentCompletionItem> contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
+    private List<ContragentCompletionItem> contragentCompletionItems;
     private List<Contragent> contragentList;
     private Contragent defaultSupplier;
     private Integer contragentListCount = 0;
@@ -65,6 +65,7 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     }
 
     public Object generate(){
+        contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
         if(defaultSupplier!=null) {
             List<Org> orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(defaultSupplier);
             if(!orgItems.isEmpty()){

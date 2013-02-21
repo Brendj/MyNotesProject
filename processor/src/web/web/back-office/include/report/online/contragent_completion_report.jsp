@@ -68,7 +68,7 @@
                     <h:outputText value="Город"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="Район"/>
+                    <h:outputText value="Локация"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="Тэги"/>
