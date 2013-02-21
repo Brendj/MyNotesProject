@@ -54,7 +54,7 @@ public class QuestionaryElement {
         Element element = document.createElement("Questionary");
         element.setAttribute("Text", questionary);
         element.setAttribute("Name", questionaryName);
-        element.setAttribute("viewDate", dateOnlyFormat.format(viewDate));
+        element.setAttribute("ViewDate", dateOnlyFormat.format(viewDate));
         for (ClientAnswerElement clientAnswerElement: clientAnswerElementList){
             element.appendChild(clientAnswerElement.toElement(document));
         }
