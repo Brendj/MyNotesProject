@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.slf4j.Logger;

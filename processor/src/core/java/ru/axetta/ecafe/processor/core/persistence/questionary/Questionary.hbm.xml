@@ -26,16 +26,18 @@
             </type>
         </property>
         <property name="viewDate" column="ViewDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+                  not-null="true"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <set name="answers" table="cf_qa_answers" inverse="true" lazy="true" fetch="select" cascade="all">
+
+        <set name="answers" table="cf_qa_answers" inverse="true" lazy="true" cascade="all-delete-orphan" order-by="idofanswer">
             <key>
-                <column name="IdOfAnswer" not-null="true" />
+                <column name="IdOfQuestionary" not-null="true" />
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.Answer" />
         </set>
+
         <set name="orgs" table="cf_qa_organization_questionary" inverse="false" lazy="true" fetch="select" cascade="all" >
             <key>
                 <column name="IdOfQuestionary" not-null="true" />

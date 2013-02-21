@@ -3,4 +3,8 @@
 --! Информация для разработчика -- информация для пользователя
 
 -- Пакет обновлений 2.2.36
+--! Добавлена дата отображения опросника если пусто то отобразится во все дни
 ALTER TABLE cf_qa_questionaries ADD COLUMN viewdate bigint;
+
+--!
+DROP TABLE IF EXISTS cf_qa_questionaryresultbyorg;

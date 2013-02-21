@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 

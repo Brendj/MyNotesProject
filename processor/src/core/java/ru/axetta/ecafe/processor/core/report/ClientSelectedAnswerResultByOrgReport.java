@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
-import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryResultByOrg;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -146,9 +145,10 @@ public class ClientSelectedAnswerResultByOrgReport extends BasicReportForOrgJob 
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
+        /* TODO: переделать запрос используфя QuestionaryService как в отчете QuestionaryResultByOrgReport*/
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
-            List<ClientSelectedAnswerReportItem> resultRows = new LinkedList<ClientSelectedAnswerReportItem>();
+            List<ClientSelectedAnswerReportItem> resultRows = new ArrayList<ClientSelectedAnswerReportItem>();
             Criteria clientOrgCriteria = session.createCriteria(Client.class);
             clientOrgCriteria.add(Restrictions.eq("org",org));
             List<Client> clients = clientOrgCriteria.list();

@@ -24,11 +24,11 @@ import java.util.List;
 @WebService
 public interface ClientRoomController {
 
-    @WebMethod(operationName = "getActiveQuestionaries")
-    QuestionaryResultList getActiveQuestionaries(@WebParam(name="contractId") Long contractId, @WebParam(name = "currentDate") Date currentDate);
+    @WebMethod(operationName = "getActiveMenuQuestions")
+    QuestionaryResultList getActiveMenuQuestions(@WebParam(name="contractId") Long contractId, @WebParam(name = "currentDate") final Date currentDate);
 
-    @WebMethod(operationName = "setAnswerFromQuestionary")
-    Result setAnswerFromQuestionary(@WebParam(name="contractId") Long contractId,@WebParam(name="IdOfAnswer") Long idOfAnswer);
+    @WebMethod(operationName = "setAnswerFromQuestion")
+    Result setAnswerFromQuestion(@WebParam(name="contractId") Long contractId, @WebParam(name="IdOfAnswer") Long idOfAnswer);
 
     @WebMethod (operationName = "getGroupListByOrg")
     ClientGroupListResult getGroupListByOrg(@WebParam(name="idOfOrg") Long idOfOrg);

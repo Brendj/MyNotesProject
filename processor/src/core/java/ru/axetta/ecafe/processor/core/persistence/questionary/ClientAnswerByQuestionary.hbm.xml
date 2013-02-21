@@ -14,7 +14,7 @@
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" update="false" lazy="false"/>
         <many-to-one name="answer" class="ru.axetta.ecafe.processor.core.persistence.questionary.Answer" column="IdOfAnswer"
-                     not-null="true" update="false" lazy="proxy"/>
+                     not-null="true"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

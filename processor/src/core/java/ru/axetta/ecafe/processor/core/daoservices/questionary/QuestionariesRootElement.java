@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.questionaryservice;
+package ru.axetta.ecafe.processor.core.daoservices.questionary;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;

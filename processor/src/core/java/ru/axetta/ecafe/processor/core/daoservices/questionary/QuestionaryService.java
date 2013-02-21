@@ -2,13 +2,20 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.questionaryservice;
+package ru.axetta.ecafe.processor.core.daoservices.questionary;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 
-import org.hibernate.type.IntegerType;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
@@ -24,7 +30,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.*;
@@ -66,36 +71,47 @@ public class QuestionaryService {
         return !clientAnswerByQuestionaryTypedQuery.getResultList().isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<ClientAnswerByQuestionaryItem> generateReportByQuestionaryResultByOrg(Session session, Org org){
+        Criteria criteria = session.createCriteria(ClientAnswerByQuestionary.class);
+        criteria.createAlias("client","cl").add(Restrictions.eq("cl.org",org));
+        criteria.createAlias("answer", "a");
+        criteria.createAlias("a.questionary","q");
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.count("a.idOfAnswer"), "count")
+                .add(Projections.groupProperty("a.answer"), "answer")
+                .add(Projections.groupProperty("q.question"), "questionary")
+        );
+        criteria.setResultTransformer(Transformers.aliasToBean(ClientAnswerByQuestionaryItem.class));
+        return (List<ClientAnswerByQuestionaryItem>) criteria.list();
+    }
 
-    public void registrationAnswerByClient(Long contractId, Long idOfAnswer){
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
 
-        TypedQuery<Client> clientTypedQuery = entityManager.createQuery("from Client where contractId=:contractId",Client.class);
-        clientTypedQuery.setParameter("contractId",contractId);
-        Client client = clientTypedQuery.getSingleResult();
+    public void registrationAnswerByClient(Session session, Long contractId, Long idOfAnswer) throws Exception{
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.eq("contractId",contractId));
+        Client client = (Client) clientCriteria.uniqueResult();
 
-        Answer answer = entityManager.find(Answer.class,idOfAnswer);
-        Questionary questionary = entityManager.getReference(Questionary.class,
-                answer.getQuestionary().getIdOfQuestionary());
+        DetachedCriteria idOfQuestionCriteria = DetachedCriteria.forClass(Questionary.class);
+        idOfQuestionCriteria.createAlias("answers","answer", JoinType.NONE);
+        idOfQuestionCriteria.add(Restrictions.eq("answer.idOfAnswer",idOfAnswer));
+        idOfQuestionCriteria.setProjection(Property.forName("idOfQuestionary"));
 
-        ClientAnswerByQuestionary clientAnswerByQuestionary = new ClientAnswerByQuestionary(answer,client);
-        entityManager.persist(clientAnswerByQuestionary);
-
-        TypedQuery<QuestionaryResultByOrg> questionaryResultByOrgTypedQuery = entityManager.createQuery(
-                "from QuestionaryResultByOrg where answer=:answer and org=:org", QuestionaryResultByOrg.class);
-        questionaryResultByOrgTypedQuery.setParameter("answer",answer);
-        questionaryResultByOrgTypedQuery.setParameter("org",client.getOrg());
-        List<QuestionaryResultByOrg> questionaryResultByOrgList = questionaryResultByOrgTypedQuery.getResultList();
-        QuestionaryResultByOrg questionaryResultByOrg = null;
-        if(questionaryResultByOrgList==null || questionaryResultByOrgList.isEmpty()){
-            questionaryResultByOrg = new QuestionaryResultByOrg(answer,questionary,client.getOrg());
+        Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
+        clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
+        clientAnswerByQuestionaryCriteria.createAlias("answer","an");
+        clientAnswerByQuestionaryCriteria.createAlias("an.questionary", "question");
+        clientAnswerByQuestionaryCriteria.add( Property.forName("question.idOfQuestionary").eq(idOfQuestionCriteria));
+        List list = clientAnswerByQuestionaryCriteria.list();
+        Answer answer = (Answer) session.get(Answer.class, idOfAnswer);
+        if(list.isEmpty()){
+            ClientAnswerByQuestionary clientAnswerByQuestionary = new ClientAnswerByQuestionary(answer,client);
+            session.persist(clientAnswerByQuestionary);
         } else {
-            questionaryResultByOrg = questionaryResultByOrgList.get(0);
-            questionaryResultByOrg.addAnswer(answer);
+            ClientAnswerByQuestionary clientAnswerByQuestionary = (ClientAnswerByQuestionary) list.get(0);
+            clientAnswerByQuestionary.setAnswer(answer);
+            session.saveOrUpdate(clientAnswerByQuestionary);
         }
-        entityManager.persist(questionaryResultByOrg);
-        transactionManager.commit(status);
     }
 
     public List<Answer> getAnswers(Questionary questionary){

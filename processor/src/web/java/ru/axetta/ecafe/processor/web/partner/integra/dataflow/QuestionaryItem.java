@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +22,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QuestionaryItem", propOrder = {
-        "idOfQuestionary", "question", "name", "description", "status", "type", "answers"
+        "idOfQuestionary", "question", "name", "description", "status", "type", "viewDate", "checkedAnswer","answers"
 })
 public class QuestionaryItem {
 
@@ -36,6 +38,10 @@ public class QuestionaryItem {
     protected Integer status;
     @XmlAttribute(name = "Type", required = false)
     protected Integer type;
+    @XmlAttribute(name = "ViewDate", required = false)
+    protected Date viewDate;
+    @XmlAttribute(name = "CheckedAnswer", required = false)
+    protected Long checkedAnswer;
     @XmlElement(name="Answer")
     protected List<AnswerItem> answers;
 
@@ -50,6 +56,7 @@ public class QuestionaryItem {
         this.description = questionary.getDescription();
         this.status =  questionary.getStatus().getValue();
         this.type = questionary.getQuestionaryType().getValue();
+        this.viewDate = questionary.getViewDate();
         answers = new ArrayList<AnswerItem>();
     }
 
@@ -89,7 +96,7 @@ public class QuestionaryItem {
         return answers;
     }
 
-    public void addAnswers(List<Answer> answetList){
+    public void addAnswers(Collection<Answer> answetList){
         for (Answer answer: answetList){
             answers.add(new AnswerItem(answer));
         }
@@ -109,6 +116,22 @@ public class QuestionaryItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getViewDate() {
+        return viewDate;
+    }
+
+    public void setViewDate(Date viewDate) {
+        this.viewDate = viewDate;
+    }
+
+    public Long getCheckedAnswer() {
+        return checkedAnswer;
+    }
+
+    public void setCheckedAnswer(Long checkedAnswer) {
+        this.checkedAnswer = checkedAnswer;
     }
 
     @Override

@@ -7,9 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
-import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
-import ru.axetta.ecafe.processor.core.questionaryservice.AnswerItem;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.AnswerItem;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
@@ -17,10 +16,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.model.DataModel;
-import javax.faces.model.ListDataModel;
 import java.util.*;
 
 /**

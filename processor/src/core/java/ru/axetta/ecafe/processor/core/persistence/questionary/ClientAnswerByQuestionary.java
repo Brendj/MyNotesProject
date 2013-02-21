@@ -15,7 +15,7 @@ import java.util.Date;
  * Time: 16:17
  * To change this template use File | Settings | File Templates.
  */
-public final class ClientAnswerByQuestionary {
+public class ClientAnswerByQuestionary {
 
     private Long idOfClientAnswerByQuestionary;
     private Client client;
@@ -59,7 +59,8 @@ public final class ClientAnswerByQuestionary {
         this.updatedDate = updatedDate;
     }
 
-    protected void setAnswer(Answer answer) {
+    public void setAnswer(Answer answer) {
+        this.updatedDate = new Date();
         this.answer = answer;
     }
 

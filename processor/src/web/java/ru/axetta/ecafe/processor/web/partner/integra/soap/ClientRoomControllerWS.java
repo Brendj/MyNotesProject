@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
@@ -20,9 +21,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
@@ -34,9 +34,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -3223,7 +3221,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
     @Override
-    public QuestionaryResultList getActiveQuestionaries(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") final Date currentDate) {
+    public QuestionaryResultList getActiveMenuQuestions(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") final Date currentDate) {
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
@@ -3241,51 +3239,63 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result setAnswerFromQuestionary(@WebParam(name = "contractId") Long contractId, @WebParam(name="IdOfAnswer") Long idOfAnswer) {
+    public Result setAnswerFromQuestion(@WebParam(name = "contractId") Long contractId, @WebParam(name="IdOfAnswer") Long idOfAnswer) {
         authenticateRequest(contractId);
         Result r = new Result();
         r.resultCode = RC_OK;
         r.description = RC_OK_DESC;
-        QuestionaryService questionaryService = RuntimeContext.getAppContext().getBean(QuestionaryService.class);
-        if (questionaryService.checkClientToQuestionary(contractId, idOfAnswer)) {
-            r.resultCode = 200L;
-            r.description = "Клиент ответил на данное анкетирование";
-            return r;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            QuestionaryService questionaryService = new QuestionaryService();
+            questionaryService.registrationAnswerByClient(persistenceSession ,contractId, idOfAnswer);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
-        questionaryService.registrationAnswerByClient(contractId, idOfAnswer);
         return r;
     }
 
     private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session, Date currentDate, QuestionaryType type){
-        //Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
-        //clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
-        //List<ClientAnswerByQuestionary> clientAnswerByQuestionaryList = clientAnswerByQuestionaryCriteria.list();
-        //List<Long> questionariesOut = new ArrayList<Long>();
-        //for (ClientAnswerByQuestionary clientAnswerByQuestionary: clientAnswerByQuestionaryList){
-        //    Questionary questionary = clientAnswerByQuestionary.getAnswer().getQuestionary();
-        //    questionariesOut.add(questionary.getIdOfQuestionary());
-        //}
+        DetachedCriteria orgCriteria = DetachedCriteria.forClass(Client.class)
+                .createAlias("org","o", JoinType.NONE)
+                .setProjection( Property.forName("org.idOfOrg"))
+                .add(Restrictions.eq("contractId",client.getContractId()));
         Criteria questionaryCriteria = session.createCriteria(Questionary.class);
-        //if(!questionariesOut.isEmpty()){
-        //    questionaryCriteria.add(Restrictions.not(Restrictions.in("idOfQuestionary", questionariesOut)));
-        //}
         questionaryCriteria.add(Restrictions.eq("status", QuestionaryStatus.START));
         questionaryCriteria.add(Restrictions.eq("questionaryType", type));
-        //Date date24add = CalendarUtils.addDays(currentDate,24);
-        questionaryCriteria.add(Restrictions.gt("viewDate",currentDate));
-        questionaryCriteria.createAlias("answers","answer", JoinType.LEFT_OUTER_JOIN);
+        questionaryCriteria.createAlias("orgs", "org", JoinType.INNER_JOIN);
+        questionaryCriteria.add(Property.forName("org.idOfOrg").eq(orgCriteria));
+        questionaryCriteria.add(Restrictions.ge("viewDate",currentDate));
+        questionaryCriteria.addOrder(org.hibernate.criterion.Order.asc("viewDate"));
         questionaryCriteria.setMaxResults(24);
+
         List<Questionary> questionaries = questionaryCriteria.list();
         QuestionaryList questionaryList = objectFactory.createQuestionaryList();
+
         for (Questionary questionary: questionaries){
-            if(questionary.getOrgs().contains(client.getOrg())){
-                QuestionaryItem questionaryItem = new QuestionaryItem(questionary);
-                //Criteria answerCriteria = session.createCriteria(Answer.class);
-                //answerCriteria.add(Restrictions.eq("questionary", questionary));
-                Set<Answer> answerList = questionary.getAnswers();
-                questionaryItem.addAnswers(new ArrayList<Answer>(answerList));
-                questionaryList.getQ().add(questionaryItem);
+            Criteria criteria = session.createCriteria(ClientAnswerByQuestionary.class);
+            criteria.add(Restrictions.in("answer",questionary.getAnswers()));
+            criteria.add(Restrictions.eq("client",client));
+            List<ClientAnswerByQuestionary> list = (List<ClientAnswerByQuestionary>) criteria.list();
+            QuestionaryItem questionaryItem = new QuestionaryItem(questionary);
+            if(!list.isEmpty()){
+                questionaryItem.setCheckedAnswer(list.get(0).getAnswer().getIdOfAnswer());
             }
+            questionaryItem.addAnswers(questionary.getAnswers());
+            questionaryList.getQ().add(questionaryItem);
         }
         data.setQuestionaryList(questionaryList);
     }

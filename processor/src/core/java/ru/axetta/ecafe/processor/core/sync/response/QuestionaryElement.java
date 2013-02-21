@@ -9,8 +9,12 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,7 +27,15 @@ public class QuestionaryElement {
 
     private final String questionaryName;
     private final String questionary;
+    private Date viewDate;
     private List<ClientAnswerElement> clientAnswerElementList;
+
+    private final static DateFormat dateOnlyFormat;
+    static {
+        TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+        dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
+        dateOnlyFormat.setTimeZone(utcTimeZone);
+    }
 
     public QuestionaryElement( String questionaryName, String questionary) {
         this.questionaryName = questionaryName;
@@ -34,6 +46,7 @@ public class QuestionaryElement {
     public QuestionaryElement(Questionary questionary) {
         this.questionaryName = questionary.getQuestionName();
         this.questionary = questionary.getQuestion();
+        this.viewDate = questionary.getViewDate();
         clientAnswerElementList = new ArrayList<ClientAnswerElement>();
     }
 
@@ -41,6 +54,7 @@ public class QuestionaryElement {
         Element element = document.createElement("Questionary");
         element.setAttribute("Text", questionary);
         element.setAttribute("Name", questionaryName);
+        element.setAttribute("viewDate", dateOnlyFormat.format(viewDate));
         for (ClientAnswerElement clientAnswerElement: clientAnswerElementList){
             element.appendChild(clientAnswerElement.toElement(document));
         }

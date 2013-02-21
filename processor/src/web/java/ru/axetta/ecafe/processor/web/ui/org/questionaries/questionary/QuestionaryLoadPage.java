@@ -4,17 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionariesRootElement;
-import ru.axetta.ecafe.processor.core.questionaryservice.QuestionaryService;
-import ru.axetta.ecafe.processor.core.questionaryservice.RegistrationItem;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionariesRootElement;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.RegistrationItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 import org.slf4j.Logger;
@@ -23,12 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

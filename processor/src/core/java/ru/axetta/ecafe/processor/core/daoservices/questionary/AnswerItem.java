@@ -2,15 +2,13 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.questionaryservice;
+package ru.axetta.ecafe.processor.core.daoservices.questionary;
 
 import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
