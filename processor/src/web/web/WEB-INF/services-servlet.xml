@@ -20,6 +20,7 @@
           class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="classesToBeBound">
             <list>
+                <value>ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportDataInfo</value>
                 <value>ru.axetta.ecafe.processor.web.partner.integra.dataflow.Data</value>
                 <value>ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummary</value>
             </list>
