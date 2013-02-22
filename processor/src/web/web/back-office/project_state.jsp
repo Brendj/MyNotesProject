@@ -22,12 +22,12 @@
 </script>
 <style>
     a { font-size: 12px; }
-    .ui-tabs-vertical { width: 975px; }
+    .ui-tabs-vertical { width: 1100px; }
     .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 220px; }
     .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
     .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
     .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
-    .ui-tabs-vertical .ui-tabs-panel { padding: 5px; padding-left: 50px; float: right; width: 745px;}
+    .ui-tabs-vertical .ui-tabs-panel { padding: 5px; padding-left: 50px; float: right; width: 870px;}
 </style>
 
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -146,11 +146,9 @@ function drawActiveChart ()
 {
     clearInterval (inter);
 
-    var period = document.getElementById('select_period_01');
-    var region = document.getElementById('select_region_01');
     var container = document.getElementById('activeChart');
     var chart = new google.visualization.LineChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=ActiveChart&period=' + period.value + '&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=ActiveChart&period=' + $("#select_period_01").val() + '&region=' + $("#select_region_01").val());
     var options = { title: 'Количество активных ОУ по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
@@ -161,11 +159,9 @@ function drawUniqueChart ()
 {
     clearInterval (inter2);
 
-    var period = document.getElementById('select_period_01');
-    var region = document.getElementById('select_region_01');
     var container = document.getElementById('uniqueChart');
     var chart = new google.visualization.LineChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=UniqueChart&period=' + period.value + '&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=UniqueChart&period=' + $("#select_period_01").val() + '&region=' + $("#select_region_01").val());
     var options = { title: 'Количество уникальных пользователей по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
@@ -184,14 +180,18 @@ function drawContentsChart()
     queryWrapper.sendAndDraw();
 }
 
+function toUTF8(str)
+{
+    return unescape(encodeURIComponent(str));
+}
+
 function drawRefillChart ()
 {
     clearInterval (inter);
 
-    var region = document.getElementById('select_region_02');
     var container = document.getElementById('refillChart');
     var chart = new google.visualization.PieChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillChart&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillChart&region=' + $("#select_region_02").val());
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (количество транзакций)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
@@ -201,10 +201,9 @@ function drawRefillAvgChart ()
 {
     clearInterval (inter2);
 
-    var region = document.getElementById('select_region_02');
     var container = document.getElementById('refillAvgChart');
     var chart = new google.visualization.ColumnChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillAvgChart&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillAvgChart&region=' + $("#select_region_02").val());
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (средняя сумма пополнения)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
@@ -214,10 +213,9 @@ function drawRefillProgressChart ()
 {
     clearInterval (inter3);
 
-    var region = document.getElementById('select_region_02');
     var container = document.getElementById('refillProgressChart');
     var chart = new google.visualization.SteppedAreaChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillProgressChart&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=RefillProgressChart&region=' + $("#select_region_02").val());
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (динамика пополнений)', isStacked: true, vAxis: {title: 'Динамика пополнений относительно всех пополнений', maxValue: 100, viewWindow: {max: 100}} };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
@@ -227,10 +225,9 @@ function drawInformingChart()
 {
     clearInterval (inter);
 
-    var region = document.getElementById('select_region_03');
     var container = document.getElementById('informingChart');
     var chart = new google.visualization.PieChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=InformingChart&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=InformingChart&region=' + $("#select_region_03").val());
     var options = { title: 'Организация информирования родителей', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
@@ -264,11 +261,9 @@ function drawVisitorsChart()
 {
     clearInterval (inter);
 
-    var region = document.getElementById('select_region_04');
-    var period = document.getElementById('select_period_02');
     var container = document.getElementById('visitorsChart');
     var chart = new google.visualization.AreaChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=VisitorsChart&period=' + period.value + '&region=' + region.value);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=VisitorsChart&period=' + $("#select_period_02").val() + '&region=' + $("#select_region_04").val());
     var options = { title: 'Процент учащихся, находившихся в школе', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
         chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
@@ -288,6 +283,7 @@ function drawRatingDescChart()
     //	Start drawing
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
+    drawToolbar();
 }
 
 
@@ -303,7 +299,17 @@ function drawRatingAscChart()
     //	Start drawing
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
+    drawToolbar();
 }
+
+function drawToolbar() {
+    var components = [
+        {type: 'csv', datasource: '<%= externalURL %>/processor/prj-state?type=OrgsRatingChart&encoding=cyr'}
+    ];
+
+    var container = document.getElementById('export_toolbar_01');
+    google.visualization.drawToolbar(container, components);
+};
 
 function drawRatingCharts ()
 {
@@ -397,7 +403,7 @@ function addPeriod (container, title, value)
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option>Все округа</option><option>ЮВАО</option><option>САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
         <div id="activeChart" style="width: 100%; height: 310px;"></div><br/>
         <div id="uniqueChart" style="width: 100%; height: 310px;"></div>
     </div>
@@ -405,13 +411,13 @@ function addPeriod (container, title, value)
         <div id="contentsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-3" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><option>Все округа</option><option>ЮВАО</option><option>САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
         <div id="refillChart" style="width: 100%; height: 500px;"></div>
         <div id="refillAvgChart" style="width: 100%; height: 500px;"></div>
         <div id="refillProgressChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-4" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><option>Все округа</option><option>ЮВАО</option><option>САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
         <div id="informingChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-5" style="padding: 0px; margin: 0px">
@@ -420,21 +426,24 @@ function addPeriod (container, title, value)
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw(drawVisitorsChart)"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option>Все округа</option><option>ЮВАО</option><option>САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
         <div id="visitorsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-7" style="padding: 0px; margin: 0px">
         <table cellspacing="0" cellpadding="0" border="0" style="width: 100%">
             <tr>
-                <td style="width: 45%; padding-right: 10px;">
+                <td colspan="2" style="text-align: right; padding-bottom: 10px"><a href="<%= externalURL %>/processor/prj-state?type=OrgsRatingChart&encoding=cyr&tqx=out%3Acsv%3B" target="_blank">Загрузить данные в CSV</a></td>
+            </tr>
+            <tr>
+                <td style="width: 50%; padding-right: 5px; padding-bottom: 15px">
                     <div id="orgsRatingChartDesc" style="width: 100%; height: 500px;"></div>
                 </td>
-                <td style="width: 45%; padding-left: 10px;">
+                <td style="width: 50%; padding-right: 5px; padding-bottom: 15px">
                     <div id="orgsRatingChartAsc" style="width: 100%; height: 500px;"></div>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="background-color: #eeeeee; padding-top: 15px">
+                <td colspan="2" style="background-color: #eeeeee;">
                     <strong>Проход (%)</strong> - процент уникальных учащихся, осуществивших проход по электронной карте в ОУ за последние 7 дней<br/>
                     <strong>Платное питание (%)</strong> - процент уникальных учащихся, осуществивших оплату горячего питания или буфетной продукции по электронной карте в ОУ за последние 7 дней<br/>
                     <strong>Льготное питание (%)</strong> - наличие проведенного в системе льготного питания за последние 7 дней<br/>
