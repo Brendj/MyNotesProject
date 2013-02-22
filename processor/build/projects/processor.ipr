@@ -88,6 +88,7 @@
             <element id="library" level="project" name="javamelody-monitoring" />
             <element id="library" level="project" name="axetta_smpp" />
             <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
+            <element id="library" level="project" name="groovy-all-1.5.5" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -446,7 +447,32 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" compressed="false" hash="1792873702" />
+  <component name="DataSourceManagerImpl" format="xml" hash="1792873702">
+    <data-source source="LOCAL" name="client-room DB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="ae486cbf-e3ec-4e67-9bc9-200ddeee8589">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_clientroom_db</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <libraries>
+        <library>
+          <url>file://$PROJECT_DIR$/../lib/postgresql-9.1-901.jdbc4.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="processor_db" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6290c1ea-ca24-4c56-8948-0e5e19e1d42c">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_spb_21012013</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <libraries>
+        <library>
+          <url>file://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+  </component>
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -686,6 +712,14 @@
           <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
+        <codeStyleSettings language="CoffeeScript">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
         <codeStyleSettings language="ECMA Script Level 4">
           <option name="KEEP_LINE_BREAKS" value="false" />
           <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
@@ -889,7 +923,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="jdk6x64" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -916,6 +950,12 @@
   </component>
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.28-2.2.29.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.30-2.2.31.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.32-2.2.33.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.33-2.2.34.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.34-2.2.35.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.35-2.2.36.sql" dialect="PostgreSQL" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
@@ -976,6 +1016,13 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../../src/synctest">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/testmodule">
           <value>
             <SvnBranchConfiguration>
               <option name="trunkUrl" value="" />
@@ -1178,6 +1225,13 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="groovy-all-1.5.5">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../runtime/jboss7/modules/ecafe/main/groovy-all-1.5.5.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="guava">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/icu4j-4_0_1.jar!/" />
@@ -1207,7 +1261,9 @@
         <root url="jar://$PROJECT_DIR$/../lib/jasper/jasperreports-4.7.1.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="jar://D:/lib/ireport/src/jasperreports-4.7.1-sources.jar!/" />
+      </SOURCES>
     </library>
     <library name="Java EE 6-3.1">
       <CLASSES>

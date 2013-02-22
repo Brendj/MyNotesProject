@@ -36,7 +36,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="processor" />
+          <factory-entry name="processor" value="6290c1ea-ca24-4c56-8948-0e5e19e1d42c" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
@@ -101,6 +101,7 @@
     <orderEntry type="library" name="jasperlib" level="project" />
     <orderEntry type="library" name="hibernate-4.0.1" level="project" />
     <orderEntry type="library" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
+    <orderEntry type="library" name="groovy-all-1.5.5" level="project" />
   </component>
 </module>
 
