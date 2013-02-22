@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm.GroupPaymentConfirm;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm.GroupPaymentConfirmPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 
@@ -18,6 +20,10 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
  * To change this template use File | Settings | File Templates.
  */
 public enum DistributedObjectsEnum {
+
+    /* Подствеждение заказов */
+    GroupPaymentConfirm(GroupPaymentConfirm.class,0),
+    GroupPaymentConfirmPosition(GroupPaymentConfirmPosition.class,1),
     /* Накладная */
     ActOfInventorization(ActOfInventarization.class,0),
     ActOfWayBillDifference(ActOfWayBillDifference.class, 0),
@@ -49,22 +55,23 @@ public enum DistributedObjectsEnum {
     ProhibitionExclusion(ProhibitionExclusion.class, 4),
     GoodBasicBasketPrice(GoodBasicBasketPrice.class,3),
     // настойки
-    ECafeSettings(ECafeSettings.class,0),
+    ECafeSettings(ECafeSettings.class,0)
     // библиоткека
-    Publication(Publication.class, 0),
-    Source(Source.class,0),
-    TypeOfAccompanyingDocument(TypeOfAccompanyingDocument.class,0),
-    InventoryBook(InventoryBook.class,0),
-    Fund(Fund.class,0),
-    RetirementReason(RetirementReason.class,0),
-    AccompanyingDocument(AccompanyingDocument.class, 1),
-    Journal(Journal.class, 1),
-    Ksu2Record(Ksu2Record.class,1),
-    Ksu1Record(Ksu1Record.class, 2),
-    Instance(Instance.class,3),
-    JournalItem(JournalItem.class,3),
-    Issuable(Issuable.class, 4),
-    Circulation(Circulation.class, 5);
+    //Publication(Publication.class, 0),
+    //Source(Source.class,0),
+    //TypeOfAccompanyingDocument(TypeOfAccompanyingDocument.class,0),
+    //InventoryBook(InventoryBook.class,0),
+    //Fund(Fund.class,0),
+    //RetirementReason(RetirementReason.class,0),
+    //AccompanyingDocument(AccompanyingDocument.class, 1),
+    //Journal(Journal.class, 1),
+    //Ksu2Record(Ksu2Record.class,1),
+    //Ksu1Record(Ksu1Record.class, 2),
+    //Instance(Instance.class,3),
+    //JournalItem(JournalItem.class,3),
+    //Issuable(Issuable.class, 4),
+    //Circulation(Circulation.class, 5)
+    ;
 
     private final Class<? extends DistributedObject> value;
     /* приоритет обработки объектов при синхронизации */

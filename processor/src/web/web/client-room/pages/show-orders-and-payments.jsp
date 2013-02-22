@@ -24,6 +24,11 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
+<%@ page import="org.hibernate.sql.JoinType" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm.GroupPaymentConfirm" %>
+<%@ page import="org.hibernate.criterion.DetachedCriteria" %>
+<%@ page import="org.hibernate.criterion.Property" %>
+<%@ page import="org.hibernate.Query" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -255,407 +260,542 @@
     }
 </script>
 
-<form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
-      enctype="application/x-www-form-urlencoded" class="borderless-form">
-    <%if (!dataToProcessVerified) {%>
-    <div class="output-text">Ошибка: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
-    </div>
-    <%}%>
-    <table>
-        <tr>
-            <td>
-                <div class="output-text">Начальная дата</div>
-            </td>
-            <td>
-                <input type="text" class="input-text" name="<%=START_DATE_PARAM%>" id="startDate"
-                       value="<%=StringEscapeUtils.escapeHtml(startDateParamValue)%>" />
-            </td>
-            <td>
-                <input type="button" class="command-button" value="..." id="toggleStartCalendarBtn"
-                       onclick="startCalendarInit();" />
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div class="yui-skin-sam">
-                    <div id="startCalendarContainer" />
+<table>
+    <tr>
+        <td valign="top">
+        <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
+              enctype="application/x-www-form-urlencoded" class="borderless-form">
+            <%if (!dataToProcessVerified) {%>
+            <div class="output-text">Ошибка: <%=StringEscapeUtils.escapeHtml(errorMessage)%>
+            </div>
+            <%}%>
+            <table>
+                <tr>
+                    <td>
+                        <div class="output-text">Начальная дата</div>
+                    </td>
+                    <td>
+                        <input type="text" class="input-text" name="<%=START_DATE_PARAM%>" id="startDate"
+                               value="<%=StringEscapeUtils.escapeHtml(startDateParamValue)%>" />
+                    </td>
+                    <td>
+                        <input type="button" class="command-button" value="..." id="toggleStartCalendarBtn"
+                               onclick="startCalendarInit();" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div class="yui-skin-sam">
+                            <div id="startCalendarContainer" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="output-text">Конечная дата</div>
+                    </td>
+                    <td>
+                        <input type="text" class="input-text" name="<%=END_DATE_PARAM%>" id="endDate"
+                               value="<%=StringEscapeUtils.escapeHtml(endDateParamValue)%>" />
+                    </td>
+                    <td>
+                        <input type="button" class="command-button" value="..." id="toggleEndCalendarBtn"
+                               onclick="endCalendarInit();" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div class="yui-skin-sam">
+                            <div id="endCalendarContainer" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" name="<%=PROCESS_PARAM%>" value="Показать" class="command-button" />
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(todayUri))%>"
+                           class="command-link">Сегодня</a>
+                    </td>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(thisWeeekUri))%>" class="command-link">На
+                            этой
+                            неделе</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(yesterdayUri))%>"
+                           class="command-link">Вчера</a>
+                    </td>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(prevWeeekUri))%>" class="command-link">На
+                            прошлой неделе</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(beforeYesterdayUri))%>"
+                           class="command-link">Позавчера</a>
+                    </td>
+                    <td>
+                        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(beforePrevWeeekUri))%>"
+                           class="command-link">На позапрошлой неделе</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+        <%if (haveDataToProcess && dataToProcessVerified) {%>
+        <table class="infotable">
+        <tr class="header-tr">
+            <td colspan="9">
+                <div class="output-text">Покупки, совершенные с <%=StringEscapeUtils.escapeHtml(dateFormat.format(startDate))%>
+                    по <%=StringEscapeUtils.escapeHtml(dateFormat.format(endDate))%>
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="subheader-tr">
             <td>
-                <div class="output-text">Конечная дата</div>
+                <div class="output-text">Дата</div>
             </td>
             <td>
-                <input type="text" class="input-text" name="<%=END_DATE_PARAM%>" id="endDate"
-                       value="<%=StringEscapeUtils.escapeHtml(endDateParamValue)%>" />
+                <div class="output-text">Сумма покупки</div>
             </td>
             <td>
-                <input type="button" class="command-button" value="..." id="toggleEndCalendarBtn"
-                       onclick="endCalendarInit();" />
+                <div class="output-text">Социальная скидка</div>
+            </td>
+            <td>
+                <div class="output-text">Торговая скидка</div>
+            </td>
+            <td>
+                <div class="output-text">Дотация</div>
+            </td>
+            <td>
+                <div class="output-text">Наличными</div>
+            </td>
+            <td>
+                <div class="output-text">По карте</div>
+            </td>
+            <td>
+                <div class="output-text">Номер карты</div>
+            </td>
+            <td>
+                <div class="output-text">Состав</div>
             </td>
         </tr>
-        <tr>
-            <td colspan="3">
-                <div class="yui-skin-sam">
-                    <div id="endCalendarContainer" />
+        <%
+            Session persistenceSession = null;
+            org.hibernate.Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+                clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
+                Client client = (Client) clientCriteria.uniqueResult();
+
+                Date nextToEndDate = DateUtils.addDays(endDate, 1);
+
+                Criteria ordersCriteria = persistenceSession.createCriteria(Order.class);
+                ordersCriteria.add(Restrictions.eq("client", client));
+                ordersCriteria.add(Restrictions.ge("createTime", startDate));
+                ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+                ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
+                List ordersList = ordersCriteria.list();
+
+                Criteria clientPaymentsCriteria = persistenceSession.createCriteria(ClientPayment.class);
+                clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+                clientPaymentsCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
+                clientPaymentsCriteria.add(Restrictions.ge("createTime", startDate));
+                clientPaymentsCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+                clientPaymentsCriteria = clientPaymentsCriteria.createCriteria("transaction");
+                clientPaymentsCriteria.add(Restrictions.eq("client", client));
+                List clientPaymentsList = clientPaymentsCriteria.list();
+
+                Criteria clientSmsCriteria = persistenceSession.createCriteria(ClientSms.class);
+                clientSmsCriteria.add(Restrictions.ge("serviceSendTime", startDate));
+                clientSmsCriteria.add(Restrictions.lt("serviceSendTime", nextToEndDate));
+                clientSmsCriteria.add(Restrictions.eq("client", client));
+                List clientSmsList = clientSmsCriteria.list();
+
+                int orderIndex = 0;
+                int ordersCount = ordersList.size();
+                int clientPaymentIndex = 0;
+                int clientPaymentsCount = clientPaymentsList.size();
+                int clientSmsIndex = 0;
+                int clientSmsCount = clientSmsList.size();
+
+                boolean done = false;
+                while (!done) {
+                    Date minTime = null;
+                    if (orderIndex != ordersCount) {
+                        Order order = (Order) ordersList.get(orderIndex);
+
+                        minTime = order.getCreateTime();
+                    }
+                    if (clientPaymentIndex != clientPaymentsCount) {
+                        ClientPayment clientPayment = (ClientPayment) clientPaymentsList.get(clientPaymentIndex);
+                        Date clientPaymentTime = clientPayment.getCreateTime();
+                        minTime = minTime == null ? clientPaymentTime
+                                : (clientPaymentTime.before(minTime) ? clientPaymentTime : minTime);
+                    }
+                    if (clientSmsIndex != clientSmsCount) {
+                        ClientSms clientSms = (ClientSms) clientSmsList.get(clientSmsIndex);
+                        Date clientSmsTime = clientSms.getServiceSendTime();
+                        minTime = minTime == null ? clientSmsTime : (clientSmsTime.before(minTime) ? clientSmsTime : minTime);
+                    }
+                    if (minTime == null) {
+                        done = true;
+                        continue;
+                    }
+                    if (clientPaymentIndex != clientPaymentsCount) {
+                        ClientPayment clientPayment = (ClientPayment) clientPaymentsList.get(clientPaymentIndex);
+                        if (clientPayment.getCreateTime().equals(minTime)) {
+                            //if (logger.isDebugEnabled()) {
+                            //    logger.debug(clientPayment.toString());
+                            //}
+        %>
+        <tr valign="top">
+            <td>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(timeFormat.format(clientPayment.getCreateTime()))%>
                 </div>
             </td>
+            <td colspan="5">
+                <%
+
+                    Long clientPaymentSum = clientPayment.getPaySum();
+                    String transferInfo = PaymentTextUtils.buildTransferInfo(clientPayment);
+                %>
+                <div class="output-text topup-info">Пополнение баланса
+                    +<%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(clientPaymentSum))%>
+                    (<%=StringEscapeUtils.escapeHtml(transferInfo)%>)
+                    идентификатор платежа <%=clientPayment.getIdOfPayment()%>
+                </div>
+            </td>
+            <td>
+                <%
+                    Card card = clientPayment.getTransaction().getCard();
+                    if (null != card) {
+                %>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
+                </div>
+                <%}%>
+            </td>
+            <td />
         </tr>
-        <tr>
-            <td>
-                <input type="submit" name="<%=PROCESS_PARAM%>" value="Показать" class="command-button" />
-            </td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(todayUri))%>"
-                   class="command-link">Сегодня</a>
-            </td>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(thisWeeekUri))%>" class="command-link">На
-                    этой
-                    неделе</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(yesterdayUri))%>"
-                   class="command-link">Вчера</a>
-            </td>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(prevWeeekUri))%>" class="command-link">На
-                    прошлой неделе</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(beforeYesterdayUri))%>"
-                   class="command-link">Позавчера</a>
-            </td>
-            <td>
-                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(beforePrevWeeekUri))%>"
-                   class="command-link">На позапрошлой неделе</a>
-            </td>
-        </tr>
-    </table>
-</form>
-
-<%if (haveDataToProcess && dataToProcessVerified) {%>
-<table class="infotable">
-<tr class="header-tr">
-    <td colspan="9">
-        <div class="output-text">Покупки, совершенные с <%=StringEscapeUtils.escapeHtml(dateFormat.format(startDate))%>
-            по <%=StringEscapeUtils.escapeHtml(dateFormat.format(endDate))%>
-        </div>
-    </td>
-</tr>
-<tr class="subheader-tr">
-    <td>
-        <div class="output-text">Дата</div>
-    </td>
-    <td>
-        <div class="output-text">Сумма покупки</div>
-    </td>
-    <td>
-        <div class="output-text">Социальная скидка</div>
-    </td>
-    <td>
-        <div class="output-text">Торговая скидка</div>
-    </td>
-    <td>
-        <div class="output-text">Дотация</div>
-    </td>
-    <td>
-        <div class="output-text">Наличными</div>
-    </td>
-    <td>
-        <div class="output-text">По карте</div>
-    </td>
-    <td>
-        <div class="output-text">Номер карты</div>
-    </td>
-    <td>
-        <div class="output-text">Состав</div>
-    </td>
-</tr>
-<%
-    Session persistenceSession = null;
-    org.hibernate.Transaction persistenceTransaction = null;
-    try {
-        persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
-
-        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-        clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-        Client client = (Client) clientCriteria.uniqueResult();
-
-        Date nextToEndDate = DateUtils.addDays(endDate, 1);
-
-        Criteria ordersCriteria = persistenceSession.createCriteria(Order.class);
-        ordersCriteria.add(Restrictions.eq("client", client));
-        ordersCriteria.add(Restrictions.ge("createTime", startDate));
-        ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
-        ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-        List ordersList = ordersCriteria.list();
-
-        Criteria clientPaymentsCriteria = persistenceSession.createCriteria(ClientPayment.class);
-        clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
-        clientPaymentsCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-        clientPaymentsCriteria.add(Restrictions.ge("createTime", startDate));
-        clientPaymentsCriteria.add(Restrictions.lt("createTime", nextToEndDate));
-        clientPaymentsCriteria = clientPaymentsCriteria.createCriteria("transaction");
-        clientPaymentsCriteria.add(Restrictions.eq("client", client));
-        List clientPaymentsList = clientPaymentsCriteria.list();
-
-        Criteria clientSmsCriteria = persistenceSession.createCriteria(ClientSms.class);
-        clientSmsCriteria.add(Restrictions.ge("serviceSendTime", startDate));
-        clientSmsCriteria.add(Restrictions.lt("serviceSendTime", nextToEndDate));
-        clientSmsCriteria.add(Restrictions.eq("client", client));
-        List clientSmsList = clientSmsCriteria.list();
-
-        int orderIndex = 0;
-        int ordersCount = ordersList.size();
-        int clientPaymentIndex = 0;
-        int clientPaymentsCount = clientPaymentsList.size();
-        int clientSmsIndex = 0;
-        int clientSmsCount = clientSmsList.size();
-
-        boolean done = false;
-        while (!done) {
-            Date minTime = null;
+        <%
+                    ++clientPaymentIndex;
+                }
+            }
             if (orderIndex != ordersCount) {
                 Order order = (Order) ordersList.get(orderIndex);
-
-                minTime = order.getCreateTime();
-            }
-            if (clientPaymentIndex != clientPaymentsCount) {
-                ClientPayment clientPayment = (ClientPayment) clientPaymentsList.get(clientPaymentIndex);
-                Date clientPaymentTime = clientPayment.getCreateTime();
-                minTime = minTime == null ? clientPaymentTime
-                        : (clientPaymentTime.before(minTime) ? clientPaymentTime : minTime);
+                if (order.getCreateTime().equals(minTime)) {
+                    //if (logger.isDebugEnabled()) {
+                    //    logger.debug(order.toString());
+                    //}
+        %>
+        <tr valign="top">
+            <td>
+                <%
+                    CompositeIdOfOrder compositeIdOfOrder = order.getCompositeIdOfOrder();
+                    URI showOrderDetailsUri = UriUtils
+                            .putParam(formAction, ID_OF_ORG_PARAM, compositeIdOfOrder.getIdOfOrg().toString());
+                    showOrderDetailsUri = UriUtils
+                            .putParam(showOrderDetailsUri, ID_OF_ORDER_PARAM, compositeIdOfOrder.getIdOfOrder().toString());
+                    showOrderDetailsUri = UriUtils.putParam(showOrderDetailsUri, PAGE_PARAM, SHOW_ORDER_DETAILS_PAGE);
+                %>
+                <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(showOrderDetailsUri.toString()))%>"
+                   class="command-link">
+                    <%=StringEscapeUtils.escapeHtml(timeFormat.format(order.getCreateTime()))%>
+                </a>
+            </td>
+            <td align="right">
+                <%Long rSum = order.getRSum();%>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(rSum))%>
+                </div>
+            </td>
+            <td align="right">
+                <%String socDiscountInfo = "";
+                    if (order.getSocDiscount()!=0) socDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getSocDiscount());
+                    if (socDiscountInfo.length()==0) socDiscountInfo="-";
+                %>
+                <div class="output-text"><%=socDiscountInfo%>
+                </div>
+            </td>
+            <td align="right">
+                <%String trdDiscountInfo = "";
+                    if (order.getTrdDiscount()!=0) trdDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getTrdDiscount());
+                    if (trdDiscountInfo.length()==0) trdDiscountInfo="-";
+                %>
+                <div class="output-text"><%=trdDiscountInfo%>
+                </div>
+            </td>
+            <td align="right">
+                <%Long grantSum = order.getGrantSum();%>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(grantSum))%>
+                </div>
+            </td>
+            <td align="right">
+                <%Long sumByCash = order.getSumByCash();%>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sumByCash))%>
+                </div>
+            </td>
+            <td align="right">
+                <%Long sumByCard = order.getSumByCard();%>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sumByCard))%>
+                </div>
+            </td>
+            <td>
+                <%
+                    Card card = order.getCard();
+                    if (null != card) {
+                %>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
+                </div>
+                <%}%>
+            </td>
+            <td>
+                <table>
+                    <%
+                        Set<OrderDetail> orderDetails = order.getOrderDetails();
+                        for (OrderDetail currOrderDetail : orderDetails) {
+                    %>
+                    <tr valign="top">
+                        <td>
+                            <% String odStyle="";
+                                if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_9) odStyle="od-complex";
+                                else if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_ITEM_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_ITEM_9) odStyle="od-c-item";
+                            %>
+                            <div class="output-text <%=odStyle%>"><%=StringEscapeUtils.escapeHtml(currOrderDetail.getMenuDetailName())%>
+                                (<%=StringEscapeUtils.escapeHtml(currOrderDetail.getQty().toString())%>)
+                            </div>
+                        </td>
+                    </tr>
+                    <%}%>
+                </table>
+            </td>
+        </tr>
+        <%
+                    ++orderIndex;
+                }
             }
             if (clientSmsIndex != clientSmsCount) {
                 ClientSms clientSms = (ClientSms) clientSmsList.get(clientSmsIndex);
-                Date clientSmsTime = clientSms.getServiceSendTime();
-                minTime = minTime == null ? clientSmsTime : (clientSmsTime.before(minTime) ? clientSmsTime : minTime);
-            }
-            if (minTime == null) {
-                done = true;
-                continue;
-            }
-            if (clientPaymentIndex != clientPaymentsCount) {
-                ClientPayment clientPayment = (ClientPayment) clientPaymentsList.get(clientPaymentIndex);
-                if (clientPayment.getCreateTime().equals(minTime)) {
+                if (clientSms.getServiceSendTime().equals(minTime)) {
                     //if (logger.isDebugEnabled()) {
-                    //    logger.debug(clientPayment.toString());
+                    //    logger.debug(clientSms.toString());
                     //}
-%>
-<tr valign="top">
-    <td>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(timeFormat.format(clientPayment.getCreateTime()))%>
-        </div>
-    </td>
-    <td colspan="5">
+        %>
+        <tr valign="top">
+            <td>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(timeFormat.format(clientSms.getServiceSendTime()))%>
+                </div>
+            </td>
+            <td align="right">
+                <%
+                    AccountTransaction accountTransaction = clientSms.getTransaction();
+                    Long sum = clientSms.getPrice();
+                %>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sum))%>
+                </div>
+            </td>
+            <td align="right">
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
+                </div>
+            </td>
+            <td align="right">
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
+                </div>
+            </td>
+            <td align="right">
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
+                </div>
+            </td>
+            <td align="right">
+                <%
+                    Long transactionSum = 0L;
+                    if (null != accountTransaction) {
+                        transactionSum = accountTransaction.getTransactionSum();
+                    }
+                %>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(transactionSum))%>
+                </div>
+            </td>
+            <td>
+                <%
+                    if (null != accountTransaction) {
+                        Card card = accountTransaction.getCard();
+                        if (null != card) {
+                %>
+                <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
+                </div>
+                <%
+                        }
+                    }
+                %>
+            </td>
+            <td>
+                <div class="output-text">
+                    <%=StringEscapeUtils.escapeHtml(String.format("SMS-уведомление. Тип: %s. Статус: %s.",
+                            ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()],
+                            ClientSms.DELIVERY_STATUS_DESCRIPTION[clientSms.getDeliveryStatus()]))%>
+                </div>
+            </td>
+        </tr>
         <%
-
-            Long clientPaymentSum = clientPayment.getPaySum();
-            String transferInfo = PaymentTextUtils.buildTransferInfo(clientPayment);
+                            ++clientSmsIndex;
+                        }
+                    }
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Failed to build page", e);
+                throw new ServletException(e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         %>
-        <div class="output-text topup-info">Пополнение баланса
-            +<%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(clientPaymentSum))%>
-            (<%=StringEscapeUtils.escapeHtml(transferInfo)%>)
-            идентификатор платежа <%=clientPayment.getIdOfPayment()%>
-        </div>
-    </td>
-    <td>
-        <%
-            Card card = clientPayment.getTransaction().getCard();
-            if (null != card) {
-        %>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
-        </div>
-        <%}%>
-    </td>
-    <td />
-</tr>
-<%
-            ++clientPaymentIndex;
-        }
-    }
-    if (orderIndex != ordersCount) {
-        Order order = (Order) ordersList.get(orderIndex);
-        if (order.getCreateTime().equals(minTime)) {
-            //if (logger.isDebugEnabled()) {
-            //    logger.debug(order.toString());
-            //}
-%>
-<tr valign="top">
-    <td>
-        <%
-            CompositeIdOfOrder compositeIdOfOrder = order.getCompositeIdOfOrder();
-            URI showOrderDetailsUri = UriUtils
-                    .putParam(formAction, ID_OF_ORG_PARAM, compositeIdOfOrder.getIdOfOrg().toString());
-            showOrderDetailsUri = UriUtils
-                    .putParam(showOrderDetailsUri, ID_OF_ORDER_PARAM, compositeIdOfOrder.getIdOfOrder().toString());
-            showOrderDetailsUri = UriUtils.putParam(showOrderDetailsUri, PAGE_PARAM, SHOW_ORDER_DETAILS_PAGE);
-        %>
-        <a href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(showOrderDetailsUri.toString()))%>"
-           class="command-link">
-            <%=StringEscapeUtils.escapeHtml(timeFormat.format(order.getCreateTime()))%>
-        </a>
-    </td>
-    <td align="right">
-        <%Long rSum = order.getRSum();%>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(rSum))%>
-        </div>
-    </td>
-    <td align="right">
-        <%String socDiscountInfo = "";
-          if (order.getSocDiscount()!=0) socDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getSocDiscount());
-          if (socDiscountInfo.length()==0) socDiscountInfo="-";
-      %>
-        <div class="output-text"><%=socDiscountInfo%>
-        </div>
-    </td>
-    <td align="right">
-        <%String trdDiscountInfo = "";
-            if (order.getTrdDiscount()!=0) trdDiscountInfo=CurrencyStringUtils.copecksToRubles(order.getTrdDiscount());
-            if (trdDiscountInfo.length()==0) trdDiscountInfo="-";
-        %>
-        <div class="output-text"><%=trdDiscountInfo%>
-        </div>
-    </td>
-    <td align="right">
-        <%Long grantSum = order.getGrantSum();%>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(grantSum))%>
-        </div>
-    </td>
-    <td align="right">
-        <%Long sumByCash = order.getSumByCash();%>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sumByCash))%>
-        </div>
-    </td>
-    <td align="right">
-        <%Long sumByCard = order.getSumByCard();%>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sumByCard))%>
-        </div>
-    </td>
-    <td>
-        <%
-            Card card = order.getCard();
-            if (null != card) {
-        %>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
-        </div>
-        <%}%>
-    </td>
-    <td>
-        <table>
-            <%
-                Set<OrderDetail> orderDetails = order.getOrderDetails();
-                for (OrderDetail currOrderDetail : orderDetails) {
-            %>
-            <tr valign="top">
-                <td>
-                    <% String odStyle="";
-                       if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_9) odStyle="od-complex";
-                       else if (currOrderDetail.getMenuType()>=OrderDetail.TYPE_COMPLEX_ITEM_0 && currOrderDetail.getMenuType()<=OrderDetail.TYPE_COMPLEX_ITEM_9) odStyle="od-c-item";
-                    %>
-                    <div class="output-text <%=odStyle%>"><%=StringEscapeUtils.escapeHtml(currOrderDetail.getMenuDetailName())%>
-                        (<%=StringEscapeUtils.escapeHtml(currOrderDetail.getQty().toString())%>)
-                    </div>
-                </td>
-            </tr>
-            <%}%>
         </table>
-    </td>
-</tr>
-<%
-            ++orderIndex;
-        }
-    }
-    if (clientSmsIndex != clientSmsCount) {
-        ClientSms clientSms = (ClientSms) clientSmsList.get(clientSmsIndex);
-        if (clientSms.getServiceSendTime().equals(minTime)) {
-            //if (logger.isDebugEnabled()) {
-            //    logger.debug(clientSms.toString());
-            //}
-%>
-<tr valign="top">
-    <td>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(timeFormat.format(clientSms.getServiceSendTime()))%>
-        </div>
-    </td>
-    <td align="right">
-        <%
-            AccountTransaction accountTransaction = clientSms.getTransaction();
-            Long sum = clientSms.getPrice();
-        %>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(sum))%>
-        </div>
-    </td>
-    <td align="right">
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
-        </div>
-    </td>
-    <td align="right">
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
-        </div>
-    </td>
-    <td align="right">
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(0L))%>
-        </div>
-    </td>
-    <td align="right">
-        <%
-            Long transactionSum = 0L;
-            if (null != accountTransaction) {
-                transactionSum = accountTransaction.getTransactionSum();
-            }
-        %>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(transactionSum))%>
-        </div>
-    </td>
-    <td>
-        <%
-            if (null != accountTransaction) {
-                Card card = accountTransaction.getCard();
-                if (null != card) {
-        %>
-        <div class="output-text"><%=StringEscapeUtils.escapeHtml(CardNoFormat.format(card.getCardNo()))%>
-        </div>
-        <%
-                }
-            }
-        %>
-    </td>
-    <td>
-        <div class="output-text">
-            <%=StringEscapeUtils.escapeHtml(String.format("SMS-уведомление. Тип: %s. Статус: %s.",
-                    ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()],
-                    ClientSms.DELIVERY_STATUS_DESCRIPTION[clientSms.getDeliveryStatus()]))%>
-        </div>
-    </td>
-</tr>
-<%
-                    ++clientSmsIndex;
-                }
-            }
-        }
-        persistenceTransaction.commit();
-        persistenceTransaction = null;
-    } catch (Exception e) {
-        logger.error("Failed to build page", e);
-        throw new ServletException(e);
-    } finally {
-        HibernateUtils.rollback(persistenceTransaction, logger);
-        HibernateUtils.close(persistenceSession, logger);
-    }
-%>
+        </td>
+        <td valign="top">
+           <%
+               try {
+
+                   persistenceSession = runtimeContext.createPersistenceSession();
+                   persistenceTransaction = persistenceSession.beginTransaction();
+
+                   Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
+                   criteriaCanConfirmGroupPayment.add(Restrictions.eq("canConfirmGroupPayment",true));
+                   criteriaCanConfirmGroupPayment.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
+                   if(!criteriaCanConfirmGroupPayment.list().isEmpty()){
+                       /* TODO: teacher logic  */
+                       Client teacher = (Client) criteriaCanConfirmGroupPayment.list().get(0);
+
+                       String sql = "SELECT  cf_persons.surname || ' ' || cf_persons.firstname || ' ' || cf_persons.secondname, "
+                               +  "  student.balance, cf_orders.rsum, cf_orders.createddate, student.idofclient "
+                               + " FROM  "
+                               + "  public.cf_group_payment_confirm, "
+                               + "  public.cf_group_payment_confirm_position,  public.cf_orders, "
+                               + "  public.cf_clients student,  public.cf_persons "
+                               + " WHERE cf_group_payment_confirm.confirmerid = " +teacher.getIdOfClient() +" AND "
+                               + "  cf_group_payment_confirm_position.idofgrouppaymentconfirm = cf_group_payment_confirm.idofgrouppaymentconfirm AND "
+                               + "  cf_orders.idoforder = cf_group_payment_confirm_position.idoforder AND "
+                               + "  cf_orders.idoforg = cf_group_payment_confirm_position.orgowner AND "
+                               + "  student.idofclient = cf_orders.idofclient AND "
+                               + "  cf_persons.idofperson = student.idofperson AND "
+                               + "  student.balance < 0 ORDER BY "
+                               + "  cf_orders.idofclient ASC, cf_orders.createddate DESC ,cf_group_payment_confirm_position.idoforder ASC ";
+                       Query query = persistenceSession.createSQLQuery(sql);
+                       List students = query.list();
+
+
+                       %>
+                        <table border="1" cellpadding="0" cellspacing="0">
+                            <tr>
+                               <td>
+                                   <span style="margin: 20px">
+                                       ФИО
+                                   </span>
+                               </td>
+                                <td>
+                                   <span style="margin: 20px">
+                                       Текущий баланс
+                                   </span>
+                                </td>
+                                <td>
+                                    <span style="margin: 20px">
+                                    Дата заказа
+                                   </span>
+                                </td>
+                                <td>
+                                    <span style="margin: 20px">
+                                    Сумма заказа
+                                   </span>
+                                </td>
+                            </tr>
+                            <%
+                                Long idOfClient=null;
+                                Long sum = 0L;
+                                for (Object object: students){
+                                    Object[] student =(Object[]) object;
+                                    String fio = String.valueOf(student[0]);
+                                    Long balance = Long.valueOf(String.valueOf(student[1]));
+                                    Date date = new Date(Long.valueOf(String.valueOf(student[3])));
+                                    String stringDate = timeFormat.format(date);
+                                    Long paySum = Long.valueOf(String.valueOf(student[2]));
+                                    Long currentIdOfClient = Long.valueOf(String.valueOf(student[4]));
+                                    if(idOfClient==null || (idOfClient!=null && !idOfClient.equals(currentIdOfClient)) ){
+                                        idOfClient = currentIdOfClient;
+                                        sum=0L;
+                                    }
+                                    if(balance + sum<0 && idOfClient.equals(currentIdOfClient)){
+                                        sum+=paySum;
+                                                %>
+                                                <tr>
+                                                    <td>
+                                                        <span style="margin: 20px">
+                                                            <%= fio%>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span style="margin: 20px">
+                                                <%=
+                                                StringEscapeUtils
+                                                        .escapeHtml(CurrencyStringUtils.copecksToRubles(balance))
+                                                %>
+                                               </span>
+
+                                                    </td>
+                                                    <td>
+                                                        <span style="margin: 20px">
+                                                <%=StringEscapeUtils.escapeHtml(stringDate)%>
+                                               </span>
+
+                                                    </td>
+                                                    <td>
+                                                       <span style="margin: 20px">
+                                                           <%=
+                                                           StringEscapeUtils
+                                                                   .escapeHtml(CurrencyStringUtils.copecksToRubles(paySum))
+                                                           %>
+                                                       </span>
+
+                                                    </td>
+                                                </tr>
+                                                <%
+                                            }
+                                }
+                            %>
+                        </table>
+                       <%
+                   } else {
+                       /* TODO: students logic  */
+                   }
+
+                   persistenceTransaction.commit();
+                   persistenceTransaction = null;
+
+               }catch (Exception e) {
+                   logger.error("Failed to build page", e);
+                   throw new ServletException(e);
+               } finally {
+                   HibernateUtils.rollback(persistenceTransaction, logger);
+                   HibernateUtils.close(persistenceSession, logger);
+               }
+
+           %>
+        </td>
+    </tr>
 </table>
+
 <%
         }
     } catch (RuntimeContext.NotInitializedException e) {
