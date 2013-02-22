@@ -2396,7 +2396,7 @@ CREATE TABLE Cf_Good_Basic_Basket_Price
   SendAll integer DEFAULT 1,
   OrgOwner bigint,
   Price bigint,
-  CONSTRAINT Cf_Good_Basic_Basket_Price_PK                  PRIMARY KEY (IdOfBasicGood),
+  CONSTRAINT Cf_Good_Basic_Basket_Price_PK                  PRIMARY KEY (IdOfGoodBasicBasketPrice),
   CONSTRAINT Cf_Good_Basic_Basket_Price_BasicGoodNumber_Key UNIQUE      (Guid)
 );
 
