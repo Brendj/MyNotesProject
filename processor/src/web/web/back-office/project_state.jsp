@@ -22,7 +22,7 @@
 </script>
 <style>
     a { font-size: 12px; }
-    .ui-tabs-vertical { width: 1100px; }
+    .ui-tabs-vertical { width: 1120px; }
     .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 220px; }
     .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
     .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
