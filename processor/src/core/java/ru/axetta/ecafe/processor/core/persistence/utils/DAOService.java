@@ -570,14 +570,14 @@ public class DAOService {
     public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
-            sql = "SELECT cf_orders.idoforg, COUNT(cf_orders.idofclient) " +
+            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
                     "FROM cf_orders " +
                     "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
                     "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
                     + (notDiscounted ? " AND cf_orders.socdiscount=0" : "") +
                     "GROUP BY cf_orders.idoforg";
         } else {
-            sql = "SELECT cf_orders.idoforg, COUNT(cf_orders.idofclient) " +
+            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
                     "FROM cf_orders " +
                     "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
                     "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "

@@ -243,9 +243,9 @@ public class DashboardServiceBean {
                     .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
             Map<Long, Integer> employeeEnters = daoService
                     .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
-            Map<Long, Integer> studentOrders = daoService
+            Map<Long, Integer> studentPays = daoService
                     .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, true);
-            Map<Long, Integer> employeeOrders = daoService
+            Map<Long, Integer> employeePays = daoService
                     .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, true);
             Map<Long, Integer> studentDiscounts = daoService
                     .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
@@ -264,8 +264,8 @@ public class DashboardServiceBean {
                 }
                 Integer studentsEntersCount = studentEnters.get(orgID);
                 Integer employeesEntersCount = employeeEnters.get(orgID);
-                Integer studentsOrdersCount = studentOrders.get(orgID);
-                Integer employeeOrdersCount = employeeOrders.get(orgID);
+                Integer studentsPayOrdersCount = studentPays.get(orgID);
+                Integer employeePayOrdersCount = employeePays.get(orgID);
                 Integer studentsDiscountsCount = zeroIfNull (studentDiscounts.get(orgID));
                 Integer employeeDiscountsCount = zeroIfNull (employeeDiscounts.get(orgID));
                 Integer studentsUniqueCount = studentUniqueOrders.get(orgID);
@@ -277,11 +277,13 @@ public class DashboardServiceBean {
                 if (employeesEntersCount != null && statItem.getNumberOfEnterEvents() != 0) {
                     per2 = (double) employeesEntersCount / (double) statItem.getNumberOfEnterEvents();
                 }
-                if (studentsOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
-                    per3 = (double) studentsOrdersCount / (double) statItem.getNumberOfPayOrders();
+                if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                    per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
+                                                                       statItem.getNumberOfNonStudentClients());
                 }
-                if (employeeOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
-                    per4 = (double) employeeOrdersCount / (double) statItem.getNumberOfPayOrders();
+                if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                    per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
+                                                                       statItem.getNumberOfStudentClients());
                 }
                 if (studentsUniqueCount != null && studentsDiscountsCount != 0) {
                     per5 = (double) studentsUniqueCount / (double) studentsDiscountsCount;
