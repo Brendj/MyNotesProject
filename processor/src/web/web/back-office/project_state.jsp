@@ -136,9 +136,9 @@
 <script type="text/javascript">
 google.load ("visualization", "1", {packages: ["corechart"]});
 google.load('visualization', '1', {packages: ['table']});
-google.setOnLoadCallback (initPeriods);
 google.setOnLoadCallback (drawActiveChart);
 google.setOnLoadCallback (drawUniqueChart);
+google.setOnLoadCallback (initPeriods);
 var inter;
 var inter2;
 var inter3;
