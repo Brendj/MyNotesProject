@@ -38,6 +38,7 @@ import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -3300,4 +3301,176 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setQuestionaryList(questionaryList);
     }
 
+
+    @Override
+    public ClientNotificationSettingsResult getClientNotificationTypes() {
+
+        ClientNotificationSettingsResult res = new ClientNotificationSettingsResult(RC_OK, RC_OK_DESC);
+
+        List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
+        try {
+            for (ClientNotificationSetting.Predefined predef : ClientNotificationSetting.Predefined.values()) {
+                if (predef.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()){
+                    continue;
+                }
+                ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                it.setTypeOfNotification(predef.getValue());
+                it.setNameOfNotification(predef.getName());
+                list.add(it);
+            }
+            res.settings = list;
+        } catch (Exception e) {
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+        }
+        return res;
+    }
+
+
+    @Override
+    public ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId) {
+
+        //authenticateRequest(contractId);
+
+        ClientNotificationSettingsResult res = new ClientNotificationSettingsResult(RC_OK, RC_OK_DESC);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+
+        List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+            if (client == null) {
+                res.resultCode = RC_CLIENT_NOT_FOUND;
+                res.description = RC_CLIENT_NOT_FOUND_DESC;
+                return res;
+            }
+
+
+            org.hibernate.Query q = persistenceSession.createSQLQuery("select notifytype "
+                    + "from cf_clientsnotificationsettings "
+                    + "where cf_clientsnotificationsettings.idofclient=:idofclient");
+            q.setLong("idofclient", client.getIdOfClient());
+
+            for (Object entry : q.list()) {
+                long type = ((BigInteger) entry).longValue();
+
+                if (type == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+                    continue;
+                }
+
+                ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                it.setTypeOfNotification(type);
+                it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(type).getName());
+                list.add(it);
+            }
+            if (list.size() < 1) {
+                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
+                    if (pd.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue() ||
+                            !pd.isEnabledAtDefault()) {
+                        continue;
+                    }
+                    ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                    it.setTypeOfNotification(pd.getValue());
+                    it.setNameOfNotification(pd.getName());
+                    list.add(it);
+                }
+            }
+
+            res.settings = list;
+            persistenceSession.flush();
+        } catch (Exception e) {
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return res;
+    }
+
+
+    @Override
+    public ClientNotificationChangeResult setClientNotificationSettings (@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "notificationType") List<Long> notificationTypes) {
+        //authenticateRequest(contractId);
+
+        ClientNotificationChangeResult res = new ClientNotificationChangeResult(RC_OK, RC_OK_DESC);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+
+
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            Client client = (Client) clientCriteria.uniqueResult();
+
+            if (client == null) {
+                res.resultCode = RC_CLIENT_NOT_FOUND;
+                res.description = RC_CLIENT_NOT_FOUND_DESC;
+                return res;
+            }
+
+
+
+            Set<ClientNotificationSetting> currentSettings = client.getNotificationSettings();
+            removeSMSSettings(currentSettings);
+
+            Set <ClientNotificationSetting> newSettings = new HashSet<ClientNotificationSetting>();
+            if (notificationTypes != null) {
+                for (Long type : notificationTypes) {
+                    ClientNotificationSetting.Predefined pd = ClientNotificationSetting.Predefined.parse(type);
+                    if (pd == null || pd.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+                        continue;
+                    }
+                    newSettings.add(new ClientNotificationSetting(client, pd.getValue()));
+                }
+            }
+            ClientNotificationSetting changeSetting = new ClientNotificationSetting(client,
+                    ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
+            newSettings.add(changeSetting);
+            client.setNotificationSettings(newSettings);
+            persistenceSession.update(client);
+
+            persistenceSession.flush();
+        } catch (Exception e) {
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return res;
+    }
+
+    @Transactional
+    public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            for (ClientNotificationSetting currentSetting : notificationSettings) {
+                currentSetting = (ClientNotificationSetting) persistenceSession.merge(currentSetting);
+                persistenceSession.delete(currentSetting);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to remove active settings", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+    }
 }

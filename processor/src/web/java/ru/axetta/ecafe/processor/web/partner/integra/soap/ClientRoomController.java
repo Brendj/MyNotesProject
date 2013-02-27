@@ -184,4 +184,14 @@ public interface ClientRoomController {
     public ComplexListResult getComplexList(@WebParam(name = "contractId") Long contractId,
             final Date startDate, final Date endDate);
 
+    @WebMethod(operationName="getNotificationSettings")
+    public ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName="setNotificationSettings")
+    public ClientNotificationChangeResult setClientNotificationSettings (@WebParam(name = "contractId") Long contractId,
+                                                                         @WebParam(name = "notificationType") List<Long> notificationTypes);
+
+    @WebMethod(operationName="getNotificationTypes")
+    public ClientNotificationSettingsResult getClientNotificationTypes ();
+
 }
