@@ -461,6 +461,22 @@ public class DAOUtils {
         return (MenuDetail)q.uniqueResult();
     }
 
+    public static MenuDetail findMenuDetailByPathAndPrice(Session persistenceSession, Menu menu, String path, Long price) {
+        String sql = "";
+        if (price != null) {
+            sql = "FROM MenuDetail WHERE menu=:menu AND menupath=:menupath AND price=:price";
+        } else {
+            sql ="FROM MenuDetail WHERE menu=:menu AND menupath=:menupath";
+        }
+        Query q = persistenceSession.createQuery(sql);
+        q.setParameter("menu", menu);
+        q.setParameter("menupath", path);
+        if (price != null) {
+            q.setParameter("price", price);
+        }
+        return q.list() == null || q.list().size() < 1 ? null : (MenuDetail)q.list().get(0);//.uniqueResult();
+    }
+
     public static PublicKey getContragentPublicKey(RuntimeContext runtimeContext, Long idOfContragent) throws Exception {
         PublicKey publicKey;
         Session persistenceSession = null;

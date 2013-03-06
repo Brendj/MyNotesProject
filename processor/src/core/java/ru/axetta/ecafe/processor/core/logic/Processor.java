@@ -199,6 +199,11 @@ public class Processor implements SyncProcessor,
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
         QuestionaryData questionaryData = null;
+
+
+
+
+
         GoodsBasicBasketData goodsBasicBasketData = null;
         try {
             setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
@@ -1453,7 +1458,6 @@ public class Processor implements SyncProcessor,
             Transaction persistenceTransaction = null;
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
 
                 Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
 
@@ -1469,6 +1473,9 @@ public class Processor implements SyncProcessor,
                 Enumeration<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
                 boolean bFirstMenuItem = true;
                 while (menuItems.hasMoreElements()) {
+                    //  Открываем тразнакцию для каждого дня
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
                     SyncRequest.ReqMenu.Item item = menuItems.nextElement();
                     /// сохраняем данные меню для распространения
                     if (bOrgIsMenuExchangeSource) {
@@ -1488,15 +1495,20 @@ public class Processor implements SyncProcessor,
                     }
                     processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
                     processReqMenuDetails(persistenceSession, organization, menuDate, menu, item,
-                            item.getReqMenuDetails());
+                            item.getReqMenuDetails(), bOrgIsMenuExchangeSource);
                     processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos());
                     bFirstMenuItem = false;
+
+
+                    //  Подтверждаем транзакцию для каждого дня
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
                 }
 
-                persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } finally {
+            } catch (Exception e) {
+                logger.error("Failed to sync menu", e);
+            }finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
             }
@@ -1595,14 +1607,40 @@ public class Processor implements SyncProcessor,
     }
 
     private void processReqMenuDetails(Session persistenceSession, Org organization, Date menuDate, Menu menu,
-            SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails)
+            SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
+            boolean bOrgIsMenuExchangeSource)
             throws Exception {
+        // Ищем "лишние" элементы меню
+        List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
+        for (MenuDetail menuDetail : menu.getMenuDetails()) {
+            if (!find(menuDetail, item, bOrgIsMenuExchangeSource)) {
+                superfluousMenuDetails.add(menuDetail);
+            }
+        }
+        // Удаляем "лишние" элементы меню
+        for (MenuDetail menuDetail : superfluousMenuDetails) {
+            menu.removeMenuDetail(menuDetail);
+            persistenceSession.delete(menuDetail);
+        }
+
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
-            if (null == DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu())) {
-                MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
+
+            /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
+           (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
+            for (MenuDetail menuDetail : menu.getMenuDetails()) {
+                boolean procceed = false;
+                if (bOrgIsMenuExchangeSource) {
+                    procceed = reqMenuDetail.getIdOfMenu() == menuDetail.getLocalIdOfMenu();
+                }
+                else {
+                    procceed = StringUtils.equals (reqMenuDetail.getPath(), menuDetail.getMenuPath()) &&
+                               (reqMenuDetail.getPrice() == null ? true : reqMenuDetail.getPrice() == menuDetail.getPrice());
+                }
+                if (procceed) {
+                /*MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
                         reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
-                        reqMenuDetail.getFlags());
+                        reqMenuDetail.getFlags());*/
                 menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
                 menuDetail.setGroupName(reqMenuDetail.getGroup());
                 menuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
@@ -1623,36 +1661,33 @@ public class Processor implements SyncProcessor,
 
                 persistenceSession.save(menuDetail);
                 menu.addMenuDetail(menuDetail);
+                    break;
+                }
             }
         }
-        // Ищем "лишние" элементы меню
-        List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
-        for (MenuDetail menuDetail : menu.getMenuDetails()) {
-            if (!find(menuDetail, item)) {
-                superfluousMenuDetails.add(menuDetail);
-            }
-        }
-        // Удаляем "лишние" элементы меню
-        for (MenuDetail menuDetail : superfluousMenuDetails) {
-            menu.removeMenuDetail(menuDetail);
-            persistenceSession.delete(menuDetail);
-        }
-
     }
 
     private boolean isOrgMenuExchangeSource(Session persistenceSession, Long idOfOrg) {
         return DAOUtils.isOrgMenuExchangeSource(persistenceSession, idOfOrg);
     }
 
-    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem) throws Exception {
+    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem, boolean bOrgIsMenuExchangeSource) throws Exception {
         Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
             Long localIdOfMenu = menuDetail.getLocalIdOfMenu();
-            // если есть локальный ID то ищем по нему, если нет - то по имени
-            if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
+            //  Проверяем отталкиваясь от bOrgIsMenuExchangeSource - если true, то используем localIdOfMenu,
+            //  иначе ищем только по пути и цене
+            if (bOrgIsMenuExchangeSource && (localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
+                .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
+                .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {
+            /*if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
                     .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
-                    .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {
+                    .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {*/
+                return true;
+            }
+            else if (menuDetail.getMenuPath() != null && StringUtils.equals(menuDetail.getMenuPath(), reqMenuDetail.getPath())/* &&
+                     menuDetail.getPrice() != null && menuDetail.getPrice() == reqMenuDetail.getPrice()*/) {
                 return true;
             }
         }
