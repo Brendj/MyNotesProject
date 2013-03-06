@@ -108,7 +108,8 @@ public class Processor implements SyncProcessor,
                                 clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
                     }  */
                     RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client, addIdOfPayment);
+                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client,
+                                    addIdOfPayment);
                 }
             }
 
@@ -201,9 +202,6 @@ public class Processor implements SyncProcessor,
         QuestionaryData questionaryData = null;
 
 
-
-
-
         GoodsBasicBasketData goodsBasicBasketData = null;
         try {
             setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
@@ -212,8 +210,10 @@ public class Processor implements SyncProcessor,
                 // Generate IdOfPacket
                 idOfPacket = generateIdOfPacket(request.getIdOfOrg());
                 // Register sync history
-                idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),request.getRemoteAddr());
-                addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),request.getRemoteAddr());
+                idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+                        request.getRemoteAddr());
+                addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
+                        request.getRemoteAddr());
                 // Process paymentRegistry
                 try {
                     if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
@@ -223,10 +223,9 @@ public class Processor implements SyncProcessor,
                     }
                     resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
                             request.getPaymentRegistry());
-                } catch (Exception e){
+                } catch (Exception e) {
                     logger.error(
-                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
+                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
                 }
 
                 // Process ClientParamRegistry
@@ -240,7 +239,7 @@ public class Processor implements SyncProcessor,
 
                 // Process OrgStructure
                 try {
-                    if(request.getOrgStructure()!=null){
+                    if (request.getOrgStructure() != null) {
                         resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure());
                     }
                 } catch (Exception e) {
@@ -298,8 +297,9 @@ public class Processor implements SyncProcessor,
                 // Process enterEvents
                 try {
                     if (request.getEnterEvents() != null) {
-                        if (request.getEnterEvents().getEvents().size()>0) {
-                            if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
+                        if (request.getEnterEvents().getEvents().size() > 0) {
+                            if (!RuntimeContext.getInstance()
+                                    .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
                                 throw new Exception("no license slots available");
                             }
                         }
@@ -357,15 +357,16 @@ public class Processor implements SyncProcessor,
                 try {
                     orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to process org owner data, IdOfOrg == %s",
-                            request.getIdOfOrg()), e);
+                    logger.error(String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
                 }
 
                 try {
                     questionaryData = processQuestionaryData(request.getIdOfOrg());
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to process questionary data, IdOfOrg == %s",
-                            request.getIdOfOrg()), e);
+                    logger.error(
+                            String.format("Failed to process questionary data, IdOfOrg == %s", request.getIdOfOrg()),
+                            e);
                 }
 
                 try {
@@ -376,19 +377,18 @@ public class Processor implements SyncProcessor,
                 }
 
                 try {
-                    if(request.getManager()!=null){
+                    if (request.getManager() != null) {
                         manager = request.getManager();
                         manager.process(persistenceSessionFactory);
                     }
                 } catch (Exception e) {
-                    logger.error(
-                            String.format("Failed to process of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
+                    logger.error(String.format("Failed to process of Distribution Manager, IdOfOrg == %s",
+                            request.getIdOfOrg()), e);
                 }
 
             } else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
                 // запрос на получение пополнений
-                boolean bError=false;
+                boolean bError = false;
                 try {
                     accIncRegistry = getAccIncRegistry(request.getIdOfOrg(),
                             request.getAccIncRegistryRequest().dateTime);
@@ -397,15 +397,16 @@ public class Processor implements SyncProcessor,
                             e);
                     accIncRegistry = new SyncResponse.AccIncRegistry();
                     accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
-                    bError=true;
+                    bError = true;
                 }
 
                 // Process paymentRegistry
                 try {
-                    if(request.getPaymentRegistry()!=null){
-                        if(request.getPaymentRegistry().getPayments() !=null){
+                    if (request.getPaymentRegistry() != null) {
+                        if (request.getPaymentRegistry().getPayments() != null) {
                             if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
-                                if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                                if (!RuntimeContext.getInstance()
+                                        .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
                                     throw new Exception("no license slots available");
                                 }
                             }
@@ -413,10 +414,9 @@ public class Processor implements SyncProcessor,
                                     request.getPaymentRegistry());
                         }
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     logger.error(
-                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
+                            String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
                 }
 
                 // Process enterEvents
@@ -427,10 +427,13 @@ public class Processor implements SyncProcessor,
                 } catch (Exception e) {
                     logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
                             e);
-                    bError=true;
+                    bError = true;
                 }
-                if (bError) DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
-                else DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
+                if (bError) {
+                    DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+                } else {
+                    DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
+                }
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to perform synchronization, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -583,7 +586,7 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private OrgOwnerData processOrgOwnerData(Long idOfOrg) throws Exception{
+    private OrgOwnerData processOrgOwnerData(Long idOfOrg) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         OrgOwnerData orgOwnerData = new OrgOwnerData();
@@ -600,7 +603,7 @@ public class Processor implements SyncProcessor,
         return orgOwnerData;
     }
 
-    private QuestionaryData processQuestionaryData(Long idOfOrg) throws Exception{
+    private QuestionaryData processQuestionaryData(Long idOfOrg) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         QuestionaryData questionaryData = new QuestionaryData();
@@ -617,7 +620,7 @@ public class Processor implements SyncProcessor,
         return questionaryData;
     }
 
-    private GoodsBasicBasketData processGoodsBasicBasketData(Long idOfOrg) throws Exception{
+    private GoodsBasicBasketData processGoodsBasicBasketData(Long idOfOrg) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         GoodsBasicBasketData goodsBasicBasketData = new GoodsBasicBasketData();
@@ -726,8 +729,7 @@ public class Processor implements SyncProcessor,
             Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, idOfOrg);
             if (null != client) {
                 Org clientOrg = client.getOrg();
-                if (!clientOrg.getIdOfOrg().equals(idOfOrg)
-                        && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
+                if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
                             "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
@@ -794,7 +796,7 @@ public class Processor implements SyncProcessor,
                         purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getRPrice(),
                         purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
                         purchase.getMenuOutput(), purchase.getType());
-                if(purchase.getItemCode() != null){
+                if (purchase.getItemCode() != null) {
                     orderDetail.setItemCode(purchase.getItemCode());
                 }
                 if (purchase.getGuidOfGoods() != null) {
@@ -885,20 +887,21 @@ public class Processor implements SyncProcessor,
                                 payment.getContractId(), payment.getClientId()), null);
             }
             Long idOfClient = client.getIdOfClient();
-            Long paymentTspContragentId=null;
+            Long paymentTspContragentId = null;
             HashMap<String, String> payAddInfo = new HashMap<String, String>();
             Contragent defaultTsp = client.getOrg().getDefaultSupplier();
-            if (payment.getTspContragentId()!=null) {
+            if (payment.getTspContragentId() != null) {
                 // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
-                if (defaultTsp==null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
+                if (defaultTsp == null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
                     return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
                             PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
                             String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
-                                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(), payment.getTspContragentId(),
-                                    payment.getContractId(), payment.getClientId()), null);
+                                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(),
+                                    payment.getTspContragentId(), payment.getContractId(), payment.getClientId()),
+                            null);
                 }
             }
-            if (defaultTsp!=null) {
+            if (defaultTsp != null) {
                 paymentTspContragentId = defaultTsp.getIdOfContragent();
                 processContragentAddInfo(defaultTsp, payAddInfo);
             }
@@ -925,8 +928,9 @@ public class Processor implements SyncProcessor,
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
-                    idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(), PaymentProcessResult.OK.getCode(),
-                    PaymentProcessResult.OK.getDescription(), client, null, payAddInfo);
+                    idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(),
+                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, null,
+                    payAddInfo);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -938,7 +942,7 @@ public class Processor implements SyncProcessor,
     }
 
     private void processContragentAddInfo(Contragent contragent, HashMap<String, String> payAddInfo) {
-        if (contragent.getRemarks()!=null && contragent.getRemarks().length()>0) {
+        if (contragent.getRemarks() != null && contragent.getRemarks().length() > 0) {
             ParameterStringUtils.extractParameters("TSP.", contragent.getRemarks(), payAddInfo);
         }
     }
@@ -947,30 +951,30 @@ public class Processor implements SyncProcessor,
             SyncRequest.ClientParamRegistry clientParamRegistry) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
                     .getPayments().iterator();
 
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
-            Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
-            Set<Org> orgSet  = org.getFriendlyOrg();
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
             orgSet.add(org);
-            for (Org o: orgSet){
+            for (Org o : orgSet) {
                 List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
                 HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
-                for(Object object: clientGroups){
+                for (Object object : clientGroups) {
                     ClientGroup clientGroup = (ClientGroup) object;
-                    nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
-                    orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(),nameIdGroupMap);
+                    nameIdGroupMap.put(clientGroup.getGroupName(), clientGroup);
+                    orgMap.put(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg(), nameIdGroupMap);
                 }
                 orgMap.put(o.getIdOfOrg(), nameIdGroupMap);
             }
-            Long version=null;
-            if(clientParamItems.hasNext()){
-                version=DAOUtils.updateClientRegistryVersion(persistenceSession);
+            Long version = null;
+            if (clientParamItems.hasNext()) {
+                version = DAOUtils.updateClientRegistryVersion(persistenceSession);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1000,7 +1004,8 @@ public class Processor implements SyncProcessor,
     }
 
     private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem, HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
+            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1008,7 +1013,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
-            if(!orgMap.keySet().contains(client.getOrg().getIdOfOrg())){
+            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 throw new IllegalArgumentException("Client from another organization");
             }
             /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
@@ -1019,7 +1024,7 @@ public class Processor implements SyncProcessor,
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
             /**/
-            if(clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY){
+            if (clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY) {
                 /* распарсим строку с категориями */
                 if (clientParamItem.getCategoriesDiscounts() != null) {
                     String categories = clientParamItem.getCategoriesDiscounts();
@@ -1039,46 +1044,68 @@ public class Processor implements SyncProcessor,
                         client.setCategories(categoryDiscountSet);
                     }
                 }
-            }  else {
+            } else {
                 /* Льгота по категориями то ощищаем */
                 client.setCategories(new HashSet<CategoryDiscount>());
             }
-            if (clientParamItem.getAddress()!=null) client.setAddress(clientParamItem.getAddress());
-            if (clientParamItem.getEmail()!=null) {
+            if (clientParamItem.getAddress() != null) {
+                client.setAddress(clientParamItem.getAddress());
+            }
+            if (clientParamItem.getEmail() != null) {
                 client.setEmail(clientParamItem.getEmail());
-                if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail()==null) {
+                if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
                     client.setNotifyViaEmail(true);
                 }
             }
-            if (clientParamItem.getMobilePhone()!=null) {
+            if (clientParamItem.getMobilePhone() != null) {
                 client.setMobile(clientParamItem.getMobilePhone());
-                if (!StringUtils.isEmpty(clientParamItem.getMobilePhone()) && clientParamItem.getNotifyViaSMS()==null) {
+                if (!StringUtils.isEmpty(clientParamItem.getMobilePhone())
+                        && clientParamItem.getNotifyViaSMS() == null) {
                     client.setNotifyViaSMS(true);
                 }
             }
-            if (clientParamItem.getName()!=null) client.getPerson().setFirstName(clientParamItem.getName());
-            if (clientParamItem.getPhone()!=null) client.setPhone(clientParamItem.getPhone());
-            if (clientParamItem.getSecondName()!=null) client.getPerson().setSecondName(clientParamItem.getSecondName());
-            if (clientParamItem.getSurname()!=null) client.getPerson().setSurname(clientParamItem.getSurname());
-            if (clientParamItem.getRemarks()!=null) client.setRemarks(clientParamItem.getRemarks());
-            if (clientParamItem.getNotifyViaEmail()!=null) client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
-            if (clientParamItem.getNotifyViaSMS()!=null) client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            if (clientParamItem.getName() != null) {
+                client.getPerson().setFirstName(clientParamItem.getName());
+            }
+            if (clientParamItem.getPhone() != null) {
+                client.setPhone(clientParamItem.getPhone());
+            }
+            if (clientParamItem.getSecondName() != null) {
+                client.getPerson().setSecondName(clientParamItem.getSecondName());
+            }
+            if (clientParamItem.getSurname() != null) {
+                client.getPerson().setSurname(clientParamItem.getSurname());
+            }
+            if (clientParamItem.getRemarks() != null) {
+                client.setRemarks(clientParamItem.getRemarks());
+            }
+            if (clientParamItem.getNotifyViaEmail() != null) {
+                client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
+            }
+            if (clientParamItem.getNotifyViaSMS() != null) {
+                client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            }
             /* FAX клиента */
-            if (clientParamItem.getFax() != null) client.setFax(clientParamItem.getFax());
+            if (clientParamItem.getFax() != null) {
+                client.setFax(clientParamItem.getFax());
+            }
             /* разрешает клиенту подтверждать оплату групового питания */
-            if (clientParamItem.getCanConfirmGroupPayment() != null) client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
+            if (clientParamItem.getCanConfirmGroupPayment() != null) {
+                client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
+            }
 
             /* заносим клиента в группу */
-            if(clientParamItem.getGroupName() != null){
+            if (clientParamItem.getGroupName() != null) {
                 ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
                 //если группы нет то создаем
-                if(clientGroup == null){
-                    clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
+                if (clientGroup == null) {
+                    clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                            clientParamItem.getGroupName());
                     // заносим в хэш - карту
-                    orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(),clientGroup);
+                    orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                 }
 
-                if(clientGroup!=null){
+                if (clientGroup != null) {
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 }
             }
@@ -1260,10 +1287,12 @@ public class Processor implements SyncProcessor,
             }
             ////
             Client client = DAOUtils.findClient(persistenceSession, idOfClient);
-            Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
+            Set<Long> idOfFriendlyOrgSet = DAOUtils
+                    .getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
-            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet.contains(client.getOrg().getIdOfOrg())) {
+            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
+                    .contains(client.getOrg().getIdOfOrg())) {
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
                         idOfClient, client, organization.getIdOfOrg()));
@@ -1291,13 +1320,14 @@ public class Processor implements SyncProcessor,
         return false;
     }
 
-    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress){
+    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress);
+            DAOUtils.updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion,
+                    remoteAddress);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -1306,7 +1336,8 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private Long addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion, String remoteAddress) throws Exception {
+    private Long addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
+            String remoteAddress) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1314,7 +1345,8 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion, remoteAddress);
+            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
+                    remoteAddress);
             persistenceSession.save(syncHistory);
             Long idOfSync = syncHistory.getIdOfSync();
 
@@ -1359,11 +1391,11 @@ public class Processor implements SyncProcessor,
 
             Set<Long> idOfOrgSet = new HashSet<Long>();
 
-            Org org = (Org)persistenceSession.get(Org.class, idOfOrg);
-            Set<Org> orgSet  = org.getFriendlyOrg();
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Set<Org> orgSet = org.getFriendlyOrg();
             //Set<Long> orgSet = DAOUtils.getFriendlyOrg(persistenceSession, idOfOrg);
             /* совместимость организаций которые не имеют дружественных организаций */
-            for (Org o: orgSet){
+            for (Org o : orgSet) {
                 idOfOrgSet.add(o.getIdOfOrg());
             }
             idOfOrgSet.add(idOfOrg);
@@ -1397,7 +1429,8 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date currentDate = new Date();
-            List<AccountTransaction> accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
+            List<AccountTransaction> accountTransactionList = DAOUtils
+                    .getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
                             AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
@@ -1428,7 +1461,7 @@ public class Processor implements SyncProcessor,
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
             List clients;
-            if(organization.getFriendlyOrg()==null || organization.getFriendlyOrg().isEmpty()){
+            if (organization.getFriendlyOrg() == null || organization.getFriendlyOrg().isEmpty()) {
                 clients = DAOUtils
                         .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             } else {
@@ -1508,7 +1541,7 @@ public class Processor implements SyncProcessor,
 
             } catch (Exception e) {
                 logger.error("Failed to sync menu", e);
-            }finally {
+            } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
             }
@@ -1545,8 +1578,8 @@ public class Processor implements SyncProcessor,
                 }
             }
 
-            SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail =
-                    reqComplexInfo.getComplexInfoDiscountDetail();
+            SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDiscountDetail reqComplexInfoDiscountDetail = reqComplexInfo
+                    .getComplexInfoDiscountDetail();
             if (reqComplexInfoDiscountDetail != null) {
                 double size = reqComplexInfoDiscountDetail.getSize();
                 int isAllGroups = reqComplexInfoDiscountDetail.getIsAllGroups();
@@ -1554,7 +1587,8 @@ public class Processor implements SyncProcessor,
                 Long idOfClientGroup = reqComplexInfoDiscountDetail.getIdOfClientGroup();
                 ComplexInfoDiscountDetail complexInfoDiscountDetail = new ComplexInfoDiscountDetail(size, isAllGroups);
                 if (idOfClientGroup != null) {
-                    CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(), idOfClientGroup);
+                    CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(),
+                            idOfClientGroup);
                     ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
                     complexInfoDiscountDetail.setClientGroup(clientGroup);
                     complexInfoDiscountDetail.setOrg(clientGroup.getOrg());
@@ -1608,8 +1642,7 @@ public class Processor implements SyncProcessor,
 
     private void processReqMenuDetails(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
-            boolean bOrgIsMenuExchangeSource)
-            throws Exception {
+            boolean bOrgIsMenuExchangeSource) throws Exception {
         // Ищем "лишние" элементы меню
         List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
         for (MenuDetail menuDetail : menu.getMenuDetails()) {
@@ -1632,35 +1665,35 @@ public class Processor implements SyncProcessor,
                 boolean procceed = false;
                 if (bOrgIsMenuExchangeSource) {
                     procceed = reqMenuDetail.getIdOfMenu() == menuDetail.getLocalIdOfMenu();
-                }
-                else {
-                    procceed = StringUtils.equals (reqMenuDetail.getPath(), menuDetail.getMenuPath()) &&
-                               (reqMenuDetail.getPrice() == null ? true : reqMenuDetail.getPrice() == menuDetail.getPrice());
+                } else {
+                    procceed = StringUtils.equals(reqMenuDetail.getPath(), menuDetail.getMenuPath()) && (
+                            reqMenuDetail.getPrice() == null ? true
+                                    : reqMenuDetail.getPrice() == menuDetail.getPrice());
                 }
                 if (procceed) {
-                /*MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
-                        reqMenuDetail.getFlags());*/
-                menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
-                menuDetail.setGroupName(reqMenuDetail.getGroup());
-                menuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
-                menuDetail.setPrice(reqMenuDetail.getPrice());
-                menuDetail.setPriority(reqMenuDetail.getPriority());
-                menuDetail.setProtein(reqMenuDetail.getProtein());
-                menuDetail.setFat(reqMenuDetail.getFat());
-                menuDetail.setCarbohydrates(reqMenuDetail.getCarbohydrates());
-                menuDetail.setCalories(reqMenuDetail.getCalories());
-                menuDetail.setVitB1(reqMenuDetail.getVitB1());
-                menuDetail.setVitC(reqMenuDetail.getVitC());
-                menuDetail.setVitA(reqMenuDetail.getVitA());
-                menuDetail.setVitE(reqMenuDetail.getVitE());
-                menuDetail.setMinCa(reqMenuDetail.getMinCa());
-                menuDetail.setMinP(reqMenuDetail.getMinP());
-                menuDetail.setMinMg(reqMenuDetail.getMinMg());
-                menuDetail.setMinFe(reqMenuDetail.getMinFe());
+                    /*MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
+                    reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
+                    reqMenuDetail.getFlags());*/
+                    menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
+                    menuDetail.setGroupName(reqMenuDetail.getGroup());
+                    menuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
+                    menuDetail.setPrice(reqMenuDetail.getPrice());
+                    menuDetail.setPriority(reqMenuDetail.getPriority());
+                    menuDetail.setProtein(reqMenuDetail.getProtein());
+                    menuDetail.setFat(reqMenuDetail.getFat());
+                    menuDetail.setCarbohydrates(reqMenuDetail.getCarbohydrates());
+                    menuDetail.setCalories(reqMenuDetail.getCalories());
+                    menuDetail.setVitB1(reqMenuDetail.getVitB1());
+                    menuDetail.setVitC(reqMenuDetail.getVitC());
+                    menuDetail.setVitA(reqMenuDetail.getVitA());
+                    menuDetail.setVitE(reqMenuDetail.getVitE());
+                    menuDetail.setMinCa(reqMenuDetail.getMinCa());
+                    menuDetail.setMinP(reqMenuDetail.getMinP());
+                    menuDetail.setMinMg(reqMenuDetail.getMinMg());
+                    menuDetail.setMinFe(reqMenuDetail.getMinFe());
 
-                persistenceSession.save(menuDetail);
-                menu.addMenuDetail(menuDetail);
+                    persistenceSession.save(menuDetail);
+                    menu.addMenuDetail(menuDetail);
                     break;
                 }
             }
@@ -1671,22 +1704,23 @@ public class Processor implements SyncProcessor,
         return DAOUtils.isOrgMenuExchangeSource(persistenceSession, idOfOrg);
     }
 
-    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem, boolean bOrgIsMenuExchangeSource) throws Exception {
+    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem,
+            boolean bOrgIsMenuExchangeSource) throws Exception {
         Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
             Long localIdOfMenu = menuDetail.getLocalIdOfMenu();
             //  Проверяем отталкиваясь от bOrgIsMenuExchangeSource - если true, то используем localIdOfMenu,
             //  иначе ищем только по пути и цене
-            if (bOrgIsMenuExchangeSource && (localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
-                .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
-                .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {
-            /*if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
-                    .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
-                    .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {*/
+            if (bOrgIsMenuExchangeSource && (localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null
+                    && (localIdOfMenu.equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
+                    .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {
+                /*if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
+              .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
+              .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {*/
                 return true;
-            }
-            else if (menuDetail.getMenuPath() != null && StringUtils.equals(menuDetail.getMenuPath(), reqMenuDetail.getPath())/* &&
+            } else if (menuDetail.getMenuPath() != null && StringUtils
+                    .equals(menuDetail.getMenuPath(), reqMenuDetail.getPath())/* &&
                      menuDetail.getPrice() != null && menuDetail.getPrice() == reqMenuDetail.getPrice()*/) {
                 return true;
             }
@@ -1948,8 +1982,8 @@ public class Processor implements SyncProcessor,
                 logger.error("Save enter event to database error: ", e);
                 resEnterEvents = new SyncResponse.ResEnterEvents();
                 for (SyncRequest.EnterEvents.EnterEvent ee : enterEvents.getEvents()) {
-                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(), 1,
-                            "Save to data base error");
+                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(),
+                            1, "Save to data base error");
                     resEnterEvents.addItem(item);
                 }
             } finally {
@@ -2031,8 +2065,8 @@ public class Processor implements SyncProcessor,
             List<CategoryDiscount> categoryDiscounts = criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
                 SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
-                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(), categoryDiscount.getCategoryType().getValue(),
-                        categoryDiscount.getDiscountRules());
+                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
+                        categoryDiscount.getCategoryType().getValue(), categoryDiscount.getDiscountRules());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }
             /*
@@ -2534,10 +2568,9 @@ public class Processor implements SyncProcessor,
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
         return new String[]{
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
-                "contractId", ContractIdFormat.format(client.getContractId()),
-                "surname", client.getPerson().getSurname(), "firstName",
-                client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
+                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
     }
 
     private static boolean isDateToday(Date date) {
@@ -2558,6 +2591,7 @@ public class Processor implements SyncProcessor,
     protected void setOrgSyncAddress(Long idOfOrg, String address) {
         orgSyncAddressMap.put(idOfOrg, address);
     }
+
     public String getOrgSyncAddress(Long idOfOrg) {
         return orgSyncAddressMap.get(idOfOrg);
     }
