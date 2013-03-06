@@ -138,7 +138,6 @@ google.load ("visualization", "1", {packages: ["corechart"]});
 google.load('visualization', '1', {packages: ['table']});
 google.setOnLoadCallback (drawActiveChart);
 google.setOnLoadCallback (drawUniqueChart);
-google.setOnLoadCallback (initPeriods);
 var inter;
 var inter2;
 var inter3;
@@ -320,7 +319,7 @@ function drawRatingCharts ()
 function drawBenefitsCharts ()
 {
     inter = setInterval(drawBenefitsChart, 10);
-    inter2 = setInterval(drawBenefitPartChart, 10);
+    //inter2 = setInterval(drawBenefitPartChart, 10);
 }
 
 function drawActivityCharts ()
@@ -421,8 +420,8 @@ function addPeriod (container, title, value)
         <div id="informingChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-5" style="padding: 0px; margin: 0px">
-        <div id="benefitPartChart" style="width: 100%; height: 310px;"></div>
         <div id="benefitsChart" style="width: 100%; height: 310px;"></div>
+        <div id="benefitPartChart" style="width: 100%; height: 310px;"></div>
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw(drawVisitorsChart)"></select></div>
@@ -454,5 +453,8 @@ function addPeriod (container, title, value)
         </table>
     </div>
 </div>
+<script>
+    initPeriods();
+</script>
 </body>
 </html>
