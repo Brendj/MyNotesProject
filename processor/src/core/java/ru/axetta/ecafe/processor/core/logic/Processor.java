@@ -1498,9 +1498,15 @@ public class Processor implements SyncProcessor,
 
                 /// сохраняем секцию Settings
                 if (bOrgIsMenuExchangeSource && (reqMenu.getSettingsSectionRawXML() != null)) {
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
                     MenuExchange menuExchangeSettings = new MenuExchange(new Date(0), idOfOrg,
                             reqMenu.getSettingsSectionRawXML(), MenuExchange.FLAG_SETTINGS);
                     persistenceSession.saveOrUpdate(menuExchangeSettings);
+
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
                 }
 
                 Enumeration<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
@@ -1642,7 +1648,8 @@ public class Processor implements SyncProcessor,
 
     private void processReqMenuDetails(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
-            boolean bOrgIsMenuExchangeSource) throws Exception {
+            boolean bOrgIsMenuExchangeSource)
+            throws Exception {
         // Ищем "лишние" элементы меню
         List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
         for (MenuDetail menuDetail : menu.getMenuDetails()) {
@@ -1658,44 +1665,49 @@ public class Processor implements SyncProcessor,
 
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
+            boolean exists = false;
 
             /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
-           (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
+            (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
             for (MenuDetail menuDetail : menu.getMenuDetails()) {
-                boolean procceed = false;
+                if (menuDetail.getLocalIdOfMenu().longValue() == 89109 && reqMenuDetail.getIdOfMenu().longValue() == 89109) {
+                    int fewf =2;
+                }
                 if (bOrgIsMenuExchangeSource) {
-                    procceed = reqMenuDetail.getIdOfMenu() == menuDetail.getLocalIdOfMenu();
-                } else {
-                    procceed = StringUtils.equals(reqMenuDetail.getPath(), menuDetail.getMenuPath()) && (
-                            reqMenuDetail.getPrice() == null ? true
-                                    : reqMenuDetail.getPrice() == menuDetail.getPrice());
+                    exists = reqMenuDetail.getIdOfMenu() == null ? true : reqMenuDetail.getIdOfMenu().equals(menuDetail.getLocalIdOfMenu());
                 }
-                if (procceed) {
-                    /*MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                    reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
-                    reqMenuDetail.getFlags());*/
-                    menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
-                    menuDetail.setGroupName(reqMenuDetail.getGroup());
-                    menuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
-                    menuDetail.setPrice(reqMenuDetail.getPrice());
-                    menuDetail.setPriority(reqMenuDetail.getPriority());
-                    menuDetail.setProtein(reqMenuDetail.getProtein());
-                    menuDetail.setFat(reqMenuDetail.getFat());
-                    menuDetail.setCarbohydrates(reqMenuDetail.getCarbohydrates());
-                    menuDetail.setCalories(reqMenuDetail.getCalories());
-                    menuDetail.setVitB1(reqMenuDetail.getVitB1());
-                    menuDetail.setVitC(reqMenuDetail.getVitC());
-                    menuDetail.setVitA(reqMenuDetail.getVitA());
-                    menuDetail.setVitE(reqMenuDetail.getVitE());
-                    menuDetail.setMinCa(reqMenuDetail.getMinCa());
-                    menuDetail.setMinP(reqMenuDetail.getMinP());
-                    menuDetail.setMinMg(reqMenuDetail.getMinMg());
-                    menuDetail.setMinFe(reqMenuDetail.getMinFe());
+                else {
+                    exists= reqMenuDetail.getPath().equals (menuDetail.getMenuPath()) &&
+                            (reqMenuDetail.getPrice() == null || menuDetail.getPrice() == null ? true :
+                                    reqMenuDetail.getPrice().longValue() == menuDetail.getPrice().longValue());
+                }
+                if (exists) break;
+            }
 
-                    persistenceSession.save(menuDetail);
-                    menu.addMenuDetail(menuDetail);
-                    break;
-                }
+            if (!exists) {
+                MenuDetail newMenuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
+                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
+                        reqMenuDetail.getFlags());
+                newMenuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
+                newMenuDetail.setGroupName(reqMenuDetail.getGroup());
+                newMenuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
+                newMenuDetail.setPrice(reqMenuDetail.getPrice());
+                newMenuDetail.setPriority(reqMenuDetail.getPriority());
+                newMenuDetail.setProtein(reqMenuDetail.getProtein());
+                newMenuDetail.setFat(reqMenuDetail.getFat());
+                newMenuDetail.setCarbohydrates(reqMenuDetail.getCarbohydrates());
+                newMenuDetail.setCalories(reqMenuDetail.getCalories());
+                newMenuDetail.setVitB1(reqMenuDetail.getVitB1());
+                newMenuDetail.setVitC(reqMenuDetail.getVitC());
+                newMenuDetail.setVitA(reqMenuDetail.getVitA());
+                newMenuDetail.setVitE(reqMenuDetail.getVitE());
+                newMenuDetail.setMinCa(reqMenuDetail.getMinCa());
+                newMenuDetail.setMinP(reqMenuDetail.getMinP());
+                newMenuDetail.setMinMg(reqMenuDetail.getMinMg());
+                newMenuDetail.setMinFe(reqMenuDetail.getMinFe());
+
+                persistenceSession.save(newMenuDetail);
+                menu.addMenuDetail(newMenuDetail );
             }
         }
     }
