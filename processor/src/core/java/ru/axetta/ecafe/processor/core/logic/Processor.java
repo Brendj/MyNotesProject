@@ -1670,9 +1670,6 @@ public class Processor implements SyncProcessor,
             /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
             (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
             for (MenuDetail menuDetail : menu.getMenuDetails()) {
-                if (menuDetail.getLocalIdOfMenu().longValue() == 89109 && reqMenuDetail.getIdOfMenu().longValue() == 89109) {
-                    int fewf =2;
-                }
                 if (bOrgIsMenuExchangeSource) {
                     exists = reqMenuDetail.getIdOfMenu() == null ? true : reqMenuDetail.getIdOfMenu().equals(menuDetail.getLocalIdOfMenu());
                 }
