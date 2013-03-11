@@ -11,7 +11,7 @@
 ALTER TABLE cf_qa_questionaries ADD COLUMN viewdate bigint;
 
 --! нет необходимости даной таблицы
-DROP TABLE IF EXISTS cf_qa_questionaryresultbyorg;
+DROP TABLE cf_qa_questionaryresultbyorg;
 
 -- Добавлена возможность просмотра в личном кабинете (вкладка "Покупки и платежи") заказы которые подтвердил взрослый клиент за ребенка в случае если ребенок ушел в минус
 --! доавлены таблицы учета платежей за счет учителей за детей которые ушли в минус
