@@ -68,7 +68,18 @@ public class EventNotificationService {
                     + "Код активации личного кабинета: [linkingToken]. <br/>\n"
                     + "Если Вы не запрашивали код активации, пожалуйста, удалите данное письмо. <br/>\n" + "<br/>\n"
                     + "С уважением,<br/>\n" + "Служба поддержки клиентов\n" + "</body>\n" + "</html>",
-            MESSAGE_LINKING_TOKEN_GENERATED + "." + TYPE_EMAIL_SUBJECT, "Код активации личного кабинета",};
+            MESSAGE_LINKING_TOKEN_GENERATED + "." + TYPE_EMAIL_SUBJECT, "Код активации личного кабинета",
+            MESSAGE_PAYMENT + "." + TYPE_SMS,
+            "Списание [date] Л/с: [contractId] Буфет: [others] Комплекс: [complexes]",
+            MESSAGE_PAYMENT + "." + TYPE_EMAIL_SUBJECT, "Уведомление о списании средств",
+            MESSAGE_PAYMENT + "." + TYPE_EMAIL_TEXT,
+            "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n" + "\n"
+            + "Дата списания: [date]. <br/>\n"
+            + "Л/c: [contractId]. <br/>\n"
+            + "Буфет: [others]. <br/>\n"
+            + "Комплекс: [complexes]. <br/>\n"+ "<br/>\n"
+            + "С уважением,<br/>\n" + "Служба поддержки клиентов\n" + "</body>\n" + "</html>",
+    };
 
     String getDefaultText(String name) {
         for (int n = 0; n < DEFAULT_MESSAGES.length; n += 2) {
@@ -225,6 +236,8 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_PAYMENT_REGISTERED;
             } else if (type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 clientSMSType = ClientSms.TYPE_LINKING_TOKEN;
+            } else if (type.equals(MESSAGE_PAYMENT)) {
+                clientSMSType = ClientSms.TYPE_PAYMENT_NOTIFY;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
@@ -279,7 +292,7 @@ public class EventNotificationService {
     }
 
 
-    public void sendPaymentNotificationSMS(long idOfOrg, SyncRequest.PaymentRegistry.Payment payment) {
+    /*public void sendPaymentNotificationSMS(long idOfOrg, SyncRequest.PaymentRegistry.Payment payment) {
         if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON)) {
             return;
         }
@@ -333,7 +346,7 @@ public class EventNotificationService {
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendMessageAsync(cl, EventNotificationService.MESSAGE_PAYMENT,
                         new String[]{EventNotificationService.MESSAGE_PAYMENT, msg});
-    }
+    }*/
 
     public String beautifyAmount(long amt) {
         String balanceStr = NumberFormat.getCurrencyInstance().format((double) amt / 100) + "р.";

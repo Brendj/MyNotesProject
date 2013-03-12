@@ -24,6 +24,7 @@ public class ClientSms {
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
     public static final int TYPE_LINKING_TOKEN = 4;
+    public static final int TYPE_PAYMENT_NOTIFY= 5;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;

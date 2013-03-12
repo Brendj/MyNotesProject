@@ -46,6 +46,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -826,6 +827,12 @@ public class Processor implements SyncProcessor,
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
+
+            // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                    .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
+                            generatePaymentNotificationParams(persistenceSession, client, payment));
+
             // Return no errors
             return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 0, null);
         } finally {
@@ -2589,6 +2596,28 @@ public class Processor implements SyncProcessor,
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
     }
+
+    private String[] generatePaymentNotificationParams(Session session, Client client, SyncRequest.PaymentRegistry.Payment payment) {
+        long complexes = 0L;
+        long others = 0L;
+        Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+        while (purchases.hasMoreElements()) {
+            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
+            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_0 && purchase.getType() <= OrderDetail.TYPE_COMPLEX_9) {
+                complexes += purchase.getSocDiscount() + purchase.getRPrice();
+            } else {
+                others += purchase.getSocDiscount() + purchase.getRPrice();
+            }
+        }
+
+        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
+        return new String[] {
+                "date", date,
+                "contractId", "" + client.getContractId(),
+                "others", CurrencyStringUtils.copecksToRubles(others),
+                "complexes", CurrencyStringUtils.copecksToRubles(complexes) };
+    }
+
 
     private static boolean isDateToday(Date date) {
         Calendar today = Calendar.getInstance();
