@@ -1533,9 +1533,11 @@ public class Processor implements SyncProcessor,
                         persistenceSession.save(menu);
                     }
                     processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-                    processReqMenuDetails(persistenceSession, organization, menuDate, menu, item,
-                            item.getReqMenuDetails(), bOrgIsMenuExchangeSource);
-                    processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos());
+                    HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
+                    processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
+                            localIdsToMenuDetailMap);
+                    processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+                            localIdsToMenuDetailMap);
                     bFirstMenuItem = false;
 
 
@@ -1555,7 +1557,8 @@ public class Processor implements SyncProcessor,
     }
 
     private void processReqComplexInfos(Session persistenceSession, Org organization, Date menuDate, Menu menu,
-            List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos) throws Exception {
+            List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
+            HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
         DAOUtils.deleteComplexInfoForDate(persistenceSession, organization, menuDate);
 
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
@@ -1611,13 +1614,16 @@ public class Processor implements SyncProcessor,
 
             for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDetail reqComplexInfoDetail : reqComplexInfo
                     .getComplexInfoDetails()) {
-                MenuDetail menuDetail = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
-                        reqComplexInfoDetail.getReqMenuDetail().getIdOfMenu());
+                //MenuDetail menuDetail = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
+                //        reqComplexInfoDetail.getReqMenuDetail().getIdOfMenu());
+                MenuDetail menuDetail = localIdsToMenuDetailMap
+                        .get(reqComplexInfoDetail.getReqMenuDetail().getIdOfMenu());
                 if (menuDetail == null) {
                     throw new Exception(
                             "MenuDetail not found for complex detail with localIdOfMenu=" + reqComplexInfoDetail
                                     .getReqMenuDetail().getIdOfMenu());
                 }
+                menuDetail = (MenuDetail) persistenceSession.get(MenuDetail.class, menuDetail.getIdOfMenuDetail());
                 ComplexInfoDetail complexInfoDetail = new ComplexInfoDetail(complexInfo, menuDetail);
                 Long idOfItem = reqComplexInfoDetail.getIdOfItem();
                 if (idOfItem != null) {
@@ -1646,14 +1652,13 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private void processReqMenuDetails(Session persistenceSession, Org organization, Date menuDate, Menu menu,
-            SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
-            boolean bOrgIsMenuExchangeSource)
-            throws Exception {
+    private void processReqMenuDetails(Session persistenceSession, Menu menu, SyncRequest.ReqMenu.Item item,
+            Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
+            HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
         // Ищем "лишние" элементы меню
         List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
         for (MenuDetail menuDetail : menu.getMenuDetails()) {
-            if (!find(menuDetail, item, bOrgIsMenuExchangeSource)) {
+            if (!find(menuDetail, item)) {
                 superfluousMenuDetails.add(menuDetail);
             }
         }
@@ -1663,6 +1668,7 @@ public class Processor implements SyncProcessor,
             persistenceSession.delete(menuDetail);
         }
 
+        // Добавляем новые элементы из пришедшего меню
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
             boolean exists = false;
@@ -1670,23 +1676,19 @@ public class Processor implements SyncProcessor,
             /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
             (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
             for (MenuDetail menuDetail : menu.getMenuDetails()) {
-                if (bOrgIsMenuExchangeSource) {
-                    exists = reqMenuDetail.getIdOfMenu() == null ? true : reqMenuDetail.getIdOfMenu().equals(menuDetail.getLocalIdOfMenu());
+                exists = areMenuDetailsEqual(menuDetail, reqMenuDetail);
+                if (exists) {
+                    localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), menuDetail);
+                    break;
                 }
-                else {
-                    exists= reqMenuDetail.getPath().equals (menuDetail.getMenuPath()) &&
-                            (reqMenuDetail.getPrice() == null || menuDetail.getPrice() == null ? true :
-                                    reqMenuDetail.getPrice().longValue() == menuDetail.getPrice().longValue());
-                }
-                if (exists) break;
             }
 
             if (!exists) {
                 MenuDetail newMenuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
-                        reqMenuDetail.getFlags());
+                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(), reqMenuDetail.getFlags());
                 newMenuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
-                newMenuDetail.setGroupName(reqMenuDetail.getGroup());
+                newMenuDetail.setGroupName(reqMenuDetail.getGroup() == null ? ""
+                        : reqMenuDetail.getGroup()); // в старых версиях клиента могут быть без группы
                 newMenuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
                 newMenuDetail.setPrice(reqMenuDetail.getPrice());
                 newMenuDetail.setPriority(reqMenuDetail.getPriority());
@@ -1704,33 +1706,40 @@ public class Processor implements SyncProcessor,
                 newMenuDetail.setMinFe(reqMenuDetail.getMinFe());
 
                 persistenceSession.save(newMenuDetail);
-                menu.addMenuDetail(newMenuDetail );
+                menu.addMenuDetail(newMenuDetail);
+
+                localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), newMenuDetail);
             }
         }
+    }
+
+    private static boolean areMenuDetailsEqual(MenuDetail menuDetail,
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail) {
+        // для организации - источника меню делаем поиска по локальным идентификаторам
+        //if (bOrgIsMenuExchangeSource && reqMenuDetail.getIdOfMenu() != null && menuDetail.getLocalIdOfMenu() != null) {
+        //    return reqMenuDetail.getIdOfMenu().equals(menuDetail.getLocalIdOfMenu());
+        //}
+        // для остальных - по путям и ценам, т.к. в клиентах некорректно обновлялось меню, каждый раз перезаписывалось с новыми ид.
+        //else {
+        return reqMenuDetail.getPath().equals(menuDetail.getMenuPath()) &&
+                (reqMenuDetail.getPrice() == null || menuDetail.getPrice() == null
+                        || reqMenuDetail.getPrice().longValue() == menuDetail.getPrice().longValue()) && (
+                reqMenuDetail.getGroup() == null || menuDetail.getGroupName() == null || reqMenuDetail.getGroup()
+                        .equals(menuDetail.getGroupName())) && (reqMenuDetail.getOutput() == null
+                || menuDetail.getMenuDetailOutput() == null || reqMenuDetail.getOutput()
+                .equals(menuDetail.getMenuDetailOutput()));
+        //}
     }
 
     private boolean isOrgMenuExchangeSource(Session persistenceSession, Long idOfOrg) {
         return DAOUtils.isOrgMenuExchangeSource(persistenceSession, idOfOrg);
     }
 
-    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem,
-            boolean bOrgIsMenuExchangeSource) throws Exception {
+    private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem) throws Exception {
         Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
         while (reqMenuDetails.hasMoreElements()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
-            Long localIdOfMenu = menuDetail.getLocalIdOfMenu();
-            //  Проверяем отталкиваясь от bOrgIsMenuExchangeSource - если true, то используем localIdOfMenu,
-            //  иначе ищем только по пути и цене
-            if (bOrgIsMenuExchangeSource && (localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null
-                    && (localIdOfMenu.equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
-                    .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {
-                /*if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
-              .equals(reqMenuDetail.getIdOfMenu()))) || (localIdOfMenu == null && StringUtils
-              .equals(menuDetail.getMenuDetailName(), reqMenuDetail.getName()))) {*/
-                return true;
-            } else if (menuDetail.getMenuPath() != null && StringUtils
-                    .equals(menuDetail.getMenuPath(), reqMenuDetail.getPath())/* &&
-                     menuDetail.getPrice() != null && menuDetail.getPrice() == reqMenuDetail.getPrice()*/) {
+            if (areMenuDetailsEqual(menuDetail, reqMenuDetail)) {
                 return true;
             }
         }
@@ -1886,8 +1895,7 @@ public class Processor implements SyncProcessor,
                         resEnterEvents.addItem(item);
                     } else {
                         SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
-                                e.getIdOfEnterEvent(),
-                                SyncResponse.ResEnterEvents.Item.RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES,
+                                e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_OK,
                                 "Enter event already registered but attributes differ, idOfOrg == " + e.getIdOfOrg() +
                                         ", idOfEnterEvent == " + e.getIdOfEnterEvent());
                         resEnterEvents.addItem(item);

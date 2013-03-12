@@ -819,6 +819,7 @@ CREATE TABLE CF_EnterEvents (
 
 create index cf_enterevents_idofclient_idx on cf_enterevents(idOfClient); --v25
 create index cf_enterevents_idevtdt_idx on cf_enterevents(IdOfClient, EvtDateTime); --v25
+CREATE index cf_enterevents_org_event_idx ON cf_enterevents(idOfOrg, idOfEnterEvent); --v36
 
 CREATE TABLE CF_Options (
   IdOfOption    BIGINT  NOT NULL,

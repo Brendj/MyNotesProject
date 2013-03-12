@@ -113,9 +113,10 @@ public class SyncServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            /* Must be commented for testing!!!  */
+            /* Must be FALSE for testing!!!  */
+            boolean verifySignature = true;
             try {
-                if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
+                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;

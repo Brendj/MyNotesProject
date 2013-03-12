@@ -52,6 +52,8 @@ CREATE TABLE CF_Group_Payment_Confirm_Position
 
 ALTER TABLE CF_ClientSms ALTER COLUMN IdOfSms type CHAR(40);
 
+CREATE index cf_enterevents_org_event_idx ON CF_EnterEvents (idOfOrg, idOfEnterEvent);
+
 --! ФИНАЛИЗИРОВАН (Кадыров, 130222) НЕ МЕНЯТЬ
 
 
