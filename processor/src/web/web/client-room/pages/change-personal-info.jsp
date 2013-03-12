@@ -26,6 +26,7 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" %>
 <%@ page import="java.util.*" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
+<%@ page import="ru.axetta.ecafe.processor.web.util.ClientRoomNotificationSettingsUtils" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -48,6 +49,7 @@
         final String HTML_TRUE = "on";
         final String HTML_CHECKED = "checked";
         final String NOTIFY_VIA_SMS_PARAM = "notify-via-sms";
+        final String NOTIFY_RULE_PARAM = "notify-rule";
         final String NOTIFY_VIA_EMAIL_PARAM = "notify-via-mail";
         final String EXPENDITURE_LIMIT = "expenditure-limit";
 
@@ -121,6 +123,7 @@
                             client.setUpdateTime(new Date());
                             client.setExpenditureLimit(expenditureLimit);
                             persistenceSession.update(client);
+                            ClientRoomNotificationSettingsUtils.setNotificationSettings (client, request, NOTIFY_RULE_PARAM, HTML_TRUE);
                             dataProcessSucceed = true;
                         }
                     } else {
@@ -150,6 +153,7 @@
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
             clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
             Client client = (Client) clientCriteria.uniqueResult();
+            List <ClientRoomNotificationSettingsUtils.Item> notifications = ClientRoomNotificationSettingsUtils.getNotificationSettings(client);
 %>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
@@ -307,6 +311,28 @@
                 <div class="output-text">Адрес электронной почты</div>
             </td>
             <td>
+                <input type="text" name="<%=EMAIL_PARAM%>" size="16" maxlength="64" class="input-text"
+                       value="<%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(client.getEmail()))%>" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="output-text">Правила оповещений</div>
+            </td>
+            <td>
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <%
+                    for (ClientRoomNotificationSettingsUtils.Item it : notifications) {
+                        %>
+                        <tr>
+                            <td><%=it.getNotificationTypeName()%></td>
+                            <td><input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotificationType() %>" size="16" maxlength="64" class="input-text"
+                                       <%=it.isEnabled() ? HTML_CHECKED : ""%>/></td>
+                        </tr>
+                        <%
+                    }
+                    %>
+                </table>
                 <input type="text" name="<%=EMAIL_PARAM%>" size="16" maxlength="64" class="input-text"
                        value="<%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(client.getEmail()))%>" />
             </td>
