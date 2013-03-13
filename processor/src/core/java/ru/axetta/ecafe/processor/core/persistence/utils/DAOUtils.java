@@ -503,8 +503,8 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
             Date fromDateTime, Date toDateTime, int sourceType) {
-        Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
-                + " where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and (c.org.idOfOrg=:idOfOrg or c.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg))");
+        Query query = persistenceSession.createQuery("select at from AccountTransaction at "
+                + " where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and (at.org.idOfOrg=:idOfOrg or at.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg))");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("sinceTime", fromDateTime);
         query.setParameter("tillTime", toDateTime);
