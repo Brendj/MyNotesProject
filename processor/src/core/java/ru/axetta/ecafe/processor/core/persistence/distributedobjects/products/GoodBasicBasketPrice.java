@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -31,16 +30,20 @@ public class GoodBasicBasketPrice extends DistributedObject {
         if(g != null){
             setGood(g);
         }
-        DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        distributedObjectException.setData(guidOfGoodsBasicBasket);
-        GoodsBasicBasket basicGood;
-        try {
-            basicGood = DAOUtils.findBasicGood(session, guidOfGoodsBasicBasket);
-        } catch (Exception e) {
-            throw distributedObjectException;
+        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
+        //distributedObjectException.setData(guidOfGoodsBasicBasket);
+        //GoodsBasicBasket basicGood;
+        //try {
+        //    basicGood = DAOUtils.findBasicGood(session, guidOfGoodsBasicBasket);
+        //} catch (Exception e) {
+        //    throw distributedObjectException;
+        //}
+        //if (basicGood == null) throw distributedObjectException;
+        //setGoodsBasicBasket(basicGood);
+        GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfGoodsBasicBasket);
+        if (basicGood != null) {
+            setGoodsBasicBasket(basicGood);
         }
-        if (basicGood == null) throw distributedObjectException;
-        setGoodsBasicBasket(basicGood);
     }
 
     @Override

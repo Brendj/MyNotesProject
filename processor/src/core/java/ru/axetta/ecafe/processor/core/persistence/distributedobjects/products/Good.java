@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -37,16 +36,12 @@ public class Good extends DistributedObject {
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
 
-        DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        distributedObjectException.setData(guidOfBasicGood);
-        GoodsBasicBasket basicGood;
-        try {
-            basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
-        } catch (Exception e) {
-            throw distributedObjectException;
+        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
+        //distributedObjectException.setData(guidOfBasicGood);
+        GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
+        if (basicGood != null) {
+            setBasicGood(basicGood);
         }
-        if (basicGood == null) throw distributedObjectException;
-        setBasicGood(basicGood);
     }
 
     @Override
