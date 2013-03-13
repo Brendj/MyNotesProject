@@ -19,6 +19,7 @@ public class ClientAccountManager {
             String source, int sourceType, Date transactionTime) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, transactionSum, source,
                 sourceType, transactionTime);
+        accountTransaction.setOrg(client.getOrg());
         session.save(accountTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
         client.addBalanceNotForSave(transactionSum);
@@ -30,6 +31,7 @@ public class ClientAccountManager {
         AccountTransaction cancelTransaction = new AccountTransaction(transaction.getClient(), null,
                 -transaction.getTransactionSum(), ""+transaction.getIdOfTransaction(),
                 AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, transactionTime);
+        cancelTransaction.setOrg(transaction.getOrg());
         session.save(cancelTransaction);
         DAOUtils.changeClientBalance(session, transaction.getClient().getIdOfClient(), -transaction.getTransactionSum());
         return cancelTransaction;

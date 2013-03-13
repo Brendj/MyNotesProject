@@ -50,6 +50,7 @@ public class AccountTransaction {
     private Set<Order> orders = new HashSet<Order>();
     private Set<ClientSms> clientSms = new HashSet<ClientSms>();
     private Set<SubscriptionFee> subscriptionFees = new HashSet<SubscriptionFee>();
+    private Org org;
 
     AccountTransaction() {
         // For Hibernate only
@@ -216,6 +217,14 @@ public class AccountTransaction {
         return Collections.unmodifiableSet(getSubscriptionFeesInternal());
     }
 
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -240,6 +249,7 @@ public class AccountTransaction {
     public String toString() {
         return "AccountTransaction{" + "idOfTransaction=" + idOfTransaction + ", client=" + client + ", card=" + card
                 + ", transactionSum=" + transactionSum + ", source='" + source + '\'' + ", sourceType=" + sourceType
-                + ", transactionTime=" + transactionTime + '}';
+                + ", transactionTime=" + transactionTime +
+                ", idOfOrg=" + (org != null ? org.getOfficialName() : "unknown") + '}';
     }
 }

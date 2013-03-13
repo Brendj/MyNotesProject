@@ -25,6 +25,7 @@
         <property name="transactionTime" column="TransactionDate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         <set name="contragentPaymentsInternal" inverse="true" cascade="all">
             <key column="IdOfTransaction"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ContragentPayment"/>
