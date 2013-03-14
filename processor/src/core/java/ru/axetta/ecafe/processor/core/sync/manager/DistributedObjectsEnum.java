@@ -21,9 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
  */
 public enum DistributedObjectsEnum {
 
-    /* Подствеждение заказов */
-    GroupPaymentConfirm(GroupPaymentConfirm.class,0),
-    GroupPaymentConfirmPosition(GroupPaymentConfirmPosition.class,1),
     /* Накладная */
     ActOfInventorization(ActOfInventarization.class,0),
     ActOfWayBillDifference(ActOfWayBillDifference.class, 0),

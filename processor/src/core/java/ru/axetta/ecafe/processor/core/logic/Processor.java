@@ -774,7 +774,7 @@ public class Processor implements SyncProcessor,
             }
             // Create order
             RuntimeContext.getFinancialOpsManager()
-                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card);
+                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
@@ -1303,7 +1303,7 @@ public class Processor implements SyncProcessor,
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
                         idOfClient, client, organization.getIdOfOrg()));
-            } else {
+            } else if(client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg())) {
                 //ClientGroup curClientGroup = client.getClientGroup();
                 //if (null == curClientGroup || !curClientGroup.getCompositeIdOfClientGroup()
                 //        .equals(clientGroup.getCompositeIdOfClientGroup())) {
@@ -1469,13 +1469,11 @@ public class Processor implements SyncProcessor,
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
             List clients;
             if (organization.getFriendlyOrg() == null || organization.getFriendlyOrg().isEmpty()) {
-                clients = DAOUtils
-                        .findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
+                clients = DAOUtils.findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             } else {
                 List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
                 orgList.add(organization);
-                clients = DAOUtils
-                        .findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
+                clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
             }
 
             for (Object object : clients) {

@@ -38,6 +38,7 @@ public class Order{
     private POS pos;
     private Contragent contragent;
     private int state;
+    private Long confirmerId;
 
     Order() {
         // For Hibernate only
@@ -69,6 +70,14 @@ public class Order{
     private void setCompositeIdOfOrder(CompositeIdOfOrder compositeIdOfOrder) {
         // For Hibernate only
         this.compositeIdOfOrder = compositeIdOfOrder;
+    }
+
+    public Long getConfirmerId() {
+        return confirmerId;
+    }
+
+    public void setConfirmerId(Long confirmerId) {
+        this.confirmerId = confirmerId;
     }
 
     public Org getOrg() {

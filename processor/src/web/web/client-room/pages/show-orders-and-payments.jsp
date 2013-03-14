@@ -25,6 +25,9 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
+<%@ page import="org.hibernate.sql.JoinType" %>
+<%@ page import="org.hibernate.criterion.Projections" %>
+<%@ page import="org.hibernate.Hibernate" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -56,6 +59,7 @@
 <%final Logger logger = LoggerFactory
         .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-orders-and-payments_jsp");
     final String PROCESS_PARAM = "submit";
+    final String PROCESS_PARAM_VIEW = "submit_view";
     final String START_DATE_PARAM = "start-date";
     final String END_DATE_PARAM = "end-date";
     final String ID_OF_ORG_PARAM = "org-id";
@@ -63,7 +67,7 @@
     final String PAGE_PARAM = "page";
     final String SHOW_ORDER_DETAILS_PAGE = "show-order-details";
     final String PARAMS_TO_REMOVE[] = {
-            PROCESS_PARAM, START_DATE_PARAM, END_DATE_PARAM, ID_OF_ORG_PARAM, ID_OF_ORDER_PARAM};
+            PROCESS_PARAM, START_DATE_PARAM, END_DATE_PARAM, ID_OF_ORG_PARAM, ID_OF_ORDER_PARAM, PROCESS_PARAM_VIEW};
 
     RuntimeContext runtimeContext = null;
     try {
@@ -650,93 +654,100 @@
 </table>
 </td>
 <td valign="top" align="center">
-    <%try {
+    <%
+        boolean haveDataToProcessView = StringUtils.isNotEmpty(request.getParameter(PROCESS_PARAM_VIEW));
+        try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
 
-        persistenceSession = runtimeContext.createPersistenceSession();
-        persistenceTransaction = persistenceSession.beginTransaction();
-
-        Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
-        criteriaCanConfirmGroupPayment.add(Restrictions.eq("canConfirmGroupPayment", true));
-        criteriaCanConfirmGroupPayment.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-        if (!criteriaCanConfirmGroupPayment.list().isEmpty()) {
+                Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
+                criteriaCanConfirmGroupPayment.add(Restrictions.eq("canConfirmGroupPayment", true));
+                criteriaCanConfirmGroupPayment.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
+                if (!criteriaCanConfirmGroupPayment.list().isEmpty()) {
                        /* TODO: teacher logic  */
-            Client teacher = (Client) criteriaCanConfirmGroupPayment.list().get(0);
-
-            String sql = "SELECT  cf_persons.surname || ' ' || cf_persons.firstname || ' ' || cf_persons.secondname, "
-                    + "  student.balance, cf_orders.rsum, cf_orders.createddate, student.idofclient " + " FROM  "
-                    + "  PUBLIC.cf_group_payment_confirm, "
-                    + "  PUBLIC.cf_group_payment_confirm_position,  PUBLIC.cf_orders, "
-                    + "  PUBLIC.cf_clients student,  PUBLIC.cf_persons "
-                    + " WHERE cf_group_payment_confirm.confirmerid = " + teacher.getIdOfClient() + " AND "
-                    + "  cf_group_payment_confirm_position.idofgrouppaymentconfirm = cf_group_payment_confirm.idofgrouppaymentconfirm AND "
-                    + "  cf_orders.idoforder = cf_group_payment_confirm_position.idoforder AND "
-                    + "  cf_orders.idoforg = cf_group_payment_confirm_position.orgowner AND "
-                    + "  student.idofclient = cf_orders.idofclient AND "
-                    + "  cf_persons.idofperson = student.idofperson AND " + "  student.balance < 0 ORDER BY "
-                    + "  cf_orders.idofclient ASC, cf_orders.createddate DESC ,cf_group_payment_confirm_position.idoforder ASC ";
-            Query query = persistenceSession.createSQLQuery(sql);
-            List students = query.list();
-
+                    List students = new ArrayList(0);
+                    if(haveDataToProcessView){
+                        Client teacher = (Client) criteriaCanConfirmGroupPayment.list().get(0);
+                        Criteria criteria = persistenceSession.createCriteria(Order.class);
+                        criteria.add(Restrictions.eq("confirmerId",teacher.getIdOfClient()));
+                        criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
+                                .add(Restrictions.sqlRestriction("{alias}.balance - {alias}.\"Limit\" < 0"));
+                        criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
+                        criteria.setProjection(Projections.projectionList()
+                                .add(Projections.property("person.firstName"), "firstName")
+                                .add(Projections.property("person.surname"), "surname")
+                                .add(Projections.property("person.secondName"), "secondName")
+                                .add(Projections.property("student.balance"), "balance")
+                                .add(Projections.property("RSum"), "rSum")
+                                .add(Projections.property("createTime"), "createTime")
+                                .add(Projections.property("student.idOfClient"), "idOfClient")
+                        );
+                        students = criteria.list();
+                    }
 
     %>
-        <p class="output-text">Список заказов по учащимся с превышением лимита овердрафта</p>
-        <table border="1" cellpadding="0" cellspacing="0">
-            <tr>
-                <td>
+    <p class="output-text">Список заказов по учащимся с превышением лимита овердрафта</p>
+    <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
+          enctype="application/x-www-form-urlencoded" class="borderless-form">
+        <input type="submit" name="<%=PROCESS_PARAM_VIEW%>" value="Показать" class="command-button" />
+    </form>
+   <br/>
+    <table border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
                                    <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                        ФИО
                                    </span>
-                </td>
-                <td>
+            </td>
+            <td>
                                    <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                        Текущий баланс
                                    </span>
-                </td>
-                <td>
+            </td>
+            <td>
                                     <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                     Дата заказа
                                    </span>
-                </td>
-                <td>
+            </td>
+            <td>
                                     <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                     Сумма заказа
                                    </span>
-                </td>
-            </tr>
-            <%if (students.isEmpty()) {
-            %>
-            <tr>
-                <td colspan="4" align="center" valign="center">
+            </td>
+        </tr>
+        <%if (students.isEmpty() && haveDataToProcessView) {
+        %>
+        <tr>
+            <td colspan="4" align="center" valign="center">
                 <span style="margin: 5px;text-align: center;font-size: 8pt; color: #90ee90">
                   Должников нет
                 </span>
-                </td>
-            </tr>
-            <%
-            } else {
-                Long idOfClient = null;
-                Long sum = 0L;
-                for (Object object : students) {
-                    Object[] student = (Object[]) object;
-                    String fio = String.valueOf(student[0]);
-                    Long balance = Long.valueOf(String.valueOf(student[1]));
-                    Date date = new Date(Long.valueOf(String.valueOf(student[3])));
-                    String stringDate = timeFormat.format(date);
-                    Long paySum = Long.valueOf(String.valueOf(student[2]));
-                    Long currentIdOfClient = Long.valueOf(String.valueOf(student[4]));
-                    if (idOfClient == null || (idOfClient != null && !idOfClient.equals(currentIdOfClient))) {
-                        idOfClient = currentIdOfClient;
-                        sum = 0L;
-                    }
-                    if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
-                        sum += paySum;%>
-            <tr>
-                <td>
+            </td>
+        </tr>
+        <%
+        } else {
+            Long idOfClient = null;
+            Long sum = 0L;
+            for (Object object : students) {
+                Object[] student = (Object[]) object;
+                String fio = String.valueOf(student[1]) + " "+String.valueOf(student[0]) + " "+String.valueOf(student[2]) ;
+                Long balance = Long.valueOf(String.valueOf(student[3]));
+                String stringDate = timeFormat.format((Date)student[5]);
+                Long paySum = Long.valueOf(String.valueOf(student[4]));
+                Long currentIdOfClient = Long.valueOf(String.valueOf(student[6]));
+                if (idOfClient == null || (idOfClient != null && !idOfClient.equals(currentIdOfClient))) {
+                    idOfClient = currentIdOfClient;
+                    sum = 0L;
+                }
+                if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
+                    sum += paySum;%>
+        <tr>
+            <td>
                                                         <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                                             <%= fio%>
                                                         </span>
-                </td>
-                <td>
+            </td>
+            <td>
                                                         <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                                 <%=
                                                 StringEscapeUtils
@@ -744,14 +755,14 @@
                                                 %>
                                                </span>
 
-                </td>
-                <td>
+            </td>
+            <td>
                                                         <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                                 <%=StringEscapeUtils.escapeHtml(stringDate)%>
                                                </span>
 
-                </td>
-                <td>
+            </td>
+            <td>
                                                        <span style="margin: 5px;text-align: center;font-size: 8pt;">
                                                            <%=
                                                            StringEscapeUtils.escapeHtml(
@@ -759,30 +770,145 @@
                                                            %>
                                                        </span>
 
-                </td>
-            </tr>
-            <%}
-            }
-            }
-
-            %>
-        </table>
-        <%} else {
-                       /* TODO: students logic  */
+            </td>
+        </tr>
+        <%}
         }
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
-        } catch (Exception e) {
-            logger.error("Failed to build page", e);
-            throw new ServletException(e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
 
         %>
+    </table>
+    <%} else {
+                       /* TODO: students logic  */
+                       %>
+    <p class="output-text">Список заказов по учащимся с превышением лимита овердрафта</p>
+    <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
+          enctype="application/x-www-form-urlencoded" class="borderless-form">
+        <input type="submit" name="<%=PROCESS_PARAM_VIEW%>" value="Показать" class="command-button" />
+    </form>
+    <br/>
+    <table border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                                   <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                       ФИО
+                                   </span>
+            </td>
+            <td>
+                                   <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                       Текущий баланс
+                                   </span>
+            </td>
+            <td>
+                                    <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                    Дата заказа
+                                   </span>
+            </td>
+            <td>
+                                    <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                    Сумма заказа
+                                   </span>
+            </td>
+        </tr>
+        <%
+        if(haveDataToProcessView){
+            Criteria criteria = persistenceSession.createCriteria(Order.class);
+            criteria.add(Restrictions.isNotNull("confirmerId"));
+            criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
+                    .add(Restrictions.sqlRestriction("{alias}.balance - {alias}.\"Limit\" < 0"));
+           criteria.add(Restrictions.eq("student.contractId",clientAuthToken.getContractId()));
+           // teacher
+           // criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
+            criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
+            criteria.setProjection(Projections.projectionList()
+                    .add(Projections.property("person.firstName"), "firstName")
+                    .add(Projections.property("person.surname"), "surname")
+                    .add(Projections.property("person.secondName"), "secondName")
+                    .add(Projections.property("student.balance"), "balance")
+                    .add(Projections.property("RSum"), "rSum")
+                    .add(Projections.property("createTime"), "createTime")
+                    .add(Projections.property("student.idOfClient"), "idOfClient")
+            );
+            List students = criteria.list();
+        if (students.isEmpty() && haveDataToProcessView) {
+        %>
+        <tr>
+            <td colspan="4" align="center" valign="center">
+                <span style="margin: 5px;text-align: center;font-size: 8pt; color: #90ee90">
+                  Долгов нет
+                </span>
+            </td>
+        </tr>
+        <%
+        } else {
+            Long idOfClient = null;
+            Long sum = 0L;
+            for (Object object : students) {
+                Object[] stud = (Object[]) object;
+                String fio = String.valueOf(stud[1]) + " "+String.valueOf(stud[0]) + " "+String.valueOf(stud[2]) ;
+                Long balance = Long.valueOf(String.valueOf(stud[3]));
+                String stringDate = timeFormat.format((Date)stud[5]);
+                Long paySum = Long.valueOf(String.valueOf(stud[4]));
+                Long currentIdOfClient = Long.valueOf(String.valueOf(stud[6]));
+                if (idOfClient == null || (idOfClient != null && !idOfClient.equals(currentIdOfClient))) {
+                    idOfClient = currentIdOfClient;
+                    sum = 0L;
+                }
+                if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
+                    sum += paySum;%>
+        <tr>
+            <td>
+                                                        <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                                            <%= fio%>
+                                                        </span>
+            </td>
+            <td>
+                                                        <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                                <%=
+                                                StringEscapeUtils
+                                                        .escapeHtml(CurrencyStringUtils.copecksToRubles(balance))
+                                                %>
+                                               </span>
+
+            </td>
+            <td>
+                                                        <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                                <%=StringEscapeUtils.escapeHtml(stringDate)%>
+                                               </span>
+
+            </td>
+            <td>
+                                                       <span style="margin: 5px;text-align: center;font-size: 8pt;">
+                                                           <%=
+                                                           StringEscapeUtils.escapeHtml(
+                                                                   CurrencyStringUtils.copecksToRubles(paySum))
+                                                           %>
+                                                       </span>
+
+            </td>
+        </tr>
+        <%}
+        }
+        }
+
+        %>
+    </table>
+          <%
+        }
+    }
+
+        persistenceTransaction.commit();
+        persistenceTransaction = null;
+
+    } catch (Exception e) {
+        logger.error("Failed to build page", e);
+        throw new ServletException(e);
+    } finally {
+        HibernateUtils.rollback(persistenceTransaction, logger);
+        HibernateUtils.close(persistenceSession, logger);
+    }
+    %>
+
 </td>
 </tr>
 </table>

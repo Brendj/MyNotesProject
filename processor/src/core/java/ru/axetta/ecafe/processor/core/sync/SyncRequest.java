@@ -241,6 +241,7 @@ public class SyncRequest {
                             trdDiscount = 0L;
                         }
                     }
+                    Long confirmerId = getLongValueNullSafe(namedNodeMap, "ConfirmerId");
                     long grant = getLongValue(namedNodeMap, "Grant");
                     Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
                     long idOfOrder = getLongValue(namedNodeMap, "IdOfOrder");
@@ -251,7 +252,7 @@ public class SyncRequest {
                     if (namedNodeMap.getNamedItem("IdOfPOS") != null) {
                         idOfPOS = getLongValue(namedNodeMap, "IdOfPOS");
                     }
-                    List<Purchase> purchases = new LinkedList<Purchase>();
+                    List<Purchase> purchases = new ArrayList<Purchase>();
                     Node purchaseNode = paymentNode.getFirstChild();
                     while (null != purchaseNode) {
                         if (Node.ELEMENT_NODE == purchaseNode.getNodeType() && purchaseNode.getNodeName()
@@ -261,7 +262,7 @@ public class SyncRequest {
                         purchaseNode = purchaseNode.getNextSibling();
                     }
                     return new Payment(cardNo, date, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
-                            idOfCashier, sumByCard, sumByCash, rSum, idOfPOS, purchases);
+                            idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, purchases);
                 }
 
             }
@@ -270,6 +271,7 @@ public class SyncRequest {
             private final Date time;
             private final Long socDiscount;
             private final Long trdDiscount;
+            private final Long confirmerId;
             private final long grant;
             private final Long idOfClient;
             private final long idOfOrder;
@@ -281,12 +283,13 @@ public class SyncRequest {
             private final List<Purchase> purchases;
 
             public Payment(Long cardNo, Date time, long socDiscount, long trdDiscount, long grant, Long idOfClient,
-                    long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long rSum, Long idOfPOS,
+                    long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long rSum, Long idOfPOS, Long confirmerId,
                     List<Purchase> purchases) {
                 this.cardNo = cardNo;
                 this.time = time;
                 this.socDiscount = socDiscount;
                 this.trdDiscount = trdDiscount;
+                this.confirmerId = confirmerId;
                 this.grant = grant;
                 this.idOfClient = idOfClient;
                 this.idOfOrder = idOfOrder;
@@ -296,6 +299,10 @@ public class SyncRequest {
                 this.rSum = rSum;
                 this.idOfPOS = idOfPOS;
                 this.purchases = purchases;
+            }
+
+            public Long getConfirmerId() {
+                return confirmerId;
             }
 
             public Long getCardNo() {

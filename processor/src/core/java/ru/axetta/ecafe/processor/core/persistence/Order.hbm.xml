@@ -23,6 +23,9 @@
         <property name="idOfCashier" column="IdOfCashier" type="long" not-null="true" update="false"/>
         <property name="socDiscount" column="SocDiscount" type="long" not-null="true" update="false"/>
         <property name="trdDiscount" column="TrdDiscount" type="long" not-null="true" update="false"/>
+
+        <property name="confirmerId" column="ConfirmerId" type="long"/>
+
         <property name="grantSum" column="GrantSum" type="long" not-null="true" update="false"/>
         <property name="RSum" column="rSum" type="long" not-null="true" update="false"/>
         <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"

@@ -90,7 +90,7 @@ public class FinancialOpsManager {
     }
 
     public void createOrderCharge(Session session, SyncRequest.PaymentRegistry.Payment payment, Long idOfOrg,
-            Client client, Card card) throws Exception {
+            Client client, Card card, Long confirmerId) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
         // If "card part" of payment is specified...
@@ -138,6 +138,9 @@ public class FinancialOpsManager {
         Long sumByCard = order.getSumByCard();
         Long budgetSum = order.getSocDiscount() + order.getGrantSum();
         getCurrentPositionsManager(session).changeOrderPosition(sumByCard, budgetSum, supplier);
+        if(confirmerId!=null){
+            order.setConfirmerId(confirmerId);
+        }
         session.save(order);
 
         /// Формирование журнала транзакции
