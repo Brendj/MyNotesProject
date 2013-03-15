@@ -592,7 +592,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public void createCategoryDiscount(Long idOfCategoryDiscount, String categoryName, String discountRules, String description){
         Date currentTime = new Date();
         CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules, description, currentTime, currentTime);
-
+        categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         em.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");
     }
