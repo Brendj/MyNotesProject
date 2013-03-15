@@ -9,12 +9,9 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -132,10 +129,10 @@ public class ClientPaymentList {
         criteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
         criteria.add(Restrictions.ge("createTime", startTime));
         criteria.add(Restrictions.le("createTime", endTime));
-        criteria = criteria.createCriteria("transaction");
+        criteria = criteria.createCriteria("transaction").addOrder(org.hibernate.criterion.Order.desc("transactionTime"));
         criteria.add(Restrictions.eq("client", client));
 
-        List<Item> items = new LinkedList<Item>();
+        List<Item> items = new ArrayList<Item>();
         List clientPayments = criteria.list();
         for (Object object : clientPayments) {
             ClientPayment clientPayment = (ClientPayment) object;

@@ -11,8 +11,9 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,9 +33,9 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private final ClientPaymentList clientPaymentList = new ClientPaymentList();
     private final ClientOrderList clientOrderList = new ClientOrderList();
     private final ClientSmsList clientSmsList = new ClientSmsList();
-    private List<AccountTransfer> accountTransferList = new LinkedList<AccountTransfer>(); 
-    private List<AccountRefund> accountRefundList = new LinkedList<AccountRefund>();
-    private List<AccountTransaction> accountTransactionList = new LinkedList<AccountTransaction>();
+    private List<AccountTransfer> accountTransferList = new ArrayList<AccountTransfer>();
+    private List<AccountRefund> accountRefundList = new ArrayList<AccountRefund>();
+    private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -119,10 +120,11 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.add(Restrictions.ge("transactionTime", startTime));
         criteria.add(Restrictions.le("transactionTime", endTime));
         criteria.add(Restrictions.eq("client", client));
-        this.accountTransactionList = new LinkedList<AccountTransaction>();
+        criteria.addOrder(org.hibernate.criterion.Order.asc("transactionTime"));
+        this.accountTransactionList = new ArrayList<AccountTransaction>();
         for (Object o : criteria.list()) {
             AccountTransaction accTrans = (AccountTransaction)o;
-            if (accTrans.getCard()!=null) accTrans.getCard().getCardNo(); // lazy load
+            if (accTrans.getCard()!=null) accTrans.getCard().getCardNo(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
             accountTransactionList.add(accTrans);
         }
 

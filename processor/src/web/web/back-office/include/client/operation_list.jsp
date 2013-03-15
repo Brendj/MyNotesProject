@@ -42,7 +42,7 @@
             <f:setPropertyActionListener value="#{item.card.cardNo}" target="#{mainPage.selectedIdOfCard}" />
         </a4j:commandLink>
     </rich:column>
-    <rich:column headerClass="column-header">
+    <rich:column headerClass="column-header" sortBy="#{item.transactionTime}">
         <f:facet name="header">
             <h:outputText escape="true" value="Время транзакции" />
         </f:facet>
