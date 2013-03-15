@@ -52,6 +52,19 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="SMS уведомление о списании средств" id="payment-SMS">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.paymentSMSMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[date] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[contractId] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[others] - суммы оплаты не комплексного питания" styleClass="output-text" />
+                    <h:outputText value="[complexes] - суммы оплаты комплексного питания" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
         <rich:tab label="E-mail уведомления о пополнении баланса" id="balance-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
@@ -106,6 +119,21 @@
                 <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
                 <h:panelGrid>
                     <h:outputText value="[url] - URL для сброса пароля" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
+        <rich:tab label="E-mail уведомление о списании средств" id="payment-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.paymentEmailSubject}" size="80" maxlength="128" styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea id="payment-Email-text" rows="15" cols="80" value="#{messageConfigurePage.paymentEmailMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[date] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[contractId] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[others] - суммы оплаты не комплексного питания" styleClass="output-text" />
+                    <h:outputText value="[complexes] - суммы оплаты комплексного питания" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

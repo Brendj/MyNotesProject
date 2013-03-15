@@ -41,6 +41,10 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String linkingTokenEmailMessageText;
     private String linkingTokenSMSMessageText;
 
+    private String paymentEmailSubject;
+    private String paymentEmailMessageText;
+    private String paymentSMSMessageText;
+
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -70,6 +74,13 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                 EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_SUBJECT);
         linkingTokenSMSMessageText = eventNotificationService.getNotificationText(
                 EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_SMS);
+
+        paymentEmailSubject = eventNotificationService.getNotificationText(
+                EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        paymentEmailMessageText = eventNotificationService.getNotificationText(
+                EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_TEXT);
+        paymentSMSMessageText = eventNotificationService.getNotificationText(
+                EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS);
     }
 
     public Object save() throws Exception {
@@ -99,7 +110,14 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_EMAIL_SUBJECT,
                     linkingTokenEmailSubject,
                     EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED, EventNotificationService.TYPE_SMS,
-                    linkingTokenSMSMessageText});
+                    linkingTokenSMSMessageText,
+                    ////
+                    EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    paymentEmailSubject,
+                    EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_TEXT,
+                    paymentEmailMessageText,
+                    EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS,
+                    paymentSMSMessageText});
 
             printMessage("Настройки сохранены.");
         } catch (Exception e) {
@@ -201,5 +219,29 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setLinkingTokenSMSMessageText(String linkingTokenSMSMessageText) {
         this.linkingTokenSMSMessageText = linkingTokenSMSMessageText;
+    }
+
+    public String getPaymentEmailSubject() {
+        return paymentEmailSubject;
+    }
+
+    public void setPaymentEmailSubject(String paymentEmailSubject) {
+        this.paymentEmailSubject = paymentEmailSubject;
+    }
+
+    public String getPaymentEmailMessageText() {
+        return paymentEmailMessageText;
+    }
+
+    public void setPaymentEmailMessageText(String paymentEmailMessageText) {
+        this.paymentEmailMessageText = paymentEmailMessageText;
+    }
+
+    public String getPaymentSMSMessageText() {
+        return paymentSMSMessageText;
+    }
+
+    public void setPaymentSMSMessageText(String paymentSMSMessageText) {
+        this.paymentSMSMessageText = paymentSMSMessageText;
     }
 }
