@@ -7,7 +7,7 @@
 --! Добавление индекса, если требуется, раскомментировать
 --! CREATE index "cf_menudetails_path_price_idx" ON CF_menudetails (menupath, price);
 
---! Переводим клиентов с нилевой ссылкой на группу в корень, то есть делаем их без группы
+-- Переводим клиентов с нилевой ссылкой на группу в корень, то есть делаем их без группы
 UPDATE cf_clients
    SET idofclientgroup=null
  WHERE idofclient in (
