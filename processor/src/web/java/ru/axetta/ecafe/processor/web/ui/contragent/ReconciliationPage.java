@@ -40,8 +40,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private String caReceiverName;
     private String registryProcessingError;
     private Date dtFrom = new Date(), dtTo = new Date();
-    private LinkedList<PaymentReconciliationManager.RegistryItem> registryItems;
-    private LinkedList<PaymentReconciliationManager.Difference> differencesList;
+    private List<PaymentReconciliationManager.RegistryItem> registryItems;
+    private List<PaymentReconciliationManager.Difference> differencesList;
     private String differencesInfo;
 
     @Override
@@ -147,7 +147,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     
     
     public void loadRegistry(InputStream inputStream, long dataSize) throws Exception {
-        LinkedList<PaymentReconciliationManager.RegistryItem> registryItems = new LinkedList<PaymentReconciliationManager.RegistryItem>();
+        List<PaymentReconciliationManager.RegistryItem> registryItems = new ArrayList<PaymentReconciliationManager.RegistryItem>();
 
         int lineNo = 0;
         LineConfig lineConfig = new LineConfig();
@@ -248,7 +248,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         this.dtTo = dtTo;
     }
 
-    public LinkedList<PaymentReconciliationManager.Difference> getDifferencesList() {
+    public List<PaymentReconciliationManager.Difference> getDifferencesList() {
         return differencesList;
     }
 
