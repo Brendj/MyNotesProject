@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-@Scope("singleton")
+@Scope("prototype")
 public class MSRStopListLoader {
 
     private String WS_LOGIN = null;
@@ -52,7 +53,8 @@ public class MSRStopListLoader {
     private boolean loggingEnabled = false;
     private DatatypeFactory df;
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private DAOService daoService = DAOService.getInstance();
+    @Autowired(required = false)
+    private DAOService daoService;
 
     private Date updateDate;
     private LongRunningStopListService port = null;

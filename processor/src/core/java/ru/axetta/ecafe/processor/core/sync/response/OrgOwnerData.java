@@ -40,7 +40,12 @@ public class OrgOwnerData {
         //if(!orgOwners.isEmpty()){
         //}
         Org org = DAOUtils.findOrg(session, idOfOrg);
-        orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), true));
+        /*
+         * TODO: ранее высылался как поставщик сама организация
+         * TODO: при возникновении проблем написать пояснения
+         * TODO: Зачем синхронизируемой организации являться поставщиком
+         * */
+        orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), false));
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, true));
         orgOwnerList = orgOwners;
     }

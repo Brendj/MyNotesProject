@@ -22,4 +22,4 @@ DROP TABLE CF_Group_Payment_Confirm_Position;
 --! REFERENCES cf_clientgroups (idoforg, idofclientgroup);
 
 
---! ФИНАЛИЗИРОВАН (Кадыров, 130222) НЕ МЕНЯТЬ
+--! ФИНАЛИЗИРОВАН (Кадыров, 130318) НЕ МЕНЯТЬ
