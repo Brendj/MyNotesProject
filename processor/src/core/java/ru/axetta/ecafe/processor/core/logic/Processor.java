@@ -1053,6 +1053,7 @@ public class Processor implements SyncProcessor,
                 }
             } else {
                 /* Льгота по категориями то ощищаем */
+                client.setCategoriesDiscounts("");
                 client.setCategories(new HashSet<CategoryDiscount>());
             }
             if (clientParamItem.getAddress() != null) {
