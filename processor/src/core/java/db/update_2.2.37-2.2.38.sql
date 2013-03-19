@@ -22,4 +22,4 @@ UPDATE cf_clients
 ALTER TABLE cf_clients ADD CONSTRAINT cf_clients_fk_orgclientsgroup FOREIGN KEY (idoforg, idofclientgroup)
 REFERENCES cf_clientgroups (idoforg, idofclientgroup);
 
--- Исправлен не дочет по категориям скидо, далее после изменения параметров клиента в части категорий скидо данные будут валидными.
+-- Исправлен не дочет по категориям скидок, далее после изменения параметров клиента в части категорий скидок данные будут валидными.
