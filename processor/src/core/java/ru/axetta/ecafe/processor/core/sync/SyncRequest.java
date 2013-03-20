@@ -55,9 +55,9 @@ public class SyncRequest {
         return node.getTextContent();
     }
 
-    public int getType() {
-        return type;
-    }
+    //public int getType() {
+    //    return type;
+    //}
 
     public static class PaymentRegistry {
 
@@ -3031,10 +3031,13 @@ public class SyncRequest {
             return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
         }
 
-        public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
-            return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
-        }
+        //public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
+        //    return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
+        //}
 
+        public static SyncType getSyncType(NamedNodeMap namedNodeMap) throws Exception {
+            return SyncType.parse(getStringValueNullSafe(namedNodeMap, "Type"));
+        }
 
         public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
                 throws Exception {
@@ -3043,7 +3046,9 @@ public class SyncRequest {
                 throw new Exception(String.format("Unsupported protoVersion: %d", version));
             }
             String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
-            int type = parseSyncType(sSyncType);
+
+            //int type = parseSyncType(sSyncType);
+            SyncType syncType = SyncType.parse(sSyncType);
 
             String clientVersion = getClientVersion(namedNodeMap);
 
@@ -3161,22 +3166,24 @@ public class SyncRequest {
             }
 
 
-            return new SyncRequest(remoteAddr, version, type, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(remoteAddr, version, syncType /*type,*/, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, libraryData, libraryData2, manager);
         }
 
-        private static int parseSyncType(String sSyncType) throws Exception {
-            int type;
-            if (sSyncType != null && sSyncType.equals("GetAccInc")) {
-                type = SyncRequest.TYPE_GET_ACC_INC;
-            } else if (sSyncType == null || sSyncType.equals("Full")) {
-                type = SyncRequest.TYPE_FULL;
-            } else {
-                throw new Exception("Invalid request type: " + sSyncType);
-            }
-            return type;
-        }
+        //private static int parseSyncType(String sSyncType) throws Exception {
+        //    int type;
+        //    if (sSyncType != null && sSyncType.equals("GetAccInc")) {
+        //        type = SyncRequest.TYPE_GET_ACC_INC;
+        //    } else if (sSyncType != null && sSyncType.equals("GetClientParams")) {
+        //        type = SyncRequest.TYPE_GET_CLIENTS_PARAMS;
+        //    } else if (sSyncType == null || sSyncType.equals("Full")) {
+        //        type = SyncRequest.TYPE_FULL;
+        //    } else  {
+        //        throw new Exception("Invalid request type: " + sSyncType);
+        //    }
+        //    return type;
+        //}
 
         private static Node findFirstChildElement(Node node, String name) throws Exception {
             Node currNode = node.getFirstChild();
@@ -3201,7 +3208,12 @@ public class SyncRequest {
         }
     }
 
-    public final static int TYPE_FULL = 0, TYPE_GET_ACC_INC = 1;
+    //public final static int TYPE_FULL = 0, TYPE_GET_ACC_INC = 1, TYPE_GET_CLIENTS_PARAMS = 2;
+    private final SyncType syncType;
+
+    public SyncType getSyncType() {
+        return syncType;
+    }
 
     private final String remoteAddr;
     private final long protoVersion;
@@ -3218,14 +3230,14 @@ public class SyncRequest {
     private final ReqMenu reqMenu;
     private final ReqDiary reqDiary;
     private final String message;
-    private final int type;
+    /*private final int type;*/
     private final String clientVersion;
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
     private final Manager manager;
 
-    public SyncRequest(String remoteAddr, long protoVersion, int type, String clientVersion, Org org, Date syncTime, Long idOfPacket,
+    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType /*int type*/, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
@@ -3233,7 +3245,8 @@ public class SyncRequest {
             Manager manager) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
-        this.type = type;
+       /* this.type = type;*/
+        this.syncType = syncType;
         this.clientVersion = clientVersion;
         this.manager = manager;
         this.idOfOrg = org.getIdOfOrg();

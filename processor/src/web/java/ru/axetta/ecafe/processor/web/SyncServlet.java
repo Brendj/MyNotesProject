@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.sync.SyncLogger;
-import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
-import ru.axetta.ecafe.processor.core.sync.SyncResponse;
+import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -78,7 +75,8 @@ public class SyncServlet extends HttpServlet {
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             long idOfOrg;
             String idOfSync;
-            int syncType;
+            /*int syncType;*/
+            SyncType syncType;
             Node envelopeNode;
             NamedNodeMap namedNodeMap;
             try {
@@ -94,13 +92,14 @@ public class SyncServlet extends HttpServlet {
             }
             logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg+""));
 
-            boolean bLogPackets = (syncType==SyncRequest.TYPE_FULL);
+            //boolean bLogPackets = (syncType==SyncRequest.TYPE_FULL);
+            boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
             if (bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             else {
-                logger.info(String.format("Synchronization with %s - type: %d - packets not logged", request.getRemoteAddr(), syncType));
+                logger.info(String.format("Synchronization with %s - type: %d - packets not logged", request.getRemoteAddr(), syncType.getValue()));
             }
 
             // Verify XML signature
