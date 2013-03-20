@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online"--%>
+<%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
 <h:panelGrid id="reportPanelGrid" binding="#{totalServicesReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
@@ -34,28 +34,28 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                        <h:outputText styleClass="column-header" escape="true" value="№" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                        <h:outputText styleClass="column-header" escape="true" value="Организация" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Число учащихся" />
+                        <h:outputText styleClass="column-header" escape="true" value="Число учащихся" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Получают льготное питание" />
+                        <h:outputText styleClass="column-header" escape="true" value="Получают льготное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Зафиксирован проход" />
+                        <h:outputText styleClass="column-header" escape="true" value="Зафиксирован проход" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Получили льготное питание" />
+                        <h:outputText styleClass="column-header" escape="true" value="Получили льготное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Получили платное питание" />
+                        <h:outputText styleClass="column-header" escape="true" value="Получили платное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Получили питание (льготное + платное)" />
+                        <h:outputText styleClass="column-header" escape="true" value="Получили питание (льготное + платное)" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
