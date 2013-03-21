@@ -37,7 +37,7 @@
     <file path="/TransactionTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355830368186" ignored="false" />
     <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363790957773" ignored="false" />
     <file path="/CommodityAccountingGroupPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356006147159" ignored="false" />
-    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363854841887" ignored="false" />
+    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363855030051" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
     <file path="/inventarization_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355924047405" ignored="false" />
     <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363788841533" ignored="false" />
@@ -48,7 +48,7 @@
     <file path="/ActOfWayBillDifferencePositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355918761293" ignored="false" />
     <file path="/waybilldifferenceposition_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355925377001" ignored="false" />
     <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363777973523" ignored="false" />
-    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363854841887" ignored="false" />
+    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363855030051" ignored="false" />
     <file path="/TradeMaterialGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355996963925" ignored="false" />
     <file path="/TradeMaterialGoodItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017537756" ignored="false" />
     <file path="/tradematrialgoods.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355998169227" ignored="false" />
@@ -1232,7 +1232,7 @@
       <file leaf-file-name="HMACSHA1Test.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="35" selection-start="1152" selection-end="1152" vertical-scroll-proportion="0.7816092">
+            <state line="32" column="33" selection-start="1150" selection-end="1150" vertical-scroll-proportion="0.7816092">
               <folding />
             </state>
           </provider>
@@ -2284,7 +2284,7 @@
       <recent name="ru.axetta.ecafe.processor.core.utils" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.HMACSHA1Test">
+  <component name="RunManager" selected="JUnit.SignHandlerTest">
     <configuration default="false" name="TeralectSmsServiceTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <module name="core" />
@@ -2978,6 +2978,31 @@
         <option name="Make" enabled="false" />
       </method>
     </configuration>
+    <configuration default="false" name="SignHandlerTest" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="emma" />
+      <module name="web" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="ru.axetta.soap" />
+      <option name="MAIN_CLASS_NAME" value="ru.axetta.soap.SignHandlerTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" enabled="false" />
+      </method>
+    </configuration>
     <configuration default="false" name="Remote" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -3020,7 +3045,7 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <method />
     </configuration>
-    <list size="22">
+    <list size="23">
       <item index="0" class="java.lang.String" itemvalue="Application.synctest at freexter.com" />
       <item index="1" class="java.lang.String" itemvalue="Application.pubkey" />
       <item index="2" class="java.lang.String" itemvalue="Application.synctest" />
@@ -3035,14 +3060,15 @@
       <item index="11" class="java.lang.String" itemvalue="JUnit.ReportWS" />
       <item index="12" class="java.lang.String" itemvalue="JUnit.PhoneNumberCanonicalizatorTest" />
       <item index="13" class="java.lang.String" itemvalue="JUnit.HMACSHA1Test" />
-      <item index="14" class="java.lang.String" itemvalue="JUnit.TeralectSmsServiceTest" />
-      <item index="15" class="java.lang.String" itemvalue="JUnit.DESTest" />
-      <item index="16" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
-      <item index="17" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
-      <item index="18" class="java.lang.String" itemvalue="Query Language Console.Default" />
-      <item index="19" class="java.lang.String" itemvalue="Remote.Remote" />
-      <item index="20" class="java.lang.String" itemvalue="Remote.Kirill_remote" />
-      <item index="21" class="java.lang.String" itemvalue="Remote.test_server_remote" />
+      <item index="14" class="java.lang.String" itemvalue="JUnit.SignHandlerTest" />
+      <item index="15" class="java.lang.String" itemvalue="JUnit.TeralectSmsServiceTest" />
+      <item index="16" class="java.lang.String" itemvalue="JUnit.DESTest" />
+      <item index="17" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
+      <item index="18" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
+      <item index="19" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="20" class="java.lang.String" itemvalue="Remote.Remote" />
+      <item index="21" class="java.lang.String" itemvalue="Remote.Kirill_remote" />
+      <item index="22" class="java.lang.String" itemvalue="Remote.test_server_remote" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -3317,7 +3343,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <frame x="-8" y="-8" width="1696" height="1026" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3210587" sideWeight="0.0" order="23" side_tool="false" content_ui="tabs" />
@@ -3685,7 +3711,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="35" selection-start="1152" selection-end="1152" vertical-scroll-proportion="0.7816092">
+        <state line="32" column="33" selection-start="1150" selection-end="1150" vertical-scroll-proportion="0.7816092">
           <folding />
         </state>
       </provider>
