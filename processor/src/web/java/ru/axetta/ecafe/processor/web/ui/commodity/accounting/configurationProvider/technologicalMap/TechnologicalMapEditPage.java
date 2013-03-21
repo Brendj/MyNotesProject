@@ -104,20 +104,22 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
          }
     }
 
-    @Transactional
+    //@Transactional
     public void remove(){
         if(!currentTechnologicalMap.getDeletedState()) {
             printError("Технологическая карта не может быть удалена.");
             return;
         }
         try{
-            for (TechnologicalMapProduct technologicalMapProduct: currentTechnologicalMap.getTechnologicalMapProduct()) {
-                TechnologicalMapProduct tmp = em.getReference(TechnologicalMapProduct.class,
-                        technologicalMapProduct.getGlobalId());
-                em.remove(tmp);
-            }
-            TechnologicalMap tm=em.getReference(TechnologicalMap.class, currentTechnologicalMap.getGlobalId());
-            em.remove(tm);
+            //for (TechnologicalMapProduct technologicalMapProduct: currentTechnologicalMap.getTechnologicalMapProduct()) {
+            //    //TechnologicalMapProduct tmp = em.getReference(TechnologicalMapProduct.class,
+            //    //        technologicalMapProduct.getGlobalId());
+            //    //em.remove(tmp);
+            //}
+            //TechnologicalMap tm=em.getReference(TechnologicalMap.class, currentTechnologicalMap.getGlobalId());
+            //em.remove(tm);
+
+            daoService.removeTechnologicalMap(currentTechnologicalMap.getGlobalId());
             printMessage("Технологическая карта удалена успешно.");
         }  catch (Exception e){
             printError("Ошибка при удалении технологической карты.");
@@ -189,6 +191,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 }
             }
             selectedTechnologicalMapGroupPage.setCurrentTechnologicalMap(currentTechnologicalMap);
+            daoService.mergeDistributedObject(tm, tm.getGlobalVersion()+1);
             printMessage("Технологическая карта сохранена успешно.");
         } catch (Exception e){
             printError("Ошибка при сохранении новой технологической карты.");

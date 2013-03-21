@@ -132,6 +132,17 @@ public class DAOService {
     }
 
     @Transactional
+    public void removeTechnologicalMap(Long idOfTechnologicalMaps){
+        Query query1 = em.createNativeQuery("DELETE FROM cf_technological_map_products where idoftechnologicalmaps="+idOfTechnologicalMaps);
+        query1.executeUpdate();
+        Query query = em.createNativeQuery("DELETE FROM cf_technological_map where idoftechnologicalmaps="+idOfTechnologicalMaps);
+        query.executeUpdate();
+        //em.remove(goodsBasicBasket);
+        //Query query = em.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood ");
+        //query.setParameter("idOfBasicGood", idOfBasicGood);
+    }
+
+    @Transactional
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
         TypedQuery<DistributedObject> query = em.createQuery(
                 "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()
