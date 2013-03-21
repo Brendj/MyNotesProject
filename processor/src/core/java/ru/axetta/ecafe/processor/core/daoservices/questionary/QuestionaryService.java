@@ -86,21 +86,20 @@ public class QuestionaryService {
         return (List<ClientAnswerByQuestionaryItem>) criteria.list();
     }
 
-
     public void registrationAnswerByClient(Session session, Long contractId, Long idOfAnswer) throws Exception{
         Criteria clientCriteria = session.createCriteria(Client.class);
         clientCriteria.add(Restrictions.eq("contractId",contractId));
         Client client = (Client) clientCriteria.uniqueResult();
 
         DetachedCriteria idOfQuestionCriteria = DetachedCriteria.forClass(Questionary.class);
-        idOfQuestionCriteria.createAlias("answers","answer", JoinType.NONE);
+        idOfQuestionCriteria.createAlias("answers","answer");
         idOfQuestionCriteria.add(Restrictions.eq("answer.idOfAnswer",idOfAnswer));
         idOfQuestionCriteria.setProjection(Property.forName("idOfQuestionary"));
 
         Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
-        clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
+        clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client",client));
         clientAnswerByQuestionaryCriteria.createAlias("answer","an");
-        clientAnswerByQuestionaryCriteria.createAlias("an.questionary", "question");
+        clientAnswerByQuestionaryCriteria.createAlias("an.questionary","question");
         clientAnswerByQuestionaryCriteria.add( Property.forName("question.idOfQuestionary").eq(idOfQuestionCriteria));
         List list = clientAnswerByQuestionaryCriteria.list();
         Answer answer = (Answer) session.get(Answer.class, idOfAnswer);
@@ -113,6 +112,33 @@ public class QuestionaryService {
             session.saveOrUpdate(clientAnswerByQuestionary);
         }
     }
+
+    //public void registrationAnswerByClient(Session session, Long contractId, Long idOfAnswer) throws Exception{
+    //    Criteria clientCriteria = session.createCriteria(Client.class);
+    //    clientCriteria.add(Restrictions.eq("contractId",contractId));
+    //    Client client = (Client) clientCriteria.uniqueResult();
+    //
+    //    DetachedCriteria idOfQuestionCriteria = DetachedCriteria.forClass(Questionary.class);
+    //    idOfQuestionCriteria.createAlias("answers","answer", JoinType.NONE);
+    //    idOfQuestionCriteria.add(Restrictions.eq("answer.idOfAnswer",idOfAnswer));
+    //    idOfQuestionCriteria.setProjection(Property.forName("idOfQuestionary"));
+    //
+    //    Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
+    //    clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
+    //    clientAnswerByQuestionaryCriteria.createAlias("answer","an");
+    //    clientAnswerByQuestionaryCriteria.createAlias("an.questionary", "question");
+    //    clientAnswerByQuestionaryCriteria.add( Property.forName("question.idOfQuestionary").eq(idOfQuestionCriteria));
+    //    List list = clientAnswerByQuestionaryCriteria.list();
+    //    Answer answer = (Answer) session.get(Answer.class, idOfAnswer);
+    //    if(list.isEmpty()){
+    //        ClientAnswerByQuestionary clientAnswerByQuestionary = new ClientAnswerByQuestionary(answer,client);
+    //        session.persist(clientAnswerByQuestionary);
+    //    } else {
+    //        ClientAnswerByQuestionary clientAnswerByQuestionary = (ClientAnswerByQuestionary) list.get(0);
+    //        clientAnswerByQuestionary.setAnswer(answer);
+    //        session.saveOrUpdate(clientAnswerByQuestionary);
+    //    }
+    //}
 
     public List<Answer> getAnswers(Questionary questionary){
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
