@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="Реализован отчет по миграции клиентов, исправлен не дочет если клиент регистрируется в другой корпус организации">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
     </list>
@@ -36,7 +37,7 @@
     <file path="/TransactionTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355830368186" ignored="false" />
     <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363790957773" ignored="false" />
     <file path="/CommodityAccountingGroupPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356006147159" ignored="false" />
-    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363790392824" ignored="false" />
+    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363854841887" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
     <file path="/inventarization_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355924047405" ignored="false" />
     <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363788841533" ignored="false" />
@@ -47,7 +48,7 @@
     <file path="/ActOfWayBillDifferencePositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355918761293" ignored="false" />
     <file path="/waybilldifferenceposition_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355925377001" ignored="false" />
     <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363777973523" ignored="false" />
-    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363792876398" ignored="false" />
+    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363854841887" ignored="false" />
     <file path="/TradeMaterialGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355996963925" ignored="false" />
     <file path="/TradeMaterialGoodItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017537756" ignored="false" />
     <file path="/tradematrialgoods.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355998169227" ignored="false" />
@@ -619,7 +620,7 @@
     <file path="/confirm_delete.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360744633503" ignored="false" />
     <file path="/GoodsBasicBasketData.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360748718120" ignored="false" />
     <file path="/GoodsBasicBasketDataItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360746867075" ignored="false" />
-    <file path="/OrgOwnerData.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363591927585" ignored="false" />
+    <file path="/OrgOwnerData.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363853848178" ignored="false" />
     <file path="/GoodsBasicBasketDataElement.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360747446126" ignored="false" />
     <file path="/Good.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360750708310" ignored="false" />
     <file path="/SyncResponse.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363776078451" ignored="false" />
@@ -1174,24 +1175,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="main_menu.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="772" column="111" selection-start="54054" selection-end="54054" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="total_srvc_report.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/total_srvc_report.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="63" selection-start="2468" selection-end="2468" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ReportTemplateManagerPage.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/ReportTemplateManagerPage.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -1228,10 +1211,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Staff.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Staff.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/documents/Staff.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="25" selection-start="625" selection-end="625" vertical-scroll-proportion="0.2422452">
+            <state line="21" column="25" selection-start="625" selection-end="625" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OrgOwnerData.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="51" selection-start="1079" selection-end="1079" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HMACSHA1Test.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="35" selection-start="1152" selection-end="1152" vertical-scroll-proportion="0.7816092">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AuthorizationType.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/core/persistence/AuthorizationType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="22" column="19" selection-start="453" selection-end="453" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -1250,15 +1260,6 @@
         <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql">
           <provider selected="true" editor-type-id="text-editor">
             <state line="24" column="0" selection-start="957" selection-end="1002" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="styles.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="0" selection-start="581" selection-end="581" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -1333,7 +1334,6 @@
         <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.35-2.2.36.sql" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/client/ClientPaymentList.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ReconciliationPage.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncRequest.java" />
@@ -1345,6 +1345,7 @@
         <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/total_srvc_report.jsp" />
         <option value="$PROJECT_DIR$/../../src/core/java/db/update.properties" />
         <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.37-2.2.38.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java" />
       </list>
     </option>
   </component>
@@ -1798,26 +1799,16 @@
               <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="axetta" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1831,19 +1822,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
+              <option name="myItemId" value="axetta" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1857,23 +1840,15 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
+              <option name="myItemId" value="axetta" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="option" />
+              <option name="myItemId" value="partner" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1888,10 +1863,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1902,6 +1873,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sms" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1942,6 +1935,32 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="sync" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sync" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="response" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2265,7 +2284,7 @@
       <recent name="ru.axetta.ecafe.processor.core.utils" />
     </key>
   </component>
-  <component name="RunManager" selected="Remote.Remote">
+  <component name="RunManager" selected="JUnit.HMACSHA1Test">
     <configuration default="false" name="TeralectSmsServiceTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <module name="core" />
@@ -2934,6 +2953,31 @@
         <option name="Make" enabled="false" />
       </method>
     </configuration>
+    <configuration default="false" name="HMACSHA1Test" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="emma" />
+      <module name="web" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="ru.axetta.test" />
+      <option name="MAIN_CLASS_NAME" value="ru.axetta.test.HMACSHA1Test" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" enabled="false" />
+      </method>
+    </configuration>
     <configuration default="false" name="Remote" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -2976,7 +3020,7 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <method />
     </configuration>
-    <list size="21">
+    <list size="22">
       <item index="0" class="java.lang.String" itemvalue="Application.synctest at freexter.com" />
       <item index="1" class="java.lang.String" itemvalue="Application.pubkey" />
       <item index="2" class="java.lang.String" itemvalue="Application.synctest" />
@@ -2990,14 +3034,15 @@
       <item index="10" class="java.lang.String" itemvalue="JUnit.DistributedObjectsAccessTest" />
       <item index="11" class="java.lang.String" itemvalue="JUnit.ReportWS" />
       <item index="12" class="java.lang.String" itemvalue="JUnit.PhoneNumberCanonicalizatorTest" />
-      <item index="13" class="java.lang.String" itemvalue="Remote.Remote" />
-      <item index="14" class="java.lang.String" itemvalue="Remote.Kirill_remote" />
-      <item index="15" class="java.lang.String" itemvalue="Remote.test_server_remote" />
-      <item index="16" class="java.lang.String" itemvalue="JUnit.TeralectSmsServiceTest" />
-      <item index="17" class="java.lang.String" itemvalue="JUnit.DESTest" />
-      <item index="18" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
-      <item index="19" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
-      <item index="20" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="13" class="java.lang.String" itemvalue="JUnit.HMACSHA1Test" />
+      <item index="14" class="java.lang.String" itemvalue="JUnit.TeralectSmsServiceTest" />
+      <item index="15" class="java.lang.String" itemvalue="JUnit.DESTest" />
+      <item index="16" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
+      <item index="17" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
+      <item index="18" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="19" class="java.lang.String" itemvalue="Remote.Remote" />
+      <item index="20" class="java.lang.String" itemvalue="Remote.Kirill_remote" />
+      <item index="21" class="java.lang.String" itemvalue="Remote.test_server_remote" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -3280,7 +3325,7 @@
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.16724336" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.3763797" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33231333" sideWeight="0.7750865" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33231333" sideWeight="0.83506346" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.7031824" order="27" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.30334488" order="5" side_tool="true" content_ui="tabs" />
@@ -3289,7 +3334,7 @@
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902735" sideWeight="0.6996587" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.7820069" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16493656" sideWeight="0.56854343" order="24" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16493656" sideWeight="0.56854343" order="24" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3217993" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38188493" sideWeight="0.6697353" order="1" side_tool="false" content_ui="tabs" />
@@ -3297,8 +3342,8 @@
       <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.22737306" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298731" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2239902" sideWeight="0.83506346" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.48556232" order="28" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2239902" sideWeight="0.67128026" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32871974" sideWeight="0.48556232" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -3533,299 +3578,6 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="12" selection-start="323" selection-end="323" vertical-scroll-proportion="0.3409742">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#505#522#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/SyncResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="439" column="21" selection-start="15991" selection-end="15991" vertical-scroll-proportion="-22.56">
-          <folding>
-            <element signature="docComment;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfOrder#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getResult#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResPaymentRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCardNo#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCardType#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getUpdateTime#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getBalance#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getLimit#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getExpenditureLimit#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getState#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="e#5875#5891#0" expanded="false" />
-            <element signature="e#6121#6137#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#AccRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfPaymentOrder#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfClient#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDateTime#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getSum#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#AccIncRegistry#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setDate#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#AccIncRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getClientGroup#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfClient#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getFirstName#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getSurname#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getSecondName#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdDocument#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getAddress#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPhone#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMobile#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getFax#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getContractState#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getFreePayMaxCount#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCategoriesDiscounts#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDiscountMode#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#isCanConfirmGroupPayment#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ClientRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#CorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#CorrectingNumbersOrdersRegistry#0;class#CorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#CorrectingNumbersOrdersRegistry#1;class#CorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#CorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#CorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#ResOrgStructure#0;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#ResOrgStructure#1;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getResult#0;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResOrgStructure#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResMenuExchangeData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#ResMenuDetail#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getName#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getGroup#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getOutput#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPrice#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getProtein#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getFat#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCarbohydrates#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCalories#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVitB1#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVitC#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVitA#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVitE#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMinCa#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMinP#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMinMg#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMinFe#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setMinorComponent#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#convertMinorComponentAmountToLong#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResMenuDetail#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDate#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getMenuDetails#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResMenu#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#ResDiary#0;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#ResDiary#1;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getResult#0;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResDiary#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Item#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfEnterEvent#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getResEvent#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Item#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getItems#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResEnterEvents#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCirculations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setCirculations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setPublications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Circulation#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfCirculation#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVersion#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getErrCode#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Circulation#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCirculationList#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Circulations#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Publication#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfPublication#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVersion#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getErrCode#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Publication#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublicationList#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Publications#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResLibraryData#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPubls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setPubls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCirculs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setCirculs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getStatus#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setStatus#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setCommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Publ#0;class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfPublication#0;class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getErrCode#0;class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Publ#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublList#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Publs#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Circul#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfCircul#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getErrCode#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getError#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfClient#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfPublication#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfOrg#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Circul#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getResult#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setResult#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCirculList#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Circuls#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#CommonUpdate#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Publ#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#Publ#1;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdofpubl#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIsbn#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getData#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getAuthor#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getTitle#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getTitle2#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublicationdate#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublisher#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getHash#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getVersion#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#Publ#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addItem#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addAll#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPublList#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#CommonUpdate#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResLibraryData2#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#DCI#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfCategoryDiscount#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCategoryName#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCategoryType#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDiscountRules#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#DCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getOperationor#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#setOperationor#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCategoryDiscounts#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getPriority#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#DCRI#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#DCRI#1;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getIdOfRule#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDescription#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex0#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex1#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex2#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex3#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex4#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex5#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex6#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex7#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex8#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getComplex9#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#DCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addDCI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#addDCRI#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDcis#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getDcris#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toElement#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#toString#0;class#ResCategoriesDiscountsAndRules#0;class#SyncResponse#0" expanded="false" />
-            <element signature="method#getCorrectingNumbersOrdersRegistry#0;class#SyncResponse#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="123" column="29" selection-start="5099" selection-end="5099" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ContragentPaymentReport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="51" column="61" selection-start="1555" selection-end="1555" vertical-scroll-proportion="0.0">
@@ -3912,7 +3664,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/documents/Staff.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="25" selection-start="625" selection-end="625" vertical-scroll-proportion="0.2422452">
+        <state line="21" column="25" selection-start="625" selection-end="625" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/core/persistence/AuthorizationType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="19" selection-start="453" selection-end="453" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/response/OrgOwnerData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="39" column="51" selection-start="1079" selection-end="1079" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="35" selection-start="1152" selection-end="1152" vertical-scroll-proportion="0.7816092">
           <folding />
         </state>
       </provider>
