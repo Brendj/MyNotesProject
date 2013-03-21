@@ -37,15 +37,17 @@ public class OrgOwnerData {
     public void process(Session session, Long idOfOrg) throws Exception{
         List<OrgOwner> orgOwners = new ArrayList<OrgOwner>();
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, false));
-        //if(!orgOwners.isEmpty()){
-        //}
         Org org = DAOUtils.findOrg(session, idOfOrg);
-        /*
+         /*
          * TODO: ранее высылался как поставщик сама организация
          * TODO: при возникновении проблем написать пояснения
          * TODO: Зачем синхронизируемой организации являться поставщиком
          * */
-        orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), false));
+        if(!orgOwners.isEmpty()){
+            orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), true));
+        } else {
+            orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), false));
+        }
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, true));
         orgOwnerList = orgOwners;
     }
