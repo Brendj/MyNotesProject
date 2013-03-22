@@ -106,7 +106,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
                 return null;
             }
             technologicalMap.setCreatedDate(new Date());
-            technologicalMap.setDeletedState(false);
+            technologicalMap.setDeletedState(true);
             technologicalMap.setGlobalVersion(daoService.updateVersionByDistributedObjects(TechnologicalMap.class.getSimpleName()));
             technologicalMap.setGuid(UUID.randomUUID().toString());
 

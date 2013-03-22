@@ -15,6 +15,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Frozen
@@ -37,6 +39,15 @@ public class Product extends DistributedObject implements IConfigProvider {
     private String guidOfPG;
     private String classificationCode;
     private Float density;
+    private Set<Good> goodInternal;
+
+    public Set<Good> getGoodInternal() {
+        return goodInternal;
+    }
+
+    public void setGoodInternal(Set<Good> goodInternal) {
+        this.goodInternal = goodInternal;
+    }
 
     /**
      * Создает  одного из потомков элемента <Pr>  в секции <RO> в выходном xml документе по объекту this.

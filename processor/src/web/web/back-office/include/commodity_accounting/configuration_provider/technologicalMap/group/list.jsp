@@ -73,7 +73,7 @@
             <f:facet name="header">
                 <h:outputText value="Наименование группы" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="" value="#{technologicalMapGroup.nameOfGroup}" action="#{technologicalMapGroupViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{technologicalMapGroup.nameOfGroup}" action="#{technologicalMapGroupViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{technologicalMapGroup}" target="#{selectedTechnologicalMapGroupGroupPage.currentTechnologicalMapGroup}"/>
             </a4j:commandLink>
         </rich:column>
@@ -96,7 +96,7 @@
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true" styleClass="output-text"/>
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" rendered="#{technologicalMapGroup.deletedState}"
                              oncomplete="#{rich:component('removedTechnologicalMapGroupItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{technologicalMapGroup}" target="#{technologicalMapGroupEditPage.currentTechnologicalMapGroup}" />

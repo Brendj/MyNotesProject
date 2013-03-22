@@ -111,18 +111,12 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
         return null;
     }
 
-    @Transactional
     protected void remove(){
         if(!currentProduct.getDeletedState()) {
-            //printError();
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            facesContext.addMessage("productListMessages",
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Продукт не может быть удален со статусом неудален.", null));
-            return;
+            printError("Продукт не может быть удален со статусом неудален.");
         }
         try{
-            Product p = entityManager.getReference(Product.class, currentProduct.getGlobalId());
-            entityManager.remove(p);
+            daoService.removeProduct(currentProduct);
             printMessage("Продукт успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении продукта.");

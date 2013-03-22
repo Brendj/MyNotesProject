@@ -127,7 +127,7 @@
             <f:facet name="header">
                 <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" rendered="#{product.deletedState}"
                              oncomplete="#{rich:component('removedProductItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{product}" target="#{productEditPage.currentProduct}" />

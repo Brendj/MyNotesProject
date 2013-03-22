@@ -111,7 +111,7 @@
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true" styleClass="output-text"/>
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" rendered="#{technologicalMap.deletedState}"
                              oncomplete="#{rich:component('removedTechnologicalMapItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{technologicalMap}" target="#{technologicalMapEditPage.currentTechnologicalMap}" />

@@ -8,9 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,9 +135,24 @@ public class DAOService {
         query1.executeUpdate();
         Query query = em.createNativeQuery("DELETE FROM cf_technological_map where idoftechnologicalmaps="+idOfTechnologicalMaps);
         query.executeUpdate();
-        //em.remove(goodsBasicBasket);
-        //Query query = em.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood ");
-        //query.setParameter("idOfBasicGood", idOfBasicGood);
+    }
+
+    @Transactional
+    public void removeGoodGroup(GoodGroup goodGroup){
+         GoodGroup group = em.merge(goodGroup);
+         em.remove(group);
+    }
+
+    @Transactional
+    public void removeGood(Good good){
+        Good g = em.merge(good);
+        em.remove(g);
+    }
+
+    @Transactional
+    public void removeProduct(Product product){
+        Product p = em.merge(product);
+        em.remove(p);
     }
 
     @Transactional
@@ -296,6 +309,20 @@ public class DAOService {
                 .createQuery("from TechnologicalMapProduct where technologicalMap=:technologicalMap",
                         TechnologicalMapProduct.class);
         query.setParameter("technologicalMap", technologicalMap);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<TechnologicalMap> findTechnologicalMapByTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup){
+        TypedQuery<TechnologicalMap> query = em.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup", TechnologicalMap.class);
+        query.setParameter("technologicalMapGroup",technologicalMapGroup);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<Good> findGoodsByGoodGroup(GoodGroup goodGroup){
+        TypedQuery<Good> query = em.createQuery("from Good where goodGroup=:goodGroup",Good.class);
+        query.setParameter("goodGroup",goodGroup);
         return query.getResultList();
     }
 

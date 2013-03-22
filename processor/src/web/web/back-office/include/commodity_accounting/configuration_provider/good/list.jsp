@@ -139,6 +139,7 @@
                 <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm" rendered="#{good.deletedState}"
                              oncomplete="#{rich:component('removedGoodItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{good}" target="#{goodEditPage.currentGood}" />

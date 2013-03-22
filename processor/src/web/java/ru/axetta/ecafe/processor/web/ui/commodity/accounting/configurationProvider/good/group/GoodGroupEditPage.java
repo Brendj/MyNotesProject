@@ -44,6 +44,8 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
     private DAOService daoService;
     @Autowired
     private SelectedGoodGroupGroupPage selectedGoodGroupGroupPage;
+    @Autowired
+    private GoodGroupListPage goodGroupListPage;
 
     @Override
     public void onShow() throws Exception {
@@ -88,19 +90,14 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
             printError("Группа не может быть удалена.");
             return;
         }
-        TypedQuery<Good> query = entityManager.createQuery("from Good where goodGroup=:goodGroup",Good.class);
-        query.setParameter("goodGroup",currentGoodGroup);
-        List<Good> goodList = query.getResultList();
+        List<Good> goodList = daoService.findGoodsByGoodGroup(currentGoodGroup);
         if(!(goodList==null || goodList.isEmpty())){
             printError("В группе имеются зарегистрированные товары.");
             return;
         }
         try{
-            //GoodGroup pg = entityManager.getReference(GoodGroup.class, currentGoodGroup.getGlobalId());
-            //entityManager.remove(pg);
-            GoodGroup gg = entityManager.merge(currentGoodGroup);
-            gg.setDeletedState(true);
-            currentGoodGroup = entityManager.merge(gg);
+            daoService.removeGoodGroup(currentGoodGroup);
+            goodGroupListPage.reload();
             printMessage("Группа удалена успешно.");
         }  catch (Exception e){
             printError("Ошибка при удалении группа.");

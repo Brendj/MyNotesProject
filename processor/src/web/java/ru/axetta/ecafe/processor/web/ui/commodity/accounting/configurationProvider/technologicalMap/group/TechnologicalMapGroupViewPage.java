@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,9 +55,12 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
     public void onShow() throws Exception {
         selectedTechnologicalMapGroupGroupPage.onShow();
         currentTechnologicalMapGroup = selectedTechnologicalMapGroupGroupPage.getCurrentTechnologicalMapGroup();
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup", TechnologicalMap.class);
-        query.setParameter("technologicalMapGroup",currentTechnologicalMapGroup);
-        countTechnologicalMaps = query.getResultList().size();
+        List<TechnologicalMap> technologicalMapList = daoService.findTechnologicalMapByTechnologicalMapGroup(currentTechnologicalMapGroup);
+        if(technologicalMapList==null || technologicalMapList.isEmpty()){
+            countTechnologicalMaps = 0;
+        }else {
+            countTechnologicalMaps = technologicalMapList.size();
+        }
         currentOrg = daoService.findOrById(currentTechnologicalMapGroup.getOrgOwner());
         currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
     }

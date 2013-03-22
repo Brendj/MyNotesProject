@@ -25,7 +25,7 @@
                 <td style="text-align: center;">
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{goodGroupEditPage.remove}"
-                                           oncomplete="#{rich:component('removedProductGroupItemDeletePanel')}.hide();return false;"
+                                           oncomplete="#{rich:component('removedGoodGroupItemDeletePanel')}.hide();"
                                            reRender="mainMenu, goodGroupListTable, #{goodGroupListPage.pageComponent.id}"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"

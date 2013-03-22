@@ -26,7 +26,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{goodEditPage.remove}"
                                            oncomplete="#{rich:component('removedGoodItemDeletePanel')}.hide();"
-                                           reRender="mainMenu, workspaceTogglePanel, #{goodListPage.pageComponent.id}"
+                                           reRender="mainMenu, #{goodListPage.pageComponent.id}"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"
                                            onclick="#{rich:component('removedGoodItemDeletePanel')}.hide();return false;" />

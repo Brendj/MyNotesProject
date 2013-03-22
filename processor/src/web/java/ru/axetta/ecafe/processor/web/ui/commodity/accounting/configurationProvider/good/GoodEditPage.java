@@ -57,6 +57,8 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
     private DAOService daoService;
     @Autowired
     private SelectedGoodGroupPage selectedGoodGroupPage;
+    @Autowired
+    private GoodListPage goodListPage;
 
     @Override
     public void onShow() throws Exception {
@@ -116,15 +118,19 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
         return null;
     }
 
-    @Transactional
-    public void remove(){
+    public Object remove(){
+        removeGood();
+        return null;
+    }
+
+    private void removeGood() {
         if(!currentGood.getDeletedState()) {
             printError("Товар не может быть удален.");
             return;
         }
         try{
-            Good g = entityManager.getReference(Good.class, currentGood.getGlobalId());
-            entityManager.remove(g);
+            daoService.removeGood(currentGood);
+            goodListPage.reload();
             printMessage("Товар успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении товара.");

@@ -66,6 +66,13 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct" />
         </set>
 
+        <set name="goodInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
+        </set>
+
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />

@@ -72,6 +72,15 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     private String guidOfTMG;
     private Integer lifeTime;
+    private Set<Good> goodInternal;
+
+    public Set<Good> getGoodInternal() {
+        return goodInternal;
+    }
+
+    public void setGoodInternal(Set<Good> goodInternal) {
+        this.goodInternal = goodInternal;
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {

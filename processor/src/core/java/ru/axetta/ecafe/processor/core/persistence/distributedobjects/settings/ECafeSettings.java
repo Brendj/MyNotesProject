@@ -54,7 +54,6 @@ public class ECafeSettings extends DistributedObject{
 
     private String settingValue;
 
-    private Long orgOwner;
     private Long identificator;
     private String settingText;
 

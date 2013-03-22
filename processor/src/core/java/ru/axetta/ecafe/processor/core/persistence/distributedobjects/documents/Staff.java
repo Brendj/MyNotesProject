@@ -13,6 +13,8 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -21,6 +23,17 @@ import org.w3c.dom.Node;
  * To change this template use File | Settings | File Templates.
  */
 public class Staff extends DistributedObject {
+
+
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+
+    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

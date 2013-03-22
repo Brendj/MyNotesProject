@@ -43,5 +43,12 @@
         <property name="rights" column="Rights" type="string" length="256"/>
         <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
 
+        <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInternalIncomingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+        </set>
+
     </class>
 </hibernate-mapping>

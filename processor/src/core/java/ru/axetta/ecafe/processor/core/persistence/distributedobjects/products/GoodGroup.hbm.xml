@@ -33,7 +33,7 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="NameOfGoodsGroup" column="NameOfGoodsGroup" type="string" length="128" not-null="true"/>
 
-        <set name="goodInternal">
+        <set name="goodInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGoodsGroup"/>
             </key>

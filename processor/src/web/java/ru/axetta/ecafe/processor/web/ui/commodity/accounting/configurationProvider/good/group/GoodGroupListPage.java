@@ -33,12 +33,10 @@ public class GoodGroupListPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(GoodGroupListPage.class);
     private List<GoodGroup> goodGroupList;
-    private Boolean deletedStatusSelected = Boolean.FALSE;
+    private Boolean deletedStatusSelected = false;
 
     @PersistenceContext
     private EntityManager entityManager;
-    @Autowired
-    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
 
 
     @Override
@@ -54,9 +52,8 @@ public class GoodGroupListPage extends BasicWorkspacePage {
     }
 
     @Transactional
-    private void reload() throws Exception{
-        String where = "";
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup " + where + " ORDER BY globalId", GoodGroup.class);
+    public void reload() throws Exception{
+        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup ORDER BY globalId", GoodGroup.class);
         goodGroupList = query.getResultList();
     }
 

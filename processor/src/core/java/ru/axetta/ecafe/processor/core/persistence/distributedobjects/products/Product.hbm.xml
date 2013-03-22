@@ -46,5 +46,13 @@
             <column name="idOfProductGroups" not-null="true" />
         </many-to-one>
 
+        <set name="goodInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
+        </set>
+
+
     </class>
 </hibernate-mapping>
