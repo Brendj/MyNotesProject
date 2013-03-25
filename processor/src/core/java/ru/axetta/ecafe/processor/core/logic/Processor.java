@@ -204,115 +204,168 @@ public class Processor implements SyncProcessor,
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
 
+        SyncResponse response = null;
+
         try {
             setOrgSyncAddress(request.getIdOfOrg(), request.getRemoteAddr());
 
             switch (request.getSyncType()){
                 case TYPE_FULL:{
-                    // Generate IdOfPacket
-                    idOfPacket = generateIdOfPacket(request.getIdOfOrg());
-                    // Register sync history
-                    idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                            request.getRemoteAddr());
-                    addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                            request.getRemoteAddr());
-                    // Process paymentRegistry
-                    try {
-                        if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
-                            if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
-                                throw new Exception("no license slots available");
-                            }
-                        }
-                        resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
-                                request.getPaymentRegistry());
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
-                    }
+                    // обработка полной синхронизации
+                    response = getFullSyncResponse(request, syncStartTime, syncResult, resPaymentRegistry,
+                            accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resEnterEvents,
+                            resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
+                            correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData,
+                            goodsBasicBasketData);
+                    break;
+                }
+                case TYPE_GET_ACC_INC:{
+                    // обработка синхронизации покупок и прохода клиентов
+                    response = getAccIncSyncResponse(request, idOfPacket, idOfSync, resPaymentRegistry, accRegistry,
+                            clientRegistry, resOrgStructure, resMenuExchange, resDiary, resEnterEvents, resLibraryData,
+                            resLibraryData2, resCategoriesDiscountsAndRules, correctingNumbersOrdersRegistry, manager,
+                            orgOwnerData, questionaryData, goodsBasicBasketData);
+                    break;
+                }
+                case TYPE_GET_CLIENTS_PARAMS:{
+                    // обработка синхронизации параметров клиента
+                    response = getClientsParamsSyncResponse(request, idOfPacket, idOfSync, resPaymentRegistry,
+                            accRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary,
+                            resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
+                            correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData,
+                            goodsBasicBasketData);
+                    break;
+                }
+            }
 
-                    // Process ClientParamRegistry
-                    try {
-                        processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry());
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to perform synchronization, IdOfOrg == %s", request.getIdOfOrg()), e);
+            syncResult = 1;
+        }
 
-                    // Process OrgStructure
-                    try {
-                        if (request.getOrgStructure() != null) {
-                            resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure());
-                        }
-                    } catch (Exception e) {
-                        resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
-                        logger.error(String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+        // Build and return response
+        if (request.getSyncType() ==SyncType.TYPE_FULL) {
+            eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
+        }
+        return response;
+    }
 
-                    // Build client registry
-                    try {
-                        clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                                request.getClientRegistryRequest());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+    private SyncResponse getFullSyncResponse(SyncRequest request, Date syncStartTime, int syncResult,
+            SyncResponse.ResPaymentRegistry resPaymentRegistry, SyncResponse.AccIncRegistry accIncRegistry,
+            SyncResponse.ClientRegistry clientRegistry, SyncResponse.ResOrgStructure resOrgStructure,
+            SyncResponse.ResMenuExchangeData resMenuExchange, SyncResponse.ResEnterEvents resEnterEvents,
+            SyncResponse.ResLibraryData resLibraryData, SyncResponse.ResLibraryData2 resLibraryData2,
+            SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
+            SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
+            OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData) throws Exception {
 
-                    // Process menu from Org
-                    try {
-                        processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg()), e);
-                    }
+        Long idOfPacket;
+        Long idOfSync;
+        SyncResponse.AccRegistry accRegistry;
+        SyncResponse.ResDiary resDiary;// Generate IdOfPacket
+        idOfPacket = generateIdOfPacket(request.getIdOfOrg());
+        // Register sync history
+        idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+                request.getRemoteAddr());
+        addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
+                request.getRemoteAddr());
+        // Process paymentRegistry
+        try {
+            if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+                if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                    throw new Exception("no license slots available");
+                }
+            }
+            resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
+                    request.getPaymentRegistry());
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
 
-                    // Copy menu from Contragent (currentTime <= date < currentTime + RESPONSE_MENU_PERIOD_IN_DAYS days) to response
+        // Process ClientParamRegistry
+        try {
+            processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry());
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
+        // Process OrgStructure
+        try {
+            if (request.getOrgStructure() != null) {
+                resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure());
+            }
+        } catch (Exception e) {
+            resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
+            logger.error(String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
+        // Build client registry
+        try {
+            clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
+                    request.getClientRegistryRequest());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
+        // Process menu from Org
+        try {
+            processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+
+        // Copy menu from Contragent (currentTime <= date < currentTime + RESPONSE_MENU_PERIOD_IN_DAYS days) to response
                 /*try {
                     resMenu = getContragentMenu(request.getIdOfOrg(), syncStartTime,
                             DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
                 } catch (Exception e) {
                     logger.error(String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg()), e);
                 } */
-                    try {
-                        resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
-                                DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg()), e);
+        try {
+            resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
+                    DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+
+
+        // Build AccRegistry
+        try {
+            accRegistry = getAccRegistry(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+            accRegistry = new SyncResponse.AccRegistry();
+        }
+
+        // Process ReqDiary
+        try {
+            resDiary = processSyncDiary(request.getIdOfOrg(), request.getReqDiary());
+        } catch (Exception e) {
+            resDiary = new SyncResponse.ResDiary(1, "Unexpected error");
+        }
+
+        // Process enterEvents
+        try {
+            if (request.getEnterEvents() != null) {
+                if (request.getEnterEvents().getEvents().size() > 0) {
+                    if (!RuntimeContext.getInstance()
+                            .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
+                        throw new Exception("no license slots available");
                     }
+                }
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
 
-
-                    // Build AccRegistry
-                    try {
-                        accRegistry = getAccRegistry(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
-                        accRegistry = new SyncResponse.AccRegistry();
-                    }
-
-                    // Process ReqDiary
-                    try {
-                        resDiary = processSyncDiary(request.getIdOfOrg(), request.getReqDiary());
-                    } catch (Exception e) {
-                        resDiary = new SyncResponse.ResDiary(1, "Unexpected error");
-                    }
-
-                    // Process enterEvents
-                    try {
-                        if (request.getEnterEvents() != null) {
-                            if (request.getEnterEvents().getEvents().size() > 0) {
-                                if (!RuntimeContext.getInstance()
-                                        .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
-                                    throw new Exception("no license slots available");
-                                }
-                            }
-                            resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
-                        }
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
-
-                    // Process library data
+        // Process library data
                 /*try {
                     if (request.getLibraryData() != null) {
                         if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_B)) {
@@ -339,163 +392,166 @@ public class Processor implements SyncProcessor,
                             e);
                 } */
 
-                    // Process ResCategoriesDiscountsAndRules
-                    try {
-                        resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
-                                request.getIdOfOrg()), e);
-                    }
+        // Process ResCategoriesDiscountsAndRules
+        try {
+            resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process categories and rules, IdOfOrg == %s",
+                    request.getIdOfOrg()), e);
+        }
 
-                    // Process CorrectingNumbersOrdersRegistry
-                    try {
-                        correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process numbers of Orders, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+        // Process CorrectingNumbersOrdersRegistry
+        try {
+            correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process numbers of Orders, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
 
-                    try {
-                        orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+        try {
+            orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
 
-                    try {
-                        questionaryData = processQuestionaryData(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process questionary data, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
+        try {
+            questionaryData = processQuestionaryData(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process questionary data, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
 
-                    try {
-                        goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process goods basic basket data , IdOfOrg == %s",
-                                request.getIdOfOrg()), e);
-                    }
+        try {
+            goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process goods basic basket data , IdOfOrg == %s",
+                    request.getIdOfOrg()), e);
+        }
 
-                    try {
-                        if (request.getManager() != null) {
-                            manager = request.getManager();
-                            manager.process(persistenceSessionFactory);
-                        }
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process of Distribution Manager, IdOfOrg == %s",
-                                request.getIdOfOrg()), e);
-                    }
-                    break;
-                }
-                case TYPE_GET_ACC_INC:{
-                    // запрос на получение пополнений
-                    boolean bError = false;
-                    try {
-                        accIncRegistry = getAccIncRegistry(request.getIdOfOrg(),
-                                request.getAccIncRegistryRequest().dateTime);
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                        accIncRegistry = new SyncResponse.AccIncRegistry();
-                        accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
-                        bError = true;
-                    }
-
-                    // Process paymentRegistry
-                    try {
-                        if (request.getPaymentRegistry() != null) {
-                            if (request.getPaymentRegistry().getPayments() != null) {
-                                if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
-                                    if (!RuntimeContext.getInstance()
-                                            .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
-                                        throw new Exception("no license slots available");
-                                    }
-                                }
-                                resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
-                                        request.getPaymentRegistry());
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
-                    }
-
-                    // Process enterEvents
-                    try {
-                        if (request.getEnterEvents() != null) {
-                            resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
-                        }
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                        bError = true;
-                    }
-                    if (bError) {
-                        DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
-                    } else {
-                        DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
-                    }
-                    break;
-                }
-                case TYPE_GET_CLIENTS_PARAMS:{
-                    // Process ClientParamRegistry
-                    try {
-                        processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry());
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
-                    // Build client registry
-                    try {
-                        clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                                request.getClientRegistryRequest());
-                    } catch (Exception e) {
-                        logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                                e);
-                    }
-                    break;
-                }
-            }
-
-            ////
-            //if (request.getType() == SyncRequest.TYPE_FULL) {
-            if (request.getSyncType() == SyncType.TYPE_FULL) {
-
-
-            //} else if (request.getType() == SyncRequest.TYPE_GET_ACC_INC) {
-            } else if (request.getSyncType() == SyncType.TYPE_GET_ACC_INC) {
-
-            //} else if (request.getType() == SyncRequest.TYPE_GET_CLIENTS_PARAMS) {
-            } else if (request.getSyncType() == SyncType.TYPE_GET_CLIENTS_PARAMS) {
-
-
+        try {
+            if (request.getManager() != null) {
+                manager = request.getManager();
+                manager.process(persistenceSessionFactory);
             }
         } catch (Exception e) {
-            logger.error(String.format("Failed to perform synchronization, IdOfOrg == %s", request.getIdOfOrg()), e);
-            syncResult = 1;
+            logger.error(String.format("Failed to process of Distribution Manager, IdOfOrg == %s",
+                    request.getIdOfOrg()), e);
         }
 
         Date syncEndTime = new Date();
-        //if (request.getType() == SyncRequest.TYPE_FULL) {
-        if (request.getSyncType() ==SyncType.TYPE_FULL) {
+
+        if (request.getSyncType() == SyncType.TYPE_FULL) {
             // Update sync history - store sync end time and sync result
             updateSyncHistory(idOfSync, syncResult, syncEndTime);
         }
-
-        // Build and return response
-        SyncResponse response = new SyncResponse(request.getSyncType()/*request.getType()*/, request.getIdOfOrg(),
+        return new SyncResponse(request.getSyncType()/*request.getType()*/, request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
-        //if (request.getType() == SyncRequest.TYPE_FULL) {
-        if (request.getSyncType() ==SyncType.TYPE_FULL) {
-            eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
+    }
+
+    private SyncResponse getClientsParamsSyncResponse(SyncRequest request, Long idOfPacket, Long idOfSync,
+            SyncResponse.ResPaymentRegistry resPaymentRegistry, SyncResponse.AccRegistry accRegistry,
+            SyncResponse.AccIncRegistry accIncRegistry, SyncResponse.ClientRegistry clientRegistry,
+            SyncResponse.ResOrgStructure resOrgStructure, SyncResponse.ResMenuExchangeData resMenuExchange,
+            SyncResponse.ResDiary resDiary, SyncResponse.ResEnterEvents resEnterEvents,
+            SyncResponse.ResLibraryData resLibraryData, SyncResponse.ResLibraryData2 resLibraryData2,
+            SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
+            SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
+            OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData) {
+        try {
+            processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry());
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
         }
-        return response;
+        // Build client registry
+        try {
+            clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
+                    request.getClientRegistryRequest());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType()/*request.getType()*/, request.getIdOfOrg(),
+                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
+    }
+
+    private SyncResponse getAccIncSyncResponse(SyncRequest request, Long idOfPacket, Long idOfSync,
+            SyncResponse.ResPaymentRegistry resPaymentRegistry, SyncResponse.AccRegistry accRegistry,
+            SyncResponse.ClientRegistry clientRegistry, SyncResponse.ResOrgStructure resOrgStructure,
+            SyncResponse.ResMenuExchangeData resMenuExchange, SyncResponse.ResDiary resDiary,
+            SyncResponse.ResEnterEvents resEnterEvents, SyncResponse.ResLibraryData resLibraryData,
+            SyncResponse.ResLibraryData2 resLibraryData2,
+            SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
+            SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
+            OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData) {
+        SyncResponse.AccIncRegistry accIncRegistry;
+        boolean bError = false;
+        try {
+            accIncRegistry = getAccIncRegistry(request.getIdOfOrg(),
+                    request.getAccIncRegistryRequest().dateTime);
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+            accIncRegistry = new SyncResponse.AccIncRegistry();
+            accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
+            bError = true;
+        }
+
+        // Process paymentRegistry
+        try {
+            if (request.getPaymentRegistry() != null) {
+                if (request.getPaymentRegistry().getPayments() != null) {
+                    if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+                        if (!RuntimeContext.getInstance()
+                                .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                            throw new Exception("no license slots available");
+                        }
+                    }
+                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync, request.getIdOfOrg(),
+                            request.getPaymentRegistry());
+                }
+            }
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+
+        // Process enterEvents
+        try {
+            if (request.getEnterEvents() != null) {
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+            bError = true;
+        }
+        if (bError) {
+            DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+        } else {
+            DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType()/*request.getType()*/, request.getIdOfOrg(),
+                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
     }
 
     public PaymentResponse processPayRequest(PaymentRequest request) throws Exception {
