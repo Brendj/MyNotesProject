@@ -6,9 +6,6 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm.GroupPaymentConfirm;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm.GroupPaymentConfirmPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 
