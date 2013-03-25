@@ -13,6 +13,8 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -24,6 +26,15 @@ public class RetirementReason extends DistributedObject {
 
     private String retirementReasonName;
     private int hashCode;
+    private Set<Ksu2Record> ksu2RecordInternal;
+
+    public Set<Ksu2Record> getKsu2RecordInternal() {
+        return ksu2RecordInternal;
+    }
+
+    public void setKsu2RecordInternal(Set<Ksu2Record> ksu2RecordInternal) {
+        this.ksu2RecordInternal = ksu2RecordInternal;
+    }
 
     public int getHashCode() {
         return hashCode;

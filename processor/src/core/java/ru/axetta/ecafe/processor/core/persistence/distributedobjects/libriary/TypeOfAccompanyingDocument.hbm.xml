@@ -33,5 +33,13 @@
 
         <property name="typeOfAccompanyingDocumentName" column="typeOfAccompanyingDocumentName" type="string" not-null="true"/>
         <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
+
+        <set name="accompanyingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfTypeOfAccompanyingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.AccompanyingDocument" />
+        </set>
+
     </class>
 </hibernate-mapping>

@@ -44,5 +44,13 @@
         <property name="date" column="date" type="date" not-null="true"/>
         <property name="number" column="Number" type="string" length="10" not-null="true"/>
         <property name="cost" column="Cost" type="int" not-null="true"/>
+
+        <set name="issuableInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfJournalItem"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable" />
+        </set>
+
     </class>
 </hibernate-mapping>

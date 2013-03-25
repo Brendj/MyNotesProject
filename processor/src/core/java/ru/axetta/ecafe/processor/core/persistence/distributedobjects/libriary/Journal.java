@@ -14,6 +14,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -31,6 +33,15 @@ public class Journal extends DistributedObject {
 
     private String guidFund;
     private String guidPublication;
+    private Set<JournalItem> journalItemInternal;
+
+    public Set<JournalItem> getJournalItemInternal() {
+        return journalItemInternal;
+    }
+
+    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
+        this.journalItemInternal = journalItemInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

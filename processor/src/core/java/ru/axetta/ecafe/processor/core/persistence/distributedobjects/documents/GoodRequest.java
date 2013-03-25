@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,6 +25,25 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class GoodRequest extends DistributedObject {
+
+    private Set<StateChange> stateChangeInternal;
+    private Set<GoodRequestPosition> goodRequestPositionInternal;
+
+    public Set<GoodRequestPosition> getGoodRequestPositionInternal() {
+        return goodRequestPositionInternal;
+    }
+
+    public void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
+        this.goodRequestPositionInternal = goodRequestPositionInternal;
+    }
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

@@ -34,16 +34,19 @@
         <property name="classificationCode" column="ClassificationCode" type="string" length="32"/>
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <set name="productInternal">
+        <set name="productInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfProductGroups"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" />
         </set>
-<!--
-        <set name="technologicalMapProductInternal" cascade="all">
-            <key column="IdOfTechnoMapProduct"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
-        </set>-->
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfProductGroups"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+        </set>
+
     </class>
 </hibernate-mapping>

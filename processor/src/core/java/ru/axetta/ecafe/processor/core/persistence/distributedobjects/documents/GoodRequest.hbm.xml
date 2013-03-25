@@ -37,9 +37,23 @@
         <property name="doneDate" column="DoneDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="comment" column="Comment" type="string" length="512"/>
 
-        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff" fetch="select" lazy="false">
-            <column name="IdOfStaff" not-null="true" />
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+            <column name="IdOfStaff" not-null="false" />
         </many-to-one>
+
+        <set name="stateChangeInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGoodsRequest"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+        </set>
+
+        <set name="goodRequestPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGoodsRequest"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+        </set>
 
     </class>
 </hibernate-mapping>

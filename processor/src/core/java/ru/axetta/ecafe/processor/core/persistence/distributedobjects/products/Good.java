@@ -7,12 +7,15 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,6 +27,99 @@ import org.w3c.dom.Node;
 public class Good extends DistributedObject {
 
     public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+    private Set<TradeMaterialGood> tradeMaterialGoodInternal;
+    private Set<ProhibitionExclusion> prohibitionExclusionInternal;
+    private Set<Prohibition> prohibitionInternal;
+    private Set<GoodComplaintBook> goodComplaintBookInternal;
+    private Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal;
+    private Set<WayBillPosition> wayBillPositionInternal;
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
+    private Set<GoodRequestPosition> goodRequestPositionInternal;
+    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
+
+    public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
+        return actOfWayBillDifferencePositionInternal;
+    }
+
+    public void setActOfWayBillDifferencePositionInternal(
+            Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
+        this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
+    }
+
+    public Set<GoodRequestPosition> getGoodRequestPositionInternal() {
+        return goodRequestPositionInternal;
+    }
+
+    public void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
+        this.goodRequestPositionInternal = goodRequestPositionInternal;
+    }
+
+    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
+        return internalDisposingDocumentPositionInternal;
+    }
+
+    public void setInternalDisposingDocumentPositionInternal(
+            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
+        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
+    }
+
+    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
+        return internalIncomingDocumentPositionInternal;
+    }
+
+    public void setInternalIncomingDocumentPositionInternal(
+            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+    }
+
+    public Set<WayBillPosition> getWayBillPositionInternal() {
+        return wayBillPositionInternal;
+    }
+
+    public void setWayBillPositionInternal(Set<WayBillPosition> wayBillPositionInternal) {
+        this.wayBillPositionInternal = wayBillPositionInternal;
+    }
+
+    public Set<GoodBasicBasketPrice> getGoodBasicBasketPriceInternal() {
+        return goodBasicBasketPriceInternal;
+    }
+
+    public void setGoodBasicBasketPriceInternal(Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal) {
+        this.goodBasicBasketPriceInternal = goodBasicBasketPriceInternal;
+    }
+
+    public Set<GoodComplaintBook> getGoodComplaintBookInternal() {
+        return goodComplaintBookInternal;
+    }
+
+    public void setGoodComplaintBookInternal(Set<GoodComplaintBook> goodComplaintBookInternal) {
+        this.goodComplaintBookInternal = goodComplaintBookInternal;
+    }
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
+
+    public Set<ProhibitionExclusion> getProhibitionExclusionInternal() {
+        return prohibitionExclusionInternal;
+    }
+
+    public void setProhibitionExclusionInternal(Set<ProhibitionExclusion> prohibitionExclusionInternal) {
+        this.prohibitionExclusionInternal = prohibitionExclusionInternal;
+    }
+
+    public Set<TradeMaterialGood> getTradeMaterialGoodInternal() {
+        return tradeMaterialGoodInternal;
+    }
+
+    public void setTradeMaterialGoodInternal(Set<TradeMaterialGood> tradeMaterialGoodInternal) {
+        this.tradeMaterialGoodInternal = tradeMaterialGoodInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

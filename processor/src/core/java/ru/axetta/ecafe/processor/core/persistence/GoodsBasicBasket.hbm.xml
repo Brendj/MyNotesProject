@@ -14,11 +14,18 @@
         <property name="unitsScale" column="UnitsScale" type="int" not-null="true" update="false"/>
         <property name="netWeight" column="NetWeight" type="long" not-null="true" update="false"/>
 
-        <set name="good">
+        <set name="good" lazy="true" inverse="true">
             <key>
                 <column name="IdOfBasicGood"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good"/>
+        </set>
+
+        <set name="goodBasicBasketPriceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfBasicGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice" />
         </set>
 
 

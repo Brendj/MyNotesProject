@@ -41,5 +41,13 @@
         <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" column="IdOfGood"
                      insert="false" update="false"/>
 
+        <set name="goodComplaintOrdersInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfOrg"/>
+                <column name="IdOfOrder"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders" />
+        </set>
+
     </class>
 </hibernate-mapping>

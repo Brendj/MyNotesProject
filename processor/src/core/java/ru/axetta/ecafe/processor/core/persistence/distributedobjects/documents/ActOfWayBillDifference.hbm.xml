@@ -33,9 +33,23 @@
         <property name="date" column="DateOfActOfDifference" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="number" column="NumberOfActOfDifference" type="string" length="128"/>
 
-        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff" fetch="select" lazy="false">
-            <column name="IdOfStaff" not-null="true" />
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+            <column name="IdOfStaff" not-null="false" />
         </many-to-one>
+
+        <set name="wayBillInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfActOfDifference"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+        </set>
+
+        <set name="actOfWayBillDifferencePositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfActOfDifference"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition" />
+        </set>
 
     </class>
 </hibernate-mapping>

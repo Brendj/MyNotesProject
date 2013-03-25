@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
 
 import org.apache.commons.codec.binary.Base64;
@@ -95,6 +99,42 @@ public class Client {
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Set<ClientNotificationSetting> notificationSettings = new HashSet<ClientNotificationSetting>();
+    private Set<Prohibition> prohibitionInternal;
+    private Set<GoodComplaintBook> goodComplaintBookInternal;
+    private Set<LibVisit> libVisitInternal;
+    private Set<Circulation> circulationInternal;
+
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
+    }
+
+    public Set<LibVisit> getLibVisitInternal() {
+        return libVisitInternal;
+    }
+
+    public void setLibVisitInternal(Set<LibVisit> libVisitInternal) {
+        this.libVisitInternal = libVisitInternal;
+    }
+
+    public Set<GoodComplaintBook> getGoodComplaintBookInternal() {
+        return goodComplaintBookInternal;
+    }
+
+    public void setGoodComplaintBookInternal(Set<GoodComplaintBook> goodComplaintBookInternal) {
+        this.goodComplaintBookInternal = goodComplaintBookInternal;
+    }
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
 
     public Set<ClientMigration> getClientMigration() {
         return clientMigration;

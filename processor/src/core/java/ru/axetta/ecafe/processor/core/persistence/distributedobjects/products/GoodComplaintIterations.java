@@ -12,7 +12,28 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 public class GoodComplaintIterations extends DistributedObject {
+
+    private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
+    private Set<GoodComplaintCauses> goodComplaintCausesInternal;
+
+    public Set<GoodComplaintCauses> getGoodComplaintCausesInternal() {
+        return goodComplaintCausesInternal;
+    }
+
+    public void setGoodComplaintCausesInternal(Set<GoodComplaintCauses> goodComplaintCausesInternal) {
+        this.goodComplaintCausesInternal = goodComplaintCausesInternal;
+    }
+
+    public Set<GoodComplaintOrders> getGoodComplaintOrdersInternal() {
+        return goodComplaintOrdersInternal;
+    }
+
+    public void setGoodComplaintOrdersInternal(Set<GoodComplaintOrders> goodComplaintOrdersInternal) {
+        this.goodComplaintOrdersInternal = goodComplaintOrdersInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

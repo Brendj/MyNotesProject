@@ -13,6 +13,8 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -25,6 +27,15 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
     private long idOfTypeOfAccompanyingDocument;
     private String typeOfAccompanyingDocumentName;
     private Integer hashCode;
+    private Set<AccompanyingDocument> accompanyingDocumentInternal;
+
+    public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
+        return accompanyingDocumentInternal;
+    }
+
+    public void setAccompanyingDocumentInternal(Set<AccompanyingDocument> accompanyingDocumentInternal) {
+        this.accompanyingDocumentInternal = accompanyingDocumentInternal;
+    }
 
     public Integer getHashCode() {
         return hashCode;

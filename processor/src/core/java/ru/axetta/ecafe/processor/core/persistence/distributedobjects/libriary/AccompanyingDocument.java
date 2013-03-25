@@ -13,6 +13,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -28,6 +30,15 @@ public class AccompanyingDocument extends DistributedObject {
 
     private String guidTypeOfAccompanyingDocument;
     private String guidSource;
+    private Set<Ksu1Record> ksu1RecordInternal;
+
+    public Set<Ksu1Record> getKsu1RecordInternal() {
+        return ksu1RecordInternal;
+    }
+
+    public void setKsu1RecordInternal(Set<Ksu1Record> ksu1RecordInternal) {
+        this.ksu1RecordInternal = ksu1RecordInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

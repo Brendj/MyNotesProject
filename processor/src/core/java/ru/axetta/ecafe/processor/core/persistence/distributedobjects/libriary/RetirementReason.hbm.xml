@@ -28,5 +28,12 @@
         <property name="retirementReasonName" column="RetirementReasonName" type="string" length="45" not-null="false"/>
         <property name="hashCode" column="HashCode" type="integer" not-null="false"/>
 
+        <set name="ksu2RecordInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idofretirementreason"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu2Record" />
+        </set>
+
     </class>
 </hibernate-mapping>

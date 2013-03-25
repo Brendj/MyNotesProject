@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,6 +32,24 @@ import java.io.IOException;
 public class Publication extends DistributedObject {
 
     private Boolean validISBN;
+    private Set<Journal> journalInternal;
+    private Set<Instance> instanceInternal;
+
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<Journal> getJournalInternal() {
+        return journalInternal;
+    }
+
+    public void setJournalInternal(Set<Journal> journalInternal) {
+        this.journalInternal = journalInternal;
+    }
 
     public Boolean getValidISBN() {
         return validISBN;

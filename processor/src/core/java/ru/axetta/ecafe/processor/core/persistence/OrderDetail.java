@@ -5,8 +5,10 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders;
 
 import java.awt.*;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +60,15 @@ public class OrderDetail {
     private int state;
     private String itemCode;
     private Good good;
+    private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
+
+    public Set<GoodComplaintOrders> getGoodComplaintOrdersInternal() {
+        return goodComplaintOrdersInternal;
+    }
+
+    public void setGoodComplaintOrdersInternal(Set<GoodComplaintOrders> goodComplaintOrdersInternal) {
+        this.goodComplaintOrdersInternal = goodComplaintOrdersInternal;
+    }
 
     public String getItemCode() {
         return itemCode;

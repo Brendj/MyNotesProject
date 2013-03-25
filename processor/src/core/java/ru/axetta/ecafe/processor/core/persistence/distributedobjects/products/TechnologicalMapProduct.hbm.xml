@@ -35,11 +35,12 @@
 
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap" fetch="select" lazy="false">
-            <column name="idOfTechnologicalMaps" not-null="true" />
+        <many-to-one name="technologicalMap" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap">
+            <column name="idOfTechnologicalMaps" not-null="false" />
         </many-to-one>
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" fetch="select" unique="true" lazy="false">
-            <column name="idOfProducts" not-null="true" />
+
+        <many-to-one name="product" fetch="join" lazy="false" unique="true" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
+            <column name="idOfProducts" not-null="false" />
         </many-to-one>
 
     </class>

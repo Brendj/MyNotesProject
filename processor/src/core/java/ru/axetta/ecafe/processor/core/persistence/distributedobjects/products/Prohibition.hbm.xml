@@ -32,25 +32,32 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" fetch="select" lazy="false">
-            <column name="IdOfClient" not-null="true" />
+        <many-to-one name="client" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Client">
+            <column name="IdOfClient" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" fetch="select" lazy="false">
-            <column name="IdOfProducts" not-null="true" />
+        <many-to-one name="product" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
+            <column name="IdOfProducts" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="productGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup" fetch="select" lazy="false">
-            <column name="IdOfProductGroups" not-null="true" />
+        <many-to-one name="productGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup">
+            <column name="IdOfProductGroups" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
-            <column name="IdOfGood" not-null="true" />
+        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+            <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="goodGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup" fetch="select" lazy="false">
-            <column name="IdOfGoodsGroup" not-null="true" />
+        <many-to-one name="goodGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
+            <column name="IdOfGoodsGroup" not-null="false" />
         </many-to-one>
+
+        <set name="prohibitionExclusionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfProhibition"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProhibitionExclusion" />
+        </set>
 
     </class>
 </hibernate-mapping>

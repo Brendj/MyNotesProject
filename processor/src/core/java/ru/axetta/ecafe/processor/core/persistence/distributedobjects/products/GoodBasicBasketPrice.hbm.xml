@@ -33,10 +33,10 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="price" column="Price" type="long"/>
 
-        <many-to-one name="goodsBasicBasket" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket" fetch="join" lazy="false" cascade="all">
+        <many-to-one name="goodsBasicBasket" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket">
             <column name="idOfBasicGood" not-null="false" />
         </many-to-one>
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="join" lazy="false" cascade="all">
+        <many-to-one name="good" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="idOfGood" not-null="false" />
         </many-to-one>
 

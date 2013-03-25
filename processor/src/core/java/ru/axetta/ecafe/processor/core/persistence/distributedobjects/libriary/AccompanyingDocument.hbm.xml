@@ -40,5 +40,13 @@
                      not-null="false"/>
 
         <property name="accompanyingDocumentNumber" column="accompanyingDocumentNumber" type="string" length="32" not-null="true" />
+
+        <set name="ksu1RecordInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfAccompanyingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu1Record" />
+        </set>
+
     </class>
 </hibernate-mapping>

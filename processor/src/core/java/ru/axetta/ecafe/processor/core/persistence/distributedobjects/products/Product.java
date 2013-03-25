@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -40,6 +41,42 @@ public class Product extends DistributedObject implements IConfigProvider {
     private String classificationCode;
     private Float density;
     private Set<Good> goodInternal;
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal;
+    private Set<Prohibition> prohibitionInternal;
+    private Set<GoodRequestPosition> goodRequestPositionInternal;
+    private String productGuid;
+
+    public String getProductGuid() {
+        return productGuid;
+    }
+
+    public void setProductGuid(String productGuid) {
+        this.productGuid = productGuid;
+    }
+
+    public Set<GoodRequestPosition> getGoodRequestPositionInternal() {
+        return goodRequestPositionInternal;
+    }
+
+    public void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
+        this.goodRequestPositionInternal = goodRequestPositionInternal;
+    }
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
+
+    public Set<TechnologicalMapProduct> getTechnologicalMapProductInternal() {
+        return technologicalMapProductInternal;
+    }
+
+    public void setTechnologicalMapProductInternal(Set<TechnologicalMapProduct> technologicalMapProductInternal) {
+        this.technologicalMapProductInternal = technologicalMapProductInternal;
+    }
 
     public Set<Good> getGoodInternal() {
         return goodInternal;
@@ -65,6 +102,7 @@ public class Product extends DistributedObject implements IConfigProvider {
         setAttribute(element,"Density", density);
         setAttribute(element,"ClassificationCode", classificationCode);
         setAttribute(element,"GuidOfPG", productGroup.getGuid());
+        //setAttribute(element,"GuidOfPG", productGuid);
     }
 
     @Override

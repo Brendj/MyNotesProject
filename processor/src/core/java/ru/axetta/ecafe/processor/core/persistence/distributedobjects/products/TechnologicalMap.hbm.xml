@@ -55,11 +55,11 @@
 
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <many-to-one name="technologicalMapGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup" fetch="select" lazy="false">
-            <column name="IdOfTechMapGroups" not-null="true" />
+        <many-to-one name="technologicalMapGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup">
+            <column name="IdOfTechMapGroups" not-null="false" />
         </many-to-one>
 
-        <set name="technologicalMapProductInternal" cascade="delete">
+        <set name="technologicalMapProductInternal" lazy="true" inverse="true">
             <key>
                 <column name="idOfTechnologicalMaps"/>
             </key>

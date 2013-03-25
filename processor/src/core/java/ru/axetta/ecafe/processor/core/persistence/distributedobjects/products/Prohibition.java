@@ -13,7 +13,19 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 public class Prohibition extends DistributedObject {
+
+    private Set<ProhibitionExclusion> prohibitionExclusionInternal;
+
+    public Set<ProhibitionExclusion> getProhibitionExclusionInternal() {
+        return prohibitionExclusionInternal;
+    }
+
+    public void setProhibitionExclusionInternal(Set<ProhibitionExclusion> prohibitionExclusionInternal) {
+        this.prohibitionExclusionInternal = prohibitionExclusionInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

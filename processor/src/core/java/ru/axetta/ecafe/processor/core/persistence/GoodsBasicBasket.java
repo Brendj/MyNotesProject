@@ -22,6 +22,15 @@ public class GoodsBasicBasket {
     private Long netWeight;
     private GoodBasicBasketPrice goodBasicBasketPrice;
     private Set<Good> good;
+    private Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal;
+
+    public Set<GoodBasicBasketPrice> getGoodBasicBasketPriceInternal() {
+        return goodBasicBasketPriceInternal;
+    }
+
+    public void setGoodBasicBasketPriceInternal(Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal) {
+        this.goodBasicBasketPriceInternal = goodBasicBasketPriceInternal;
+    }
 
     public Set<Good> getGood() {
         return good;

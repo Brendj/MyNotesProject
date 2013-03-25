@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,6 +24,26 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ActOfWayBillDifference extends DistributedObject {
+
+    private Set<WayBillPosition> wayBillInternal;
+    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
+
+    public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
+        return actOfWayBillDifferencePositionInternal;
+    }
+
+    public void setActOfWayBillDifferencePositionInternal(
+            Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
+        this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
+    }
+
+    public Set<WayBillPosition> getWayBillInternal() {
+        return wayBillInternal;
+    }
+
+    public void setWayBillInternal(Set<WayBillPosition> wayBillInternal) {
+        this.wayBillInternal = wayBillInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

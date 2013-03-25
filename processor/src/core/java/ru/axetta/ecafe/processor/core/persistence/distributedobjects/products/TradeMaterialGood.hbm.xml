@@ -39,9 +39,23 @@
         <property name="selfPrice" column="SelfPrice" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
-            <column name="IdOfGood" not-null="true" />
+        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+            <column name="IdOfGood" not-null="false" />
         </many-to-one>
+
+        <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfTradeMaterialGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition" />
+        </set>
+
+        <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfTradeMaterialGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+        </set>
 
     </class>
 </hibernate-mapping>

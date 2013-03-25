@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,6 +33,24 @@ public class Ksu1Record extends DistributedObject {
 
     private String guidFund;
     private String guidAccompanyingDocument;
+    private Set<JournalItem> journalItemInternal;
+    private Set<Instance> instanceInternal;
+
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<JournalItem> getJournalItemInternal() {
+        return journalItemInternal;
+    }
+
+    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
+        this.journalItemInternal = journalItemInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{

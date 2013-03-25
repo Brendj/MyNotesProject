@@ -29,6 +29,15 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
     private Set<Product> productInternal;
     private Long idOfConfigurationProvider;
     private String classificationCode;
+    private Set<Prohibition> prohibitionInternal;
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

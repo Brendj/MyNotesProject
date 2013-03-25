@@ -37,13 +37,34 @@
         <property name="shipper" column="Shipper" type="string" length="128" not-null="true"/>
         <property name="receiver" column="Receiver" type="string" length="128" not-null="true"/>
 
-        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff" fetch="select" lazy="false">
-            <column name="IdOfStaff" not-null="true" />
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+            <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfWayBillDifference" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference" fetch="select" lazy="false">
-            <column name="IdOfActOfDifference" not-null="true" />
+        <many-to-one name="actOfWayBillDifference" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference">
+            <column name="IdOfActOfDifference" not-null="false" />
         </many-to-one>
+
+        <set name="wayBillPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+        </set>
+
+        <set name="stateChangeInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+        </set>
+
+        <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+        </set>
 
     </class>
 </hibernate-mapping>

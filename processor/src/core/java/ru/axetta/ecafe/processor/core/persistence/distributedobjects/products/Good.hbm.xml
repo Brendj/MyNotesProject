@@ -39,25 +39,95 @@
         <property name="lifeTime" column="LifeTime" type="long"/>
         <property name="margin" column="Margin" type="long"/>
 
-        <many-to-one name="goodGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup" fetch="select" lazy="false">
-            <column name="IdOfGoodsGroup" not-null="true" />
+        <many-to-one name="goodGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
+            <column name="IdOfGoodsGroup" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" fetch="select" lazy="false">
+        <many-to-one name="product" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
             <column name="IdOfProducts" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="technologicalMap" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap" fetch="select" lazy="false">
+        <many-to-one name="technologicalMap" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap">
             <column name="IdOfTechnologicalMaps" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="basicGood" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket" fetch="select" lazy="false">
+        <many-to-one name="basicGood" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket">
             <column name="idOfBasicGood" not-null="false" />
         </many-to-one>
 
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
         <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
+
+        <set name="tradeMaterialGoodInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood" />
+        </set>
+
+        <set name="prohibitionExclusionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProhibitionExclusion" />
+        </set>
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+        </set>
+
+        <set name="goodComplaintBookInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook" />
+        </set>
+
+        <set name="goodBasicBasketPriceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice" />
+        </set>
+
+        <set name="wayBillPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+        </set>
+
+        <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition" />
+        </set>
+
+        <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+        </set>
+
+        <set name="goodRequestPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+        </set>
+
+        <set name="actOfWayBillDifferencePositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition" />
+        </set>
 
     </class>
 </hibernate-mapping>

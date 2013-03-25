@@ -42,17 +42,40 @@
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <many-to-one name="productGroup" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup" fetch="select" lazy="false">
-            <column name="idOfProductGroups" not-null="true" />
+        <many-to-one name="productGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup">
+            <column name="idOfProductGroups" not-null="false" />
         </many-to-one>
+
+        <!--<property name="productGuid"-->
+                  <!--formula="( SELECT pg.guid FROM cf_products p LEFT JOIN cf_product_groups pg on p.idOfProductGroups = pg.idOfProductGroups WHERE p.idofproducts = idOfProducts )"  type="java.lang.String"/>-->
 
         <set name="goodInternal" lazy="true" inverse="true">
             <key>
-                <column name="IdOfGood"/>
+                <column name="idOfProducts"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
         </set>
 
+        <set name="technologicalMapProductInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfProducts"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct" />
+        </set>
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfProducts"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+        </set>
+
+        <set name="goodRequestPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfProducts"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+        </set>
 
     </class>
 </hibernate-mapping>

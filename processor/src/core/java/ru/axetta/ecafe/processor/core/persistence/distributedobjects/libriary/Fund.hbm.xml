@@ -27,5 +27,41 @@
 
         <property name="fundName" column="fundName" type="string" length="128" not-null="false"/>
         <property name="stud" column="Stud" type="boolean"/>
+
+        <set name="ksu2RecordInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu2Record" />
+        </set>
+
+        <set name="ksu1RecordInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu1Record" />
+        </set>
+
+        <set name="journalItemInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.JournalItem" />
+        </set>
+
+        <set name="journalInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Journal" />
+        </set>
+
+        <set name="instanceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idoffund"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" />
+        </set>
+
     </class>
 </hibernate-mapping>

@@ -40,12 +40,12 @@
         <property name="price" column="Price" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
-            <column name="IdOfGood" not-null="true" />
+        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+            <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfWayBillDifference" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference" fetch="select" lazy="false">
-            <column name="IdOfActOfDifference" not-null="true" />
+        <many-to-one name="actOfWayBillDifference" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference">
+            <column name="IdOfActOfDifference" not-null="false" />
         </many-to-one>
 
     </class>

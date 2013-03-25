@@ -32,8 +32,8 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="complaintIteration" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations" fetch="select" lazy="false">
-            <column name="IdOfIteration" not-null="true" />
+        <many-to-one name="complaintIteration" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations">
+            <column name="IdOfIteration" not-null="false" />
         </many-to-one>
 
         <property name="cause" column="Cause">

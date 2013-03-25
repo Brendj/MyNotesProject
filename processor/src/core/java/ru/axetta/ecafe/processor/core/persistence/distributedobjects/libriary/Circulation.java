@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +40,15 @@ public class Circulation extends DistributedObject {
     private String guidParentCirculation;
     private String guidIssuable;
     private Client client;
+    private Set<Circulation> circulationInternal;
 
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
+    }
 
 
     @Override

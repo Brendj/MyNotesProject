@@ -36,13 +36,35 @@
         <property name="state" column="State" type="integer" not-null="true"/>
         <property name="comments" column="Comments" type="string" length="1024" not-null="true"/>
 
-        <many-to-one name="staff" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff" fetch="select" lazy="false">
-            <column name="IdOfStaff" not-null="true" />
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+            <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfInventarization" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization" fetch="select" lazy="false">
+        <many-to-one name="actOfInventarization" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization">
             <column name="IdOfActOfInventarization" not-null="false" />
         </many-to-one>
+
+        <set name="stateChangeInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInternalDisposingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+        </set>
+
+        <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInternalDisposingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+        </set>
+
+        <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInternalDisposingDocument"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+        </set>
+
 
     </class>
 </hibernate-mapping>

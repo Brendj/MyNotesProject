@@ -26,6 +26,43 @@ public class Staff extends DistributedObject {
 
 
     private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+    private Set<WayBillPosition> wayBillInternal;
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalDisposingDocument> internalDisposingDocumentInternal;
+    private Set<GoodRequest> goodRequestInternal;
+
+    public Set<GoodRequest> getGoodRequestInternal() {
+        return goodRequestInternal;
+    }
+
+    public void setGoodRequestInternal(Set<GoodRequest> goodRequestInternal) {
+        this.goodRequestInternal = goodRequestInternal;
+    }
+
+    public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
+        return internalDisposingDocumentInternal;
+    }
+
+    public void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
+        this.internalDisposingDocumentInternal = internalDisposingDocumentInternal;
+    }
+
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
+
+    public Set<WayBillPosition> getWayBillInternal() {
+        return wayBillInternal;
+    }
+
+    public void setWayBillInternal(Set<WayBillPosition> wayBillInternal) {
+        this.wayBillInternal = wayBillInternal;
+    }
 
     public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
         return internalIncomingDocumentInternal;

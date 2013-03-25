@@ -25,6 +25,25 @@ import java.util.Set;
  */
 public class GoodGroup extends DistributedObject {
 
+    private Set<ProhibitionExclusion> prohibitionExclusionInternal;
+    private Set<Prohibition> prohibitionInternal;
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
+
+    public Set<ProhibitionExclusion> getProhibitionExclusionInternal() {
+        return prohibitionExclusionInternal;
+    }
+
+    public void setProhibitionExclusionInternal(Set<ProhibitionExclusion> prohibitionExclusionInternal) {
+        this.prohibitionExclusionInternal = prohibitionExclusionInternal;
+    }
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
 

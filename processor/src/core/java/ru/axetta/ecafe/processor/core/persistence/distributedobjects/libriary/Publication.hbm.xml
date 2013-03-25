@@ -35,5 +35,19 @@
         <property name="publisher" column="Publisher" type="string" length="255" not-null="false"/>
         <property name="hash" column="Hash" type="integer" not-null="false"/>
 
+        <set name="journalInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfPublication"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Journal" />
+        </set>
+
+        <set name="instanceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfPublication"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" />
+        </set>
+
     </class>
 </hibernate-mapping>

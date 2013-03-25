@@ -21,7 +21,7 @@
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-        not-null="true" update="false"/>
+            not-null="true" update="false"/>
         <property name="sendAll" column="SendAll">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
@@ -45,9 +45,37 @@
 
         <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
             <key>
-                <column name="IdOfInternalIncomingDocument"/>
+                <column name="IdOfStaff"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+        </set>
+
+        <set name="wayBillInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfStaff"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+        </set>
+
+        <set name="stateChangeInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfStaff"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+        </set>
+
+        <set name="internalDisposingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfStaff"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument" />
+        </set>
+
+        <set name="goodRequestInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfStaff"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest" />
         </set>
 
     </class>

@@ -35,5 +35,20 @@
 
         <property name="recordNumber" column="recordNumber" type="int" not-null="true"/>
         <property name="incomeDate" column="incomeDate" type="date" not-null="true"/>
+
+        <set name="journalItemInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfKSU1Record"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.JournalItem" />
+        </set>
+
+        <set name="instanceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfKSU1Record"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" />
+        </set>
+
     </class>
 </hibernate-mapping>

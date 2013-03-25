@@ -33,16 +33,13 @@
 
         <!-- End Global params -->
         <property name="nameOfGroup" column="NameOfGroup" type="string" length="128"/>
-        <set name="technologicalMapInternal">
+
+        <set name="technologicalMapInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfTechMapGroups"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap" />
         </set>
-<!--
-        <set name="technologicalMapProductInternal" cascade="all">
-            <key column="IdOfTechnoMapProduct"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.TechnologicalMapProduct"/>
-        </set>-->
+
     </class>
 </hibernate-mapping>

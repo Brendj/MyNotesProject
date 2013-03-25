@@ -36,5 +36,13 @@
         <property name="newspaper" column="IsNewspaper" type="boolean" not-null="true"/>
         <property name="monthCount" column="MonthCount" type="int" not-null="true"/>
         <property name="count" column="count" type="int" not-null="true"/>
+
+        <set name="journalItemInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfJournal"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.JournalItem" />
+        </set>
+
     </class>
 </hibernate-mapping>

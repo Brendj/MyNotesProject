@@ -9,7 +9,19 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 public class GoodComplaintBook extends DistributedObject {
+
+    private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
+
+    public Set<GoodComplaintIterations> getGoodComplaintIterationsInternal() {
+        return GoodComplaintIterationsInternal;
+    }
+
+    public void setGoodComplaintIterationsInternal(Set<GoodComplaintIterations> goodComplaintIterationsInternal) {
+        GoodComplaintIterationsInternal = goodComplaintIterationsInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

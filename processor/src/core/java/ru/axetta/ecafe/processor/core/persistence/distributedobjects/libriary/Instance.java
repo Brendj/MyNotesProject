@@ -14,6 +14,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -37,6 +39,15 @@ public class Instance extends DistributedObject {
     private String guidInventaryBook;
     private String guidKsu1Record;
     private String guidKsu2Record;
+    private Set<Issuable> issuableInternal;
+
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
+
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

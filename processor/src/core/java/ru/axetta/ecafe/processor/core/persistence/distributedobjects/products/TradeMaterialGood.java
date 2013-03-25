@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -15,6 +17,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +29,26 @@ import java.util.Date;
 public class TradeMaterialGood extends DistributedObject {
 
     public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
+
+    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
+        return internalDisposingDocumentPositionInternal;
+    }
+
+    public void setInternalDisposingDocumentPositionInternal(
+            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
+        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
+    }
+
+    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
+        return internalIncomingDocumentPositionInternal;
+    }
+
+    public void setInternalIncomingDocumentPositionInternal(
+            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

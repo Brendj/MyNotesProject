@@ -48,5 +48,13 @@
         <property name="inGroup" column="InGroup" type="boolean" not-null="true"/>
         <property name="invNumber" column="InvNumber" type="string" length="10" not-null="false"/>
         <property name="cost" column="Cost" type="int" not-null="true"/>
+
+        <set name="issuableInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInstance"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable" />
+        </set>
+
     </class>
 </hibernate-mapping>

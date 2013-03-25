@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +21,25 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ActOfInventarization extends DistributedObject {
+
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+    private Set<InternalDisposingDocument> InternalDisposingDocumentInternal;
+
+    public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
+        return InternalDisposingDocumentInternal;
+    }
+
+    public void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
+        InternalDisposingDocumentInternal = internalDisposingDocumentInternal;
+    }
+
+    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

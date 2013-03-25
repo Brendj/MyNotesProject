@@ -34,5 +34,12 @@
         <property name="barcode" type="long" not-null="false" column="barcode"/>
         <property name="type" type="char" not-null="true" column="TypeOfIssuable"/>
 
+        <set name="circulationInternal" lazy="true" inverse="true">
+            <key>
+                <column name="idOfIssuable"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" />
+        </set>
+
     </class>
 </hibernate-mapping>

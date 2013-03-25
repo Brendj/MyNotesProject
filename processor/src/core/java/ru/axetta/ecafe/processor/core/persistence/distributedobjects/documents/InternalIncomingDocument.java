@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,6 +24,26 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class InternalIncomingDocument extends DistributedObject {
+
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+
+    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
+        return internalIncomingDocumentPositionInternal;
+    }
+
+    public void setInternalIncomingDocumentPositionInternal(
+            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+    }
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

@@ -33,5 +33,20 @@
         <property name="dateOfAct" column="DateOfAct" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="number" column="NumberOfAct" type="string" length="128" not-null="true"/>
         <property name="commission" column="Commission" type="string" length="512" not-null="true"/>
+
+        <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfActOfInventarization"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+        </set>
+
+        <set name="InternalDisposingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfActOfInventarization"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument" />
+        </set>
+
     </class>
 </hibernate-mapping>

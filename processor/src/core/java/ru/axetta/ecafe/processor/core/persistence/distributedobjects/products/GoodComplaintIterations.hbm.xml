@@ -32,8 +32,8 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="complaint" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook" fetch="select" lazy="false">
-            <column name="IdOfComplaint" not-null="true" />
+        <many-to-one name="complaint" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook">
+            <column name="IdOfComplaint" not-null="false" />
         </many-to-one>
 
         <property name="iterationNumber" column="IterationNumber" type="integer"/>
@@ -46,6 +46,20 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+
+        <set name="goodComplaintOrdersInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfIteration"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders" />
+        </set>
+
+        <set name="goodComplaintCausesInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfIteration"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintCauses" />
+        </set>
 
     </class>
 </hibernate-mapping>

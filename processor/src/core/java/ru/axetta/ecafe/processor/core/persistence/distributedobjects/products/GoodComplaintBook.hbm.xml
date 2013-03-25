@@ -32,13 +32,20 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" fetch="select" lazy="false">
-            <column name="IdOfClient" not-null="true" />
+        <many-to-one name="client" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.Client">
+            <column name="IdOfClient" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
-            <column name="IdOfGood" not-null="true" />
+        <many-to-one name="good" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+            <column name="IdOfGood" not-null="false" />
         </many-to-one>
+
+        <set name="GoodComplaintIterationsInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfComplaint"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations" />
+        </set>
 
     </class>
 </hibernate-mapping>

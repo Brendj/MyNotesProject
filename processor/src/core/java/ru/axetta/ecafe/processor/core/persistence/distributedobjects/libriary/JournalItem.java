@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +39,15 @@ public class JournalItem extends DistributedObject {
     private String guidFund;
     private String guidKsu1Record;
     private String guidKsu2Record;
+    private Set<Issuable> issuableInternal;
+
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
+
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
+    }
 
 
     @Override

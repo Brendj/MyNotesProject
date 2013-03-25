@@ -43,5 +43,12 @@
                   not-null="false"/>
         <property name="status" column="Status" type="integer" not-null="true" unique="false" optimistic-lock="true" lazy="false" generated="never" />
 
+        <set name="circulationInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfCirculation"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" />
+        </set>
+
     </class>
 </hibernate-mapping>

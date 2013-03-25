@@ -40,6 +40,19 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
         </set>
 
+        <set name="prohibitionExclusionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGoodsGroup"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProhibitionExclusion" />
+        </set>
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGoodsGroup"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+        </set>
 
     </class>
 </hibernate-mapping>

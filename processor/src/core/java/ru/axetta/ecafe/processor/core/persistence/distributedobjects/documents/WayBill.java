@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +26,33 @@ import java.util.Date;
 public class WayBill extends DistributedObject {
 
     public static String[] STATES = {"Новая", "Отгружена", "Получена", "Получена с расхождениями"};
+    private Set<WayBillPosition> wayBillPositionInternal;
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+
+    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
+
+    public Set<WayBillPosition> getWayBillPositionInternal() {
+        return wayBillPositionInternal;
+    }
+
+    public void setWayBillPositionInternal(Set<WayBillPosition> wayBillPositionInternal) {
+        this.wayBillPositionInternal = wayBillPositionInternal;
+    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {

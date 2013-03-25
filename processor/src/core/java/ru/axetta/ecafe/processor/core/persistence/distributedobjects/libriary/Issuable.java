@@ -14,6 +14,8 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Artyom
@@ -30,6 +32,15 @@ public class Issuable extends DistributedObject {
 
     private String guidInstance;
     private String guidJournalItem;
+    private Set<Circulation> circulationInternal;
+
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
+    }
 
     @Override
     protected void appendAttributes(Element element) {

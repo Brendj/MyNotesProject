@@ -35,15 +35,15 @@
         <property name="totalCount" column="TotalCount" type="long"/>
         <property name="netWeight" column="NetWeight" type="long"/>
 
-        <many-to-one name="goodRequest" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest" fetch="select" lazy="false">
-            <column name="IdOfGoodsRequest" not-null="true" />
+        <many-to-one name="goodRequest" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest">
+            <column name="IdOfGoodsRequest" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" fetch="select" lazy="false">
+        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="product" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" fetch="select" lazy="false">
+        <many-to-one name="product" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
             <column name="IdOfProducts" not-null="false" />
         </many-to-one>
 
