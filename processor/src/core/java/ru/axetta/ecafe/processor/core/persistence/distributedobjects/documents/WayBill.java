@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -25,7 +24,8 @@ import java.util.Set;
  */
 public class WayBill extends DistributedObject {
 
-    public static String[] STATES = {"Новая", "Отгружена", "Получена", "Получена с расхождениями"};
+    //public static String[] STATES = {"Новая", "Отгружена", "Получена", "Получена с расхождениями"};
+    public static String[] STATES = {"Создан", "К исполнению", "Выполнен"};
     private Set<WayBillPosition> wayBillPositionInternal;
     private Set<StateChange> stateChangeInternal;
     private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
