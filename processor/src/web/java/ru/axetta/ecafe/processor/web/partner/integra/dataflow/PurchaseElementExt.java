@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "PurchaseElementExt")
 public class PurchaseElementExt {
 
+    @XmlAttribute(name = "IdOfOrderDetail")
+    protected Long idOfOrderDetail;
     @XmlAttribute(name = "Name")
     protected String name;
     @XmlAttribute(name = "Sum")
@@ -39,6 +41,14 @@ public class PurchaseElementExt {
     protected Long amount;
     @XmlAttribute(name = "Type")
     protected Integer type;
+
+    public Long getIdOfOrderDetail() {
+        return idOfOrderDetail;
+    }
+
+    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+        this.idOfOrderDetail = idOfOrderDetail;
+    }
 
     /**
      * Gets the value of the name property.

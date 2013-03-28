@@ -1591,6 +1591,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Set<OrderDetail> orderDetailSet = ((Order) o).getOrderDetails();
             for (OrderDetail od : orderDetailSet) {
                 PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
+                purchaseElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                 purchaseElementExt.setAmount(od.getQty());
                 purchaseElementExt.setName(od.getMenuDetailName());
                 purchaseElementExt.setSum(od.getRPrice());
