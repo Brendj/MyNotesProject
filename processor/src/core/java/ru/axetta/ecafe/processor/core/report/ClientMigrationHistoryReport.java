@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.client.ClientDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.client.ClientMigrationHistoryReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Session;

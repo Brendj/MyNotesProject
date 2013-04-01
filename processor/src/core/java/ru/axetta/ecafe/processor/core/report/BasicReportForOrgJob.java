@@ -42,7 +42,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                             getMyClass().getCanonicalName()));
                 }
                 String classPropertyValue = getMyClass().getCanonicalName();
-                List<AutoReport> autoReports = new LinkedList<AutoReport>();
+                List<AutoReport> autoReports = new ArrayList<AutoReport>();
                 Session session = null;
                 org.hibernate.Transaction transaction = null;
                 try {
