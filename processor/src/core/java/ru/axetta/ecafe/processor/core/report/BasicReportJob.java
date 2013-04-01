@@ -25,7 +25,8 @@ import java.util.concurrent.ExecutorService;
 public abstract class BasicReportJob extends BasicJasperReport {
     public final static int REPORT_PERIOD_PREV_MONTH=0,
             REPORT_PERIOD_PREV_DAY=1, REPORT_PERIOD_TODAY=2,
-            REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4;
+            REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4,
+            REPORT_PERIOD_LAST_WEEK =5;
     private String BASE_DOCUMENT_FILENAME;
 
     {
@@ -353,6 +354,26 @@ public abstract class BasicReportJob extends BasicJasperReport {
         } else if (type==REPORT_PERIOD_TODAY) {
             if (startTime==null) startTime = calculateTodayStart(calendar, generateTime);
             endTime = calculatePlusOneDay(calendar, startTime);
+        } else if (type== REPORT_PERIOD_LAST_WEEK) {
+            if (startTime==null) {
+                calendar.setTime(generateTime);
+                calendar.set(Calendar.DAY_OF_WEEK,2);
+                calendar.set(Calendar.MILLISECOND, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                startTime = calendar.getTime();
+            } else {
+                calendar.setTime(startTime);
+                calendar.set(Calendar.DAY_OF_WEEK,2);
+                calendar.set(Calendar.MILLISECOND, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                startTime = calendar.getTime();
+            }
+            calendar.set(Calendar.DAY_OF_WEEK,7);
+            endTime = calendar.getTime();
         }
         return new Date[]{startTime, endTime};
     }

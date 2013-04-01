@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="3.4522712143931975"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="490"/>
+	<property name="ireport.zoom" value="1.210000000000034"/>
+	<property name="ireport.x" value="360"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -29,7 +29,7 @@
 	<field name="dates" class="java.util.List"/>
 	<field name="balance" class="java.lang.Long"/>
 	<field name="count" class="java.lang.Integer"/>
-	<variable name="variable1" class="java.lang.Long" resetType="Group" resetGroup="classgroupname" calculation="Sum">
+	<variable name="sumBalanceByGroup" class="java.lang.Integer" resetType="Group" resetGroup="classgroupname" calculation="Sum">
 		<variableExpression><![CDATA[$F{balance}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
@@ -45,7 +45,7 @@ Double.parseDouble($F{dayInfoType1}.get(1).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(2).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(3).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(4).toString())/100 +
-Double.parseDouble($F{dayInfoType1}.get(5).toString())/100 ]]></variableExpression>
+Double.parseDouble($F{dayInfoType1}.get(5).toString())/100]]></variableExpression>
 	</variable>
 	<variable name="sumByfetAndVending" class="java.lang.Double" resetType="Group" resetGroup="classgroupname" calculation="Sum">
 		<variableExpression><![CDATA[Double.parseDouble($F{dayInfoType0}.get(0).toString())/100 +
@@ -53,7 +53,7 @@ Double.parseDouble($F{dayInfoType0}.get(1).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(2).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(3).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(4).toString())/100 +
-Double.parseDouble($F{dayInfoType0}.get(5).toString())/100 ]]></variableExpression>
+Double.parseDouble($F{dayInfoType0}.get(5).toString())/100]]></variableExpression>
 	</variable>
 	<variable name="sumByType1onMon" class="java.lang.Double" resetType="Group" resetGroup="classgroupname" calculation="Sum">
 		<variableExpression><![CDATA[Double.parseDouble($F{dayInfoType1}.get(0).toString())/100]]></variableExpression>
@@ -300,15 +300,13 @@ Double.parseDouble($F{dayInfoType0}.get(5).toString())/100 ]]></variableExpressi
 					<textElement textAlignment="Center" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[String.format("ОТЧЕТ ЗА НЕДЕЛЮ (%s - %s)",
 new SimpleDateFormat("dd.MM.yyyy").format($P{startDate}),
-new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
-
-]]></textFieldExpression>
+new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
 			<band height="81">
-				<textField pattern="###0.00;-###0.00">
+				<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
 					<reportElement uuid="5ada3009-d01e-4f72-a995-5b86055d2c44" style="table" x="235" y="0" width="87" height="20"/>
 					<box>
 						<pen lineWidth="3.0" lineStyle="Double"/>
@@ -318,9 +316,9 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 						<rightPen lineWidth="3.0" lineStyle="Solid"/>
 					</box>
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[(double)$V{variable1} / 100]]></textFieldExpression>
+					<textFieldExpression><![CDATA[(double)$V{sumBalanceByGroup} / 100]]></textFieldExpression>
 				</textField>
-				<textField pattern="#,##0.00 %">
+				<textField pattern="#,##0.00 %" isBlankWhenNull="true">
 					<reportElement uuid="81ae7aae-243e-46d0-9d9d-e2d9675ea714" style="table" x="322" y="0" width="61" height="20"/>
 					<box>
 						<pen lineWidth="3.0" lineStyle="Solid"/>
@@ -332,7 +330,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumCountsByGroup} / ($V{countStudents}*6)]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="55b8b1a1-3de1-434c-823c-4533d275dae1" style="table" x="383" y="0" width="65" height="20"/>
 					<box>
 						<pen lineWidth="3.0" lineStyle="Solid"/>
@@ -344,7 +342,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumRazdacha}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="3fdff0ca-a242-4a01-9106-71d436f618f6" style="table" x="448" y="0" width="60" height="20"/>
 					<box>
 						<pen lineWidth="3.0" lineStyle="Solid"/>
@@ -364,7 +362,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement verticalAlignment="Middle"/>
 					<text><![CDATA[Итого]]></text>
 				</staticText>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="9a1a5c32-168c-451c-8080-731f3c780ad6" x="508" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -374,7 +372,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onMon}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="e2b91c82-72b4-4900-8cef-20e26ac26131" x="558" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -384,7 +382,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType0onMon}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="16491db4-03ec-4146-889e-0e1d829edb84" x="608" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -394,7 +392,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onTue}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="e60a7f0a-cac4-4b22-a796-cbb6844ebfc5" x="658" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -404,7 +402,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType0onTue}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="9671b0c9-3327-4b0f-8087-808a7ccd1734" x="708" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -414,7 +412,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onWed}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="a23e07e3-5fd5-43bf-aea9-97efe0df0369" x="758" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -424,7 +422,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType0onWed}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="bbc7d0d8-6b52-4768-9e42-863a966c6891" x="808" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -434,7 +432,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onThu}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="2fef06a3-c8f6-458e-afd5-2985f403c496" x="858" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -444,7 +442,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType0onThu}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="b0a581da-8732-480b-a6f0-339cacf4c65b" x="908" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -454,7 +452,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onFri}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="4bb3c387-6741-419a-ae09-9e3aef585ec6" x="958" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -464,7 +462,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType0onFri}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="9767ab73-ba73-45e3-b1a5-073fd23ab625" x="1008" y="0" width="50" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -474,7 +472,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<textElement textAlignment="Right" verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$V{sumByType1onSun}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0.00;-###0.00">
+				<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 					<reportElement uuid="87d71c78-b839-47d5-898a-cafa6d07045e" x="1058" y="0" width="37" height="20"/>
 					<box>
 						<topPen lineWidth="3.0"/>
@@ -578,8 +576,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 					<rightPen lineWidth="3.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[Double.parseDouble($F{dayInfoType0}.get(3).toString())/100
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Double.parseDouble($F{dayInfoType0}.get(3).toString())/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 				<reportElement uuid="2ce27b2c-9276-42da-8a83-ddbc10e02fc3" style="table" x="908" y="0" width="50" height="20"/>
@@ -620,7 +617,7 @@ new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;-###0.00">
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 				<reportElement uuid="7c08b4e3-53ad-460e-b593-cf36648b91de" style="table" x="383" y="0" width="65" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[Double.parseDouble($F{dayInfoType1}.get(0).toString())/100 +
@@ -628,9 +625,9 @@ Double.parseDouble($F{dayInfoType1}.get(1).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(2).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(3).toString())/100 +
 Double.parseDouble($F{dayInfoType1}.get(4).toString())/100 +
-Double.parseDouble($F{dayInfoType1}.get(5).toString())/100 ]]></textFieldExpression>
+Double.parseDouble($F{dayInfoType1}.get(5).toString())/100]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;-###0.00">
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
 				<reportElement uuid="b5f02488-2a04-4498-88c6-ca65ae8ce167" style="table" x="448" y="0" width="60" height="20"/>
 				<box>
 					<rightPen lineWidth="3.0" lineStyle="Solid"/>
@@ -641,7 +638,7 @@ Double.parseDouble($F{dayInfoType0}.get(1).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(2).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(3).toString())/100 +
 Double.parseDouble($F{dayInfoType0}.get(4).toString())/100 +
-Double.parseDouble($F{dayInfoType0}.get(5).toString())/100 ]]></textFieldExpression>
+Double.parseDouble($F{dayInfoType0}.get(5).toString())/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0;-###0">
 				<reportElement uuid="e56dd722-1e85-43f0-abed-e3a456c19cdc" x="0" y="0" width="36" height="20"/>

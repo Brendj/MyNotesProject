@@ -134,7 +134,7 @@ public class ReportOnNutritionByWeekReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_PREV_PREV_PREV_DAY;
+        return REPORT_PERIOD_LAST_WEEK;
     }
 }
 
