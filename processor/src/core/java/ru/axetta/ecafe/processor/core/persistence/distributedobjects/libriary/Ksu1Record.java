@@ -84,7 +84,7 @@ public class Ksu1Record extends DistributedObject {
         guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
         incomeDate = getDateOnlyAttributeValue(node, "IncomeDate");
         recordNumber = getIntegerAttributeValue(node, "RecordNumber");
-        setSendAll(SendToAssociatedOrgs.Send);
+        //setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

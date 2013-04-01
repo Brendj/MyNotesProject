@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -67,6 +68,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         guidOfIDD = getStringAttributeValue(node,"GuidOfInternalDisposingDocument",36);
         guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
         guidOfGood = getStringAttributeValue(node,"GuidOfGoods",36);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

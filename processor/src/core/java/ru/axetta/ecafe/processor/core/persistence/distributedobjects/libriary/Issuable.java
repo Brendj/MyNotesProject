@@ -62,7 +62,7 @@ public class Issuable extends DistributedObject {
 
         guidInstance = getStringAttributeValue(node, "GuidInstance", 36);
         guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 36);
-        setSendAll(SendToAssociatedOrgs.Send);
+        //setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

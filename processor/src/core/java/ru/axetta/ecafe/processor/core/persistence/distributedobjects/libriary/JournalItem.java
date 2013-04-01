@@ -69,7 +69,7 @@ public class JournalItem extends DistributedObject {
         date = getDateOnlyAttributeValue(node, "Date");
         number = getStringAttributeValue(node, "Number", 10);
         cost = getIntegerAttributeValue(node, "Cost");
-        setSendAll(SendToAssociatedOrgs.Send);
+        //setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

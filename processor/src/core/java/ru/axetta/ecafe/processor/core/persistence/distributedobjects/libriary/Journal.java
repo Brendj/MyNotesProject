@@ -64,7 +64,7 @@ public class Journal extends DistributedObject {
         isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
         monthCount = getIntegerAttributeValue(node, "MonthCount");
         count = getIntegerAttributeValue(node, "Count");
-        setSendAll(SendToAssociatedOrgs.Send);
+        //setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

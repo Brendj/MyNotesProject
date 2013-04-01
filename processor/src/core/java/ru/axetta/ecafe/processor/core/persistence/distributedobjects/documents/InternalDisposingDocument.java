@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -90,6 +91,7 @@ public class InternalDisposingDocument extends DistributedObject {
         if(stringComments != null) setComments(stringComments);
         guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
         guidOfAI = getStringAttributeValue(node,"GuidOfInventarizationAct",36);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

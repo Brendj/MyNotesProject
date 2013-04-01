@@ -70,7 +70,7 @@ public class Ksu2Record extends DistributedObject {
         guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
         retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
         recordNumber = getIntegerAttributeValue(node, "RecordNumber");
-        setSendAll(SendToAssociatedOrgs.Send);
+        //setSendAll(SendToAssociatedOrgs.Send);
         return this;
     }
 

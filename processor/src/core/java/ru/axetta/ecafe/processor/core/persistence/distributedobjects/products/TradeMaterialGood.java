@@ -90,7 +90,7 @@ public class TradeMaterialGood extends DistributedObject {
         Long longNDS = getLongAttributeValue(node,"NDS");
         if(longNDS != null) setNds(longNDS);
         guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
-        setSendAll(SendToAssociatedOrgs.SendToSelf);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
