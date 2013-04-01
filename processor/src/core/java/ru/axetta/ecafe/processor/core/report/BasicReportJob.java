@@ -12,8 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,6 +357,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         } else if (type== REPORT_PERIOD_LAST_WEEK) {
             if (startTime==null) {
                 calendar.setTime(generateTime);
+                // устанавливаем понедельник в качестве стартовой даты выборки
                 calendar.set(Calendar.DAY_OF_WEEK,2);
                 calendar.set(Calendar.MILLISECOND, 0);
                 calendar.set(Calendar.SECOND, 0);
@@ -372,6 +373,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
                 calendar.set(Calendar.HOUR_OF_DAY, 0);
                 startTime = calendar.getTime();
             }
+            // устанавливаем субботу в качестве конечной даты выборки
             calendar.set(Calendar.DAY_OF_WEEK,7);
             endTime = calendar.getTime();
         }
