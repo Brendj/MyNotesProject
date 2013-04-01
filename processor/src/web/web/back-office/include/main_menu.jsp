@@ -70,7 +70,7 @@
                             action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
 
         <%--@elvariable id="cafeSettingsEditListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.ECafeSettingsEditListPage"--%>
-        <rich:panelMenuItem id="ecafeSettingsEditListMenuItem" binding="#{cafeSettingsEditListPage.mainMenuComponent}" label="Настройки принтера"
+        <rich:panelMenuItem id="ecafeSettingsEditListMenuItem" binding="#{cafeSettingsEditListPage.mainMenuComponent}" label="Настройки"
                             action="#{cafeSettingsEditListPage.show}" reRender="workspaceForm">
                 <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{cafeSettingsEditListPage.idOfOrg}" />
         </rich:panelMenuItem>

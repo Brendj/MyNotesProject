@@ -53,7 +53,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Значение"/>
+                <h:outputText value="Параметры принтера (формат чека)"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{setting.settingValue}"
                                id="inplaceSettingValue" required="true"
@@ -68,7 +68,7 @@
                 <h:outputText value="Текстовое сообщение"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{setting.settingText}"
-                               id="inplaceSettingText" required="true"
+                               id="inplaceSettingText"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
                                selectOnEdit="true" editEvent="ondblclick">
