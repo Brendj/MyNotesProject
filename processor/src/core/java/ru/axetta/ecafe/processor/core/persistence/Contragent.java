@@ -74,6 +74,9 @@ public class Contragent {
     private Set<Org> orgs = new HashSet<Org>();
     private Set<AddPayment> payerAddPayments = new HashSet<AddPayment>();
     private Set<AddPayment> receiverAddPayments = new HashSet<AddPayment>();
+    private String kpp;
+    private String ogrn;
+
 
     Contragent() {
         // For Hibernate only
@@ -479,6 +482,22 @@ public class Contragent {
         this.publicKeyGOSTAlias = publicKeyGOSTAlias;
     }
 
+    public String getKpp() {
+        return kpp;
+    }
+
+    public void setKpp(String kpp) {
+        this.kpp = kpp;
+    }
+
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -504,7 +523,8 @@ public class Contragent {
                 + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", fax='" + fax + '\'' + ", remarks='"
                 + remarks + '\'' + ", inn='" + inn + '\'' + ", bank='" + bank + '\'' + ", bic='" + bic + '\''
                 + ", corrAccount='" + corrAccount + '\'' + ", account='" + account + '\'' + ", createTime=" + createTime
-                + ", updateTime=" + updateTime + ", publicKey='" + publicKey + '\'' + '}';
+                + ", updateTime=" + updateTime + ", publicKey='" + publicKey + '\''
+                + ", KPP='" + kpp + '\'' + ", OGRN='" + ogrn+ '\'' + '}';
     }
 
 }

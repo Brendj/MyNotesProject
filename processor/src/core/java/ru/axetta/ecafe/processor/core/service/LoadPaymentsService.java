@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -58,8 +59,10 @@ import com.sun.org.apache.xml.internal.security.Init;
 import com.sun.org.apache.xml.internal.security.transforms.Transforms;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 import generated.rnip.roskazna.smevunifoservice.UnifoTransferMsg;
+import generated.rnip.roskazna.xsd.errinfo.ErrInfo;
 import generated.rnip.roskazna.xsd.exportpaymentsresponse.ExportPaymentsResponse;
 import generated.rnip.roskazna.xsd.paymentinfo.PaymentInfoType;
+import generated.rnip.roskazna.xsd.responsetemplate.ResponseTemplate;
 import ru.CryptoPro.JCP.JCP;
 import ru.CryptoPro.JCP.tools.Array;
 
@@ -82,9 +85,11 @@ public class LoadPaymentsService {
     /**
      * Файл с документом для подписи.
      */
-    //private final static String inSOAPFile = System.getProperty("user.dir") + "/data/soap_net.xml";
     private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static String inSOAPFile = "META-INF/rnip/getPayments_byDate.xml";//;
+    private final static String LOAD_PAYMENTS_TEMPLATE = "META-INF/rnip/getPayments_byDate.xml";
+    private final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
+    private final static String MODIFY_CATALOG_TEMPLATE = "META-INF/rnip/modifyCatalog.xml";
+    //private final static String LOAD_PAYMENTS_TEMPLATE = "D:/2/test.xml";// !!!!!!!!!! ЗАМенить !!!!!!!!!
     /**
      * Адрес тестового сервиса СМЭВ.
      */
@@ -96,7 +101,7 @@ public class LoadPaymentsService {
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
 
     static {
-        PAYMENT_PARAMS.add("SupplierBillID");
+        PAYMENT_PARAMS.add("SystemIdentifier"); // Идентификатор платежа в РНИП (уникаклен)
         PAYMENT_PARAMS.add("Amount");
         PAYMENT_PARAMS.add("PaymentDate");
         PAYMENT_PARAMS.add("NUM_DOGOVOR");  // Это номер договора в нашей БД
@@ -134,42 +139,102 @@ public class LoadPaymentsService {
     }
 
 
-    public void run() {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            return;
+    public void createCatalogForContragent (Contragent contragent) throws IllegalStateException, Exception {
+        String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
+        if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+            logger.error("Попытка подключить контрагента " + contragent + " к сервису загрузк платежей из РНИП. Ошибка: необходимо "
+                         + "указать идентификатор контрагента в ИС ПП - в Ремарки добавить {RNIP=id_контрагента_в_РНИП}");
         }
-        Date updateTime = new Date(System.currentTimeMillis());
 
+        //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(updateTime);
+            response = executeRequest(new Date(System.currentTimeMillis()), CREATE_CATALOG_TEMPLATE, contragent);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
 
-        if (response == null) {
-            setLastUpdateDate(new Date(System.currentTimeMillis()));
-            return;
+        String soapError = checkError (response);
+        if (soapError != null && soapError.length () > 1) {
+            throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-
-        List<Map<String, String>> payments = null;
-        try {
-            payments = parsePayments(response);
-        } catch (Exception e) {
-            logger.error("Failed to parse payments from soap message", e);
-        }
-
-        if (payments == null || payments.size() < 1) {
-            setLastUpdateDate(updateTime);
-            return;
-        }
-
-        addPaymentsToDb(payments);
-        setLastUpdateDate(updateTime);
     }
 
-    public SOAPMessage executeRequest(Date updateTime) throws Exception {
 
+    public void modifyCatalogForContragent (Contragent contragent) throws IllegalStateException, Exception {
+        String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
+        if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+            logger.error("Попытка подключить контрагента " + contragent + " к сервису загрузк платежей из РНИП. Ошибка: необходимо "
+                    + "указать идентификатор контрагента в ИС ПП - в Ремарки добавить {RNIP=id_контрагента_в_РНИП}");
+        }
+
+        //  Отправка запроса на получение платежей
+        SOAPMessage response = null;
+        try {
+            response = executeRequest(new Date(System.currentTimeMillis()), MODIFY_CATALOG_TEMPLATE, contragent);
+        } catch (Exception e) {
+            logger.error("Failed to request data from RNIP service", e);
+        }
+
+        String soapError = checkError (response);
+        if (soapError != null) {
+            throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
+        }
+
+    }
+
+
+    public void run() {
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+            return;
+        }
+
+        Date updateTime = new Date(System.currentTimeMillis());
+        for (Contragent contragent : DAOService.getInstance().getContragentsList()) {
+            //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
+            String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
+            if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+                continue;
+            }
+
+
+            //  Отправка запроса на получение платежей
+            SOAPMessage response = null;
+            try {
+                response = executeRequest(updateTime, LOAD_PAYMENTS_TEMPLATE, contragent);
+            } catch (Exception e) {
+                logger.error("Failed to request data from RNIP service", e);
+            }
+
+            if (response == null) {
+                continue;
+            }
+
+            try {
+                String soapError = checkError (response);
+                if (soapError != null) {
+                    logger.error("An error occurred while parsing RNIP result: " + soapError);
+                    continue;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+
+            // Если платежи есть, то обрабатываем их
+            List<Map<String, String>> payments = null;
+            try {
+                payments = parsePayments(response);
+            } catch (Exception e) {
+                logger.error("Failed to parse payments from soap message", e);
+            }
+            //  И записываем в БД
+            addPaymentsToDb(payments);
+            }
+        setLastUpdateDate(updateTime);
+        }
+
+
+    public SOAPMessage executeRequest(Date updateTime, String fileName, Contragent contragent) throws Exception {
         /*** Инициализация ***/
         Init.init();
 
@@ -190,10 +255,10 @@ public class LoadPaymentsService {
         SOAPPart soapPart = message.getSOAPPart();
 
         // Читаем сообщение из файла.
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(inSOAPFile);
-        //FileInputStream fis = new FileInputStream(is);
-        soapPart.setContent(doMacroReplacement(updateTime, new StreamSource(is)));
-        message.getSOAPPart().getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#");
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
+        //FileInputStream fis = new FileInputStream(fileName);
+        soapPart.setContent(doMacroReplacement(updateTime, new StreamSource(is), contragent));//new StreamSource(fis)));
+        message.getSOAPPart().getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#"); // !!!!!!! Замиенить !!!!!!!!
 
         // Формируем заголовок.
         WSSecHeader header = new WSSecHeader();
@@ -271,7 +336,7 @@ public class LoadPaymentsService {
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
-        //Array.writeFile(inSOAPFile + ".signed.uri.xml", msg.getBytes("utf-8"));
+        Array.writeFile("D:/2/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
 
         /*** а) Проверка подписи (локально) ***/
         // Получение блока, содержащего сертификат.
@@ -359,42 +424,56 @@ public class LoadPaymentsService {
                         getExportDataResponse().getResponseTemplate()).getPayments().getPaymentInfo();
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         for (ExportPaymentsResponse.Payments.PaymentInfo pi : piList) {
-            String paymentInfoStr = new String(pi.getPaymentData(), "cp1251");
-            InputStream stream = new ByteArrayInputStream(paymentInfoStr.getBytes());
+            //String paymentInfoStr = new String(pi.getPaymentData(), "cp1251");        !!!!!!!!!!! БЫЛО !!!!!!!!!!!!!!
+            String paymentInfoStr = new String(pi.getPaymentData(), "utf8");
+            /*InputStream stream = new ByteArrayInputStream(paymentInfoStr.getBytes());
             InputSource is = new InputSource(stream);
-            is.setEncoding("UTF-8");
-            Document doc = builderFactory.newDocumentBuilder().parse(is);
+            is.setEncoding("UTF-8");                                                    !!!!!!!!!!! БЫЛО !!!!!!!!!!!!!!*/
+            Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(paymentInfoStr)));
             result.add(parsePayment(doc));
         }
         return result;
     }
 
-
     public Map<String, String> parsePayment(Document doc) {
         Map<String, String> vals = new HashMap<String, String>();
-        Node root = doc.getFirstChild();
-        for (int i = 0; i < root.getChildNodes().getLength(); i++) {
-            Node n = root.getChildNodes().item(i);
-            for (String param : PAYMENT_PARAMS) {
-                if (n.getNodeName().equals(param) || n.getNodeName().equals("AdditionalData")) {
-                    String v = n.getFirstChild().getNodeValue();
-                    if (n.getNodeName().equals("AdditionalData")) {
-                        if (n.getFirstChild().getFirstChild().getNodeValue().equals("NUM_DOGOVOR")) {
-                            v = n.getChildNodes().item(1).getFirstChild().getNodeValue();
-                            param = "NUM_DOGOVOR";
-                        }
-                        if (n.getFirstChild().getFirstChild().getNodeValue().equals("SRV_CODE")) {
-                            v = n.getChildNodes().item(1).getFirstChild().getNodeValue();
-                            param = "SRV_CODE";
-                        }
-                    }
-                    if (!vals.containsKey(param)) {
-                        vals.put(param, v);
+        parseNode(doc.getChildNodes(), vals);
+        return vals;
+    }
+
+    private void parseNode (NodeList nodelist, Map<String, String> vals) {
+        for (int i=0; i<nodelist.getLength(); i++) {
+            Node node = nodelist.item(i);
+
+            if (node.hasChildNodes() && node.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE) {
+                String n = node.getNodeName();
+                String v = node.getChildNodes().item(0).getNodeValue();
+                for (String param : PAYMENT_PARAMS) {
+                    if (param.equals(n)) {
+                        vals.put(n, v);
+                        break;
                     }
                 }
             }
+            else {
+                if (node.getNodeName().equals("AdditionalData")) {
+                    String nameLabel = node.getChildNodes().item(0).getNodeName();
+                    String nameValue = node.getChildNodes().item(0).getChildNodes().item(0).getNodeValue();
+                    if (nameLabel.equals("Name")) {
+                        for (String param : PAYMENT_PARAMS) {
+                            if (param.equals (nameValue)) {
+                                String valName = node.getChildNodes().item(1).getNodeName();
+                                String valValue = node.getChildNodes().item(1).getChildNodes().item(0).getNodeValue();
+                                vals.put(nameValue, valValue);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            parseNode (node.getChildNodes(), vals);
+            }
         }
-        return vals;
     }
 
 
@@ -413,11 +492,12 @@ public class LoadPaymentsService {
 
 
         for (Map<String, String> p : payments) {
-            String paymentID = p.get("SupplierBillID");
-            String paymentDate = p.get("PaymentDate");
+            String paymentID = "";
             try {
-                String contragentKey = p.get("SRV_CODE").substring(5, 10);
-                long idOfContragent = getContragentByRNIPCode(contragentKey, contrgents);
+                paymentID            = p.get("SystemIdentifier").trim();//SupplierBillID
+                String paymentDate   = p.get("PaymentDate").trim();
+                String contragentKey = p.get("SRV_CODE").substring(5, 10).trim();
+                long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
                 if (idOfContragent == 0) {
                     continue;
                 }
@@ -426,7 +506,10 @@ public class LoadPaymentsService {
                 long amt = Long.parseLong(p.get("Amount"));
                 OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
                         OnlinePaymentProcessor.PayRequest.V_0, false, idOfContragent, null,
-                        ClientPayment.ATM_PAYMENT_METHOD, idOfClient, paymentID, paymentDate + "/" + paymentID, amt,
+                        ClientPayment.ATM_PAYMENT_METHOD,
+                        Long.parseLong(p.get("NUM_DOGOVOR")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
+                                                                поэтому используется Long.parseLong(p.get("NUM_DOGOVOR")) */
+                        paymentID, paymentDate + "/" + paymentID, amt,
                         false);
                 OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
                         .processPayRequest(req);
@@ -441,12 +524,7 @@ public class LoadPaymentsService {
 
     public long getContragentByRNIPCode(String contragentKey, List<Contragent> contragents) {
         for (Contragent c : contragents) {
-            String v = c.getRemarks();
-            String cc = "";
-            if (v != null && v.indexOf("{RNIP=") > -1) {
-                cc = v.substring(v.indexOf("{RNIP=") + "{RNIP=".length(),
-                        v.indexOf("}", v.indexOf("{RNIP=") + "{RNIP=".length()));
-            }
+            String cc = getRNIPIdFromRemarks (c.getRemarks());
             if (cc.equals(contragentKey)) {
                 return c.getIdOfContragent();
             }
@@ -455,22 +533,121 @@ public class LoadPaymentsService {
     }
 
 
-    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss) throws Exception {
+    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent) throws Exception {
         InputStream is = ss.getInputStream();
         byte[] data = new byte[is.available()];
         is.read(data);
 
         String content = new String(data);
         if (content.indexOf("%START_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(getLastUpdateDate());
-            content = content.replaceAll("%START_DATE%", str);
+            //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(getLastUpdateDate());                       !!!!!!!!!!!!!!! ЗАМЕНИИТЬ !!!!!!!!!!!
+            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 86400000));
+            content = content.replaceAll("%START_DATE%", str.trim());
         }
         if (content.indexOf("%END_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis()));
-            content = content.replaceAll("%END_DATE%", str);
+            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() + 86400000)); //!!!!!!!!!!! УБРАТЬ ПРИБАВЛЕНИЕ
+            content = content.replaceAll("%END_DATE%", str.trim());
         }
+        if (content.indexOf("%CONTRAGENT_ID%") > 1) {
+            String id = getRNIPIdFromRemarks(contragent.getRemarks());
+            content = content.replaceAll("%CONTRAGENT_ID%", id == null ? "" : id);
+        }
+        if (content.indexOf("%FINANCE_PROVIDER%") > 1) {
+            content = content.replaceAll("%FINANCE_PROVIDER%", contragent.getBank());
+        }
+        if (content.indexOf("%CONTRAGENT_NAME%") > 1) {
+            content = content.replaceAll("%CONTRAGENT_NAME%", contragent.getContragentName());
+        }
+        if (content.indexOf("%FINANCE_ACCOUNT%") > 1) {
+            content = content.replaceAll("%FINANCE_ACCOUNT%", contragent.getAccount());
+        }
+        if (content.indexOf("%KORR_FINANCE_ACCOUNT%") > 1) {
+            content = content.replaceAll("%KORR_FINANCE_ACCOUNT%", contragent.getCorrAccount());
+        }
+        if (content.indexOf("%KBK%") > 1) {
+            content = content.replaceAll("%KBK%", "00000000000000000000");
+        }
+        if (content.indexOf("%INN%") > 1) {
+            content = content.replaceAll("%INN%", contragent.getInn());
+        }
+        if (content.indexOf("%KPP%") > 1) {
+            content = content.replaceAll("%KPP%", contragent.getKpp());
+        }
+        if (content.indexOf("%OGRN%") > 1) {
+            content = content.replaceAll("%OGRN%", contragent.getOgrn());
+        }
+        if (content.indexOf("%BIK%") > 1) {
+            content = content.replaceAll("%BIK%", contragent.getBic());
+        }
+        if (content.indexOf("%COMISSION_PERCENTS%") > 1) {
+            String comissionStr = getRNIPComissionFromRemarks(contragent.getRemarks());
+            double comission = 0D;
+            try {
+                comission = Double.parseDouble(comissionStr);
+            } catch (Exception e) {
+                comission = 0D;
+            }
+            String cStr = new BigDecimal(comission).setScale(1, BigDecimal.ROUND_HALF_DOWN).toString();
+            content = content.replaceAll("%COMISSION_PERCENTS%", cStr.trim());
+        }
+
+
         StreamSource res = new StreamSource();
         res.setReader(new StringReader(content));
         return res;
+    }
+
+
+    public String checkError (SOAPMessage response) throws Exception {
+        if (response == null) {
+            return null;
+        }
+
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(true);
+
+        JAXBContext jc = JAXBContext.newInstance(UnifoTransferMsg.class);
+        Unmarshaller u = jc.createUnmarshaller();
+        Object o = u.unmarshal(response.getSOAPBody().getFirstChild());
+
+        UnifoTransferMsg m = (UnifoTransferMsg) o;
+        jc = JAXBContext.newInstance(PaymentInfoType.class);
+        u = jc.createUnmarshaller();
+        try {
+            ErrInfo e = m.getMessageData().getAppData().getImportDataResponse().getTicket().getRequestProcessResult();
+            if (e == null || e.getErrorCode() == null || e.getErrorCode().length() < 1) {
+                return null;
+            }
+
+            return "[" + e.getErrorCode() + "] " + e.getErrorDescription();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    public static final String getRNIPComissionFromRemarks (String remark) {
+        String comission = null;
+        if (remark.indexOf("{RNIP_Comission=") > -1) {
+            comission = remark.substring(remark.indexOf("{RNIP_Comission=") + "{RNIP_Comission=".length(),
+                    remark.indexOf("}", remark.indexOf("{RNIP_Comission=") + "{RNIP_Comission=".length()));
+        }
+        if (comission == null || comission.length() < 1) {
+            return null;
+        }
+        return comission;
+    }
+
+
+    public static final String getRNIPIdFromRemarks (String remark) {
+        String RNIPIdOfContragent = null;
+        if (remark != null && remark.length() > 0 && remark.indexOf("{RNIP=") > -1) {
+            RNIPIdOfContragent = remark.substring(remark.indexOf("{RNIP=") + "{RNIP=".length(),
+                    remark.indexOf("}", remark.indexOf("{RNIP=") + "{RNIP=".length()));
+        }
+        if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+            return null;
+        }
+        return RNIPIdOfContragent;
     }
 }

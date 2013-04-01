@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -95,6 +97,8 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
     private final ContragentClassMenu contragentClassMenu = new ContragentClassMenu();
+    private String kpp;
+    private String ogrn;
 
     public String getPageFilename() {
         return "contragent/create";
@@ -236,6 +240,22 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         return contragentName;
     }
 
+    public String getKpp() {
+        return kpp;
+    }
+
+    public void setKpp(String kpp) {
+        this.kpp = kpp;
+    }
+
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
     public String getPublicKey() {
         return publicKey;
     }
@@ -271,7 +291,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         Person contactPerson = this.contactPerson.buildPerson();
         session.save(contactPerson);
         Date currentTime = new Date();
-        Contragent contragent = new Contragent(contactPerson, this.contragentName, this.classId, 1, this.title,
+        Contragent contragent = new Contragent(contactPerson, this.contragentName.trim(), this.classId, 1, this.title,
                 this.address, currentTime, currentTime, this.publicKey, this.needAccountTranslate);
         contragent.setContactPerson(contactPerson);
         contragent.setParentId(this.parentId);
@@ -279,20 +299,65 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setMobile(this.mobile);
         contragent.setEmail(this.email);
         contragent.setFax(this.fax);
-        contragent.setRemarks(this.remarks);
-        contragent.setInn(this.inn);
-        contragent.setBank(this.bank);
-        contragent.setBic(this.bic);
-        contragent.setCorrAccount(this.corrAccount);
-        contragent.setAccount(this.account);
+        contragent.setRemarks(this.remarks.trim());
+        contragent.setInn(this.inn.trim());
+        contragent.setBank(this.bank.trim());
+        contragent.setBic(this.bic.trim());
+        contragent.setCorrAccount(this.corrAccount.trim());
+        contragent.setAccount(this.account.trim());
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
+        contragent.setKpp(kpp.trim());
+        contragent.setOgrn(ogrn.trim());
         session.save(contragent);
+
+        updateContragentRNIP(session, contragent);
+    }
+
+    public void updateContragentRNIP (Session session, Contragent contragent) throws Exception {
+        String id = LoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
+        if (isEmpty (id)) {
+            throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
+        }
+        if (isEmpty (contragent.getContragentName())) {
+            throw new IllegalStateException("Необходимо указать наименование Контрагента");
+        }
+        if (isEmpty(contragent.getBank())) {
+            throw new IllegalStateException("Необходимо указать Банк");
+        }
+        if (isEmpty(contragent.getAccount())) {
+            throw new IllegalStateException("Необходимо указать номер счета");
+        }
+        if (isEmpty(contragent.getInn())) {
+            throw new IllegalStateException("Необходимо указать ИНН");
+        }
+        if (isEmpty(contragent.getKpp())) {
+            throw new IllegalStateException("Необходимо указать КПП");
+        }
+        if (isEmpty(contragent.getOgrn())) {
+            throw new IllegalStateException("Необходимо указать ОГРН");
+        }
+        if (isEmpty(contragent.getCorrAccount())) {
+            throw new IllegalStateException("Необходимо указать номер Коррсчета");
+        }
+        if (isEmpty(contragent.getBic())) {
+            throw new IllegalStateException("Необходимо указать БИК");
+        }
+
+    RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
     }
 
     public class ContragentWithClassExistsException extends Exception {
         public ContragentWithClassExistsException(String e) {
             super(e);
         }
+    }
+
+
+    public static final boolean isEmpty (String str) {
+        if (str == null || str.length() < 1) {
+            return true;
+        }
+        return false;
     }
 
 }

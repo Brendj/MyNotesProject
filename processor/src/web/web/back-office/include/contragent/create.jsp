@@ -54,6 +54,10 @@
     <h:inputText value="#{mainPage.contragentCreatePage.corrAccount}" maxlength="20" styleClass="input-text" />
     <h:outputText escape="true" value="Счет" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.account}" maxlength="20" styleClass="input-text" />
+    <h:outputText escape="true" value="КПП" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentCreatePage.kpp}" maxlength="10" styleClass="input-text" />
+    <h:outputText escape="true" value="ОГРН" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentCreatePage.ogrn}" maxlength="15" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ (RSA)" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.publicKey}" maxlength="1024" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ (ГОСТ) - контейнер" styleClass="output-text" />

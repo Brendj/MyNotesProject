@@ -34,6 +34,8 @@
         <property name="bic" column="BIC" type="string" length="15"/>
         <property name="corrAccount" column="CorrAccount" type="string" length="20"/>
         <property name="account" column="Account" type="string" length="20"/>
+        <property name="kpp" column="kpp" type="string" length="10" />
+        <property name="ogrn" column="ogrn" type="string" length="15" />
         <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"

@@ -79,6 +79,8 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String publicKey;
     private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
+    private String kpp;
+    private String ogrn;
 
     public Long getIdOfContragent() {
         return idOfContragent;
@@ -172,6 +174,22 @@ public class ContragentViewPage extends BasicWorkspacePage {
         return needAccountTranslate;
     }
 
+    public String getKpp() {
+        return kpp;
+    }
+
+    public void setKpp(String kpp) {
+        this.kpp = kpp;
+    }
+
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
     public void fill(Session session, Long idOfContragent) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         this.idOfContragent = contragent.getIdOfContragent();
@@ -197,6 +215,8 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.publicKey = contragent.getPublicKey();
         this.publicKeyGOSTAlias = contragent.getPublicKeyGOSTAlias();
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
+        this.kpp = contragent.getKpp();
+        this.ogrn = contragent.getOgrn();
     }
 
 }

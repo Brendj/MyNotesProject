@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -108,6 +110,9 @@ public class ContragentEditPage extends BasicWorkspacePage {
     private String publicKeyGOSTAlias;
     private boolean needAccountTranslate;
     private final ContragentClassMenu contragentClassMenu = new ContragentClassMenu();
+    private String kpp;
+    private String ogrn;
+
 
     public ContragentClassMenu getContragentClassMenu() {
         return contragentClassMenu;
@@ -277,6 +282,22 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.publicKeyGOSTAlias = publicKeyGOSTAlias;
     }
 
+    public String getKpp() {
+        return kpp;
+    }
+
+    public void setKpp(String kpp) {
+        this.kpp = kpp;
+    }
+
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
     public boolean isNeedAccountTranslate() {
         return needAccountTranslate;
     }
@@ -295,7 +316,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         Person contractPerson = contragent.getContactPerson();
         this.contactPerson.copyTo(contractPerson);
         contragent.setParentId(this.parentId);
-        contragent.setContragentName(this.contragentName);
+        contragent.setContragentName(this.contragentName.trim());
         contragent.setClassId(this.classId);
         contragent.setFlags(this.flags);
         contragent.setTitle(this.title);
@@ -304,16 +325,18 @@ public class ContragentEditPage extends BasicWorkspacePage {
         contragent.setMobile(this.mobile);
         contragent.setEmail(this.email);
         contragent.setFax(this.fax);
-        contragent.setRemarks(this.remarks);
-        contragent.setInn(this.inn);
-        contragent.setBank(this.bank);
-        contragent.setBic(this.bic);
-        contragent.setCorrAccount(this.corrAccount);
-        contragent.setAccount(this.account);
+        contragent.setRemarks(this.remarks.trim());
+        contragent.setInn(this.inn.trim());
+        contragent.setBank(this.bank.trim());
+        contragent.setBic(this.bic.trim());
+        contragent.setCorrAccount(this.corrAccount.trim());
+        contragent.setAccount(this.account.trim());
         contragent.setUpdateTime(new Date());
         contragent.setPublicKey(this.publicKey);
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
         contragent.setNeedAccountTranslate(this.needAccountTranslate);
+        contragent.setKpp(kpp.trim());
+        contragent.setOgrn(ogrn.trim());
         session.update(contragent);
         fill(contragent);
     }
@@ -340,6 +363,71 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.publicKey = contragent.getPublicKey();
         this.publicKeyGOSTAlias = contragent.getPublicKeyGOSTAlias();
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
+        this.kpp = contragent.getKpp();
+        this.ogrn = contragent.getOgrn();
+    }
+
+
+    public void updateContragentRNIP (Session session, Long idOfContragent) throws Exception {
+        Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
+        // Получаем id в РНИП, который был там до изменения (если он изменится или отсутствует,
+        // то необходимо пересоздаваить каталог в самом РНИП)
+        String preId = LoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
+        updateContragent(session, idOfContragent);
+        String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        if (isEmpty (id)) {
+            throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
+        }
+        if (isEmpty (contragent.getContragentName())) {
+            throw new IllegalStateException("Необходимо указать наименование Контрагента");
+        }
+        if (isEmpty(contragent.getBank())) {
+            throw new IllegalStateException("Необходимо указать Банк");
+        }
+        if (isEmpty(contragent.getAccount())) {
+            throw new IllegalStateException("Необходимо указать номер счета");
+        }
+        if (isEmpty(contragent.getInn())) {
+            throw new IllegalStateException("Необходимо указать ИНН");
+        }
+        if (isEmpty(contragent.getKpp())) {
+            throw new IllegalStateException("Необходимо указать КПП");
+        }
+        if (isEmpty(contragent.getOgrn())) {
+            throw new IllegalStateException("Необходимо указать ОГРН");
+        }
+        if (isEmpty(contragent.getCorrAccount())) {
+            throw new IllegalStateException("Необходимо указать номер Коррсчета");
+        }
+        if (isEmpty(contragent.getBic())) {
+            throw new IllegalStateException("Необходимо указать БИК");
+        }
+
+
+        if (isEmpty(preId) || !preId.equals(id)) {
+            RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
+        }
+        else {
+            RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).modifyCatalogForContragent(contragent);
+        }
+    }
+
+
+    public String getRNIPButtonLabel () {
+        String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        if (id == null) {
+            return "Создать каталог в РНИП";
+        }
+        else {
+            return "Сохранить каталог в РНИП";
+        }
+    }
+
+    public static final boolean isEmpty (String str) {
+        if (str == null || str.length() < 1) {
+            return true;
+        }
+        return false;
     }
 
 }
