@@ -425,7 +425,7 @@ public class Manager {
                 // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
             }
             sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
-            String sendAllWhere = " (sendAll is null or sendAll=0) ";
+            String sendAllWhere = " (sendAll is null or sendAll="+SendToAssociatedOrgs.Send.getSendMode()+") ";
             String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where ("+ sendAllWhere + " and " + where)+") or "+sendOnlyOrgWhere;
             Query query = persistenceSession.createQuery(select);
             List list = query.list();
