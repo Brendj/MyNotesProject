@@ -520,7 +520,7 @@ public class ClientManager {
 
             return idOfClient;
         } catch (Exception e) {
-            logger.info("Ошибка при создании клиента", e);
+            logger.error("Ошибка при создании клиента", e);
             throw new Exception("Ошибка: "+e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
