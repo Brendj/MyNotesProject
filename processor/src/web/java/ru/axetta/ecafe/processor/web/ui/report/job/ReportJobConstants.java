@@ -111,6 +111,7 @@ public class ReportJobConstants {
     };
 
     public static final ReportHint[] REPORT_HINTS = {
+            new ReportHint(ReportOnNutritionByWeekReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),
             new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{3, 4, 5, 6, 22, 23}),
             new ReportHint(OrgBalanceJasperReport.class.getCanonicalName(), new int[]{3, 4, 5, 22, 23}),

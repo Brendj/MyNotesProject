@@ -2,7 +2,7 @@
  * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.daoservices.client;
+package ru.axetta.ecafe.processor.core.daoservices.client.items;
 
 import java.util.Date;
 
