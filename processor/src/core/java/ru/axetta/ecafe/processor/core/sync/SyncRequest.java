@@ -109,7 +109,7 @@ public class SyncRequest {
                         if (menuGroup == null) {
                             menuGroup = MenuDetail.DEFAULT_GROUP_NAME;
                         }
-                        String guidOfGoods = getStringValueNullSafe(namedNodeMap, "GuidOfGoods");
+                        String guidOfGoods = getStringValueNullSafe(namedNodeMap, "GoodsGuid");
 
                         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
                                 menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods);
