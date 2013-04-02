@@ -34,6 +34,12 @@
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
+    <a4j:status id="contractListTableGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="contractListTable" value="#{contractListPage.itemList}"
                     var="item" rows="20" footerClass="data-table-footer"
                     columnClasses="center-aligned-column">

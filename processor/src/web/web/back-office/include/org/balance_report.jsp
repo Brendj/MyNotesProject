@@ -28,32 +28,32 @@
                 <rich:columnGroup>
                     <rich:column colspan="4" />
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Платежи" styleClass="output-text" />
+                        <h:outputText escape="true" value="Платежи" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Покупки по картам" styleClass="output-text" />
+                        <h:outputText escape="true" value="Покупки по картам" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Баланс по картам" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс по картам" styleClass="column-header" />
                     </rich:column>
                     <rich:column colspan="4" breakBefore="true" styleClass="left-aligned-column">
                         <h:outputText escape="true" value="#{mainPage.orgBalanceReportPage.shortName}"
-                                      styleClass="output-text" />
+                                      styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalClientPaymentSum}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalOrderSumByCard}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalBalance}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

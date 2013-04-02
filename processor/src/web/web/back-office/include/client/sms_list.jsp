@@ -78,8 +78,14 @@
 
     </rich:simpleTogglePanel>
 
+    <a4j:status id="clientSmsTableGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="clientSmsTable" value="#{mainPage.clientSmsListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column"
+                    columnClasses="right-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column, left-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">

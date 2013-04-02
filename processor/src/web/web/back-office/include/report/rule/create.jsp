@@ -52,7 +52,7 @@
 <rich:dataTable id="paramHints" value="#{mainPage.reportRuleCreatePage.paramHints}" var="item"
                 columnClasses="left-aligned-column, left-aligned-column">
     <f:facet name="header">
-        <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="output-text" />
+        <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="column-header" />
     </f:facet>
     <rich:column>
         <h:outputText escape="true" value="#{item.name}" styleClass="output-text" />

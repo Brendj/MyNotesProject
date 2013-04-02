@@ -13,159 +13,64 @@
     <rich:dataTable id="ruleTable" width="700" var="item" value="#{ruleListPage.items}" rows="20"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer">
-           <%--
-    <rich:column rowspan="2"  headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.idOfRule}" />
-    </rich:column>
-    <rich:column rowspan="2"  headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Приоритет" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.priority}" />
-    </rich:column>
-    <rich:column rowspan="2"  headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Описание" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.description}" />
-    </rich:column>
-    <rich:column rowspan="2"  headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Категории" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.categoryDiscounts}" />
-    </rich:column>
-    <rich:column rowspan="2"  headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Тип условия" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
-    </rich:column>
-    <rich:column colspan="4" headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText value="Комплексы" styleClass="output-text" escape="true"/>
-        </f:facet>
-    </rich:column>
-
-    <rich:column headerClass="column-header" breakBefore="true">
-        <f:facet name="header">
-            <h:outputText value="0" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.complex0}" />
-    </rich:column>
-    <rich:column headerClass="column-header" breakBefore="true">
-        <f:facet name="header">
-            <h:outputText value="1" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.complex1}" />
-    </rich:column>
-    <rich:column headerClass="column-header" breakBefore="true">
-        <f:facet name="header">
-            <h:outputText value="2" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.complex2}" />
-    </rich:column>
-    <rich:column headerClass="column-header" breakBefore="true">
-        <f:facet name="header">
-            <h:outputText value="3" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <h:outputText styleClass="output-text" value="#{item.complex3}" />
-    </rich:column>
-
-    <rich:column breakBefore="false">
-        <f:facet name="header">
-            <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showRuleEditPage}" styleClass="command-link">
-            <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-            <f:setPropertyActionListener value="#{item.idOfRule}" target="#{mainPage.selectedIdOfRule}" />
-        </a4j:commandLink>
-    </rich:column>
-    <rich:column style="text-align:center" breakBefore="false">
-        <f:facet name="header">
-            <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
-        </f:facet>
-        <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                         oncomplete="#{rich:component('ruleDeletePanel')}.show();">
-            <h:graphicImage value="/images/16x16/delete.png" />
-            <f:setPropertyActionListener value="#{item.idOfRule}"
-                                         target="#{mainPage.selectedIdOfRule}" />
-        </a4j:commandLink>
-    </rich:column>
-
-    <f:facet name="footer">
-        <rich:datascroller for="ruleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                           stepControls="auto" boundaryControls="hide">
-            <f:facet name="previous">
-                <h:graphicImage value="/images/16x16/left-arrow.png" />
-            </f:facet>
-            <f:facet name="next">
-                <h:graphicImage value="/images/16x16/right-arrow.png" />
-            </f:facet>
-        </rich:datascroller>
-    </f:facet>  --%>
-
         <f:facet name="header">
             <rich:columnGroup>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
-                    <h:outputText value="Идентификатор" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column" >
+                    <h:outputText value="Идентификатор" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
-                    <h:outputText value="Приоритет" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column" >
+                    <h:outputText value="Приоритет" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header" >
-                    <h:outputText value="Описание" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column" >
+                    <h:outputText value="Описание" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Категории клиентов" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Категории клиентов" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Категории организаций" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Категории организаций" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Тип условия" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Тип условия" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column colspan="10" headerClass="center-aligned-column column-header" width="200%">
-                    <h:outputText value="Комплексы" escape="true"/>
+                <rich:column colspan="10" headerClass="center-aligned-column" width="200%">
+                    <h:outputText value="Комплексы" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Редактировать" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Редактировать" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column rowspan="2" headerClass="center-aligned-column column-header">
-                    <h:outputText value="Удалить" escape="true"/>
+                <rich:column rowspan="2" headerClass="center-aligned-column">
+                    <h:outputText value="Удалить" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header"  breakBefore="true" width="200%">
-                    <h:outputText value="0" escape="true"/>
+                <rich:column headerClass="center-aligned-column"  breakBefore="true" width="200%">
+                    <h:outputText value="0" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header" >
-                    <h:outputText value="1" escape="true"/>
+                <rich:column headerClass="center-aligned-column" >
+                    <h:outputText value="1" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="2" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="2" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="3" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="3" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="4" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="4" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="5" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="5" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="6" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="6" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="7" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="7" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="8" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="8" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column column-header">
-                    <h:outputText value="9" escape="true"/>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="9" escape="true" styleClass="column-header"/>
                 </rich:column>
             </rich:columnGroup>
         </f:facet>

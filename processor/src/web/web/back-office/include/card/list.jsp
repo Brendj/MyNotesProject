@@ -52,6 +52,12 @@
 
     </rich:simpleTogglePanel>
 
+    <a4j:status id="cardTableGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="cardTable" value="#{mainPage.cardListPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">

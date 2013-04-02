@@ -35,6 +35,13 @@
                                reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
+
+    <a4j:status id="posTableGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="posTable" value="#{mainPage.posListPage.items}" var="item" rows="20"
                     columnClasses="left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">

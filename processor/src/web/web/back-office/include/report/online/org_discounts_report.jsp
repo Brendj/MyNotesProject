@@ -47,7 +47,7 @@
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column headerClass="center-aligned-column" colspan="2">
-                            <h:outputText escape="true" value="Класс" styleClass="output-text" />
+                            <h:outputText escape="true" value="Класс" styleClass="column-header" />
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>

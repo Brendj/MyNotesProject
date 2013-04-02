@@ -27,40 +27,40 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="№" styleClass="output-text" />
+                        <h:outputText escape="true" value="№" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Номер учреждения" styleClass="output-text" />
+                        <h:outputText escape="true" value="Номер учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Название учреждения" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Название учреждения" styleClass="column-header"/>
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="4">
-                        <h:outputText escape="true" value="Количество учащихся" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Количество учащихся" styleClass="column-header"/>
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="3">
-                        <h:outputText escape="true" value="Сумма балансов" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Сумма балансов" styleClass="column-header"/>
                     </rich:column>
                     <rich:column breakBefore="true" headerClass="center-aligned-column">
-                        <h:outputText escape="true" value="Общее" styleClass="output-text" />
+                        <h:outputText escape="true" value="Общее" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText escape="true" value="Баланс > 0" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс > 0" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText escape="true" value="Баланс = 0" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс = 0" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText escape="true" value="Баланс < 0" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс < 0" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Общая" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Общая" styleClass="column-header"/>
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Баланс > 0" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс > 0" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Баланс < 0" styleClass="output-text" />
+                        <h:outputText escape="true" value="Баланс < 0" styleClass="column-header" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

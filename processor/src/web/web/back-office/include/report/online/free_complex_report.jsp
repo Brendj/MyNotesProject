@@ -41,37 +41,37 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="№" />
+                        <h:outputText styleClass="column-header" escape="true" value="№" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                        <h:outputText styleClass="column-header" escape="true" value="Организация" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Название" />
+                        <h:outputText styleClass="column-header" escape="true" value="Название" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Цена за ед" />
+                        <h:outputText styleClass="column-header" escape="true" value="Цена за ед" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Скидка за ед" />
+                        <h:outputText styleClass="column-header" escape="true" value="Скидка за ед" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Количество" />
+                        <h:outputText styleClass="column-header" escape="true" value="Количество" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Сумма без скидки" />
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма без скидки" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Сумма скидки" />
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма скидки" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Итоговая сумма" />
+                        <h:outputText styleClass="column-header" escape="true" value="Итоговая сумма" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Время первой продажи" />
+                        <h:outputText styleClass="column-header" escape="true" value="Время первой продажи" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="output-text" escape="true" value="Время последней продажи" />
+                        <h:outputText styleClass="column-header" escape="true" value="Время последней продажи" />
                     </rich:column>
                 </rich:columnGroup>
 

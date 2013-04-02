@@ -52,34 +52,34 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="№" styleClass="output-text" />
+                        <h:outputText escape="true" value="№" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Номер учреждения" styleClass="output-text" />
+                        <h:outputText escape="true" value="Номер учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Название учреждения" styleClass="output-text" />
+                        <h:outputText escape="true" value="Название учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Наименование входа" styleClass="output-text" />
+                        <h:outputText escape="true" value="Наименование входа" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Адрес турникета" styleClass="output-text" />
+                        <h:outputText escape="true" value="Адрес турникета" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Направление прохода" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Направление прохода" styleClass="column-header"/>
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Код события" styleClass="output-text" />
+                        <h:outputText escape="true" value="Код события" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
+                        <h:outputText escape="true" value="Номер договора" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Фамилия и Имя учащегося" styleClass="output-text" />
+                        <h:outputText escape="true" value="Фамилия и Имя учащегося" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Дата события" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Дата события" styleClass="column-header"/>
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

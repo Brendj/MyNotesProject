@@ -46,7 +46,7 @@
 <rich:dataTable value="#{mainPage.eventNotificationCreatePage.eventParamHints}" var="eventParamHint"
                 columnClasses="center-aligned-column">
     <f:facet name="header">
-        <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="output-text" />
+        <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="column-header" />
     </f:facet>
     <rich:column colspan="2">
         <h:outputText escape="true" value="#{eventParamHint.typeName}" styleClass="output-text" />

@@ -36,50 +36,50 @@
                 <rich:columnGroup>
                     <rich:column colspan="4" />
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Покупки по картам" styleClass="output-text" />
+                        <h:outputText escape="true" value="Покупки по картам" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Покупки наличными" styleClass="output-text" />
+                        <h:outputText escape="true" value="Покупки наличными" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
                         <h:outputText escape="true" value="Сумма покупок по бесплатному питанию"
-                                      styleClass="output-text" />
+                                      styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
                         <h:outputText escape="true" value="Сумма скидок"
-                                      styleClass="output-text" />
+                                      styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="center-aligned-column">
-                        <h:outputText escape="true" value="Сумма дотаций" styleClass="output-text" />
+                        <h:outputText escape="true" value="Сумма дотаций" styleClass="column-header" />
                     </rich:column>
                     <rich:column colspan="4" breakBefore="true" styleClass="left-aligned-column">
                         <h:outputText escape="true" value="#{mainPage.orgOrderReportPage.shortName}"
-                                      styleClass="output-text" />
+                                      styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalOrderSumByCard}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalOrderSumByCash}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalSocDiscount}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalTrdDiscount}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText escape="true"
                                       value="#{mainPage.orgOrderReportPage.orgOrderReport.org.totalGrantSum}"
-                                      converter="copeckSumConverter" styleClass="output-text" />
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
