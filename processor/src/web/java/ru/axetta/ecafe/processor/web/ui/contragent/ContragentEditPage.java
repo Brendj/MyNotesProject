@@ -376,7 +376,8 @@ public class ContragentEditPage extends BasicWorkspacePage {
         updateContragent(session, idOfContragent);
         String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (isEmpty (id)) {
-            throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
+            return;
+            //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
         }
         if (isEmpty (contragent.getContragentName())) {
             throw new IllegalStateException("Необходимо указать наименование Контрагента");
@@ -404,11 +405,17 @@ public class ContragentEditPage extends BasicWorkspacePage {
         }
 
 
-        if (isEmpty(preId) || !preId.equals(id)) {
-            RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
-        }
-        else {
-            RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).modifyCatalogForContragent(contragent);
+        try {
+            if (isEmpty(preId) || !preId.equals(id)) {
+                RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
+            }
+            else {
+                RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).modifyCatalogForContragent(contragent);
+            }
+        } catch (IllegalStateException ise) {
+            throw ise;
+        } catch (Exception e) {
+            //logger.error(e);
         }
     }
 
