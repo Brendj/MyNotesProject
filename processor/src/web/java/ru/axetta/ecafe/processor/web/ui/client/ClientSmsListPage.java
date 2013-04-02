@@ -19,10 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -265,7 +262,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
     }
 
     public void fill(Session session) throws Exception {
-        List<ClientSmsItem> items = new LinkedList<ClientSmsItem>();
+        List<ClientSmsItem> items = new ArrayList<ClientSmsItem>();
         List clients = clientSmsFilter.retrieveClientSms(session);
         for (Object object : clients) {
             ClientSms clientSms = (ClientSms) object;
