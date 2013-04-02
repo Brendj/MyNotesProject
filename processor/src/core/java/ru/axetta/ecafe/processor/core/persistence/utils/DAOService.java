@@ -823,6 +823,13 @@ public class DAOService {
 
 
     public Contragent getRNIPContragent () {
-        return null;
+        TypedQuery<Contragent> query = em.createQuery("from Contragent where remarks=:remarks", Contragent.class);
+        query.setParameter("remarks", "RNIP_DEFAULT");
+        List<Contragent> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
     }
 }

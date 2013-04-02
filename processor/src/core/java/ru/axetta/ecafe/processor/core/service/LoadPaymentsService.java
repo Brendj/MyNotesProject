@@ -515,7 +515,10 @@ public class LoadPaymentsService {
                 }
                 else {
                     logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
-                    //idOfContragent = DAOService.getInstance().getRNIPContragent().getIdOfContragent();
+                    Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
+                    if (rnipContragent != null) {
+                        idOfContragent = rnipContragent.getIdOfContragent();
+                    }
                 }
                 long amt = Long.parseLong(p.get("Amount"));
                 OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
