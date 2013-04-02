@@ -68,6 +68,7 @@ import ru.CryptoPro.JCP.tools.Array;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
@@ -101,11 +102,12 @@ public class LoadPaymentsService {
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
 
     static {
-        PAYMENT_PARAMS.add("SystemIdentifier"); // Идентификатор платежа в РНИП (уникаклен)
-        PAYMENT_PARAMS.add("Amount");
-        PAYMENT_PARAMS.add("PaymentDate");
-        PAYMENT_PARAMS.add("NUM_DOGOVOR");  // Это номер договора в нашей БД
-        PAYMENT_PARAMS.add("SRV_CODE");     // Здесь содержится
+        PAYMENT_PARAMS.add("SystemIdentifier");     // Идентификатор платежа в РНИП (уникаклен)
+        PAYMENT_PARAMS.add("Amount");               //  Сумма платежа
+        PAYMENT_PARAMS.add("PaymentDate");          // Дата платежа
+        PAYMENT_PARAMS.add("NUM_DOGOVOR");          // Это номер договора в нашей БД
+        PAYMENT_PARAMS.add("SRV_CODE");             // Здесь содержится
+        PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
 
     public static boolean isOn() {
@@ -336,7 +338,7 @@ public class LoadPaymentsService {
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
-        Array.writeFile("D:/2/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
+        //Array.writeFile("D:/2/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
 
         /*** а) Проверка подписи (локально) ***/
         // Получение блока, содержащего сертификат.
@@ -494,18 +496,30 @@ public class LoadPaymentsService {
         for (Map<String, String> p : payments) {
             String paymentID = "";
             try {
-                paymentID            = p.get("SystemIdentifier").trim();//SupplierBillID
-                String paymentDate   = p.get("PaymentDate").trim();
-                String contragentKey = p.get("SRV_CODE").substring(5, 10).trim();
+                paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
+                String paymentDate    = p.get("PaymentDate").trim();
+                String contragentKey  = p.get("SRV_CODE").substring(5, 10).trim();
+                String bic            = p.get("BIK");
                 long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
                 if (idOfContragent == 0) {
                     continue;
                 }
-                long idOfClient = DAOUtils.findClientByContractId(session, Long.parseLong(p.get("NUM_DOGOVOR")))
-                        .getIdOfClient();
+                Client client = DAOUtils.findClientByContractId(session, Long.parseLong(p.get("NUM_DOGOVOR")));
+                if (client == null) {
+                    throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
+                }
+                Long idOfPaymentContragent = null;
+                Contragent payContragent = DAOService.getInstance().getContragentByBIC(bic);
+                if (payContragent != null) {
+                    idOfPaymentContragent = payContragent.getIdOfContragent();
+                }
+                else {
+                    logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
+                    //idOfContragent = DAOService.getInstance().getRNIPContragent().getIdOfContragent();
+                }
                 long amt = Long.parseLong(p.get("Amount"));
                 OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
-                        OnlinePaymentProcessor.PayRequest.V_0, false, idOfContragent, null,
+                        OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
                         ClientPayment.ATM_PAYMENT_METHOD,
                         Long.parseLong(p.get("NUM_DOGOVOR")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
                                                                 поэтому используется Long.parseLong(p.get("NUM_DOGOVOR")) */
@@ -525,7 +539,7 @@ public class LoadPaymentsService {
     public long getContragentByRNIPCode(String contragentKey, List<Contragent> contragents) {
         for (Contragent c : contragents) {
             String cc = getRNIPIdFromRemarks (c.getRemarks());
-            if (cc.equals(contragentKey)) {
+            if (cc != null && cc.equals(contragentKey)) {
                 return c.getIdOfContragent();
             }
         }
@@ -540,12 +554,13 @@ public class LoadPaymentsService {
 
         String content = new String(data);
         if (content.indexOf("%START_DATE%") > 1) {
-            //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(getLastUpdateDate());                       !!!!!!!!!!!!!!! ЗАМЕНИИТЬ !!!!!!!!!!!
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 86400000));
+            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(getLastUpdateDate());
+            //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 986400000));
             content = content.replaceAll("%START_DATE%", str.trim());
         }
         if (content.indexOf("%END_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() + 86400000)); //!!!!!!!!!!! УБРАТЬ ПРИБАВЛЕНИЕ
+            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis()));
+            //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() + 986400000));
             content = content.replaceAll("%END_DATE%", str.trim());
         }
         if (content.indexOf("%CONTRAGENT_ID%") > 1) {
@@ -649,5 +664,11 @@ public class LoadPaymentsService {
             return null;
         }
         return RNIPIdOfContragent;
+    }
+
+
+    public static final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
+        Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+        return getRNIPIdFromRemarks (contragent.getRemarks());
     }
 }

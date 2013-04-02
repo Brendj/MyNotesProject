@@ -806,4 +806,23 @@ public class DAOService {
             return reportInfoList.get(0);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public Contragent getContragentByBIC(String bic) {
+        TypedQuery<Contragent> query = em.createQuery("from Contragent where bic=:bic and classId=:classId", Contragent.class);
+        query.setParameter("bic", bic);
+        query.setParameter("classId", Contragent.PAY_AGENT);
+        List<Contragent> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+
+    public Contragent getRNIPContragent () {
+        return null;
+    }
 }

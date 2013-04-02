@@ -348,7 +348,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     try {
         RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
     } catch (IllegalStateException ise) {
-        throw ise;
+        //throw ise;
     } catch (Exception e) {
         //logger.error(e);
     }

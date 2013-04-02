@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
@@ -1861,47 +1862,25 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            //contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
-            contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent);
+            String prevRNIPId = LoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to update contragent", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных контрагента", null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        return null;
-    }
-
-    public Object updateContragentRNIP () {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent);
-            selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно. Каталог РНИП успешно обновлен", null));
+            String newRNIPId = LoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
+            if (newRNIPId != null) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП", null));
+            }
         } catch (IllegalStateException ise) {
             logger.error("Failed to update contragent catalog in RNIP", ise);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
         } catch (Exception e) {
-            logger.error("Failed to update contragent catalog in RNIP", e);
+            logger.error("Failed to update contragent", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных контрагента", null));
         } finally {

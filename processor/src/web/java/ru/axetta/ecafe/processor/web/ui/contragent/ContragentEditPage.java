@@ -368,12 +368,10 @@ public class ContragentEditPage extends BasicWorkspacePage {
     }
 
 
-    public void updateContragentRNIP (Session session, Long idOfContragent) throws Exception {
+    public void updateContragentRNIP (Session session, Long idOfContragent, String prevId) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
         // Получаем id в РНИП, который был там до изменения (если он изменится или отсутствует,
         // то необходимо пересоздаваить каталог в самом РНИП)
-        String preId = LoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
-        updateContragent(session, idOfContragent);
         String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (isEmpty (id)) {
             return;
@@ -406,7 +404,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
 
 
         try {
-            if (isEmpty(preId) || !preId.equals(id)) {
+            if (isEmpty(prevId) || !prevId.equals(id)) {
                 RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
             }
             else {
