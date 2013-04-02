@@ -111,6 +111,36 @@ public class BIDataExportService {
 
         TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
                 .setSpecificExporter("cartTypesExporter"));
+
+
+        TYPES.add(new BIDataExportType("clientscount",
+                "select cf_clients.idoforg, 1 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
+                + "from cf_clients "
+                + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
+                + "where cf_clients.idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " AND cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " "//--Сотрудники
+                + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
+
+                + "union all "
+
+                + "select cf_clients.idoforg, 2 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
+                + "from cf_clients "
+                + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
+                + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " " //--Ученики
+                + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
+                + "order by idoforg, 2",
+                new String[]{
+                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));
+
+
+        TYPES.add(new BIDataExportType("clientsdiscountcategories",
+                "select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
+                + "       array_to_string(array(select cf_clients_categorydiscounts.idofcategorydiscount "
+                + "                             from cf_clients_categorydiscounts "
+                + "                             where cf_clients_categorydiscounts.idofclient = cf_clients.idofclient), ',') as idofcategorydiscount "
+                + "from cf_clients "
+                + "order by cf_clients.idoforg, cf_clients.idofclient",
+                new String[]{
+                        "idofclient", "idoforg", "condition_date", "build_date", "categories"}));
     }
 
 
@@ -218,7 +248,7 @@ public class BIDataExportService {
             BufferedWriter output = null;
 
 
-            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(type.getSQL(), last, now));
+            org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(type.getSQL(), last, now, last));
             List resultList = q.list();
             StringBuilder builder = new StringBuilder();
             boolean fileCreated = false;
@@ -329,17 +359,21 @@ public class BIDataExportService {
     public String applyMacroReplace(String sql) {
         Calendar min = getStartDate();
         Calendar max = getToday();
-        return applyMacroReplace(sql, min, max);
+        return applyMacroReplace(sql, min, max, min);
     }
 
 
-    public static String applyMacroReplace(String sql, Calendar min, Calendar max) {
+    public static String applyMacroReplace(String sql, Calendar min, Calendar max, Calendar report) {
         if (sql.indexOf("%MINIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MINIMUM_DATE%", DB_DATE_FORMAT.format(min.getTime()));
         }
         if (sql.indexOf("%MAXIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MAXIMUM_DATE%", DB_DATE_FORMAT.format(max.getTime()));
         }
+        if (sql.indexOf("%REPORT_DATE%") > -1) {
+            sql = sql.replaceAll("%REPORT_DATE%", DB_DATE_FORMAT.format(report.getTime()));
+        }
+
         return sql;
     }
 
