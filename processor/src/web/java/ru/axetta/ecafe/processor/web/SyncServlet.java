@@ -68,14 +68,13 @@ public class SyncServlet extends HttpServlet {
                 //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to parse request: "+e.getMessage());
                 return;
             }
 
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             long idOfOrg;
             String idOfSync;
-            /*int syncType;*/
             SyncType syncType;
             Node envelopeNode;
             NamedNodeMap namedNodeMap;
@@ -87,12 +86,11 @@ public class SyncServlet extends HttpServlet {
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
             } catch (Exception e) {
                 logger.error("Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]");
                 return;
             }
             logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg+""));
 
-            //boolean bLogPackets = (syncType==SyncRequest.TYPE_FULL);
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
@@ -117,12 +115,12 @@ public class SyncServlet extends HttpServlet {
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg));
                 return;
             }
 
@@ -133,7 +131,7 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync, request.getRemoteAddr());
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to parse XML request: " + e.getMessage());
                 return;
             }
 
@@ -145,7 +143,7 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = null;
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to serialize response: " + e.getMessage());
                 return;
             }
 
@@ -157,7 +155,7 @@ public class SyncServlet extends HttpServlet {
                 DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to serialize response", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to serialize response: "+e.getMessage());
                 return;
             }
 
@@ -178,16 +176,6 @@ public class SyncServlet extends HttpServlet {
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
         }
-    }
-    
-    private static RequestData readRequestFromFile() throws Exception {
-        RequestData requestData = new RequestData();
-        FileInputStream fileInputStream = new FileInputStream("D:/Projects/request.xml");
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        requestData.document = documentBuilder.parse(fileInputStream);
-        return requestData;
     }
 
     private static RequestData readRequest(HttpServletRequest httpRequest) throws Exception {
