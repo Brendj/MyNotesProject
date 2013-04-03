@@ -646,9 +646,9 @@ public class LoadPaymentsService {
 
     public static final String getRNIPComissionFromRemarks (String remark) {
         String comission = null;
-        if (remark.indexOf("{RNIP_Comission=") > -1) {
-            comission = remark.substring(remark.indexOf("{RNIP_Comission=") + "{RNIP_Comission=".length(),
-                    remark.indexOf("}", remark.indexOf("{RNIP_Comission=") + "{RNIP_Comission=".length()));
+        if (remark.indexOf("{RNIP_Commission=") > -1) {
+            comission = remark.substring(remark.indexOf("{RNIP_Commission=") + "{RNIP_Commission=".length(),
+                    remark.indexOf("}", remark.indexOf("{RNIP_Commission=") + "{RNIP_Commission=".length()));
         }
         if (comission == null || comission.length() < 1) {
             return null;
