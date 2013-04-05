@@ -1001,23 +1001,32 @@ public class DAOUtils {
     }
 
     public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
+        //List<Long> resultList = new ArrayList<Long>();
+        //Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
+        //query.setParameter("idOfOrg",idOfOrg);
+        //List list = query.list();
+        //if(!(list==null || list.isEmpty())){
+        //    for (Object object: list){
+        //        resultList.add((Long) object);
+        //    }
+        //}
+        //query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
+        //query.setParameter("idOfOrg",idOfOrg);
+        //list = query.list();
+        //if(!(list==null || list.isEmpty())){
+        //    for (Object object: list){
+        //        resultList.add((Long) object);
+        //    }
+        //}
         List<Long> resultList = new ArrayList<Long>();
         Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
-        List list = query.list();
-        if(!(list==null || list.isEmpty())){
-            for (Object object: list){
-                resultList.add((Long) object);
-            }
-        }
+        List<Long> list = (List<Long>)query.list();
+        resultList.addAll(list);
         query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
-        list = query.list();
-        if(!(list==null || list.isEmpty())){
-            for (Object object: list){
-                resultList.add((Long) object);
-            }
-        }
+        list = (List<Long>)query.list();
+        resultList.addAll(list);
         return resultList;
     }
 

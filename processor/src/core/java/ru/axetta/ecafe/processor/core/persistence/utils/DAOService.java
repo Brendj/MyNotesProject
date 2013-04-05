@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,13 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    @Transactional
+    public List<ECafeSettings> geteCafeSettingses(Long idOfOrg) {
+        TypedQuery<ECafeSettings> query = em.createQuery("from ECafeSettings where orgOwner=:idOfOrg order by id", ECafeSettings.class);
+        query.setParameter("idOfOrg",idOfOrg);
+        return query.getResultList();
     }
 
     @Transactional
@@ -142,6 +150,13 @@ public class DAOService {
          GoodGroup group = em.merge(goodGroup);
          em.remove(group);
     }
+
+    @Transactional
+    public void removeSetting(ECafeSettings eCafeSettings){
+        ECafeSettings settings = em.merge(eCafeSettings);
+        em.remove(settings);
+    }
+
 
     @Transactional
     public void removeGood(Good good){
