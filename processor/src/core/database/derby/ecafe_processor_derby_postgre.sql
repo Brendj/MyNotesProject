@@ -36,6 +36,8 @@ CREATE TABLE CF_Contragents (
   PublicKey               VARCHAR(1024)     NOT NULL,
   PublicKeyGOSTAlias varchar(64), --v22
   NeedAccountTranslate    INTEGER           NOT NULL,
+  KPP VARCHAR(10) NOT NULL DEFAULT '',  --v39
+  OGRN VARCHAR(15) NOT NULL DEFAULT '', --v39
   CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
   CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
   CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)
@@ -203,7 +205,7 @@ CREATE TABLE CF_Transactions (
   IdOfClient              BIGINT            NOT NULL,
   IdOfCard                BIGINT,
   TransactionSum          BIGINT            NOT NULL,
-  Source                  VARCHAR(30)       NOT NULL,
+  Source                  VARCHAR(50)       NOT NULL,
   SourceType              INTEGER           NOT NULL,
   TransactionDate         BIGINT            NOT NULL,
   BalanceBefore           BIGINT,
@@ -995,7 +997,9 @@ CREATE TABLE CF_Clients_CategoryDiscounts
   CONSTRAINT cf_clienscategorydiscount_categorydiscount FOREIGN KEY (idofcategorydiscount)
   REFERENCES CF_CategoryDiscounts (idofcategorydiscount),
   CONSTRAINT cf_clienscategorydiscount_client FOREIGN KEY (idofclient)
-  REFERENCES CF_Clients (idofclient)
+  REFERENCES CF_Clients (idofclient),
+  CONSTRAINT cf_clients_fk_orgclientsgroup FOREIGN KEY (idoforg, idofclientgroup)
+  REFERENCES CF_CLIENTGROUPS (idoforg, idofclientgroup)
 );
 
 --v20
@@ -2156,7 +2160,7 @@ CREATE TABLE CF_ProjectState_Data
   StringKey character varying(128),
   StringValue character varying(128),
   GenerationDate bigint NOT NULL,
-  Region char(128) default 'Все',
+  Region char(128) default 'Все округа',
   Comments char(255) default '',
   CONSTRAINT CF_ProjectState_Data_PK PRIMARY KEY (Period, Type, Region, StringKey)
 );
@@ -2187,6 +2191,7 @@ CREATE TABLE CF_QA_Questionaries
   Type integer DEFAULT 0,
   CreatedDate bigint NOT NULL,
   UpdatedDate bigint,
+  ViewDate bigint,
   CONSTRAINT CF_QA_Questionaries_pk PRIMARY KEY (IdOfQuestionary )
 );
 
@@ -2229,19 +2234,19 @@ CREATE TABLE CF_QA_ClientAnswerByQuestionary
 );
 
 -- Таблица промежуточных результатов ответа по организациям
-CREATE TABLE CF_QA_QuestionaryResultByOrg
-(
-  IdOfQuestionaryResultByOrg bigserial NOT NULL,
-  IdOfOrg bigint NOT NULL,
-  IdOfQuestionary bigint NOT NULL,
-  IdOfAnswer bigint NOT NULL,
-  Count bigint NOT NULL DEFAULT 0,
-  UpdatedDate bigint,
-  CONSTRAINT CF_QA_QuestionaryResultByOrg_pk PRIMARY KEY (IdOfQuestionaryResultByOrg ),
-  CONSTRAINT CF_QA_QuestionaryResultByOrg_Answer FOREIGN KEY (IdOfAnswer) REFERENCES CF_QA_Answers (IdOfAnswer),
-  CONSTRAINT CF_QA_QuestionaryResultByOrg_Org FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
-  CONSTRAINT CF_QA_QuestionaryResultByOrg_Questionary FOREIGN KEY (IdOfQuestionary) REFERENCES CF_QA_Questionaries (IdOfQuestionary)
-);
+-- CREATE TABLE CF_ClientSms
+-- (
+--   IdOfQuestionaryResultByOrg bigserial NOT NULL,
+--   IdOfOrg bigint NOT NULL,
+--   IdOfQuestionary bigint NOT NULL,
+--   IdOfAnswer bigint NOT NULL,
+--   Count bigint NOT NULL DEFAULT 0,
+--   UpdatedDate bigint,
+--   CONSTRAINT CF_QA_QuestionaryResultByOrg_pk PRIMARY KEY (IdOfQuestionaryResultByOrg ),
+--   CONSTRAINT CF_QA_QuestionaryResultByOrg_Answer FOREIGN KEY (IdOfAnswer) REFERENCES CF_QA_Answers (IdOfAnswer),
+--   CONSTRAINT CF_QA_QuestionaryResultByOrg_Org FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
+--   CONSTRAINT CF_QA_QuestionaryResultByOrg_Questionary FOREIGN KEY (IdOfQuestionary) REFERENCES CF_QA_Questionaries (IdOfQuestionary)
+-- );
 
 -- Таблица жалоб на товары из совершенных заказов
 CREATE TABLE CF_Goods_ComplaintBook
@@ -2401,9 +2406,20 @@ CREATE TABLE Cf_Good_Basic_Basket_Price
   CONSTRAINT Cf_Good_Basic_Basket_Price_BasicGoodNumber_Key UNIQUE      (Guid)
 );
 
+CREATE TABLE CF_ClientsNotificationSettings
+(
+  IdOfSetting   bigserial                      NOT NULL,
+  IdOfClient    bigint                         NOT NULL,
+  NotifyType    bigint                         NOT NULL,
+  CreatedDate   bigint                         NOT NULL,
+
+  CONSTRAINT CF_ClientsSMSSetting_PK           PRIMARY KEY (IdOfSetting),
+  CONSTRAINT CF_ClientsSMSSetting_NotifyPair   UNIQUE      (IdOfClient, NotifyType)
+);
+
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-VALUES(2, 2, 33, 130212, 0, '');
+VALUES(2, 2, 39, 130403, 0, '');
 
 
