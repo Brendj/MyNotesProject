@@ -2704,7 +2704,8 @@ public class Processor implements SyncProcessor,
             }
         }
 
-        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
+        //String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
+        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
         return new String[] {
                 "date", date,
                 "contractId", "" + client.getContractId(),

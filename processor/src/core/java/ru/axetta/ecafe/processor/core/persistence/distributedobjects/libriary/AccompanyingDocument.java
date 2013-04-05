@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -77,6 +78,7 @@ public class AccompanyingDocument extends DistributedObject {
 
         guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 36);
         guidSource = getStringAttributeValue(node, "GuidSource", 36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

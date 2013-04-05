@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -26,6 +27,77 @@ import java.util.Set;
  */
 public class Good extends DistributedObject {
 
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException {
+        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
+        if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
+        setGoodGroup(gg);
+        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
+        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
+        if(p == null && tm == null) throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
+        if(p != null) setProduct(p);
+        if(tm != null) setTechnologicalMap(tm);
+
+        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
+        //distributedObjectException.setData(guidOfBasicGood);
+        GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
+        if (basicGood != null) {
+            setBasicGood(basicGood);
+        }
+    }
+
+    @Override
+    protected void appendAttributes(Element element) {
+        setAttribute(element, "OrgOwner", orgOwner);
+        setAttribute(element,"Name", nameOfGood);
+        setAttribute(element, "FullName", fullName);
+        setAttribute(element,"GoodsCode", goodsCode);
+        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"NetWeight", netWeight);
+        setAttribute(element,"LifeTime", lifeTime);
+        setAttribute(element,"Margin", margin);
+        setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
+        if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
+        if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
+        if(basicGood != null) setAttribute(element, "GuidOfBasicGood", basicGood.getGuid());
+        setSendAll(SendToAssociatedOrgs.SendToAll);
+    }
+    @Override
+    protected Good parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        String stringNameOfGood = getStringAttributeValue(node,"Name",512);
+        if(stringNameOfGood!=null) setNameOfGood(stringNameOfGood);
+        String stringFullName = getStringAttributeValue(node,"FullName",1024);
+        if(stringFullName!=null) setFullName(stringFullName);
+        String stringGoodsCode = getStringAttributeValue(node,"GoodsCode",32);
+        if(stringGoodsCode!=null) setGoodsCode(stringGoodsCode);
+        Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
+        if(integerUnitsScale!=null) setUnitsScale(integerUnitsScale);
+        Long longNetWeight = getLongAttributeValue(node, "NetWeight");
+        if( longNetWeight != null) setNetWeight(longNetWeight);
+        Long longLifeTime = getLongAttributeValue(node, "LifeTime");
+        if(longLifeTime != null) setLifeTime(longLifeTime);
+        Long longMargin = getLongAttributeValue(node, "Margin");
+        if(longMargin != null) setMargin(longMargin);
+        guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
+        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
+        guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
+        guidOfBasicGood = getStringAttributeValue(node, "GuidOfBasicGood", 36);
+        return this;
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Good) distributedObject).getOrgOwner());
+        setNameOfGood(((Good) distributedObject).getNameOfGood());
+        setFullName(((Good) distributedObject).getFullName());
+        setGoodsCode(((Good) distributedObject).getGoodsCode());
+        setUnitsScale(((Good) distributedObject).getUnitsScale());
+        setNetWeight(((Good) distributedObject).getNetWeight());
+        setLifeTime(((Good) distributedObject).getLifeTime());
+        setMargin(((Good) distributedObject).getMargin());
+    }
     public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
     private Set<TradeMaterialGood> tradeMaterialGoodInternal;
     private Set<ProhibitionExclusion> prohibitionExclusionInternal;
@@ -36,6 +108,7 @@ public class Good extends DistributedObject {
     private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
     private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
     private Set<GoodRequestPosition> goodRequestPositionInternal;
+
     private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
     public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
@@ -119,77 +192,6 @@ public class Good extends DistributedObject {
 
     public void setTradeMaterialGoodInternal(Set<TradeMaterialGood> tradeMaterialGoodInternal) {
         this.tradeMaterialGoodInternal = tradeMaterialGoodInternal;
-    }
-
-    @Override
-    public void preProcess(Session session) throws DistributedObjectException {
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
-        if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
-        setGoodGroup(gg);
-        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
-        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
-        if(p == null && tm == null) throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
-        if(p != null) setProduct(p);
-        if(tm != null) setTechnologicalMap(tm);
-
-        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        //distributedObjectException.setData(guidOfBasicGood);
-        GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
-        if (basicGood != null) {
-            setBasicGood(basicGood);
-        }
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Name", nameOfGood);
-        setAttribute(element,"FullName", fullName);
-        setAttribute(element,"GoodsCode", goodsCode);
-        setAttribute(element,"UnitsScale", unitsScale);
-        setAttribute(element,"NetWeight", netWeight);
-        setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"Margin", margin);
-        setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
-        if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
-        if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
-        if(basicGood != null) setAttribute(element, "GuidOfBasicGood", basicGood.getGuid());
-    }
-    @Override
-    protected Good parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGood = getStringAttributeValue(node,"Name",512);
-        if(stringNameOfGood!=null) setNameOfGood(stringNameOfGood);
-        String stringFullName = getStringAttributeValue(node,"FullName",1024);
-        if(stringFullName!=null) setFullName(stringFullName);
-        String stringGoodsCode = getStringAttributeValue(node,"GoodsCode",32);
-        if(stringGoodsCode!=null) setGoodsCode(stringGoodsCode);
-        Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(integerUnitsScale);
-        Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if( longNetWeight != null) setNetWeight(longNetWeight);
-        Long longLifeTime = getLongAttributeValue(node, "LifeTime");
-        if(longLifeTime != null) setLifeTime(longLifeTime);
-        Long longMargin = getLongAttributeValue(node, "Margin");
-        if(longMargin != null) setMargin(longMargin);
-        guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
-        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
-        guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
-        guidOfBasicGood = getStringAttributeValue(node, "GuidOfBasicGood", 36);
-        return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Good) distributedObject).getOrgOwner());
-        setNameOfGood(((Good) distributedObject).getNameOfGood());
-        setFullName(((Good) distributedObject).getFullName());
-        setGoodsCode(((Good) distributedObject).getGoodsCode());
-        setUnitsScale(((Good) distributedObject).getUnitsScale());
-        setNetWeight(((Good) distributedObject).getNetWeight());
-        setLifeTime(((Good) distributedObject).getLifeTime());
-        setMargin(((Good) distributedObject).getMargin());
     }
 
     private String nameOfGood;

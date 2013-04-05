@@ -40,7 +40,7 @@
             <f:facet name="header">
                 <h:outputText value="Идентификатор притнера"/>
             </f:facet>
-            <h:outputText value="#{setting.identificator}"/>
+            <rich:inputNumberSpinner value="#{setting.identificator}"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">
@@ -56,7 +56,7 @@
                 <h:outputText value="Параметры принтера (формат чека)"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{setting.settingValue}"
-                               id="inplaceSettingValue" required="true"
+                               id="inplaceSettingValue"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
                                selectOnEdit="true" editEvent="ondblclick">
@@ -76,16 +76,25 @@
             </rich:inplaceInput>
         </rich:column>
         <rich:column>
-            <a4j:commandButton action="#{cafeSettingsEditListPage.save}" value="Сохранить" >
+            <a4j:commandButton action="#{cafeSettingsEditListPage.save}" value="Сохранить">
                 <f:param name="id" value="#{setting.globalId}"/>
             </a4j:commandButton>
         </rich:column>
+        <rich:column>
+            <a4j:commandLink action="#{cafeSettingsEditListPage.remove}" ajaxSingle="true" reRender="ecafeSettingsEditListPage">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:param name="id" value="#{setting.globalId}"/>
+            </a4j:commandLink>
+        </rich:column>
     </rich:dataTable>
 
-    <a4j:commandButton value="Востановить" action="#{cafeSettingsEditListPage.updateList}" reRender="ecafeSettingsEditListTable"/>
+    <h:panelGrid columns="2">
+        <a4j:commandButton value="Востановить" action="#{cafeSettingsEditListPage.updateList}" reRender="ecafeSettingsEditListTable"/>
+        <a4j:commandButton value="Добавить" action="#{cafeSettingsEditListPage.addSetting}" reRender="ecafeSettingsEditListTable"/>
+    </h:panelGrid>
 
 </h:panelGrid>
-<a4j:status id="sOrgCreateStatus">
+<a4j:status id="sSettingsEditListStatus">
     <f:facet name="start">
         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
     </f:facet>

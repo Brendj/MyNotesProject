@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -61,6 +62,7 @@ public class GoodBasicBasketPrice extends DistributedObject {
         if(longPrice != null) setPrice(longPrice);
         guidOfGood = getStringAttributeValue(node,"GuidOfGood",36);
         guidOfGoodsBasicBasket = getStringAttributeValue(node,"GuidOfBasicGood",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

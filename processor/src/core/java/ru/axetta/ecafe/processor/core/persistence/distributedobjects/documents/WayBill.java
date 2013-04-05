@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -93,6 +94,7 @@ public class WayBill extends DistributedObject {
         if(stringReceiver != null) setReceiver(stringReceiver);
         guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
         guidOfAWD = getStringAttributeValue(node,"GuidOfActOfDifference",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

@@ -18,7 +18,9 @@ import javax.faces.model.ListDataModel;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +39,7 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
     private DAOService daoService;
     private Long idOfOrg;
     private DataModel cafeSettingsList;
+    private List<ECafeSettings> list;
 
     @Override
     public void onShow() throws Exception {
@@ -48,11 +51,8 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
         return "org/ecafesettings";
     }
 
-    @Transactional
-    protected void reload(){
-        TypedQuery<ECafeSettings> query = entityManager.createQuery("from ECafeSettings where orgOwner=:idOfOrg order by identificator, deletedState", ECafeSettings.class);
-        query.setParameter("idOfOrg",idOfOrg);
-        List<ECafeSettings> list = query.getResultList();
+    private void reload(){
+        list = daoService.geteCafeSettingses(idOfOrg);
         this.cafeSettingsList = new ListDataModel(list);
     }
 
@@ -61,9 +61,44 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
         return null;
     }
 
+    public Object addSetting() {
+        ECafeSettings settings = new ECafeSettings();
+        settings.setOrgOwner(idOfOrg);
+        settings.setGuid(UUID.randomUUID().toString());
+        settings.setIdentificator(1L);
+        settings.setDeletedState(true);
+        list.add(settings);
+        return null;
+    }
+
+    public Object remove(){
+        ECafeSettings currentSetting = getEntityFromRequestParam();
+        if(!currentSetting.getDeletedState()){
+            printError("Настройки нельзя удалить.");
+            return null;
+        }
+        daoService.removeSetting(currentSetting);
+        printMessage("Натройка удалена успешно");
+        return null;
+    }
+
     public Object save(){
         ECafeSettings currentSetting = getEntityFromRequestParam();
+        if(currentSetting.getSettingValue()==null || currentSetting.getSettingValue().isEmpty()){
+            printError("Введите настройки Параметры принтера (формат чека) в параметр с GUID:"+currentSetting.getGuid());
+        }
         ECafeSettings cafeSettings = daoService.findDistributedObjectByRefGUID(ECafeSettings.class, currentSetting.getGuid());
+        if(cafeSettings == null){
+            cafeSettings = currentSetting;
+            cafeSettings.setGlobalVersion(daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName()));
+            cafeSettings.setCreatedDate(new Date());
+            try {
+                daoService.persistEntity(cafeSettings);
+            } catch (Exception e) {
+                getLogger().error("Error persist ECafeSettings: ",e);
+                printError("Ошибка при сохранении Настройки."+e.getMessage());
+            }
+        }
         cafeSettings.fill(currentSetting);
         cafeSettings.setDeletedState(currentSetting.getDeletedState());
         cafeSettings.setGlobalVersion(daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName()));

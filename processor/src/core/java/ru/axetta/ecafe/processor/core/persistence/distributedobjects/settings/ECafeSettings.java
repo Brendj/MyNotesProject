@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
@@ -41,6 +42,7 @@ public class ECafeSettings extends DistributedObject{
         if(longId!=null) setIdentificator(longId);
         String stringSettingText = getStringAttributeValue(node, "Text", 128);
         if(stringSettingText!=null) setSettingText(stringSettingText);
+        setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
 

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -70,6 +71,7 @@ public class ActOfWayBillDifference extends DistributedObject {
         String stringNumber = getStringAttributeValue(node, "Number",128);
         if(stringNumber != null) setNumber(stringNumber);
         guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

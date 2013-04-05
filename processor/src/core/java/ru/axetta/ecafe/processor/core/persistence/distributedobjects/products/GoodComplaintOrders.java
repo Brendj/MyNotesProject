@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfOrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -63,6 +64,7 @@ public class GoodComplaintOrders extends DistributedObject {
         guidOfComplaintIteration = getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
         idOfOrderDetail = getLongAttributeValue(node, "IdOfOrg");
         idOfOrderDetail = getLongAttributeValue(node, "IdOfOrderDetail");
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -61,10 +62,10 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         if (integerNumberGroupReplace != null) {
             setNumberGroupReplace(integerNumberGroupReplace);
         }
-
-
         guidOfP = getStringAttributeValue(node, "GuidOfP", 36);
         guidOfTM = getStringAttributeValue(node, "GuidOfTM", 36);
+
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

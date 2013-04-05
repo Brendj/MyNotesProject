@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange;
 
 import org.w3c.dom.Element;
@@ -56,6 +57,8 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
 
         String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
         if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
+
+        setSendAll(SendToAssociatedOrgs.SendToAll);
 
         return this;
     }

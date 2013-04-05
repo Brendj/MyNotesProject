@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.*;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +112,6 @@ public class Manager {
                                 distributedObject.setDistributedObjectException(e);
                                 logger.error(distributedObject.toString(), e);
                             } catch (Exception e){
-                                //distributedObject.setErrorType(DistributedObjectException.ErrorType.UNKNOWN_ERROR);
                                 distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
                                 logger.error(distributedObject.toString(), e);
                             }
@@ -135,9 +136,6 @@ public class Manager {
 
     }
 
-    //public Boolean isEmpty(){
-    //    return distributedObjectsListMap.isEmpty();
-    //}
     public Element toElement(Document document) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("RO section begin generate XML node");
@@ -400,35 +398,88 @@ public class Manager {
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
+            /* TODO: новый функционал  */
+            Criteria criteria = persistenceSession.createCriteria(clazz);
             List classList = Arrays.asList(clazz.getInterfaces());
-            String where = "";
+
+            Criterion sendToAnyAllRestriction = Restrictions.conjunction();
+            sendToAnyAllRestriction = ((Conjunction)sendToAnyAllRestriction)
+                    .add(Restrictions.isNull("orgOwner"))
+                    .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
+
+            Criterion sendToAllRestriction = Restrictions.conjunction();
+            Set<Long>  allOrg = new TreeSet<Long>();
+            allOrg.addAll(menuExchangeRuleList);
+            allOrg.addAll(DAOUtils.getListIdOfOrgList(persistenceSession, menuExchangeRuleList.get(0)));
+            sendToAllRestriction = ((Conjunction)sendToAllRestriction)
+                    .add(Restrictions.in("orgOwner",allOrg))
+                    .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
+
+            Criterion sendToMainRestriction = Restrictions.conjunction();
+            sendToMainRestriction = ((Conjunction)sendToMainRestriction)
+                    .add(Restrictions.in("orgOwner",menuExchangeRuleList))
+                    .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToMain));
+
+            Criterion sendToSelfRestriction = Restrictions.conjunction();
+            sendToSelfRestriction = ((Conjunction)sendToSelfRestriction)
+                    .add(Restrictions.eq("orgOwner",idOfOrg))
+                    .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToSelf));
+
+            /* собираем все условия в дизюнкцию */
+            Criterion sendToAndOrgRestriction = Restrictions.disjunction()
+                    .add(sendToAnyAllRestriction)
+                    .add(sendToAllRestriction)
+                    .add(sendToMainRestriction)
+                    .add(sendToSelfRestriction);
+
+            Criterion resultCriterion =  Restrictions.conjunction().add(sendToAndOrgRestriction);
+
+            Criterion restrictionConfigProvider = null;
             if(classList.contains(IConfigProvider.class)){
-                //ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
-                if ( configurationProvider!=null){
-                    where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
-                } else {
-                    where = " idOfConfigurationProvider = null";
-                }
+                restrictionConfigProvider = Restrictions.eq("idOfConfigurationProvider",configurationProvider.getIdOfConfigurationProvider());
+                ((Conjunction)resultCriterion).add(restrictionConfigProvider);
             }
-            // вытянем номер организации поставщика если есть.
-            String whereOrgSource = "";
-            if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
-                whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
-            } else{
-                whereOrgSource = " orgOwner = "+idOfOrg;
-            }
-            where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
-            String sendOnlyOrgWhere = " (sendAll = 3 and orgOwner = "+idOfOrg+" ";
+
+            Criterion restrictionCurrentMaxVersion = null;
             if(currentMaxVersion != null){
-                where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
-                sendOnlyOrgWhere = sendOnlyOrgWhere + " and globalVersion>"+currentMaxVersion;
+                restrictionCurrentMaxVersion = Restrictions.gt("globalVersion",currentMaxVersion);
+                ((Conjunction)resultCriterion).add(restrictionCurrentMaxVersion);
                 // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
             }
-            sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
-            String sendAllWhere = " (sendAll is null or sendAll="+SendToAssociatedOrgs.Send.getSendMode()+") ";
-            String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where ("+ sendAllWhere + " and " + where)+") or "+sendOnlyOrgWhere;
-            Query query = persistenceSession.createQuery(select);
-            List list = query.list();
+
+            criteria.add(resultCriterion);
+            /* TODO: новый функционал  */
+            List list = criteria.list();
+            //String where = "";
+            //if(classList.contains(IConfigProvider.class)){
+            //    //ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
+            //    if ( configurationProvider!=null){
+            //        where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
+            //    } else {
+            //        where = " idOfConfigurationProvider = null";
+            //    }
+            //}
+            //
+            //// вытянем номер организации поставщика если есть.
+            //String whereOrgSource = "";
+            //if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
+            //    whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
+            //} else{
+            //    whereOrgSource = " orgOwner = "+idOfOrg;
+            //}
+            //where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
+            //String sendOnlyOrgWhere = " (sendAll = 3 and orgOwner = "+idOfOrg+" ";
+            //if(currentMaxVersion != null){
+            //    where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
+            //    sendOnlyOrgWhere = sendOnlyOrgWhere + " and globalVersion>"+currentMaxVersion;
+            //    // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
+            //}
+            //sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
+            //String sendAllWhere = " (sendAll is null or sendAll="+SendToAssociatedOrgs.Send.getSendMode()+") ";
+            //String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where ("+ sendAllWhere + " and " + where)+") or "+sendOnlyOrgWhere;
+            //Query query = persistenceSession.createQuery(select);
+            //List list = query.list();
             if(!(list==null || list.isEmpty())){
                 for (Object object: list){
                     DistributedObject distributedObject = (DistributedObject) object;
@@ -453,7 +504,7 @@ public class Manager {
     }
 
     private List<DistributedObject> generateConfirmResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz){
-        List<DistributedObject> result = new LinkedList<DistributedObject>();
+        List<DistributedObject> result = new ArrayList<DistributedObject>();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -463,7 +514,7 @@ public class Manager {
             query.setParameter("orgOwner",idOfOrg);
             query.setParameter("distributedObjectClassName",DistributedObjectsEnum.parse(clazz).name());
             List list = query.list();
-            List<String> stringList = new LinkedList<String>();
+            List<String> stringList = new ArrayList<String>();
             if(!(list==null || list.isEmpty())){
                 for (Object object: list){
                     stringList.add((String) object);

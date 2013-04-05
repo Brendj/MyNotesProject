@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -65,6 +66,7 @@ public class GoodRequestPosition extends DistributedObject {
         guidOfGR = getStringAttributeValue(node,"GuidOfGoodsRequest",36);
         guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
     @Override

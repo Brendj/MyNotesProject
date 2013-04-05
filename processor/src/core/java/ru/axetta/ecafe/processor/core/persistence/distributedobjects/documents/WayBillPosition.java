@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -76,6 +77,7 @@ public class WayBillPosition extends DistributedObject {
         if(longNDS != null) setNds(longNDS);
         guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

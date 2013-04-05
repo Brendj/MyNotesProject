@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -67,6 +68,7 @@ public class Circulation extends DistributedObject {
         refundDate = getDateOnlyAttributeValue(node, "RefundDate");
         realRefundDate = getDateTimeAttributeValue(node, "RealRefundDate");
         status = getIntegerAttributeValue(node, "Status");
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

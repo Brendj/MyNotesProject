@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -25,62 +26,6 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class TechnologicalMap extends DistributedObject implements IConfigProvider {
-
-    /*  private String groupName;*/
-    private String nameOfTechnologicalMap;
-
-    private Long numberOfTechnologicalMap;
-
-    //Технология приготовления
-    private String technologyOfPreparation;
-
-    private String timeOfRealization;
-    // Температура приготовления
-    private String tempOfPreparation;
-
-    // В 100 граммах данного блюда содержится:
-    //Пищевые вещества, г
-    private Float proteins;
-
-    private Float carbohydrates;
-    private Float fats;
-
-    //Минеральные вещества, мг
-    private Float microElCa;
-    private Float microElMg;
-    private Float microElP;
-
-    private Float microElFe;
-    //Энергетическая ценность (ккал)
-    private Float energyValue;
-    //Витамины, мг
-    private Float vitaminA;
-    private Float vitaminB1;
-
-    private Float vitaminB2;
-
-    private Float vitaminPp;
-    private Float vitaminC;
-    private Float vitaminE;
-    private TechnologicalMapGroup technologicalMapGroup;
-    private Long idOfConfigurationProvider;
-
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
-    private User userCreate;
-    private User userDelete;
-    private User userEdit;
-
-    private String guidOfTMG;
-    private Integer lifeTime;
-    private Set<Good> goodInternal;
-
-    public Set<Good> getGoodInternal() {
-        return goodInternal;
-    }
-
-    public void setGoodInternal(Set<Good> goodInternal) {
-        this.goodInternal = goodInternal;
-    }
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -241,7 +186,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         }
 
         guidOfTMG = getStringAttributeValue(node, "GuidOfTMG", 36);
-
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
@@ -251,6 +196,62 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         TechnologicalMapGroup tmg = (TechnologicalMapGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
         if(tmg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setTechnologicalMapGroup(tmg);
+    }
+
+    /*  private String groupName;*/
+    private String nameOfTechnologicalMap;
+
+    private Long numberOfTechnologicalMap;
+
+    //Технология приготовления
+    private String technologyOfPreparation;
+    private String timeOfRealization;
+
+    // Температура приготовления
+    private String tempOfPreparation;
+
+    // В 100 граммах данного блюда содержится:
+    //Пищевые вещества, г
+    private Float proteins;
+    private Float carbohydrates;
+
+    private Float fats;
+    //Минеральные вещества, мг
+    private Float microElCa;
+    private Float microElMg;
+
+    private Float microElP;
+    private Float microElFe;
+    //Энергетическая ценность (ккал)
+    private Float energyValue;
+    //Витамины, мг
+    private Float vitaminA;
+
+    private Float vitaminB1;
+
+    private Float vitaminB2;
+    private Float vitaminPp;
+    private Float vitaminC;
+    private Float vitaminE;
+    private TechnologicalMapGroup technologicalMapGroup;
+
+    private Long idOfConfigurationProvider;
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
+    private User userCreate;
+    private User userDelete;
+
+    private User userEdit;
+    private String guidOfTMG;
+    private Integer lifeTime;
+
+    private Set<Good> goodInternal;
+
+    public Set<Good> getGoodInternal() {
+        return goodInternal;
+    }
+
+    public void setGoodInternal(Set<Good> goodInternal) {
+        this.goodInternal = goodInternal;
     }
 
     public List<TechnologicalMapProduct> getTechnologicalMapProduct() {

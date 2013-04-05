@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
@@ -122,6 +123,7 @@ public class Staff extends DistributedObject {
         String stringRights = getStringAttributeValue(node, "Rights", 256);
         if(stringRights != null) setRights(stringRights);
         setHashCode(hashCode());
+        setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
 

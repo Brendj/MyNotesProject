@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
@@ -61,6 +62,7 @@ public class GoodGroup extends DistributedObject {
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringNameOfGoodsGroup = getStringAttributeValue(node,"Name",128);
         if(stringNameOfGoodsGroup!=null) setNameOfGoodsGroup(stringNameOfGoodsGroup);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
     @Override

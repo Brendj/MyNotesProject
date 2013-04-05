@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -82,6 +83,7 @@ public class Prohibition extends DistributedObject {
         guidOfProductGroup = getStringAttributeValue(node,"GuidOfProductGroup",36);
         guidOfGoods = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

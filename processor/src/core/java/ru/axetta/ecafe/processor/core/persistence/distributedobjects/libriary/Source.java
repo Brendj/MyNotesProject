@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
@@ -70,6 +71,8 @@ public class Source extends DistributedObject {
         }
 
         setHashCode(hashCode());
+
+        setSendAll(SendToAssociatedOrgs.SendToAll);
 
         return this;
     }

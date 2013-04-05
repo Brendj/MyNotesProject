@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -54,6 +55,7 @@ public class GoodComplaintBook extends DistributedObject {
         if (longOrgOwner != null) setOrgOwner(longOrgOwner);
         idOfClient = getLongAttributeValue(node, "IdOfClient");
         guidOfGood = getStringAttributeValue(node, "GuidOfGoods", 36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

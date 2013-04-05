@@ -76,8 +76,7 @@ public class Instance extends DistributedObject {
         inGroup = getBollAttributeValue(node, "InGroup");
         invNumber = getStringAttributeValue(node, "InvNumber", 10);
         cost = getIntegerAttributeValue(node, "Cost");
-
-        //setSendAll(SendToAssociatedOrgs.Send);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
