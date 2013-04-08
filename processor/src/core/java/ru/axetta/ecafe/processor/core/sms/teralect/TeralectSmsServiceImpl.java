@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sms.teralect;
 
-import generated.nfp.TransactionListType;
-import generated.nfp.TransactionService;
-import generated.nfp.TransactionServicePortType;
 import generated.ru.teralect.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Option;

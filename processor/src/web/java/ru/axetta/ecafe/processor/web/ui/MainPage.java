@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
@@ -1862,14 +1862,14 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            String prevRNIPId = LoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            String prevRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
-            String newRNIPId = LoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            String newRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
             if (newRNIPId != null) {
                 facesContext.addMessage(null,

@@ -5,13 +5,18 @@
 package ru.axetta.ecafe.processor.core;
 
 
+import generated.opc.ru.msk.schemas.uec.common.v1.AdditionalDataType;
+import generated.opc.ru.msk.schemas.uec.common.v1.ErrorType;
+import generated.opc.ru.msk.schemas.uec.identification.v1.HolderIdDescriptionType;
+import generated.opc.ru.msk.schemas.uec.identification.v1.LegalIdDescriptionType;
+import generated.opc.ru.msk.schemas.uec.identification.v1.OrganizationType;
+import generated.opc.ru.msk.schemas.uec.transaction.v1.*;
+import generated.opc.ru.msk.schemas.uec.transactionservice.v1.*;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import generated.nfp.*;
-import generated.nfp.x3.AdditionalDataType;
-import generated.nfp.x3.ErrorType;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;

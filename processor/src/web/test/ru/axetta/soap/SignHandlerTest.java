@@ -58,7 +58,7 @@ import java.util.*;
 
 public class SignHandlerTest extends TestCase{
 
-    public class LogMessageHandler implements SOAPHandler<SOAPMessageContext> {
+    public static class LogMessageHandler implements SOAPHandler<SOAPMessageContext> {
 
         void signMessage(SOAPMessage message) throws Exception {
             SOAPBody soapBody = message.getSOAPBody();
@@ -75,8 +75,8 @@ public class SignHandlerTest extends TestCase{
             keyStore.load(null, null);
 
             // Получение ключа и сертификата.
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey("test", "test".toCharArray());
-            X509Certificate cert = (X509Certificate) keyStore.getCertificate("test");
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey("dituec", "1234567890".toCharArray());
+            X509Certificate cert = (X509Certificate) keyStore.getCertificate("dituec");
 
             /*** Подготовка документа ***/
             MessageFactory mf = MessageFactory.newInstance();
@@ -111,7 +111,7 @@ public class SignHandlerTest extends TestCase{
             //Element binarySecurityTokenEl = new Element("BinarySecurityToken", null);
             binarySecurityTokenEl.setAttribute("EncodingType", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary");
             binarySecurityTokenEl.setAttribute("ValueType", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
-            binarySecurityTokenEl.setAttribute("wsu:id", "SenderCertificate");
+            binarySecurityTokenEl.setAttribute("wsu:Id", "SenderCertificate");
             //Attr wsuIdAttr = doc.createAttributeNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", "id");
             //wsuIdAttr.setValue("SenderCertificate");
             //binarySecurityTokenEl.setAttributeNode(wsuIdAttr);
@@ -262,11 +262,22 @@ public class SignHandlerTest extends TestCase{
         }
 
         public boolean handleMessage(SOAPMessageContext messageContext) {
-            SOAPMessage message = messageContext.getMessage();
-            try {
-                signMessage(message);
-            } catch (Exception e) {
-                throw new Error(e);
+            boolean outbound = (Boolean) messageContext.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            if (outbound) {
+                SOAPMessage message = messageContext.getMessage();
+                try {
+                    signMessage(message);
+                } catch (Exception e) {
+                    throw new Error(e);
+                }
+            } else {
+                try {
+                    Document doc = messageContext.getMessage().getSOAPPart().getEnvelope().getOwnerDocument();
+                    System.out.println(messageToString(doc));
+                } catch (Exception e) {
+                    throw new Error(e);
+                }
+                
             }
             return true;
         }
@@ -304,7 +315,8 @@ public class SignHandlerTest extends TestCase{
         ClientRoomController port
                 = service.getClientRoomControllerWSPort();
         //((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://109.237.3.46:8443/processor/soap/client");
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://188.254.16.92:7777/gateway/services/SID0003038");
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://10.126.216.2:3000/gateway/services/SID0003080");
+        //((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://188.254.16.92:7777/gateway/services/SID0003038");
         //((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "https://127.0.0.1:8443/processor/soap/client");
         ((BindingProvider)port).getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, new PaymentWSTest.TestHostnameVerifier());
         List<Handler> handlerChain = new ArrayList<Handler>();

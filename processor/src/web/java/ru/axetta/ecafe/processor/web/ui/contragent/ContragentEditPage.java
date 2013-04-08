@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -372,7 +372,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
         // Получаем id в РНИП, который был там до изменения (если он изменится или отсутствует,
         // то необходимо пересоздаваить каталог в самом РНИП)
-        String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (isEmpty (id)) {
             return;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
@@ -405,10 +405,10 @@ public class ContragentEditPage extends BasicWorkspacePage {
 
         try {
             if (isEmpty(prevId) || !prevId.equals(id)) {
-                RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
+                RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
             }
             else {
-                RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).modifyCatalogForContragent(contragent);
+                RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
             }
         } catch (IllegalStateException ise) {
             throw ise;
@@ -419,7 +419,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
 
 
     public String getRNIPButtonLabel () {
-        String id = LoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (id == null) {
             return "Создать каталог в РНИП";
         }

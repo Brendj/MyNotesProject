@@ -209,6 +209,7 @@ CREATE TABLE CF_Transactions (
   SourceType              INTEGER           NOT NULL,
   TransactionDate         BIGINT            NOT NULL,
   BalanceBefore           BIGINT,
+  IdOfOrg                 BIGINT, --v37
   CONSTRAINT CF_Transactions_pk PRIMARY KEY (IdOfTransaction),
   CONSTRAINT CF_Transactions_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient),
   CONSTRAINT CF_Transactions_IdOfCard_fk FOREIGN KEY (IdOfCard) REFERENCES CF_Cards (IdOfCard)

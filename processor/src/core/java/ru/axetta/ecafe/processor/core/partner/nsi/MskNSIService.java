@@ -203,7 +203,7 @@ public class MskNSIService {
     public List<OrgInfo> getOrgByName(String orgName) throws Exception {
         List<QueryResult> queryResults = executeQuery(
                 "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
-                        + "item['РОУ XML/Номер  учреждения'], \n" + "item['РОУ XML/Краткое наименование учреждения'],\n"
+                        + "item['РОУ XML/Краткое наименование учреждения'],\n"
                         + "item['РОУ XML/Официальный адрес'],\n"
                         + "item['РОУ XML/Дата изменения (число)']\n"
                         + "from catalog('Реестр образовательных учреждений') where \n"
@@ -212,9 +212,10 @@ public class MskNSIService {
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
             orgInfo.guid = qr.getQrValue().get(0);
-            orgInfo.number = qr.getQrValue().get(1);
-            orgInfo.shortName = qr.getQrValue().get(2);
-            orgInfo.address = qr.getQrValue().get(3);
+            //orgInfo.number = qr.getQrValue().get(1);
+            orgInfo.shortName = qr.getQrValue().get(1);
+            orgInfo.address = qr.getQrValue().get(2);
+            orgInfo.number = Org.extractOrgNumberFromName(orgInfo.shortName);
             list.add(orgInfo);
         }
         return list;

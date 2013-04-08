@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.LoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -314,7 +314,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     }
 
     public void updateContragentRNIP (Session session, Contragent contragent) throws Exception {
-        String id = LoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
+        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
         if (isEmpty (id)) {
             return;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
@@ -346,7 +346,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
 
 
     try {
-        RuntimeContext.getAppContext().getBean(LoadPaymentsService.class).createCatalogForContragent(contragent);
+        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
     } catch (IllegalStateException ise) {
         //throw ise;
     } catch (Exception e) {
