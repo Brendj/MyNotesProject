@@ -197,6 +197,9 @@
                     <h:outputText escape="true" value="Импортировать платежи из РНИП"
                                   styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.importRNIPPayments}" styleClass="output-text" />
+                    <h:outputText escape="true" value="URL сервиса РНИП"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsURL}" styleClass="input-text" size="100" />
                 </h:panelGrid>
             </rich:panel>
 
@@ -218,6 +221,23 @@
                 </h:panelGrid>
             </rich:panel>
 
+        </h:panelGrid>
+    </rich:tab>
+
+    <rich:tab label="Криптопровайдер">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header"
+                                                     value="Испорт из РНИП" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Наименование контейнера" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsStore}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Алиас" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsAlias}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Пароль" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsPassword}" styleClass="input-text" size="40" />
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
     </rich:tab>
 

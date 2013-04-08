@@ -69,6 +69,10 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean disableSMSNotifyEditInClientRoom;
     private Boolean importRNIPPayments;
     private Boolean sendSMSPaymentNotification;
+    private String RNIPPaymentsURL;
+    private String RNIPPaymentsAlias;
+    private String RNIPPaymentsPassword;
+    private String RNIPPaymentsStore;
 
 
     @PersistenceContext
@@ -341,6 +345,38 @@ public class OptionPage extends BasicWorkspacePage {
         this.sendSMSPaymentNotification = sendSMSPaymentNotification;
     }
 
+    public String getRNIPPaymentsURL() {
+        return RNIPPaymentsURL;
+    }
+
+    public void setRNIPPaymentsURL(String RNIPPaymentsURL) {
+        this.RNIPPaymentsURL = RNIPPaymentsURL;
+    }
+
+    public String getRNIPPaymentsAlias() {
+        return RNIPPaymentsAlias;
+    }
+
+    public void setRNIPPaymentsAlias(String RNIPPaymentsAlias) {
+        this.RNIPPaymentsAlias = RNIPPaymentsAlias;
+    }
+
+    public String getRNIPPaymentsPassword() {
+        return RNIPPaymentsPassword;
+    }
+
+    public void setRNIPPaymentsPassword(String RNIPPaymentsPassword) {
+        this.RNIPPaymentsPassword = RNIPPaymentsPassword;
+    }
+
+    public String getRNIPPaymentsStore() {
+        return RNIPPaymentsStore;
+    }
+
+    public void setRNIPPaymentsStore(String RNIPPaymentsStore) {
+        this.RNIPPaymentsStore = RNIPPaymentsStore;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -380,9 +416,14 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterUser = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_USER);
         syncRegisterPassword = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_PASSWORD);
         syncRegisterCompany = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_COMPANY);
-        disableSMSNotifyEditInClientRoom = runtimeContext.getOptionValueBool(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM);
+        disableSMSNotifyEditInClientRoom = runtimeContext.getOptionValueBool(
+                Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM);
         importRNIPPayments = runtimeContext.getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
         sendSMSPaymentNotification = runtimeContext.getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON);
+        RNIPPaymentsURL = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
+        RNIPPaymentsAlias = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+        RNIPPaymentsPassword = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+        RNIPPaymentsStore = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
 
         bankListPage.onShow();
 
@@ -467,6 +508,10 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM, disableSMSNotifyEditInClientRoom);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, importRNIPPayments);
             runtimeContext.setOptionValue(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, sendSMSPaymentNotification);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL, RNIPPaymentsURL);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, RNIPPaymentsAlias);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD, RNIPPaymentsPassword);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME, RNIPPaymentsStore);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

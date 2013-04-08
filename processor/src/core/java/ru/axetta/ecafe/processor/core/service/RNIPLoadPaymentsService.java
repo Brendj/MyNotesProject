@@ -31,6 +31,8 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
@@ -60,7 +62,9 @@ import generated.rnip.roskazna.smevunifoservice.UnifoTransferMsg;
 import generated.rnip.roskazna.xsd.errinfo.ErrInfo;
 import generated.rnip.roskazna.xsd.exportpaymentsresponse.ExportPaymentsResponse;
 import generated.rnip.roskazna.xsd.paymentinfo.PaymentInfoType;
+import generated.rnip.roskazna.xsd.responsetemplate.ResponseTemplate;
 import ru.CryptoPro.JCP.JCP;
+import ru.CryptoPro.JCP.tools.Array;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -71,12 +75,13 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import javax.xml.namespace.QName;
 import javax.xml.soap.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 @Component
 @Scope("singleton")
-public class RNIPLoadPaymentsService {
+    public class RNIPLoadPaymentsService {
 
     /**
      * Файл с документом для подписи.
@@ -89,7 +94,7 @@ public class RNIPLoadPaymentsService {
     /**
      * Адрес тестового сервиса СМЭВ.
      */
-    private final static String URL_ADDR = "http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
+    private String URL_ADDR = null;//"http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
@@ -239,12 +244,15 @@ public class RNIPLoadPaymentsService {
         com.sun.org.apache.xml.internal.security.Init.init();
 
         // Инициализация ключевого контейнера.
-        KeyStore keyStore = KeyStore.getInstance(JCP.HD_STORE_NAME);
+        String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
+        KeyStore keyStore = KeyStore.getInstance(store);
         keyStore.load(null, null);
 
         // Получение ключа и сертификата.
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey("test", "test".toCharArray());
-        X509Certificate cert = (X509Certificate) keyStore.getCertificate("test");
+        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
+        X509Certificate cert = (X509Certificate) keyStore.getCertificate(alias);
 
         /*** Подготовка документа ***/
         MessageFactory mf = MessageFactory.newInstance();
@@ -369,7 +377,7 @@ public class RNIPLoadPaymentsService {
             throw new Exception("Сертификат не найден.");
         }
 
-        System.out.println("Verify by: " + cert.getSubjectDN());
+        //System.out.println("Verify by: " + cert.getSubjectDN());
 
         // Поиск элемента с подписью.
         NodeList nl = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
@@ -384,7 +392,7 @@ public class RNIPLoadPaymentsService {
         javax.xml.crypto.dsig.XMLSignature signature = fac.unmarshalXMLSignature(valContext);
 
         // Проверяем подпись.
-        System.out.println("Verified locally: " + signature.validate(valContext));
+        //System.out.println("Verified locally: " + signature.validate(valContext));
         return send(message);
     }
 
@@ -393,6 +401,7 @@ public class RNIPLoadPaymentsService {
         // Use SAAJ to convert Document to SOAPElement
         SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = sfc.createConnection();
+        URL_ADDR = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
         URL endpoint = new URL(URL_ADDR);
         SOAPMessage response = connection.call(message, endpoint);
         connection.close();
@@ -525,8 +534,8 @@ public class RNIPLoadPaymentsService {
                         false);
                 OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
                         .processPayRequest(req);
-                logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
-                        resp == null ? "null" : resp.toString()));
+                /*logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
+                        resp == null ? "null" : resp.toString()));*/
             } catch (Exception e) {
                 logger.error("Failed to insert payment #" + paymentID + " into database", e);
             }

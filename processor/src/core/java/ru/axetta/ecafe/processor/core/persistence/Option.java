@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.CryptoPro.JCP.JCP;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -75,7 +77,12 @@ public class Option {
             OPTION_MSK_NSI_COMPANY=100027,
             OPTION_IMPORT_RNIP_PAYMENTS_ON=100028,
             OPTION_IMPORT_RNIP_PAYMENTS_TIME=100029,
-            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON=100030
+            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON=100030,
+
+            OPTION_IMPORT_RNIP_PAYMENTS_URL=100031,
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME=100032,
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS=100033,
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD=100034
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -112,7 +119,11 @@ public class Option {
             OPTION_MSK_NSI_COMPANY, "dogm_nsi",
             OPTION_IMPORT_RNIP_PAYMENTS_ON, "0",
             OPTION_IMPORT_RNIP_PAYMENTS_TIME, null,
-            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, "0"
+            OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, "0",
+            OPTION_IMPORT_RNIP_PAYMENTS_URL, "http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService",
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME, JCP.HD_STORE_NAME,
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, "test",
+            OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD, "test"
 };
 
     private Long idOfOption;
