@@ -134,7 +134,7 @@ public class BIDataExportService {
 
         TYPES.add(new BIDataExportType("clientsdiscountcategories",
                 "select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
-                + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',') "
+                + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',') as idofcategorydiscount "
                 + "from cf_clients "
                 + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
                 + "group by cf_clients.idofclient, cf_clients.idoforg, condition_date, build_date "
