@@ -773,6 +773,8 @@
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}" label="Свод по услугам"
                         action="#{totalServicesReportPage.show}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="clientPaymentsReportMenuItem" binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}"
+                        label="Отчет по начислениям" action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
 

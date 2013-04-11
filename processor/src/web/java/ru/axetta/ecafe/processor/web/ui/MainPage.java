@@ -324,6 +324,8 @@ public class MainPage {
     private final BasicWorkspacePage goodGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodGroupsGroupPage = new BasicWorkspacePage();
 
+    private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
+
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
     }
@@ -4902,6 +4904,52 @@ public Long getSelectedIdOfReportRule() {
     // baybikov (06.10.2011)
     public SalesReportPage getSalesReportPage() {
         return salesReportPage;
+    }
+
+    // baybikov (06.10.2011)
+    public ClientPaymentsPage getClientPaymentsReportPage() {
+        return clientPaymentsReportPage;
+    }
+
+    public Object showClientPaymentsReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = clientPaymentsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам",
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildClientPaymentsReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientPaymentsReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
     }
 
     // baybikov (06.10.2011)
