@@ -32,21 +32,28 @@ public class ContractIdGenerator {
         this.sessionFactory = sessionFactory;
     }
 
+    public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        long lastClientContractId = org.getLastClientContractId();
+        if (MIN_ORDER_ID > lastClientContractId || MAX_ORDER_ID < lastClientContractId) {
+            throw new IllegalArgumentException("Too large last client contractId");
+        }
+        lastClientContractId++;
+        long newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 10000 + lastClientContractId);
+        org.setLastClientContractId(lastClientContractId);
+        session.update(org);
+        session.flush();
+        return newClientContractId;
+    }
+
     public long generate(long idOfOrg) throws Exception {
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
         try {
             transaction = session.beginTransaction();
-            Org org = (Org) session.load(Org.class, idOfOrg);
-            long lastClientContractId = org.getLastClientContractId();
-            if (MIN_ORDER_ID > lastClientContractId || MAX_ORDER_ID < lastClientContractId) {
-                throw new IllegalArgumentException("Too large last client contractId");
-            }
-            lastClientContractId++;
-            long newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 10000 + lastClientContractId);
-            org.setLastClientContractId(lastClientContractId);
-            session.update(org);
-            session.flush();
+
+            long newClientContractId =generateTransactionFree (idOfOrg, session);
+
             transaction.commit();
             transaction = null;
             return newClientContractId;

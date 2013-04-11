@@ -7,10 +7,12 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -20,12 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +43,8 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class ImportRegisterClientsService {
+    @PersistenceContext
+    EntityManager em;
 
     @Autowired
     MskNSIService nsiService;
@@ -81,12 +89,14 @@ public class ImportRegisterClientsService {
         }
         Date lastUpd = getLastUpdateDate();
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
+
+
         for (Org org : orgs) {
             try {
                 if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
                     continue;
                 }
-                loadClients(lastUpd, org);
+                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
             } catch (Exception e) {
                 logger.error("Failed to add clients for " + org.getIdOfOrg() + " org", e);
             }
@@ -95,69 +105,110 @@ public class ImportRegisterClientsService {
     }
 
 
+    @Transactional
     public void loadClients(java.util.Date lastUpd, Org org) throws Exception {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session session = (Session) em.getDelegate();
+        org = em.merge(org);
         List<MskNSIService.ExpandedPupilInfo> pupils = nsiService.getChangedClients(lastUpd, org);
 
-        Session session = null;
-        Transaction transaction = null;
         try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
+            //  Проходим по всем существующим клиентам ОУ
+            Set<Client> currentClients = org.getClients();
+            for (Client dbClient : currentClients) {
+                boolean found = false;
+                for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
+                    if (pupil.getGuid().equals(dbClient.getClientGUID())) {
+                        found = true;
+                        break;
+                    }
+                }
+                ClientGroup currGroup = dbClient.getClientGroup();
+                //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", то заносим его в эту группу
+                if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
+                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                    ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
+                                                                                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    if (clientGroup == null) {
+                        clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    }
+                    dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    session.save(dbClient);
+                    /*FieldProcessor.Config fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+                    DAOService.getInstance().bindClientToGroup(ClientManager
+                            .findClientByFullName(org, (ClientManager.ClientFieldConfigForUpdate) fieldConfig),
+                            ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                    ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
+                            String.format(MskNSIService.COMMENT_AUTO_DELETED, date));*/
+                }
+            }
+
+            //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
             for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
                 FieldProcessor.Config fieldConfig;
-                boolean exists = ClientManager.existClient(session, org, emptyIfNull(pupil.getFirstName()),
-                        emptyIfNull(pupil.getFamilyName()), emptyIfNull(pupil.getSecondName()));
-                //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
-                if (/*pupil.isCreated() && */!exists && !pupil.isDeleted()) {
+                boolean updateClient = false;
+                Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
+                if (cl == null) {
                     fieldConfig = new ClientManager.ClientFieldConfig();
                 } else {
                     fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                 }
-                fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
-                fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(pupil.getFamilyName()));
-                fieldConfig.setValue(ClientManager.FieldId.NAME, emptyIfNull(pupil.getFirstName()));
-                fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(pupil.getSecondName()));
+                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.CLIENT_GUID,
+                                               pupil.getGuid(), cl.getClientGUID(), updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SURNAME,
+                                               pupil.getFamilyName(), cl.getPerson().getSurname(), updateClient);
+                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.NAME,
+                                               pupil.getFirstName(), cl.getPerson().getFirstName(), updateClient);
+                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SECONDNAME,
+                                               pupil.getSecondName(), cl.getPerson().getSecondName(), updateClient);
                 if (pupil.getGroup() != null) {
-                    fieldConfig.setValue(ClientManager.FieldId.GROUP, pupil.getGroup());
+                    updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.GROUP,
+                                                   pupil.getGroup(), cl.getClientGroup().getGroupName(), updateClient);
+                }
+                //  Если клиент был переведен из другого ОУ, то перемещаем его
+                if (cl != null && !cl.getOrg ().getGuid().equals (pupil.getGuidOfOrg())) {
+                    Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
+                    cl.setOrg(newOrg);
+                    updateClient = true;
+                }
+
+
+
+                if (!updateClient) {
+                    continue;
                 }
                 try {
-                    if (pupil.isDeleted()) {
-                        DAOService.getInstance().bindClientToGroup(ClientManager
-                                .findClientByFullName(org, (ClientManager.ClientFieldConfigForUpdate) fieldConfig),
-                                ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                        ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
-                                String.format(MskNSIService.COMMENT_AUTO_DELETED, date));
-                    }
-                    //  Created пока всегда будет пустым, как только r-style сделает их, следует раскомментировать
-                    else if (/*pupil.isCreated() && */!exists) {
+                    //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
+                    if (cl == null) {
                         try {
                             fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
                                     String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
                             ClientManager
-                                    .registerClient(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
-                                            true);
+                                    .registerClientTransactionFree(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
+                                            true, session);
                         } catch (Exception e) {
                             // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         }
+                    //  Иначе - обновляем клиента в БД
                     } else {
-                        ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
-                                String.format(MskNSIService.COMMENT_AUTO_MODIFY, date));
+                        ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
+                                String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
                     }
                 } catch (Exception e) {
                     logger.error("Failed to add client for " + org.getIdOfOrg() + " org", e);
                 }
             }
-            ////
-            transaction.commit();
-            transaction = null;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
         }
+    }
+
+    public boolean doClientUpdate (FieldProcessor.Config fieldConfig, Object fieldID,
+                                  String reesterValue, String currentValue, boolean doClientUpdate) throws Exception {
+        reesterValue = emptyIfNull(reesterValue);
+        currentValue = emptyIfNull(currentValue);
+        fieldConfig.setValue(fieldID, reesterValue);
+        return doClientUpdate || !currentValue.equals(reesterValue);
     }
 
     private String emptyIfNull(String str) {

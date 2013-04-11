@@ -847,4 +847,20 @@ public class DAOService {
         }
         return result.get(0);
     }
+
+
+    public Org getOrgByGuid (String guid) {
+        javax.persistence.Query q = em.createQuery("from Org where guid=:guid");
+        q.setParameter("guid", guid);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Org)l.get(0));
+    }
+
+
+    public Client getClientByGuid (String guid) {
+        return DAOUtils.findClientByGuid(em, guid);
+    }
+
+
 }

@@ -35,6 +35,7 @@ public class MskNSIService {
     public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
     public static final String COMMENT_AUTO_MODIFY = "{Изменено из Реестров %s}";
     public static final String COMMENT_AUTO_DELETED = "{Исключен по Реестру %s}";
+    public static final String REPLACEMENT_REGEXP = "\\{[^}]* Реестр[^}]*\\}";
 
     public static class Config {
 
@@ -125,6 +126,7 @@ public class MskNSIService {
 
         public boolean deleted;
         public boolean created;
+        public String guidOfOrg;
 
         public boolean isDeleted() {
             return deleted;
@@ -132,6 +134,14 @@ public class MskNSIService {
 
         public boolean isCreated() {
             return created;
+        }
+
+        public String getGuidOfOrg() {
+            return guidOfOrg;
+        }
+
+        public void setGuidOfOrg(String guidOfOrg) {
+            this.guidOfOrg = guidOfOrg;
         }
     }
 
@@ -264,18 +274,39 @@ public class MskNSIService {
 
 
     public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org) throws Exception {
-        String query = "select \n" + "item['Реестр обучаемых линейный/Фамилия'],\n"
-                + "item['Реестр обучаемых линейный/Имя'], \n" + "item['Реестр обучаемых линейный/Отчество'],\n"
-                + "item['Реестр обучаемых линейный/GUID'],\n" + "item['Реестр обучаемых линейный/Дата рождения'], \n"
-                + "item['Реестр обучаемых линейный/Класс или группа зачисления'], \n"
-                + "item['Реестр обучаемых линейный/Дата зачисления'], \n"
-                + "item['Реестр обучаемых линейный/Дата отчисления'], \n"
-                + "item['Реестр обучаемых линейный/Текущий класс или группа'] \n"
-                + "from catalog('Реестр обучаемых')\n"
-                + "where\n" + "item['Реестр обучаемых линейный/ID Образовательного учреждения']\n"
-                + "in (select item['РОУ XML/Первичный ключ'] from catalog('Реестр образовательных учреждений') "
-                + "where  item['РОУ XML/Дата изменения (число)']>=" + date.getTime() + " and "
-                + "item['РОУ XML/GUID Образовательного учреждения']='" + org.getGuid() + "')\n";
+        String query =
+                "select "
+                + "item['Реестр обучаемых спецификация/Фамилия'], "
+                + "item['Реестр обучаемых спецификация/Имя'], "
+                + "item['Реестр обучаемых спецификация/Отчество'], "
+                + "item['Реестр обучаемых спецификация/GUID'], "
+                + "item['Реестр обучаемых спецификация/Дата рождения'], "
+                + "item['Реестр обучаемых спецификация/Класс или группа зачисления'], "
+                + "item['Реестр обучаемых спецификация/Дата зачисления'], "
+                + "item['Реестр обучаемых спецификация/Дата отчисления'], "
+                + "item['Реестр обучаемых спецификация/Текущий класс или группа'], "
+                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] "
+                + "from catalog('Реестр обучаемых') "
+                + "where "
+                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] like '" + org.getGuid() + "'";
+                /*"select "
+                + "item['Реестр обучаемых спецификация/Фамилия'], "
+                + "item['Реестр обучаемых спецификация/Имя'], "
+                + "item['Реестр обучаемых спецификация/Отчество'], "
+                + "item['Реестр обучаемых спецификация/GUID'], "
+                + "item['Реестр обучаемых спецификация/Дата рождения'], "
+                + "item['Реестр обучаемых спецификация/Класс или группа зачисления'], "
+                + "item['Реестр обучаемых спецификация/Дата зачисления'], "
+                + "item['Реестр обучаемых спецификация/Дата отчисления'], "
+                + "item['Реестр обучаемых спецификация/Текущий класс или группа'], "
+                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] "
+                + "from catalog('Реестр обучаемых') "
+                + "where "
+                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] "
+                + "in (select item['РОУ XML/GUID Образовательного учреждения'] "
+                    + "from catalog('Реестр образовательных учреждений') "
+                    + "where  item['РОУ XML/Дата изменения (число)']>=" + 0 + " and "//date.getTime() + " and "           //!!!!!!!!!!!!! ЗАМЕНИТЬ !!!!!
+                           + "item['РОУ XML/GUID Образовательного учреждения'] like '" + org.getGuid() + "')";*/
         //org.getGuid()
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
@@ -289,6 +320,7 @@ public class MskNSIService {
             pupilInfo.group = getGroup(qr.getQrValue().get(8), qr.getQrValue().get(5));
             pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
+            pupilInfo.guidOfOrg = qr.getQrValue().get(9);
             list.add(pupilInfo);
         }
         return list;
