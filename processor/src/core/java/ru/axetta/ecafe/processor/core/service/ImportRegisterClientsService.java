@@ -115,7 +115,9 @@ public class ImportRegisterClientsService {
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
             //  Проходим по всем существующим клиентам ОУ
-            Set<Client> currentClients = org.getClients();
+            List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly (em, org);
+            List<Org> orgsList = DAOUtils.findFriendlyOrgs (em, org);   //  Текущая организация и дружественные ей
+            orgsList.add(org);
             for (Client dbClient : currentClients) {
                 boolean found = false;
                 for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
@@ -166,8 +168,15 @@ public class ImportRegisterClientsService {
                     updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.GROUP,
                                                    pupil.getGroup(), cl.getClientGroup().getGroupName(), updateClient);
                 }
-                //  Если клиент был переведен из другого ОУ, то перемещаем его
-                if (cl != null && !cl.getOrg ().getGuid().equals (pupil.getGuidOfOrg())) {
+                //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
+                boolean guidFound = false;
+                for (Org o : orgsList) {
+                    if (o.getGuid().equals(pupil.getGuidOfOrg())) {
+                        guidFound = true;
+                        break;
+                    }
+                }
+                if (cl != null && !guidFound) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
                     cl.setOrg(newOrg);
                     updateClient = true;

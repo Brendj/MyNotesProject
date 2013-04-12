@@ -302,6 +302,25 @@ public class DAOUtils {
         return (DiaryValue) persistenceSession.get(DiaryValue.class, compositeIdOfDiaryValue);
     }
 
+
+    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
+        javax.persistence.Query query = em.createQuery(
+                //"from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg))");
+                "from Client client where client.org = :org");
+        query.setParameter("org", organization);
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        return (List <Client>)query.getResultList();
+    }
+
+    public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
+        javax.persistence.Query query = em.createQuery(
+                "from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg", organization.getIdOfOrg());
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        return (List <Org>)query.getResultList();
+    }
+
+
     public static List findClients(Session persistenceSession, Org organization, String firstName, String surname,
             String secondName) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
