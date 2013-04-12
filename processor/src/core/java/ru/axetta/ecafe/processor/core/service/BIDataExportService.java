@@ -219,7 +219,7 @@ public class BIDataExportService {
                     if (!updateFiles(session, t, end, start)) // Если файл не удалось создать, то пропускаем
                     // создание всех остальных файлов
                     {
-                        break;
+                        //break;
                     }
                 }
             }
