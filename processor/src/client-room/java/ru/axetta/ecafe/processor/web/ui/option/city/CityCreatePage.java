@@ -6,10 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.option.city;
 
 import ru.axetta.ecafe.processor.core.persistence.AuthorizationType;
 import ru.axetta.ecafe.processor.core.persistence.City;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.option.user.FunctionSelector;
 
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.faces.model.SelectItem;
-import javax.persistence.TypedQuery;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -126,7 +122,7 @@ public class CityCreatePage extends BasicWorkspacePage {
     }
     private void getAllTypeItems(){
 
-        DAOService daoService=DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
 
         List<AuthorizationType> authTypes=daoService.getAuthorizationType(null);
         this.authTypeItems=new SelectItem[authTypes.size()] ;
@@ -153,7 +149,7 @@ public class CityCreatePage extends BasicWorkspacePage {
         city.setServiceUrl(this.serviceUrl);
         city.setContractIdMask(this.contractIdMask);
         Integer idOfAuthorizationType=(Integer)authTypeItems[indexOfAuthType-1].getValue();
-        DAOService daoService=DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         AuthorizationType authType=daoService.getAuthorizationType(idOfAuthorizationType).get(0);
         city.setAuthorizationType(authType);
 

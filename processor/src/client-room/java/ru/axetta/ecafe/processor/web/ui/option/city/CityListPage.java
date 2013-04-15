@@ -5,15 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.option.city;
 
 import ru.axetta.ecafe.processor.core.persistence.City;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -105,7 +106,7 @@ public class CityListPage extends BasicWorkspacePage {
 
 
     public void fill(Session session) throws Exception {
-         DAOService daoService= DAOService.getInstance();
+         DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         List<Item> items = new LinkedList<Item>();
         //Criteria criteria = session.createCriteria(User.class);
          //logger.info("entityManager: "+entityManager);
@@ -119,7 +120,7 @@ public class CityListPage extends BasicWorkspacePage {
     }
 
     public void removeCity(Session session, Long idOfCity) throws Exception {
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // User user = (User) session.load(User.class, idOfCity);
        // Query q=entityManager.createQuery("from User where idOfCity=:idOfCity");
        // q.setParameter("idOfCity",idOfCity);

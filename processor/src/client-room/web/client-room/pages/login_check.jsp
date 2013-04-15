@@ -3,26 +3,23 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.Result" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.net.URI" %>
-<%@ page import="java.util.Arrays" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.Result" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
-<%@ page import="org.apache.commons.lang.CharEncoding" %>
+<%@ page import="java.net.URI" %>
 <%@ page import="java.security.MessageDigest" %>
-<%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="java.util.Arrays" %>
 
 <%
      final Long RC_CLIENT_NOT_FOUND = 110L;
@@ -92,7 +89,7 @@
 
             try {
 
-                City city= DAOService.getInstance().getCityByName(cityName);
+                City city= DAOClientRoomService.getInstance().getCityByName(cityName);
 
                 ClientRoomControllerWSService service = new ClientRoomControllerWSService();
                 ClientRoomController port

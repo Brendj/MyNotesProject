@@ -3,22 +3,22 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
+<%@ page import="ru.axetta.ecafe.processor.core.client.ClientPasswordRecover" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.RequestWebParam" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.SendResult" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="javax.xml.ws.BindingProvider" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.util.List" %>
-<%@ page import="ru.axetta.ecafe.processor.core.client.ClientPasswordRecover" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.ClientRoomController" %>
-<%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.RequestWebParam" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.SendResult" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.password_jsp");
@@ -29,7 +29,7 @@
     final String PASS_PARAM = "p";
     final String CITY_PARAM="cityName" ;
     String mainPage = ServletUtils.getHostRelativeResourceUri(request, "client-room/index.jsp");
-    List<City>cities= DAOService.getInstance().getTowns(true);
+    List<City>cities= DAOClientRoomService.getInstance().getTowns(true);
     Boolean haveRecoverPasswordData = StringUtils.isNotEmpty(request.getParameter(HAVE_RECOVER_DATA_PARAM));
     Boolean sendEmailSucceed = false;
     String errorMessage = null, infoMessage = null;
@@ -49,7 +49,7 @@
          try{
 
              String cityName=request.getParameter(CITY_PARAM);
-             City city= DAOService.getInstance().getCityByName(cityName);
+             City city= DAOClientRoomService.getInstance().getCityByName(cityName);
 
              String sContractId = request.getParameter(CONTRACT_ID_PARAM);
              sContractId = sContractId.replaceAll("[^0-9]", "");

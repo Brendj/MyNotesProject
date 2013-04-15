@@ -5,14 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.option.city;
 
 import ru.axetta.ecafe.processor.core.persistence.City;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.option.user.FunctionViewer;
 
 import org.hibernate.Session;
-
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -106,7 +102,7 @@ public class CityViewPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session, Long idOfCity) throws Exception {
-         DAOService daoService= DAOService.getInstance();
+         DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         // User user = (User) session.load(User.class, idOfUser);
        // Query q=entityManager.createQuery("from User where idOfUser=:idOfUser");
       //  q.setParameter("idOfUser",idOfUser);

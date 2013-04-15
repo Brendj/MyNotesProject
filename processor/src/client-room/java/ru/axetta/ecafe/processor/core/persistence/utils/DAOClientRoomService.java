@@ -31,8 +31,8 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class DAOService {
-    private static final Logger logger = LoggerFactory.getLogger(DAOService.class);
+public class DAOClientRoomService {
+    private static final Logger logger = LoggerFactory.getLogger(DAOClientRoomService.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -69,8 +69,8 @@ public class DAOService {
 
     }
 
-    public static DAOService getInstance() {
-        return(DAOService) SpringApplicationContext.getBean("DAOService");
+    public static DAOClientRoomService getInstance() {
+        return(DAOClientRoomService) SpringApplicationContext.getBean("DAOService");
     }
     @Transactional
     public List<User> getUser(Long idOfUser){

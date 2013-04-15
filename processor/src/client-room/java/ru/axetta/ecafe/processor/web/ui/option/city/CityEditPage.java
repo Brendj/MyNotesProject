@@ -6,17 +6,12 @@ package ru.axetta.ecafe.processor.web.ui.option.city;
 
 import ru.axetta.ecafe.processor.core.persistence.AuthorizationType;
 import ru.axetta.ecafe.processor.core.persistence.City;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.faces.model.SelectItem;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -128,7 +123,7 @@ public class CityEditPage extends BasicWorkspacePage {
 
     private void getAllTypeItems(){
 
-        DAOService daoService=DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
 
         List<AuthorizationType> authTypes=daoService.getAuthorizationType(null);
         this.authTypeItems=new SelectItem[authTypes.size()] ;
@@ -144,7 +139,7 @@ public class CityEditPage extends BasicWorkspacePage {
 
 
     public void fill(Session session, Long idOfCity) throws Exception {
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         //Query q=entityManager.createQuery("from User where idOfCity=:idOfCity");
        // q.setParameter("idOfCity",idOfCity);
        City city =daoService.getCity(idOfCity).get(0);
@@ -154,7 +149,7 @@ public class CityEditPage extends BasicWorkspacePage {
 
     public void updateCity(Session session, Long idOfCity) throws Exception {
        // User user = (User) session.load(User.class, idOfCity);
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // Query q=entityManager.createQuery("from User where idOfCity=:idOfCity");
         //q.setParameter("idOfCity",idOfCity);
         City city = daoService.getCity(idOfCity).get(0);

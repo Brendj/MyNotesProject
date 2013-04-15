@@ -5,17 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.Date;
 
 /**
@@ -106,7 +100,7 @@ public class UserEditPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session, Long idOfUser) throws Exception {
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         //Query q=entityManager.createQuery("from User where idOfUser=:idOfUser");
        // q.setParameter("idOfUser",idOfUser);
         User user =daoService.getUser(idOfUser).get(0);
@@ -116,7 +110,7 @@ public class UserEditPage extends BasicWorkspacePage {
 
     public void updateUser(Session session, Long idOfUser) throws Exception {
        // User user = (User) session.load(User.class, idOfUser);
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // Query q=entityManager.createQuery("from User where idOfUser=:idOfUser");
         //q.setParameter("idOfUser",idOfUser);
         User user = daoService.getUser(idOfUser).get(0);

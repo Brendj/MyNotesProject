@@ -1,10 +1,5 @@
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
-<%@ page import="java.util.List" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="org.slf4j.Logger" %>
-<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%--
   ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
@@ -28,7 +23,7 @@
 
     }
 
-    List<City>cities= DAOService.getInstance().getTowns(true);
+    List<City>cities= DAOClientRoomService.getInstance().getTowns(true);
     if (!(haveLoginData && loginSucceed)) {
 %>
 <style>

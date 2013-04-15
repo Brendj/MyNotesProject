@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.city;
 
 import ru.axetta.ecafe.processor.core.persistence.City;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -34,7 +33,7 @@ public class SelectedCityGroupPage extends BasicWorkspacePage {
 
 
     public void fill(Session session, Long idOfCity) throws Exception {
-         DAOService daoService= DAOService.getInstance();
+         DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // Query q=entityManager.createQuery("from User where idOfCity=:idOfCity");
        // q.setParameter("idOfCity",idOfCity);
        List<City> cities= daoService.getCity(idOfCity) ;

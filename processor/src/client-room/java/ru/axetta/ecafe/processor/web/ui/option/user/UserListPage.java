@@ -6,22 +6,13 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.admin.CityItem;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.*;
 
 /**
@@ -95,7 +86,7 @@ public class UserListPage extends BasicWorkspacePage {
 
 
     public void fill(Session session) throws Exception {
-         DAOService daoService= DAOService.getInstance();
+         DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         List<Item> items = new LinkedList<Item>();
         //Criteria criteria = session.createCriteria(User.class);
          //logger.info("entityManager: "+entityManager);
@@ -109,7 +100,7 @@ public class UserListPage extends BasicWorkspacePage {
     }
 
     public void removeUser(Session session, Long idOfUser) throws Exception {
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // User user = (User) session.load(User.class, idOfUser);
        // Query q=entityManager.createQuery("from User where idOfUser=:idOfUser");
        // q.setParameter("idOfUser",idOfUser);

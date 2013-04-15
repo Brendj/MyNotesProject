@@ -4,22 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.SpringApplicationContext;
 import ru.axetta.ecafe.processor.core.persistence.Function;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.*;
 
 /**
@@ -84,7 +76,7 @@ public class FunctionSelector {
       //  List allFunctions = allFunctionsCriteria.list();
         // Query q=entityManager.createQuery("from Function");
 
-         DAOService daoService= DAOService.getInstance();
+         DAOClientRoomService daoService= DAOClientRoomService.getInstance();
 
         List allFunctions = daoService.getFunction(null);
         for (Object object : allFunctions) {
@@ -99,7 +91,7 @@ public class FunctionSelector {
         List<Item> items = new LinkedList<Item>();
        // Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         //List allFunctions = allFunctionsCriteria.list();
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
        // Query q=entityManager.createQuery("from Function");
         List allFunctions = daoService.getFunction(null);
         for (Object object : allFunctions) {
@@ -115,7 +107,7 @@ public class FunctionSelector {
 
     public Set<Function> getSelected(Session session) throws HibernateException {
         logger.info("start getSelected");
-       DAOService daoService= DAOService.getInstance();
+       DAOClientRoomService daoService= DAOClientRoomService.getInstance();
 
         Set<Function> selectedFunctions = new HashSet<Function>();
         for (Item item : items) {

@@ -4,25 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Function;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.Set;
 
 /**
@@ -46,7 +36,7 @@ public class FunctionSetConverter implements Converter {
     }
 
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
-        DAOService daoService= DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         StringBuilder stringBuilder = new StringBuilder();
 
         try {

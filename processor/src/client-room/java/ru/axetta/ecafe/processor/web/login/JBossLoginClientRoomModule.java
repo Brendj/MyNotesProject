@@ -4,19 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.login;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -178,7 +171,7 @@ public class JBossLoginClientRoomModule implements LoginModule {
 
     private void checkUserCredentials(String plainPassword) throws Exception {
         try {
-            List<User>users= DAOService.getInstance().getUserByName(username);
+            List<User>users= DAOClientRoomService.getInstance().getUserByName(username);
             User user=null;
             if(users!=null&&users.size()!=0){
                 user = users.get(0);

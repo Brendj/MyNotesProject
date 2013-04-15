@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
@@ -94,7 +94,7 @@ public class UserCreatePage extends BasicWorkspacePage {
         user.setFunctions(functionSelector.getSelected(session));
         user.setEmail(email);
 
-        DAOService daoService=DAOService.getInstance();
+        DAOClientRoomService daoService= DAOClientRoomService.getInstance();
         daoService.createUser(user);
       //  session.save(user);
     }

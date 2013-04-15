@@ -4,20 +4,21 @@
   ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
   --%>
 
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOClientRoomService" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.CheckPasswordResult" %>
+<%@ page import="ru.axetta.ecafe.processor.web.bo.client.RequestWebParam" %>
+<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
+<%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="org.apache.commons.lang.CharEncoding" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.net.URI" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
-<%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="javax.xml.ws.BindingProvider" %>
-<%@ page import="ru.axetta.ecafe.processor.web.bo.client.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.City" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOService" %>
-<%@ page import="org.apache.commons.lang.CharEncoding" %>
-<%@ page import="org.apache.commons.codec.binary.Base64" %>
+<%@ page import="java.net.URI" %>
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.recover_jsp");
@@ -27,7 +28,7 @@
     logger.info("from recover: cityId="+cityId);
 
 
-    City city= DAOService.getInstance().getCity(cityId).get(0);
+    City city= DAOClientRoomService.getInstance().getCity(cityId).get(0);
 
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService service = new ru.axetta.ecafe.processor.web.bo.client.ClientRoomControllerWSService();
     ru.axetta.ecafe.processor.web.bo.client.ClientRoomController port
