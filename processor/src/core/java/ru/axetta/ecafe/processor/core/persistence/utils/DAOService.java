@@ -47,7 +47,7 @@ public class DAOService {
 
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<ECafeSettings> geteCafeSettingses(Long idOfOrg, SettingsIds settingsIds, Boolean deleted) {
+    public List<ECafeSettings> geteCafeSettingses(final Long idOfOrg,final SettingsIds settingsIds,final Boolean deleted) {
         Session session = (Session) em.getDelegate();
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         if(idOfOrg==null && settingsIds==null){
@@ -62,7 +62,8 @@ public class DAOService {
         if(!deleted){
             criteria.add(Restrictions.eq("deletedState",false));
         }
-        return (List<ECafeSettings> ) criteria.list();
+        List<ECafeSettings> list =(List<ECafeSettings>) criteria.list();
+        return list;
     }
 
     @Transactional

@@ -34,7 +34,7 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
 
     private DataModel settingsList;
     private OrgItem orgItem;
-    private Integer settingsIds=0;
+    private Integer settingsIds=-1;
     private Boolean deleted=false;
     private final SettingsIdEnumTypeMenu settingsIdEnumTypeMenu = new SettingsIdEnumTypeMenu();
 
@@ -67,7 +67,7 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
 
     private void reload() {
         final Long idOfOrg = (orgItem==null?null:orgItem.getIdOfOrg());
-        final SettingsIds settingsid = (settingsIds==null || settingsIds<=0 ? null : SettingsIds.fromInteger(settingsIds));
+        final SettingsIds settingsid = (settingsIds==null || settingsIds<0 ? null : SettingsIds.fromInteger(settingsIds));
         List<ECafeSettings> list = daoService.geteCafeSettingses(idOfOrg,settingsid,deleted);
         this.settingsList = new ListDataModel(list);
     }
@@ -79,7 +79,7 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
 
     public Object clearSettingListPageFilter() {
         orgItem=null;
-        settingsIds=0;
+        settingsIds=-1;
         deleted = false;
         reload();
         return null;

@@ -37,7 +37,7 @@ public class ECafeSettings extends DistributedObject{
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Value", settingValue);
         setAttribute(element,"Text", settingText);
-        setAttribute(element,"Id", settingsId.getId());
+        setAttribute(element,"Id", settingsId.getId()+1);
     }
 
     @Override
@@ -46,9 +46,9 @@ public class ECafeSettings extends DistributedObject{
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         String stringValue = getStringAttributeValue(node, "Value", 128);
         if(stringValue!=null) setSettingValue(stringValue);
-        Integer longId = getIntegerAttributeValue(node, "Id");
-        if(longId!=null){
-            setSettingsId(SettingsIds.fromInteger(longId));
+        Integer intId = getIntegerAttributeValue(node, "Id");
+        if(intId!=null){
+            setSettingsId(SettingsIds.fromInteger(intId-1));
         }
         String stringSettingText = getStringAttributeValue(node, "Text", 128);
         if(stringSettingText!=null) setSettingText(stringSettingText);

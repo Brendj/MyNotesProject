@@ -27,14 +27,14 @@
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{settingsListPage.orgItem.shortName}" readonly="true"
-                             styleClass="input-text" style="margin-right: 2px;" />
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
             <h:outputText escape="true" value="Тип устройства" styleClass="output-text"/>
             <h:selectOneMenu value="#{settingsListPage.settingsIds}" styleClass="input-text">
-                <f:selectItem itemValue="0" itemLabel="--Не выбрано--"/>
+                <f:selectItem itemValue="-1" itemLabel="--Не выбрано--"/>
                 <f:selectItems value="#{settingsListPage.settingsIdEnumTypeMenu.items}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Статус" styleClass="output-text"/>

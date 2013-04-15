@@ -15,10 +15,10 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public enum SettingsIds {
-    CashierCheckPrinter(1,"Настройки принтера кассового чека"),
-    SalesReportPrinter(2,"Настройка принтера отчета по продажам"),
-    CardBalanceReportPrinter(3,"Настройка принтера отчета по балансам карт"),
-    AutoPlanPaymentSetting(4,"Настройка автооплаты льготного питания");
+    CashierCheckPrinter(0,"Настройки принтера кассового чека"),
+    SalesReportPrinter(1,"Настройка принтера отчета по продажам"),
+    CardBalanceReportPrinter(2,"Настройка принтера отчета по балансам карт"),
+    AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания");
 
     private Integer id;
     private String description;
