@@ -42,10 +42,22 @@ public class DAOService {
     }
 
     @Transactional
-    public List<ECafeSettings> geteCafeSettingses(Long idOfOrg) {
-        TypedQuery<ECafeSettings> query = em.createQuery("from ECafeSettings where orgOwner=:idOfOrg order by id", ECafeSettings.class);
-        query.setParameter("idOfOrg",idOfOrg);
-        return query.getResultList();
+    public List<ECafeSettings> geteCafeSettingses(Long idOfOrg, SettingsIds settingsIds, Boolean deleted) {
+        Session session = (Session) em.getDelegate();
+        Criteria criteria = session.createCriteria(ECafeSettings.class);
+        if(idOfOrg==null && settingsIds==null){
+            return new ArrayList<ECafeSettings>(0);
+        }
+        if(idOfOrg!=null){
+            criteria.add(Restrictions.eq("orgOwner",idOfOrg));
+        }
+        if(settingsIds!=null){
+            criteria.add(Restrictions.eq("settingsId",settingsIds));
+        }
+        if(!deleted){
+            criteria.add(Restrictions.eq("deletedState",false));
+        }
+        return (List<ECafeSettings> ) criteria.list();
     }
 
     @Transactional

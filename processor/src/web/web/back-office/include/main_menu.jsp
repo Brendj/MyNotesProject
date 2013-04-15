@@ -69,17 +69,35 @@
                             binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
                             action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
 
-        <%--@elvariable id="cafeSettingsEditListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.ECafeSettingsEditListPage"--%>
-        <rich:panelMenuItem id="ecafeSettingsEditListMenuItem" binding="#{cafeSettingsEditListPage.mainMenuComponent}" label="Настройки"
-                            action="#{cafeSettingsEditListPage.show}" reRender="workspaceForm">
-                <f:setPropertyActionListener value="#{mainPage.selectedIdOfOrg}" target="#{cafeSettingsEditListPage.idOfOrg}" />
-        </rich:panelMenuItem>
-
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"
                         rendered="#{mainPage.eligibleToEditOrgs}"
                         action="#{mainPage.showOrgCreatePage}" reRender="workspaceForm" />
+
+    <%--@elvariable id="settingsGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingsGroupPage"--%>
+    <rich:panelMenuGroup id="settingsMenuGroup" binding="#{settingsGroupPage.mainMenuComponent}" label="Настройки"
+                         reRender="workspaceForm">
+
+        <%--@elvariable id="settingsListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingsListPage"--%>
+        <rich:panelMenuItem id="settingsListMenuItem" binding="#{settingsListPage.mainMenuComponent}" label="Список"
+                            action="#{settingsListPage.show}" reRender="workspaceForm"/>
+
+        <%--@elvariable id="selectedSettingsGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SelectedSettingsGroupPage"--%>
+        <rich:panelMenuGroup id="selectSettingMenuGroup" binding="#{selectedSettingsGroupPage.mainMenuComponent}" label="#{selectedSettingsGroupPage.title}"
+                             reRender="workspaceForm" rendered="false">
+            <a4j:support event="onclick" action="#{selectedSettingsGroupPage.show}" reRender="workspaceForm" />
+
+            <%--@elvariable id="settingViewPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingViewPage"--%>
+            <rich:panelMenuItem id="settingViewMenuItem" binding="#{settingViewPage.mainMenuComponent}" label="Просмотр"
+                                action="#{settingViewPage.show}" reRender="workspaceForm" />
+
+            <%--@elvariable id="settingEditPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingEditPage"--%>
+            <rich:panelMenuItem id="settingEditMenuItem" binding="#{settingEditPage.mainMenuComponent}" label="Редактировать"
+                                action="#{settingEditPage.show}" reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+
+    </rich:panelMenuGroup>
 
     <%--@elvariable id="questionariesGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.QuestionariesGroupPage"--%>
     <rich:panelMenuGroup id="questionariesMenuGroup" binding="#{questionariesGroupPage.mainMenuComponent}" label="Анкетирование"
