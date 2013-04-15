@@ -45,7 +45,7 @@ public class BIDataExportService {
 
     static {
         TYPES = new ArrayList<BIDataExportType>();
-        TYPES.add(new BIDataExportType("orders",
+        /*TYPES.add(new BIDataExportType("orders",
                 "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
                         + "       grp1.idofclientgroup, grp2.groupname as grade_class, "
                         + "       array_to_string(array( " + "select cf_clients_categorydiscounts.idofcategorydiscount "
@@ -129,12 +129,12 @@ public class BIDataExportService {
                 + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
                 + "order by idoforg, 2",
                 new String[]{
-                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));
+                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));*/
 
 
         TYPES.add(new BIDataExportType("clientsdiscountcategories",
                 "select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
-                + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount "
+                + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount, cf_clients.idOfClientGroup as idOfClientGroup "
                 + "from cf_clients "
                 + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
                 + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
@@ -148,7 +148,7 @@ public class BIDataExportService {
                 + "from cf_clients "
                 + "order by cf_clients.idoforg, cf_clients.idofclient", */
                 new String[]{
-                        "idofclient", "idoforg", "condition_date", "build_date", "categories"}));
+                        "idofclient", "idoforg", "condition_date", "build_date", "categories", "idOfClientGroup"}));
     }
 
 
