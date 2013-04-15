@@ -10,7 +10,11 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -42,6 +46,7 @@ public class DAOService {
     }
 
     @Transactional
+    @SuppressWarnings("unchecked")
     public List<ECafeSettings> geteCafeSettingses(Long idOfOrg, SettingsIds settingsIds, Boolean deleted) {
         Session session = (Session) em.getDelegate();
         Criteria criteria = session.createCriteria(ECafeSettings.class);
@@ -49,7 +54,7 @@ public class DAOService {
             return new ArrayList<ECafeSettings>(0);
         }
         if(idOfOrg!=null){
-            criteria.add(Restrictions.eq("orgOwner",idOfOrg));
+            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         }
         if(settingsIds!=null){
             criteria.add(Restrictions.eq("settingsId",settingsIds));
