@@ -303,21 +303,59 @@ public class DAOUtils {
     }
 
 
-    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
+    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, List <Org> orgs) throws Exception {
+        String orgsClause = "";
+        for (int i=0; i<orgs.size(); i++) {
+            if (orgsClause.length() > 0) {
+                orgsClause += " or ";
+            }
+            orgsClause += " client.org = :org" + i;
+        }
+
         javax.persistence.Query query = em.createQuery(
-                //"from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg))");
-                "from Client client where client.org = :org");
-        query.setParameter("org", organization);
+                "from Client client where " + orgsClause);
+        for (int i=0; i<orgs.size(); i++) {
+            query.setParameter("org" + i, orgs.get(i));
+        }
         if (query.getResultList().isEmpty()) return Collections.emptyList();
         return (List <Client>)query.getResultList();
     }
 
+
+    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
+        /*javax.persistence.Query query = em.createQuery(
+                //"from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg))");
+                "from Client client where client.org = :org");
+        query.setParameter("org", organization);
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        return (List <Client>)query.getResultList();*/
+
+        List <Org> orgs = findFriendlyOrgs (em, organization);
+        return findClientsForOrgAndFriendly (em, orgs);
+    }
+
     public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
-        javax.persistence.Query query = em.createQuery(
-                "from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
+        /*Session persistenceSession = (Session) em.getDelegate();
+        Query query = persistenceSession.createQuery(
+                "select idoffriendlyorg from cf_friendly_organization where currentorg=? order by currentorg");
+        query.setParameter(0, organization.getIdOfOrg());
+        List <Org> res = new ArrayList <Org> ();
+        res.add(organization);
+        List resultList = query.list();
+        for (Object idoforg : resultList) {
+            res.add(DAOService.getInstance().getOrg((Long) idoforg));
+        }
+        return res;*/
+
+        javax.persistence.Query query = em.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", organization.getIdOfOrg());
         if (query.getResultList().isEmpty()) return Collections.emptyList();
-        return (List <Org>)query.getResultList();
+        List <Long> orgs = (List <Long>)query.getResultList();
+        List <Org> res = new ArrayList <Org> ();
+        for (Long idoforg : orgs) {
+            res.add(DAOService.getInstance().getOrg((Long) idoforg));
+        }
+        return res;
     }
 
 
