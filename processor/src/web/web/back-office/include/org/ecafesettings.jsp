@@ -40,7 +40,6 @@
             <f:facet name="header">
                 <h:outputText value="Идентификатор притнера"/>
             </f:facet>
-            <rich:inputNumberSpinner value="#{setting.identificator}"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">

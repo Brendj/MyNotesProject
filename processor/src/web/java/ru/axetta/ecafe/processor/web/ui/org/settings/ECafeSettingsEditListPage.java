@@ -41,6 +41,10 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
     private DataModel cafeSettingsList;
     private List<ECafeSettings> list;
 
+    public Boolean view(){
+        return true;
+    }
+
     @Override
     public void onShow() throws Exception {
         reload();
@@ -52,7 +56,7 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
     }
 
     private void reload(){
-        list = daoService.geteCafeSettingses(idOfOrg);
+        //list = daoService.geteCafeSettingses(idOfOrg);
         this.cafeSettingsList = new ListDataModel(list);
     }
 
@@ -65,7 +69,6 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
         ECafeSettings settings = new ECafeSettings();
         settings.setOrgOwner(idOfOrg);
         settings.setGuid(UUID.randomUUID().toString());
-        settings.setIdentificator(1L);
         settings.setDeletedState(true);
         list.add(settings);
         return null;
@@ -87,6 +90,9 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
         if(currentSetting.getSettingValue()==null || currentSetting.getSettingValue().isEmpty()){
             printError("Введите настройки Параметры принтера (формат чека) в параметр с GUID:"+currentSetting.getGuid());
         }
+        if(checkFormat(currentSetting.getSettingValue())){
+
+        }
         ECafeSettings cafeSettings = daoService.findDistributedObjectByRefGUID(ECafeSettings.class, currentSetting.getGuid());
         if(cafeSettings == null){
             cafeSettings = currentSetting;
@@ -104,6 +110,11 @@ public class ECafeSettingsEditListPage extends BasicWorkspacePage {
         cafeSettings.setGlobalVersion(daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName()));
         daoService.mergeDistributedObject(cafeSettings, cafeSettings.getGlobalVersion()+1);
         return null;
+    }
+
+    private boolean checkFormat(String settingValue) {
+
+        return false;
     }
 
     private ECafeSettings getEntityFromRequestParam() {
