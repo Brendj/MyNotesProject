@@ -3208,7 +3208,6 @@ public class SyncRequest {
         }
     }
 
-    //public final static int TYPE_FULL = 0, TYPE_GET_ACC_INC = 1, TYPE_GET_CLIENTS_PARAMS = 2;
     private final SyncType syncType;
 
     public SyncType getSyncType() {
@@ -3230,14 +3229,13 @@ public class SyncRequest {
     private final ReqMenu reqMenu;
     private final ReqDiary reqDiary;
     private final String message;
-    /*private final int type;*/
     private final String clientVersion;
     private final EnterEvents enterEvents;
     private final LibraryData libraryData;
     private final LibraryData2 libraryData2;
     private final Manager manager;
 
-    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType /*int type*/, String clientVersion, Org org, Date syncTime, Long idOfPacket,
+    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
             OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
@@ -3245,7 +3243,6 @@ public class SyncRequest {
             Manager manager) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
-       /* this.type = type;*/
         this.syncType = syncType;
         this.clientVersion = clientVersion;
         this.manager = manager;
