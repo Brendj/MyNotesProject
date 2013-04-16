@@ -30,6 +30,7 @@ import java.util.List;
 @Scope("singleton")
 public class MskNSIService {
 
+    private static final boolean USE_NSI_TESTING_SERVICE = false;
     private static final Logger logger = LoggerFactory.getLogger(MskNSIService.class);
     public static final String COMMENT_MANUAL_IMPORT = "{Ручной импорт из Реестров}";
     public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
@@ -243,43 +244,28 @@ public class MskNSIService {
         return list;
     }
 
-    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
-        /*
-       От Козлова
-       */
-       String select = "select item['Реестр обучаемых линейный/Фамилия'], "
-        + "item['Реестр обучаемых линейный/Имя'], item['Реестр обучаемых линейный/Отчество'], "
-        + "item['Реестр обучаемых линейный/GUID'], item['Реестр обучаемых линейный/Дата рождения'], "
-        + "item['Реестр обучаемых линейный/Текущий класс или группа'], "
-        + "item['Реестр обучаемых линейный/Класс или группа зачисления'] "
-        + "from catalog('Реестр обучаемых') "
-        + "where item['Реестр обучаемых линейный/Статус записи'] not like 'Удален%' and "
-        + "item['Реестр обучаемых линейный/GUID образовательного учреждения'] like '"+orgGuid+"'";
+    private String getGroup(String currentGroup, String initialGroup) {
+        String group = currentGroup;
+        if (group==null || group.trim().length()==0) group=initialGroup;
+        if (group!=null) group = group.replaceAll("[ -]", "");
+        return group;
+    }
 
-        /*String select = "select \n" + "item['Реестр обучаемых спецификация/Фамилия'],\n"
-                + "item['Реестр обучаемых спецификация/Имя'], \n" + "item['Реестр обучаемых спецификация/Отчество'],\n"
-                + "item['Реестр обучаемых спецификация/GUID'],\n" + "item['Реестр обучаемых спецификация/Дата рождения'], \n"
-                + "item['Реестр обучаемых спецификация/Текущий класс или группа'],\n"
-                + "item['Реестр обучаемых спецификация/Класс или группа зачисления']\n"
-                + "from catalog('Реестр обучаемых')\n" + "where item['Реестр обучаемых спецификация/Статус записи']!='Удаленный' and \n"
-                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] like '"+orgGuid+"'";*/
+    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
+        String tbl = getNSIWorkTable (USE_NSI_TESTING_SERVICE);
+        String select = "select item['" + tbl + "/Фамилия'], "
+        + "item['" + tbl + "/Имя'], item['" + tbl + "/Отчество'], "
+        + "item['" + tbl + "/GUID'], item['" + tbl + "/Дата рождения'], "
+        + "item['" + tbl + "/Текущий класс или группа'], "
+        + "item['" + tbl + "/Класс или группа зачисления'] "
+        + "from catalog('Реестр обучаемых') "
+        + "where item['" + tbl + "/Статус записи'] not like 'Удален%' and "
+        + "item['" + tbl + "/GUID образовательного учреждения'] like '"+orgGuid+"'";
         if (familyName != null && familyName.length() > 0) {
-            /*
-            От Козлова
-            */
-            select += " and item['Реестр обучаемых линейный/Фамилия'] like '%" + familyName + "%'";
-            /*
-            select += " and item['Реестр обучаемых спецификация/Фамилия'] like '%" + familyName + "%'";
-            */
+            select += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
         }
         if (updateTime != null) {
-            /*
-            От Козлова
-            */
-            select += " and  item['Реестр обучаемых линейный/Дата изменения (число)']  &gt; " + (updateTime / 1000);
-            /*
-            select += " and  item['Реестр обучаемых спецификация/Дата изменения (число)']  &gt; " + (updateTime / 1000);
-            */
+            select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
         List<QueryResult> queryResults = executeQuery(select);
         LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
@@ -297,51 +283,28 @@ public class MskNSIService {
         return list;
     }
 
-    private String getGroup(String currentGroup, String initialGroup) {
-        String group = currentGroup;
-        if (group==null || group.trim().length()==0) group=initialGroup;
-        if (group!=null) group = group.replaceAll("[ -]", "");
-        return group;
-    }
-
 
     public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org) throws Exception {
         /*
         От Козлова
         */
+        String tbl = getNSIWorkTable (USE_NSI_TESTING_SERVICE);
         String query = "select "+
-        "item['Реестр обучаемых линейный/Фамилия'], "+
-        "item['Реестр обучаемых линейный/Имя'], "+
-        "item['Реестр обучаемых линейный/Отчество'], "+
-        "item['Реестр обучаемых линейный/GUID'], "+
-        "item['Реестр обучаемых линейный/Дата рождения'], "+
-        "item['Реестр обучаемых линейный/Класс или группа зачисления'], "+
-        "item['Реестр обучаемых линейный/Дата зачисления'], "+
-        "item['Реестр обучаемых линейный/Дата отчисления'], "+
-        "item['Реестр обучаемых линейный/Текущий класс или группа'], "+
-        "item['Реестр обучаемых линейный/GUID образовательного учреждения'] "+
+        "item['" + tbl + "/Фамилия'], "+
+        "item['" + tbl + "/Имя'], "+
+        "item['" + tbl + "/Отчество'], "+
+        "item['" + tbl + "/GUID'], "+
+        "item['" + tbl + "/Дата рождения'], "+
+        "item['" + tbl + "/Класс или группа зачисления'], "+
+        "item['" + tbl + "/Дата зачисления'], "+
+        "item['" + tbl + "/Дата отчисления'], "+
+        "item['" + tbl + "/Текущий класс или группа'], "+
+        "item['" + tbl + "/GUID образовательного учреждения'] "+
         "from catalog('Реестр обучаемых') "+
         "where "+
-        "item['Реестр обучаемых линейный/Статус записи'] not like 'Удален%' and "+
-        "item['Реестр обучаемых линейный/GUID образовательного учреждения'] like '" + org.getGuid() + "' ";
+        "item['" + tbl + "/Статус записи'] not like 'Удален%' and "+
+        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "' ";
 
-
-        /*String query =
-                "select "
-                + "item['Реестр обучаемых спецификация/Фамилия'], "
-                + "item['Реестр обучаемых спецификация/Имя'], "
-                + "item['Реестр обучаемых спецификация/Отчество'], "
-                + "item['Реестр обучаемых спецификация/GUID'], "
-                + "item['Реестр обучаемых спецификация/Дата рождения'], "
-                + "item['Реестр обучаемых спецификация/Класс или группа зачисления'], "
-                + "item['Реестр обучаемых спецификация/Дата зачисления'], "
-                + "item['Реестр обучаемых спецификация/Дата отчисления'], "
-                + "item['Реестр обучаемых спецификация/Текущий класс или группа'], "
-                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] "
-                + "from catalog('Реестр обучаемых') "
-                + "where "
-                + "item['Реестр обучаемых спецификация/Статус записи']!='Удален%' and "
-                + "item['Реестр обучаемых спецификация/GUID образовательного учреждения'] like '" + org.getGuid() + "'";*/
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
@@ -358,5 +321,10 @@ public class MskNSIService {
             list.add(pupilInfo);
         }
         return list;
+    }
+
+
+    public static String getNSIWorkTable (boolean isTestingService) {
+        return isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
     }
 }
