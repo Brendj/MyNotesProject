@@ -118,7 +118,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -470,7 +470,7 @@ public class ProjectStateReportService {
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс"}, {ValueType.NUMBER, "5-11 класс"}},
-                VISITORS_CHART_DATA));
+                VISITORS_CHART_DATA));*/
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),
@@ -1236,6 +1236,7 @@ public class ProjectStateReportService {
                         "where cf_orders.socdiscount=0 and cf_orgs.idoforg=cf_orders.idoforg and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        " and cf_orgs.state<>0 "+
                         "group by cf_orgs.idoforg " +
                         "order by cf_orgs.idoforg", false);
     }
@@ -1248,6 +1249,7 @@ public class ProjectStateReportService {
                         "where cf_orders.socdiscount<>0 and cf_orgs.idoforg=cf_orders.idoforg and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        " and cf_orgs.state<>0 "+
                         "group by cf_orgs.idoforg " +
                         "order by cf_orgs.idoforg", true);
     }
@@ -1261,6 +1263,7 @@ public class ProjectStateReportService {
                         "cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         +
                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        " and cf_orgs.state<>0 "+
                         "group by cf_orgs.idoforg " +
                         "order by cf_orgs.idoforg", false);
     }
@@ -1316,7 +1319,7 @@ public class ProjectStateReportService {
 
         Session session = (Session) sessionObj;
         try {
-            String sql = "SELECT cf_orgs.officialname, cf_orgs.district, count(cf_clients.idofclient) from cf_orgs left join cf_clients on  cf_clients.idoforg=cf_orgs.idoforg where officialname<>'' group by cf_orgs.officialname, cf_orgs.district order by cf_orgs.officialname";
+            String sql = "SELECT cf_orgs.officialname, cf_orgs.district, count(cf_clients.idofclient) from cf_orgs left join cf_clients on  cf_clients.idoforg=cf_orgs.idoforg where officialname<>'' and cf_orgs.state<>0 group by cf_orgs.officialname, cf_orgs.district order by cf_orgs.officialname";
             Map<Long, Long> targetsCount = new HashMap<Long, Long>();
             String finalSQL = applyMacroReplace(sql, reportType, dateAt, dateTo);
             org.hibernate.Query q = session.createSQLQuery(finalSQL);
@@ -1389,7 +1392,7 @@ public class ProjectStateReportService {
                         + "      group by dat.idoforg, dat.officialname " + "      union "
                         + "      select cf_orgs.idoforg, cf_orgs.officialname, count(cf_clients.idofclient) as cnt "
                         + "      from cf_clients, cf_orgs "
-                        + "      where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' "
+                        + "      where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' and cf_orgs.state<>0 "
                         + "      group by cf_orgs.idoforg, cf_orgs.officialname) as dat " + " where dat.cnt<>0 "
                         + "group by dat.idoforg, dat.officialname " + "order by 1");
         List resultList = q.list();
