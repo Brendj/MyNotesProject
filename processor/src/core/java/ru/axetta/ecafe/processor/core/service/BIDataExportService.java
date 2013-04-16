@@ -45,7 +45,7 @@ public class BIDataExportService {
 
     static {
         TYPES = new ArrayList<BIDataExportType>();
-        /*TYPES.add(new BIDataExportType("orders",
+        TYPES.add(new BIDataExportType("orders",
                 "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
                         + "       grp1.idofclientgroup, grp2.groupname as grade_class, "
                         + "       array_to_string(array( " + "select cf_clients_categorydiscounts.idofcategorydiscount "
@@ -129,7 +129,7 @@ public class BIDataExportService {
                 + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
                 + "order by idoforg, 2",
                 new String[]{
-                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));*/
+                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));
 
 
         TYPES.add(new BIDataExportType("clientsdiscountcategories",
