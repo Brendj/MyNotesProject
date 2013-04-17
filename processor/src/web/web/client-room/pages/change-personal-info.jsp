@@ -5,28 +5,31 @@
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Person" %>
 <%@ page import="ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.util.ClientRoomNotificationSettingsUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" %>
-<%@ page import="java.util.*" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
-<%@ page import="ru.axetta.ecafe.processor.web.util.ClientRoomNotificationSettingsUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.TimeZone" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -326,8 +329,12 @@
                         %>
                         <tr>
                             <td><%=it.getNotificationTypeName()%></td>
-                            <td><input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotificationType() %>" size="16" maxlength="64" class="input-text"
-                                       <%=it.isEnabled() ? HTML_CHECKED : ""%>/></td>
+                            <td>
+                                <input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotificationType() %>" size="16" maxlength="64" class="input-text"
+                                       <%=it.isEnabled() ? HTML_CHECKED : ""%>
+                                        <%=RuntimeContext.getInstance().getOptionValueBool(
+                                                Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM) ? "disabled=\"disabled\" onclick=\"return false\" onkeydown=\"return false\"" : ""%>/>
+                            </td>
                         </tr>
                         <%
                     }
