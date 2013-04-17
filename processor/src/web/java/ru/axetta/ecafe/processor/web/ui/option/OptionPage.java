@@ -73,6 +73,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPPaymentsAlias;
     private String RNIPPaymentsPassword;
     private String RNIPPaymentsStore;
+    private Boolean syncRegisterIsTestingService;
 
 
     @PersistenceContext
@@ -377,6 +378,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.RNIPPaymentsStore = RNIPPaymentsStore;
     }
 
+    public Boolean getSyncRegisterIsTestingService() {
+        return syncRegisterIsTestingService;
+    }
+
+    public void setSyncRegisterIsTestingService(Boolean syncRegisterIsTestingService) {
+        this.syncRegisterIsTestingService = syncRegisterIsTestingService;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -424,6 +433,7 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPPaymentsAlias = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         RNIPPaymentsPassword = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
         RNIPPaymentsStore = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
+        syncRegisterIsTestingService = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
 
         bankListPage.onShow();
 
@@ -502,6 +512,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_BENEFITS_RECALC_ON, recalculateBenefits);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_AUTOSYNC_ON, syncRegisterClients);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_URL, syncRegisterURL);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE, syncRegisterIsTestingService);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_USER, syncRegisterUser);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_PASSWORD, syncRegisterPassword);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_COMPANY, syncRegisterCompany);

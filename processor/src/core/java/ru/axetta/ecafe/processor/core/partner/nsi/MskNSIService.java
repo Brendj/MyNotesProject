@@ -30,7 +30,6 @@ import java.util.List;
 @Scope("singleton")
 public class MskNSIService {
 
-    private static final boolean USE_NSI_TESTING_SERVICE = false;
     private static final Logger logger = LoggerFactory.getLogger(MskNSIService.class);
     public static final String COMMENT_MANUAL_IMPORT = "{Ручной импорт из Реестров}";
     public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
@@ -252,7 +251,7 @@ public class MskNSIService {
     }
 
     public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
-        String tbl = getNSIWorkTable (USE_NSI_TESTING_SERVICE);
+        String tbl = getNSIWorkTable ();
         String select = "select item['" + tbl + "/Фамилия'], "
         + "item['" + tbl + "/Имя'], item['" + tbl + "/Отчество'], "
         + "item['" + tbl + "/GUID'], item['" + tbl + "/Дата рождения'], "
@@ -288,7 +287,7 @@ public class MskNSIService {
         /*
         От Козлова
         */
-        String tbl = getNSIWorkTable (USE_NSI_TESTING_SERVICE);
+        String tbl = getNSIWorkTable ();
         String query = "select "+
         "item['" + tbl + "/Фамилия'], "+
         "item['" + tbl + "/Имя'], "+
@@ -324,7 +323,8 @@ public class MskNSIService {
     }
 
 
-    public static String getNSIWorkTable (boolean isTestingService) {
-        return isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
+    public static String getNSIWorkTable () {
+        boolean isTestingService = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
+        return !isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
     }
 }

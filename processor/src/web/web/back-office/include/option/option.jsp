@@ -212,6 +212,9 @@
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />
                     <h:outputText escape="true" value="URL сервиса" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterURL}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Является тестовым сервисом"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.syncRegisterIsTestingService}" styleClass="output-text" />
                     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterUser}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Пароль" styleClass="output-text" />
