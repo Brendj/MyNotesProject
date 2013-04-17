@@ -118,7 +118,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -470,7 +470,7 @@ public class ProjectStateReportService {
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс"}, {ValueType.NUMBER, "5-11 класс"}},
-                VISITORS_CHART_DATA));*/
+                VISITORS_CHART_DATA));
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),

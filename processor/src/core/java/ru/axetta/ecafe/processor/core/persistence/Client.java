@@ -767,7 +767,7 @@ public class Client {
         if (mobilePhone == null || mobilePhone.length() == 0) {
             return mobilePhone;
         }
-        mobilePhone = mobilePhone.replaceAll("[+ -()]", "");
+        mobilePhone = mobilePhone.replaceAll("[+ \\-()]", "");
         if (mobilePhone.startsWith("8")) {
             mobilePhone = "7" + mobilePhone.substring(1);
         }
