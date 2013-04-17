@@ -19,7 +19,7 @@ public class ClientSms {
 
     public static final String UNKNOWN_CONTENTS_TYPE_DESCRIPTION = "Неизвестен";
     public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, "Баланс меньше нуля",
-                                                              "Уведомление о проходе", "Зачисление средств", "Код активации"};
+                                                              "Уведомление о проходе", "Зачисление средств", "Код активации","Уведомление о покупке"};
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
