@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
+import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import generated.nsiws.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
@@ -25,6 +27,7 @@ import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("singleton")
@@ -170,6 +173,7 @@ public class MskNSIService {
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
         provider.getRequestContext().put("com.sun.xml.ws.request.timeout", 15000);
         provider.getRequestContext().put("set-jaxb-validation-event-handler", false);
+        setTimeouts (provider, new Long (60000), new Long (180000));
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
 
 
@@ -326,5 +330,26 @@ public class MskNSIService {
     public static String getNSIWorkTable () {
         boolean isTestingService = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
         return !isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
+    }
+
+
+
+    public static void setTimeouts(BindingProvider bindingProvider, Long connectTimeout, Long requestTimeout) {
+        // from Java SE 6
+        final String keyInternalConnectTimeout = com.sun.xml.internal.ws.developer.JAXWSProperties.CONNECT_TIMEOUT;
+        final String keyInternalRequestTimeout = com.sun.xml.internal.ws.developer.JAXWSProperties.REQUEST_TIMEOUT;
+        // from Java EE 6
+        final String keyConnectTimeout = JAXWSProperties.CONNECT_TIMEOUT;
+        final String keyRequestTimeout = JAXWSProperties.REQUEST_TIMEOUT;
+
+        final Map<String, Object> requestContext = bindingProvider.getRequestContext();
+        if (connectTimeout != null) {
+            requestContext.put(keyInternalConnectTimeout, connectTimeout);
+            requestContext.put(keyConnectTimeout, (int) connectTimeout.longValue());
+        }
+        if (requestTimeout != null) {
+            requestContext.put(keyInternalRequestTimeout, requestTimeout);
+            requestContext.put(keyRequestTimeout, (int) requestTimeout.longValue());
+        }
     }
 }
