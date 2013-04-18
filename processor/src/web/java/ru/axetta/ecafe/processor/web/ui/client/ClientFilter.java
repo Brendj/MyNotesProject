@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -125,6 +126,7 @@ public class ClientFilter {
     private final ClientBalanceFilter clientBalanceMenu = new ClientBalanceFilter();
     private Integer clientBalanceCondition =  ClientBalanceFilter.NO_CONDITION;
     private String filterClientId;
+    private String mobileNumber;
 
     public ClientBalanceFilter getClientBalanceMenu() {
         return clientBalanceMenu;
@@ -136,6 +138,14 @@ public class ClientFilter {
 
     public void setClientBalanceCondition(int clientBalanceCondition) {
         this.clientBalanceCondition = clientBalanceCondition;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String getFilterClientId() {
@@ -204,6 +214,7 @@ public class ClientFilter {
         filterClientId = null;
         person = new PersonItem();
         contractPerson = new PersonItem();
+        mobileNumber = null;
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
     }
@@ -268,6 +279,9 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(this.filterClientId)) {
             criteria.add(Restrictions.eq("idOfClient", Long.parseLong(this.filterClientId.replaceAll("\\s", ""))));
+        }
+        if (StringUtils.isNotEmpty(this.mobileNumber)) {
+            criteria.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobileNumber), MatchMode.ANYWHERE));
         }
        criteria.addOrder(Order.asc("contractId"));
     }

@@ -19,7 +19,7 @@
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{mainPage.clientListPage.clientFilter.org.shortName}" readonly="true"
-                             styleClass="input-text" style="margin-right: 2px;" />
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
@@ -71,6 +71,9 @@
                              styleClass="input-text">
                 <f:selectItems value="#{mainPage.clientListPage.clientFilter.clientBalanceMenu.items}" />
             </h:selectOneMenu>
+            <h:outputText escape="true" value="Номер мобильного телефона" styleClass="output-text" />
+            <h:inputText value="#{mainPage.clientListPage.clientFilter.mobileNumber}" maxlength="11"
+                         styleClass="input-text" />
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
