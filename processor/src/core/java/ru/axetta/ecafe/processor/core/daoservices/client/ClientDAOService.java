@@ -71,11 +71,11 @@ public class ClientDAOService extends AbstractDAOService {
     @SuppressWarnings("unchecked")
     public List<ReportOnNutritionItem> generateReport(Long idOfOrg, ClientGroup clientGroup, Date startDate, Date endDate){
         Criteria criteria = getSession().createCriteria(OrderDetail.class, "details");
-        criteria.createAlias("details.order","ord", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("ord.org","org", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("ord.client","client", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("client.person","person", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("client.clientGroup","clientgroup", CriteriaSpecification.LEFT_JOIN);
+        criteria.createAlias("details.order","ord", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ord.org","org", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ord.client","client", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("client.person","person", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("client.clientGroup","clientgroup", JoinType.LEFT_OUTER_JOIN);
         criteria.add(Restrictions.eq("org.id", idOfOrg));
         criteria.add(Restrictions.eq("client.clientGroup", clientGroup));
         criteria.add(Restrictions.between("ord.createTime", startDate, endDate));
@@ -102,11 +102,11 @@ public class ClientDAOService extends AbstractDAOService {
     @SuppressWarnings("unchecked")
     public List<ReportOnNutritionItem> generateReportOnNutritionByWeekReport(Org org, Date startDate, Date endDate){
         Criteria criteria = getSession().createCriteria(OrderDetail.class,"details");
-        criteria.createAlias("details.order","ord", CriteriaSpecification.LEFT_JOIN);
+        criteria.createAlias("details.order","ord", JoinType.LEFT_OUTER_JOIN);
         //criteria.createAlias("ord.org","org", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("ord.client","client", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("client.person","person", CriteriaSpecification.LEFT_JOIN);
-        criteria.createAlias("client.clientGroup","clientgroup", CriteriaSpecification.LEFT_JOIN);
+        criteria.createAlias("ord.client","client", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("client.person","person", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("client.clientGroup","clientgroup", JoinType.LEFT_OUTER_JOIN);
         //criteria.add(Restrictions.eq("org.id", idOfOrg));
         criteria.add(Restrictions.eq("ord.org", org));
         //criteria.add(Restrictions.eq("client.clientGroup", clientGroup));
