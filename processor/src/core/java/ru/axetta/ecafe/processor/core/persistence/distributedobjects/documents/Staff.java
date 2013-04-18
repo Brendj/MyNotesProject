@@ -123,7 +123,7 @@ public class Staff extends DistributedObject {
         String stringRights = getStringAttributeValue(node, "Rights", 256);
         if(stringRights != null) setRights(stringRights);
         setHashCode(hashCode());
-        setSendAll(SendToAssociatedOrgs.SendToSelf);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 

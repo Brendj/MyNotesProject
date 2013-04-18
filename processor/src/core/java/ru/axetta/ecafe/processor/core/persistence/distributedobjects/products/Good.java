@@ -60,7 +60,6 @@ public class Good extends DistributedObject {
         if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
         if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
         if(basicGood != null) setAttribute(element, "GuidOfBasicGood", basicGood.getGuid());
-        setSendAll(SendToAssociatedOrgs.SendToAll);
     }
     @Override
     protected Good parseAttributes(Node node) throws Exception {
@@ -84,6 +83,7 @@ public class Good extends DistributedObject {
         guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
         guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
         guidOfBasicGood = getStringAttributeValue(node, "GuidOfBasicGood", 36);
+        setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
