@@ -1161,8 +1161,9 @@ public class Processor implements SyncProcessor,
                 }
             }
             if (clientParamItem.getMobilePhone() != null) {
-                client.setMobile(Client.checkAndConvertMobile(clientParamItem.getMobilePhone()));
-                if (!StringUtils.isEmpty(clientParamItem.getMobilePhone())
+                String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
+                client.setMobile(mobile);
+                if (!StringUtils.isEmpty(mobile)
                         && clientParamItem.getNotifyViaSMS() == null) {
                     client.setNotifyViaSMS(true);
                 }
