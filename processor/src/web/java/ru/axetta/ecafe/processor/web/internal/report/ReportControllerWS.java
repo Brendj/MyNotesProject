@@ -4,75 +4,65 @@
 
 package ru.axetta.ecafe.processor.web.internal.report;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportDataInfo;
-import ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryItem;
-import ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportDataInfo;
+import ru.axetta.ecafe.processor.web.internal.report.dataflow.TradeMaterialGoodItem;
+import ru.axetta.ecafe.processor.web.internal.report.dataflow.TradeMaterialGoodList;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
-import javax.xml.bind.annotation.XmlMimeType;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-//@MTOM
 @WebService()
 public class ReportControllerWS extends HttpServlet implements ReportController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportControllerWS.class);
 
-    @Override
-    public ReportDataInfo generateReportOrders(@WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
-        DataHandler dataHandler = null;
-        ReportDataInfo reportDataInfo = new ReportDataInfo(dataHandler, ResultEnum.FILE_NOT_FOUND);
-        try {
-            if (startDate!=null && endDate==null) {
-                endDate = CalendarUtils.addDays(startDate, 1);
-            }
-            ReportInfo reportInfo = DAOService.getInstance().getReportInfo(idOfOrg, startDate, endDate,"DailySalesByGroupsReport");
-            ResultEnum resultEnum = ResultEnum.FILE_NOT_FOUND;
-            if(reportInfo!=null){
-                String path = RuntimeContext.getInstance().getAutoReportGenerator().getReportPath() + reportInfo.getReportFile();
-                FileDataSource fileDataSource = new FileDataSource(path);
-                dataHandler = new DataHandler(fileDataSource);
-                resultEnum = ResultEnum.OK;
-            }
-            reportDataInfo = new ReportDataInfo(dataHandler,resultEnum);
-        } catch (Exception e) {
-            logger.error("Initialize error: ",e);
-        }
-        return reportDataInfo;
-    }
+    private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    private static final String RC_OK_DESC = "OK";
+    private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
 
     @Override
-    public ReportDataInfo generateReportMenus(@WebParam(name = "idOfContragent") Long idOfContragent, @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
-        DataHandler dataHandler = null;
-        ReportDataInfo reportDataInfo = new ReportDataInfo(dataHandler, ResultEnum.FILE_NOT_FOUND);
+    public ReportDataInfo generateReportTradeMaterialGood(@WebParam(name = "idOfOrg") Long idOfOrg,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        ReportService service = new ReportService();
+        ReportDataInfo result = new ReportDataInfo();
+        result.setCode(RC_OK);
+        result.setResult(RC_OK_DESC);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            if (startDate!=null && endDate==null) {
-                endDate = CalendarUtils.addDays(startDate, 1);
-            }
-            ReportInfo reportInfo = DAOService.getInstance().getReportInfo(idOfContragent, startDate, endDate,"MenuDetailsGroupByMenuOriginReport");
-            ResultEnum resultEnum = ResultEnum.FILE_NOT_FOUND;
-            if(reportInfo!=null){
-                String path = RuntimeContext.getInstance().getAutoReportGenerator().getReportPath() + reportInfo.getReportFile();
-                FileDataSource fileDataSource = new FileDataSource(path);
-                dataHandler = new DataHandler(fileDataSource);
-                resultEnum = ResultEnum.OK;
-            }
-            reportDataInfo = new ReportDataInfo(dataHandler,resultEnum);
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            service.setSession(persistenceSession);
+            List<TradeMaterialGoodItem> tradeMaterialGoodItemList = service.findReportDataInfo(idOfOrg, startDate, endDate);
+            TradeMaterialGoodList tradeMaterialGoodList = new TradeMaterialGoodList();
+            tradeMaterialGoodList.setT(tradeMaterialGoodItemList);
+            result.setTradeMaterialGoodList(tradeMaterialGoodList);
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Initialize error: ",e);
+            logger.error("Failed to process report controller request", e);
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
-        return reportDataInfo;
+        return result;
     }
 
 }

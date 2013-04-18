@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.internal.report.dataflow;
 
-import ru.axetta.ecafe.processor.web.internal.report.ResultEnum;
-
-import javax.activation.DataHandler;
 import javax.xml.bind.annotation.*;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,44 +18,43 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "", propOrder = {
         "result",
         "code",
-        "file"
+        "tradeMaterialGoodList"
 })
 @XmlRootElement(name = "Data")
 public class ReportDataInfo {
 
     @XmlElement
     protected String result;
+    @XmlElement
+    protected Long code;
 
     @XmlElement
-    protected Integer code;
+    protected TradeMaterialGoodList tradeMaterialGoodList;
 
-    @XmlElement
-    @XmlMimeType("application/octet-stream")
-    protected DataHandler file;
+    public ReportDataInfo() {}
 
-    public ReportDataInfo() {
-    }
-
-    public ReportDataInfo(DataHandler file, ResultEnum result) {
-        this.file = file;
-        this.result = result.toString();
-        this.code = result.getValue();
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public DataHandler getFile() {
-        return file;
-    }
-
-    public void setFile(DataHandler file) {
-        this.file = file;
-    }
 
     public String getResult() {
         return result;
     }
 
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public Long getCode() {
+        return code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
+    }
+
+    public TradeMaterialGoodList getTradeMaterialGoodList() {
+        return tradeMaterialGoodList;
+    }
+
+    public void setTradeMaterialGoodList(TradeMaterialGoodList tradeMaterialGoodList) {
+        this.tradeMaterialGoodList = tradeMaterialGoodList;
+    }
 }
