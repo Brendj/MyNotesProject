@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -26,11 +29,24 @@ public class SettingViewPage extends BasicWorkspacePage {
     private OrgItem orgItem;
     @Autowired
     private SelectedSettingsGroupPage selectedSettingsGroupPage;
-
+    @Autowired
+    private SettingEditPage settingEditPage;
+    @Autowired
+    private DAOService daoService;
     @Override
     public void onShow() throws Exception {
          setting = selectedSettingsGroupPage.getSelectSettings();
          orgItem = selectedSettingsGroupPage.getCurrentOrg();
+    }
+
+    public Object edit() throws Exception {
+        selectedSettingsGroupPage.setSelectSettings(setting);
+        Org currentOrg = daoService.getOrg(setting.getOrgOwner());
+        selectedSettingsGroupPage.setCurrentOrg(new OrgItem(currentOrg));
+        selectedSettingsGroupPage.onShow();
+        MainPage.getSessionInstance().setCurrentWorkspacePage(settingEditPage);
+        settingEditPage.show();
+        return null;
     }
 
     @Override

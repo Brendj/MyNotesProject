@@ -38,6 +38,11 @@
     color: #000;
 }
 
+.output-text-font {
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
+}
+
 .hint-output-text {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 8pt;

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org.settings;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -13,6 +14,10 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.faces.event.ValueChangeEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,19 +33,41 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
     private ECafeSettings setting;
     private OrgItem orgItem;
     private Integer settingsIds;
-    private final SettingsIdEnumTypeMenu settingsIdEnumTypeMenu = new SettingsIdEnumTypeMenu();
     private ECafeSettings.AbstractParserBySettingValue parserBySettingValue;
-    private SelectItemBuilder selectItemBuilder;
+
+    private List<String> allPrinters;
 
     @Autowired
     private SelectedSettingsGroupPage selectedSettingsGroupPage;
+    @Autowired
+    private SettingService settingService;
 
     @Override
     public void onShow() throws Exception {
+        init();
+    }
+
+    public Object reload(){
+        try {
+            init();
+            printMessage("Настройки успешно восстановлены");
+        } catch (Exception e){
+            getLogger().error("Error reload info by settings: ",e);
+            printError("Ошибка при загрузке данных.");
+        }
+        return null;
+    }
+
+    private void init() throws Exception {
         setting = selectedSettingsGroupPage.getSelectSettings();
         orgItem = selectedSettingsGroupPage.getCurrentOrg();
         settingsIds = setting.getSettingsId().getId();
         parserBySettingValue = setting.getSplitSettingValue();
+        if(settingsIds.equals(0) || settingsIds.equals(1) || settingsIds.equals(2)){
+            allPrinters = settingService.findAllPrinterNames();
+        } else {
+            allPrinters = new ArrayList<String>(0);
+        }
     }
 
     @Override
@@ -51,13 +78,32 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
         }
     }
 
+    public Object save(){
+        String settingValue = parserBySettingValue.build();
+        setting.setSettingValue(settingValue);
+        setting.setOrgOwner(orgItem.getIdOfOrg());
+        try {
+            settingService.save(setting);
+            printMessage("Настройки успешно обновлены");
+        } catch (Exception e) {
+            getLogger().error("Error update setting: ",e);
+            printError("Ошибка при сохранении данных.");
+        }
+
+        return null;
+    }
+
     @Override
     public String getPageFilename() {
         return "org/settings/edit";
     }
 
-    public SettingsIdEnumTypeMenu getSettingsIdEnumTypeMenu() {
-        return settingsIdEnumTypeMenu;
+    public List<String> getAllPrinters() {
+        return allPrinters;
+    }
+
+    public void setAllPrinters(List<String> allPrinters) {
+        this.allPrinters = allPrinters;
     }
 
     public Integer getSettingsIds() {

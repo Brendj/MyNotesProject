@@ -36,7 +36,6 @@ public class ECafeSettings extends DistributedObject{
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Value", settingValue);
-        setAttribute(element,"Text", settingText);
         setAttribute(element,"Id", settingsId.getId()+1);
     }
 
@@ -50,8 +49,6 @@ public class ECafeSettings extends DistributedObject{
         if(intId!=null){
             setSettingsId(SettingsIds.fromInteger(intId-1));
         }
-        String stringSettingText = getStringAttributeValue(node, "Text", 128);
-        if(stringSettingText!=null) setSettingText(stringSettingText);
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
@@ -60,12 +57,10 @@ public class ECafeSettings extends DistributedObject{
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((ECafeSettings) distributedObject).getOrgOwner());
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
-        setSettingText(((ECafeSettings) distributedObject).getSettingText());
         setSettingsId(((ECafeSettings) distributedObject).getSettingsId());
     }
 
     private String settingValue;
-    private String settingText;
     private SettingsIds settingsId;
 
     public SettingsIds getSettingsId() {
@@ -75,15 +70,6 @@ public class ECafeSettings extends DistributedObject{
     public void setSettingsId(SettingsIds settingsId) {
         this.settingsId = settingsId;
     }
-
-    public String getSettingText() {
-        return settingText;
-    }
-
-    public void setSettingText(String settingText) {
-        this.settingText = settingText;
-    }
-
 
     public String getSettingValue() {
         return settingValue;
@@ -119,296 +105,331 @@ public class ECafeSettings extends DistributedObject{
     public static abstract class AbstractParserBySettingValue {
 
         protected AbstractParserBySettingValue(String[] values) throws ParseException {
-            build(values);
+            parse(values);
         }
 
-        protected abstract void build(String[] values) throws ParseException;
+        protected abstract void parse(String[] values) throws ParseException;
+
+        public abstract String build();
+
     }
 
     public static class CashierCheckPrinterSettingValue extends AbstractParserBySettingValue{
 
-        private String name; // имя принтера
-        private int s; //: 42 - общая ширина ленты принтера (возможные значения  42,48)
-        private int a; //: 1 - ширина разделителя между колонками (возможные значения 1,2,3)
-        private int b; //: 2 - ширина колонки количество (возможные значения 2,4)
-        private int c; //: 12 - ширина колонки стоимость (возможные значения 7,8,9,10,11,12)
-        private int d; //: 26 - ширина колонки товар (возможные значения определяется на основе остатка от общей длинны минус все остальные колонки)
+        private String a;//a: Microsoft XPS Document Writer - название принтера
+        private String b;//b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
+        private String c;//c: 1 - ширина разделителя между колонками (возможные значения 1,2,3, по умолчанию 1)
+        private String d;//d: 19 – ширина колонки наименование (определяется по формуле: d = b – c*3 – e – f – g)
+        private String e;//e: 3 - ширина колонки количество (возможные значения 2,3,4, по умолчанию 3)
+        private String f;//f: 9 - ширина колонки стоимость (возможные значения 7,8,9,10,11, 12, по умолчанию 10)
+        private String g;//g: 8 – ширина колонки цена (возможные значения 6,7,8,9,10,11, по умолчанию 10)
+        private String h;//h: текстовое поле выводимое на принтере
 
         public CashierCheckPrinterSettingValue(String[] values) throws ParseException {
             super(values);
         }
 
         @Override
-        protected void build(String[] values) {
-            this.name = values[0];
-            this.s = Integer.parseInt(values[1]);
-            this.a = Integer.parseInt(values[2]);
-            this.b = Integer.parseInt(values[4]);
-            this.c = Integer.parseInt(values[5]);
-            this.d = Integer.parseInt(values[3]);
+        protected void parse(String[] values) {
+            this.a = values[0];
+            this.b = values[1];
+            this.c = values[2];
+            this.d = values[3];
+            this.e = values[4];
+            this.f = values[5];
+            this.g = values[6];
+            if(values.length==8) {
+                this.h = values[7];
+            } else {
+                this.h = "";
+            }
+        }
+
+        @Override
+        public String build() {
+            return a+";"+b+";"+c+";"+d+";"+e+";"+f+";"+g+";" + h+";";
         }
 
         public boolean check(){
-            return d==valuesByD();
+            int d1 = getValuesByD();
+            int d2 = Integer.parseInt(d);
+            return d1==d2;
         }
 
-        public String getName() {
-            return name;
+        public Integer getValuesByD(){
+            int temp = (Integer.parseInt(b)-3*Integer.parseInt(c)-Integer.parseInt(e)-Integer.parseInt(f)-Integer.parseInt(g));
+            this.d = String.valueOf(temp);
+            return temp;
         }
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getS() {
-            return s;
-        }
-
-        public void setS(int s) {
-            this.s = s;
-        }
-
-        public Integer[] valuesByS(){
-            return new Integer[]{42,48};
-        }
-
-        public int getA() {
+        public String getA() {
             return a;
         }
 
-        public void setA(int a) {
+        public void setA(String a) {
             this.a = a;
         }
 
-        public Integer[] valuesByA(){
-            return new Integer[]{1,2,3};
-        }
-
-        public int getB() {
+        public String getB() {
             return b;
         }
 
-        public void setB(int b) {
+        public void setB(String b) {
             this.b = b;
         }
 
-        public Integer[] valuesByB(){
-            return new Integer[]{2,4};
-        }
-
-        public int getC() {
+        public String getC() {
             return c;
         }
 
-        public void setC(int c) {
+        public void setC(String c) {
             this.c = c;
         }
 
-        public Integer[] valuesByC(){
-            return new Integer[]{7,8,9,10,11,12};
-        }
-
-        public int getD() {
+        public String getD() {
             return d;
         }
 
-        public void setD(int d) {
+        public void setD(String d) {
             this.d = d;
         }
 
-        public Integer valuesByD(){
-            return (s - a*2 - b - c);
+        public String getE() {
+            return e;
+        }
+
+        public void setE(String e) {
+            this.e = e;
+        }
+
+        public String getF() {
+            return f;
+        }
+
+        public void setF(String f) {
+            this.f = f;
+        }
+
+        public String getG() {
+            return g;
+        }
+
+        public void setG(String g) {
+            this.g = g;
+        }
+
+        public String getH() {
+            return h;
+        }
+
+        public void setH(String h) {
+            this.h = h;
         }
     }
 
     public static class SalesReportPrinterSettingValue extends AbstractParserBySettingValue{
 
-        private String name; // имя принтера
-        private int s; //: 42 - общая ширина ленты принтера (возможные значения  42,48)
-        private int a; //: 1 - ширина разделителя между колонками (возможные значения 1,2,3)
-        private int b; //: 2 - ширина колонки количество (возможные значения 2,4)
-        private int c; //: 12 - ширина колонки стоимость (возможные значения 7,8,9,10,11,12)
-        private int d; //: 26 - ширина колонки товар (возможные значения определяется на основе остатка от общей длинны минус все остальные колонки)
+        private String a;//a: Microsoft XPS Document Writer - название принтера
+        private String b;//b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
+        private String c;//c: 1 - ширина разделителя между колонками (возможные значения 1,2,3, по умолчанию 1)
+        private String d;//d: 22 - ширина колонки наименование (определяется по формуле: d = b – c*2 – e – f)
+        private String e;//e: 6 - ширина колонки количество (возможные значения 6,7,8, по умолчанию 6)
+        private String f;//f: 12 - ширина колонки стоимость (возможные значения 10,11,12,13,14,15, по умолчанию 12)
+        private String g;//g: текстовое поле выводимое на принтере
 
         public SalesReportPrinterSettingValue(String[] values) throws ParseException {
             super(values);
         }
 
         @Override
-        protected void build(String[] values) {
-            this.name = values[0];
-            this.s = Integer.parseInt(values[1]);
-            this.a = Integer.parseInt(values[2]);
-            this.b = Integer.parseInt(values[4]);
-            this.c = Integer.parseInt(values[5]);
-            this.d = Integer.parseInt(values[3]);
+        protected void parse(String[] values) {
+            this.a = values[0];
+            this.b = values[1];
+            this.c = values[2];
+            this.d = values[3];
+            this.e = values[4];
+            this.f = values[5];
+            if(values.length==7) {
+                this.g = values[6];
+            } else {
+                this.g = "";
+            }
+        }
+
+        @Override
+        public String build() {
+            return a+";"+b+";"+c+";"+d+";"+e+";"+f+";"+g+";";
         }
 
         public boolean check(){
-            return d==valuesByD();
+            int d1 = getValuesByD();
+            int d2 = Integer.parseInt(d);
+            return d1==d2;
         }
 
-        public String getName() {
-            return name;
+        public Integer getValuesByD(){
+            int temp = (Integer.parseInt(b)-2*Integer.parseInt(c)-Integer.parseInt(e)-Integer.parseInt(f));
+            this.d = String.valueOf(temp);
+            return temp;
         }
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getS() {
-            return s;
-        }
-
-        public void setS(int s) {
-            this.s = s;
-        }
-
-        public Integer[] valuesByS(){
-            return new Integer[]{42,48};
-        }
-
-        public int getA() {
+        public String getA() {
             return a;
         }
 
-        public void setA(int a) {
+        public void setA(String a) {
             this.a = a;
         }
 
-        public Integer[] valuesByA(){
-            return new Integer[]{1,2,3};
-        }
-
-        public int getB() {
+        public String getB() {
             return b;
         }
 
-        public void setB(int b) {
+        public void setB(String b) {
             this.b = b;
         }
 
-        public Integer[] valuesByB(){
-            return new Integer[]{6,7, 8};
-        }
-
-        public int getC() {
+        public String getC() {
             return c;
         }
 
-        public void setC(int c) {
+        public void setC(String c) {
             this.c = c;
         }
 
-        public Integer[] valuesByC(){
-            return new Integer[]{10,11,12,13,14,15};
-        }
-
-        public int getD() {
+        public String getD() {
             return d;
         }
 
-        public void setD(int d) {
+        public void setD(String d) {
             this.d = d;
         }
 
-        public Integer valuesByD(){
-            return (s - a*2 - b - c);
+        public String getE() {
+            return e;
+        }
+
+        public void setE(String e) {
+            this.e = e;
+        }
+
+        public String getF() {
+            return f;
+        }
+
+        public void setF(String f) {
+            this.f = f;
+        }
+
+        public String getG() {
+            return g;
+        }
+
+        public void setG(String g) {
+            this.g = g;
         }
     }
 
     public static class CardBalanceReportPrinterSettingValue extends AbstractParserBySettingValue{
 
-        private String name; // имя принтера
-        private int s; //: 42 - общая ширина ленты принтера (возможные значения  42,48)
-        private int a; //: 1 - ширина разделителя между колонками (возможные значения 1,2,3)
-        private int b; //: 2 - ширина колонки количество (возможные значения 2,4)
-        private int c; //: 12 - ширина колонки стоимость (возможные значения 7,8,9,10,11,12)
-        private int d; //: 26 - ширина колонки товар (возможные значения определяется на основе остатка от общей длинны минус все остальные колонки)
+        private String a; //a: Microsoft XPS Document Writer - название принтера
+        private String b; //b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
+        private String c;//c: 1 - ширина разделителя между колонками (возможные значения 1,2,3, по умолчанию 1)
+        private String d; //d: 22 - ширина колонки наименование (определяется по формуле: d = b – c*2 – e – f)
+        private String e;//e: 6 - ширина колонки номер карты (возможные значения 8,10,12,14, по умолчанию 12)
+        private String f;//f: 12 - ширина колонки баланс (возможные значения 7,8,9,10,11,12, по умолчанию 12)
+        private String g;//g: текстовое поле выводимое на принтере
 
         public CardBalanceReportPrinterSettingValue(String[] values) throws ParseException {
             super(values);
         }
 
         @Override
-        protected void build(String[] values) {
-            this.name = values[0];
-            this.s = Integer.parseInt(values[1]);
-            this.a = Integer.parseInt(values[2]);
-            this.b = Integer.parseInt(values[4]);
-            this.c = Integer.parseInt(values[5]);
-            this.d = Integer.parseInt(values[3]);
-        }
-        public boolean check(){
-            return d==valuesByD();
-        }
-
-        public String getName() {
-            return name;
+        protected void parse(String[] values) {
+            this.a = values[0];
+            this.b = values[1];
+            this.c = values[2];
+            this.d = values[3];
+            this.e = values[4];
+            this.f = values[5];
+            if(values.length==7) {
+                this.g = values[6];
+            } else {
+                this.g = "";
+            }
         }
 
-        public void setName(String name) {
-            this.name = name;
+        @Override
+        public String build() {
+            return a+";"+b+";"+c+";"+d+";"+e+";"+f+";"+g+";";
         }
 
-        public int getS() {
-            return s;
+        public Integer getValuesByD(){
+            int temp = (Integer.parseInt(b)-2*Integer.parseInt(c)-Integer.parseInt(e)-Integer.parseInt(f));
+            this.d = String.valueOf(temp);
+            return temp;
         }
 
-        public void setS(int s) {
-            this.s = s;
+        public Boolean check(){
+            int d1 = getValuesByD();
+            int d2 = Integer.parseInt(d);
+            return d1==d2;
         }
 
-        public Integer[] valuesByS(){
-            return new Integer[]{42,48};
-        }
-
-        public int getA() {
+        public String getA() {
             return a;
         }
 
-        public void setA(int a) {
+        public void setA(String a) {
             this.a = a;
         }
 
-        public Integer[] valuesByA(){
-            return new Integer[]{1,2,3};
-        }
-
-        public int getB() {
+        public String getB() {
             return b;
         }
 
-        public void setB(int b) {
+        public void setB(String b) {
             this.b = b;
         }
 
-        public Integer[] valuesByB(){
-            return new Integer[]{ 8,10,12,14};
-        }
-
-        public int getC() {
+        public String getC() {
             return c;
         }
 
-        public void setC(int c) {
+        public void setC(String c) {
             this.c = c;
         }
 
-        public Integer[] valuesByC(){
-            return new Integer[]{7,8,9,10,11,12};
-        }
-
-        public int getD() {
+        public String getD() {
             return d;
         }
 
-        public void setD(int d) {
+        public void setD(String d) {
             this.d = d;
         }
 
-        public Integer valuesByD(){
-            return (s - a*2 - b - c);
+        public String getE() {
+            return e;
+        }
+
+        public void setE(String e) {
+            this.e = e;
+        }
+
+        public String getF() {
+            return f;
+        }
+
+        public void setF(String f) {
+            this.f = f;
+        }
+
+        public String getG() {
+            return g;
+        }
+
+        public void setG(String g) {
+            this.g = g;
         }
     }
 
@@ -417,13 +438,7 @@ public class ECafeSettings extends DistributedObject{
         private boolean offOnFlag; //булевое значение ввкл выкл
         private Date payTime; //  0:00 - время автооплаты
         private int porog;//100 - порог срабатывания (от 0 до 100)
-        private static SimpleDateFormat dateOnlyFormat;
-
-        static {
-            TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-            dateOnlyFormat = new SimpleDateFormat("HH:mm");
-            dateOnlyFormat.setTimeZone(utcTimeZone);
-        }
+        private static SimpleDateFormat dateOnlyFormat = new SimpleDateFormat("HH:mm");
 
 
         public AutoPlanPaymentSettingSettingValue(String[] values) throws ParseException {
@@ -431,10 +446,15 @@ public class ECafeSettings extends DistributedObject{
         }
 
         @Override
-        protected void build(String[] values) throws ParseException {
-            this.offOnFlag = !values[0].equals("0");
+        protected void parse(String[] values) throws ParseException {
+            this.offOnFlag = values[0].equals("1");
             this.payTime = dateOnlyFormat.parse(values[1]);
-            this.porog = Integer.getInteger(values[2]);
+            this.porog = Integer.parseInt(values[2]);
+        }
+
+        @Override
+        public String build() {
+            return (offOnFlag?1:0)+";"+dateOnlyFormat.format(payTime)+";"+porog+";";
         }
 
         public boolean isOffOnFlag() {

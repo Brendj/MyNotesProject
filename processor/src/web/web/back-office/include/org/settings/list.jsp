@@ -21,7 +21,7 @@
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Фильтр (#{settingsListPage.status})" switchType="client"
-                            eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
+                            eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
@@ -66,13 +66,13 @@
             <a4j:commandLink value="#{setting.guid}" action="#{settingsListPage.view}"
                              styleClass="command-link" reRender="mainMenu, workspaceForm"/>
         </rich:column>
-        <rich:column>
+        <rich:column sortBy="#{setting.globalVersion}">
             <f:facet name="header">
                 <h:outputText value="Версия"/>
             </f:facet>
             <h:outputText value="#{setting.globalVersion}"/>
         </rich:column>
-        <rich:column>
+        <rich:column sortBy="#{setting.settingsId}">
             <f:facet name="header">
                 <h:outputText value="Тип устройства"/>
             </f:facet>
@@ -82,19 +82,13 @@
             <f:facet name="header">
                 <h:outputText value="Статус"/>
             </f:facet>
-            <h:outputText value="#{setting.deletedState}"/>
+            <h:outputText value="#{(setting.deletedState?'Удален':'Активен')}"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Параметры принтера (формат чека)"/>
             </f:facet>
             <h:outputText value="#{setting.settingValue}"/>
-        </rich:column>
-        <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Текстовое сообщение"/>
-            </f:facet>
-            <h:outputText value="#{setting.settingText}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

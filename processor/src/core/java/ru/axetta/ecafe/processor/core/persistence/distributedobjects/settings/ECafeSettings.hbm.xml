@@ -36,7 +36,6 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
-        <property name="settingText" column="SettingText" type="string" length="128"/>
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
     </class>

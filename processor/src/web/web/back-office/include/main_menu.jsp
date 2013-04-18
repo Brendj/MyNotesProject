@@ -97,6 +97,10 @@
                                 action="#{settingEditPage.show}" reRender="workspaceForm" />
         </rich:panelMenuGroup>
 
+        <%--@elvariable id="settingCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingCreatePage"--%>
+        <rich:panelMenuItem id="settingsCreateMenuItem" binding="#{settingCreatePage.mainMenuComponent}" label="Регистрация"
+                            action="#{settingCreatePage.show}" reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="questionariesGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.QuestionariesGroupPage"--%>

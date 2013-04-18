@@ -23,10 +23,12 @@ public enum SettingsIds {
     private Integer id;
     private String description;
 
-    private static Map<Integer,SettingsIds> map = new HashMap<Integer,SettingsIds>();
+    private static Map<Integer,SettingsIds> mapInt = new HashMap<Integer,SettingsIds>();
+    private static Map<String,SettingsIds> mapStr = new HashMap<String,SettingsIds>();
     static {
         for (SettingsIds questionaryStatus : SettingsIds.values()) {
-            map.put(questionaryStatus.getId(), questionaryStatus);
+            mapInt.put(questionaryStatus.getId(), questionaryStatus);
+            mapStr.put(questionaryStatus.toString(), questionaryStatus);
         }
     }
 
@@ -40,7 +42,11 @@ public enum SettingsIds {
     }
 
     public static SettingsIds fromInteger(Integer id){
-        return map.get(id);
+        return mapInt.get(id);
+    }
+
+    public static SettingsIds fromString(String description){
+        return mapStr.get(description);
     }
 
     @Override
