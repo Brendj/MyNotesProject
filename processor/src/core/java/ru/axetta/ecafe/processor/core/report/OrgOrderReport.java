@@ -261,7 +261,7 @@ public class OrgOrderReport extends BasicReport {
 
     public static class Builder {
 
-        private static class GrouppedClientsData {
+        private static class GroupedClientsData {
 
             private final long totalOrderSumByCard;
             private final long totalOrderSumByCash;
@@ -269,8 +269,8 @@ public class OrgOrderReport extends BasicReport {
             private final long totalGrantSum;
             private final List<ClientGroupItem> clientGroupItems;
 
-            private GrouppedClientsData(long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount,
-                    long totalGrantSum, List<ClientGroupItem> clientGroupItems) {
+            private GroupedClientsData(long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount,
+                    long totalTrdDiscount, long totalGrantSum, List<ClientGroupItem> clientGroupItems) {
                 this.totalOrderSumByCard = totalOrderSumByCard;
                 this.totalOrderSumByCash = totalOrderSumByCash;
                 this.totalSocDiscount = totalSocDiscount;
@@ -383,22 +383,22 @@ public class OrgOrderReport extends BasicReport {
 
         public OrgOrderReport build(Session session, Date startTime, Date endTime, Org org) throws Exception {
             Date generateTime = new Date();
-            GrouppedClientsData grouppedClientsData = buildGrouppedClientsData(session, startTime, endTime, org);
-            ClientGroupItem unGrouppedClientsData = buildUnGrouppedClientsData(session, startTime, endTime, org);
-            List<ClientGroupItem> clientGroupItems = grouppedClientsData.getClientGroupItems();
-            clientGroupItems.add(unGrouppedClientsData);
+            GroupedClientsData groupedClientsData = buildGroupedClientsData(session, startTime, endTime, org);
+            ClientGroupItem unGroupedClientsData = buildUnGroupedClientsData(session, startTime, endTime, org);
+            List<ClientGroupItem> clientGroupItems = groupedClientsData.getClientGroupItems();
+            clientGroupItems.add(unGroupedClientsData);
             return new OrgOrderReport(generateTime, new Date().getTime() - generateTime.getTime(), startTime, endTime,
-                    new OrgItem(org, grouppedClientsData.getTotalOrderSumByCard() + unGrouppedClientsData
+                    new OrgItem(org, groupedClientsData.getTotalOrderSumByCard() + unGroupedClientsData
                             .getTotalOrderSumByCard(),
-                            grouppedClientsData.getTotalOrderSumByCash() + unGrouppedClientsData
+                            groupedClientsData.getTotalOrderSumByCash() + unGroupedClientsData
                                     .getTotalOrderSumByCash(),
-                            grouppedClientsData.getTotalSocDiscount() + unGrouppedClientsData.getTotalSocDiscount(),
-                            grouppedClientsData.getTotalTrdDiscount() + unGrouppedClientsData.getTotalTrdDiscount(),
-                            grouppedClientsData.getTotalGrantSum() + unGrouppedClientsData.getTotalGrantSum(),
+                            groupedClientsData.getTotalSocDiscount() + unGroupedClientsData.getTotalSocDiscount(),
+                            groupedClientsData.getTotalTrdDiscount() + unGroupedClientsData.getTotalTrdDiscount(),
+                            groupedClientsData.getTotalGrantSum() + unGroupedClientsData.getTotalGrantSum(),
                             clientGroupItems));
         }
 
-        private static GrouppedClientsData buildGrouppedClientsData(Session session, Date startTime, Date endTime,
+        private static GroupedClientsData buildGroupedClientsData(Session session, Date startTime, Date endTime,
                 Org org) throws Exception {
             Criteria clientGroupsCriteria = session.createCriteria(ClientGroup.class);
             clientGroupsCriteria.add(Restrictions.eq("org", org)).setFetchMode("org", FetchMode.JOIN);
@@ -426,12 +426,11 @@ public class OrgOrderReport extends BasicReport {
                 totalGrantSum += clientGroupItem.getTotalGrantSum();
                 clientGroupItems.add(clientGroupItem);
             }
-            return new GrouppedClientsData(totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount, totalGrantSum,
+            return new GroupedClientsData(totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount, totalGrantSum,
                     clientGroupItems);
         }
 
-        private static ClientGroupItem buildUnGrouppedClientsData(Session session, Date startTime, Date endTime,
-                Org org) throws Exception {
+        private static ClientGroupItem buildUnGroupedClientsData(Session session, Date startTime, Date endTime, Org org) throws Exception {
             Criteria clientsCriteria = session.createCriteria(Client.class);
             clientsCriteria.add(Restrictions.eq("org", org)).setFetchMode("org", FetchMode.JOIN);
             clientsCriteria.add(Restrictions.isNull("idOfClientGroup"));
