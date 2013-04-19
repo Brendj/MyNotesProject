@@ -82,6 +82,7 @@ public class ProjectStateReportService {
     private static final int REFILL_PROGRESS_0_CHART = 1001;
     private static final int REFILL_PROGRESS_1_CHART = 1002;
     private static final int REFILL_PROGRESS_2_CHART = 1003;
+    private static final int DISCOUNT_FLOWCHARTS_DATE_INCREMENT = -259200000; // 3 дня
 
 
     //  Для возможности отбора данных по регионам, достаточно указать два макро-заменителя
@@ -491,11 +492,11 @@ public class ProjectStateReportService {
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
     //private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
-    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
+    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= %MAXIMUM_DATE_CLAUSE% and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
             "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
-                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and "
+                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') and "
                     + "      period >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                     + "      Type=? and Region=? and substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') <> '' "
                     + PERIODIC_AVG_GROUP + " order by 2 desc, 1";
@@ -757,6 +758,17 @@ public class ProjectStateReportService {
 
     public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName,
             Integer idOfContragent) {
+        if (sql.indexOf("%MAXIMUM_DATE_CLAUSE%") > -1) {
+            //  Для льготного питания для графика берем либо указанный предыдуще, относительно текущего, полугодие;
+            //  либо берем максимальную дату 3 дня назад (для текущего полугодия)
+            if (type == ACTIVE_CHART_4_DATA || type == UNIQUE_CHART_4_DATA) {
+                Calendar today = getToday();
+                today.setTimeInMillis(today.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
+                sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "least(EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(today.getTime()) + "'), EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%')) * 1000");
+            } else {
+                sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000");
+            }
+        }
         if (sql.indexOf("%MINIMUM_DATE%") > -1) {
             sql = sql.replaceAll("%MINIMUM_DATE%", DB_DATE_FORMAT.format(min.getTime()));
         }
