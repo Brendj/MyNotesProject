@@ -11,10 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +22,34 @@ import java.util.List;
  */
 public class ClientPaymentsReport extends BasicReport {
 
+
+    private static final String PAYMENTS_SQL =
+                        "select "
+                      + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                      + "cf_contragents.contragentname, "
+                      + "int8(sum(cf_orders.rsum)) as sales, "
+                      + "int8(sum(cf_orders.socdiscount)) as discounts "
+                      + "from cf_orgs "
+                      + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
+                      + "                       cf_orders.createddate between :fromCreatedDate and :toCreatedDate "
+                      + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid=%CONTRAGENT_TYPE% "
+                      + "where %ORGS_LIST% "
+                      + "group by cf_orgs.officialname, cf_contragents.contragentname "
+                      + "order by cf_orgs.officialname, cf_contragents.contragentname";
+    private static final String TRANSACTIONS_SQL =
+                        "select "
+                      + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                      + "cf_contragents.contragentname, "
+                      + "int8(sum(cf_clientpayments.paysum) / 100) as payments "
+                      + "from cf_orgs "
+                      + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
+                      + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
+                      + "                             cf_transactions.transactiondate between :fromCreatedDate and :toCreatedDate "
+                      + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
+                      + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid=%CONTRAGENT_TYPE% "
+                      + "where %ORGS_LIST% "
+                      + "group by cf_orgs.officialname, cf_contragents.contragentname "
+                      + "order by cf_orgs.officialname";
 
 
     private final List<ClientPaymentItem> items;
@@ -46,41 +71,66 @@ public class ClientPaymentsReport extends BasicReport {
                 }
                 orgCondition = orgCondition + ") ";
 
-                String preparedQuery =
-                          "select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_contragents.contragentname, "
-                        + "int8(sum(cf_transactions.transactionsum)) as payments, int8(sum(cf_orders.rsum)) as sales, int8(sum(cf_orders.socdiscount)) as discounts "
-                        + "from cf_orgs "
-                        + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
-                        + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
-                        + "                       cf_orders.createddate between :fromCreatedDate and :toCreatedDate "
-                        + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid=:contragentsType "
-                        + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
-                        + "                       cf_transactions.transactiondate between :fromCreatedDate and :toCreatedDate "
-                        + "where " + orgCondition
-                        + "group by cf_orgs.officialname, cf_contragents.contragentname "
-                        + "order by cf_orgs.officialname, cf_contragents.contragentname ";
-                List resultList = null;
-                Query query = session.createSQLQuery(preparedQuery);
+
                 long startDateLong = startDate.getTime();
                 long endDateLong = endDate.getTime();
-                query.setLong("fromCreatedDate", startDateLong);
-                query.setLong("toCreatedDate", endDateLong);
-                query.setInteger("contragentsType", Contragent.TSP);
 
-                resultList = query.list();
-
-                for (Object result : resultList) {
-                    Object[] pay = (Object[]) result;
-                    String orgName = (String) pay[0];
-                    String agent = (String) pay[1];
-                    Long payments = ((BigInteger) pay[2]).longValue();
-                    Long sales = ((BigInteger) pay[3]).longValue();
-                    Long discounts = ((BigInteger) pay[4]).longValue();
-                    ClientPaymentItem item = new ClientPaymentItem(orgName, agent, payments, sales, discounts);
-                    items.add(item);
-                }
+                parseSales(items, executeSQL(session, PAYMENTS_SQL, startDateLong, endDateLong, orgCondition));
+                parseTransactions(items,
+                        executeSQL(session, TRANSACTIONS_SQL, startDateLong, endDateLong, orgCondition));
             }
             return new ClientPaymentsReport(generateTime, new Date().getTime() - generateTime.getTime(), items);
+        }
+
+
+        private List executeSQL (Session session, String sql, long startDate, long endDate, String orgCondition) {
+            sql = sql.replaceAll("%CONTRAGENT_TYPE%", "" + Contragent.TSP);
+            sql = sql.replaceAll("%ORGS_LIST%", orgCondition);
+            Query query = session.createSQLQuery(sql);
+            query.setLong("fromCreatedDate", startDate);
+            query.setLong("toCreatedDate", endDate);
+            return query.list();
+        }
+
+
+        private void parseSales (List<ClientPaymentItem> items, List res) {
+            for (Object result : res) {
+                Object[] o = (Object[]) result;
+                String orgName = (String) o[0];
+                String agent = (String) o[1];
+                Long sales = ((BigInteger) o[2]).longValue();
+                Long discounts = ((BigInteger) o[3]).longValue();
+                ClientPaymentItem item = new ClientPaymentItem(orgName, agent, 0L, sales, discounts);
+                items.add(item);
+            }
+        }
+
+        private void parseTransactions (List<ClientPaymentItem> items, List res) {
+            for (Object result : res) {
+                Object[] o = (Object[]) result;
+                String orgName = (String) o[0];
+                String agent = (String) o[1];
+                Long payments = ((BigInteger) o[2]).longValue();
+
+                ClientPaymentItem item = lookupOrgByName(items, orgName);
+                if (item == null) {
+                    item = new ClientPaymentItem(orgName, agent, payments, 0L, 0L);
+                    items.add(item);
+                }
+                item.setPayments(payments);
+            }
+        }
+
+        private ClientPaymentItem lookupOrgByName (List<ClientPaymentItem> items, String orgName) {
+            if (items == null || items.size() < 1) {
+                return null;
+            }
+            for (ClientPaymentItem i : items) {
+                if (i.getOrgName().equals(orgName)) {
+                    return i;
+                }
+            }
+            return null;
         }
 
     }
@@ -99,10 +149,9 @@ public class ClientPaymentsReport extends BasicReport {
 
         private final String orgName; // Наименование организации
         private final String agent; // Наименование контрагента
-        private final String payments; // Сумма платежей
-        private final String sales; // Сумма продаж
-        private final String discounts; // Сумма льготных продаж
-        private final String diff; // Разница (Сумма продаж - Сумма льготных продаж)
+        private Long payments; // Сумма платежей
+        private Long sales; // Сумма продаж
+        private Long discounts; // Сумма льготных продаж
 
 
         public String getOrgName () {
@@ -116,33 +165,36 @@ public class ClientPaymentsReport extends BasicReport {
 
 
         public String getPayments () {
-            return payments;
+            return longToMoney(payments);
         }
 
 
         public String getSales() {
-            return sales;
+            return longToMoney(sales);
         }
 
 
         public String getDiscounts() {
-            return discounts;
+            return longToMoney(discounts);
         }
 
 
         public String getDiff() {
-            return diff;
+            return longToMoney((payments == null ? 0L : payments) - (sales == null ? 0L : sales));
         }
 
+
+        public void setPayments (Long payments) {
+            this.payments = payments;
+        }
 
 
         public ClientPaymentItem(String orgName, String agent, Long payments, Long sales, Long discounts) {
             this.orgName = orgName;
             this.agent = agent;
-            this.payments = longToMoney(payments);
-            this.sales = longToMoney(sales);
-            this.discounts = longToMoney(discounts);
-            this.diff = longToMoney((payments == null ? 0L : payments) - (sales == null ? 0L : sales));
+            this.payments = payments;
+            this.sales = sales;
+            this.discounts = discounts;
         }
     }
 
