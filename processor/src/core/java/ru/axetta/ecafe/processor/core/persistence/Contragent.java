@@ -83,7 +83,7 @@ public class Contragent {
     }
 
     public Contragent(Person contactPerson, String contragentName, int classId, int flags, String title, String address,
-            Date createTime, Date updateTime, String publicKey, boolean needAccountTranslate) throws Exception {
+            Date createTime, Date updateTime, String publicKey, String kpp, String ogrn, boolean needAccountTranslate) throws Exception {
         this.contactPerson = contactPerson;
         this.contragentName = contragentName;
         this.classId = classId;
@@ -93,6 +93,8 @@ public class Contragent {
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.publicKey = publicKey;
+        this.kpp = kpp;
+        this.ogrn = ogrn;
         this.needAccountTranslate = needAccountTranslate;
     }
 

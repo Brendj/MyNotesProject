@@ -292,7 +292,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         session.save(contactPerson);
         Date currentTime = new Date();
         Contragent contragent = new Contragent(contactPerson, this.contragentName.trim(), this.classId, 1, this.title,
-                this.address, currentTime, currentTime, this.publicKey, this.needAccountTranslate);
+                this.address, currentTime, currentTime, this.publicKey,kpp.trim(),ogrn.trim(), this.needAccountTranslate);
         contragent.setContactPerson(contactPerson);
         contragent.setParentId(this.parentId);
         contragent.setPhone(this.phone);
@@ -306,8 +306,6 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setCorrAccount(this.corrAccount.trim());
         contragent.setAccount(this.account.trim());
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
-        contragent.setKpp(kpp.trim());
-        contragent.setOgrn(ogrn.trim());
         session.save(contragent);
 
         updateContragentRNIP(session, contragent);

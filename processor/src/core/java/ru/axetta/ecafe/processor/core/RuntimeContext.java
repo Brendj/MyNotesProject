@@ -602,7 +602,7 @@ public class RuntimeContext implements ApplicationContextAware {
         em.persist(contactPerson);
         Date currentTime = new Date();
         Contragent contragent = new Contragent(contactPerson, contragentName, classId, 1, "",
-                "", currentTime, currentTime, "", false);
+                "", currentTime, currentTime, "","","", false);
         em.persist(contragent);
         String className = Contragent.getClassAsString(classId);
         logger.info("Contragent with class \"" + className + "\" created, name \"" + contragentName + "\"");
