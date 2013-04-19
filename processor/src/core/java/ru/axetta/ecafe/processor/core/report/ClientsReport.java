@@ -105,12 +105,20 @@ public class ClientsReport extends BasicReportForOrgJob {
             HashMap<Integer, ClientsReportItem> mapItems = new HashMap<Integer, ClientsReportItem>(31);
             List<ClientsReportItem> resultRows = new LinkedList<ClientsReportItem>();
             Calendar c = Calendar.getInstance();
-            Query query = session.createSQLQuery("SELECT o.CreatedDate, sum(od.rPrice) AS SUM1, p.firstname, p.surname, p.secondname "
+            Query query = session.createSQLQuery
+                   ("select cf_orders.CreatedDate, sum(cf_orders.rsum/100), trim(both ' ' from cf_persons.firstname), trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.secondname) "
+                    + "from cf_orders "
+                    + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
+                    + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
+                    + "where cf_orders.idoforg=:idOfOrg and cf_orders.CreatedDate>=:startTime AND cf_orders.CreatedDate<=:endTime AND (cf_orders.rsum > 0) "
+                    + "group by cf_orders.CreatedDate, cf_persons.firstname, cf_persons.surname, cf_persons.secondname "
+                    + "order by trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.firstname), trim(both ' ' from cf_persons.secondname), cf_orders.CreatedDate");
+                    /*("SELECT o.CreatedDate, sum(od.rPrice) AS SUM1, p.firstname, p.surname, p.secondname "
                     + "FROM CF_ORDERS o, CF_CLIENTS c, CF_PERSONS p, CF_ORDERDETAILS od "
                     + "WHERE (o.idOfOrg=:idOfOrg) AND (o.idofclient=c.idofclient) AND (p.idofperson=c.idofperson) AND od.idOfOrder=o.idOfOrder "
                     + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND (od.rPrice > 0) "
                     + "group by o.CreatedDate, p.firstname, p.surname, p.secondname "
-                    + "order by p.surname, p.firstname, p.secondname, o.CreatedDate;");
+                    + "order by p.surname, p.firstname, p.secondname, o.CreatedDate;");*/
 
             query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
             query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
