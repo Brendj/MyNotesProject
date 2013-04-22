@@ -221,6 +221,8 @@
                     <h:inputText value="#{optionPage.syncRegisterPassword}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Организация" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterCompany}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Вести лог синхронизации" styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.syncRegisterLogging}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
 

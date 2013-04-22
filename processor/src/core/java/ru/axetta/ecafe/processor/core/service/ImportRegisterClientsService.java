@@ -110,9 +110,11 @@ public class ImportRegisterClientsService {
         Session session = (Session) em.getDelegate();
         org = em.merge(org);
         List<MskNSIService.ExpandedPupilInfo> pupils = nsiService.getChangedClients(lastUpd, org);
+        String synchDate = "[Синхронизация от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
 
         try {
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+            log(synchDate + "Производится синхронизация для " + org.getOfficialName());
 
             //  Проходим по всем существующим клиентам ОУ
             List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly (em, org);
@@ -135,14 +137,9 @@ public class ImportRegisterClientsService {
                     if (clientGroup == null) {
                         clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
+                    log(synchDate + "Требует произвести удаление клиента " + dbClient);
                     dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     session.save(dbClient);
-                    /*FieldProcessor.Config fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                    DAOService.getInstance().bindClientToGroup(ClientManager
-                            .findClientByFullName(org, (ClientManager.ClientFieldConfigForUpdate) fieldConfig),
-                            ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                    ClientManager.modifyClient((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
-                            String.format(MskNSIService.COMMENT_AUTO_DELETED, date));*/
                 }
             }
 
@@ -178,6 +175,7 @@ public class ImportRegisterClientsService {
                 }
                 if (cl != null && !guidFound) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
+                    log(synchDate + "Клиент " + cl + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
                     cl.setOrg(newOrg);
                     updateClient = true;
                 }
@@ -191,6 +189,9 @@ public class ImportRegisterClientsService {
                     //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
                     if (cl == null) {
                         try {
+                            log(synchDate + "Требуется добавление нового клинета " + pupil.getGuid() + ", " +
+                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
+                                pupil.getSecondName() + ", " + pupil.getGroup());
                             fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
                                     String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
                             ClientManager
@@ -201,6 +202,7 @@ public class ImportRegisterClientsService {
                         }
                     //  Иначе - обновляем клиента в БД
                     } else {
+                        log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя cl");
                         ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
                                 String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
                     }
@@ -259,4 +261,10 @@ public class ImportRegisterClientsService {
         scheduler.start();
     } */
 
+
+    private void log (String str) {
+        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
+            logger.info(str);
+        }
+    }
 }
