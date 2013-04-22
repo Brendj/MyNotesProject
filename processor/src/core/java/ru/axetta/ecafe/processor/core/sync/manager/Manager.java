@@ -58,7 +58,6 @@ public class Manager {
     private List<DOConfirm> confirmDistributedObject = new ArrayList<DOConfirm>();
     private Document document;
     private Long idOfOrg;
-    private List<Long> idOfOrgOwners;
     private final DateFormat dateOnlyFormat;
     private final DateFormat timeFormat;
 
@@ -383,7 +382,7 @@ public class Manager {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }  catch (Exception e){
-            logger.error("");
+            logger.error("Exception get ConfigurationProvider: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -436,7 +435,7 @@ public class Manager {
             Criterion resultCriterion =  Restrictions.conjunction().add(sendToAndOrgRestriction);
 
             Criterion restrictionConfigProvider = null;
-            if(classList.contains(IConfigProvider.class)){
+            if(classList.contains(IConfigProvider.class) && configurationProvider!=null){
                 restrictionConfigProvider = Restrictions.eq("idOfConfigurationProvider",configurationProvider.getIdOfConfigurationProvider());
                 ((Conjunction)resultCriterion).add(restrictionConfigProvider);
             }
@@ -451,35 +450,6 @@ public class Manager {
             criteria.add(resultCriterion);
             /* TODO: новый функционал  */
             List list = criteria.list();
-            //String where = "";
-            //if(classList.contains(IConfigProvider.class)){
-            //    //ConfigurationProvider configurationProvider = getConfigurationProvider(persistenceSession, clazz);
-            //    if ( configurationProvider!=null){
-            //        where = " idOfConfigurationProvider="+configurationProvider.getIdOfConfigurationProvider();
-            //    } else {
-            //        where = " idOfConfigurationProvider = null";
-            //    }
-            //}
-            //
-            //// вытянем номер организации поставщика если есть.
-            //String whereOrgSource = "";
-            //if(!(menuExchangeRuleList == null || menuExchangeRuleList.isEmpty() || menuExchangeRuleList.get(0)==null)){
-            //    whereOrgSource = " orgOwner in ("+  menuExchangeRuleList.toString().replaceAll("[^0-9,]","") + ", "+idOfOrg+")";
-            //} else{
-            //    whereOrgSource = " orgOwner = "+idOfOrg;
-            //}
-            //where = (where.equals("")?"(" + whereOrgSource + " or orgOwner is null )": where + " and  (" + whereOrgSource + " or orgOwner is null )")+" ";
-            //String sendOnlyOrgWhere = " (sendAll = 3 and orgOwner = "+idOfOrg+" ";
-            //if(currentMaxVersion != null){
-            //    where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion;
-            //    sendOnlyOrgWhere = sendOnlyOrgWhere + " and globalVersion>"+currentMaxVersion;
-            //    // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
-            //}
-            //sendOnlyOrgWhere = sendOnlyOrgWhere + " ) ";
-            //String sendAllWhere = " (sendAll is null or sendAll="+SendToAssociatedOrgs.Send.getSendMode()+") ";
-            //String select = "from " + clazz.getSimpleName() + (where.equals("")?"" + sendAllWhere:" where ("+ sendAllWhere + " and " + where)+") or "+sendOnlyOrgWhere;
-            //Query query = persistenceSession.createQuery(select);
-            //List list = query.list();
             if(!(list==null || list.isEmpty())){
                 for (Object object: list){
                     DistributedObject distributedObject = (DistributedObject) object;
