@@ -110,7 +110,7 @@ public class ImportRegisterClientsService {
         Session session = (Session) em.getDelegate();
         org = em.merge(org);
         List<MskNSIService.ExpandedPupilInfo> pupils = nsiService.getChangedClients(lastUpd, org);
-        String synchDate = "[Синхронизация от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
 
         try {
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
