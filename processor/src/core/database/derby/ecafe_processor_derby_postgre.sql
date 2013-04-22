@@ -494,7 +494,7 @@ CREATE TABLE CF_OrderDetails (
   MenuOutput      VARCHAR(32)   NOT NULL,
   MenuOrigin      INT           NOT NULL,
   State           INT           NOT NULL DEFAULT 0,
-  ItemCode VARCHAR(32),
+  ItemCode        VARCHAR(32),
   CONSTRAINT CF_OrderDetails_pk PRIMARY KEY (IdOfOrg, IdOfOrderDetail),
   CONSTRAINT CF_OrderDetails_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
   CONSTRAINT CF_OrderDetails_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder) REFERENCES CF_Orders (IdOfOrg, IdOfOrder),
