@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryDAOService;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
@@ -36,6 +37,8 @@ public class QuestionaryListPage extends BasicWorkspacePage {
     private QuestionaryService questionaryService;
     @Autowired
     protected QuestionaryGroupPage questionaryGroupPage;
+    @Autowired
+    private QuestionaryDAOService questionaryDAOService;
 
     @Override
     public void onShow() throws Exception {
@@ -52,7 +55,7 @@ public class QuestionaryListPage extends BasicWorkspacePage {
         try {
             Questionary questionary = getEntityFromRequestParam();
             if(questionary.getStatus()== QuestionaryStatus.STOP || questionary.getStatus() == QuestionaryStatus.INACTIVE){
-                questionaryService.changeStatusQuestionary(questionary, QuestionaryStatus.DELETED);
+                questionaryDAOService.changeStatusQuestionary(questionary, QuestionaryStatus.DELETED);
                 reload();
                 printMessage("Анкета отправлена на удаление");
             } else {
@@ -69,7 +72,7 @@ public class QuestionaryListPage extends BasicWorkspacePage {
     public Object start(){
         try {
             Questionary questionary = getEntityFromRequestParam();
-            questionaryService.changeStatusQuestionary(questionary, QuestionaryStatus.START);
+            questionaryDAOService.changeStatusQuestionary(questionary, QuestionaryStatus.START);
             questionaryGroupPage.setQuestionary(questionary);
             reload();
             printMessage("Анкета успешно активирована");
@@ -84,7 +87,7 @@ public class QuestionaryListPage extends BasicWorkspacePage {
     public Object stop(){
         try {
             Questionary questionary = getEntityFromRequestParam();
-            questionaryService.changeStatusQuestionary(questionary, QuestionaryStatus.STOP);
+            questionaryDAOService.changeStatusQuestionary(questionary, QuestionaryStatus.STOP);
             questionaryGroupPage.setQuestionary(questionary);
             reload();
             printMessage("Анкета успешно остановлена");
@@ -109,7 +112,7 @@ public class QuestionaryListPage extends BasicWorkspacePage {
     }
 
     private void reload(){
-        List<Questionary> questionaryList = questionaryService.getQuestionaries();
+        List<Questionary> questionaryList = questionaryDAOService.getQuestionaries();
         questionaries = new ListDataModel(questionaryList);
     }
 }

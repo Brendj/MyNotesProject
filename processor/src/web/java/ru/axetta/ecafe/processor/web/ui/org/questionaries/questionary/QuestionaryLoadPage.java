@@ -45,7 +45,6 @@ public class QuestionaryLoadPage extends BasicWorkspacePage implements OrgListSe
     private QuestionaryService questionaryService;
 
     public void questionaryLoadFileListener(UploadEvent event) {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
         QuestionariesRootElement questionariesRootElement = null;
         try {

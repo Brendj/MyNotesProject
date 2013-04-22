@@ -42,7 +42,9 @@ public enum QuestionaryType {
     }
 
     public static QuestionaryType fromInteger(Integer value){
-        return map.get(value);
+        QuestionaryType questionaryType = map.get(value);
+        if(questionaryType==null) questionaryType = QuestionaryType.DEFAULT;
+        return questionaryType;
     }
 
 }

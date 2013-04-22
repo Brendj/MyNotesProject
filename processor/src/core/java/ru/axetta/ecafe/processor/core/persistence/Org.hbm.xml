@@ -138,7 +138,7 @@
             <many-to-one name="thisOrg" column="currentOrg"/>
         </join>-->
 
-        <set name="questionaries" table="stock_category" inverse="false" lazy="true" fetch="select">
+        <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="join" outer-join="false">
             <key>
                 <column name="IdOfOrg" not-null="true" />
             </key>

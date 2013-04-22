@@ -24,70 +24,9 @@ import java.util.List;
  */
 public class OrgListPage extends BasicWorkspacePage {
 
-    public static class Item {
-
-        private final Long idOfOrg;
-        private final String shortName;
-        private final String contractId;
-        private final Integer state;
-        private final String phone;
-        private final String tag;
-        private final String city;
-        private final String district;
-        private final String location;
-
-        public Item(Org org) {
-            this.idOfOrg = org.getIdOfOrg();
-            this.shortName = org.getShortName();
-            this.state = org.getState();
-            this.contractId = org.getContractId();
-            this.phone = org.getPhone();
-            this.tag = org.getTag();
-            this.city = org.getCity();
-            this.location = org.getLocation();
-            this.district = org.getDistrict();
-        }
-
-        public Long getIdOfOrg() {
-            return idOfOrg;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public String getContractId() {
-            return contractId;
-        }
-
-        public Integer getState() {
-            return state;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
-        public String getTag() {
-            return tag;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-        public String getDistrict() {
-            return district;
-        }
-
-        public String getLocation() {
-            return location;
-        }
-    }
-
     private final OrgFilter orgFilter = new OrgFilter();
 
-    private List<Item> items = Collections.emptyList();
+    private List<OrgItem> items = Collections.emptyList();
 
     public String getPageFilename() {
         return "org/list";
@@ -97,7 +36,7 @@ public class OrgListPage extends BasicWorkspacePage {
         return super.getPageTitle() + String.format(" (%d)", items.size());
     }
 
-    public List<Item> getItems() {
+    public List<OrgItem> getItems() {
         return items;
     }
 
@@ -106,16 +45,12 @@ public class OrgListPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        List<Item> items = new LinkedList<Item>();
+        List<OrgItem> items = new LinkedList<OrgItem>();
 
         /* Добавленна проверка на фильтр
          * производится выборка только при введении одного из параметров фильтра */
         if(!orgFilter.isEmpty()){
-            List orgs = orgFilter.retrieveOrgs(session);
-            for (Object object : orgs) {
-                Org org = (Org) object;
-                items.add(new Item(org));
-            }
+            items = orgFilter.retrieveOrgs(session);
         }
 
         this.items = items;

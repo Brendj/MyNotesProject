@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 
 import java.util.List;
 
@@ -52,7 +52,8 @@ public class OrgFilter {
      * @author Kadyrov Damir
      * @since 2012-02-27
      */
-    public List retrieveOrgs(Session session) {
+    @SuppressWarnings("unchecked")
+    public List<OrgItem> retrieveOrgs(Session session) {
         Criteria criteria = session.createCriteria(Org.class);
         /*criteria.add(Restrictions.or(
                 Restrictions.eq("idOfOrg",idOfOrg),
@@ -76,9 +77,22 @@ public class OrgFilter {
         if (location != null && location.length() > 0) {
             criteria.add(Restrictions.like("location", tag, MatchMode.ANYWHERE).ignoreCase());
         }
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
+                .add(Projections.property("shortName"),"shortName")
+                .add(Projections.property("contractId"),"contractId")
+                .add(Projections.property("state"),"state")
+                .add(Projections.property("phone"),"phone")
+                .add(Projections.property("tag"),"tag")
+                .add(Projections.property("city"),"city")
+                .add(Projections.property("district"),"district")
+                .add(Projections.property("location"),"location")
+        );
+
+        criteria.setResultTransformer(Transformers.aliasToBean(OrgItem.class));
 
         criteria.addOrder(Order.asc("idOfOrg"));
-        return criteria.list();
+        return (List<OrgItem>) criteria.list();
     }
 
     /**

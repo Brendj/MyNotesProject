@@ -43,8 +43,10 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     private SettingService settingService;
 
     public void valueChangeListener(ValueChangeEvent event) throws Exception{
-        settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
-        init();
+        if(event.getNewValue()!=null){
+            settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
+            init();
+        }
     }
 
     @Override

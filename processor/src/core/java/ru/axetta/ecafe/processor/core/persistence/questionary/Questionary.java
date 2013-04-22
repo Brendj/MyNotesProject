@@ -4,9 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.persistence.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryItem;
 import ru.axetta.ecafe.processor.core.persistence.DateType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -64,6 +67,20 @@ public class Questionary {
         this.description = description;
         this.status = QuestionaryStatus.INACTIVE;
         this.questionaryType = type;
+        Date date = new Date();
+        this.createdDate = date;
+        this.updatedDate = date;
+        date = CalendarUtils.truncateToDayOfMonth(date);
+        this.viewDate = date;
+    }
+
+    public Questionary(QuestionaryItem questionaryItem){
+        if(StringUtils.isEmpty(questionaryItem.getQuestion())) throw new NullPointerException("Отсутствует текст опросника");
+        this.question = questionaryItem.getQuestion();
+        this.questionName = questionaryItem.getQuestionName();
+        this.description = questionaryItem.getDescription();
+        this.status = QuestionaryStatus.INACTIVE;
+        this.questionaryType = QuestionaryType.fromInteger(questionaryItem.getType());
         Date date = new Date();
         this.createdDate = date;
         this.updatedDate = date;

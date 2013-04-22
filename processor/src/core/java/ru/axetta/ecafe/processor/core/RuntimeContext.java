@@ -1178,7 +1178,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private static Set<TrustAnchor> getTrustStore() throws Exception {
-        Set<TrustAnchor> resultSet = new HashSet(1);
+        Set<TrustAnchor> resultSet = new HashSet<TrustAnchor>(1);
         resultSet.add(new TrustAnchor(getRootCert(), null));
         return resultSet;
     }

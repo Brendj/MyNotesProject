@@ -58,21 +58,6 @@ public class DistributionRulesPage extends BasicWorkspacePage {
             ruleItem.setSourceOrg(org);
             ruleItemList.add(ruleItem);
         }
-
-        /*
-        TypedQuery<MenuExchangeRule> menuExchangeRuleTypedQuery = entityManager.createQuery("from MenuExchangeRule order by idOfDestOrg",MenuExchangeRule.class);
-        List<MenuExchangeRule> menuExchangeRules = menuExchangeRuleTypedQuery.getResultList();
-        for (MenuExchangeRule menuExchangeRule: menuExchangeRules){
-            Org distributionOrg = entityManager.find(Org.class,menuExchangeRule.getIdOfSourceOrg());
-            Org sourceOrg = entityManager.find(Org.class,menuExchangeRule.getIdOfDestOrg());
-            Contragent contragent = entityManager.find(Contragent.class, sourceOrg.getDefaultSupplier().getIdOfContragent());
-            RuleItem ruleItem = new RuleItem();
-            ruleItem.setContragent(contragent);
-            ruleItem.setDistributionOrg(distributionOrg);
-            ruleItem.setSourceOrg(sourceOrg);
-            ruleItemList.add(ruleItem);
-        }
-        */
     }
 
     public List<RuleItem> getRuleItemList() {

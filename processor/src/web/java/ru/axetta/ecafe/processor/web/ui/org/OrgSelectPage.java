@@ -13,7 +13,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -33,39 +35,9 @@ public class OrgSelectPage extends BasicPage {
         void completeOrgSelection(Session session, Long idOfOrg) throws Exception;
     }
 
-    public static class Item {
-        private final Long idOfOrg;
-        private final String shortName;
-        private final String officialName;
-
-        public Item() {
-            this.idOfOrg = null;
-            this.shortName = null;
-            this.officialName = null;
-        }
-
-        public Item(Org org) {
-            this.idOfOrg = org.getIdOfOrg();
-            this.shortName = org.getShortName();
-            this.officialName = org.getOfficialName();
-        }
-
-        public Long getIdOfOrg() {
-            return idOfOrg;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public String getOfficialName() {
-            return officialName;
-        }
-    }
-
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
-    private List<Item> items = Collections.emptyList();
-    private Item selectedItem = new Item();
+    private List<OrgShortItem> items = Collections.emptyList();
+    private OrgShortItem selectedItem = new OrgShortItem();
     private String filter;
 
     public void pushCompleteHandler(CompleteHandler handler) {
@@ -79,17 +51,17 @@ public class OrgSelectPage extends BasicPage {
         }
     }
 
-    public List<Item> getItems() {
+    public List<OrgShortItem> getItems() {
         return items;
     }
 
-    public Item getSelectedItem() {
+    public OrgShortItem getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(Item selected) {
+    public void setSelectedItem(OrgShortItem selected) {
         if (null == selected) {
-            this.selectedItem = new Item();
+            this.selectedItem = new OrgShortItem();
         } else {
             this.selectedItem = selected;
         }
@@ -104,39 +76,46 @@ public class OrgSelectPage extends BasicPage {
     }
 
     public void fill(Session session) throws Exception {
-        List<Item> items = new LinkedList<Item>();
-        List orgs = retrieveOrgs(session);
-        for (Object object : orgs) {
-            Org org = (Org) object;
-            items.add(new Item(org));
-        }
-        this.items = items;
+        this.items = retrieveOrgs(session);
     }
 
     public void fill(Session session, Long idOfOrg) throws Exception {
-        List<Item> items = new LinkedList<Item>();
-        List orgs = retrieveOrgs(session);
-        for (Object object : orgs) {
-            Org org = (Org) object;
-            items.add(new Item(org));
-        }
-        Item selectedItem = new Item();
+        List<OrgShortItem> items = retrieveOrgs(session);
+        OrgShortItem selectedItem = new OrgShortItem();
         if (null != idOfOrg) {
-            Org org = (Org) session.load(Org.class, idOfOrg);
-            selectedItem = new Item(org);
+
+            Criteria criteria = session.createCriteria(Org.class);
+            criteria.add(Restrictions.eq("idOfOrg",idOfOrg));
+            criteria.setProjection(Projections.projectionList()
+                    .add(Projections.property("idOfOrg"),"idOfOrg")
+                    .add(Projections.property("shortName"),"shortName")
+                    .add(Projections.property("officialName"),"officialName")
+            );
+
+            criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
+            selectedItem = (OrgShortItem) criteria.uniqueResult();
         }
+
         this.items = items;
         this.selectedItem = selectedItem;
     }
 
-    private List retrieveOrgs(Session session) throws HibernateException {
+    @SuppressWarnings("unchecked")
+    private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.addOrder(Order.asc("idOfOrg"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
         }
-        return criteria.list();
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
+                .add(Projections.property("shortName"),"shortName")
+                .add(Projections.property("officialName"),"officialName")
+        );
+
+        criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
+        criteria.addOrder(Order.asc("idOfOrg"));
+        return (List<OrgShortItem>) criteria.list();
     }
 
 }

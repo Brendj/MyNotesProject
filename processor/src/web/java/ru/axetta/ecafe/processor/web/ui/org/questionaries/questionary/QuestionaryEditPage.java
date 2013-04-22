@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
@@ -46,6 +47,8 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     private QuestionaryGroupPage questionaryGroupPage;
     @Autowired
     private QuestionaryService questionaryService;
+    @Autowired
+    private QuestionaryDAOService questionaryDAOService;
 
     @Override
     public void onShow() throws Exception {
@@ -59,13 +62,13 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
         description = questionary.getDescription();
         viewDate = questionary.getViewDate();
         type = questionary.getQuestionaryType().getValue();
-        List<Answer> answerList = questionaryService.getAnswers(questionary);
+        List<Answer> answerList = questionaryDAOService.getAnswers(questionary);
         List<AnswerItem> answerItems = new ArrayList<AnswerItem>(answerList.size());
         for (Answer answer: answerList){
             answerItems.add(new AnswerItem(answer));
         }
         answers = answerItems;
-        List<Org> orgList = questionaryService.getOrgs(questionary);
+        List<Org> orgList = questionaryDAOService.getOrgs(questionary);
         if(!orgList.isEmpty()){
             orgItemList = new ArrayList<OrgItem>(orgList.size());
             StringBuilder sb=new StringBuilder();
@@ -100,12 +103,12 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     public Object save(){
         try {
             /* update answers */
-            if (questionaryService.getStatus(questionary)){
+            if (questionaryDAOService.getStatus(questionary)){
                 List<Answer> answerList = new ArrayList<Answer>(answers.size());
                 for (AnswerItem answerItem: answers){
                     answerList.add(new Answer(answerItem.getAnswer(),answerItem.getDescription(),questionary,answerItem.getWeight()));
                 }
-                questionary = questionaryService.updateQuestionary(questionary.getIdOfQuestionary(),question,
+                questionary = questionaryDAOService.updateQuestionary(questionary.getIdOfQuestionary(),question,
                         questionName,description,idOfOrgList, type, answerList,viewDate);
                 questionaryGroupPage.setQuestionary(questionary);
                 load();

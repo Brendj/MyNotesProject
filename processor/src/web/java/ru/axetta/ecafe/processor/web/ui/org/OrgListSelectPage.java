@@ -12,10 +12,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 
 import java.util.*;
 import java.util.List;
@@ -32,49 +30,8 @@ public class OrgListSelectPage extends BasicPage {
         void completeOrgListSelection(Map<Long, String> orgMap) throws Exception;
     }
 
-    public static class Item {
-        private Boolean selected;
-        private final Long idOfOrg;
-        private final String shortName;
-        private final String officialName;
-
-        public Item() {
-            this.selected = null;
-            this.idOfOrg = null;
-            this.shortName = null;
-            this.officialName = null;
-        }
-
-        public Item(Org org) {
-            this.selected = false;
-            this.idOfOrg = org.getIdOfOrg();
-            this.shortName = org.getShortName();
-            this.officialName = org.getOfficialName();
-        }
-
-        public void setSelected(Boolean selected) {
-            this.selected = selected;
-        }
-
-        public Boolean getSelected() {
-            return selected;
-        }
-
-        public Long getIdOfOrg() {
-            return idOfOrg;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public String getOfficialName() {
-            return officialName;
-        }
-    }
-
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
-    private List<Item> items = Collections.emptyList();
+    private List<OrgShortItem> items = Collections.emptyList();
     private String filter;
     /*
        0               - нет фильтра
@@ -117,7 +74,7 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    public List<Item> getItems() {
+    public List<OrgShortItem> getItems() {
         return items;
     }
 
@@ -194,14 +151,11 @@ public class OrgListSelectPage extends BasicPage {
             selectedOrgs.put(id, org.getShortName());
         }
         ///
-        List<Item> items = new LinkedList<Item>();
-        List orgs = retrieveOrgs(session);
-        for (Object object : orgs) {
-            Org org = (Org) object;
-            Item item = new Item(org);
-            if (selectedOrgs.containsKey(org.getIdOfOrg())) item.setSelected(true);
-            items.add(item);
+        List<OrgShortItem> items = retrieveOrgs(session);
+        for (OrgShortItem orgShortItem: items){
+            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
+
         this.items = items;
     }
 
@@ -209,25 +163,20 @@ public class OrgListSelectPage extends BasicPage {
     
     public void onShow() {
         selectedOrgs = new HashMap<Long, String>();
-        this.items = new LinkedList<Item>();
+        this.items = new LinkedList<OrgShortItem>();
     }
     
     public void fill(Session session) throws Exception {
         updateSelectedOrgs();
-        ////
-        List<Item> items = new LinkedList<Item>();
-        List orgs = retrieveOrgs(session);
-        for (Object object : orgs) {
-            Org org = (Org) object;
-            Item i = new Item(org);
-            if (selectedOrgs.containsKey(i.getIdOfOrg())) i.setSelected(Boolean.TRUE);
-            items.add(i);
+        List<OrgShortItem> items = retrieveOrgs(session);
+        for (OrgShortItem orgShortItem: items){
+            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
         this.items = items;
     }
 
     private void updateSelectedOrgs() {
-        for (Item i : this.items) {
+        for (OrgShortItem i : this.items) {
             if (i.getSelected()) {
                 selectedOrgs.put(i.getIdOfOrg(), i.getShortName());
             } else {
@@ -236,7 +185,8 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    private List retrieveOrgs(Session session) throws HibernateException {
+    @SuppressWarnings("unchecked")
+    private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         if (StringUtils.isNotEmpty(filter)) {
@@ -261,18 +211,26 @@ public class OrgListSelectPage extends BasicPage {
             criteria.add(criterion);
         }
 
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
+                .add(Projections.property("shortName"),"shortName")
+                .add(Projections.property("officialName"),"officialName")
+        );
+
+        criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
+
         deselectAllItems();
-        return criteria.list();
+        return (List<OrgShortItem>) criteria.list();
     }
 
     public void deselectAllItems() {
-        for (Item item : items) {
+        for (OrgShortItem item : items) {
             item.setSelected(false);
         }
     }
 
     public void selectAllItems() {
-        for (Item item : items) {
+        for (OrgShortItem item : items) {
             item.setSelected(true);
         }
     }

@@ -14,16 +14,14 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -41,35 +39,13 @@ import java.util.*;
  * Time: 14:32
  * To change this template use File | Settings | File Templates.
  */
-@Component
-@Scope("session")
+@Service
 public class QuestionaryService {
 
     private static Logger logger = LoggerFactory.getLogger(QuestionaryService.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    /* истена если клиент не ответил на данный вопрос или нет доступных для него анкет*/
-    public Boolean checkClientToQuestionary(Long contractId, Long idOfAnswer){
-        TypedQuery<Client> clientTypedQuery = entityManager.createQuery("from Client where contractId=:contractId",Client.class);
-        clientTypedQuery.setParameter("contractId",contractId);
-        Client client = clientTypedQuery.getSingleResult();
-        Answer answer = entityManager.find(Answer.class, idOfAnswer);
-        if(answer==null) return true;
-        Questionary questionary = entityManager.find(Questionary.class, answer.getQuestionary().getIdOfQuestionary());
-        if(!questionary.getStartStatus()) return false;
-        TypedQuery<Answer> q = entityManager.createQuery("from Answer where questionary=:questionary", Answer.class);
-        q.setParameter("questionary",questionary);
-        List<Answer> answers = q.getResultList();
-        TypedQuery<ClientAnswerByQuestionary> clientAnswerByQuestionaryTypedQuery = entityManager.createQuery("from ClientAnswerByQuestionary where client=:client and answer in :answer",ClientAnswerByQuestionary.class);
-        clientAnswerByQuestionaryTypedQuery.setParameter("client",client);
-        clientAnswerByQuestionaryTypedQuery.setParameter("answer",answers);
-        return !clientAnswerByQuestionaryTypedQuery.getResultList().isEmpty();
-    }
+    private QuestionaryDAOService service;
 
     @SuppressWarnings("unchecked")
     public List<ClientAnswerByQuestionaryItem> generateReportByQuestionaryResultByOrg(Session session, Org org){
@@ -91,6 +67,8 @@ public class QuestionaryService {
         clientCriteria.add(Restrictions.eq("contractId",contractId));
         Client client = (Client) clientCriteria.uniqueResult();
 
+        /* Создаем под запрос но не выполняем его */
+        /* Вытягиеваем все варианты ответов текущего вопроса */
         DetachedCriteria idOfQuestionCriteria = DetachedCriteria.forClass(Questionary.class);
         idOfQuestionCriteria.createAlias("answers","answer");
         idOfQuestionCriteria.add(Restrictions.eq("answer.idOfAnswer",idOfAnswer));
@@ -113,53 +91,6 @@ public class QuestionaryService {
         }
     }
 
-    //public void registrationAnswerByClient(Session session, Long contractId, Long idOfAnswer) throws Exception{
-    //    Criteria clientCriteria = session.createCriteria(Client.class);
-    //    clientCriteria.add(Restrictions.eq("contractId",contractId));
-    //    Client client = (Client) clientCriteria.uniqueResult();
-    //
-    //    DetachedCriteria idOfQuestionCriteria = DetachedCriteria.forClass(Questionary.class);
-    //    idOfQuestionCriteria.createAlias("answers","answer", JoinType.NONE);
-    //    idOfQuestionCriteria.add(Restrictions.eq("answer.idOfAnswer",idOfAnswer));
-    //    idOfQuestionCriteria.setProjection(Property.forName("idOfQuestionary"));
-    //
-    //    Criteria clientAnswerByQuestionaryCriteria = session.createCriteria(ClientAnswerByQuestionary.class);
-    //    clientAnswerByQuestionaryCriteria.add(Restrictions.eq("client", client));
-    //    clientAnswerByQuestionaryCriteria.createAlias("answer","an");
-    //    clientAnswerByQuestionaryCriteria.createAlias("an.questionary", "question");
-    //    clientAnswerByQuestionaryCriteria.add( Property.forName("question.idOfQuestionary").eq(idOfQuestionCriteria));
-    //    List list = clientAnswerByQuestionaryCriteria.list();
-    //    Answer answer = (Answer) session.get(Answer.class, idOfAnswer);
-    //    if(list.isEmpty()){
-    //        ClientAnswerByQuestionary clientAnswerByQuestionary = new ClientAnswerByQuestionary(answer,client);
-    //        session.persist(clientAnswerByQuestionary);
-    //    } else {
-    //        ClientAnswerByQuestionary clientAnswerByQuestionary = (ClientAnswerByQuestionary) list.get(0);
-    //        clientAnswerByQuestionary.setAnswer(answer);
-    //        session.saveOrUpdate(clientAnswerByQuestionary);
-    //    }
-    //}
-
-    public List<Answer> getAnswers(Questionary questionary){
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        TypedQuery<Answer> q = entityManager.createQuery("from Answer where questionary=:questionary", Answer.class);
-        q.setParameter("questionary",questionary);
-        List<Answer> answers = q.getResultList();
-        transactionManager.commit(status);
-        return answers;
-    }
-
-    public List<Questionary> getQuestionaries(){
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        TypedQuery<Questionary> query = entityManager.createQuery("from Questionary where status!=:status", Questionary.class);
-        query.setParameter("status",QuestionaryStatus.DELETED);
-        List<Questionary> questionaries = query.getResultList();
-        transactionManager.commit(status);
-        return questionaries;
-    }
-
     public QuestionariesRootElement parseQuestionaryByXML(File file) throws Exception{
         JAXBContext jaxbContext = JAXBContext.newInstance(QuestionariesRootElement.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -177,7 +108,7 @@ public class QuestionaryService {
                     Answer answer = new Answer(answerItem.getAnswer(), answerItem.getDescription(), questionary, answerItem.getWeight());
                     questionary.getAnswers().add(answer);
                 }
-                registrationQuestionary(questionary,idOfOrgList);
+                service.registrationQuestionary(questionary,idOfOrgList);
                 registrationItems.add(new RegistrationItem(questionary, "OK"));
             } catch (Exception e){
                 logger.error("Error registration questionary: ",e);
@@ -187,99 +118,4 @@ public class QuestionaryService {
         return registrationItems;
     }
 
-    public List<Org> getOrgs(Questionary questionary){
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        Questionary questionary1 = entityManager.find(Questionary.class, questionary.getIdOfQuestionary());
-        List<Org> orgs = new ArrayList<Org>();
-        for (Org org: questionary1.getOrgs()){
-            orgs.add(org);
-        }
-        transactionManager.commit(status);
-        return orgs;
-    }
-
-    public Questionary updateQuestionary(Long id,String question, String name, String description,
-            List<Long> idOfOrgList, Integer type, List<Answer> answers,
-            Date viewDate) throws Exception{
-        if(answers.isEmpty()) throw new  Exception("Questionnaire can not be registered without answers");
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        Questionary currentQuestionary = entityManager.find(Questionary.class,id);
-        currentQuestionary = currentQuestionary.update(name, question, description);
-        currentQuestionary.getOrgs().clear();
-        Set<Org> orgs = getOrgs(idOfOrgList);
-        currentQuestionary.setOrgs(orgs);
-        currentQuestionary.setQuestionaryType(QuestionaryType.fromInteger(type));
-        currentQuestionary.setViewDate(viewDate);
-        entityManager.persist(currentQuestionary);
-        Query q = entityManager.createQuery("delete from Answer where questionary=:questionary");
-        q.setParameter("questionary",currentQuestionary);
-        q.executeUpdate();
-        for (Answer answer: answers){
-            answer.setQuestionary(currentQuestionary);
-            entityManager.persist(answer);
-        }
-        transactionManager.commit(status);
-        return currentQuestionary;
-    }
-
-    public void registrationQuestionary(Questionary questionary, List<Long> idOfOrgList) throws Exception{
-        if(questionary.getAnswers().isEmpty()) throw new  Exception("Questionnaire can not be registered without answers");
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        Set<Org> orgs = getOrgs(idOfOrgList);
-        questionary.setOrgs(orgs);
-        entityManager.persist(questionary);
-        for (Answer answer: questionary.getAnswers()){
-            entityManager.persist(answer);
-        }
-        transactionManager.commit(status);
-    }
-
-    protected Set<Org> getOrgs(List<Long> idOfOrgList) {
-        TypedQuery<Org> query;
-        if(!idOfOrgList.isEmpty()){
-            query = entityManager.createQuery("from Org where idOfOrg in :curId order by idOfOrg asc", Org.class);
-            query.setParameter("curId", idOfOrgList);
-        } else {
-            query = entityManager.createQuery("from Org order by idOfOrg asc", Org.class);
-        }
-        return new HashSet<Org>(query.getResultList());
-    }
-
-    public void extractQuestionary(Questionary questionary) {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        Questionary currentQuestionary = entityManager.find(Questionary.class,questionary.getIdOfQuestionary());
-        Query q = entityManager.createQuery("delete from Answer where questionary=:questionary");
-        q.setParameter("questionary",currentQuestionary);
-        q.executeUpdate();
-        currentQuestionary.getOrgs().clear();
-        entityManager.remove(currentQuestionary);
-        transactionManager.commit(status);
-    }
-
-    public void changeStatusQuestionary(Questionary q, QuestionaryStatus status) throws Exception{
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus transactionStatus = transactionManager.getTransaction(def);
-        Questionary questionary = entityManager.find(Questionary.class, q.getIdOfQuestionary());
-        switch (status){
-            case START: questionary = questionary.start(); break;
-            case STOP: questionary = questionary.stop(); break;
-            case DELETED: questionary = questionary.deleted(); break;
-        }
-        entityManager.persist(questionary);
-        transactionManager.commit(transactionStatus);
-    }
-
-    public Boolean getStatus(Questionary questionary){
-        Boolean result = false;
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus transactionStatus = transactionManager.getTransaction(def);
-        questionary = entityManager.merge(questionary);
-        result = questionary.getStatus() == QuestionaryStatus.INACTIVE;
-        transactionManager.commit(transactionStatus);
-        return result;
-    }
 }
