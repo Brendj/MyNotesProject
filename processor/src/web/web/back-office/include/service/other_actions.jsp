@@ -14,6 +14,10 @@
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid">
     <a4j:commandButton value="Запустить генерацию ключевых показетелей" action="#{otherActionsPage.runProjectStateGenerator}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
+    <a4j:commandButton value="Запустить синхронизацию с Реестами" action="#{otherActionsPage.runImportRegisterClients}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
