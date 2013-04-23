@@ -28,6 +28,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run(); //DEF
+        printMessage("Импорт клиентов из Реестров выполнен");
     }
 
     @Override
