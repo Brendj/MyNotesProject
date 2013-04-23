@@ -23,7 +23,7 @@ import java.util.*;
 public class ClientPaymentsReport extends BasicReport {
 
 
-    private static final String PAYMENTS_SQL =
+    private static final String SALES_SQL =
                         "select "
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
@@ -40,7 +40,7 @@ public class ClientPaymentsReport extends BasicReport {
                         "select "
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
-                      + "int8(sum(cf_clientpayments.paysum) / 100) as payments "
+                      + "int8(sum(cf_clientpayments.paysum)) as payments "
                       + "from cf_orgs "
                       + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
                       + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
@@ -75,7 +75,7 @@ public class ClientPaymentsReport extends BasicReport {
                 long startDateLong = startDate.getTime();
                 long endDateLong = endDate.getTime();
 
-                parseSales(items, executeSQL(session, PAYMENTS_SQL, startDateLong, endDateLong, orgCondition));
+                parseSales(items, executeSQL(session, SALES_SQL, startDateLong, endDateLong, orgCondition));
                 parseTransactions(items,
                         executeSQL(session, TRANSACTIONS_SQL, startDateLong, endDateLong, orgCondition));
             }
@@ -98,8 +98,23 @@ public class ClientPaymentsReport extends BasicReport {
                 Object[] o = (Object[]) result;
                 String orgName = (String) o[0];
                 String agent = (String) o[1];
-                Long sales = ((BigInteger) o[2]).longValue();
-                Long discounts = ((BigInteger) o[3]).longValue();
+                Long sales = null;
+                Long discounts = null;
+                if (o[2] != null) {
+                    sales = ((BigInteger) o[2]).longValue();
+                }
+                if (o[3] != null) {
+                    discounts = ((BigInteger) o[3]).longValue();
+                }
+                if (sales == null && discounts == null) {
+                    continue;
+                }
+                if (sales == null) {
+                    sales = 0L;
+                }
+                if (discounts== null) {
+                    discounts = 0L;
+                }
                 ClientPaymentItem item = new ClientPaymentItem(orgName, agent, 0L, sales, discounts);
                 items.add(item);
             }
@@ -110,7 +125,14 @@ public class ClientPaymentsReport extends BasicReport {
                 Object[] o = (Object[]) result;
                 String orgName = (String) o[0];
                 String agent = (String) o[1];
-                Long payments = ((BigInteger) o[2]).longValue();
+                Long payments = null;
+                if (o[2] != null) {
+                    payments = ((BigInteger) o[2]).longValue();
+                }
+                if (payments == null) {
+                    continue;
+                }
+
 
                 ClientPaymentItem item = lookupOrgByName(items, orgName);
                 if (item == null) {
