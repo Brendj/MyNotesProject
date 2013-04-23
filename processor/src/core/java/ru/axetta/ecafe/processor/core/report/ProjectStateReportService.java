@@ -12,6 +12,7 @@ import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.TableRow;
+import com.google.visualization.datasource.datatable.value.Value;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 import com.google.visualization.datasource.render.JsonRenderer;
@@ -119,7 +120,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -171,18 +172,18 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between %DATE_CLAUSE% "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
+                        "                                     AND "
                         +
                         "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", ACTIVE_CHART_4_DATA).setIncremental(true)}, new Object[][]{
-                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте"},
-                {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД"},
-                {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету"},
-                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания"}}, ACTIVE_CHART_DATA));
-        TYPES.put("UniqueChart", new ComplexType(new Type[]{
+                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте", ACTIVE_CHART_1_DATA},
+                {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД", ACTIVE_CHART_2_DATA},
+                {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету", ACTIVE_CHART_3_DATA},
+                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания", ACTIVE_CHART_4_DATA}}, ACTIVE_CHART_DATA));
+        /*TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -241,10 +242,10 @@ public class ProjectStateReportService {
                         "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_4_DATA).setIncremental(true)}, new Object[][]{
-                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Число уникальных пользователей в день"},
-                {ValueType.NUMBER, "Число уникальных пользователей услуги ПРОХОД"},
-                {ValueType.NUMBER, "Число уникальных пользователей, получивших платное питание"},
-                {ValueType.NUMBER, "Число уникальных пользователей, получивших льготное питание"}}, UNIQUE_CHART_DATA));
+                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Число уникальных пользователей в день", UNIQUE_CHART_1_DATA},
+                {ValueType.NUMBER, "Число уникальных пользователей услуги ПРОХОД", UNIQUE_CHART_2_DATA},
+                {ValueType.NUMBER, "Число уникальных пользователей, получивших платное питание", UNIQUE_CHART_3_DATA},
+                {ValueType.NUMBER, "Число уникальных пользователей, получивших льготное питание", UNIQUE_CHART_4_DATA}}, UNIQUE_CHART_DATA));
         TYPES.put("ContentsChart",
                 new SimpleType("select cf_orderdetails.menugroup as g, count(cf_orderdetails.idoforder) as c " +
                         "from cf_orders as regOrgSrc " +
@@ -256,7 +257,7 @@ public class ProjectStateReportService {
                         +
                         "      cf_orderdetails.menugroup<>'' " +
                         "group by cf_orderdetails.menugroup", new Object[][]{
-                        {ValueType.TEXT, "Группа меню"}, {ValueType.NUMBER, "Покупок"}}, CONTENTS_CHART_DATA)
+                        {ValueType.TEXT, "Группа меню"}, {ValueType.NUMBER, "Покупок", CONTENTS_CHART_DATA}}, CONTENTS_CHART_DATA)
                         .setPostReportMethod("parseContentsChart"));
         TYPES.put("RefillChart",
                 new SimpleType("select cf_contragents.contragentname, count(cf_clientpayments.idofclientpayment) " +
@@ -268,7 +269,7 @@ public class ProjectStateReportService {
                         "where cf_clientpayments.paysum<>0 " +REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_contragents.contragentname " +
                         "order by 1", new Object[][]{
-                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, "Количество пополнений"}},
+                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, "Количество пополнений", REFILL_CHART_DATA}},
                         REFILL_CHART_DATA).setPostReportMethod("parseRefillChart"));
         TYPES.put("RefillAvgChart", new ComplexType(new Type[]{
                 new SimpleType("select 'Средняя сумма пополнения' as title, avg(cf_clientpayments.paysum) / 100 " +
@@ -281,7 +282,7 @@ public class ProjectStateReportService {
                         "group by cf_contragents.contragentname " +
                         "order by 1", REFILL_CHART_02_DATA).setValueType(Double.class), },
                         new Object[][]{
-                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS}}, REFILL_CHART_01_DATA));
+                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_CHART_01_DATA}}, REFILL_CHART_01_DATA));
         TYPES.put("RefillProgressChart", new ComplexType(new Type[]{
                 new SimpleType("select bycontr.dat, bycontr.cnt / byall.cnt * 100 "
                         + "from (select '' || EXTRACT(EPOCH FROM ooo.dat) * 1000 as dat, sum(ooo.cnt) as cnt "
@@ -312,7 +313,7 @@ public class ProjectStateReportService {
                         + "where bycontr.dat = byall.dat "
                         + "order by bycontr.dat", REFILL_PROGRESS_0_CHART).setIncremental(true).setValueType (Double.class)},
                 new Object[][]{
-                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS}},
+                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_CHART}},
                 REFILL_PROGRESS_CHART));
         TYPES.put("InformingChart",
                 new SimpleType("select 'Не предоставлены данные для информирования', count(regOrgSrc.idofclient) " +
@@ -337,7 +338,7 @@ public class ProjectStateReportService {
                         "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
                         REGION_SENSITIVE_JOIN + " "+
                         "where regOrgSrc.mobile<>'' and cf_cards.state=0 " + REGION_SENSITIVE_CLAUSE, new Object[][]{
-                        {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов"}},
+                        {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов", INFORMING_CHART_DATA}},
                         INFORMING_CHART_DATA));
                 new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
                         + "from cf_clients "
@@ -362,7 +363,7 @@ public class ProjectStateReportService {
                         + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
                         new Object[][]{
                                 {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
-                                {ValueType.NUMBER, "Количество учащихся"}}, BENEFIT_PART_CHART_DATA);
+                                {ValueType.NUMBER, "Количество учащихся", BENEFIT_PART_CHART_DATA}}, BENEFIT_PART_CHART_DATA);
         TYPES.put("BenefitPartChart",
                 new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
                         + "from cf_clients "
@@ -387,7 +388,7 @@ public class ProjectStateReportService {
                         + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
                         new Object[][]{
                                 {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
-                                {ValueType.NUMBER, "Количество учащихся"}}, BENEFIT_PART_CHART_DATA));
+                                {ValueType.NUMBER, "Количество учащихся", BENEFIT_PART_CHART_DATA}}, BENEFIT_PART_CHART_DATA));
         TYPES.put("BenefitsChart", new SimpleType("select cf_categorydiscounts.categoryname, count (cat) " +
                 "from ( " +
                 "select trim(split_part(categoriesdiscounts, ',', 1)) as cat " +
@@ -412,7 +413,7 @@ public class ProjectStateReportService {
                 "where cat <> '' and int8(cat)>0 " +
                 "group by cf_categorydiscounts.categoryname", new Object[][]{
                 {ValueType.TEXT, "Детализация льготных категорий кроме 1-4 класса"},
-                {ValueType.NUMBER, "Количество учащихся"}}, BENEFITS_CHART_DATA));
+                {ValueType.NUMBER, "Количество учащихся", BENEFITS_CHART_DATA}}, BENEFITS_CHART_DATA));
         TYPES.put("VisitorsChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000 as date, " +
                         "       int8(sum(evnt_count) / sum(all_count) * 100) as visited " +
@@ -470,8 +471,8 @@ public class ProjectStateReportService {
                         "group by events.d, overall.o, overall.c " +
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
-                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс"}, {ValueType.NUMBER, "5-11 класс"}},
-                VISITORS_CHART_DATA));
+                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс", VISITORS_CHART_1_DATA}, {ValueType.NUMBER, "5-11 класс", VISITORS_CHART_2_DATA}},
+                VISITORS_CHART_DATA));*/
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),
@@ -483,8 +484,8 @@ public class ProjectStateReportService {
                         .setPeriodDaysInc(-7).setIncremental(true),
                 new SimpleType("regions", RATING_CHART_5_DATA).setPreSelectSQLMethod("parseOrgsRegions")
                         .setPeriodDaysInc(-7).setIncremental(true)}, new Object[][]{
-                {ValueType.TEXT, "ОУ"}, {ValueType.NUMBER, "Проход (%)"}, {ValueType.NUMBER, "Платное питание (%)"},
-                {ValueType.TEXT, "Льготное питание"}, {ValueType.NUMBER, "Рейтинг (%)"}, {ValueType.TEXT, "Округ"},},
+                {ValueType.TEXT, "ОУ"}, {ValueType.NUMBER, "Проход (%)", RATING_CHART_1_DATA}, {ValueType.NUMBER, "Платное питание (%)", RATING_CHART_2_DATA},
+                {ValueType.TEXT, "Льготное питание", RATING_CHART_3_DATA}, {ValueType.NUMBER, "Рейтинг (%)", RATING_CHART_4_DATA}, {ValueType.TEXT, "Округ", RATING_CHART_5_DATA},},
                 RATING_CHART_DATA));
     }
 
@@ -492,7 +493,7 @@ public class ProjectStateReportService {
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
     //private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
-    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= %MAXIMUM_DATE_CLAUSE% and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
+    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
             "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
@@ -652,7 +653,16 @@ public class ProjectStateReportService {
 
 
     public Calendar getLastUploadData(Session session, SimpleType t, String regionName, int idofcontragent) {
-        try {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*try {
             org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(CHECK_SQL, t.getReportType()));
             q.setInteger(0, t.getReportType() + buildPayAgentTypeInc(idofcontragent));
             q.setString(1, regionName);
@@ -665,7 +675,7 @@ public class ProjectStateReportService {
             }
         } catch (Exception e) {
             logger.error("Failed to check existance of data for report " + t.getReportType(), e);
-        }
+        }*/
 
         return getStartDate();
     }
@@ -680,6 +690,7 @@ public class ProjectStateReportService {
             }
             String finalSQL = applyMacroReplace(t.getSQL(), t.getReportType(), lastUpload, today, 0, regionName,
                     idOfContragent);
+
             org.hibernate.Query q = session.createSQLQuery(finalSQL);
             //logger.info(t.getReportType() + " :: " + regionName + " :: SQL:__ " + finalSQL);
             List resultList = q.list();//Collections.EMPTY_LIST;
@@ -713,6 +724,15 @@ public class ProjectStateReportService {
         cal.set(Calendar.YEAR, 2012);
         cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
         cal.set(Calendar.DAY_OF_MONTH, 1);
+
+
+
+
+        cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
+
         return cal;
     }
 
@@ -726,9 +746,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        /*cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.YEAR, 2013);
         cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 3);*/
+        cal.set(Calendar.DAY_OF_MONTH, 5);
 
         return cal;
     }
@@ -758,15 +778,18 @@ public class ProjectStateReportService {
 
     public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName,
             Integer idOfContragent) {
-        if (sql.indexOf("%MAXIMUM_DATE_CLAUSE%") > -1) {
-            //  Для льготного питания для графика берем либо указанный предыдуще, относительно текущего, полугодие;
-            //  либо берем максимальную дату 3 дня назад (для текущего полугодия)
+        if (sql.indexOf("%DATE_CLAUSE%") > -1) {
+            //  Для льготного питания получаем данные на 3 дня раньше текущего, при охранении так же необходимо следить за сохраняемой датой
             if (type == ACTIVE_CHART_4_DATA || type == UNIQUE_CHART_4_DATA) {
-                Calendar today = getToday();
-                today.setTimeInMillis(today.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
-                sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "least(EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(today.getTime()) + "'), EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%')) * 1000");
+                Calendar maxD = new GregorianCalendar();
+                Calendar minD = new GregorianCalendar();
+                maxD.setTimeInMillis(max.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
+                minD.setTimeInMillis(min.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
+                sql = sql.replaceAll("%DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(minD.getTime()) + "') * 1000 AND "
+                                                    + "EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(maxD.getTime()) + "') * 1000");
+
             } else {
-                sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000");
+                sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000");
             }
         }
         if (sql.indexOf("%MINIMUM_DATE%") > -1) {
@@ -841,7 +864,7 @@ public class ProjectStateReportService {
 
             initDictionaries(session);
 
-            Map<String, List<String>> data = loadReportData(session, dateAt, dateTo, regionName, t);
+            Map<String, List<Item>> data = loadReportData(session, dateAt, dateTo, regionName, t);
             session.close();
 
             if (t instanceof SimpleType) {
@@ -856,6 +879,7 @@ public class ProjectStateReportService {
                             ((SimpleType) t2).getPostReportMethod());
                 }
             }
+            normalizeData (data);
             DataTable dataTable = buildDataTable(data, t, encoding);
             return dataTable;
         } catch (Exception e) {
@@ -865,14 +889,14 @@ public class ProjectStateReportService {
     }
 
 
-    private Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+    private Map<String, List<Item>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
             String regionName, Type t) {
-        return loadReportData(session, dateAt, dateTo, regionName, t, new TreeMap<String, List<String>>());
+        return loadReportData(session, dateAt, dateTo, regionName, t, new TreeMap<String, List<Item>>());
     }
 
 
-    private Map<String, List<String>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
-            String regionName, Type t, Map<String, List<String>> result) {
+    private Map<String, List<Item>> loadReportData(Session session, Calendar dateAt, Calendar dateTo,
+            String regionName, Type t, Map<String, List<Item>> result) {
         try {
             if (t instanceof SimpleType) {
                 //  Если в SQL есть использование полатежного агента, то необходимо
@@ -887,15 +911,15 @@ public class ProjectStateReportService {
                     // Платежный агент, иногда необходимо для макро-подставноки
                     Integer idOfContragent = agentCount == 0 ? 0 : (Integer) PAY_AGENTS_LIST.get(agentI)[0];
 
-                    Map<String, String> res = loadReportData(session, dateAt, dateTo, regionName, idOfContragent,
+                    Map<String, Item> res = loadReportData(session, dateAt, dateTo, regionName, idOfContragent,
                             (SimpleType) t);
                     if (res == null) {
                         return result;
                     }
                     for (String k : res.keySet()) {
-                        List<String> vals = result.get(k);
+                        List<Item> vals = result.get(k);
                         if (vals == null) {
-                            vals = new ArrayList<String>();
+                            vals = new ArrayList<Item>();
                             result.put(k, vals);
                         }
                         vals.add(res.get(k));
@@ -915,10 +939,10 @@ public class ProjectStateReportService {
     }
 
 
-    private Map<String, String> loadReportData(Session session, Calendar dateAt, Calendar dateTo, String regionName,
+    private Map<String, Item> loadReportData(Session session, Calendar dateAt, Calendar dateTo, String regionName,
             int payAgentInc, SimpleType t) {
         try {
-            Map<String, String> result = new TreeMap<String, String>();
+            Map<String, Item> result = new TreeMap<String, Item>();
             org.hibernate.Query q = null;
             int type = t.getReportType() + buildPayAgentTypeInc(
                     payAgentInc); //  Увеличиваем ID типа, если это конрагент или регион
@@ -943,7 +967,7 @@ public class ProjectStateReportService {
 
             for (Object entry : q.list()) {
                 Object e[] = (Object[]) entry;
-                result.put(((String) e[0]).trim(), ((String) e[1]).trim());
+                result.put(((String) e[0]).trim(), new Item (t.getReportType (), ((String) e[1]).trim()));
             }
             return result;
         } catch (Exception e) {
@@ -953,7 +977,7 @@ public class ProjectStateReportService {
     }
 
 
-    private DataTable buildDataTable(Map<String, List<String>> data, Type t, String encoding) throws TypeMismatchException {
+    private DataTable buildDataTable(Map<String, List<Item>> data, Type t, String encoding) throws TypeMismatchException {
         DataTable dt = new DataTable();
         ArrayList cd = new ArrayList();
         for (int i = 0; i < t.getColumns().length; i++) {
@@ -977,7 +1001,7 @@ public class ProjectStateReportService {
 
         for (String k : data.keySet()) {
             TableRow r = new TableRow();
-            List<String> vals = data.get(k);
+            List<Item> vals = data.get(k);
 
             if (vals == null || vals.size() < 1) {
                 continue;
@@ -988,12 +1012,15 @@ public class ProjectStateReportService {
             } else if (t.getColumns()[0][0] == ValueType.DATE) {
                 Date d = new Date(Long.parseLong(k));
                 if (d.getDay() == 0 || d.getDay() == 6) {
-                    continue;
+                    /*if (t.getReportType() != ACTIVE_CHART_DATA && t.getReportType() != UNIQUE_CHART_DATA) {*/
+                        continue;
+                    //}
                 }
                 r.addCell(DATE_FORMAT.format(d));
             } else if (t.getColumns()[0][0] == ValueType.NUMBER) {
                 r.addCell(Integer.parseInt(k));
             }
+
 
             int agentInc = 0;
             if (t.getColumns().length > 0 && ((String) t.getColumns()[1][1]).equals(PAY_AGENTS_COLUMNS)) {
@@ -1001,20 +1028,34 @@ public class ProjectStateReportService {
             }
             for (int i = 1; i < t.getColumns().length + agentInc; i++) {
                 Object col[] = t.getColumns()[agentInc != 0 ? 1 : i];       // Подсчет переделать
+                Integer type = null;
+                if (col [2] != null) {
+                    type = (Integer) col [2];
+                }
+                String val = getValue (vals, type);
+
+
                 if ((ValueType) col[0] == ValueType.TEXT) {
                     if (i - 1 >= vals.size()) {
                         r.addCell("");
                     } else {
-                        r.addCell(encode (vals.get(i - 1), encoding));
+                        r.addCell(encode (val, encoding));
                     }
                 } else if ((ValueType) col[0] == ValueType.NUMBER) {
+                    //  Проверка, если выполняем за выходной и выполняются конкретные типы,
+                    //  то добавляем null вместо значений, чтобы линия прервалась и потом продолжилась
+                    if (val == null) {
+                        r.addCell(Value.getNullValueFromValueType(ValueType.NUMBER));
+                        continue;
+                    }
+
                     if (i - 1 >= vals.size()) {
                         r.addCell(0);
                     } else {
                         try {
-                            r.addCell(Integer.parseInt(vals.get(i - 1)));
+                            r.addCell(Integer.parseInt(val));
                         } catch (NumberFormatException nfe) {
-                            r.addCell(new BigDecimal(Double.parseDouble(vals.get(i - 1)))
+                            r.addCell(new BigDecimal(Double.parseDouble(val))
                                     .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
                         }
                     }
@@ -1529,5 +1570,59 @@ public class ProjectStateReportService {
 
     public int buildPayAgentTypeInc(int idofcontragent) {
         return idofcontragent == 0 ? 0 : PAY_AGENT_MULTI_ID + idofcontragent;
+    }
+
+
+    public void normalizeData (Map <String, List <Item>> data) {
+        for (String k : data.keySet()) {
+            List <Item> vals = data.get(k);
+            for (Type t : TYPES.values()) {
+                if (t instanceof SimpleType) {
+                    normalizeData(vals, (SimpleType) t);
+                } else if (t instanceof ComplexType) {
+                    ComplexType ct = (ComplexType) t;
+                    Type types[] = ct.getTypes();
+                    for (Type t2 : types) {
+                        normalizeData (vals, (SimpleType) t2);
+                    }
+                }
+            }
+        }
+    }
+
+    public void normalizeData (List <Item> vals, SimpleType t) {
+        boolean found = false;
+        for (Item i : vals) {
+            if (t.getReportType() == i.type) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            vals.add(new Item(t.getReportType(), null));
+        }
+    }
+
+
+    public String getValue (List <Item> items, Integer type) {
+        if (items == null || type == null) {
+            return "";
+        }
+        for (Item i : items) {
+            if (i.type == type) {
+                return i.value;
+            }
+        }
+        return "";
+    }
+
+    private static class Item {
+        public int type;
+        public String value;
+
+        public Item (int type, String value) {
+            this.type = type;
+            this.value = value;
+        }
     }
 }
