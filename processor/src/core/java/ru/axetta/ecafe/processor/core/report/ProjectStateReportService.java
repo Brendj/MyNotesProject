@@ -120,7 +120,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -183,7 +183,7 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД", ACTIVE_CHART_2_DATA},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету", ACTIVE_CHART_3_DATA},
                 {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания", ACTIVE_CHART_4_DATA}}, ACTIVE_CHART_DATA));
-        /*TYPES.put("UniqueChart", new ComplexType(new Type[]{
+        TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -472,7 +472,7 @@ public class ProjectStateReportService {
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс", VISITORS_CHART_1_DATA}, {ValueType.NUMBER, "5-11 класс", VISITORS_CHART_2_DATA}},
-                VISITORS_CHART_DATA));*/
+                VISITORS_CHART_DATA));
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),
@@ -653,16 +653,7 @@ public class ProjectStateReportService {
 
 
     public Calendar getLastUploadData(Session session, SimpleType t, String regionName, int idofcontragent) {
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        /*try {
+        try {
             org.hibernate.Query q = session.createSQLQuery(applyMacroReplace(CHECK_SQL, t.getReportType()));
             q.setInteger(0, t.getReportType() + buildPayAgentTypeInc(idofcontragent));
             q.setString(1, regionName);
@@ -675,7 +666,7 @@ public class ProjectStateReportService {
             }
         } catch (Exception e) {
             logger.error("Failed to check existance of data for report " + t.getReportType(), e);
-        }*/
+        }
 
         return getStartDate();
     }
