@@ -233,6 +233,7 @@ public class MskNSIService {
                         + "item['РОУ XML/Официальный адрес'],\n"
                         + "item['РОУ XML/Дата изменения (число)']\n"
                         + "from catalog('Реестр образовательных учреждений') where \n"
+                        + "item['РОУ XML/Статус записи'] not like 'Удален%' and "
                         + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'");
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
