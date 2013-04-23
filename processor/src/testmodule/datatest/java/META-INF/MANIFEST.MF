@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Class-Path: junit-4.10.jar axetta_smpp.jar smpp.jar opentoolsutil.jar 
+ myOTA.jar exprescd.jar axetta_charset.1.jar smpp.jar axetta_smpp.jar 
+ icu4j-4_0_1.jar visualization-datasource-1.1.1.jar asm.jar cglib-node
+ p-2.2.jar org.springframework.aop-3.0.5.RELEASE.jar org.springframewo
+ rk.asm-3.0.5.RELEASE.jar org.springframework.beans-3.0.5.RELEASE.jar 
+ org.springframework.context-3.0.5.RELEASE.jar org.springframework.con
+ text.support-3.0.5.RELEASE.jar org.springframework.core-3.0.5.RELEASE
+ .jar org.springframework.expression-3.0.5.RELEASE.jar org.springframe
+ work.jdbc-3.0.5.RELEASE.jar org.springframework.orm-3.0.5.RELEASE.jar
+  org.springframework.oxm-3.0.5.RELEASE.jar org.springframework.transa
+ ction-3.0.5.RELEASE.jar org.springframework.web-3.0.5.RELEASE.jar org
+ .springframework.web.servlet-3.0.5.RELEASE.jar xmlsec.jar xmldsig.jar
+  iText-2.1.7.jar jasperreports-4.7.1.jar hibernate-commons-annotation
+ s-4.0.1.Final.jar hibernate-jpa-2.0-api-1.0.1.Final.jar hibernate-cor
+ e-4.0.1.Final.jar hibernate-entitymanager-4.0.1.Final.jar jboss-loggi
+ ng-3.1.0.GA.jar dom4j-1.6.1.jar javassist-3.15.0-GA.jar antlr-2.7.7.j
+ ar
+Main-Class: 
+

@@ -140,6 +140,29 @@
         </element>
       </root>
     </artifact>
+    <artifact name="datatest:jar">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/datatest_jar</output-path>
+      <root id="root">
+        <element id="archive" name="datatest.jar">
+          <element id="directory" name="META-INF">
+            <element id="file-copy" path="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/MANIFEST.MF" />
+          </element>
+          <element id="module-output" name="datatest" />
+          <element id="module-output" name="core" />
+          <element id="module-output" name="util" />
+        </element>
+        <element id="library" level="project" name="junit" />
+        <element id="library" level="project" name="axetta_smpp" />
+        <element id="library" level="project" name="axetta_charset" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
+        <element id="library" level="project" name="spring305" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/xmlsec.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/xmldsig.jar" />
+        <element id="library" level="project" name="jasperlib" />
+        <element id="library" level="project" name="hibernate-4.0.1" />
+      </root>
+    </artifact>
   </component>
   <component name="ClearCaseSharedConfig">
     <option name="myUseUcmModel" value="true" />
@@ -438,6 +461,23 @@
       <option name="myLocal" value="true" />
     </copyright>
     <module2copyright />
+  </component>
+  <component name="DataSourceManagerImpl" format="xml" hash="3808811354">
+    <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/amoscow</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>amoscow.public</schema-pattern>
+      <default-schemas>amoscow.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
@@ -880,7 +920,7 @@
       <module fileurl="file://$PROJECT_DIR$/client-room/client-room.iml" filepath="$PROJECT_DIR$/client-room/client-room.iml" />
       <module fileurl="file://$PROJECT_DIR$/core.iml" filepath="$PROJECT_DIR$/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/dashboard-ws-client.iml" filepath="$PROJECT_DIR$/dashboard-ws-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/testmodule/hbmodule.iml" filepath="$PROJECT_DIR$/testmodule/hbmodule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" filepath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" />
       <module fileurl="file://$PROJECT_DIR$/j2ee.iml" filepath="$PROJECT_DIR$/j2ee.iml" />
       <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />

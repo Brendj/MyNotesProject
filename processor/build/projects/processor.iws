@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="web:web" />
+      <artifact name="datatest:jar" />
     </artifacts-to-build>
   </component>
   <component name="CCaseConfig">
@@ -20,12 +20,246 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="Реализован отчет по миграции клиентов, исправлен не дочет если клиент регистрируется в другой корпус организации">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Contragent.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Contragent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ContragentCreatePage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ContragentCreatePage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" afterPath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/MANIFEST.MF" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/datatest-context.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/persistence.xml" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\Main.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\hibernate.cfg.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccompanyingdocuments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccompanyingdocuments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccountRefund.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccountRefund.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccountTransfers.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAccountTransfers.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfInventarization.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfInventarization.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfWaybillDifference.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfWaybillDifference.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfWaybillDifferencePositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfActsOfWaybillDifferencePositions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAddpayments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAddpayments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAssortment.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfAssortment.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfBanks.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfBanks.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCalls.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCalls.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCards.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCards.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategorydiscounts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategorydiscounts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategoryorg.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategoryorg.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategoryorgOrgs.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCategoryorgOrgs.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCirculations.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCirculations.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientgroups.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientgroups.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientgroupsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientpaymentorders.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientpaymentorders.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientpayments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientpayments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClients.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClients.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientsCategorydiscounts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientsCategorydiscounts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientscomplexdiscounts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientscomplexdiscounts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientsms.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfClientsms.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfo.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfo.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfoDiscountdetail.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfoDiscountdetail.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfodetail.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfComplexinfodetail.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContracts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContracts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragentclientaccounts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragentclientaccounts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragentclientaccountsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragentpayments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragentpayments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragents.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfContragents.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCurrentpositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfCurrentpositions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrules.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrules.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrulesCategorydiscounts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrulesCategorydiscounts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrulesCategorydiscountsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrulesCategoryorg.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDiscountrulesCategoryorg.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDishProhibitionExclusions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDishProhibitionExclusions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDishProhibitions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDishProhibitions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoConfirms.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoConfirms.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoConflicts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoConflicts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoVersions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfDoVersions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfEcafesettings.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfEcafesettings.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfEnterevents.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfEnterevents.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfEntereventsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFriendlyOrganization.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFriendlyOrganization.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFunctions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFunctions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFunds.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfFunds.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoods.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoods.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsGroups.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsGroups.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsRequests.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsRequests.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsRequestsPositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfGoodsRequestsPositions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInstances.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInstances.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalDisposingDocumentPositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalDisposingDocumentPositions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalDisposingDocuments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalDisposingDocuments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalIncomingDocumentPositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalIncomingDocumentPositions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalIncomingDocuments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInternalIncomingDocuments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInventorybooks.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfInventorybooks.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfIssuable.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfIssuable.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfJournalitems.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfJournalitems.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfJournals.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfJournals.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfKsu1Records.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfKsu1Records.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfKsu2Records.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfKsu2Records.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfLibvisits.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfLibvisits.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfLinkingTokens.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfLinkingTokens.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenu.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenu.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenudetails.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenudetails.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchange.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchange.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchangePK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchangerules.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchangerules.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfMenuexchangerulesPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfNotifications.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfNotifications.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOptions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOptions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrderdetails.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrderdetails.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrderdetailsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrders.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrders.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrdersPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrgs.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfOrgs.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPermissions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPermissions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPermissionsPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPersons.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPersons.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPos.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPos.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProductGroups.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProductGroups.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProducts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProducts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProjectstateData.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProjectstateData.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProjectstateDataPK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProviderConfigurations.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfProviderConfigurations.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPublications.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfPublications.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReaderreg.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReaderreg.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReaders.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReaders.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRegistry.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRegistry.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReporthandlerules.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReporthandlerules.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReportinfo.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfReportinfo.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRetirementreasons.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRetirementreasons.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRuleconditions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfRuleconditions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSchedulerjobs.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSchedulerjobs.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSchemaVersionInfo.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSchemaVersionInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSettlements.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSettlements.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSources.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSources.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfStaffs.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfStaffs.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfStateChanges.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfStateChanges.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSubscriptionfee.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSubscriptionfee.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSubscriptionfeePK.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSynchistory.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfSynchistory.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMap.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMap.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMapGroups.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMapGroups.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMapProducts.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTechnologicalMapProducts.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTradeMaterialGoods.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTradeMaterialGoods.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTransactionjournal.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTransactionjournal.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTransactions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTransactions.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTypesofaccompanyingdocuments.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfTypesofaccompanyingdocuments.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfUsers.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfUsers.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfWaybills.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfWaybills.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfWaybillsPositions.hbm.xml" afterPath="" />
+      <change type="DELETED" beforePath="D:\workspace\ecafe\2013\04\processor1504\src\testmodule\hbmodule\java\ru\axetta\ecafe\processor\core\persistence\CfWaybillsPositions.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru/axetta" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru/axetta/ecafe/processor/core" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru/axetta/ecafe" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru/axetta/ecafe/processor/core/persistence" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru/axetta/ecafe/processor" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../src/testmodule/hbmodule/java/ru" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.hbm.xml" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.hbm.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryItem.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -40,7 +274,7 @@
     <file path="/TransactionTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355830368186" ignored="false" />
     <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366354639381" ignored="false" />
     <file path="/CommodityAccountingGroupPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356006147159" ignored="false" />
-    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366356390528" ignored="false" />
+    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366630920902" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
     <file path="/inventarization_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366269686473" ignored="false" />
     <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366379783829" ignored="false" />
@@ -50,7 +284,7 @@
     <file path="/ActOfWayBillDifferencePositionItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017518232" ignored="false" />
     <file path="/ActOfWayBillDifferencePositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355918761293" ignored="false" />
     <file path="/waybilldifferenceposition_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366269740237" ignored="false" />
-    <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364205882658" ignored="false" />
+    <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366630257230" ignored="false" />
     <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366353701054" ignored="false" />
     <file path="/TradeMaterialGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355996963925" ignored="false" />
     <file path="/TradeMaterialGoodItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017537756" ignored="false" />
@@ -79,7 +313,7 @@
     <file path="/0-21.01.2013 14.07.31-in.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358782257866" ignored="false" />
     <file path="/processor" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358784784741" ignored="false" />
     <file path="/ContragentCompletionReport.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359714464031" ignored="false" />
-    <file path="/QuestionaryService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363866782999" ignored="false" />
+    <file path="/QuestionaryService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366700378230" ignored="false" />
     <file path="/ContragentService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358935428919" ignored="false" />
     <file path="/ContragentCompletionItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360674126998" ignored="false" />
     <file path="/CfClientpayments.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358865685425" ignored="false" />
@@ -146,7 +380,7 @@
     <file path="D:/home/java/testing/report/java/META-INF/report-context.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366093755335" ignored="false" />
     <file path="/report-context.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366093756190" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/persistence/Bank.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360057542654" ignored="false" />
-    <file path="/sessionFactory" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366286328923" ignored="false" />
+    <file path="/sessionFactory" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366704082946" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/persistence/Bank.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360056302643" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/repositories.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360056330850" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/repositories/BankService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360922776174" ignored="false" />
@@ -591,7 +825,7 @@
     <file path="/ClientMigration.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360061957232" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/persistence/Client.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360062050061" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/persistence/Org.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361344842473" ignored="false" />
-    <file path="/Org.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361344830758" ignored="false" />
+    <file path="/Org.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366626565564" ignored="false" />
     <file path="/Contragent.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366366785584" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/repositories/ContragentCompletionService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360222567993" ignored="false" />
     <file path="/ContragentCompletionService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360222208297" ignored="false" />
@@ -907,14 +1141,14 @@
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/core/java/ru/axetta/ecafe/processor/core/service/EventNotificationService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361175428883" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/core/java/db/update_2.2.34-2.2.35.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361198720713" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/core/java/db/update_2.2.32-2.2.33.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361177735990" ignored="false" />
-    <file path="/Questionary.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361437450119" ignored="false" />
-    <file path="/Questionary.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361347487183" ignored="false" />
+    <file path="/Questionary.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366702792989" ignored="false" />
+    <file path="/Questionary.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366700883401" ignored="false" />
     <file path="/update_2.2.34-2.2.35.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361185316164" ignored="false" />
     <file path="/QuestionaryListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361187327359" ignored="false" />
-    <file path="/QuestionaryEditPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361342675877" ignored="false" />
+    <file path="/QuestionaryEditPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366642201150" ignored="false" />
     <file path="/question_edit.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361343136554" ignored="false" />
     <file path="/question_view.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361343217427" ignored="false" />
-    <file path="/questions_list.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361343206333" ignored="false" />
+    <file path="/questions_list.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366701748147" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/core/java/db/update_2.2.30-2.2.31.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361202229830" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/core/java/db/update.properties" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361202990830" ignored="false" />
     <file path="/ClientRoomController.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361259206212" ignored="false" />
@@ -923,7 +1157,7 @@
     <file path="/ConfigurationProvider.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361344862259" ignored="false" />
     <file path="D:/home/java/testing/report/java/console/report/persistence/ConfigurationProvider.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361344863291" ignored="false" />
     <file path="dbtable:/testing46cd263e/fb72fd1a-ed90-4305-ac74-7c72f5013d16/apiter.public.cf_qa_questionaries" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361347899708" ignored="false" />
-    <file path="/QuestionaryItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361441908305" ignored="false" />
+    <file path="/QuestionaryItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366700849244" ignored="false" />
     <file path="/QuestionaryResultByOrg.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361128281095" ignored="false" />
     <file path="$USER_HOME$/Desktop/казань/_33/9072out.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361358530570" ignored="false" />
     <file path="/QuestionaryResultByOrg.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361361503500" ignored="false" />
@@ -939,7 +1173,7 @@
     <file path="/Answer.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361437412597" ignored="false" />
     <file path="/QuestionaryElement.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361448614887" ignored="false" />
     <file path="/update_2.2.35-2.2.36.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361546288704" ignored="false" />
-    <file path="/Manager.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361453975699" ignored="false" />
+    <file path="/Manager.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366632451301" ignored="false" />
     <file path="/show-orders-and-payments.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363184945504" ignored="false" />
     <file path="/GroupPaymentConfirm.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361526354316" ignored="false" />
     <file path="/GroupPaymentConfirm.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361526337196" ignored="false" />
@@ -1053,7 +1287,7 @@
     <file path="D:/home/java/testing/hibernate3/java/console/hibernate3/persistence/Org.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366093320358" ignored="false" />
     <file path="D:/home/java/testing/hibernate3/java/console/hibernate3/persistence/Org.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366093452515" ignored="false" />
     <file path="D:/home/java/testing/hibernate3/java/META-INF/application-context.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366093799770" ignored="false" />
-    <file path="/SettingCreatePage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366112139249" ignored="false" />
+    <file path="/SettingCreatePage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366629346967" ignored="false" />
     <file path="/styles.css" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366112571746" ignored="false" />
     <file path="/SettingValueConfigurePanelGrid.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366113829961" ignored="false" />
     <file path="/change-personal-info.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366188802279" ignored="false" />
@@ -1068,6 +1302,22 @@
     <file path="/ReportJobViewPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366356440445" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/web/web/client-room/payform.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366366239766" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/web/web/client-room/index.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366366239766" ignored="false" />
+    <file path="/QuestionaryType.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366625814461" ignored="false" />
+    <file path="/OrgFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366627373741" ignored="false" />
+    <file path="/OrgListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366627902882" ignored="false" />
+    <file path="/OrgSelectPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366628272902" ignored="false" />
+    <file path="/OrgListSelectPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366629085373" ignored="false" />
+    <file path="/OrgShortItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366628859875" ignored="false" />
+    <file path="/QuestionaryDAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366638275887" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/loader/AppVerInfo.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366639355740" ignored="false" />
+    <file path="/AppVerInfo.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366639338901" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/loader/Version.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366639282121" ignored="false" />
+    <file path="/Version.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366639047939" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/services/ScannerImpl.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366640472381" ignored="false" />
+    <file path="/ScannerImpl.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366640471584" ignored="false" />
+    <file path="/QuestionaryViewPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366642185814" ignored="false" />
+    <file path="$PROJECT_DIR$/datatest/java/META-INF/persistence.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366702910532" ignored="false" />
+    <file path="/datatest-context.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366703643792" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1095,44 +1345,8 @@
     <sortChildren value="true" />
   </component>
   <component name="DebuggerManager">
-    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </breakpoint_any>
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="626" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="596" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
         <option name="ENABLED" value="false" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -1268,6 +1482,42 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </line_breakpoints>
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
@@ -1287,56 +1537,85 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Processor.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
+      <file leaf-file-name="Questionary.hbm.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.hbm.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="83" column="34" selection-start="3937" selection-end="3937" vertical-scroll-proportion="0.0">
+            <state line="35" column="77" selection-start="2206" selection-end="2206" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ecafe_processor_derby_postgre.sql" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+      <file leaf-file-name="persistence.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/persistence.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="468" column="31" selection-start="20049" selection-end="20049" vertical-scroll-proportion="0.6367521">
+            <state line="13" column="27" selection-start="172" selection-end="765" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="update_2.2.36-2.2.37.sql" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql">
+      <file leaf-file-name="datatest-context.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/datatest-context.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="28" selection-start="556" selection-end="556" vertical-scroll-proportion="0.0">
+            <state line="41" column="43" selection-start="2882" selection-end="2882" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RuntimeContext.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <file leaf-file-name="Org.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Org.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="605" column="55" selection-start="25257" selection-end="25257" vertical-scroll-proportion="-14.56">
+            <state line="397" column="11" selection-start="11076" selection-end="11076" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ContragentCreatePage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ContragentCreatePage.java">
+      <file leaf-file-name="Card.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="300" column="28" selection-start="7429" selection-end="7429" vertical-scroll-proportion="0.0">
+            <state line="218" column="23" selection-start="5605" selection-end="5605" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Contragent.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Contragent.java">
+      <file leaf-file-name="Questionary.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="85" column="85" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0">
+            <state line="104" column="27" selection-start="3928" selection-end="3928" vertical-scroll-proportion="1.1658536">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Answer.hbm.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Answer.hbm.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="43" selection-start="1384" selection-end="1384" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QuestionaryEditPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryEditPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="110" column="57" selection-start="4331" selection-end="4331" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QuestionaryDAOService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryDAOService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="98" column="41" selection-start="4556" selection-end="4556" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1406,22 +1685,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/OrgOrderReport.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/list.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/client/ClientFilter.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/client/list.jsp" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/user/UserService.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/user/UserRemovePanel.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/list.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/OrgItem.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/view.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobViewPage.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Contragent.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ContragentCreatePage.java" />
-        <option value="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Publication.hbm.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/RetirementReason.hbm.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Source.hbm.xml" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryDAOService.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryViewPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryEditPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryListPage.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryService.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryItem.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.hbm.xml" />
+        <option value="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/persistence.xml" />
+        <option value="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/datatest-context.xml" />
       </list>
     </option>
   </component>
@@ -1704,11 +1983,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
+              <option name="myItemId" value="testmodule" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1718,311 +1993,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
+              <option name="myItemId" value="testmodule" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="classes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="META-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="back-office" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="back-office" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="back-office" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="back-office" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="job" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rule" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="report" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="job" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
+              <option name="myItemId" value="datatest" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2072,7 +2047,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="logic" />
+              <option name="myItemId" value="persistence" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2089,6 +2064,18 @@
               <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="persistence" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="questionary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -2101,28 +2088,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="db" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="database" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="derby" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2133,7 +2098,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="project.structure.proportion" value="0.09832842" />
     <property name="OverrideImplement.combined" value="true" />
@@ -2145,7 +2110,7 @@
     <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
     <property name="recentsLimit" value="5" />
     <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/processor.ipr" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF" />
     <property name="JdbcConsole.OpenEditorOnStart" value="false" />
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="processor" />
     <property name="GoToClass.includeJavaFiles" value="false" />
@@ -2174,13 +2139,13 @@
     <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateTestDialog.Recents.Supers">
-      <recent name="" />
-    </key>
     <key name="CreateTestDialog.RecentsKey">
       <recent name="ru.axetta.ecafe.processor.core.sms" />
       <recent name="ru.axetta.ecafe.processor.web.partner.integra.soap" />
       <recent name="ru.axetta.ecafe.processor.core.sync.manager" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.web.ui.report.job" />
@@ -2189,15 +2154,15 @@
       <recent name="ru.axetta.ecafe.processor.web.ui.org.settings" />
       <recent name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.payment.confirm" />
     </key>
-    <key name="OPEN_URL_DIALOG">
-      <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\workspace\ecafe\2013\04\processor1504\src\web\web\back-office\include\org\settings" />
       <recent name="D:\workspace\ecafe\2013\03\ecafeprocessor1103\src\core\java\db" />
       <recent name="D:\workspace\ecafe\2013\01\processor21\src\core\java\ru\axetta\ecafe\processor\core\persistence\distributedobjects\payment\confirm" />
       <recent name="D:\workspace\ecafe\2013\01\processor21\src\core\java\db" />
       <recent name="D:\workspace\ecafe\2013\01\processor21\src\core\java\ru\axetta\ecafe\processor\core\persistence\distributedobjects\products" />
+    </key>
+    <key name="OPEN_URL_DIALOG">
+      <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" />
@@ -2206,24 +2171,24 @@
       <recent name="ru.axetta.ecafe.processor.core.report.BasicReport" />
       <recent name="ru.axetta.ecafe.processor.core.model.ClientPayment" />
     </key>
-    <key name="ImportMappingsDialog.RecentPackages">
-      <recent name="ru.axetta.ecafe.processor.core.persistence" />
-      <recent name="ru.axetta.ecafe.processor.core.persistence.test" />
-      <recent name="" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting\waybill" />
-      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting\acts" />
-      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting" />
-      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\org\menu" />
-      <recent name="D:\workspace\ecafe\10\khb_CR1b\build\projects\smpp\java" />
-    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.core.partner" />
       <recent name="ru.axetta.ecafe.processor.core.model" />
       <recent name="ru.axetta.ecafe.processor.core" />
       <recent name="ru.axetta.ecafe.util" />
       <recent name="ru.axetta.ecafe.processor.core.utils" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\ecafe\2013\04\processor1504\src\testmodule" />
+      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting\waybill" />
+      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting\acts" />
+      <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting" />
+      <recent name="D:\workspace\ecafe\12\ecafe_03\src\web\web\back-office\include\org\menu" />
+    </key>
+    <key name="ImportMappingsDialog.RecentPackages">
+      <recent name="ru.axetta.ecafe.processor.core.persistence" />
+      <recent name="ru.axetta.ecafe.processor.core.persistence.test" />
+      <recent name="" />
     </key>
   </component>
   <component name="RunManager" selected="Remote.Remote">
@@ -3442,13 +3407,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3183391" sideWeight="0.32986537" order="23" side_tool="false" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21019109" sideWeight="0.3763797" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.16724336" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2613219" sideWeight="0.4509804" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13402693" sideWeight="0.65282583" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21358629" sideWeight="0.44059977" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5146879" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289183" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902735" sideWeight="0.6996587" order="3" side_tool="false" content_ui="tabs" />
@@ -3457,14 +3422,14 @@
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3217993" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298731" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2613219" sideWeight="0.61361015" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2613219" sideWeight="0.54901963" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.4853121" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.7739331" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38638985" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34140715" sideWeight="0.7031824" order="27" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Hibernate Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.55940026" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34371397" sideWeight="0.7031824" order="27" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.30334488" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.019607844" sideWeight="0.57037944" order="24" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28373703" sideWeight="0.57037944" order="24" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38188493" sideWeight="0.6697353" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="10" side_tool="false" content_ui="tabs" />
@@ -3480,6 +3445,7 @@
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3897059" sideWeight="0.7794457" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5883134" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="Atlassian " active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38638985" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="APIdoc" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32536522" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -3491,7 +3457,6 @@
       <window_info id="JPA Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290735" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hibernate Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3164557" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="RESTClient" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.86378205" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
@@ -3703,135 +3668,127 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/view.jsp">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryListPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="55" selection-start="2639" selection-end="2639" vertical-scroll-proportion="-16.961538">
+        <state line="114" column="65" selection-start="3948" selection-end="3948" vertical-scroll-proportion="0.6626984">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryViewPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="57" selection-start="1238" selection-end="1305" vertical-scroll-proportion="0.4940476">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryLoadPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="59" selection-start="2235" selection-end="2235" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="52" selection-start="5143" selection-end="5143" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1366357464530" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#1541#1571#0" expanded="true" />
+            <element signature="e#4864#4882#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobViewPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="58" selection-start="927" selection-end="927" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/../lib/quartz-1.8.1.jar!/org/quartz/JobDetail.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="13" selection-start="153" selection-end="153" vertical-scroll-proportion="0.108142495">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/../lib/quartz-1.8.1.jar!/org/quartz/Scheduler.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="9" selection-start="2455" selection-end="2455" vertical-scroll-proportion="0.34292865">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/AutoReportGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="998" column="66" selection-start="62020" selection-end="62020" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/OrgBalanceReport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="13" selection-start="1231" selection-end="1231" vertical-scroll-proportion="-1.1345133">
+        <state line="27" column="56" selection-start="1454" selection-end="1454" vertical-scroll-proportion="-7.8461537">
           <folding>
-            <element signature="class#PersonItem#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#ClientItem#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#ClientGroupItem#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#OrgItem#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#Builder#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#HtmlReportBuilder#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="class#DocumentBuilderCallback#0;class#OrgBalanceReport#0" expanded="false" />
-            <element signature="method#createDocumentBuilders#0;class#OrgBalanceReport#0" expanded="false" />
+            <marker date="1366702041531" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1366702041531" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1366702041531" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1366702041531" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportForOrgJob.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="33" selection-start="1125" selection-end="1126" vertical-scroll-proportion="-13.44">
+        <state line="22" column="31" selection-start="1025" selection-end="1025" vertical-scroll-proportion="22.884615">
           <folding>
-            <element signature="e#3765#3766#0" expanded="true" />
+            <marker date="1366007206503" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportJob.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryItem.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="22" selection-start="1884" selection-end="1884" vertical-scroll-proportion="0.0">
+        <state line="54" column="32" selection-start="1862" selection-end="1862" vertical-scroll-proportion="0.8420168">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ClientsReport.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryEditPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="164" column="22" selection-start="6770" selection-end="6770" vertical-scroll-proportion="0.58148146">
+        <state line="110" column="57" selection-start="4331" selection-end="4331" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/questionary/QuestionaryDAOService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="98" column="41" selection-start="4556" selection-end="4556" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="class#ClientsReportItem#0;class#Builder#0;class#ClientsReport#0" expanded="false" />
-            <element signature="method#createDataSource#0;class#Builder#0;class#ClientsReport#0" expanded="false" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Answer.hbm.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="34" selection-start="3937" selection-end="3937" vertical-scroll-proportion="0.0">
+        <state line="24" column="43" selection-start="1384" selection-end="1384" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Contragent.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.hbm.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="85" column="85" selection-start="3088" selection-end="3088" vertical-scroll-proportion="0.0">
+        <state line="35" column="77" selection-start="2206" selection-end="2206" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+    <entry file="file://$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/persistence.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="605" column="55" selection-start="25257" selection-end="25257" vertical-scroll-proportion="-14.56">
+        <state line="13" column="27" selection-start="172" selection-end="765" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/ContragentCreatePage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/datatest-context.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="300" column="28" selection-start="7429" selection-end="7429" vertical-scroll-proportion="0.0">
+        <state line="41" column="43" selection-start="2882" selection-end="2882" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Org.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="40" selection-start="2505" selection-end="2505" vertical-scroll-proportion="-0.083847106">
+        <state line="397" column="11" selection-start="11076" selection-end="11076" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="28" selection-start="556" selection-end="556" vertical-scroll-proportion="0.0">
+        <state line="218" column="23" selection-start="5605" selection-end="5605" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/questionary/Questionary.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="468" column="31" selection-start="20049" selection-end="20049" vertical-scroll-proportion="0.6367521">
+        <state line="104" column="27" selection-start="3928" selection-end="3928" vertical-scroll-proportion="1.1658536">
           <folding />
         </state>
       </provider>
@@ -3846,7 +3803,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.21096176" />
+                <option value="0.2705448" />
                 <option value="0.5" />
               </list>
             </option>
@@ -3896,7 +3853,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>web</last-edited>
+          <last-edited>j2ee</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -3912,7 +3869,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.21096176" />
+                <option value="0.2705448" />
               </list>
             </option>
           </splitter-proportions>
