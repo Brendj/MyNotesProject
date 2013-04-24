@@ -18,7 +18,7 @@ public class CompositeIdOfDiaryClass implements Serializable {
     private Long idOfOrg;
     private Long idOfClass;
 
-    CompositeIdOfDiaryClass() {
+    protected CompositeIdOfDiaryClass() {
         // For Hibernate only
     }
 

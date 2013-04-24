@@ -18,7 +18,7 @@ public class CompositeIdOfClientGroup implements Serializable {
     private Long idOfOrg;
     private Long idOfClientGroup;
 
-    CompositeIdOfClientGroup() {
+    protected CompositeIdOfClientGroup() {
         // For Hibernate only
     }
 

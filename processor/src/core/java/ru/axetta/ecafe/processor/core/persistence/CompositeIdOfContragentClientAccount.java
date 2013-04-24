@@ -18,7 +18,7 @@ public class CompositeIdOfContragentClientAccount implements Serializable {
     private Long idOfContragent;
     private Long idOfAccount;
 
-    CompositeIdOfContragentClientAccount() {
+    protected CompositeIdOfContragentClientAccount() {
         // For Hibernate only
     }
 
