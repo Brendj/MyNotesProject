@@ -21,7 +21,7 @@ public class Notification {
     private Integer notificationType;
     private String notificationText;
 
-    Notification() {
+    protected Notification() {
         // For Hibernate only
     }
 
