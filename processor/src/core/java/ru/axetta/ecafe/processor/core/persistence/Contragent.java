@@ -78,7 +78,7 @@ public class Contragent {
     private String ogrn;
 
 
-    Contragent() {
+    protected Contragent() {
         // For Hibernate only
     }
 

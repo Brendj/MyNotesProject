@@ -65,19 +65,23 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ContragentClientAccount"/>
         </set>
         <set name="payerSettlementsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentPayer"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Settlement"/>
         </set>
         <set name="receiverSettlementsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentReceiver"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Settlement"/>
         </set>
         <set name="debtorPositionsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentDebtor"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CurrentPosition"/>
         </set>
         <set name="creditorPositionsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentCreditor"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CurrentPosition"/>
         </set>
         <set name="POSSetInternal" inverse="true" cascade="all">
@@ -89,15 +93,17 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
         </set>
         <set name="orgsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <key column="defaultsupplier"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
         </set>
         <set name="payerAddPaymentsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentPayer"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AddPayment"/>
         </set>
         <set name="receiverAddPaymentsInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <!--<key column="IdOfContragent"/>-->
+            <key column="IdOfContragentReceiver"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AddPayment"/>
         </set>
     </class>
