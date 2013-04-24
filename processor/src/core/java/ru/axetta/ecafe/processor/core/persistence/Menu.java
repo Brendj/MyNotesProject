@@ -38,7 +38,7 @@ public class Menu {
         this.flags = flags;
     }
 
-    Menu() {
+    protected Menu() {
         // For Hibernate only
     }
 

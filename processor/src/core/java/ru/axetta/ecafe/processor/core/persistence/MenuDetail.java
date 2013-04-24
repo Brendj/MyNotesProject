@@ -97,7 +97,7 @@ public class MenuDetail {
         this.menuOrigin = menuOrigin;
     }
 
-    MenuDetail() {
+    protected MenuDetail() {
         // For Hibernate only
     }
 

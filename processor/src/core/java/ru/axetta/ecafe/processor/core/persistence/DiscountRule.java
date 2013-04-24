@@ -74,7 +74,7 @@ public class DiscountRule {
         this.categoryDiscounts = categoryDiscounts;
     }
 
-    public Boolean isOperationOr() {
+    public Boolean getOperationOr() {
         return operationOr;
     }
 

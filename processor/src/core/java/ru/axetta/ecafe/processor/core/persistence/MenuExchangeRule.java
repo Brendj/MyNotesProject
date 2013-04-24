@@ -20,7 +20,7 @@ public class MenuExchangeRule implements Serializable {
     /* ид потребителя основного меню */
     private Long idOfDestOrg;
 
-    private MenuExchangeRule() {
+    protected MenuExchangeRule() {
 
     }
 

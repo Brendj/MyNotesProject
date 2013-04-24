@@ -32,7 +32,7 @@ public class MenuExchange {
         this.flags = flags;
     }
 
-    MenuExchange() {
+    protected MenuExchange() {
         // For Hibernate only
     }
     final static char COMPRESS_MARKER='@';

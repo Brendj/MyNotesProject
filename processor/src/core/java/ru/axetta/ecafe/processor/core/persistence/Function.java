@@ -86,7 +86,7 @@ public class Function {
     private String functionName;
     private Set<User> users = new HashSet<User>();
 
-    Function() {
+    protected Function() {
         // For Hibernate
     }
 
@@ -112,12 +112,12 @@ public class Function {
         this.functionName = functionName;
     }
 
-    private Set<User> getUsersInternal() {
+    protected Set<User> getUsersInternal() {
         // For Hibernate
         return users;
     }
 
-    private void setUsersInternal(Set<User> users) {
+    protected void setUsersInternal(Set<User> users) {
         // For Hibernate
         this.users = users;
     }
