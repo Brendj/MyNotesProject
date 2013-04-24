@@ -326,7 +326,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                  this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
         }
-        this.operationor=discountRule.isOperationOr();
+        this.operationor=discountRule.getOperationOr();
     }
 
     public String getFilterOrg() {
