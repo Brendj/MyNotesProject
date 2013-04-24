@@ -42,7 +42,7 @@
 
         <set name="goodComplaintOrdersInternal" lazy="true" inverse="true">
             <key>
-                <column name="idOfOrg"/>
+                <column name="IdOfOrderOrg"/>
                 <column name="IdOfOrder"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders" />

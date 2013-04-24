@@ -203,7 +203,7 @@ public class Org {
     }
     //private Set<EnterEvent> enterEvents;
 
-    Org() {
+    protected Org() {
         // For Hibernate only
     }
 

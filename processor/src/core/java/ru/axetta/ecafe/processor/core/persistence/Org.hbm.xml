@@ -83,6 +83,7 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
         </set>
+
         <set name="orderDetailsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrderDetail"/>
@@ -114,7 +115,7 @@
         </set>
 
         <!-- Производственая конфигурация -->
-        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" lazy="false">
+        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" fetch="join" lazy="false">
             <column name="idOfConfigurationProvider"/>
         </many-to-one>
 
@@ -138,7 +139,7 @@
             <many-to-one name="thisOrg" column="currentOrg"/>
         </join>-->
 
-        <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="join" outer-join="false">
+        <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="IdOfOrg" not-null="true" />
             </key>

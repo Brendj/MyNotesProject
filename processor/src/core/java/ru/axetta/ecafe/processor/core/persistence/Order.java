@@ -40,7 +40,7 @@ public class Order{
     private int state;
     private Long confirmerId;
 
-    Order() {
+    protected Order() {
         // For Hibernate only
     }
 

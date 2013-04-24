@@ -110,7 +110,7 @@ public class OrderDetail {
         this.menuType = menuType;
     }
 
-    OrderDetail() {
+    protected OrderDetail() {
         // For Hibernate only
     }
 
