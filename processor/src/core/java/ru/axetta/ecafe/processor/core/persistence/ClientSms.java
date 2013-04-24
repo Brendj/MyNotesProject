@@ -47,7 +47,7 @@ public class ClientSms {
     private Date deliveryTime;
     private Long price;
 
-    ClientSms() {
+    protected ClientSms() {
         // For Hibernate only
     }
 

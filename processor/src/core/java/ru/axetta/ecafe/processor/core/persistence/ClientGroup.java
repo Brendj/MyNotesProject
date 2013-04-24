@@ -78,7 +78,7 @@ public class ClientGroup {
     private Set<Client> clients = new HashSet<Client>();
     private Set<DiaryTimesheet> diaryTimesheets = new HashSet<DiaryTimesheet>();
 
-    ClientGroup() {
+    protected ClientGroup() {
         // For Hibernate only
     }
 

@@ -44,7 +44,7 @@ public class ClientPayment {
     private String addIdOfPayment;
     private Contragent contragentReceiver;
 
-    ClientPayment() {
+    protected ClientPayment() {
         // For Hibernate only
     }
 

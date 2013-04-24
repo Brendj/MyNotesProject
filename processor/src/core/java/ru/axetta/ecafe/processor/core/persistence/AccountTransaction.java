@@ -52,7 +52,7 @@ public class AccountTransaction {
     private Set<SubscriptionFee> subscriptionFees = new HashSet<SubscriptionFee>();
     private Org org;
 
-    AccountTransaction() {
+    protected AccountTransaction() {
         // For Hibernate only
     }
 

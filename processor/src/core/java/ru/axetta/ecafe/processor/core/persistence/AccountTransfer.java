@@ -17,9 +17,8 @@ public class AccountTransfer {
     AccountTransaction transactionOnBenefactor;
     AccountTransaction transactionOnBeneficiary;
     Long transferSum;
-    
-    AccountTransfer() {
-    }
+
+    protected AccountTransfer() {}
 
     public AccountTransfer(Date createTime, Client clientBenefactor, Client clientBeneficiary, String reason,
             User createdBy, AccountTransaction transactionOnBenefactor, AccountTransaction transactionOnBeneficiary,

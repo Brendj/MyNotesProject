@@ -22,7 +22,7 @@ public class Call {
     private Integer callType;
     private Integer state;
 
-    Call() {
+    protected Call() {
         // For Hibernate only
     }
 

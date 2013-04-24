@@ -36,7 +36,7 @@ public class ClientPaymentOrder {
     private String idOfPayment;
     private Set<ClientPayment> clientPayments = new HashSet<ClientPayment>();
 
-    ClientPaymentOrder() {
+    protected ClientPaymentOrder() {
         // For Hibernate only
     }
 

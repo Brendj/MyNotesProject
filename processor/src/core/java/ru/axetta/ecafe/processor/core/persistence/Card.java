@@ -57,7 +57,7 @@ public class Card {
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Order> orders = new HashSet<Order>();
 
-    Card() {
+    protected Card() {
         // For Hibernate only
     }
 
