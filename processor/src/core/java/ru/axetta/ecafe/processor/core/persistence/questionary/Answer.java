@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.questionary;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,7 +23,7 @@ public class Answer {
     private Date createdDate;
     private Date updatedDate;
     private Questionary questionary;
-    private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
+    private Set<ClientAnswerByQuestionary> clientAnswerByQuestion = new HashSet<ClientAnswerByQuestionary>();
     private String description;
 
     public String getDescription() {
@@ -33,12 +34,12 @@ public class Answer {
         this.description = description;
     }
 
-    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
-        return clientAnswerByQuestionary;
+    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestion() {
+        return clientAnswerByQuestion;
     }
 
-    public void setClientAnswerByQuestionary(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
-        this.clientAnswerByQuestionary = clientAnswerByQuestionary;
+    public void setClientAnswerByQuestion(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
+        this.clientAnswerByQuestion = clientAnswerByQuestionary;
     }
 
     protected Answer() {}
@@ -125,19 +126,19 @@ public class Answer {
         this.idOfAnswer = idOfAnswer;
     }
 
-    protected void setAnswer(String answer) {
+    public void setAnswer(String answer) {
         this.answer = answer;
     }
 
-    protected void setWeight(Integer weight) {
+    public void setWeight(Integer weight) {
         this.weight = weight;
     }
 
-    protected void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 
-    protected void setUpdatedDate(Date updatedDate) {
+    public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
     }
 
@@ -145,35 +146,35 @@ public class Answer {
         this.questionary = questionary;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Answer answer1 = (Answer) o;
-
-        if (!answer.equals(answer1.answer)) {
-            return false;
-        }
-        if (!createdDate.equals(answer1.createdDate)) {
-            return false;
-        }
-        if (!weight.equals(answer1.weight)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = answer.hashCode();
-        result = 31 * result + weight.hashCode();
-        result = 31 * result + createdDate.hashCode();
-        return result;
-    }
+    //@Override
+    //public boolean equals(Object o) {
+    //    if (this == o) {
+    //        return true;
+    //    }
+    //    if (o == null || getClass() != o.getClass()) {
+    //        return false;
+    //    }
+    //
+    //    Answer answer1 = (Answer) o;
+    //
+    //    if (!answer.equals(answer1.answer)) {
+    //        return false;
+    //    }
+    //    if (!createdDate.equals(answer1.createdDate)) {
+    //        return false;
+    //    }
+    //    if (!weight.equals(answer1.weight)) {
+    //        return false;
+    //    }
+    //
+    //    return true;
+    //}
+    //
+    //@Override
+    //public int hashCode() {
+    //    int result = answer.hashCode();
+    //    result = 31 * result + weight.hashCode();
+    //    result = 31 * result + createdDate.hashCode();
+    //    return result;
+    //}
 }

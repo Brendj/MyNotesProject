@@ -11,9 +11,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,19 +28,11 @@ public class Questionary {
     private QuestionaryType questionaryType;
     private Date createdDate;
     private Date updatedDate;
-    private Set<Answer> answers = new HashSet<Answer>();
     private Set<Org> orgs = new HashSet<Org>();
     private String questionName;
     private String description;
     private Date viewDate;
-
-    public Date getViewDate() {
-        return viewDate;
-    }
-
-    public void setViewDate(Date viewDate) {
-        this.viewDate = viewDate;
-    }
+    private Set<Answer> answers = new HashSet<Answer>();
 
     protected Questionary() {}
 
@@ -85,7 +75,11 @@ public class Questionary {
         this.createdDate = date;
         this.updatedDate = date;
         date = CalendarUtils.truncateToDayOfMonth(date);
-        this.viewDate = date;
+        if(questionaryItem.getViewDate()!=null){
+            this.viewDate = questionaryItem.getViewDate().getTime();
+        }else {
+            this.viewDate = date;
+        }
     }
 
     public Questionary(String questionName, String question, String description, QuestionaryType type, QuestionaryStatus status) throws Exception {
@@ -144,17 +138,23 @@ public class Questionary {
         return this;
     }
 
-    public boolean getInactiveStatus() {
+    public Boolean getInactiveStatus() {
         return this.status == QuestionaryStatus.INACTIVE;
     }
 
-    public boolean getStartStatus() {
+    void setInactiveStatus(Boolean stopStatus) {}
+
+    public Boolean getStartStatus() {
         return this.status == QuestionaryStatus.START;
     }
 
-    public boolean getStopStatus() {
-        return  this.status == QuestionaryStatus.STOP;
+    void setStartStatus(Boolean stopStatus) {}
+
+    public Boolean getStopStatus() {
+        return this.status == QuestionaryStatus.STOP;
     }
+
+    void setStopStatus(Boolean stopStatus) {}
 
     public Set<Org> getOrgs() {
         return orgs;
@@ -170,6 +170,30 @@ public class Questionary {
 
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
+    }
+
+    public void addAnswer(Answer answer){
+        if(!this.answers.contains(answer)){
+            this.answers.add(answer);
+        }
+    }
+
+    public void removeAnswer(Answer answer){
+        if(!this.answers.contains(answer)){
+            this.answers.remove(answer);
+        }
+    }
+
+    public List<Answer> getAnswerList(){
+        return new ArrayList<Answer>(answers);
+    }
+
+    public Date getViewDate() {
+        return viewDate;
+    }
+
+    public void setViewDate(Date viewDate) {
+        this.viewDate = viewDate;
     }
 
     public Date getUpdatedDate() {
@@ -205,19 +229,27 @@ public class Questionary {
         this.createdDate = createdDate;
     }
 
-    public void setQuestionaryType(QuestionaryType questionaryType) {
+    protected void setQuestionaryType(QuestionaryType questionaryType) {
         this.questionaryType = questionaryType;
     }
 
-    protected void setStatus(QuestionaryStatus status) {
+    public Integer getType() {
+        return questionaryType.getValue();
+    }
+
+    public void setType(Integer questionaryType) {
+        this.questionaryType = QuestionaryType.fromInteger(questionaryType);
+    }
+
+    public void setStatus(QuestionaryStatus status) {
         this.status = status;
     }
 
-    protected void setQuestion(String question) {
+    public void setQuestion(String question) {
         this.question = question;
     }
 
-    protected void setIdOfQuestionary(Long idOfQuestionary) {
+    public void setIdOfQuestionary(Long idOfQuestionary) {
         this.idOfQuestionary = idOfQuestionary;
     }
 
@@ -225,7 +257,7 @@ public class Questionary {
         return description;
     }
 
-    protected void setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -233,7 +265,7 @@ public class Questionary {
         return questionName;
     }
 
-    protected void setQuestionName(String questionName) {
+    public void setQuestionName(String questionName) {
         this.questionName = questionName;
     }
 }
