@@ -120,7 +120,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -472,7 +472,7 @@ public class ProjectStateReportService {
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс", VISITORS_CHART_1_DATA}, {ValueType.NUMBER, "5-11 класс", VISITORS_CHART_2_DATA}},
-                VISITORS_CHART_DATA));
+                VISITORS_CHART_DATA));*/
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),
@@ -497,7 +497,7 @@ public class ProjectStateReportService {
     private static final String PERIODIC_AVG_SELECT_SQL =
             "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
-                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') and "
+                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and "
                     + "      period >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                     + "      Type=? and Region=? and substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') <> '' "
                     + PERIODIC_AVG_GROUP + " order by 2 desc, 1";
