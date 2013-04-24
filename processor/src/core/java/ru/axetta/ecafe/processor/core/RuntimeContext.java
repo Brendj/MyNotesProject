@@ -1080,7 +1080,22 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public String getOptionValueString(int optionId) {
-        return optionsValues.get(optionId);
+        String src = optionsValues.get(optionId);
+        if (src == null) {
+            return src;
+        }
+        Map <String, String> env = System.getenv();
+        while (src.indexOf ("${") > -1) {
+            int idx = src.indexOf("${");
+            String key = src.substring(idx + 2, src.indexOf("}", idx + 2));
+            String val = env.get(key);
+            if (val == null) {
+                val = "";
+            }
+            src = src.replaceAll("[$]\\{" + key + "\\}", val);
+        }
+        return src;
+        //return optionsValues.get(optionId);
     }
 
     public void setOptionValue(int optionId, String value) {
