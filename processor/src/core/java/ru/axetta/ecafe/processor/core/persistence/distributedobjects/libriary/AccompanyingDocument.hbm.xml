@@ -43,7 +43,7 @@
 
         <set name="ksu1RecordInternal" lazy="true" inverse="true">
             <key>
-                <column name="IdOfAccompanyingDocument"/>
+                <column name="AccompanyingDocument"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu1Record" />
         </set>

@@ -33,12 +33,12 @@
 
         <property name="bookName" column="bookName" type="string" length="256" not-null="false"/>
 
-        <set name="instanceInternal" lazy="true" inverse="true">
+       <!-- <set name="instanceInternal" lazy="true" inverse="true">
             <key>
                 <column name="idofbook"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" />
-        </set>
+        </set>-->
 
     </class>
 </hibernate-mapping>
