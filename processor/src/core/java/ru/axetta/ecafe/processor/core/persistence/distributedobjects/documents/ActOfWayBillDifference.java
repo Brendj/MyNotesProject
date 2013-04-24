@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class ActOfWayBillDifference extends DistributedObject {
 
-    private Set<WayBillPosition> wayBillInternal;
+    private Set<WayBill> wayBillInternal;
     private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
     public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
@@ -38,11 +38,11 @@ public class ActOfWayBillDifference extends DistributedObject {
         this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
     }
 
-    public Set<WayBillPosition> getWayBillInternal() {
+    public Set<WayBill> getWayBillInternal() {
         return wayBillInternal;
     }
 
-    public void setWayBillInternal(Set<WayBillPosition> wayBillInternal) {
+    public void setWayBillInternal(Set<WayBill> wayBillInternal) {
         this.wayBillInternal = wayBillInternal;
     }
 

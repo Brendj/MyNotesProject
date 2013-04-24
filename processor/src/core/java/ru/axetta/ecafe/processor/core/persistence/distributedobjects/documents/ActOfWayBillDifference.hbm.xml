@@ -41,7 +41,7 @@
             <key>
                 <column name="IdOfActOfDifference"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill" />
         </set>
 
         <set name="actOfWayBillDifferencePositionInternal" lazy="true" inverse="true">

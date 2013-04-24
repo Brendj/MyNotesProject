@@ -27,49 +27,49 @@ public class Staff extends DistributedObject {
 
 
     private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
-    private Set<WayBillPosition> wayBillInternal;
+    private Set<WayBill> wayBillInternal;
     private Set<StateChange> stateChangeInternal;
     private Set<InternalDisposingDocument> internalDisposingDocumentInternal;
     private Set<GoodRequest> goodRequestInternal;
 
-    public Set<GoodRequest> getGoodRequestInternal() {
+    Set<GoodRequest> getGoodRequestInternal() {
         return goodRequestInternal;
     }
 
-    public void setGoodRequestInternal(Set<GoodRequest> goodRequestInternal) {
+    void setGoodRequestInternal(Set<GoodRequest> goodRequestInternal) {
         this.goodRequestInternal = goodRequestInternal;
     }
 
-    public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
+    Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
         return internalDisposingDocumentInternal;
     }
 
-    public void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
+    void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
         this.internalDisposingDocumentInternal = internalDisposingDocumentInternal;
     }
 
 
-    public Set<StateChange> getStateChangeInternal() {
+    Set<StateChange> getStateChangeInternal() {
         return stateChangeInternal;
     }
 
-    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+    void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
         this.stateChangeInternal = stateChangeInternal;
     }
 
-    public Set<WayBillPosition> getWayBillInternal() {
+    Set<WayBill> getWayBillInternal() {
         return wayBillInternal;
     }
 
-    public void setWayBillInternal(Set<WayBillPosition> wayBillInternal) {
+    void setWayBillInternal(Set<WayBill> wayBillInternal) {
         this.wayBillInternal = wayBillInternal;
     }
 
-    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+    Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
         return internalIncomingDocumentInternal;
     }
 
-    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+    void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
         this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
     }
 
