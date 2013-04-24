@@ -25,7 +25,10 @@
 <h:panelGrid id="questionaryListPanelGrid" binding="#{questionaryListPage.pageComponent}" styleClass="borderless-grid">
 
     <rich:dataTable value="#{questionaryListPage.questionary}" var="questionary"
-                    captionClass="center-aligned-column">
+                    captionClass="center-aligned-column"
+                    columnClasses="right-aligned-column, center-aligned-column, center-aligned-column,
+                                   center-aligned-column, center-aligned-column, center-aligned-column,
+                                   center-aligned-column, center-aligned-column, center-aligned-column">
         <f:facet name="header">
              <rich:columnGroup>
                  <rich:column  sortBy="#{questionary.idOfQuestionary}">

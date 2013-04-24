@@ -31,27 +31,32 @@
         </a4j:repeat>
     </h:panelGroup>
     <h:outputText value="Идентификатор" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.idOfQuestionary}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.idOfQuestionary}" styleClass="input-text"/>
 
     <h:outputText value="Наименование" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.questionName}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.questionName}" styleClass="input-text"/>
 
     <h:outputText value="Вопрос" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.question}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.question}" styleClass="input-text"/>
 
     <h:outputText value="Описание" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.description}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.description}" styleClass="input-text"/>
 
     <h:outputText value="Статус" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.status}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.status}" styleClass="input-text"/>
+
     <h:outputText value="Тип" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.questionaryType}" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.questionaryType}" styleClass="input-text"/>
+
     <h:outputText value="Дата показа" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.viewDate}" converter="dateConverter" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.viewDate}" converter="dateConverter" styleClass="input-text"/>
+
     <h:outputText value="Дата остановки" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.createdDate}" converter="timeConverter" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.createdDate}" converter="timeConverter" styleClass="input-text"/>
+
     <h:outputText value="Дата последних изменений" styleClass="output-text"/>
-    <h:outputText value="#{questionaryViewPage.questionary.updatedDate}" converter="timeConverter" styleClass="output-text"/>
+    <h:inputText readonly="true" value="#{questionaryViewPage.questionary.updatedDate}" converter="timeConverter" styleClass="input-text"/>
+
     <a4j:commandButton value="Редактировать" reRender="mainMenu, workspaceForm"  action="#{questionaryEditPage.show}" styleClass="command-button"/>
 </h:panelGrid>
 

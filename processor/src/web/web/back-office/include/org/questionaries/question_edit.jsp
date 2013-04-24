@@ -25,13 +25,16 @@
         <h:inputText value="#{questionaryEditPage.questionary.idOfQuestionary}" styleClass="output-text" readonly="true"/>
 
         <h:outputText value="Наименование" styleClass="output-text long-field required-field"/>
-        <h:inputText value="#{questionaryEditPage.questionName}" styleClass="output-text"/>
+        <%--<h:inputText value="#{questionaryEditPage.questionName}" styleClass="output-text"/>--%>
+        <h:inputText value="#{questionaryEditPage.questionary.questionName}" styleClass="output-text"/>
 
         <h:outputText value="Вопрос" styleClass="output-text long-field required-field"/>
-        <h:inputText value="#{questionaryEditPage.question}" styleClass="output-text"/>
+        <%--<h:inputText value="#{questionaryEditPage.question}" styleClass="output-text"/>--%>
+        <h:inputText value="#{questionaryEditPage.questionary.question}" styleClass="output-text"/>
 
         <h:outputText value="Описание" styleClass="output-text long-field"/>
-        <h:inputTextarea value="#{questionaryEditPage.description}" styleClass="output-text"/>
+        <%--<h:inputTextarea value="#{questionaryEditPage.description}" styleClass="output-text"/>--%>
+        <h:inputText value="#{questionaryEditPage.questionary.description}" styleClass="output-text"/>
 
         <h:outputText escape="true" value="Организации" styleClass="output-text" />
         <h:panelGrid columns="2">
@@ -46,20 +49,20 @@
         <%--<h:outputText value="Статус" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.status}" styleClass="output-text"/>--%>
         <h:outputText escape="true" value="Тип" styleClass="output-text" />
-        <h:selectOneMenu value="#{questionaryEditPage.type}" styleClass="input-text">
+        <h:selectOneMenu value="#{questionaryEditPage.questionary.type}" styleClass="input-text">
             <f:selectItems value="#{questionaryEditPage.questionaryEnumTypeMenu.items}" />
         </h:selectOneMenu>
 
         <h:outputText escape="true" value="Дата показа" styleClass="output-text" />
-        <rich:calendar value="#{questionaryEditPage.viewDate}" datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <rich:calendar value="#{questionaryEditPage.questionary.viewDate}" datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
         <h:outputText value="Дата регистрации" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.createdDate}" converter="dateConverter" styleClass="output-text" readonly="true"/>
         <h:outputText value="Дата последних изменений" styleClass="output-text"/>
         <h:inputText value="#{questionaryEditPage.questionary.updatedDate}" converter="dateConverter" styleClass="output-text" readonly="true"/>
     </h:panelGrid>
-    <rich:dataTable value="#{questionaryEditPage.answers}" var="answer" id="answerTable" rowKeyVar="row"
-            columnClasses="right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
+    <rich:dataTable value="#{questionaryEditPage.questionary.answerList}" var="ans" id="answerTable" rowKeyVar="row"
+            columnClasses="right-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="№"/>
@@ -70,7 +73,7 @@
             <f:facet name="header">
                 <h:outputText value="Вариант ответа"/>
             </f:facet>
-            <rich:inplaceInput layout="block" value="#{answer.answer}"
+            <rich:inplaceInput layout="block" value="#{ans.answer}"
                                id="answerText" required="true"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
@@ -82,7 +85,7 @@
             <f:facet name="header">
                 <h:outputText value="Пояснения"/>
             </f:facet>
-            <rich:inplaceInput layout="block" value="#{answer.description}"
+            <rich:inplaceInput layout="block" value="#{ans.description}"
                                id="answerDescription"
                                changedHoverClass="hover" viewHoverClass="hover"
                                viewClass="inplace" changedClass="inplace"
@@ -94,15 +97,15 @@
             <f:facet name="header">
                 <h:outputText value="Балл"/>
             </f:facet>
-            <rich:inputNumberSpinner value="#{answer.weight}" id="answerWeightSpinner"/>
+            <rich:inputNumberSpinner value="#{ans.weight}" id="answerWeightSpinner"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Удалить"/>
             </f:facet>
-            <a4j:commandLink action="#{questionaryEditPage.removeAnswer}">
+            <a4j:commandLink action="#{questionaryEditPage.removeAnswer}" reRender="answerTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{answer}" target="#{questionaryEditPage.removeAnswer}"/>
+                <f:setPropertyActionListener value="#{ans}" target="#{questionaryEditPage.removeAnswer}"/>
             </a4j:commandLink>
         </rich:column>
     </rich:dataTable>
