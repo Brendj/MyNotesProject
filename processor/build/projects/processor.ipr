@@ -151,16 +151,20 @@
           <element id="module-output" name="core" />
           <element id="module-output" name="util" />
         </element>
-        <element id="library" level="project" name="junit" />
         <element id="library" level="project" name="axetta_smpp" />
-        <element id="library" level="project" name="axetta_charset" />
-        <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
-        <element id="library" level="project" name="spring305" />
         <element id="file-copy" path="$PROJECT_DIR$/../lib/xmlsec.jar" />
         <element id="file-copy" path="$PROJECT_DIR$/../lib/xmldsig.jar" />
-        <element id="library" level="project" name="jasperlib" />
+        <element id="library" level="project" name="axetta_charset" />
+        <element id="library" level="project" name="junit" />
         <element id="library" level="project" name="hibernate-4.0.1" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
+        <element id="library" level="project" name="spring305" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
+        <element id="library" level="project" name="jasperlib" />
+        <element id="library" level="project" name="commons" />
+        <element id="library" level="project" name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
+        <element id="library" level="project" name="postgresql-9.1-901.jdbc4" />
+        <element id="library" level="project" name="Java EE 6-3.1" />
       </root>
     </artifact>
   </component>
@@ -462,7 +466,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="3808811354">
+  <component name="DataSourceManagerImpl" format="xml" hash="432786669">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -472,6 +476,21 @@
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <schema-pattern>amoscow.public</schema-pattern>
       <default-schemas>amoscow.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Kazan Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>akazan.public</schema-pattern>
+      <default-schemas>akazan.public</default-schemas>
       <libraries>
         <library>
           <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
@@ -508,6 +527,17 @@
   </component>
   <component name="IdProvider" IDEtalkID="18F2146BFFA68BDCCC8665BD3D587E9B" />
   <component name="InspectionProjectProfileManager">
+    <profiles>
+      <profile version="1.0" is_locked="false">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <inspection_tool class="JpaAttributeMemberSignatureInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JpaAttributeTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+      </profile>
+    </profiles>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
       <item index="1" class="java.lang.String" itemvalue="WEAK WARNING" />
@@ -1266,6 +1296,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/dom4j-1.6.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/javassist-3.15.0-GA.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/antlr-2.7.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-envers-4.0.1.Final.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -1315,6 +1346,21 @@
     <library name="junit">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/junit-4.10.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" type="repository">
+      <properties maven-id="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="postgresql-9.1-901.jdbc4">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
