@@ -719,15 +719,16 @@ public class ProjectStateReportService {
 
 
 
-        cal.set(Calendar.YEAR, 2013);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        /*cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.MARCH);
+        cal.set(Calendar.DAY_OF_MONTH, 24);*/
 
 
         return cal;
     }
 
 
+    //public int DAY_OF_MONTH = 10;
     public static Calendar getToday() {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
@@ -737,9 +738,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        cal.set(Calendar.YEAR, 2013);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 5);
+        /*cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.MARCH);
+        cal.set(Calendar.DAY_OF_MONTH, DAY_OF_MONTH);*/
 
         return cal;
     }
@@ -1003,9 +1004,7 @@ public class ProjectStateReportService {
             } else if (t.getColumns()[0][0] == ValueType.DATE) {
                 Date d = new Date(Long.parseLong(k));
                 if (d.getDay() == 0 || d.getDay() == 6) {
-                    /*if (t.getReportType() != ACTIVE_CHART_DATA && t.getReportType() != UNIQUE_CHART_DATA) {*/
-                        continue;
-                    //}
+                    continue;
                 }
                 r.addCell(DATE_FORMAT.format(d));
             } else if (t.getColumns()[0][0] == ValueType.NUMBER) {
