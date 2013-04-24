@@ -1545,7 +1545,7 @@ public class SyncResponse {
                 this.complex8 = discountRule.getComplex8();
                 this.complex9 = discountRule.getComplex9();
                 this.priority = discountRule.getPriority();
-                this.operationor = discountRule.isOperationOr();
+                this.operationor = discountRule.getOperationOr();
             }
 
 
