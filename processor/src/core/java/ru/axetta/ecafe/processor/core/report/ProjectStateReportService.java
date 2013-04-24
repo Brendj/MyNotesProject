@@ -120,7 +120,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -472,7 +472,7 @@ public class ProjectStateReportService {
                         "having cast(count(events.c) as float8)/cast(overall.c as float8) > 0.2) as res " +
                         "group by d", VISITORS_CHART_2_DATA).setIncremental(true)}, new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, "1-4 класс", VISITORS_CHART_1_DATA}, {ValueType.NUMBER, "5-11 класс", VISITORS_CHART_2_DATA}},
-                VISITORS_CHART_DATA));*/
+                VISITORS_CHART_DATA));
         TYPES.put("OrgsRatingChart", new ComplexType(new Type[]{
                 new SimpleType("events", RATING_CHART_1_DATA).setPreSelectSQLMethod("parseOrgsEvents")
                         .setPeriodDaysInc(-7).setIncremental(true),
@@ -791,6 +791,9 @@ public class ProjectStateReportService {
             sql = sql.replaceAll("%MAXIMUM_DATE%", DB_DATE_FORMAT.format(max.getTime()));
         }
         if (sql.indexOf(PERIODIC_AVG_COL) > -1) {
+            if (type == RATING_CHART_3_DATA) {
+                sql = sql.replaceAll(PERIODIC_AVG_COL, " max(StringValue) ");
+            }
             if (type == RATING_CHART_5_DATA) {
                 sql = sql.replaceAll(PERIODIC_AVG_COL, " StringValue ");
             } else {
@@ -1449,9 +1452,9 @@ public class ProjectStateReportService {
 
 
     public void parseContentsChart(Object dataSource, Object sessionObj, Object paramsObj) {
-        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
+        Map<String, List<Item>> data = (Map<String, List<Item>>) dataSource;
 
-        List<String> list = data.get("Соб. Произв.");
+        List<Item> list = data.get("Соб. Произв.");
         data.put("Собственное производство", list);
         data.remove("Соб. Произв.");
 
@@ -1470,8 +1473,8 @@ public class ProjectStateReportService {
 
 
     public void parseRefillChart(Object dataSource, Object sessionObj, Object paramsObj) {
-        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
-        List<String> list = data.get("Банк Москвы");
+        Map<String, List<Item>> data = (Map<String, List<Item>>) dataSource;
+        List<Item> list = data.get("Банк Москвы");
         data.put("Через Банк Москвы", list);
         data.remove("Банк Москвы");
 
@@ -1486,13 +1489,14 @@ public class ProjectStateReportService {
 
 
     public void parseRatingChart(Object dataSource, Object sessionObj, Object paramsObj) {
-        Map<String, List<String>> data = (Map<String, List<String>>) dataSource;
+        Map<String, List<Item>> data = (Map<String, List<Item>>) dataSource;
         for (String k : data.keySet()) {
-            List<String> dat = data.get(k);
-            if (dat.get(2).indexOf("0") == 0) {
-                dat.set(2, "Нет");
+            List<Item> dat = data.get(k);
+            Item it = dat.get(2);
+            if (it.value.indexOf("0") == 0) {
+                dat.set(2, new Item (it.type, "Нет"));
             } else {
-                dat.set(2, "Да");
+                dat.set(2, new Item (it.type, "Да"));
             }
         }
     }
@@ -1606,7 +1610,7 @@ public class ProjectStateReportService {
         return "";
     }
 
-    private static class Item {
+    public static class Item {
         public int type;
         public String value;
 
