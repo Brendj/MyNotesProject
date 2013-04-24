@@ -133,7 +133,7 @@ public class Option {
     private Long idOfOption;
     private String optionText;
 
-    Option() {
+    protected Option() {
         // For Hibernate
     }
 
