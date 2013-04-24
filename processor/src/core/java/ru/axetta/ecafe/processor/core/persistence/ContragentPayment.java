@@ -24,7 +24,7 @@ public class ContragentPayment {
     private Date createTime;
     private Date paymentTime;
 
-    ContragentPayment() {
+    protected ContragentPayment() {
         // For Hibernate only
     }
 

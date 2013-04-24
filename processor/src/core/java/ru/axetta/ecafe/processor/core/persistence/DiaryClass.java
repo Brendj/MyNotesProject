@@ -32,7 +32,7 @@ public class DiaryClass {
     private Set<DiaryTimesheet> diaryTimesheets9 = new HashSet<DiaryTimesheet>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
 
-    DiaryClass() {
+    protected DiaryClass() {
         // For Hibernate only
     }
 

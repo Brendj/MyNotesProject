@@ -18,7 +18,7 @@ public class ContragentClientAccount {
     private Client client;
     private Long idOfAccount;
 
-    ContragentClientAccount() {
+    protected ContragentClientAccount() {
         // For Hibernate only
     }
 

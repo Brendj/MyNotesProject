@@ -40,7 +40,7 @@ public class DiaryTimesheet {
     private DiaryClass diaryClass8;
     private DiaryClass diaryClass9;
 
-    DiaryTimesheet() {
+    protected DiaryTimesheet() {
         // For Hibernate only
     }
 

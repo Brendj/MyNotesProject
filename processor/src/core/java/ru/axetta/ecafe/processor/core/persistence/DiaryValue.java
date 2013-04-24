@@ -38,7 +38,7 @@ public class DiaryValue {
     private Date recDate;
     private int vType;
 
-    DiaryValue() {
+    protected DiaryValue() {
         // For Hibernate only
     }
 
