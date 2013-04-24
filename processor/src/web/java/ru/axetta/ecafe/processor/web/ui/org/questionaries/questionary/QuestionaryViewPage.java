@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.questionary.OrgItem;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
@@ -44,13 +45,8 @@ public class QuestionaryViewPage extends BasicWorkspacePage {
         loadOrg();
     }
 
-    @Transactional
     protected void loadOrg(){
-        List<Org> orgList = questionaryDAOService.getOrgs(questionary);
-        orgItemList = new ArrayList<OrgItem>(orgList.size());
-        for (Org org: orgList){
-            orgItemList.add(new OrgItem(org));
-        }
+        orgItemList = questionaryDAOService.getOrgs(questionary);
     }
 
     @Override

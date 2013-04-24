@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.questionary.OrgItem;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
@@ -34,53 +35,33 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     private String filter = "Не выбрано";
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
     private Questionary questionary;
-    private String question;
-    private String questionName;
-    private String description;
-    private Integer type;
-    private Date viewDate;
     private final QuestionaryEnumTypeMenu questionaryEnumTypeMenu = new QuestionaryEnumTypeMenu();
     private List<OrgItem> orgItemList;
-    private List<AnswerItem> answers;
-    private AnswerItem removeAnswer;
+    private Answer removeAnswer;
     @Autowired
     private QuestionaryGroupPage questionaryGroupPage;
-    @Autowired
-    private QuestionaryService questionaryService;
     @Autowired
     private QuestionaryDAOService questionaryDAOService;
 
     @Override
     public void onShow() throws Exception {
         questionary = questionaryGroupPage.getQuestionary();
-        load();
-    }
-
-    public void load() {
-        question = questionary.getQuestion();
-        questionName = questionary.getQuestionName();
-        description = questionary.getDescription();
-        viewDate = questionary.getViewDate();
-        type = questionary.getQuestionaryType().getValue();
-        List<Answer> answerList = questionaryDAOService.getAnswers(questionary);
-        List<AnswerItem> answerItems = new ArrayList<AnswerItem>(answerList.size());
-        for (Answer answer: answerList){
-            answerItems.add(new AnswerItem(answer));
-        }
-        answers = answerItems;
-        List<Org> orgList = questionaryDAOService.getOrgs(questionary);
-        if(!orgList.isEmpty()){
-            orgItemList = new ArrayList<OrgItem>(orgList.size());
+        orgItemList = questionaryDAOService.getOrgs(questionary);
+        if(!orgItemList.isEmpty()){
             StringBuilder sb=new StringBuilder();
-            idOfOrgList = new ArrayList<Long>(orgList.size());
-            for (Org org: orgList){
-                orgItemList.add(new OrgItem(org));
+            idOfOrgList = new ArrayList<Long>(orgItemList.size());
+            for (OrgItem org: orgItemList){
                 idOfOrgList.add(org.getIdOfOrg());
                 sb.append(org.getShortName());
                 sb.append("; ");
             }
             filter=sb.substring(0,sb.length()-2);
         }
+        load();
+    }
+
+    public void load() {
+        questionary = questionaryDAOService.getQuestionary(questionary);
     }
 
     @Override
@@ -102,18 +83,12 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
 
     public Object save(){
         try {
-            /* update answers */
             if (questionaryDAOService.getStatus(questionary)){
-                List<Answer> answerList = new ArrayList<Answer>(answers.size());
-                for (AnswerItem answerItem: answers){
-                    answerList.add(new Answer(answerItem.getAnswer(),answerItem.getDescription(),questionary,answerItem.getWeight()));
-                }
-                questionary = questionaryDAOService.updateQuestionary(questionary.getIdOfQuestionary(),question,
-                        questionName,description,idOfOrgList, type, answerList,viewDate);
+                questionary.setOrgs(questionaryDAOService.getOrgs(idOfOrgList));
+                questionary = questionaryDAOService.saveOrUpdate(questionary);
                 questionaryGroupPage.setQuestionary(questionary);
-                load();
                 printMessage("Изменения успешно сохранены");
-            } else {
+            }  else {
                 printWarn("Необходимо остановить анкетирование перед редактированием");
             }
         } catch (Exception e) {
@@ -129,7 +104,7 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
     }
 
     public Object removeAnswer(){
-        answers.remove(getRemoveAnswer());
+        questionary.getAnswers().remove(getRemoveAnswer());
         return null;
     }
 
@@ -154,28 +129,11 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
         return orgItemList;
     }
 
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-
-    public List<AnswerItem> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(List<AnswerItem> answers) {
-        this.answers = answers;
-    }
-
-    public AnswerItem getRemoveAnswer() {
+    public Answer getRemoveAnswer() {
         return removeAnswer;
     }
 
-    public void setRemoveAnswer(AnswerItem removeAnswer) {
+    public void setRemoveAnswer(Answer removeAnswer) {
         this.removeAnswer = removeAnswer;
     }
 
@@ -183,35 +141,4 @@ public class QuestionaryEditPage extends BasicWorkspacePage implements OrgListSe
         return questionaryEnumTypeMenu;
     }
 
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getQuestionName() {
-        return questionName;
-    }
-
-    public void setQuestionName(String questionName) {
-        this.questionName = questionName;
-    }
-
-    public Date getViewDate() {
-        return viewDate;
-    }
-
-    public void setViewDate(Date viewDate) {
-        this.viewDate = viewDate;
-    }
 }
