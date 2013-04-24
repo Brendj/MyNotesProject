@@ -7,15 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientsCategoryDiscount" table="CF_Clients_CategoryDiscounts">
-        <id name="idOfClientsCategoryDiscount" column="IdOfClientsCategoryDiscount" type="long">
-             <!--
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfCategoryDiscount</param>
-                <param name="max_lo">10</param>
-            </generator>
-              -->
-        </id>
+        <id name="idOfClientsCategoryDiscount" column="idOfCliensCategoryDiscount" type="long"/>
         <property name="idOfClient" column="idOfClient" type="java.lang.Long" not-null="true"/>
         <property name="idOfCategoryDiscount" column="idofcategorydiscount" type="java.lang.Long" not-null="true" />
     </class>
