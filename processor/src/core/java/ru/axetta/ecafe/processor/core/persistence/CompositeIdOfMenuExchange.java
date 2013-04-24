@@ -19,7 +19,7 @@ public class CompositeIdOfMenuExchange implements Serializable {
     private Date menuDate;
     private Long idOfOrg;
 
-    CompositeIdOfMenuExchange() {
+    protected CompositeIdOfMenuExchange() {
         // For Hibernate only
     }
 

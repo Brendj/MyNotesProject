@@ -20,7 +20,7 @@ public class CompositeIdOfDiaryTimesheet implements Serializable {
     private Long idOfClientGroup;
     private Date recDate;
 
-    CompositeIdOfDiaryTimesheet() {
+    protected CompositeIdOfDiaryTimesheet() {
         // For Hibernate only
     }
 

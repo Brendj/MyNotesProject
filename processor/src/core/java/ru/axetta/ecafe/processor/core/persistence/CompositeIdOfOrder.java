@@ -18,7 +18,7 @@ public class CompositeIdOfOrder implements Serializable {
     private Long idOfOrg;
     private Long idOfOrder;
 
-    CompositeIdOfOrder() {
+    protected CompositeIdOfOrder() {
         // For Hibernate only
     }
 

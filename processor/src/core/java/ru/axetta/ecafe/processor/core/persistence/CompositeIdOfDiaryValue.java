@@ -22,7 +22,7 @@ public class CompositeIdOfDiaryValue implements Serializable {
     private Date recDate;
     private int vType;
 
-    CompositeIdOfDiaryValue() {
+    protected CompositeIdOfDiaryValue() {
         // For Hibernate only
     }
 

@@ -18,7 +18,7 @@ public class CompositeIdOfSubscriptionFee implements Serializable {
     private Integer subscriptionYear;
     private Integer periodNo;
 
-    CompositeIdOfSubscriptionFee() {
+    protected CompositeIdOfSubscriptionFee() {
         // For Hibernate only
     }
 

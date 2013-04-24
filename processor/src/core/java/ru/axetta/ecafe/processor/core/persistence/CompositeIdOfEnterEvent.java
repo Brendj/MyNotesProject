@@ -17,7 +17,7 @@ public class CompositeIdOfEnterEvent implements Serializable {
     private long idOfEnterEvent;
     private long idOfOrg;
 
-    CompositeIdOfEnterEvent() {
+    protected CompositeIdOfEnterEvent() {
         // For Hibernate only
     }
 
