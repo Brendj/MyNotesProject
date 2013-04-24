@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class QuestionaryItem {
     @XmlAttribute(name = "description", required = false)
     protected String description;
     @XmlAttribute(name = "viewDate", required = false)
-    protected Date viewDate;
+    protected Calendar viewDate;
     @XmlElement(name="Answer")
     protected List<AnswerItem> answers;
 
@@ -49,15 +50,17 @@ public class QuestionaryItem {
         this.description = questionary.getDescription();
         this.status =  questionary.getStatus().getValue();
         this.type = questionary.getQuestionaryType().getValue();
-        this.viewDate = questionary.getViewDate();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(questionary.getViewDate());
+        this.viewDate = calendar;
         answers = new ArrayList<AnswerItem>();
     }
 
-    public Date getViewDate() {
+    public Calendar getViewDate() {
         return viewDate;
     }
 
-    public void setViewDate(Date viewDate) {
+    public void setViewDate(Calendar viewDate) {
         this.viewDate = viewDate;
     }
 

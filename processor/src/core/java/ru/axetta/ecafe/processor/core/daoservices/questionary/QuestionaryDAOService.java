@@ -4,10 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.questionary;
 
+import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -54,24 +61,27 @@ public class QuestionaryDAOService {
     public List<Answer> getAnswers(Questionary questionary){
         TypedQuery<Answer> q = entityManager.createQuery("from Answer where questionary=:questionary", Answer.class);
         q.setParameter("questionary",questionary);
-        List<Answer> answers = q.getResultList();
-        return answers;
+        return q.getResultList();
     }
 
     public List<Questionary> getQuestionaries(){
-        TypedQuery<Questionary> query = entityManager.createQuery("from Questionary where status!=:status", Questionary.class);
+        TypedQuery<Questionary> query = entityManager.createQuery("select q from Questionary q where q.status!=:status", Questionary.class);
         query.setParameter("status", QuestionaryStatus.DELETED);
-        List<Questionary> questionaries = query.getResultList();
-        return questionaries;
+        return query.getResultList();
     }
 
-    public List<Org> getOrgs(Questionary questionary){
-        Questionary questionary1 = entityManager.find(Questionary.class, questionary.getIdOfQuestionary());
-        List<Org> orgs = new ArrayList<Org>();
-        for (Org org: questionary1.getOrgs()){
-            orgs.add(org);
-        }
-        return orgs;
+    @SuppressWarnings("unchecked")
+    public List<OrgItem> getOrgs(Questionary questionary){
+        Session session = (Session) entityManager.getDelegate();
+        Criteria criteria = session.createCriteria(Questionary.class);
+        criteria.createAlias("orgs","org");
+        criteria.add(Restrictions.eq("idOfQuestionary",questionary.getIdOfQuestionary()));
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("org.idOfOrg"),"idOfOrg")
+                .add(Projections.property("org.shortName"),"shortName")
+        );
+        criteria.setResultTransformer(Transformers.aliasToBean(OrgItem.class));
+        return (List<OrgItem>) criteria.list();
     }
 
     public Questionary updateQuestionary(Long id,String question, String name, String description,
@@ -83,7 +93,8 @@ public class QuestionaryDAOService {
         currentQuestionary.getOrgs().clear();
         Set<Org> orgs = getOrgs(idOfOrgList);
         currentQuestionary.setOrgs(orgs);
-        currentQuestionary.setQuestionaryType(QuestionaryType.fromInteger(type));
+        //currentQuestionary.setQuestionaryType(QuestionaryType.fromInteger(type));
+        currentQuestionary.setType(type);
         currentQuestionary.setViewDate(viewDate);
         entityManager.persist(currentQuestionary);
         Query q = entityManager.createQuery("delete from Answer where questionary=:questionary");
@@ -143,5 +154,15 @@ public class QuestionaryDAOService {
         return result;
     }
 
+    public Questionary getQuestionary(Questionary questionary) {
+        TypedQuery<Questionary> query = entityManager.createQuery("select distinct question from Questionary question left join question.answers answer where question.idOfQuestionary=:idOfQuestionary", Questionary.class);
+        query.setParameter("idOfQuestionary",questionary.getIdOfQuestionary());
+        return query.getSingleResult();
+
+    }
+
+    public Questionary saveOrUpdate(Questionary questionary){
+        return entityManager.merge(questionary);
+    }
 
 }
