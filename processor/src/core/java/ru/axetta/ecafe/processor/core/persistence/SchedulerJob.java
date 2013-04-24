@@ -19,7 +19,7 @@ public class SchedulerJob {
     private String cronExpression;
     private boolean enabled;
 
-    SchedulerJob() {
+    protected SchedulerJob() {
         // For Hibernate only
     }
 

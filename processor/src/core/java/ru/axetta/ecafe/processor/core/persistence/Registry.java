@@ -20,7 +20,7 @@ public class Registry {
     private Long clientRegistryVersion;
     private String smsId;
 
-    Registry() {
+    protected Registry() {
         // For Hibernate only
     }
 

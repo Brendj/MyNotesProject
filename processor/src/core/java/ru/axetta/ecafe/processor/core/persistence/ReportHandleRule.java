@@ -55,7 +55,7 @@ public class ReportHandleRule {
     private Set<RuleCondition> ruleConditions = new HashSet<RuleCondition>();
     private String tag;
 
-    ReportHandleRule() {
+    protected ReportHandleRule() {
         // For Hibernate only
     }
 

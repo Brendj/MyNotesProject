@@ -40,7 +40,7 @@ public class SyncHistory {
         this.clientVersion = clientVersion;
     }
 
-    SyncHistory() {
+    protected SyncHistory() {
         // For Hibernate only
     }
 

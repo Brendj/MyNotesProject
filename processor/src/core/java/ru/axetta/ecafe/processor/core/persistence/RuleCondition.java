@@ -54,7 +54,7 @@ public class RuleCondition {
         }
     }
 
-    RuleCondition() {
+    protected RuleCondition() {
         // For Hibernate only
     }
 

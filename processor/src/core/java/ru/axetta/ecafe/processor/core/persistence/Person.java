@@ -27,7 +27,7 @@ public class Person {
     private Set<Client> clients = new HashSet<Client>();
     private Set<Client> contractClients = new HashSet<Client>();
 
-    Person() {
+    protected Person() {
         // For Hibernate only
     }
 

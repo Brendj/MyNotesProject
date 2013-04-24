@@ -20,7 +20,7 @@ public class SubscriptionFee {
     private Long subscriptionSum;
     private Date createTime;
 
-    SubscriptionFee() {
+    protected SubscriptionFee() {
         // For Hibernate only
     }
 
