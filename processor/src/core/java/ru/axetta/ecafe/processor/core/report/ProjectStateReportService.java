@@ -18,6 +18,7 @@ import com.google.visualization.datasource.query.Query;
 import com.google.visualization.datasource.render.JsonRenderer;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
@@ -1277,33 +1278,63 @@ public class ProjectStateReportService {
 
     public void parseOrgsPayments(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
-                "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
-                        "from cf_orders, cf_orgs " +
-                        "where cf_orders.socdiscount=0 and cf_orgs.idoforg=cf_orders.idoforg and " +
-                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
-                        " and cf_orgs.state<>0 "+
-                        "group by cf_orgs.idoforg " +
-                        "order by cf_orgs.idoforg", false);
+                "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) "
+                + "from cf_orgs "
+                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
+                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
+                + "where cf_orders.socdiscount=0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                + "      cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                + "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                + "group by cf_orgs.idoforg "
+                + "order by cf_orgs.idoforg"
+                /*"select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
+                "from cf_orders, cf_orgs " +
+                "where cf_orders.socdiscount=0 and cf_orgs.idoforg=cf_orders.idoforg and " +
+                "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
+                "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                " and cf_orgs.state<>0 "+
+                "group by cf_orgs.idoforg " +
+                "order by cf_orgs.idoforg"*/, false);
     }
 
 
     public void parseOrgsDiscounts(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
-                "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
+                "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) "
+                + "from cf_orgs "
+                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
+                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
+                + "where cf_orders.socdiscount<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                + "      cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                + "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                + "group by cf_orgs.idoforg "
+                + "order by cf_orgs.idoforg"
+                /*"select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                         "from cf_orders, cf_orgs " +
                         "where cf_orders.socdiscount<>0 and cf_orgs.idoforg=cf_orders.idoforg and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
                         " and cf_orgs.state<>0 "+
                         "group by cf_orgs.idoforg " +
-                        "order by cf_orgs.idoforg", true);
+                        "order by cf_orgs.idoforg"*/, true);
     }
 
 
     public void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
-                "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
+                "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) "
+                + "from cf_orgs "
+                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                + "left join cf_enterevents on cf_enterevents.idoforg=idoffriendlyorg or cf_enterevents.idoforg=currentorg "
+                + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient "
+                + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                + "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                + "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                + "group by cf_orgs.idoforg "
+                + "order by cf_orgs.idoforg"
+                /*"select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
                         "from cf_enterevents, cf_orgs " +
                         "where cf_orgs.idoforg=cf_enterevents.idoforg and " +
                         "cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
@@ -1311,7 +1342,7 @@ public class ProjectStateReportService {
                         "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
                         " and cf_orgs.state<>0 "+
                         "group by cf_orgs.idoforg " +
-                        "order by cf_orgs.idoforg", false);
+                        "order by cf_orgs.idoforg"*/, false);
     }
 
     public void parseOrgsRequest(Object dataSource, Object sessionObj, Object paramsObj, String sql,
@@ -1419,7 +1450,14 @@ public class ProjectStateReportService {
     public Map<Object[], Long> getClientsCount(Session session) {
         Map<Object[], Long> clientsCount = new HashMap<Object[], Long>();
         org.hibernate.Query q = session.createSQLQuery(
-                "select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
+                "select cf_orgs.idoforg, officialname, count(distinct cf_clients.idofclient) as cnt "
+                + "from cf_orgs "
+                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                + "left join cf_clients on cf_clients.idoforg=idoffriendlyorg or cf_clients.idoforg=currentorg "
+                + "where cf_orgs.state<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
+                + "group by cf_orgs.idoforg, officialname "
+                + "order by cf_orgs.idoforg"
+                /*"select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
                         + "from (select dat.idoforg, dat.officialname, sum(dat.cnt) as cnt "
                         + "      from (select cf_orgs.idoforg, cf_orgs.officialname, friends.cnt "
                         + "            from cf_orgs "
@@ -1440,7 +1478,7 @@ public class ProjectStateReportService {
                         + "      from cf_clients, cf_orgs "
                         + "      where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' and cf_orgs.state<>0 "
                         + "      group by cf_orgs.idoforg, cf_orgs.officialname) as dat " + " where dat.cnt<>0 "
-                        + "group by dat.idoforg, dat.officialname " + "order by 1");
+                        + "group by dat.idoforg, dat.officialname " + "order by 1"*/);
         List resultList = q.list();
         for (Object entry : resultList) {
             Object e[] = (Object[]) entry;
