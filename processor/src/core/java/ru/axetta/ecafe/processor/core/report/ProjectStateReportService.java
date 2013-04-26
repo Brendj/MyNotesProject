@@ -236,9 +236,7 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                        +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between %DATE_CLAUSE% AND "
                         +
                         "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
