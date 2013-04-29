@@ -154,16 +154,16 @@ public class ImportRegisterClientsService {
                     fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                 }
                 updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.CLIENT_GUID,
-                                               pupil.getGuid(), cl.getClientGUID(), updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+                                               pupil.getGuid(), cl == null ? null : cl.getClientGUID(), updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
                 updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SURNAME,
-                                               pupil.getFamilyName(), cl.getPerson().getSurname(), updateClient);
+                                               pupil.getFamilyName(), cl == null ? null : cl.getPerson().getSurname(), updateClient);
                 updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.NAME,
-                                               pupil.getFirstName(), cl.getPerson().getFirstName(), updateClient);
+                                               pupil.getFirstName(), cl == null ? null : cl.getPerson().getFirstName(), updateClient);
                 updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SECONDNAME,
-                                               pupil.getSecondName(), cl.getPerson().getSecondName(), updateClient);
+                                               pupil.getSecondName(), cl == null ? null : cl.getPerson().getSecondName(), updateClient);
                 if (pupil.getGroup() != null) {
                     updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.GROUP,
-                                                   pupil.getGroup(), cl.getClientGroup().getGroupName(), updateClient);
+                                                   pupil.getGroup(), cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
                 }
                 //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
                 boolean guidFound = false;
