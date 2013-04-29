@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
+import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import generated.nsiws.*;
 
@@ -347,10 +348,12 @@ public class MskNSIService {
         if (connectTimeout != null) {
             requestContext.put(keyInternalConnectTimeout, connectTimeout);
             requestContext.put(keyConnectTimeout, (int) connectTimeout.longValue());
+            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, (int)connectTimeout.longValue());
         }
         if (requestTimeout != null) {
             requestContext.put(keyInternalRequestTimeout, requestTimeout);
             requestContext.put(keyRequestTimeout, (int) requestTimeout.longValue());
+            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, (int)requestTimeout.longValue());
         }
     }
 }
