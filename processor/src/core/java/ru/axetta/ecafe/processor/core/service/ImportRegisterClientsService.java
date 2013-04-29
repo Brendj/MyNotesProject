@@ -202,7 +202,12 @@ public class ImportRegisterClientsService {
                         }
                     //  Иначе - обновляем клиента в БД
                     } else {
-                        log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя cl");
+                        log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя " +
+                            cl.getClientGUID() + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                                emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
+                                emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                                emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " " + emptyIfNull(pupil.getFirstName()) + " " +
+                                emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()));
                         ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
                                 String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
                     }
