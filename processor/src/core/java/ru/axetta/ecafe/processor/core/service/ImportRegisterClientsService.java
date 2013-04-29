@@ -137,7 +137,10 @@ public class ImportRegisterClientsService {
                     if (clientGroup == null) {
                         clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
-                    log(synchDate + "Требует произвести удаление клиента " + dbClient);
+                    log(synchDate + "Требует произвести удаление клиента " +
+                        emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname()) + " " +
+                        emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(dbClient.getPerson().getSecondName()) + ", " +
+                        emptyIfNull(dbClient.getClientGroup().getGroupName()));
                     dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     session.save(dbClient);
                 }
@@ -175,7 +178,9 @@ public class ImportRegisterClientsService {
                 }
                 if (cl != null && !guidFound) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
-                    log(synchDate + "Клиент " + cl + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
+                    log(synchDate + "Клиент " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
+                            emptyIfNull(cl.getClientGroup().getGroupName()) + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
                     cl.setOrg(newOrg);
                     updateClient = true;
                 }
@@ -203,7 +208,7 @@ public class ImportRegisterClientsService {
                     //  Иначе - обновляем клиента в БД
                     } else {
                         log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя " +
-                            cl.getClientGUID() + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                                emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                                 emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
                                 emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
                                 emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " " + emptyIfNull(pupil.getFirstName()) + " " +
