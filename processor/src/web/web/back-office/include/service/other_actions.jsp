@@ -12,10 +12,10 @@
 
 <%--Тест лога --%>
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid">
-    <a4j:commandButton value="Запустить генерацию ключевых показетелей" action="#{otherActionsPage.runProjectStateGenerator}"
+    <a4j:commandButton value="Запустить генерацию ключевых показателей" action="#{otherActionsPage.runProjectStateGenerator}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
-    <a4j:commandButton value="Запустить синхронизацию с Реестами" action="#{otherActionsPage.runImportRegisterClients}"
+    <a4j:commandButton value="Запустить синхронизацию с Реестрами" action="#{otherActionsPage.runImportRegisterClients}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

@@ -98,7 +98,7 @@ public class ImportRegisterClientsService {
                 }
                 RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
             } catch (Exception e) {
-                logger.error("Failed to add clients for " + org.getIdOfOrg() + " org", e);
+                logger.error("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
             }
         }
         setLastUpdateDate(new Date(System.currentTimeMillis()));
@@ -107,14 +107,21 @@ public class ImportRegisterClientsService {
 
     @Transactional
     public void loadClients(java.util.Date lastUpd, Org org) throws Exception {
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        log(synchDate + "Производится синхронизация для " + org.getOfficialName());
+
         Session session = (Session) em.getDelegate();
         org = em.merge(org);
-        List<MskNSIService.ExpandedPupilInfo> pupils = nsiService.getChangedClients(lastUpd, org);
-        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        List<MskNSIService.ExpandedPupilInfo> pupils = null;
+        try {
+            pupils = nsiService.getChangedClients(lastUpd, org);
+        } catch (Exception e) {
+            logger.error("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
+            return;
+        }
 
         try {
-            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-            log(synchDate + "Производится синхронизация для " + org.getOfficialName());
 
             //  Проходим по всем существующим клиентам ОУ
             List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly (em, org);
@@ -222,6 +229,7 @@ public class ImportRegisterClientsService {
             }
         } finally {
         }
+        log(synchDate + "Синхронизация завершена для " + org.getOfficialName());
     }
 
     public boolean doClientUpdate (FieldProcessor.Config fieldConfig, Object fieldID,

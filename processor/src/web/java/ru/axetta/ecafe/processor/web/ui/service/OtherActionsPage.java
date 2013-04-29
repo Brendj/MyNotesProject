@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.BIDataExportService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
-import ru.axetta.ecafe.processor.web.SignHandlerService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
