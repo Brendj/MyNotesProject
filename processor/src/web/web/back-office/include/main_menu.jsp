@@ -788,6 +788,9 @@
     <rich:panelMenuItem id="clientPaymentsReportMenuItem"
                         binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}" label="Отчет по начислениям"
                         action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="goodRequestReportMenuItem"
+                        binding="#{mainPage.goodRequestReportPage.mainMenuComponent}" label="Отчет по заявкам организаций"
+                        action="#{mainPage.showGoodRequestReportPage}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
 
