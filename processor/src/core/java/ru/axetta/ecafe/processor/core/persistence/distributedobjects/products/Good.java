@@ -27,6 +27,43 @@ import java.util.Set;
  */
 public class Good extends DistributedObject {
 
+    private String pathPart1;
+    private String pathPart2;
+    private String pathPart3;
+    private String pathPart4;
+
+    public String getPathPart4() {
+        return pathPart4;
+    }
+
+    public void setPathPart4(String pathPart4) {
+        this.pathPart4 = pathPart4;
+    }
+
+    public String getPathPart3() {
+        return pathPart3;
+    }
+
+    public void setPathPart3(String pathPart3) {
+        this.pathPart3 = pathPart3;
+    }
+
+    public String getPathPart2() {
+        return pathPart2;
+    }
+
+    public void setPathPart2(String pathPart2) {
+        this.pathPart2 = pathPart2;
+    }
+
+    public String getPathPart1() {
+        return pathPart1;
+    }
+
+    public void setPathPart1(String pathPart1) {
+        this.pathPart1 = pathPart1;
+    }
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
@@ -68,7 +105,19 @@ public class Good extends DistributedObject {
         String stringNameOfGood = getStringAttributeValue(node,"Name",512);
         if(stringNameOfGood!=null) setNameOfGood(stringNameOfGood);
         String stringFullName = getStringAttributeValue(node,"FullName",1024);
-        if(stringFullName!=null) setFullName(stringFullName);
+        if(stringFullName!=null) {
+            String[] tmp = stringFullName.split("/");
+            if(tmp.length>0){
+                StringBuilder sb = new StringBuilder();
+                for (String s: tmp){
+                     sb.append(s.trim()).append("/");
+                }
+                String s = sb.toString();
+                setFullName(s.substring(0,s.length()-1));
+            } else {
+                setFullName(stringFullName);
+            }
+        }
         String stringGoodsCode = getStringAttributeValue(node,"GoodsCode",32);
         if(stringGoodsCode!=null) setGoodsCode(stringGoodsCode);
         Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
@@ -91,7 +140,20 @@ public class Good extends DistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((Good) distributedObject).getOrgOwner());
         setNameOfGood(((Good) distributedObject).getNameOfGood());
-        setFullName(((Good) distributedObject).getFullName());
+        String stringFullName = ((Good) distributedObject).getFullName();
+        if(stringFullName!=null) {
+            String[] tmp = stringFullName.split("/");
+            if(tmp.length>0){
+                StringBuilder sb = new StringBuilder();
+                for (String s: tmp){
+                    sb.append(s.trim()).append("/");
+                }
+                String s = sb.toString();
+                setFullName(s.substring(0,s.length()-1));
+            } else {
+                setFullName(stringFullName);
+            }
+        }
         setGoodsCode(((Good) distributedObject).getGoodsCode());
         setUnitsScale(((Good) distributedObject).getUnitsScale());
         setNetWeight(((Good) distributedObject).getNetWeight());

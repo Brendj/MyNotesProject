@@ -39,6 +39,11 @@
         <property name="lifeTime" column="LifeTime" type="long"/>
         <property name="margin" column="Margin" type="long"/>
 
+        <property name="pathPart1" formula="split_part(FullName, '/', 1)" type="java.lang.String"/>
+        <property name="pathPart2" formula="split_part(FullName, '/', 2)" type="java.lang.String"/>
+        <property name="pathPart3" formula="split_part(FullName, '/', 3)" type="java.lang.String"/>
+        <property name="pathPart4" formula="split_part(FullName, '/', 4)" type="java.lang.String"/>
+
         <many-to-one name="goodGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
             <column name="IdOfGoodsGroup" not-null="false" />
         </many-to-one>
